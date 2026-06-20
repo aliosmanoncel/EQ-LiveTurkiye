@@ -110,6 +110,20 @@
       </div>
     </div>
 
+    <!-- Heat Map gradient -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgHeat','lgHeatT')">
+        Heat Map <span class="tog" id="lgHeatT">▼</span>
+      </div>
+      <div class="legend-section-body" id="lgHeat">
+        <div style="height:8px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#22c55e,#eab308,#f97316,#ef4444,#7f1d1d)"></div>
+        <div style="display:flex;justify-content:space-between;color:#555;font-size:.68rem"><span>Low</span><span>High</span></div>
+        <div style="color:#555;font-size:.68rem;margin-top:4px">
+          R=10 Micro · R=20 Moderate · R=100 Macro
+        </div>
+      </div>
+    </div>
+
     <!-- Active Faults bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgFay','lgFayT')">
@@ -172,6 +186,16 @@
   <div style="display:flex;gap:4px">
     <button class="tbtn active" id="btnHeat"  onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- Heat Map metodoloji seçimi -->
+  <div class="ctrl"><label style="color:#555;font-size:.72rem">R (km)</label></div>
+  <div style="display:flex;gap:4px">
+    <button class="tbtn" id="rBtn10"  onclick="setHeatRadius(10)"  title="Micro — Ben-Zion">10</button>
+    <button class="tbtn active" id="rBtn20"  onclick="setHeatRadius(20)"  title="Moderate — Öncel &amp; Wyss">20</button>
+    <button class="tbtn" id="rBtn100" onclick="setHeatRadius(100)" title="Macro — Missenard">100</button>
   </div>
 
   <!-- EMSC Canlı Akış -->
@@ -630,6 +654,22 @@ function toggleLayer(type) {
       if (showCircle) markLayer.addTo(map); else map.removeLayer(markLayer);
     }
   }
+}
+
+// R değerine göre leaflet heat radius ölçeği (piksel cinsinden)
+// R=10km→küçük, R=20km→orta, R=100km→büyük
+const R_TO_PX = { 10: 8, 20: 18, 100: 45 };
+let activeR = 20;
+
+function setHeatRadius(r) {
+  activeR = r;
+  radius  = R_TO_PX[r];
+  document.getElementById('sRadius').value       = radius;
+  document.getElementById('vRadius').textContent = radius;
+  [10,20,100].forEach(v =>
+    document.getElementById('rBtn'+v).classList.toggle('active', v===r)
+  );
+  if (heatLayer) heatLayer.setOptions({ radius, blur });
 }
 
 /* ══════════════════════════════════════════
