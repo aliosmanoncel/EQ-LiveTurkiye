@@ -168,12 +168,10 @@
     </select>
   </div>
 
-  <!-- Daire toggle -->
-  <div class="ctrl">
-    <label style="cursor:pointer;display:flex;align-items:center;gap:5px">
-      <input type="checkbox" id="chkCircles" style="accent-color:#06b6d4;cursor:pointer">
-      Circles
-    </label>
+  <!-- Layer toggles -->
+  <div style="display:flex;gap:4px">
+    <button class="tbtn active" id="btnHeat"  onclick="toggleLayer('heat')">Heat Map</button>
+    <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
   </div>
 
   <!-- EMSC Canlı Akış -->
@@ -349,7 +347,8 @@ function renderHeat(evList) {
   heatLayer = L.heatLayer(pts,{
     radius, blur, maxZoom:12,
     gradient:{ 0:'#00800020', 0.3:'#22c55e', 0.55:'#eab308', 0.75:'#f97316', 0.9:'#ef4444', 1:'#7f1d1d' }
-  }).addTo(map);
+  });
+  if (showHeat) heatLayer.addTo(map);
 
   /* ── Büyüklüğe göre renk + boyut ── */
   function eqColor(m) {
@@ -360,7 +359,6 @@ function renderHeat(evList) {
     return                { c:'#22c55e', f:'#14532d', r: 3 }; // Minor — yeşil
   }
 
-  const showCircles = document.getElementById('chkCircles').checked;
   markLayer = L.layerGroup();
   evList.forEach(e=>{
     const {c, f, r} = eqColor(e.mag);
@@ -376,7 +374,7 @@ function renderHeat(evList) {
       `<br><span style="color:#666">${ago} önce</span>`
     ).addTo(markLayer);
   });
-  if (showCircles) markLayer.addTo(map);
+  if (showCircle) markLayer.addTo(map);
   labelLayer.bringToFront();
 }
 
@@ -615,11 +613,24 @@ document.getElementById('srcSel').addEventListener('change',function(){
   src = this.value; resetTimer(); loadData(src, hours);
 });
 
-document.getElementById('chkCircles').addEventListener('change', function() {
-  if (!markLayer) return;
-  if (this.checked) markLayer.addTo(map);
-  else map.removeLayer(markLayer);
-});
+let showHeat   = true;
+let showCircle = false;
+
+function toggleLayer(type) {
+  if (type === 'heat') {
+    showHeat = !showHeat;
+    document.getElementById('btnHeat').classList.toggle('active', showHeat);
+    if (heatLayer) {
+      if (showHeat) heatLayer.addTo(map); else map.removeLayer(heatLayer);
+    }
+  } else {
+    showCircle = !showCircle;
+    document.getElementById('btnCircle').classList.toggle('active', showCircle);
+    if (markLayer) {
+      if (showCircle) markLayer.addTo(map); else map.removeLayer(markLayer);
+    }
+  }
+}
 
 /* ══════════════════════════════════════════
    COUNTDOWN
