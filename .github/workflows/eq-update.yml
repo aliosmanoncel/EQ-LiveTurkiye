@@ -1,0 +1,35 @@
+name: Turkey Earthquake Data Update
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # Her saat başı (UTC)
+  workflow_dispatch:        # Manuel tetikleme (GitHub UI'dan)
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repo'yu çek
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Deprem verisi çek (son 7 gün)
+        run: python scripts/eq_fetch_turkey.py --hours 168
+
+      - name: Değişiklik varsa commit et
+        run: |
+          git config user.name  "eq-bot"
+          git config user.email "eq-bot@users.noreply.github.com"
+          git add data/turkey_eq.json
+          if git diff --cached --quiet; then
+            echo "Yeni veri yok, commit atlanıyor."
+          else
+            COUNT=$(python -c "import json; d=json.load(open('data/turkey_eq.json')); print(d['count'])")
+            git commit -m "🌍 Otomatik deprem güncellemesi — ${COUNT} olay ($(date -u '+%Y-%m-%d %H:%M') UTC)"
+            git push
+          fi
