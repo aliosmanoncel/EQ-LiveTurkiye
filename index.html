@@ -492,6 +492,9 @@ async function loadData(sourceName, h) {
     if (all.length === 0) throw new Error('Seçili zaman penceresinde veri yok');
 
     events = all;
+    // Zaman penceresine göre R otomatik seç
+    const autoR = h <= 24 ? 10 : h <= 168 ? 20 : 100;
+    if (autoR !== activeR) setHeatRadius(autoR, true);
     const combined = [...events, ...liveEvents];
     renderHeat(combined);
     updateStats(combined);
