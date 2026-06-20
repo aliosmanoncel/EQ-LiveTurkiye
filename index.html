@@ -236,8 +236,9 @@
 ══════════════════════════════════════════ */
 // EMSC izleme alanı (Euro-Mediterranean + Middle East + Central Asia)
 const TURKEY   = { minLat:10, maxLat:75, minLon:-45, maxLon:120 };
-const FAY_URL = 'https://raw.githubusercontent.com/aliosmanoncel/fay-yolu-aricilik-veri-bankasi/main/data/turkiye_diri_fay.geojson';
-const EQ_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/turkey_eq.json'; // GitHub Actions her saat günceller
+const FAY_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/fay-yolu-aricilik-veri-bankasi/main/data/turkiye_diri_fay.geojson';
+const EQ_RECENT  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_recent.json';  // 7 gün M≥1.5
+const EQ_ANNUAL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_annual.json';  // 1 yıl M≥4.5
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
 const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 
@@ -468,7 +469,9 @@ async function loadData(sourceName, h) {
   /* ── 1. GitHub raw (Actions tarafından saatlik güncellenir) ── */
   setStatus('GitHub veri deposu okunuyor…');
   try {
-    const res  = await fetch(EQ_URL + '?_=' + Date.now()); // cache bypass
+    // h<=168 → kısa pencere (eq_recent), h>168 → uzun pencere (eq_annual)
+    const jsonUrl = h <= 168 ? EQ_RECENT : EQ_ANNUAL;
+    const res  = await fetch(jsonUrl + '?_=' + Date.now());
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
 
