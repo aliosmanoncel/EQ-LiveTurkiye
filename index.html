@@ -369,7 +369,8 @@ function parseFeatures(src, raw) {
 /* ══════════════════════════════════════════
    STATE
 ══════════════════════════════════════════ */
-let events      = [];        // mevcut deprem listesi
+let events      = [];        // mevcut deprem listesi (aktif pencere)
+let annualEvents = [];       // son 1 yıl — popup risk istatistikleri için
 let liveEvents  = [];        // WS ile gelen yeni depremler
 let heatLayer   = null;
 let markLayer   = null;
@@ -752,8 +753,9 @@ async function searchLocation() {
       icon: L.divIcon({ className:'', html:'<div style="width:14px;height:14px;border-radius:50%;background:#06b6d4;border:2px solid #fff;box-shadow:0 0 6px #06b6d4"></div>', iconAnchor:[7,7] })
     }).addTo(map);
 
-    // 100 km içindeki depremleri Haversine ile bul
-    const nearby = events.map(e => ({
+    // 100 km içindeki depremleri annual JSON'dan Haversine ile bul (pencereden bağımsız)
+    const pool = annualEvents.length ? annualEvents : events;
+    const nearby = pool.map(e => ({
       ...e, distKm: haversineKm(ll[0], ll[1], e.lat, e.lon)
     })).filter(e => e.distKm <= 100).sort((a,b) => (b.mw??b.mag)-(a.mw??a.mag));
 
@@ -765,7 +767,8 @@ async function searchLocation() {
 
     const statRows = nearby.length ? `
       <table style="width:100%;font-size:0.78rem;border-collapse:collapse;margin-top:6px">
-        <tr><td style="color:#94a3b8">Within 100 km</td><td style="color:#94a3b8;text-align:right">Count</td></tr>
+        <tr><td colspan="2" style="color:#64748b;font-size:0.72rem;padding-bottom:3px">Last 1 year · within 100 km</td></tr>
+        <tr><td style="color:#94a3b8">Magnitude</td><td style="color:#94a3b8;text-align:right">Count</td></tr>
         <tr><td>Mw ≥ 3</td><td style="text-align:right;color:#eab308">${n3}</td></tr>
         <tr><td>Mw ≥ 4</td><td style="text-align:right;color:#f97316">${n4}</td></tr>
         <tr><td>Mw ≥ 5</td><td style="text-align:right;color:#ef4444">${n5}</td></tr>
@@ -834,6 +837,14 @@ function resetTimer() {
 connectWS();
 resetTimer();
 loadData(src, hours);
+
+// Annual JSON'u arka planda yükle (popup risk istatistikleri için)
+fetch(EQ_ANNUAL).then(r=>r.json()).then(json=>{
+  annualEvents = (json.events||[]).map(e=>({
+    lat:e.lat, lon:e.lon, dep:e.dep||0,
+    mag:e.mag||0, mw:e.mw||e.mag||0, place:e.place||''
+  }));
+}).catch(()=>{});
 </script>
 </body>
 </html>
