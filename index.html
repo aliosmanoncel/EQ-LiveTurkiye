@@ -165,6 +165,17 @@
 
   <div class="sep"></div>
 
+  <!-- Konum Arama -->
+  <div style="display:flex;gap:4px">
+    <input id="searchBox" type="text" placeholder="Search location…"
+      style="flex:1;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:3px 7px;font-size:0.78rem;outline:none"
+      onkeydown="if(event.key==='Enter')searchLocation()">
+    <button class="tbtn" onclick="searchLocation()" title="Go">Go</button>
+    <button class="tbtn" onclick="clearSearch()" title="Clear">✕</button>
+  </div>
+
+  <div class="sep"></div>
+
   <!-- Sliders -->
   <div class="ctrl">
     <label>Radius</label>
@@ -713,6 +724,48 @@ const PRESETS = {
 };
 
 let activePreset = null;
+
+// ── Konum arama (Nominatim) ───────────────────────────────────────────
+let searchMarker = null;
+
+async function searchLocation() {
+  const q = document.getElementById('searchBox').value.trim();
+  if (!q) return;
+  setStatus('Searching…');
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`;
+    const res  = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    const data = await res.json();
+    if (!data.length) { setStatus(`Not found: ${q}`, true); return; }
+    const { lat, lon, display_name } = data[0];
+    const ll = [parseFloat(lat), parseFloat(lon)];
+    map.flyTo(ll, 9, { duration: 1.4 });
+    if (searchMarker) searchMarker.remove();
+    searchMarker = L.marker(ll, {
+      icon: L.divIcon({ className:'', html:'<div style="width:14px;height:14px;border-radius:50%;background:#06b6d4;border:2px solid #fff;box-shadow:0 0 6px #06b6d4"></div>', iconAnchor:[7,7] })
+    }).addTo(map);
+    // Çevredeki depremleri bul (100 km içinde)
+    const nearby = events.filter(e => {
+      const dlat = e.lat - ll[0], dlon = e.lon - ll[1];
+      return Math.sqrt(dlat*dlat + dlon*dlon) < 1.0; // ~110 km
+    }).sort((a,b) => (b.mw??b.mag) - (a.mw??a.mag)).slice(0,5);
+    const rows = nearby.length
+      ? nearby.map(e=>`Mw${(e.mw??e.mag).toFixed(1)} — ${e.place||''} (${e.dep.toFixed(0)} km)`).join('<br>')
+      : 'No recent earthquakes nearby';
+    searchMarker.bindPopup(
+      `<b style="color:#06b6d4">${display_name.split(',').slice(0,2).join(',')}</b><br><hr style="border-color:#334;margin:4px 0">${rows}`
+    ).openPopup();
+    setStatus(`📍 ${display_name.split(',')[0]} · ${nearby.length} nearby earthquakes`);
+  } catch(e) {
+    setStatus(`Search error: ${e.message}`, true);
+  }
+}
+
+function clearSearch() {
+  if (searchMarker) { searchMarker.remove(); searchMarker = null; }
+  document.getElementById('searchBox').value = '';
+  setStatus('');
+}
 
 function zoomPreset(name) {
   const p = PRESETS[name];
