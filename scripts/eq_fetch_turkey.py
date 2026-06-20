@@ -24,7 +24,7 @@ CFG = {
     'maxlat'    : 75.0,
     'minlon'    : -45.0,
     'maxlon'    : 120.0,
-    'minmag'    : 2.0,   # geniş bölgede M2+ yeterli
+    'minmag'    : 4.5,   # 1 yillik pencere icin M>=4.5
     'limit'     : 2000,
     'hours'     : 168,   # varsayılan: 7 gün
     'output'    : 'data/turkey_eq.json',

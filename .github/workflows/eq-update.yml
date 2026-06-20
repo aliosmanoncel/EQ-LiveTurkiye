@@ -18,8 +18,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Deprem verisi çek (son 7 gün)
-        run: python scripts/eq_fetch_turkey.py --hours 168
+      - name: Deprem verisi çek (son 1 yil, M>=4.5)
+        run: python scripts/eq_fetch_turkey.py --hours 8760
 
       - name: Değişiklik varsa commit et
         run: |
