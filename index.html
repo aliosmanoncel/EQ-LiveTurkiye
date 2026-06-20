@@ -136,6 +136,14 @@
     </select>
   </div>
 
+  <!-- Daire toggle -->
+  <div class="ctrl">
+    <label style="cursor:pointer;display:flex;align-items:center;gap:5px">
+      <input type="checkbox" id="chkCircles" style="accent-color:#06b6d4;cursor:pointer">
+      Circles
+    </label>
+  </div>
+
   <!-- EMSC Canlı Akış -->
   <div class="live-badge off" id="liveBadge">
     <span class="dot"></span>
@@ -320,6 +328,7 @@ function renderHeat(evList) {
     return                { c:'#22c55e', f:'#14532d', r: 3 }; // Minor — yeşil
   }
 
+  const showCircles = document.getElementById('chkCircles').checked;
   markLayer = L.layerGroup();
   evList.forEach(e=>{
     const {c, f, r} = eqColor(e.mag);
@@ -335,7 +344,7 @@ function renderHeat(evList) {
       `<br><span style="color:#666">${ago} önce</span>`
     ).addTo(markLayer);
   });
-  markLayer.addTo(map);
+  if (showCircles) markLayer.addTo(map);
   labelLayer.bringToFront();
 }
 
@@ -556,6 +565,12 @@ document.querySelectorAll('.tbtn').forEach(b=>b.addEventListener('click',functio
 
 document.getElementById('srcSel').addEventListener('change',function(){
   src = this.value; resetTimer(); loadData(src, hours);
+});
+
+document.getElementById('chkCircles').addEventListener('change', function() {
+  if (!markLayer) return;
+  if (this.checked) markLayer.addTo(map);
+  else map.removeLayer(markLayer);
 });
 
 /* ══════════════════════════════════════════
