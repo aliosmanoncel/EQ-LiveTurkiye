@@ -20,10 +20,10 @@ if sys.stdout.encoding != 'utf-8':
 # ── Ayarlar ──────────────────────────────────────────────────────────
 CFG = {
     'emsc_url'  : 'https://www.seismicportal.eu/fdsnws/event/1/query',
-    'minlat'    : 24.0,   # EMSC tam kapsama alanı
-    'maxlat'    : 72.0,
-    'minlon'    : -32.0,
-    'maxlon'    : 100.0,
+    'minlat'    : 10.0,   # EMSC izleme alanı
+    'maxlat'    : 75.0,
+    'minlon'    : -45.0,
+    'maxlon'    : 120.0,
     'minmag'    : 2.0,   # geniş bölgede M2+ yeterli
     'limit'     : 2000,
     'hours'     : 168,   # varsayılan: 7 gün
