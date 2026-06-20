@@ -77,18 +77,39 @@ def parse_line(line):
     if len(c) < 11:
         return None
     try:
+        mag   = float(c[10])
+        mtype = c[9]
         return {
             'id'   : c[0],
             'time' : c[1],
             'lat'  : float(c[2]),
             'lon'  : float(c[3]),
             'dep'  : float(c[4]) if c[4] else 0.0,
-            'mag'  : float(c[10]),
-            'mtype': c[9],
+            'mag'  : mag,
+            'mtype': mtype,
+            'mw'   : to_mw(mag, mtype),
             'place': c[12] if len(c) > 12 else '',
         }
     except (ValueError, IndexError):
         return None
+
+# ── Scordilis (2006) büyüklük homojenleştirme → Mw ──────────────────
+def to_mw(mag, mag_type):
+    mt = (mag_type or '').lower().strip()
+    if mt in ('mw', 'mww', 'mwb', 'mwc', 'mwr', 'mwp', ''):
+        return round(mag, 2)
+    if mt == 'mb':
+        if 3.5 <= mag <= 6.2:
+            return round(0.85 * mag + 1.03, 2)
+    if mt in ('ml', 'md', 'mc'):
+        if 1.0 <= mag <= 6.5:
+            return round(0.0376 * mag**2 + 0.646 * mag - 0.269, 2)
+    if mt in ('ms', 'ms_20'):
+        if 3.0 <= mag <= 6.1:
+            return round(0.646 * mag + 2.079, 2)
+        elif mag > 6.1:
+            return round(0.994 * mag + 0.115, 2)
+    return round(mag, 2)
 
 # ── Ana akış ─────────────────────────────────────────────────────────
 def fetch_emsc_with_mag(hours, minmag):

@@ -378,12 +378,12 @@ function renderHeat(evList) {
   if (markLayer)  { map.removeLayer(markLayer);  markLayer  = null; }
   if (!evList.length) return;
 
-  const allMags = evList.map(e=>e.mag);
+  const allMags = evList.map(e=>e.mw??e.mag);
   const maxMag  = Math.max(...allMags, 3);
 
   const pts = evList.map(e=>[
     e.lat, e.lon,
-    Math.max(0.05, Math.min(1, (e.mag-1)/(maxMag-1||1)))
+    Math.max(0.05, Math.min(1, ((e.mw??e.mag)-1)/(maxMag-1||1)))
   ]);
 
   heatLayer = L.heatLayer(pts,{
@@ -403,17 +403,20 @@ function renderHeat(evList) {
 
   markLayer = L.layerGroup();
   evList.forEach(e=>{
-    const {c, f, r} = eqColor(e.mag);
+    const {c, f, r} = eqColor(e.mw ?? e.mag);
     const ago = agoDuration(Date.now() - e.time.getTime());
+    const mwLabel = (e.mtype && e.mtype.toLowerCase() !== 'mw' && e.mw !== e.mag)
+      ? `Mw ${e.mw.toFixed(1)} <span style="color:#888;font-size:0.8rem">(${e.mtype.toUpperCase()} ${e.mag.toFixed(1)})</span>`
+      : `Mw ${(e.mw ?? e.mag).toFixed(1)}`;
     L.circleMarker([e.lat,e.lon],{
       radius: r,
-      color: c, weight: e.mag>=4 ? 1.5 : 0.5,
-      fillColor: f, fillOpacity: e.mag>=4 ? 0.75 : 0.45
+      color: c, weight: (e.mw??e.mag)>=4 ? 1.5 : 0.5,
+      fillColor: f, fillOpacity: (e.mw??e.mag)>=4 ? 0.75 : 0.45
     }).bindPopup(
-      `<b style="color:${c};font-size:1.1rem">M${e.mag.toFixed(1)}</b>` +
-      `<br><span style="color:#aaa">${e.place||'Türkiye'}</span>` +
-      `<br>Derinlik: ${e.dep.toFixed(0)} km` +
-      `<br><span style="color:#666">${ago} önce</span>`
+      `<b style="color:${c};font-size:1.1rem">${mwLabel}</b>` +
+      `<br><span style="color:#aaa">${e.place||'EMSC Region'}</span>` +
+      `<br>Depth: ${e.dep.toFixed(0)} km` +
+      `<br><span style="color:#666">${ago} ago</span>`
     ).addTo(markLayer);
   });
   if (showCircle) markLayer.addTo(map);
@@ -440,26 +443,26 @@ function updateLastCard() {
 
 function updateStats(evList) {
   document.getElementById('sCnt').textContent = evList.length;
-  document.getElementById('sM3').textContent  = evList.filter(e=>e.mag>=3).length;
-  document.getElementById('sM4').textContent  = evList.filter(e=>e.mag>=4).length;
-  document.getElementById('sM5').textContent  = evList.filter(e=>e.mag>=5).length;
-  const mags = evList.map(e=>e.mag);
+  document.getElementById('sM3').textContent  = evList.filter(e=>(e.mw??e.mag)>=3).length;
+  document.getElementById('sM4').textContent  = evList.filter(e=>(e.mw??e.mag)>=4).length;
+  document.getElementById('sM5').textContent  = evList.filter(e=>(e.mw??e.mag)>=5).length;
+  const mags = evList.map(e=>e.mw??e.mag);
   document.getElementById('sMx').textContent  = mags.length ? 'M'+Math.max(...mags).toFixed(1) : '—';
   document.getElementById('sUpd').textContent = new Date().toLocaleTimeString('tr-TR');
 
   /* ── Son büyük deprem kartı ── */
   // En büyük M'ye göre sırala, kart için en büyüğü al
-  const sorted = [...evList].sort((a,b)=>b.mag-a.mag);
+  const sorted = [...evList].sort((a,b)=>(b.mw??b.mag)-(a.mw??a.mag));
   const biggest = sorted[0];
-  // M4.5+ için sayaç: en son gerçekleşen M4.5+ deprem
-  const big45 = evList.filter(e=>e.mag>=4.5).sort((a,b)=>b.time-a.time)[0] || null;
+  // Mw4.5+ için sayaç
+  const big45 = evList.filter(e=>(e.mw??e.mag)>=4.5).sort((a,b)=>b.time-a.time)[0] || null;
 
   if (biggest) {
     lastBigEq = big45 || biggest;
     const card  = document.getElementById('lastCard');
-    const mag   = biggest.mag;
-    const cls   = mag>=5 ? 'mag-hi' : mag>=4 ? 'mag-md' : 'mag-lo';
-    document.getElementById('lcMag').innerHTML   = `<span class="${cls}">M${mag.toFixed(1)}</span>`;
+    const mw    = biggest.mw ?? biggest.mag;
+    const cls   = mw>=5 ? 'mag-hi' : mw>=4 ? 'mag-md' : 'mag-lo';
+    document.getElementById('lcMag').innerHTML   = `<span class="${cls}">Mw${mw.toFixed(1)}</span>`;
     document.getElementById('lcPlace').textContent = biggest.place || 'Türkiye';
     if (!big45) {
       document.getElementById('lcTimer').textContent = 'son 7 günde M4.5+ yok';
@@ -495,9 +498,11 @@ async function loadData(sourceName, h) {
     const all    = (json.events || []).map(e => ({
       lat  : e.lat,
       lon  : e.lon,
-      dep  : e.dep  || 0,
-      mag  : e.mag  || 0,
-      place: e.place|| '',
+      dep  : e.dep   || 0,
+      mag  : e.mag   || 0,
+      mw   : e.mw    || e.mag || 0,
+      mtype: e.mtype || 'mw',
+      place: e.place || '',
       time : new Date(e.time)
     })).filter(e => e.time >= cutoff && e.mag > 0);
 
