@@ -20,11 +20,11 @@ if sys.stdout.encoding != 'utf-8':
 # ── Ayarlar ──────────────────────────────────────────────────────────
 CFG = {
     'emsc_url'  : 'https://www.seismicportal.eu/fdsnws/event/1/query',
-    'minlat'    : 33.0,
-    'maxlat'    : 45.0,
-    'minlon'    : 23.0,
-    'maxlon'    : 48.0,
-    'minmag'    : 1.0,
+    'minlat'    : 24.0,   # EMSC bölgesi — Avrupa + Akdeniz + Orta Doğu
+    'maxlat'    : 55.0,
+    'minlon'    : -15.0,
+    'maxlon'    : 65.0,
+    'minmag'    : 2.0,   # geniş bölgede M2+ yeterli
     'limit'     : 2000,
     'hours'     : 168,   # varsayılan: 7 gün
     'output'    : 'data/turkey_eq.json',
