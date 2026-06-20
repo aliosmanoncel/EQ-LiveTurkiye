@@ -661,7 +661,7 @@ function toggleLayer(type) {
 const R_TO_PX = { 10: 8, 20: 18, 100: 45 };
 let activeR = 20;
 
-function setHeatRadius(r) {
+function setHeatRadius(r, auto) {
   activeR = r;
   radius  = R_TO_PX[r];
   document.getElementById('sRadius').value       = radius;
@@ -670,7 +670,19 @@ function setHeatRadius(r) {
     document.getElementById('rBtn'+v).classList.toggle('active', v===r)
   );
   if (heatLayer) heatLayer.setOptions({ radius, blur });
+  // Zoom label güncelle
+  const labels = { 10:'Micro (R=10 km)', 20:'Moderate (R=20 km)', 100:'Macro (R=100 km)' };
+  if (auto) setStatus(`Auto zoom → ${labels[r]}`);
 }
+
+// Zoom seviyesine göre otomatik R seçimi
+function autoRadius() {
+  const z = map.getZoom();
+  const r = z >= 8 ? 10 : z >= 6 ? 20 : 100;
+  if (r !== activeR) setHeatRadius(r, true);
+}
+
+map.on('zoomend', autoRadius);
 
 /* ══════════════════════════════════════════
    COUNTDOWN
