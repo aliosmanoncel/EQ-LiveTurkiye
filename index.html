@@ -144,10 +144,11 @@
 <div class="panel">
   <!-- Zaman -->
   <div style="display:flex;gap:4px">
+    <button class="tbtn" data-h="1"    data-mag="1.0">1s</button>
     <button class="tbtn" data-h="24"   data-mag="1.0">24s</button>
     <button class="tbtn active" data-h="168"  data-mag="1.5">1 Hafta</button>
     <button class="tbtn" data-h="720"  data-mag="2.5">1 Ay</button>
-    <button class="tbtn" data-h="8760" data-mag="3.0">1 Yıl</button>
+    <button class="tbtn" data-h="8760" data-mag="4.5">1 Yıl</button>
   </div>
 
   <div class="sep"></div>
@@ -237,8 +238,11 @@
 // EMSC izleme alanı (Euro-Mediterranean + Middle East + Central Asia)
 const TURKEY   = { minLat:10, maxLat:75, minLon:-45, maxLon:120 };
 const FAY_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/fay-yolu-aricilik-veri-bankasi/main/data/turkiye_diri_fay.geojson';
-const EQ_RECENT  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_recent.json';  // 7 gün M≥1.5
-const EQ_ANNUAL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_annual.json';  // 1 yıl M≥4.5
+const EQ_HOUR   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_hour.json';   // 1s    M≥1.0
+const EQ_DAILY  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_daily.json';  // 24s   M≥1.0
+const EQ_WEEK   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_week.json';   // 1 hf  M≥1.5
+const EQ_MONTH  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_month.json';  // 1 ay  M≥2.5
+const EQ_ANNUAL = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_annual.json'; // 1 yıl M≥4.5
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
 const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 
@@ -469,8 +473,7 @@ async function loadData(sourceName, h) {
   /* ── 1. GitHub raw (Actions tarafından saatlik güncellenir) ── */
   setStatus('GitHub veri deposu okunuyor…');
   try {
-    // h<=168 → kısa pencere (eq_recent), h>168 → uzun pencere (eq_annual)
-    const jsonUrl = h <= 168 ? EQ_RECENT : EQ_ANNUAL;
+    const jsonUrl = h <= 1 ? EQ_HOUR : h <= 24 ? EQ_DAILY : h <= 168 ? EQ_WEEK : h <= 720 ? EQ_MONTH : EQ_ANNUAL;
     const res  = await fetch(jsonUrl + '?_=' + Date.now());
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
