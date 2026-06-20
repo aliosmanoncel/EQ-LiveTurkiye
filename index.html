@@ -117,6 +117,11 @@
     <input type="range" id="sBlur" min="1" max="50" value="15">
     <span id="vBlur">15</span>
   </div>
+  <div class="ctrl">
+    <label>Opacity</label>
+    <input type="range" id="sOpacity" min="10" max="100" value="75">
+    <span id="vOpacity">75</span>
+  </div>
 
   <div class="sep"></div>
 
@@ -302,7 +307,7 @@ function renderHeat(evList) {
 
   heatLayer = L.heatLayer(pts,{
     radius, blur, maxZoom:12,
-    gradient:{ 0:'#000080', 0.2:'#0000ff', 0.4:'#00ffff', 0.6:'#00ff00', 0.8:'#ffff00', 0.9:'#ff8800', 1:'#ff0000' }
+    gradient:{ 0:'#00800020', 0.3:'#22c55e', 0.55:'#eab308', 0.75:'#f97316', 0.9:'#ef4444', 1:'#7f1d1d' }
   }).addTo(map);
 
   /* ── Büyüklüğe göre renk + boyut ── */
@@ -517,15 +522,24 @@ function connectWS() {
 /* ══════════════════════════════════════════
    SLIDER
 ══════════════════════════════════════════ */
+let opacity = 0.75;
 function applySliders() {
-  radius = +document.getElementById('sRadius').value;
-  blur   = +document.getElementById('sBlur').value;
-  document.getElementById('vRadius').textContent = radius;
-  document.getElementById('vBlur').textContent   = blur;
-  if (heatLayer) heatLayer.setOptions({ radius, blur });
+  radius  = +document.getElementById('sRadius').value;
+  blur    = +document.getElementById('sBlur').value;
+  opacity = +document.getElementById('sOpacity').value / 100;
+  document.getElementById('vRadius').textContent  = radius;
+  document.getElementById('vBlur').textContent    = blur;
+  document.getElementById('vOpacity').textContent = Math.round(opacity*100);
+  if (heatLayer) {
+    heatLayer.setOptions({ radius, blur });
+    // opacity: heat layer canvas'ına doğrudan eriş
+    const canvas = document.querySelector('.leaflet-heatmap-layer');
+    if (canvas) canvas.style.opacity = opacity;
+  }
 }
 document.getElementById('sRadius').addEventListener('input', applySliders);
 document.getElementById('sBlur').addEventListener('input', applySliders);
+document.getElementById('sOpacity').addEventListener('input', applySliders);
 
 /* ══════════════════════════════════════════
    BUTONLAR
