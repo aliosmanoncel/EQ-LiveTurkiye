@@ -728,6 +728,13 @@ let activePreset = null;
 // ── Konum arama (Nominatim) ───────────────────────────────────────────
 let searchMarker = null;
 
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371, toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
 async function searchLocation() {
   const q = document.getElementById('searchBox').value.trim();
   if (!q) return;
@@ -744,18 +751,37 @@ async function searchLocation() {
     searchMarker = L.marker(ll, {
       icon: L.divIcon({ className:'', html:'<div style="width:14px;height:14px;border-radius:50%;background:#06b6d4;border:2px solid #fff;box-shadow:0 0 6px #06b6d4"></div>', iconAnchor:[7,7] })
     }).addTo(map);
-    // Çevredeki depremleri bul (100 km içinde)
-    const nearby = events.filter(e => {
-      const dlat = e.lat - ll[0], dlon = e.lon - ll[1];
-      return Math.sqrt(dlat*dlat + dlon*dlon) < 1.0; // ~110 km
-    }).sort((a,b) => (b.mw??b.mag) - (a.mw??a.mag)).slice(0,5);
-    const rows = nearby.length
-      ? nearby.map(e=>`Mw${(e.mw??e.mag).toFixed(1)} — ${e.place||''} (${e.dep.toFixed(0)} km)`).join('<br>')
-      : 'No recent earthquakes nearby';
+
+    // 100 km içindeki depremleri Haversine ile bul
+    const nearby = events.map(e => ({
+      ...e, distKm: haversineKm(ll[0], ll[1], e.lat, e.lon)
+    })).filter(e => e.distKm <= 100).sort((a,b) => (b.mw??b.mag)-(a.mw??a.mag));
+
+    const n3  = nearby.filter(e=>(e.mw??e.mag)>=3).length;
+    const n4  = nearby.filter(e=>(e.mw??e.mag)>=4).length;
+    const n5  = nearby.filter(e=>(e.mw??e.mag)>=5).length;
+    const top = nearby[0];
+    const name = display_name.split(',').slice(0,2).join(',');
+
+    const statRows = nearby.length ? `
+      <table style="width:100%;font-size:0.78rem;border-collapse:collapse;margin-top:6px">
+        <tr><td style="color:#94a3b8">Within 100 km</td><td style="color:#94a3b8;text-align:right">Count</td></tr>
+        <tr><td>Mw ≥ 3</td><td style="text-align:right;color:#eab308">${n3}</td></tr>
+        <tr><td>Mw ≥ 4</td><td style="text-align:right;color:#f97316">${n4}</td></tr>
+        <tr><td>Mw ≥ 5</td><td style="text-align:right;color:#ef4444">${n5}</td></tr>
+      </table>
+      <div style="margin-top:6px;padding-top:5px;border-top:1px solid #334;font-size:0.78rem">
+        <b style="color:#f97316">Max: Mw${(top.mw??top.mag).toFixed(1)}</b>
+        · ${top.distKm.toFixed(0)} km · ${top.dep.toFixed(0)} km depth<br>
+        <span style="color:#94a3b8">${top.place||'EMSC Region'}</span>
+      </div>`
+    : '<div style="color:#64748b;font-size:0.78rem;margin-top:6px">No earthquakes within 100 km in current window</div>';
+
     searchMarker.bindPopup(
-      `<b style="color:#06b6d4">${display_name.split(',').slice(0,2).join(',')}</b><br><hr style="border-color:#334;margin:4px 0">${rows}`
+      `<b style="color:#06b6d4;font-size:0.9rem">${name}</b>${statRows}`,
+      { maxWidth: 220 }
     ).openPopup();
-    setStatus(`📍 ${display_name.split(',')[0]} · ${nearby.length} nearby earthquakes`);
+    setStatus(`📍 ${display_name.split(',')[0]} · ${nearby.length} eq within 100 km · Max Mw${top ? (top.mw??top.mag).toFixed(1) : '—'}`);
   } catch(e) {
     setStatus(`Search error: ${e.message}`, true);
   }
