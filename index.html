@@ -155,12 +155,12 @@
 
   <!-- Zoom Presets -->
   <div style="display:flex;gap:4px">
-    <button class="tbtn" onclick="zoomPreset('emsc')"    title="EMSC full region">EMSC</button>
-    <button class="tbtn" onclick="zoomPreset('turkey')"  title="Türkiye">TR</button>
-    <button class="tbtn" onclick="zoomPreset('marmara')" title="Marmara">MAR</button>
-    <button class="tbtn" onclick="zoomPreset('aegean')"  title="Ege Bölgesi">EGE</button>
-    <button class="tbtn" onclick="zoomPreset('daf')"     title="Doğu Anadolu Fayı">DAF</button>
-    <button class="tbtn" onclick="zoomPreset('kaf')"     title="Kuzey Anadolu Fayı">KAF</button>
+    <button class="tbtn preset-btn" data-preset="emsc"    onclick="zoomPreset('emsc')"    title="EMSC full region">EMSC</button>
+    <button class="tbtn preset-btn" data-preset="turkey"  onclick="zoomPreset('turkey')"  title="Türkiye">TR</button>
+    <button class="tbtn preset-btn" data-preset="marmara" onclick="zoomPreset('marmara')" title="Marmara">MAR</button>
+    <button class="tbtn preset-btn" data-preset="aegean"  onclick="zoomPreset('aegean')"  title="Ege Bölgesi">EGE</button>
+    <button class="tbtn preset-btn" data-preset="daf"     onclick="zoomPreset('daf')"     title="Doğu Anadolu Fayı">DAF</button>
+    <button class="tbtn preset-btn" data-preset="kaf"     onclick="zoomPreset('kaf')"     title="Kuzey Anadolu Fayı">KAF</button>
   </div>
 
   <div class="sep"></div>
@@ -698,22 +698,28 @@ function setHeatRadius(r, auto) {
   if (auto) setStatus(`Auto zoom → ${labels[r]}`);
 }
 
-// Zoom seviyesine göre otomatik R seçimi
 const PRESETS = {
-  emsc:    { lat:38,    lon:25,   zoom:4, r:100, label:'EMSC'    },
-  turkey:  { lat:39,    lon:35,   zoom:6, r:20,  label:'Türkiye' },
-  marmara: { lat:40.8,  lon:29,   zoom:8, r:10,  label:'Marmara' },
-  aegean:  { lat:38,    lon:26,   zoom:7, r:10,  label:'Ege'     },
-  daf:     { lat:37.5,  lon:37.5, zoom:7, r:10,  label:'DAF'     },
-  kaf:     { lat:40.0,  lon:32.0, zoom:7, r:10,  label:'KAF'     },
+  emsc:    { lat:38,    lon:25,   zoom:4, r:100, label:'EMSC',    focus:'Euro-Mediterranean (EMSC region)'            },
+  turkey:  { lat:39,    lon:35,   zoom:6, r:20,  label:'Türkiye', focus:'Turkey — National View'                      },
+  marmara: { lat:40.8,  lon:29,   zoom:8, r:10,  label:'Marmara', focus:'Marmara — North Anatolian Fault (1999 M7.6)' },
+  aegean:  { lat:38,    lon:26,   zoom:7, r:10,  label:'Ege',     focus:'Aegean — Extensional Tectonics'              },
+  daf:     { lat:37.5,  lon:37.5, zoom:7, r:10,  label:'DAF',     focus:'East Anatolian Fault — 2023 M7.8 Sequence'   },
+  kaf:     { lat:40.0,  lon:32.0, zoom:7, r:10,  label:'KAF',     focus:'North Anatolian Fault — 1939 Erzincan M7.9'  },
 };
+
+let activePreset = null;
 
 function zoomPreset(name) {
   const p = PRESETS[name];
   if (!p) return;
+  activePreset = name;
   map.flyTo([p.lat, p.lon], p.zoom, { duration: 1.2 });
   setHeatRadius(p.r, true);
-  setStatus(`${p.label} → R=${p.r} km`);
+  // Preset butonlarını güncelle
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.preset-btn[data-preset="${name}"]`);
+  if (btn) btn.classList.add('active');
+  setStatus(`Focus: ${p.focus} · R=${p.r} km`);
 }
 
 function autoRadius() {
