@@ -160,6 +160,7 @@
     <button class="tbtn" onclick="zoomPreset('marmara')" title="Marmara">MAR</button>
     <button class="tbtn" onclick="zoomPreset('aegean')"  title="Ege Bölgesi">EGE</button>
     <button class="tbtn" onclick="zoomPreset('daf')"     title="Doğu Anadolu Fayı">DAF</button>
+    <button class="tbtn" onclick="zoomPreset('kaf')"     title="Kuzey Anadolu Fayı">KAF</button>
   </div>
 
   <div class="sep"></div>
@@ -704,6 +705,7 @@ const PRESETS = {
   marmara: { lat:40.8,  lon:29,   zoom:8, r:10,  label:'Marmara' },
   aegean:  { lat:38,    lon:26,   zoom:7, r:10,  label:'Ege'     },
   daf:     { lat:37.5,  lon:37.5, zoom:7, r:10,  label:'DAF'     },
+  kaf:     { lat:40.0,  lon:32.0, zoom:7, r:10,  label:'KAF'     },
 };
 
 function zoomPreset(name) {
