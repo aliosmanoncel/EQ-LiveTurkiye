@@ -102,11 +102,11 @@
         Magnitude <span class="tog" id="lgMagT">▼</span>
       </div>
       <div class="legend-section-body" id="lgMag">
-        <div><span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:#7f1d1d;border:2px solid #dc2626;vertical-align:middle;margin-right:6px"></span>M 7+ Major</div>
-        <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#991b1b;border:1.5px solid #ef4444;vertical-align:middle;margin-right:6px"></span>M 5.5–7 Strong</div>
-        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7c2d12;border:1.5px solid #f97316;vertical-align:middle;margin-right:6px"></span>M 4–5.5 Moderate</div>
-        <div><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#713f12;border:1px solid #eab308;vertical-align:middle;margin-right:6px"></span>M 2.5–4 Light</div>
-        <div><span style="display:inline-block;width:4px;height:4px;border-radius:50%;background:#14532d;border:1px solid #22c55e;vertical-align:middle;margin-right:6px"></span>M &lt;2.5 Minor</div>
+        <div><span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:#7f1d1d;border:2px solid #dc2626;vertical-align:middle;margin-right:6px"></span>Mw 7+ Major</div>
+        <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#991b1b;border:1.5px solid #ef4444;vertical-align:middle;margin-right:6px"></span>Mw 5.5–7 Strong</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7c2d12;border:1.5px solid #f97316;vertical-align:middle;margin-right:6px"></span>Mw 4–5.5 Moderate</div>
+        <div><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#713f12;border:1px solid #eab308;vertical-align:middle;margin-right:6px"></span>Mw 2.5–4 Light</div>
+        <div><span style="display:inline-block;width:4px;height:4px;border-radius:50%;background:#14532d;border:1px solid #22c55e;vertical-align:middle;margin-right:6px"></span>Mw &lt;2.5 Minor</div>
       </div>
     </div>
 
@@ -241,9 +241,9 @@
 <div class="sbar">
   <span id="statusTxt">Yükleniyor…</span>
   <span>Toplam: <b id="sCnt">—</b></span>
-  <span>M≥3: <b id="sM3">—</b></span>
-  <span>M≥4: <b id="sM4">—</b></span>
-  <span>M≥5: <b id="sM5">—</b></span>
+  <span>Mw≥3: <b id="sM3">—</b></span>
+  <span>Mw≥4: <b id="sM4">—</b></span>
+  <span>Mw≥5: <b id="sM5">—</b></span>
   <span>Maks: <b id="sMx">—</b></span>
   <span>Güncelleme: <b id="sUpd">—</b></span>
   <span style="margin-left:auto">
@@ -459,7 +459,7 @@ function updateStats(evList) {
   document.getElementById('sM4').textContent  = evList.filter(e=>(e.mw??e.mag)>=4).length;
   document.getElementById('sM5').textContent  = evList.filter(e=>(e.mw??e.mag)>=5).length;
   const mags = evList.map(e=>e.mw??e.mag);
-  document.getElementById('sMx').textContent  = mags.length ? 'M'+Math.max(...mags).toFixed(1) : '—';
+  document.getElementById('sMx').textContent  = mags.length ? 'Mw'+Math.max(...mags).toFixed(1) : '—';
   document.getElementById('sUpd').textContent = new Date().toLocaleTimeString('tr-TR');
 
   /* ── Son büyük deprem kartı ── */
@@ -477,7 +477,7 @@ function updateStats(evList) {
     document.getElementById('lcMag').innerHTML   = `<span class="${cls}">Mw${mw.toFixed(1)}</span>`;
     document.getElementById('lcPlace').textContent = biggest.place || 'Türkiye';
     if (!big45) {
-      document.getElementById('lcTimer').textContent = 'son 7 günde M4.5+ yok';
+      document.getElementById('lcTimer').textContent = 'son 7 günde Mw4.5+ yok';
     }
     card.style.display = 'block';
     clearInterval(timerInterval);
