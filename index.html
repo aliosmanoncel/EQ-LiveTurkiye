@@ -766,20 +766,35 @@ function toggleLayer(type) {
   }
 }
 
+function bvalueColor(b) {
+  // b=0.5→kirmizi, b=1.0→sari, b=1.5→yesil (RdYlGn)
+  const t = Math.max(0, Math.min(1, (b - 0.5) / 1.0)); // 0=kirmizi, 1=yesil
+  if (t < 0.5) {
+    // kirmizi → sari
+    const r = 215, g = Math.round(48 + (233-48)*(t/0.5)), bl = 39;
+    return `rgb(${r},${g},${bl})`;
+  } else {
+    // sari → yesil
+    const r = Math.round(233 - (233-26)*((t-0.5)/0.5)), g = Math.round(215 + (152-215)*((t-0.5)/0.5)), bl = Math.round(39 + (80-39)*((t-0.5)/0.5));
+    return `rgb(${r},${g},${bl})`;
+  }
+}
+
 async function loadBvalueLayer() {
   if (bvalueLayer) return;
-  setStatus('b-value grid loading… (N≥50, Aki 1965)');
+  setStatus('b-value grid loading…');
   try {
     const res  = await fetch(BVALUE_URL);
     const json = await res.json();
-    const pts  = json.grid.map(p => [p.lat, p.lon, p.w]);
-    // Gradient: dusuk b (yuksek stres/tehlike) = kirmizi, yuksek b = mavi
-    bvalueLayer = L.heatLayer(pts, {
-      radius : 28,
-      blur   : 22,
-      maxZoom: 10,
-      gradient: { 0:'#1a9850', 0.3:'#91cf60', 0.55:'#fee08b', 0.75:'#fc8d59', 1:'#d73027' }
-    });
+    // CircleMarker: heatLayer w=0 transparan olur, CircleMarker rengi dogru gosterir
+    bvalueLayer = L.layerGroup(
+      json.grid.map(p => L.circleMarker([p.lat, p.lon], {
+        radius     : 14,
+        fillColor  : bvalueColor(p.b),
+        fillOpacity: 0.75,
+        stroke     : false,
+      }).bindTooltip(`b = ${p.b}<br>N = ${p.n}`, {sticky:true}))
+    );
     if (showBvalue) bvalueLayer.addTo(map);
     setStatus(`b-value · Türkiye: b=${json.b_turkey} · grid: ${json.b_min}–${json.b_max} · ${json.count} nokta · Aki(1965)+Utsu(1966) Mc=2.95`);
   } catch(e) {
