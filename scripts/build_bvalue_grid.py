@@ -65,28 +65,16 @@ def main():
     with open(INPUT, encoding='utf-8') as f:
         data = json.load(f)
 
-    # Staircase katalog birlestirme — donem bazli Mc filtresi
-    def staircase_mc(yr):
-        for y1, y2, mc in STAIRCASE:
-            if y1 <= yr < y2:
-                return mc
-        return 9.9  # kapsam disi
-
-    events = []
-    for e in data['events']:
-        yr  = int(e['time'][:4])
-        mw  = e.get('mw') or e.get('mag', 0)
-        if yr < START_YEAR:
-            continue
-        if mw >= staircase_mc(yr):
-            events.append(e)
-    n_isc  = sum(1 for e in events if e.get('src') == 'ISC')
-    n_emsc = sum(1 for e in events if e.get('src') == 'EMSC')
-    print(f'[*] {len(events)} olay yuklendi (staircase katalog, {START_YEAR}-2026)')
-    print(f'    ISC: {n_isc} | EMSC: {n_emsc}')
-    for y1, y2, mc in STAIRCASE:
-        n = sum(1 for e in events if y1 <= int(e['time'][:4]) < y2)
-        print(f'    {y1}-{y2} Mc={mc}: {n} olay')
+    # b-degeri icin EMSC 1998-2026 (homojen Mc=3.0)
+    # Filtre: orijinal mag>=MC (Scordilis ML/MD->Mw donusumu kucuk Mw uretir,
+    #         mw filtresinde 66k olay duser ve mean(Mw) yapay yukselir)
+    # Aki hesabi: mw (Scordilis donusturulmus) kullan, yoksa mag
+    events = [e for e in data['events']
+              if e.get('src') == 'EMSC'
+              and e.get('mag', 0) >= MC]
+    print(f'[*] {len(events)} olay yuklendi (EMSC 1998-2026, mag>={MC}, orijinal filtre)')
+    mw_vals = [(e.get('mw') or e.get('mag', 0)) for e in events]
+    print(f'    mean(Mw)={sum(mw_vals)/len(mw_vals):.3f}  aralik={min(mw_vals):.1f}-{max(mw_vals):.1f}')
 
     # Grid olustur
     lats, lons = [], []
@@ -111,7 +99,7 @@ def main():
                     continue  # hizli on-eleme
                 d = haversine(lat, lon, e['lat'], e['lon'])
                 if d <= R_KM:
-                    nearby_mw.append(e.get('mw') or e.get('mag', 0))
+                    nearby_mw.append(e.get('mag', 0))  # orijinal mag (Scordilis bias yok)
 
             b, n = aki_b(nearby_mw, MC)
             if b is None:
