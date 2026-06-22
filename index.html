@@ -136,6 +136,18 @@
       </div>
     </div>
 
+    <!-- b-value bölümü -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgBval','lgBvalT')">
+        b-value (G-R) <span class="tog" id="lgBvalT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgBval">
+        <div style="height:8px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#2166ac,#74add1,#fee090,#f46d43,#a50026)"></div>
+        <div style="display:flex;justify-content:space-between;color:#555;font-size:.68rem"><span>High b</span><span>Low b (stress)</span></div>
+        <div style="color:#555;font-size:.68rem;margin-top:4px">Aki (1965) MLE · Mc=3.0 · N≥50<br>ISC(1965-1998) + EMSC(1998-2026)</div>
+      </div>
+    </div>
+
     <!-- Active Faults bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgFay','lgFayT')">
@@ -223,6 +235,7 @@
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
+    <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
   </div>
 
   <div class="sep"></div>
@@ -280,6 +293,7 @@ const EQ_WEEK   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiy
 const EQ_MONTH  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_month.json';  // 1 ay  M≥2.5
 const EQ_ANNUAL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_annual.json'; // 1 yıl M≥4.5
 const HAZARD_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/hazard_grid.json';
+const BVALUE_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_grid.json';
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
 const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 
@@ -696,6 +710,8 @@ let showCircle = false;
 
 let hazardLayer = null;
 let showHazard  = false;
+let bvalueLayer = null;
+let showBvalue  = false;
 
 async function loadHazardLayer() {
   if (hazardLayer) return; // zaten yüklü
@@ -739,6 +755,35 @@ function toggleLayer(type) {
     } else {
       if (showHazard) hazardLayer.addTo(map); else map.removeLayer(hazardLayer);
     }
+  } else if (type === 'bvalue') {
+    showBvalue = !showBvalue;
+    document.getElementById('btnBvalue').classList.toggle('active', showBvalue);
+    if (!bvalueLayer) {
+      loadBvalueLayer();
+    } else {
+      if (showBvalue) bvalueLayer.addTo(map); else map.removeLayer(bvalueLayer);
+    }
+  }
+}
+
+async function loadBvalueLayer() {
+  if (bvalueLayer) return;
+  setStatus('b-value grid loading… (N≥50, Aki 1965)');
+  try {
+    const res  = await fetch(BVALUE_URL);
+    const json = await res.json();
+    const pts  = json.grid.map(p => [p.lat, p.lon, p.w]);
+    // Gradient: dusuk b (yuksek stres/tehlike) = kirmizi, yuksek b = mavi
+    bvalueLayer = L.heatLayer(pts, {
+      radius : 28,
+      blur   : 22,
+      maxZoom: 10,
+      gradient: { 0:'#2166ac', 0.3:'#74add1', 0.55:'#fee090', 0.75:'#f46d43', 1:'#a50026' }
+    });
+    if (showBvalue) bvalueLayer.addTo(map);
+    setStatus(`b-value loaded · range: ${json.b_min}–${json.b_max} · ${json.count} grid points · N≥50`);
+  } catch(e) {
+    setStatus('b-value load error: ' + e.message, true);
   }
 }
 
