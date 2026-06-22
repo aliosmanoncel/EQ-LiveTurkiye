@@ -33,11 +33,14 @@ jobs:
       - name: eq_annual (8760s, M>=4.5)
         run: python scripts/eq_fetch_turkey.py --hours 8760 --minmag 4.5 --output data/eq_annual.json
 
+      - name: hazard_grid (Campbell 1981 GMPE, annual veriden)
+        run: python scripts/build_hazard_grid.py --input data/eq_annual.json --output data/hazard_grid.json
+
       - name: Değişiklik varsa commit et
         run: |
           git config user.name  "eq-bot"
           git config user.email "eq-bot@users.noreply.github.com"
-          git add data/eq_hour.json data/eq_daily.json data/eq_week.json data/eq_month.json data/eq_annual.json
+          git add data/eq_hour.json data/eq_daily.json data/eq_week.json data/eq_month.json data/eq_annual.json data/hazard_grid.json
           if git diff --cached --quiet; then
             echo "Yeni veri yok, commit atlanıyor."
           else
