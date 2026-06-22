@@ -142,8 +142,8 @@
         b-value (G-R) <span class="tog" id="lgBvalT">▼</span>
       </div>
       <div class="legend-section-body hidden" id="lgBval">
-        <div style="height:8px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#2166ac,#74add1,#fee090,#f46d43,#a50026)"></div>
-        <div style="display:flex;justify-content:space-between;color:#555;font-size:.68rem"><span>High b</span><span>Low b (stress)</span></div>
+        <div style="height:8px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#d73027,#fc8d59,#fee08b,#91cf60,#1a9850)"></div>
+        <div style="display:flex;justify-content:space-between;color:#555;font-size:.68rem"><span style="color:#d73027">b≈0.5 (stres)</span><span style="color:#1a9850">b≈1.0+ (normal)</span></div>
         <div style="color:#555;font-size:.68rem;margin-top:4px">Aki (1965) + Utsu (1966) · Mc=2.95 · N≥100<br>ISC M≥4.5 (1965–97) + EMSC M≥3.0 (1998–2026)</div>
       </div>
     </div>
@@ -778,7 +778,7 @@ async function loadBvalueLayer() {
       radius : 28,
       blur   : 22,
       maxZoom: 10,
-      gradient: { 0:'#2166ac', 0.3:'#74add1', 0.55:'#fee090', 0.75:'#f46d43', 1:'#a50026' }
+      gradient: { 0:'#1a9850', 0.3:'#91cf60', 0.55:'#fee08b', 0.75:'#fc8d59', 1:'#d73027' }
     });
     if (showBvalue) bvalueLayer.addTo(map);
     setStatus(`b-value loaded · range: ${json.b_min}–${json.b_max} · ${json.count} grid points · N≥50`);
