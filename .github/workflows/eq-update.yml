@@ -33,8 +33,8 @@ jobs:
       - name: eq_annual (8760s, M>=4.5)
         run: python scripts/eq_fetch_turkey.py --hours 8760 --minmag 4.5 --output data/eq_annual.json
 
-      - name: hazard_grid (Campbell 1981 GMPE, annual veriden)
-        run: python scripts/build_hazard_grid.py --input data/eq_annual.json --output data/hazard_grid.json
+      - name: hazard_grid (Campbell 1981 GMPE, monthly veriden M>=2.5)
+        run: python scripts/build_hazard_grid.py --input data/eq_month.json --output data/hazard_grid.json
 
       - name: Değişiklik varsa commit et
         run: |

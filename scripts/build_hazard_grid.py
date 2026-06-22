@@ -55,7 +55,7 @@ C3   = -1.09
 C4   =  0.0606
 C5   =  0.700
 R_MAX = 200.0  # etki yarıçapı (km)
-MW_MIN = 3.0   # küçük depremler ihmal
+MW_MIN = 2.5   # küçük depremler ihmal
 
 def gmpe_pga(mw, r_km, dep_km=10.0):
     """PGA (g cinsinden) döndürür — Campbell (1981)."""
@@ -128,7 +128,8 @@ def main():
     if grid:
         max_pga = max(p['pga'] for p in grid)
         for p in grid:
-            p['w'] = round(p['pga'] / max_pga, 4)
+            # Karekök ölçekleme: düşük değerleri görünür kılar
+            p['w'] = round((p['pga'] / max_pga) ** 0.4, 4)
     else:
         max_pga = 0
 
