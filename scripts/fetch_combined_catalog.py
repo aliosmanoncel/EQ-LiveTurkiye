@@ -17,7 +17,12 @@ if sys.stdout.encoding != 'utf-8':
 ISC_URL  = 'http://www.isc.ac.uk/fdsnws/event/1/query'
 EMSC_URL = 'https://www.seismicportal.eu/fdsnws/event/1/query'
 BOUNDS   = dict(minlat=33.0, maxlat=45.0, minlon=23.0, maxlon=48.0)
-MINMAG   = 4.5
+# Katalog tamamlılık eşikleri (Mc) — dönem bazlı
+MC = [
+    (1900, 1960, 5.5, ISC_URL,  'ISC'),   # Aletsel dönem öncesi
+    (1960, 1998, 4.5, ISC_URL,  'ISC'),   # WWSSN global ağ dönemi
+    (1998, 2026, 3.0, EMSC_URL, 'EMSC'), # Dijital geniş bant dönemi
+]
 LIMIT    = 20000
 OUTPUT   = 'data/eq_historical.json'
 
@@ -57,6 +62,9 @@ def parse_line(line, source):
         return None
 
 def fetch_chunk(base_url, start, end, source, delay=1.5):
+    return fetch_chunk_mc(base_url, start, end, MINMAG, source, delay)
+
+def _fetch_chunk_legacy(base_url, start, end, source, delay=1.5):
     params = (f"?format=text&starttime={start}&endtime={end}"
               f"&minlat={BOUNDS['minlat']}&maxlat={BOUNDS['maxlat']}"
               f"&minlon={BOUNDS['minlon']}&maxlon={BOUNDS['maxlon']}"
@@ -75,18 +83,39 @@ def fetch_chunk(base_url, start, end, source, delay=1.5):
         return []
 
 def fetch_period(base_url, start_year, end_year, source, chunk=5):
-    """Yillara bolunmus dilimler halinde ceker."""
+    return fetch_period_mc(base_url, start_year, end_year, MINMAG, source, chunk)
+
+def fetch_period_mc(base_url, start_year, end_year, minmag, source, chunk=5):
+    """Yillara bolunmus dilimler halinde, verilen Mc ile ceker."""
     all_evs = {}
     cur = start_year
     while cur < end_year:
         nxt = min(cur + chunk, end_year)
         s, e = f'{cur}-01-01', f'{nxt}-01-01'
-        evs  = fetch_chunk(base_url, s, e, source)
+        evs  = fetch_chunk_mc(base_url, s, e, minmag, source)
         for ev in evs:
             all_evs[ev['id']] = ev
         print(f'  {s} → {e}: {len(evs)} olay ({len(all_evs)} toplam)')
         cur = nxt
     return all_evs
+
+def fetch_chunk_mc(base_url, start, end, minmag, source, delay=1.5):
+    params = (f"?format=text&starttime={start}&endtime={end}"
+              f"&minlat={BOUNDS['minlat']}&maxlat={BOUNDS['maxlat']}"
+              f"&minlon={BOUNDS['minlon']}&maxlon={BOUNDS['maxlon']}"
+              f"&minmagnitude={minmag}&limit={LIMIT}&orderby=time-asc")
+    url = base_url + params
+    req = urllib.request.Request(url, headers={'User-Agent':'Mozilla/5.0'})
+    try:
+        resp = urllib.request.urlopen(req, timeout=60).read().decode('utf-8', errors='replace')
+        lines = [l for l in resp.splitlines() if l.strip() and '|' in l and not l.startswith('#')]
+        evs   = [e for e in (parse_line(l, source) for l in lines) if e]
+        time.sleep(delay)
+        return evs
+    except Exception as ex:
+        print(f'    HATA ({source} {start}): {ex}')
+        time.sleep(delay * 2)
+        return []
 
 def dedup(evs_dict, tol_sec=60, tol_km=50):
     """Zaman + konum toleransiyla tekrar eden olaylari kaldir."""
@@ -122,45 +151,50 @@ def dedup(evs_dict, tol_sec=60, tol_km=50):
     return kept
 
 def main():
-    now = datetime.now(timezone.utc)
+    now   = datetime.now(timezone.utc)
     today = now.strftime('%Y-%m-%d')
+    all_evs = {}
 
-    # ── 1. ISC: 1900-1997 ────────────────────────────────────────────
-    print('\n=== ISC: 1900-1997 ===')
-    isc_evs = fetch_period(ISC_URL, 1900, 1998, 'ISC', chunk=10)
-    print(f'ISC toplam: {len(isc_evs)} olay')
+    # ── Dönem bazlı tamamlılık eşiği ile çek ─────────────────────────
+    for start_yr, end_yr, mc, url, src in MC:
+        end_yr = min(end_yr, now.year + 1)
+        chunk  = 10 if src == 'ISC' else 5
+        print(f'\n=== {src}: {start_yr}-{end_yr}  Mc={mc} ===')
+        evs = fetch_period_mc(url, start_yr, end_yr, mc, src, chunk)
+        all_evs.update(evs)
+        print(f'Alt-toplam: {len(all_evs)} olay')
 
-    # ── 2. EMSC: 1998-bugun ─────────────────────────────────────────
-    print('\n=== EMSC: 1998-bugun ===')
-    emsc_evs = fetch_period(EMSC_URL, 1998, now.year + 1, 'EMSC', chunk=5)
-    print(f'EMSC toplam: {len(emsc_evs)} olay')
-
-    # ── 3. Birlestir + tekrar kaldir ────────────────────────────────
+    # ── Birleştir + tekrar kaldir ─────────────────────────────────────
     print('\n=== Birlestirme + tekrar temizleme ===')
-    merged = {**isc_evs, **emsc_evs}  # ID cakismasinda EMSC kazanir
-    print(f'Ham birlestirme: {len(merged)} olay')
-    cleaned = dedup(merged)
+    print(f'Ham toplam: {len(all_evs)} olay')
+    cleaned = dedup(all_evs)
     cleaned.sort(key=lambda e: e['time'], reverse=True)
     print(f'Tekrar sonrasi: {len(cleaned)} olay')
 
-    # Mtype dagilimi
     from collections import Counter
     ct = Counter(e['mtype'] for e in cleaned)
     print('Mtype:', ct.most_common(8))
-
-    # Mw istatistik
     mws = [e['mw'] for e in cleaned]
     print(f'Mw aralik: {min(mws):.1f} – {max(mws):.1f}  |  Ort: {sum(mws)/len(mws):.2f}')
 
+    # Dönem bazlı sayılar
+    for s, e, mc, _, src in MC:
+        n = sum(1 for ev in cleaned if ev['time'][:4].isdigit() and s <= int(ev['time'][:4]) < e)
+        print(f'  {s}-{e} ({src} Mc={mc}): {n} olay')
+
     out = {
-        'generated' : now.strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'source'    : 'ISC (1900-1997) + EMSC (1998-bugun) | Scordilis (2006) Mw',
-        'starttime' : '1900-01-01',
-        'endtime'   : today,
-        'minmag'    : MINMAG,
-        'bounds'    : BOUNDS,
-        'count'     : len(cleaned),
-        'events'    : cleaned,
+        'generated'  : now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'source'     : 'ISC (1900-1997) + EMSC (1998-2026) | Scordilis (2006) Mw | Mc-tabanlı tamamlılık',
+        'completeness': [
+            {'period': '1900-1960', 'Mc': 5.5, 'source': 'ISC'},
+            {'period': '1960-1998', 'Mc': 4.5, 'source': 'ISC'},
+            {'period': '1998-2026', 'Mc': 3.0, 'source': 'EMSC'},
+        ],
+        'starttime'  : '1900-01-01',
+        'endtime'    : today,
+        'bounds'     : BOUNDS,
+        'count'      : len(cleaned),
+        'events'     : cleaned,
     }
     with open(OUTPUT, 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
