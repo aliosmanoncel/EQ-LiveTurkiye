@@ -18,7 +18,7 @@ if sys.stdout.encoding != 'utf-8':
 INPUT  = 'data/eq_historical.json'
 OUTPUT = 'data/bvalue_grid.json'
 MC     = 3.0    # tamamlilik buyuklugu (EMSC dijital donem)
-N_MIN  = 50     # minimum olay sayisi kriteri
+N_MIN  = 100    # minimum olay sayisi kriteri
 R_KM   = 150.0  # arama yaricapi (km)
 STEP   = 0.5    # grid adimi (derece) — b-degeri icin daha kaba yeterli
 BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
