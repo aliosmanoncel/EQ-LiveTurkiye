@@ -50,9 +50,12 @@ def main():
     with open(INPUT, encoding='utf-8') as f:
         data = json.load(f)
 
-    # Mc >= 3.0 olan olaylari kullan (EMSC dönemi tamamliligi)
-    events = [e for e in data['events'] if (e.get('mw') or e.get('mag', 0)) >= MC]
-    print(f'[*] {len(events)} olay yüklendi (Mw>={MC})')
+    # Sadece EMSC 1998-2026: homojen Mc=3.0 katalogu
+    # ISC (1965-1997) M4.5+ karıştırılmaz — b-degeri icin tutarsiz Mc sorun yaratir
+    events = [e for e in data['events']
+              if (e.get('mw') or e.get('mag', 0)) >= MC
+              and e.get('src') == 'EMSC']
+    print(f'[*] {len(events)} olay yüklendi (EMSC 1998-2026, Mw>={MC})')
 
     # Grid olustur
     lats, lons = [], []
