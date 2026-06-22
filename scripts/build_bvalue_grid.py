@@ -17,17 +17,15 @@ if sys.stdout.encoding != 'utf-8':
 
 INPUT  = 'data/eq_historical.json'
 OUTPUT = 'data/bvalue_grid.json'
-# Staircase (basamakli) tamamlilik modeli — butunlesik katalog:
-#   1965-1997 ISC  : Mc=4.5  (WWSSN tam operasyonel)
-#   1998-2026 EMSC : Mc=3.0  (dijital genis bant)
-#
-# b-degeri icin TEK Mc=4.5 uygulanir:
-#   - ISC 1965-1997 M>=4.5 + EMSC 1998-2026 M>=4.5 → 1965-2026 homojen
-#   - M=3.0-4.5 EMSC verisi katalogda var ama b hesabina dahil edilmez
-#   - Utsu (1966) binom duzeltmesi: DM=0.05 → Mc_eff = 4.5 - 0.05 = 4.45
-MC     = 4.5    # b-degeri icin tek homojen Mc (1965-2026, ISC+EMSC)
+# Katalog birlestirme yontemi:
+#   1965-1997 ISC  : M>=4.5  (WWSSN tam operasyonel)
+#   1998-2026 EMSC : M>=3.0  (dijital genis bant)
+#   → birlesik katalog, Aki (1965) MLE b-degeri Mc=3.0 ile
+# Utsu (1966) binom duzeltmesi: DM=0.05 → Mc_eff = 3.0 - 0.05 = 2.95
+MC     = 3.0    # b-degeri Aki MLE esigi
 DM     = 0.05   # Utsu (1966) binom duzeltmesi
-START_YEAR = 1965  # WWSSN tam operasyonel
+MC_ISC = 4.5    # ISC donemi (1965-1997) tamamlilik esigi
+START_YEAR = 1965
 N_MIN  = 100    # minimum olay sayisi kriteri
 R_KM   = 150.0  # arama yaricapi (km)
 STEP   = 0.5    # grid adimi (derece) — b-degeri icin daha kaba yeterli
@@ -59,15 +57,24 @@ def main():
     with open(INPUT, encoding='utf-8') as f:
         data = json.load(f)
 
-    # ISC 1965-1997 + EMSC 1998-2026 → tek Mc=4.5 ile butunlesik katalog
-    # M=3.0-4.5 EMSC verisi katalogda var ama b hesabinda kullanilmaz
-    events = [e for e in data['events']
-              if (e.get('mw') or e.get('mag', 0)) >= MC
-              and int(e['time'][:4]) >= START_YEAR]
+    # Katalog birlestirme:
+    #   ISC  1965-1997 : M>=4.5
+    #   EMSC 1998-2026 : M>=3.0
+    events = []
+    for e in data['events']:
+        yr  = int(e['time'][:4])
+        mw  = e.get('mw') or e.get('mag', 0)
+        src = e.get('src', '')
+        if yr < START_YEAR:
+            continue
+        if src == 'ISC'  and mw >= MC_ISC:
+            events.append(e)
+        elif src == 'EMSC' and mw >= MC:
+            events.append(e)
     n_isc  = sum(1 for e in events if e.get('src') == 'ISC')
     n_emsc = sum(1 for e in events if e.get('src') == 'EMSC')
-    print(f'[*] {len(events)} olay yuklendi (Mw>={MC}, {START_YEAR}-2026)')
-    print(f'    ISC 1965-1997: {n_isc} | EMSC 1998-2026: {n_emsc}')
+    print(f'[*] {len(events)} olay yuklendi (katalog birlestirme, {START_YEAR}-2026)')
+    print(f'    ISC 1965-1997 M>={MC_ISC}: {n_isc} | EMSC 1998-2026 M>={MC}: {n_emsc}')
 
     # Grid olustur
     lats, lons = [], []
