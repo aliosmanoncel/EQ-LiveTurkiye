@@ -782,33 +782,27 @@ function bvalueColor(b) {
 
 let bvalueData = null;
 
-function bvalueRadius() {
-  const z = map.getZoom();
-  if (z >= 9) return 8;
-  if (z >= 7) return 6;
-  if (z >= 5) return 4;
-  return 3;
-}
+const BVAL_STEP_DEG = 0.09; // grid adimi (derece)
 
 function bvalueStep() {
-  // zoom-adaptive nokta seyreltme: dusuk zoom -> her N. nokta
   const z = map.getZoom();
-  if (z >= 8) return 1;   // tum noktalar ~0.09° adim
-  if (z >= 6) return 3;   // her 3. nokta ~0.27°
-  return 6;               // her 6. nokta ~0.54°
+  if (z >= 8) return 1;   // tam cozunurluk ~0.09°
+  if (z >= 6) return 3;   // ~0.27°
+  return 6;               // ~0.54° (bolgesel)
 }
 
 function buildBvalueLayer() {
   if (!bvalueData) return;
   if (bvalueLayer) { map.removeLayer(bvalueLayer); bvalueLayer = null; }
-  const step = bvalueStep();
-  const r    = bvalueRadius();
-  const pts  = bvalueData.grid.filter((_, i) => i % step === 0);
+  const step      = bvalueStep();
+  const effStep   = BVAL_STEP_DEG * step; // derece cinsinden efektif adim
+  const radiusM   = effStep * 111000 * 0.48; // metrik yaricap: adimin %48'i (bosluk kalsin)
+  const pts = bvalueData.grid.filter((_, i) => i % step === 0);
   bvalueLayer = L.layerGroup(
-    pts.map(p => L.circleMarker([p.lat, p.lon], {
-      radius     : r,
+    pts.map(p => L.circle([p.lat, p.lon], {
+      radius     : radiusM,
       fillColor  : bvalueColor(p.b),
-      fillOpacity: 0.80,
+      fillOpacity: 0.82,
       stroke     : false,
     }).bindTooltip(`b = ${p.b}<br>N = ${p.n}`, {sticky:true}))
   );
