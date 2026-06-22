@@ -124,6 +124,18 @@
       </div>
     </div>
 
+    <!-- Seismic Hazard bölümü -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgHazard','lgHazardT')">
+        Seismic Hazard (PGA) <span class="tog" id="lgHazardT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgHazard">
+        <div style="height:8px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#313695,#4575b4,#74add1,#fee090,#f46d43,#d73027,#a50026)"></div>
+        <div style="display:flex;justify-content:space-between;color:#555;font-size:.68rem"><span>Low</span><span>High PGA</span></div>
+        <div style="color:#555;font-size:.68rem;margin-top:4px">Campbell (1981) GMPE · Vs30=760 m/s<br>Source: EMSC eq_annual (Mw≥4.5)</div>
+      </div>
+    </div>
+
     <!-- Active Faults bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgFay','lgFayT')">
@@ -208,8 +220,9 @@
 
   <!-- Layer toggles -->
   <div style="display:flex;gap:4px">
-    <button class="tbtn active" id="btnHeat"  onclick="toggleLayer('heat')">Heat Map</button>
+    <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
+    <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
   </div>
 
   <div class="sep"></div>
@@ -265,7 +278,8 @@ const EQ_HOUR   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiy
 const EQ_DAILY  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_daily.json';  // 24s   M≥1.0
 const EQ_WEEK   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_week.json';   // 1 hf  M≥1.5
 const EQ_MONTH  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_month.json';  // 1 ay  M≥2.5
-const EQ_ANNUAL = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_annual.json'; // 1 yıl M≥4.5
+const EQ_ANNUAL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_annual.json'; // 1 yıl M≥4.5
+const HAZARD_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/hazard_grid.json';
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
 const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 
@@ -680,6 +694,30 @@ document.getElementById('srcSel').addEventListener('change',function(){
 let showHeat   = true;
 let showCircle = false;
 
+let hazardLayer = null;
+let showHazard  = false;
+
+async function loadHazardLayer() {
+  if (hazardLayer) return; // zaten yüklü
+  setStatus('Seismic hazard grid loading…');
+  try {
+    const res  = await fetch(HAZARD_URL);
+    const json = await res.json();
+    const pts  = json.grid.map(p => [p.lat, p.lon, p.w]);
+    hazardLayer = L.heatLayer(pts, {
+      radius : 22,
+      blur   : 18,
+      maxZoom: 9,
+      gradient: { 0:'#313695', 0.2:'#4575b4', 0.4:'#74add1',
+                  0.55:'#fee090', 0.7:'#f46d43', 0.85:'#d73027', 1:'#a50026' }
+    });
+    if (showHazard) hazardLayer.addTo(map);
+    setStatus(`Seismic Hazard loaded · max PGA=${json.max_pga_g.toFixed(3)} g · Campbell (1981)`);
+  } catch(e) {
+    setStatus('Hazard grid load error: ' + e.message, true);
+  }
+}
+
 function toggleLayer(type) {
   if (type === 'heat') {
     showHeat = !showHeat;
@@ -687,11 +725,19 @@ function toggleLayer(type) {
     if (heatLayer) {
       if (showHeat) heatLayer.addTo(map); else map.removeLayer(heatLayer);
     }
-  } else {
+  } else if (type === 'circle') {
     showCircle = !showCircle;
     document.getElementById('btnCircle').classList.toggle('active', showCircle);
     if (markLayer) {
       if (showCircle) markLayer.addTo(map); else map.removeLayer(markLayer);
+    }
+  } else if (type === 'hazard') {
+    showHazard = !showHazard;
+    document.getElementById('btnHazard').classList.toggle('active', showHazard);
+    if (!hazardLayer) {
+      loadHazardLayer();
+    } else {
+      if (showHazard) hazardLayer.addTo(map); else map.removeLayer(hazardLayer);
     }
   }
 }
