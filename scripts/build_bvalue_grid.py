@@ -25,13 +25,14 @@ OUTPUT = 'data/bvalue_grid.json'
 # Aki MLE Mc = katalogdaki en dusuk esik = 3.0, Utsu: Mc_eff = 2.95
 MC     = 3.0    # Aki MLE esigi (EMSC donemi Mc)
 DM     = 0.05   # Utsu (1966) binom duzeltmesi
-START_YEAR = 1965
-# Donem bazli staircase esikleri (yil_baslangic, yil_bitis, min_mw)
+START_YEAR = 1900
+# Donem bazli staircase esikleri — butunlesik katalog (1900-2026)
 STAIRCASE = [
-    (1965, 1980, 4.5),
-    (1980, 1990, 4.0),
-    (1990, 1998, 3.5),
-    (1998, 2100, 3.0),
+    (1900, 1965, 5.5),   # Pre-WWSSN: yalniz buyuk olaylar tam
+    (1965, 1980, 4.5),   # WWSSN tam operasyonel
+    (1980, 1990, 4.0),   # global ag yogunlasma
+    (1990, 1998, 3.5),   # dijital ag gecisi
+    (1998, 2100, 3.0),   # EMSC genis bant
 ]
 N_MIN  = 100    # minimum olay sayisi kriteri
 R_KM   = 150.0  # arama yaricapi (km)
