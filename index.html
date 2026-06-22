@@ -766,59 +766,78 @@ function toggleLayer(type) {
   }
 }
 
-function bvalueColor(b) {
-  // b=0.5→kirmizi, b=1.0→sari, b=1.5→yesil (RdYlGn)
-  const t = Math.max(0, Math.min(1, (b - 0.5) / 1.0)); // 0=kirmizi, 1=yesil
+function bvalueRGB(b) {
+  const t = Math.max(0, Math.min(1, (b - 0.5) / 1.0));
   if (t < 0.5) {
-    // kirmizi → sari
-    const r = 215, g = Math.round(48 + (233-48)*(t/0.5)), bl = 39;
-    return `rgb(${r},${g},${bl})`;
+    return [215, Math.round(48 + (233-48)*(t/0.5)), 39];
   } else {
-    // sari → yesil
-    const r = Math.round(233 - (233-26)*((t-0.5)/0.5)), g = Math.round(215 + (152-215)*((t-0.5)/0.5)), bl = Math.round(39 + (80-39)*((t-0.5)/0.5));
-    return `rgb(${r},${g},${bl})`;
+    return [Math.round(233-(233-26)*((t-0.5)/0.5)), Math.round(215+(152-215)*((t-0.5)/0.5)), Math.round(39+(80-39)*((t-0.5)/0.5))];
   }
 }
+function bvalueColor(b) { const [r,g,bl]=bvalueRGB(b); return `rgb(${r},${g},${bl})`; }
 
 let bvalueData = null;
-
-const BVAL_STEP_DEG = 0.09; // grid adimi (derece)
-
-function bvalueStep() {
-  const z = map.getZoom();
-  if (z >= 8) return 1;   // tam cozunurluk ~0.09°
-  if (z >= 6) return 3;   // ~0.27°
-  return 6;               // ~0.54° (bolgesel)
-}
 
 function buildBvalueLayer() {
   if (!bvalueData) return;
   if (bvalueLayer) { map.removeLayer(bvalueLayer); bvalueLayer = null; }
-  const step      = bvalueStep();
-  const effStep   = BVAL_STEP_DEG * step; // derece cinsinden efektif adim
-  const radiusM   = effStep * 111000 * 0.48; // metrik yaricap: adimin %48'i (bosluk kalsin)
-  const pts = bvalueData.grid.filter((_, i) => i % step === 0);
-  bvalueLayer = L.layerGroup(
-    pts.map(p => L.circle([p.lat, p.lon], {
-      radius     : radiusM,
-      fillColor  : bvalueColor(p.b),
-      fillOpacity: 0.82,
-      stroke     : false,
-    }).bindTooltip(`b = ${p.b}<br>N = ${p.n}`, {sticky:true}))
-  );
+
+  // Canvas IDW interpolasyon (W&W 2000 yontemi)
+  const MINLAT=34, MAXLAT=43, MINLON=25, MAXLON=45;
+  const W=600, H=270;
+  const canvas = document.createElement('canvas');
+  canvas.width=W; canvas.height=H;
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(W, H);
+
+  // Uzamsal grid (0.5° hucre) — hizli IDW araması
+  const CELL=0.5, K=6, POWER=2, MAX_DIST=1.2;
+  const cells = {};
+  for (const p of bvalueData.grid) {
+    const key = `${Math.floor((p.lat-MINLAT)/CELL)},${Math.floor((p.lon-MINLON)/CELL)}`;
+    (cells[key]||(cells[key]=[])).push(p);
+  }
+
+  for (let py=0; py<H; py++) {
+    const lat = MAXLAT - py/H*(MAXLAT-MINLAT);
+    for (let px=0; px<W; px++) {
+      const lon = MINLON + px/W*(MAXLON-MINLON);
+      const ci=Math.floor((lat-MINLAT)/CELL), cj=Math.floor((lon-MINLON)/CELL);
+      const cands=[];
+      for (let di=-2;di<=2;di++) for (let dj=-2;dj<=2;dj++) {
+        const pts=cells[`${ci+di},${cj+dj}`]; if(pts) cands.push(...pts);
+      }
+      if (!cands.length) continue;
+      // K en yakin noktayi bul
+      cands.sort((a,b)=>(a.lat-lat)**2+(a.lon-lon)**2-(b.lat-lat)**2-(b.lon-lon)**2);
+      const near=cands.slice(0,K);
+      const d0=Math.sqrt((near[0].lat-lat)**2+(near[0].lon-lon)**2);
+      if (d0>MAX_DIST) continue;
+      // IDW
+      let ws=0, bs=0;
+      for (const p of near) {
+        const d=Math.max(0.0001,Math.sqrt((p.lat-lat)**2+(p.lon-lon)**2));
+        const w=1/d**POWER; ws+=w; bs+=w*p.b;
+      }
+      const [r,g,bl]=bvalueRGB(bs/ws);
+      const i=(py*W+px)*4;
+      img.data[i]=r; img.data[i+1]=g; img.data[i+2]=bl; img.data[i+3]=205;
+    }
+  }
+  ctx.putImageData(img,0,0);
+  bvalueLayer = L.imageOverlay(canvas.toDataURL(), [[MINLAT,MINLON],[MAXLAT,MAXLON]], {opacity:0.85, interactive:false});
   if (showBvalue) bvalueLayer.addTo(map);
 }
 
 async function loadBvalueLayer() {
   if (bvalueData) { buildBvalueLayer(); return; }
-  setStatus('b-value grid loading…');
+  setStatus('b-value IDW interpolasyon hesaplaniyor…');
   try {
     const res  = await fetch(BVALUE_URL);
     bvalueData = await res.json();
     buildBvalueLayer();
-    map.on('zoomend', () => { if (showBvalue) buildBvalueLayer(); });
     if (showBvalue) bvalueLayer.addTo(map);
-    setStatus(`b-value · Türkiye: b=${bvalueData.b_turkey} · grid: ${bvalueData.b_min}–${bvalueData.b_max} · ${bvalueData.count} nokta · R=100km · Oncel&Wyss(2000)`);
+    setStatus(`b-value · Türkiye: b=${bvalueData.b_turkey} · ${bvalueData.count} nokta · IDW · R=100km · Öncel&Wyss(2000)`);
   } catch(e) {
     setStatus('b-value load error: ' + e.message, true);
   }
