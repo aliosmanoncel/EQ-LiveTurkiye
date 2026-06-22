@@ -123,20 +123,26 @@ def main():
     b_min, b_max = min(b_vals), max(b_vals)
     print(f'[*] b aralik: {b_min:.3f} – {b_max:.3f}  |  Ort: {sum(b_vals)/len(b_vals):.3f}')
 
-    # Normalize: dusuk b (yuksek stres) -> yuksek w (kirmizi)
-    # b dusukse tehlike yuksek -> renk yogun olmali
-    b_range = b_max - b_min or 1.0
+    # Tum Turkiye b-degeri
+    all_mags = [e.get('mag', 0) for e in events if e.get('mag', 0) >= MC]
+    b_turkey, n_turkey = aki_b(all_mags, MC)
+    print(f'[*] Tum Turkiye b-degeri: {b_turkey}  (N={n_turkey})')
+
+    # Sabit normalizasyon: 0.5=kirmizi, 1.0=sari, 1.5=yesil
+    B_LOW, B_HIGH = 0.5, 1.5
     for p in grid:
-        p['w'] = round(1.0 - (p['b'] - b_min) / b_range, 4)  # ters: dusuk b = kirmizi
+        w = 1.0 - (p['b'] - B_LOW) / (B_HIGH - B_LOW)
+        p['w'] = round(max(0.0, min(1.0, w)), 4)  # 0-1 araligina kist
 
     out = {
-        'generated': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'source'   : 'ISC+EMSC eq_historical | Aki (1965) MLE b-degeri',
-        'method'   : f'Mc={MC}, N_min={N_MIN}, R={R_KM} km',
-        'b_min'    : b_min,
-        'b_max'    : b_max,
-        'count'    : len(grid),
-        'grid'     : grid,
+        'generated'  : datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'source'     : 'EMSC 1998-2026 | Aki (1965) MLE + Utsu (1966)',
+        'method'     : f'Mc={MC}, N_min={N_MIN}, R={R_KM} km, norm=[0.5-1.5]',
+        'b_turkey'   : b_turkey,
+        'b_min'      : b_min,
+        'b_max'      : b_max,
+        'count'      : len(grid),
+        'grid'       : grid,
     }
     with open(OUTPUT, 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))

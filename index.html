@@ -781,7 +781,7 @@ async function loadBvalueLayer() {
       gradient: { 0:'#1a9850', 0.3:'#91cf60', 0.55:'#fee08b', 0.75:'#fc8d59', 1:'#d73027' }
     });
     if (showBvalue) bvalueLayer.addTo(map);
-    setStatus(`b-value loaded · range: ${json.b_min}–${json.b_max} · ${json.count} grid points · N≥50`);
+    setStatus(`b-value · Türkiye: b=${json.b_turkey} · grid: ${json.b_min}–${json.b_max} · ${json.count} nokta · Aki(1965)+Utsu(1966) Mc=2.95`);
   } catch(e) {
     setStatus('b-value load error: ' + e.message, true);
   }
