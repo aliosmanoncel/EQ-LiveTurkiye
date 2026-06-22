@@ -17,15 +17,22 @@ if sys.stdout.encoding != 'utf-8':
 
 INPUT  = 'data/eq_historical.json'
 OUTPUT = 'data/bvalue_grid.json'
-# Katalog birlestirme yontemi:
-#   1965-1997 ISC  : M>=4.5  (WWSSN tam operasyonel)
-#   1998-2026 EMSC : M>=3.0  (dijital genis bant)
-#   → birlesik katalog, Aki (1965) MLE b-degeri Mc=3.0 ile
-# Utsu (1966) binom duzeltmesi: DM=0.05 → Mc_eff = 3.0 - 0.05 = 2.95
-MC     = 3.0    # b-degeri Aki MLE esigi
+# Staircase katalog birlestirme (referans + 0.5 muhafazakar duzeltme):
+#   1965-1979 ISC  : M>=4.5
+#   1980-1989 ISC  : M>=4.0
+#   1990-1997 ISC  : M>=3.5
+#   1998-2026 EMSC : M>=3.0
+# Aki MLE Mc = katalogdaki en dusuk esik = 3.0, Utsu: Mc_eff = 2.95
+MC     = 3.0    # Aki MLE esigi (EMSC donemi Mc)
 DM     = 0.05   # Utsu (1966) binom duzeltmesi
-MC_ISC = 4.5    # ISC donemi (1965-1997) tamamlilik esigi
 START_YEAR = 1965
+# Donem bazli staircase esikleri (yil_baslangic, yil_bitis, min_mw)
+STAIRCASE = [
+    (1965, 1980, 4.5),
+    (1980, 1990, 4.0),
+    (1990, 1998, 3.5),
+    (1998, 2100, 3.0),
+]
 N_MIN  = 100    # minimum olay sayisi kriteri
 R_KM   = 150.0  # arama yaricapi (km)
 STEP   = 0.5    # grid adimi (derece) — b-degeri icin daha kaba yeterli
@@ -57,24 +64,28 @@ def main():
     with open(INPUT, encoding='utf-8') as f:
         data = json.load(f)
 
-    # Katalog birlestirme:
-    #   ISC  1965-1997 : M>=4.5
-    #   EMSC 1998-2026 : M>=3.0
+    # Staircase katalog birlestirme — donem bazli Mc filtresi
+    def staircase_mc(yr):
+        for y1, y2, mc in STAIRCASE:
+            if y1 <= yr < y2:
+                return mc
+        return 9.9  # kapsam disi
+
     events = []
     for e in data['events']:
         yr  = int(e['time'][:4])
         mw  = e.get('mw') or e.get('mag', 0)
-        src = e.get('src', '')
         if yr < START_YEAR:
             continue
-        if src == 'ISC'  and mw >= MC_ISC:
-            events.append(e)
-        elif src == 'EMSC' and mw >= MC:
+        if mw >= staircase_mc(yr):
             events.append(e)
     n_isc  = sum(1 for e in events if e.get('src') == 'ISC')
     n_emsc = sum(1 for e in events if e.get('src') == 'EMSC')
-    print(f'[*] {len(events)} olay yuklendi (katalog birlestirme, {START_YEAR}-2026)')
-    print(f'    ISC 1965-1997 M>={MC_ISC}: {n_isc} | EMSC 1998-2026 M>={MC}: {n_emsc}')
+    print(f'[*] {len(events)} olay yuklendi (staircase katalog, {START_YEAR}-2026)')
+    print(f'    ISC: {n_isc} | EMSC: {n_emsc}')
+    for y1, y2, mc in STAIRCASE:
+        n = sum(1 for e in events if y1 <= int(e['time'][:4]) < y2)
+        print(f'    {y1}-{y2} Mc={mc}: {n} olay')
 
     # Grid olustur
     lats, lons = [], []

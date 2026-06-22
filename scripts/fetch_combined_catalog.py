@@ -17,11 +17,15 @@ if sys.stdout.encoding != 'utf-8':
 ISC_URL  = 'http://www.isc.ac.uk/fdsnws/event/1/query'
 EMSC_URL = 'https://www.seismicportal.eu/fdsnws/event/1/query'
 BOUNDS   = dict(minlat=33.0, maxlat=45.0, minlon=23.0, maxlon=48.0)
-# Katalog tamamlılık eşikleri (Mc) — dönem bazlı
+# Staircase tamamlılık eşikleri — referans tablo + 0.5 muhafazakar düzeltme
+# Kaynak tablo (SRL 2021): 1960→4.0, 1980→3.0, 1990→2.5, 2003→2.1, 2005→1.8
+# +0.5 uygulandiktan sonra, EMSC alt siniri 3.0 ile sinirlandirildi
 MC = [
-    (1900, 1965, 5.5, ISC_URL,  'ISC'),   # Pre-WWSSN: yalnız büyük olaylar kayıtlı
-    (1965, 1998, 4.5, ISC_URL,  'ISC'),   # WWSSN tam operasyonel (1964-65)
-    (1998, 2026, 3.0, EMSC_URL, 'EMSC'), # Dijital geniş bant + EMSC ağı
+    (1900, 1965, 5.5, ISC_URL,  'ISC'),   # Pre-WWSSN
+    (1965, 1980, 4.5, ISC_URL,  'ISC'),   # tablo 4.0 + 0.5 = 4.5
+    (1980, 1990, 4.0, ISC_URL,  'ISC'),   # tablo 3.0 + 1.0 = 4.0
+    (1990, 1998, 3.5, ISC_URL,  'ISC'),   # tablo 2.5 + 1.0 = 3.5
+    (1998, 2026, 3.0, EMSC_URL, 'EMSC'), # tablo 1.8-2.5 + 0.5 → 3.0 (EMSC alt siniri)
 ]
 LIMIT    = 20000
 OUTPUT   = 'data/eq_historical.json'
