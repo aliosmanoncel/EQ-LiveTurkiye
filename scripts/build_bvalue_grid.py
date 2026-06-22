@@ -34,7 +34,7 @@ STAIRCASE = [
     (1990, 1998, 3.5),   # dijital ag gecisi
     (1998, 2100, 3.0),   # EMSC genis bant
 ]
-N_MIN  = 100    # minimum olay sayisi kriteri
+N_MIN  = 200    # minimum olay sayisi kriteri
 R_KM   = 150.0  # arama yaricapi (km)
 STEP   = 0.5    # grid adimi (derece) — b-degeri icin daha kaba yeterli
 BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
