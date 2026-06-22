@@ -19,9 +19,9 @@ EMSC_URL = 'https://www.seismicportal.eu/fdsnws/event/1/query'
 BOUNDS   = dict(minlat=33.0, maxlat=45.0, minlon=23.0, maxlon=48.0)
 # Katalog tamamlılık eşikleri (Mc) — dönem bazlı
 MC = [
-    (1900, 1960, 5.5, ISC_URL,  'ISC'),   # Aletsel dönem öncesi
-    (1960, 1998, 4.5, ISC_URL,  'ISC'),   # WWSSN global ağ dönemi
-    (1998, 2026, 3.0, EMSC_URL, 'EMSC'), # Dijital geniş bant dönemi
+    (1900, 1965, 5.5, ISC_URL,  'ISC'),   # Pre-WWSSN: yalnız büyük olaylar kayıtlı
+    (1965, 1998, 4.5, ISC_URL,  'ISC'),   # WWSSN tam operasyonel (1964-65)
+    (1998, 2026, 3.0, EMSC_URL, 'EMSC'), # Dijital geniş bant + EMSC ağı
 ]
 LIMIT    = 20000
 OUTPUT   = 'data/eq_historical.json'
