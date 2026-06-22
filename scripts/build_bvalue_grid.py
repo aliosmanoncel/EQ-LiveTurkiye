@@ -18,6 +18,7 @@ if sys.stdout.encoding != 'utf-8':
 INPUT  = 'data/eq_historical.json'
 OUTPUT = 'data/bvalue_grid.json'
 MC     = 3.0    # tamamlilik buyuklugu (EMSC dijital donem)
+DM     = 0.05   # Utsu (1966) binom duzeltmesi: katalog 0.1 aralikli -> MC_eff = MC - DM/2
 N_MIN  = 100    # minimum olay sayisi kriteri
 R_KM   = 150.0  # arama yaricapi (km)
 STEP   = 0.5    # grid adimi (derece) — b-degeri icin daha kaba yeterli
@@ -30,12 +31,16 @@ def haversine(la1, lo1, la2, lo2):
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
 
 def aki_b(mags, mc):
-    """Aki (1965) MLE b-degeri."""
+    """Aki (1965) MLE b-degeri + Utsu (1966) binom duzeltmesi.
+    b = log10(e) / (mean(Mw) - (Mc - DM))
+    DM = 0.05: katalog 0.1 birimlik araliklar -> efektif Mc = Mc - DM
+    """
+    mc_eff = mc - DM  # 3.0 - 0.05 = 2.95
     m = [m for m in mags if m >= mc]
     if len(m) < N_MIN:
         return None, len(m)
     mean_m = sum(m) / len(m)
-    denom  = mean_m - mc
+    denom  = mean_m - mc_eff
     if denom <= 0:
         return None, len(m)
     b = math.log10(math.e) / denom
