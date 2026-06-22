@@ -34,9 +34,9 @@ STAIRCASE = [
     (1990, 1998, 3.5),   # dijital ag gecisi
     (1998, 2100, 3.0),   # EMSC genis bant
 ]
-N_MIN  = 200    # minimum olay sayisi kriteri
-R_KM   = 150.0  # arama yaricapi (km)
-STEP   = 0.5    # grid adimi (derece) — b-degeri icin daha kaba yeterli
+N_MIN  = 50     # minimum olay sayisi (Oncel & Wyss 2000: N>50)
+R_KM   = 100.0  # arama yaricapi km (fixed area method)
+STEP   = 0.09   # kaydirma adimi ~10 km (Oncel & Wyss 2000: 5 km, Turkiye olcegi: 10 km)
 BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
 
 def haversine(la1, lo1, la2, lo2):
@@ -95,8 +95,8 @@ def main():
         for lon in lons:
             nearby_mw = []
             for e in events:
-                if abs(e['lat']-lat) > 1.5 or abs(e['lon']-lon) > 2.5:
-                    continue  # hizli on-eleme
+                if abs(e['lat']-lat) > 1.0 or abs(e['lon']-lon) > 1.3:
+                    continue  # hizli on-eleme (R=100km ~ 0.9 lat / 1.15 lon)
                 d = haversine(lat, lon, e['lat'], e['lon'])
                 if d <= R_KM:
                     nearby_mw.append(e.get('mag', 0))  # orijinal mag (Scordilis bias yok)

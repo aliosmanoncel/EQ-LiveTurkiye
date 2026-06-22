@@ -780,23 +780,51 @@ function bvalueColor(b) {
   }
 }
 
+let bvalueData = null;
+
+function bvalueRadius() {
+  const z = map.getZoom();
+  if (z >= 9) return 8;
+  if (z >= 7) return 6;
+  if (z >= 5) return 4;
+  return 3;
+}
+
+function bvalueStep() {
+  // zoom-adaptive nokta seyreltme: dusuk zoom -> her N. nokta
+  const z = map.getZoom();
+  if (z >= 8) return 1;   // tum noktalar ~0.09° adim
+  if (z >= 6) return 3;   // her 3. nokta ~0.27°
+  return 6;               // her 6. nokta ~0.54°
+}
+
+function buildBvalueLayer() {
+  if (!bvalueData) return;
+  if (bvalueLayer) { map.removeLayer(bvalueLayer); bvalueLayer = null; }
+  const step = bvalueStep();
+  const r    = bvalueRadius();
+  const pts  = bvalueData.grid.filter((_, i) => i % step === 0);
+  bvalueLayer = L.layerGroup(
+    pts.map(p => L.circleMarker([p.lat, p.lon], {
+      radius     : r,
+      fillColor  : bvalueColor(p.b),
+      fillOpacity: 0.80,
+      stroke     : false,
+    }).bindTooltip(`b = ${p.b}<br>N = ${p.n}`, {sticky:true}))
+  );
+  if (showBvalue) bvalueLayer.addTo(map);
+}
+
 async function loadBvalueLayer() {
-  if (bvalueLayer) return;
+  if (bvalueData) { buildBvalueLayer(); return; }
   setStatus('b-value grid loading…');
   try {
     const res  = await fetch(BVALUE_URL);
-    const json = await res.json();
-    // CircleMarker: heatLayer w=0 transparan olur, CircleMarker rengi dogru gosterir
-    bvalueLayer = L.layerGroup(
-      json.grid.map(p => L.circleMarker([p.lat, p.lon], {
-        radius     : 14,
-        fillColor  : bvalueColor(p.b),
-        fillOpacity: 0.75,
-        stroke     : false,
-      }).bindTooltip(`b = ${p.b}<br>N = ${p.n}`, {sticky:true}))
-    );
+    bvalueData = await res.json();
+    buildBvalueLayer();
+    map.on('zoomend', () => { if (showBvalue) buildBvalueLayer(); });
     if (showBvalue) bvalueLayer.addTo(map);
-    setStatus(`b-value · Türkiye: b=${json.b_turkey} · grid: ${json.b_min}–${json.b_max} · ${json.count} nokta · Aki(1965)+Utsu(1966) Mc=2.95`);
+    setStatus(`b-value · Türkiye: b=${bvalueData.b_turkey} · grid: ${bvalueData.b_min}–${bvalueData.b_max} · ${bvalueData.count} nokta · R=100km · Oncel&Wyss(2000)`);
   } catch(e) {
     setStatus('b-value load error: ' + e.message, true);
   }
