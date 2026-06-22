@@ -41,7 +41,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Yeni veri yok, commit atlanıyor."
           else
-            COUNT=$(python -c "import json; d=json.load(open('data/turkey_eq.json')); print(d['count'])")
+            COUNT=$(python -c "import json; total=sum(json.load(open(f))['count'] for f in ['data/eq_hour.json','data/eq_daily.json','data/eq_week.json','data/eq_month.json','data/eq_annual.json']); print(total)")
             git commit -m "🌍 Otomatik deprem güncellemesi — ${COUNT} olay ($(date -u '+%Y-%m-%d %H:%M') UTC)"
             git push
           fi
