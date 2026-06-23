@@ -293,7 +293,9 @@ const EQ_WEEK   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiy
 const EQ_MONTH  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_month.json';  // 1 ay  M≥2.5
 const EQ_ANNUAL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_annual.json'; // 1 yıl M≥4.5
 const HAZARD_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/hazard_grid.json';
-const BVALUE_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_grid.json';
+const BVALUE_URL        = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_grid.json';
+const BVALUE_KRIGING_URL = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_kriging.png';
+const BVALUE_META_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_kriging_meta.json';
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
 const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 
@@ -830,14 +832,32 @@ function buildBvalueLayer() {
 }
 
 async function loadBvalueLayer() {
-  if (bvalueData) { buildBvalueLayer(); return; }
-  setStatus('b-value IDW interpolasyon hesaplaniyor…');
+  if (bvalueLayer) { if (showBvalue) bvalueLayer.addTo(map); return; }
+  setStatus('b-value Kriging haritası yükleniyor…');
   try {
-    const res  = await fetch(BVALUE_URL);
+    // Önce Kriging PNG dene (varsa)
+    const metaRes = await fetch(BVALUE_META_URL);
+    if (metaRes.ok) {
+      const meta = await metaRes.json();
+      const b = meta.bounds;
+      bvalueLayer = L.imageOverlay(BVALUE_KRIGING_URL,
+        [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+        { opacity: 0.82, interactive: false }
+      );
+      if (showBvalue) bvalueLayer.addTo(map);
+      // Ayrıca nokta verisi status için
+      const res2 = await fetch(BVALUE_URL);
+      const bdata = await res2.json();
+      setStatus(`b-value · Kriging (linear variogram · pykrige) · Türkiye b=${bdata.b_turkey} · ${meta.source_pts} nokta → ${meta.grid_w}×${meta.grid_h} raster · R=100km · Öncel&Wyss(2000)`);
+      return;
+    }
+    // Kriging PNG yoksa IDW canvas'a düş
+    setStatus('b-value IDW interpolasyon hesaplaniyor…');
+    const res = await fetch(BVALUE_URL);
     bvalueData = await res.json();
     buildBvalueLayer();
     if (showBvalue) bvalueLayer.addTo(map);
-    setStatus(`b-value · Türkiye: b=${bvalueData.b_turkey} · ${bvalueData.count} nokta · IDW · R=100km · Öncel&Wyss(2000)`);
+    setStatus(`b-value · IDW · Türkiye b=${bvalueData.b_turkey} · ${bvalueData.count} nokta · R=100km`);
   } catch(e) {
     setStatus('b-value load error: ' + e.message, true);
   }
