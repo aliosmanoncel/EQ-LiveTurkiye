@@ -906,6 +906,9 @@ function toggleLayer(type) {
   } else if (type === 'hazard') {
     showHazard = !showHazard;
     document.getElementById('btnHazard').classList.toggle('active', showHazard);
+    // Legend bölümünü hazard aktifken aç
+    const lgH = document.getElementById('lgHazard');
+    if (lgH) { if (showHazard) lgH.classList.remove('hidden'); else lgH.classList.add('hidden'); }
     if (!hazardLayer) {
       loadHazardLayer();
     } else {
