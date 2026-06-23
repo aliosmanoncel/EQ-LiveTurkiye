@@ -12,11 +12,16 @@
     body{font-family:system-ui,sans-serif;background:#111;color:#ccc}
     #map{position:fixed;inset:0;z-index:1}
 
-    /* ── PANEL (sbar üstünde yüzer, sbar ~26px) ── */
+    /* ── PANEL (sbar üstünde yüzer) ── */
     .panel{position:fixed;bottom:26px;left:0;right:0;z-index:500;
       background:rgba(20,20,20,.94);backdrop-filter:blur(4px);
-      border-top:1px solid #2a2a2a;padding:8px 18px;
-      display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+      border-top:1px solid #2a2a2a;}
+    .panel-handle{display:flex;align-items:center;justify-content:center;
+      padding:3px 0;cursor:pointer;border-bottom:1px solid #222;user-select:none}
+    .panel-handle span{color:#444;font-size:.7rem;letter-spacing:2px}
+    .panel-handle:hover span{color:#06b6d4}
+    .panel-body{padding:7px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+    .panel-body.collapsed{display:none}
 
     .ctrl{display:flex;align-items:center;gap:7px;font-size:.83rem}
     .ctrl label{color:#888;white-space:nowrap}
@@ -68,12 +73,13 @@
     .new-eq{animation:flashNew .6s ease-out}
 
     /* ── SON BÜYÜK DEPREM KARTI ── */
-    #lastCard{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:999;
-      background:rgba(0,0,0,.82);border:1px solid #2a2a2a;border-radius:8px;
-      padding:9px 16px;min-width:260px;max-width:380px;text-align:center;pointer-events:none}
-    #lastCard .lc-mag{font-size:2rem;font-weight:900;line-height:1;letter-spacing:-1px}
-    #lastCard .lc-place{font-size:.78rem;color:#aaa;margin:2px 0 6px}
-    #lastCard .lc-timer{font-size:.72rem;color:#555;border-top:1px solid #222;padding-top:5px;margin-top:2px}
+    #lastCard{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:999;
+      background:rgba(0,0,0,.78);border:1px solid #2a2a2a;border-radius:7px;
+      padding:5px 14px;min-width:220px;max-width:340px;text-align:center;
+      pointer-events:none;cursor:pointer}
+    #lastCard .lc-mag{font-size:1.5rem;font-weight:900;line-height:1.1;letter-spacing:-1px}
+    #lastCard .lc-place{font-size:.72rem;color:#aaa;margin:1px 0 3px}
+    #lastCard .lc-timer{font-size:.68rem;color:#555;border-top:1px solid #1e1e1e;padding-top:3px;margin-top:2px}
     #lastCard .lc-timer b{color:#f97316}
     .mag-hi{color:#ef4444}
     .mag-md{color:#f97316}
@@ -172,6 +178,10 @@
 
 <!-- PANEL -->
 <div class="panel">
+  <div class="panel-handle" onclick="togglePanel()" title="Paneli gizle / göster">
+    <span id="panelArrow">▲ ▲ ▲</span>
+  </div>
+  <div class="panel-body" id="panelBody">
   <!-- Zaman -->
   <div style="display:flex;gap:4px">
     <button class="tbtn" data-h="1"    data-mag="1.0">1s</button>
@@ -275,6 +285,7 @@
     <label style="color:#444">Yenileme:</label>
     <span id="countdown" style="color:#444;min-width:32px">300s</span>
   </div>
+  </div><!-- /panel-body -->
 </div>
 
 <!-- STATUS -->
@@ -797,6 +808,13 @@ async function loadHazardLayer() {
   } catch(e) {
     setStatus('Hazard grid load error: ' + e.message, true);
   }
+}
+
+let panelCollapsed = false;
+function togglePanel() {
+  panelCollapsed = !panelCollapsed;
+  document.getElementById('panelBody').classList.toggle('collapsed', panelCollapsed);
+  document.getElementById('panelArrow').textContent = panelCollapsed ? '▼ ▼ ▼' : '▲ ▲ ▲';
 }
 
 function openIEB() {
