@@ -231,16 +231,21 @@
   </div>
 
   <!-- Layer toggles -->
-  <div style="display:flex;gap:4px;flex-wrap:wrap">
+  <div style="display:flex;gap:4px">
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
     <button class="tbtn"        id="btnFractal" onclick="toggleLayer('fractal')" title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
-    <button class="tbtn"        id="btnIEB"     onclick="openIEB()"
-      title="EarthScope Interactive Earthquake Browser — Mc istatistik analizi için bölge seçin">📊 İstatistik</button>
   </div>
+
+  <div class="sep"></div>
+
+  <button onclick="openIEB()" title="EarthScope IEB — bölge seçip Mc istatistiği görün"
+    style="padding:5px 13px;border-radius:5px;border:1px solid #f59e0b;background:rgba(245,158,11,0.12);color:#f59e0b;font-size:.8rem;cursor:pointer;font-weight:700;white-space:nowrap;">
+    📊 Mc İstatistik
+  </button>
 
   <div class="sep"></div>
 
