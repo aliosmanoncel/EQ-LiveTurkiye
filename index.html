@@ -252,6 +252,8 @@
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
+    <button class="tbtn" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
+    <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
     <button class="tbtn"        id="btnFractal" onclick="toggleLayer('fractal')" title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
   </div>
@@ -353,8 +355,11 @@ const HAZARD_META_URL = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-Live
 const BVALUE_URL        = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_grid.json';
 const BVALUE_TRIANG_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation.png';
 const BVALUE_TRIANG_META = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation_meta.json';
+const BVALUE_FN_URL      = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation_fn.png';
+const BVALUE_FN_META     = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation_fn_meta.json';
 const BVALUE_KRIGING_URL = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_kriging.png';
 const BVALUE_META_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_kriging_meta.json';
+let bvalueMethod = 'fc'; // 'fc' = Fixed Circle | 'fn' = Fixed Number
 const FRACTAL_PNG_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation.png';
 const FRACTAL_META_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation_meta.json';
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
@@ -812,6 +817,13 @@ async function loadHazardLayer() {
   }
 }
 
+function setBvalueMethod(m) {
+  bvalueMethod = m;
+  document.getElementById('btnBFC').classList.toggle('active', m === 'fc');
+  document.getElementById('btnBFN').classList.toggle('active', m === 'fn');
+  if (showBvalue) { bvalueLayer = null; loadBvalueLayer(); }
+}
+
 let panelCollapsed = true;
 function togglePanel() {
   panelCollapsed = !panelCollapsed;
@@ -963,10 +975,25 @@ function buildBvalueLayer() {
 }
 
 async function loadBvalueLayer() {
-  if (bvalueLayer) { if (showBvalue) bvalueLayer.addTo(map); return; }
+  if (bvalueLayer) { map.removeLayer(bvalueLayer); bvalueLayer = null; }
   setStatus('b-value haritası yükleniyor…');
   try {
-    // 1. Önce Triangülasyon PNG dene (Delaunay · N<50 → şeffaf)
+    // Fixed Number (FN) seçiliyse önce FN PNG dene
+    if (bvalueMethod === 'fn') {
+      const fnRes = await fetch(BVALUE_FN_META);
+      if (fnRes.ok) {
+        const meta = await fnRes.json();
+        const b = meta.bounds;
+        bvalueLayer = L.imageOverlay(BVALUE_FN_URL,
+          [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+          { opacity: 0.85, interactive: false }
+        );
+        if (showBvalue) bvalueLayer.addTo(map);
+        setStatus(`b-value · Fixed Number (N=50 adaptif R) · ZMAP (Wiemer 2001) · ${meta.source_pts} nokta · %${meta.coverage_pct} kapsama`);
+        return;
+      }
+    }
+    // Fixed Circle (FC) — Delaunay Triangülasyon PNG
     const tRes = await fetch(BVALUE_TRIANG_META);
     if (tRes.ok) {
       const meta = await tRes.json();
@@ -976,9 +1003,7 @@ async function loadBvalueLayer() {
         { opacity: 0.85, interactive: false }
       );
       if (showBvalue) bvalueLayer.addTo(map);
-      const res2 = await fetch(BVALUE_URL);
-      const bdata = await res2.json();
-      setStatus(`b-value · Delaunay Triangülasyon (lineer) · N≥50 dışı şeffaf · Türkiye b=${bdata.b_turkey} · ${meta.source_pts} nokta → ${meta.grid_w}×${meta.grid_h} raster · R=100km · Öncel&Wyss(2000)`);
+      setStatus(`b-value · Fixed Circle (R=100km, N≥50) · Öncel & Wyss (2000) · ${meta.source_pts} nokta`);
       return;
     }
     // 2. Triangülasyon yoksa Kriging PNG dene

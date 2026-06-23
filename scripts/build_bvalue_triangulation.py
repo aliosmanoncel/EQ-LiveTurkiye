@@ -26,9 +26,14 @@ from matplotlib.colors import LinearSegmentedColormap
 from PIL import Image
 from scipy.interpolate import LinearNDInterpolator
 
-INPUT       = 'data/bvalue_grid.json'
-OUTPUT_PNG  = 'data/bvalue_triangulation.png'
-OUTPUT_META = 'data/bvalue_triangulation_meta.json'
+def _parse():
+    args = sys.argv[1:]
+    def get(f, d): return args[args.index(f)+1] if f in args else d
+    return (get('--input',  'data/bvalue_grid.json'),
+            get('--output', 'data/bvalue_triangulation.png'),
+            get('--meta',   'data/bvalue_triangulation_meta.json'),
+            get('--label',  'FC'))
+INPUT, OUTPUT_PNG, OUTPUT_META, LABEL = _parse()
 
 BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
 

@@ -1,12 +1,26 @@
 """
 build_bvalue_grid.py
-eq_historical.json verisinden Gutenberg-Richter b-degeri grid'i uretir.
-Yontem: Aki (1965) maksimum olabilirlik tahmini
-  b = log10(e) / (mean(Mw) - Mc)
-Kriter: N >= 50 olmayan grid noktasi haritalanmaz.
+Gutenberg-Richter b-degeri grid haritasi — iki yontem:
+
+  FC  Fixed Circle  (Oncel & Wyss 2000 — mevcut):
+        Sabit R=100 km, N>=50 sart. Az sismik alanlarda bos.
+
+  FN  Fixed Number  (ZMAP varsayilan — Wiemer 2001):
+        Sabit N=50 en yakin olay, R degisken (adaptif).
+        Her grid noktasi her zaman dolu; R_max ile buyuk daire sinirlanir.
+
+Referanslar:
+  Aki (1965) MLE: b = log10(e) / (mean(Mw) - Mc_eff)
+  Utsu (1966) binom duzeltme: Mc_eff = Mc - 0.05
+  Oncel & Wyss (2000) Fixed Area Method: R=100km, STEP~10km
+  Wiemer (2001) ZMAP: Fixed Number, N=50, R_max=150km
 
 Kullanim:
-  python scripts/build_bvalue_grid.py
+  python scripts/build_bvalue_grid.py                          # FC varsayilan
+  python scripts/build_bvalue_grid.py --method fn              # Fixed Number
+  python scripts/build_bvalue_grid.py --method fn --n 100      # N=100
+  python scripts/build_bvalue_grid.py --method fc --r 150      # R=150 km
+  python scripts/build_bvalue_grid.py --output data/bvalue_grid_fn.json --method fn
 """
 
 import json, math, sys
@@ -15,93 +29,119 @@ from datetime import datetime, timezone
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
-INPUT  = 'data/eq_historical.json'
-OUTPUT = 'data/bvalue_grid.json'
-# Staircase katalog birlestirme (referans + 0.5 muhafazakar duzeltme):
-#   1965-1979 ISC  : M>=4.5
-#   1980-1989 ISC  : M>=4.0
-#   1990-1997 ISC  : M>=3.5
-#   1998-2026 EMSC : M>=3.0
-# Aki MLE Mc = katalogdaki en dusuk esik = 3.0, Utsu: Mc_eff = 2.95
-MC     = 3.0    # Aki MLE esigi (EMSC donemi Mc)
-DM     = 0.05   # Utsu (1966) binom duzeltmesi
-START_YEAR = 1900
-# Donem bazli staircase esikleri — butunlesik katalog (1900-2026)
-STAIRCASE = [
-    (1900, 1965, 5.5),   # Pre-WWSSN: yalniz buyuk olaylar tam
-    (1965, 1980, 4.5),   # WWSSN tam operasyonel
-    (1980, 1990, 4.0),   # global ag yogunlasma
-    (1990, 1998, 3.5),   # dijital ag gecisi
-    (1998, 2100, 3.0),   # EMSC genis bant
-]
-N_MIN  = 50     # minimum olay sayisi (Oncel & Wyss 2000: N>50)
-R_KM   = 100.0  # arama yaricapi km (fixed area method)
-STEP   = 0.09   # kaydirma adimi ~10 km (Oncel & Wyss 2000: 5 km, Turkiye olcegi: 10 km)
+# ── Sabitler ─────────────────────────────────────────────────────────
+MC     = 3.0    # Tamamlılık buyuklugu (EMSC donemi)
+DM     = 0.05   # Utsu (1966) binom duzeltmesi: Mc_eff = MC - DM
+N_MIN  = 50     # FC: minimum N; FN: hedef N
+R_KM   = 100.0  # FC: sabit yarıçap
+R_MAX  = 200.0  # FN: maksimum R siniri (km) — buyuk bos alanlari sinirlar
+STEP   = 0.09   # kaydırma adimi ~10 km
 BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
 
+INPUT  = 'data/eq_historical.json'
+
+
+def parse_args():
+    args = sys.argv[1:]
+    def get(flag, default):
+        return type(default)(args[args.index(flag)+1]) if flag in args else default
+    method = get('--method', 'fc').lower()
+    n_fixed = get('--n', N_MIN)
+    r_fixed = get('--r', R_KM)
+    output  = get('--output', 'data/bvalue_grid.json')
+    return method, n_fixed, r_fixed, output
+
+
 def haversine(la1, lo1, la2, lo2):
-    R = 6371.0; r = math.pi/180
-    dl = (la2-la1)*r; dlo = (lo2-lo1)*r
+    R = 6371.0; r = math.pi / 180
+    dl = (la2 - la1) * r; dlo = (lo2 - lo1) * r
     a = math.sin(dl/2)**2 + math.cos(la1*r)*math.cos(la2*r)*math.sin(dlo/2)**2
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
 
-def aki_b(mags, mc):
-    """Aki (1965) MLE b-degeri + Utsu (1966) binom duzeltmesi.
-    b = log10(e) / (mean(Mw) - (Mc - DM))
-    DM = 0.05: katalog 0.1 birimlik araliklar -> efektif Mc = Mc - DM
-    """
-    mc_eff = mc - DM  # 3.0 - 0.05 = 2.95
-    m = [m for m in mags if m >= mc]
-    if len(m) < N_MIN:
-        return None, len(m)
+
+def aki_b(mags, mc, n_min):
+    """Aki (1965) MLE b-degeri + Utsu (1966) binom duzeltmesi."""
+    mc_eff = mc - DM
+    m = [x for x in mags if x >= mc]
+    if len(m) < n_min:
+        return None, len(m), None
     mean_m = sum(m) / len(m)
     denom  = mean_m - mc_eff
     if denom <= 0:
-        return None, len(m)
+        return None, len(m), None
     b = math.log10(math.e) / denom
-    return round(b, 3), len(m)
+    return round(b, 3), len(m), round(mean_m, 3)
 
-def main():
-    with open(INPUT, encoding='utf-8') as f:
-        data = json.load(f)
 
-    # b-degeri icin EMSC 1998-2026 (homojen Mc=3.0)
-    # Filtre: orijinal mag>=MC (Scordilis ML/MD->Mw donusumu kucuk Mw uretir,
-    #         mw filtresinde 66k olay duser ve mean(Mw) yapay yukselir)
-    # Aki hesabi: mw (Scordilis donusturulmus) kullan, yoksa mag
-    events = [e for e in data['events']
-              if e.get('src') == 'EMSC'
-              and e.get('mag', 0) >= MC]
-    print(f'[*] {len(events)} olay yuklendi (EMSC 1998-2026, mag>={MC}, orijinal filtre)')
-    mw_vals = [(e.get('mw') or e.get('mag', 0)) for e in events]
-    print(f'    mean(Mw)={sum(mw_vals)/len(mw_vals):.3f}  aralik={min(mw_vals):.1f}-{max(mw_vals):.1f}')
-
-    # Grid olustur
-    lats, lons = [], []
-    cur = BOUNDS['minlat']
-    while cur <= BOUNDS['maxlat'] + 1e-9:
-        lats.append(round(cur, 4)); cur += STEP
-    cur = BOUNDS['minlon']
-    while cur <= BOUNDS['maxlon'] + 1e-9:
-        lons.append(round(cur, 4)); cur += STEP
-
-    print(f'[*] Grid: {len(lats)} x {len(lons)} = {len(lats)*len(lons)} nokta')
-
+# ── Fixed Circle (FC) ─────────────────────────────────────────────────
+def compute_fc(events, lats, lons, r_km, n_min):
+    """Sabit R=r_km dairesi icindeki olaylardan b-degeri."""
     grid = []
     skipped = 0
+    deg_margin = r_km / 111.0 + 0.1
+
     for i, lat in enumerate(lats):
         if i % 5 == 0:
-            print(f'    {i}/{len(lats)} satir...')
+            pct = 100 * i // len(lats)
+            print(f'    FC {pct}%  ({i}/{len(lats)} satır)', end='\r')
         for lon in lons:
-            nearby_mw = []
+            nearby = []
             for e in events:
-                if abs(e['lat']-lat) > 1.0 or abs(e['lon']-lon) > 1.3:
-                    continue  # hizli on-eleme (R=100km ~ 0.9 lat / 1.15 lon)
+                if abs(e['lat'] - lat) > deg_margin or abs(e['lon'] - lon) > deg_margin * 1.3:
+                    continue
                 d = haversine(lat, lon, e['lat'], e['lon'])
-                if d <= R_KM:
-                    nearby_mw.append(e.get('mag', 0))  # orijinal mag (Scordilis bias yok)
+                if d <= r_km:
+                    nearby.append(e.get('mag', 0))
 
-            b, n = aki_b(nearby_mw, MC)
+            b, n, mean_m = aki_b(nearby, MC, n_min)
+            if b is None:
+                skipped += 1
+                continue
+            grid.append({'lat': lat, 'lon': lon, 'b': b, 'n': n, 'r': r_km})
+
+    print()
+    return grid, skipped
+
+
+# ── Fixed Number (FN) — ZMAP yontemi ─────────────────────────────────
+def compute_fn(events, lats, lons, n_fixed, r_max):
+    """
+    Her grid noktasi icin en yakin n_fixed olayi bul (adaptif R).
+    R = n_fixed'inci olayın mesafesi.
+    R > r_max ise nokta atlanır (cok az yerel sismisita).
+    """
+    grid = []
+    skipped = 0
+
+    # Olayları numpy olmadan basit tuple listesine cevir
+    ev_tuples = [(e['lat'], e['lon'], e.get('mag', 0)) for e in events]
+
+    for i, lat in enumerate(lats):
+        if i % 5 == 0:
+            pct = 100 * i // len(lats)
+            print(f'    FN {pct}%  ({i}/{len(lats)} satır)', end='\r')
+        for lon in lons:
+            # Kaba on-eleme (hesap hizi icin)
+            deg_margin = r_max / 111.0 + 0.5
+            candidates = [
+                (haversine(lat, lon, la, lo), mg)
+                for la, lo, mg in ev_tuples
+                if abs(la - lat) <= deg_margin and abs(lo - lon) <= deg_margin * 1.4
+            ]
+            # Mesafeye gore sirala
+            candidates.sort(key=lambda x: x[0])
+
+            if len(candidates) < n_fixed:
+                skipped += 1
+                continue
+
+            r_adaptive = candidates[n_fixed - 1][0]  # N'inci olayin mesafesi
+            if r_adaptive > r_max:
+                skipped += 1
+                continue
+
+            mags = [mg for _, mg in candidates[:n_fixed]]
+            b, n, mean_m = aki_b(mags, MC, n_fixed)
             if b is None:
                 skipped += 1
                 continue
@@ -111,42 +151,75 @@ def main():
                 'lon': lon,
                 'b'  : b,
                 'n'  : n,
+                'r'  : round(r_adaptive, 1),  # adaptif R (km)
             })
 
-    print(f'[*] Haritlanan: {len(grid)} nokta | Atlanan (N<{N_MIN}): {skipped}')
+    print()
+    return grid, skipped
+
+
+def main():
+    method, n_fixed, r_fixed, output = parse_args()
+    print(f'[*] Yontem: {"Fixed Circle (FC)" if method=="fc" else "Fixed Number (FN)"}'
+          f'  |  N={n_fixed}  R={"sabit "+str(r_fixed)+"km" if method=="fc" else "adaptif (max "+str(R_MAX)+"km)"}')
+
+    with open(INPUT, encoding='utf-8') as f:
+        data = json.load(f)
+
+    events = [e for e in data['events']
+              if e.get('src') == 'EMSC' and e.get('mag', 0) >= MC]
+    print(f'[*] {len(events)} olay yuklendi (EMSC, mag>={MC})')
+
+    # Grid
+    lats, lons = [], []
+    cur = BOUNDS['minlat']
+    while cur <= BOUNDS['maxlat'] + 1e-9:
+        lats.append(round(cur, 4)); cur += STEP
+    cur = BOUNDS['minlon']
+    while cur <= BOUNDS['maxlon'] + 1e-9:
+        lons.append(round(cur, 4)); cur += STEP
+    print(f'[*] Grid: {len(lats)}x{len(lons)} = {len(lats)*len(lons)} nokta')
+
+    if method == 'fc':
+        grid, skipped = compute_fc(events, lats, lons, r_fixed, n_fixed)
+        method_label = f'Fixed Circle | R={r_fixed} km | N_min={n_fixed} | Oncel & Wyss (2000)'
+    else:
+        grid, skipped = compute_fn(events, lats, lons, n_fixed, R_MAX)
+        method_label = f'Fixed Number | N={n_fixed} | R_max={R_MAX} km | ZMAP (Wiemer 2001)'
+
+    print(f'[*] Haritlanan: {len(grid)} | Atlanan: {skipped}')
 
     if not grid:
-        print('[!] Hicbir nokta N>=50 kriterini gecemedi. R veya STEP artir.')
-        return
+        print('[!] Hicbir nokta kriterleri gecemedi.'); return
 
     b_vals = [p['b'] for p in grid]
-    b_min, b_max = min(b_vals), max(b_vals)
-    print(f'[*] b aralik: {b_min:.3f} – {b_max:.3f}  |  Ort: {sum(b_vals)/len(b_vals):.3f}')
+    print(f'[*] b: {min(b_vals):.3f} – {max(b_vals):.3f}  ort={sum(b_vals)/len(b_vals):.3f}')
 
-    # Tum Turkiye b-degeri
+    # Tum Turkiye b
     all_mags = [e.get('mag', 0) for e in events if e.get('mag', 0) >= MC]
-    b_turkey, n_turkey = aki_b(all_mags, MC)
-    print(f'[*] Tum Turkiye b-degeri: {b_turkey}  (N={n_turkey})')
+    b_turkey, n_turkey, _ = aki_b(all_mags, MC, N_MIN)
+    print(f'[*] Tum Turkiye b = {b_turkey}  (N={n_turkey})')
 
-    # Sabit normalizasyon: 0.5=kirmizi, 1.0=sari, 1.5=yesil
+    # w normalizasyonu (0.5-1.5 araliginda)
     B_LOW, B_HIGH = 0.5, 1.5
     for p in grid:
         w = 1.0 - (p['b'] - B_LOW) / (B_HIGH - B_LOW)
-        p['w'] = round(max(0.0, min(1.0, w)), 4)  # 0-1 araligina kist
+        p['w'] = round(max(0.0, min(1.0, w)), 4)
 
     out = {
-        'generated'  : datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'source'     : 'EMSC 1998-2026 | Aki (1965) MLE + Utsu (1966)',
-        'method'     : f'Mc={MC}, N_min={N_MIN}, R={R_KM} km, norm=[0.5-1.5]',
-        'b_turkey'   : b_turkey,
-        'b_min'      : b_min,
-        'b_max'      : b_max,
-        'count'      : len(grid),
-        'grid'       : grid,
+        'generated' : datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'source'    : 'EMSC 1998-2026 | Aki (1965) MLE + Utsu (1966)',
+        'method'    : method_label,
+        'b_turkey'  : b_turkey,
+        'b_min'     : min(b_vals),
+        'b_max'     : max(b_vals),
+        'count'     : len(grid),
+        'grid'      : grid,
     }
-    with open(OUTPUT, 'w', encoding='utf-8') as f:
+    with open(output, 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
-    print(f'[OK] Kaydedildi: {OUTPUT} ({len(grid)} nokta)')
+    print(f'[OK] Kaydedildi: {output}')
+
 
 if __name__ == '__main__':
     main()
