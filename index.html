@@ -236,7 +236,8 @@
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
-    <button class="tbtn"        id="btnTopo"   onclick="toggleLayer('topo')"   title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
+    <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
+    <button class="tbtn"        id="btnFractal" onclick="toggleLayer('fractal')" title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
   </div>
 
   <div class="sep"></div>
@@ -299,6 +300,8 @@ const BVALUE_TRIANG_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-L
 const BVALUE_TRIANG_META = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation_meta.json';
 const BVALUE_KRIGING_URL = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_kriging.png';
 const BVALUE_META_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_kriging_meta.json';
+const FRACTAL_PNG_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation.png';
+const FRACTAL_META_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation_meta.json';
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
 const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 
@@ -319,7 +322,9 @@ const topoRelief = L.tileLayer(
   'https://services.arcgisonline.com/arcgis/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
   { attribution:'© Esri, USGS, NOAA', maxZoom:13, zIndex:3, opacity:0.30 });
 
-let showTopo = false;
+let showTopo    = false;
+let showFractal = false;
+let fractalLayer = null;
 
 const labelLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
   { maxZoom:18, zIndex:700 }).addTo(map);
@@ -779,6 +784,14 @@ function toggleLayer(type) {
     } else {
       if (showBvalue) bvalueLayer.addTo(map); else map.removeLayer(bvalueLayer);
     }
+  } else if (type === 'fractal') {
+    showFractal = !showFractal;
+    document.getElementById('btnFractal').classList.toggle('active', showFractal);
+    if (!fractalLayer) {
+      loadFractalLayer();
+    } else {
+      if (showFractal) fractalLayer.addTo(map); else map.removeLayer(fractalLayer);
+    }
   } else if (type === 'topo') {
     showTopo = !showTopo;
     document.getElementById('btnTopo').classList.toggle('active', showTopo);
@@ -902,6 +915,30 @@ async function loadBvalueLayer() {
     setStatus(`b-value · IDW · Türkiye b=${bvalueData.b_turkey} · ${bvalueData.count} nokta · R=100km`);
   } catch(e) {
     setStatus('b-value load error: ' + e.message, true);
+  }
+}
+
+async function loadFractalLayer() {
+  if (fractalLayer) { if (showFractal) fractalLayer.addTo(map); return; }
+  setStatus('Fraktal D_c haritası yükleniyor…');
+  try {
+    const metaRes = await fetch(FRACTAL_META_URL);
+    if (!metaRes.ok) {
+      setStatus('Fraktal haritası henüz hesaplanmadı — build_fractal_grid.py çalıştırın', true);
+      showFractal = false;
+      document.getElementById('btnFractal').classList.remove('active');
+      return;
+    }
+    const meta = await metaRes.json();
+    const b = meta.bounds;
+    fractalLayer = L.imageOverlay(FRACTAL_PNG_URL,
+      [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+      { opacity: 0.82, interactive: false }
+    );
+    if (showFractal) fractalLayer.addTo(map);
+    setStatus(`Fraktal D_c · Grassberger-Procaccia (1983) · ${meta.source_pts} nokta → ${meta.grid_w}×${meta.grid_h} raster · R=100km · N≥50 · mor=kümelenme · sarı=homojen`);
+  } catch(e) {
+    setStatus('Fraktal load error: ' + e.message, true);
   }
 }
 
