@@ -830,24 +830,23 @@ let showHazard  = false;
 let bvalueLayer = null;
 let showBvalue  = false;
 
-async function loadHazardLayer() {
+function loadHazardLayer() {
   if (hazardLayer) { if (showHazard) hazardLayer.addTo(map); return; }
-  setStatus('Seismic Hazard yükleniyor…');
-  try {
-    const metaRes = await fetch(HAZARD_META_URL);
-    if (!metaRes.ok) throw new Error('meta ' + metaRes.status);
-    const meta = await metaRes.json();
-    const b = meta.bounds;
-    hazardLayer = L.imageOverlay(
-      HAZARD_PNG_URL,
-      [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
-      { opacity: 0.80, interactive: false }
-    );
-    if (showHazard) hazardLayer.addTo(map);
-    setStatus(`Seismic Hazard · PGA 475yr · max=${meta.pga_max_g.toFixed(3)} g · Campbell (1981) · AFAD 2018 hazırlık aşamasında`);
-  } catch(e) {
-    setStatus('Hazard yüklenemedi: ' + e.message, true);
-  }
+  // TSTH = Türkiye Sismik Tehlike Haritası · AFAD/CSB · TUCBS resmi WMS servisi
+  // Katman 58: TSTH_PGA_475 — PGA, 475 yıl dönüş periyodu (10%/50yr) · TBDY 2018 temel harita
+  hazardLayer = L.tileLayer.wms(
+    'https://tucbs-public-api.csb.gov.tr/trk_afad_tdth_wms',
+    {
+      layers     : 'TSTH_PGA_475',
+      format     : 'image/png',
+      transparent: true,
+      version    : '1.3.0',
+      opacity    : 0.80,
+      attribution: 'TSTH © AFAD · CSB/TUCBS · TBDY 2018',
+    }
+  );
+  if (showHazard) hazardLayer.addTo(map);
+  setStatus('Seismic Hazard · TSTH PGA 475yr (10%/50yr) · AFAD · TBDY 2018 · tucbs-public-api.csb.gov.tr');
 }
 
 function setBvalueMethod(m) {
