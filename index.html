@@ -347,7 +347,9 @@ const EQ_DAILY  = EQ_URLS.emsc.daily;
 const EQ_WEEK   = EQ_URLS.emsc.week;
 const EQ_MONTH  = EQ_URLS.emsc.month;
 const EQ_ANNUAL = EQ_URLS.emsc.annual;
-const HAZARD_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/hazard_grid.json';
+const HAZARD_URL      = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/hazard_grid.json';
+const HAZARD_PNG_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/hazard_triangulation.png';
+const HAZARD_META_URL = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/hazard_triangulation_meta.json';
 const BVALUE_URL        = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_grid.json';
 const BVALUE_TRIANG_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation.png';
 const BVALUE_TRIANG_META = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation_meta.json';
@@ -791,23 +793,22 @@ let bvalueLayer = null;
 let showBvalue  = false;
 
 async function loadHazardLayer() {
-  if (hazardLayer) return; // zaten yüklü
-  setStatus('Seismic hazard grid loading…');
+  if (hazardLayer) { if (showHazard) hazardLayer.addTo(map); return; }
+  setStatus('Seismic hazard haritası yükleniyor…');
   try {
-    const res  = await fetch(HAZARD_URL);
-    const json = await res.json();
-    const pts  = json.grid.map(p => [p.lat, p.lon, p.w]);
-    hazardLayer = L.heatLayer(pts, {
-      radius : 22,
-      blur   : 18,
-      maxZoom: 9,
-      gradient: { 0:'#313695', 0.2:'#4575b4', 0.4:'#74add1',
-                  0.55:'#fee090', 0.7:'#f46d43', 0.85:'#d73027', 1:'#a50026' }
-    });
+    const metaRes = await fetch(HAZARD_META_URL);
+    if (!metaRes.ok) throw new Error('meta ' + metaRes.status);
+    const meta = await metaRes.json();
+    const b = meta.bounds;
+    hazardLayer = L.imageOverlay(
+      HAZARD_PNG_URL,
+      [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+      { opacity: 0.80, interactive: false }
+    );
     if (showHazard) hazardLayer.addTo(map);
-    setStatus(`Seismic Hazard loaded · max PGA=${json.max_pga_g.toFixed(3)} g · Campbell (1981)`);
+    setStatus(`Seismic Hazard · max PGA=${meta.pga_max_g.toFixed(3)} g · Campbell (1981) · zoom bağımsız`);
   } catch(e) {
-    setStatus('Hazard grid load error: ' + e.message, true);
+    setStatus('Hazard yüklenemedi: ' + e.message, true);
   }
 }
 

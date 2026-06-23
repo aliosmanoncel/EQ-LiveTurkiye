@@ -79,11 +79,14 @@ jobs:
       - name: hazard_grid (Campbell 1981 GMPE, monthly veriden M>=2.5)
         run: python scripts/build_hazard_grid.py --input data/eq_month.json --output data/hazard_grid.json
 
+      - name: hazard PNG (Delaunay triangülasyon → imageOverlay)
+        run: pip install scipy pillow matplotlib && python scripts/build_hazard_triangulation.py
+
       - name: Değişiklik varsa commit et
         run: |
           git config user.name  "eq-bot"
           git config user.email "eq-bot@users.noreply.github.com"
-          git add data/eq_hour.json data/eq_daily.json data/eq_week.json data/eq_month.json data/eq_annual.json data/hazard_grid.json
+          git add data/eq_hour.json data/eq_daily.json data/eq_week.json data/eq_month.json data/eq_annual.json data/hazard_grid.json data/hazard_triangulation.png data/hazard_triangulation_meta.json
           git add data/eq_hour_afad.json data/eq_daily_afad.json data/eq_week_afad.json data/eq_month_afad.json || true
           git add data/eq_hour_usgs.json data/eq_daily_usgs.json data/eq_week_usgs.json data/eq_month_usgs.json data/eq_annual_usgs.json || true
           if git diff --cached --quiet; then
