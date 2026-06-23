@@ -1165,19 +1165,23 @@ async function loadMarmaraForecastLayer() {
     if (!evRes.ok) throw new Error('Marmara test olayları bulunamadı');
     const evData = await evRes.json();
 
+    // Yalnızca BUGÜNDEN SONRA gerçekleşen olaylar prospektif test noktası
+    const today = new Date().toISOString().slice(0, 10);
+    const prospEvents = (evData.events || []).filter(e => e.time && e.time.slice(0,10) > today);
+
     marFcDotLayer = L.layerGroup();
-    evData.events.forEach(e => {
-      const m = e.mag;  // ML — b-value hesabıyla tutarlı
-      const r = Math.max(4, (m - 2.5) * 5);
-      const clr = m >= 5.0 ? '#ef4444' : m >= 4.5 ? '#f97316' : m >= 4.0 ? '#fbbf24' : m >= 3.5 ? '#a3e635' : '#94a3b8';
+    prospEvents.forEach(e => {
+      const m = e.mag;
+      const r = Math.max(6, (m - 2.5) * 6);
+      const clr = m >= 5.5 ? '#ff0000' : m >= 5.0 ? '#ef4444' : m >= 4.5 ? '#f97316' : '#fbbf24';
       const date = e.time ? e.time.slice(0,10) : '';
       L.circleMarker([e.lat, e.lon], {
-        radius: r, color: '#000', weight: 0.6,
-        fillColor: clr, fillOpacity: 0.80,
+        radius: r, color: '#fff', weight: 1.2,
+        fillColor: clr, fillOpacity: 0.90,
       }).bindPopup(
         `<b style="color:${clr};font-size:1.1rem">ML${m.toFixed(1)}</b>` +
         `<br><span style="color:#aaa">${e.place || ''}</span>` +
-        `<br><span style="color:#f59e0b;font-size:.8rem">📅 ${date} · Test</span>` +
+        `<br><span style="color:#f59e0b;font-size:.8rem">📅 ${date} · Prospektif Test</span>` +
         `<br>Depth: ${(e.dep||0).toFixed(0)} km`
       ).addTo(marFcDotLayer);
     });
