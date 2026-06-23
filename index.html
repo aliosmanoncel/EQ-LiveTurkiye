@@ -161,6 +161,25 @@
       </div>
     </div>
 
+    <!-- Avrupa Hazard bölümü -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgEuHaz','lgEuHazT')">
+        Av. Sismik Tehlike (ESHM20) <span class="tog" id="lgEuHazT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgEuHaz">
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">PGA · 475 yıl dönüş periyodu (%10/50yr) · Avrupa + Türkiye</div>
+        <div style="height:12px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#313695,#4575b4,#74add1,#fee090,#f46d43,#d73027,#a50026)"></div>
+        <div style="display:flex;justify-content:space-between;color:#aaa;font-size:.68rem;margin-bottom:4px">
+          <span>Düşük PGA</span><span>Yüksek PGA</span>
+        </div>
+        <div style="color:#666;font-size:.65rem;line-height:1.5">
+          ESHM20 · Danciu et al. (2021)<br>
+          EFEHR · ETH Zürich · CC-BY 4.0<br>
+          Kapsam: Avrupa + Türkiye + K.Afrika
+        </div>
+      </div>
+    </div>
+
     <!-- Seismic Risk bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgRisk','lgRiskT')">
@@ -286,6 +305,7 @@
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
+    <button class="tbtn"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
     <button class="tbtn" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
     <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
@@ -849,6 +869,8 @@ let hazardLayer = null;
 let showHazard  = false;
 let riskLayer   = null;
 let showRisk    = false;
+let euHazLayer  = null;
+let showEuHaz   = false;
 let bvalueLayer = null;
 let showBvalue  = false;
 
@@ -962,6 +984,32 @@ function toggleLayer(type) {
       setStatus('Sismik Risk Endeksi · ESRM20 · EFEHR/GEM · Crowley et al. (2021) · maps.eu-risk.eucentre.it');
     } else {
       map.removeLayer(riskLayer);
+    }
+  } else if (type === 'euhaz') {
+    showEuHaz = !showEuHaz;
+    document.getElementById('btnEuHaz').classList.toggle('active', showEuHaz);
+    const lgEH = document.getElementById('lgEuHaz');
+    if (lgEH) { if (showEuHaz) lgEH.classList.remove('hidden'); else lgEH.classList.add('hidden'); }
+    if (showEuHaz && map.hasLayer(labelLayer)) map.removeLayer(labelLayer);
+    else if (!showEuHaz && !showTopo && !showHazard && !showRisk && !map.hasLayer(labelLayer)) labelLayer.addTo(map);
+    if (!euHazLayer) {
+      euHazLayer = L.tileLayer.wms(
+        'https://efehrmaps.ethz.ch/cgi-bin/mapserv?map=/var/www/mapfile/eshm20data.map',
+        {
+          layers     : 'seismic-hazard',
+          format     : 'image/png',
+          transparent: true,
+          version    : '1.3.0',
+          opacity    : 0.80,
+          attribution: 'ESHM20 © EFEHR · ETH Zürich · Danciu et al. (2021) CC-BY 4.0',
+        }
+      );
+    }
+    if (showEuHaz) {
+      euHazLayer.addTo(map);
+      setStatus('Avrupa Sismik Tehlike · ESHM20 PGA 475yr (10%/50yr) · EFEHR/ETH Zürich · Danciu et al. (2021)');
+    } else {
+      map.removeLayer(euHazLayer);
     }
   } else if (type === 'bvalue') {
     showBvalue = !showBvalue;
