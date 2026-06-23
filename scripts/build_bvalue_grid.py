@@ -45,13 +45,20 @@ def parse_args():
     args = sys.argv[1:]
     def get(flag, default):
         return type(default)(args[args.index(flag)+1]) if flag in args else default
-    method   = get('--method',   'fc').lower()
-    n_fixed  = get('--n',        N_MIN)
-    r_fixed  = get('--r',        R_KM)
-    output   = get('--output',   'data/bvalue_grid.json')
+    method     = get('--method',     'fc').lower()
+    n_fixed    = get('--n',          N_MIN)
+    r_fixed    = get('--r',          R_KM)
+    output     = get('--output',     'data/bvalue_grid.json')
     year_start = get('--year_start', 1998)
-    year_end   = get('--year_end',   2100)   # varsayilan: tum katalog
-    return method, n_fixed, r_fixed, output, year_start, year_end
+    year_end   = get('--year_end',   2100)
+    step       = get('--step',       STEP)
+    mc         = get('--mc',         MC)
+    minlat     = get('--minlat',     BOUNDS['minlat'])
+    maxlat     = get('--maxlat',     BOUNDS['maxlat'])
+    minlon     = get('--minlon',     BOUNDS['minlon'])
+    maxlon     = get('--maxlon',     BOUNDS['maxlon'])
+    src        = get('--src',        'EMSC')
+    return method, n_fixed, r_fixed, output, year_start, year_end, step, mc, minlat, maxlat, minlon, maxlon, src
 
 
 def haversine(la1, lo1, la2, lo2):
@@ -161,28 +168,32 @@ def compute_fn(events, lats, lons, n_fixed, r_max):
 
 
 def main():
-    method, n_fixed, r_fixed, output, year_start, year_end = parse_args()
+    method, n_fixed, r_fixed, output, year_start, year_end, step, mc, minlat, maxlat, minlon, maxlon, src = parse_args()
+    bounds = dict(minlat=minlat, maxlat=maxlat, minlon=minlon, maxlon=maxlon)
     print(f'[*] Yontem: {"Fixed Circle (FC)" if method=="fc" else "Fixed Number (FN)"}'
-          f'  |  N={n_fixed}  R={"sabit "+str(r_fixed)+"km" if method=="fc" else "adaptif (max "+str(R_MAX)+"km)"}'
-          f'  |  Egitim: {year_start}–{year_end}')
+          f'  |  R={r_fixed} km  N={n_fixed}  step={step}°  Mc={mc}'
+          f'  |  {year_start}–{year_end}  |  Src={src}'
+          f'  |  Bounds: {minlat}-{maxlat}N {minlon}-{maxlon}E')
 
     with open(INPUT, encoding='utf-8') as f:
         data = json.load(f)
 
     events = [e for e in data['events']
-              if e.get('src') == 'EMSC'
-              and e.get('mag', 0) >= MC
-              and year_start <= int(e.get('time', '1900')[:4]) <= year_end]
-    print(f'[*] {len(events)} olay yuklendi (EMSC, mag>={MC}, {year_start}–{year_end})')
+              if e.get('src') == src
+              and e.get('mag', 0) >= mc
+              and year_start <= int(e.get('time', '1900')[:4]) <= year_end
+              and minlat <= e.get('lat', 0) <= maxlat
+              and minlon <= e.get('lon', 0) <= maxlon]
+    print(f'[*] {len(events)} olay yuklendi ({src}, mag>={mc}, {year_start}–{year_end})')
 
     # Grid
     lats, lons = [], []
-    cur = BOUNDS['minlat']
-    while cur <= BOUNDS['maxlat'] + 1e-9:
-        lats.append(round(cur, 4)); cur += STEP
-    cur = BOUNDS['minlon']
-    while cur <= BOUNDS['maxlon'] + 1e-9:
-        lons.append(round(cur, 4)); cur += STEP
+    cur = minlat
+    while cur <= maxlat + 1e-9:
+        lats.append(round(cur, 4)); cur += step
+    cur = minlon
+    while cur <= maxlon + 1e-9:
+        lons.append(round(cur, 4)); cur += step
     print(f'[*] Grid: {len(lats)}x{len(lons)} = {len(lats)*len(lons)} nokta')
 
     if method == 'fc':
@@ -200,27 +211,26 @@ def main():
     b_vals = [p['b'] for p in grid]
     print(f'[*] b: {min(b_vals):.3f} – {max(b_vals):.3f}  ort={sum(b_vals)/len(b_vals):.3f}')
 
-    # Tum Turkiye b
-    all_mags = [e.get('mag', 0) for e in events if e.get('mag', 0) >= MC]
-    b_turkey, n_turkey, _ = aki_b(all_mags, MC, N_MIN)
-    print(f'[*] Tum Turkiye b = {b_turkey}  (N={n_turkey})')
+    all_mags = [e.get('mag', 0) for e in events if e.get('mag', 0) >= mc]
+    b_region, n_region, _ = aki_b(all_mags, mc, n_fixed)
+    print(f'[*] Bolge b = {b_region}  (N={n_region})')
 
-    # w normalizasyonu (0.5-1.5 araliginda)
     B_LOW, B_HIGH = 0.5, 1.5
     for p in grid:
         w = 1.0 - (p['b'] - B_LOW) / (B_HIGH - B_LOW)
         p['w'] = round(max(0.0, min(1.0, w)), 4)
 
     out = {
-        'generated'  : datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'source'     : f'EMSC {year_start}-{year_end} | Aki (1965) MLE + Utsu (1966)',
-        'method'     : method_label,
+        'generated'   : datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'source'      : f'{src} {year_start}-{year_end} | Aki (1965) MLE + Utsu (1966)',
+        'method'      : method_label,
         'train_period': [year_start, year_end],
-        'b_turkey'  : b_turkey,
-        'b_min'     : min(b_vals),
-        'b_max'     : max(b_vals),
-        'count'     : len(grid),
-        'grid'      : grid,
+        'bounds'      : bounds,
+        'b_region'    : b_region,
+        'b_min'       : min(b_vals),
+        'b_max'       : max(b_vals),
+        'count'       : len(grid),
+        'grid'        : grid,
     }
     with open(output, 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))

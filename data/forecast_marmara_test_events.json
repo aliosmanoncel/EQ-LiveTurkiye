@@ -1,0 +1,4126 @@
+{
+  "generated": "2026-06-23T16:30:00Z",
+  "description": "Marmara forecast test: EMSC 2020-2026 M>=3.0",
+  "train_period": [
+    1998,
+    2019
+  ],
+  "test_period": [
+    2020,
+    2026
+  ],
+  "min_mag": 3.0,
+  "bounds": {
+    "minlat": 39.5,
+    "maxlat": 41.5,
+    "minlon": 26.0,
+    "maxlon": 32.0
+  },
+  "count": 456,
+  "events": [
+    {
+      "time": "2025-04-23T09:49:11.93Z",
+      "lat": 40.8327,
+      "lon": 28.2267,
+      "mag": 6.2,
+      "mw": 6.2,
+      "dep": 15.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-23T01:08:15.6Z",
+      "lat": 40.82,
+      "lon": 30.99,
+      "mag": 6.1,
+      "mw": 6.1,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:02:35.26Z",
+      "lat": 40.864,
+      "lon": 28.4223,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 18.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T09:51:18.21Z",
+      "lat": 40.8443,
+      "lon": 28.3263,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 5.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-01-11T13:37:37.0Z",
+      "lat": 40.85,
+      "lon": 28.24,
+      "mag": 4.9,
+      "mw": 5.2,
+      "dep": 16.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-04T07:42:21.01Z",
+      "lat": 40.402,
+      "lon": 28.8598,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 5.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-02T11:55:04.88Z",
+      "lat": 40.803,
+      "lon": 27.9462,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 12.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T12:12:57.25Z",
+      "lat": 40.8561,
+      "lon": 28.2847,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 5.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-02-27T13:09:54.93Z",
+      "lat": 40.2903,
+      "lon": 27.0183,
+      "mag": 4.6,
+      "mw": 4.9,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-10-14T14:07:12.04Z",
+      "lat": 40.8768,
+      "lon": 31.7031,
+      "mag": 4.6,
+      "mw": 4.9,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:01:03.28Z",
+      "lat": 40.8427,
+      "lon": 28.3802,
+      "mag": 4.5,
+      "mw": 4.8,
+      "dep": 21.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-12-12T11:34:52.14Z",
+      "lat": 40.4231,
+      "lon": 26.1846,
+      "mag": 4.4,
+      "mw": 4.8,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-13T03:21:17.5Z",
+      "lat": 40.36,
+      "lon": 27.12,
+      "mag": 4.5,
+      "mw": 4.8,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-23T03:50:57.8Z",
+      "lat": 40.83,
+      "lon": 30.92,
+      "mag": 4.5,
+      "mw": 4.8,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-11-17T12:40:16.5Z",
+      "lat": 40.84,
+      "lon": 31.03,
+      "mag": 4.8,
+      "mw": 4.8,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-09-08T21:57:24.1Z",
+      "lat": 40.7,
+      "lon": 27.42,
+      "mag": 4.4,
+      "mw": 4.8,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-01-22T19:31:43.7Z",
+      "lat": 39.56,
+      "lon": 28.81,
+      "mag": 4.7,
+      "mw": 4.7,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-02T10:57:43.5Z",
+      "lat": 40.4597,
+      "lon": 29.1982,
+      "mag": 4.2,
+      "mw": 4.6,
+      "dep": 7.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-07-22T14:39:22.48Z",
+      "lat": 39.6752,
+      "lon": 26.3629,
+      "mag": 4.5,
+      "mw": 4.5,
+      "dep": 10.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2023-11-07T20:05:48.92Z",
+      "lat": 40.4887,
+      "lon": 27.5442,
+      "mag": 4.1,
+      "mw": 4.5,
+      "dep": 15.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-03T04:59:20.6Z",
+      "lat": 40.83,
+      "lon": 30.93,
+      "mag": 4.1,
+      "mw": 4.5,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-07-20T19:49:40.5Z",
+      "lat": 40.82,
+      "lon": 31.35,
+      "mag": 4.1,
+      "mw": 4.5,
+      "dep": 4.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-02-06T12:07:53.3Z",
+      "lat": 40.46,
+      "lon": 29.0,
+      "mag": 4.1,
+      "mw": 4.5,
+      "dep": 3.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T11:50:34.75Z",
+      "lat": 40.8215,
+      "lon": 28.3265,
+      "mag": 4.0,
+      "mw": 4.4,
+      "dep": 9.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:46:14.12Z",
+      "lat": 40.8263,
+      "lon": 28.2945,
+      "mag": 4.0,
+      "mw": 4.4,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-06-03T22:58:59.3Z",
+      "lat": 39.81,
+      "lon": 27.91,
+      "mag": 4.4,
+      "mw": 4.4,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-06-03T22:13:29.7Z",
+      "lat": 39.82,
+      "lon": 27.93,
+      "mag": 4.0,
+      "mw": 4.4,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-25T17:33:16.0Z",
+      "lat": 40.8558,
+      "lon": 28.4311,
+      "mag": 4.3,
+      "mw": 4.3,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T04:19:17.93Z",
+      "lat": 40.8411,
+      "lon": 28.3061,
+      "mag": 4.1,
+      "mw": 4.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-01T09:57:34.78Z",
+      "lat": 40.4925,
+      "lon": 29.2133,
+      "mag": 4.0,
+      "mw": 4.0,
+      "dep": 10.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-01-27T10:43:47.01Z",
+      "lat": 40.2007,
+      "lon": 28.9775,
+      "mag": 4.0,
+      "mw": 4.0,
+      "dep": 10.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-21T19:20:41.33Z",
+      "lat": 39.64,
+      "lon": 28.7756,
+      "mag": 4.0,
+      "mw": 4.0,
+      "dep": 7.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-03T08:36:55.0Z",
+      "lat": 40.8239,
+      "lon": 28.2008,
+      "mag": 3.7,
+      "mw": 3.7,
+      "dep": 15.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-04T18:38:56.26Z",
+      "lat": 40.0625,
+      "lon": 27.514,
+      "mag": 4.8,
+      "mw": 3.7,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-25T05:39:58.64Z",
+      "lat": 40.8502,
+      "lon": 28.463,
+      "mag": 3.6,
+      "mw": 3.6,
+      "dep": 19.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-16T10:55:08.3Z",
+      "lat": 40.8,
+      "lon": 31.54,
+      "mag": 4.7,
+      "mw": 3.6,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-27T03:57:45.1Z",
+      "lat": 40.87,
+      "lon": 31.05,
+      "mag": 4.7,
+      "mw": 3.6,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-07-21T15:44:23.8Z",
+      "lat": 40.16,
+      "lon": 27.42,
+      "mag": 4.7,
+      "mw": 3.6,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-27T19:43:40.0Z",
+      "lat": 40.8608,
+      "lon": 28.375,
+      "mag": 3.5,
+      "mw": 3.5,
+      "dep": 16.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-11-17T12:57:19.4Z",
+      "lat": 40.82,
+      "lon": 31.04,
+      "mag": 4.4,
+      "mw": 3.3,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-02-13T12:25:00.11Z",
+      "lat": 40.5917,
+      "lon": 27.5508,
+      "mag": 3.2,
+      "mw": 3.2,
+      "dep": 13.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-07-11T13:58:06.690897Z",
+      "lat": 39.9059,
+      "lon": 28.8525,
+      "mag": 3.2,
+      "mw": 3.2,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-03-22T14:10:55.8Z",
+      "lat": 40.07,
+      "lon": 28.64,
+      "mag": 4.3,
+      "mw": 3.2,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-20T20:36:52.26Z",
+      "lat": 40.815,
+      "lon": 28.3858,
+      "mag": 4.2,
+      "mw": 3.1,
+      "dep": 8.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T09:52:20.2Z",
+      "lat": 40.8702,
+      "lon": 28.3038,
+      "mag": 4.2,
+      "mw": 3.1,
+      "dep": 12.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-07-19T19:26:08.94Z",
+      "lat": 40.6547,
+      "lon": 27.4885,
+      "mag": 4.2,
+      "mw": 3.1,
+      "dep": 4.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-05T22:03:52.93Z",
+      "lat": 40.898,
+      "lon": 31.6523,
+      "mag": 4.2,
+      "mw": 3.1,
+      "dep": 5.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-07-12T17:37:41.09Z",
+      "lat": 39.9723,
+      "lon": 28.0907,
+      "mag": 4.2,
+      "mw": 3.1,
+      "dep": 8.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-05-04T01:50:00.2Z",
+      "lat": 40.42,
+      "lon": 26.18,
+      "mag": 4.2,
+      "mw": 3.1,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-16T13:04:48.9Z",
+      "lat": 40.83,
+      "lon": 31.51,
+      "mag": 3.1,
+      "mw": 3.1,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-10-26T10:27:43.2Z",
+      "lat": 39.55,
+      "lon": 28.2,
+      "mag": 4.2,
+      "mw": 3.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-02-20T20:20:11.3Z",
+      "lat": 40.73,
+      "lon": 27.4,
+      "mag": 4.2,
+      "mw": 3.1,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-09-24T13:38:31.6Z",
+      "lat": 40.81,
+      "lon": 28.13,
+      "mag": 4.2,
+      "mw": 3.1,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T09:59:28.64Z",
+      "lat": 40.8383,
+      "lon": 28.3668,
+      "mag": 4.1,
+      "mw": 3.0,
+      "dep": 18.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-02-06T04:24:32.5Z",
+      "lat": 40.2,
+      "lon": 27.7,
+      "mag": 4.1,
+      "mw": 3.0,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-06-19T12:07:52.7Z",
+      "lat": 40.96,
+      "lon": 29.24,
+      "mag": 4.1,
+      "mw": 3.0,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-05-05T06:42:12.0Z",
+      "lat": 40.35,
+      "lon": 27.41,
+      "mag": 4.1,
+      "mw": 3.0,
+      "dep": 15.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-02T14:27:14.44Z",
+      "lat": 40.8052,
+      "lon": 27.948,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 8.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-01T08:47:20.04Z",
+      "lat": 40.4727,
+      "lon": 29.1922,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 9.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T01:20:03.23Z",
+      "lat": 40.8217,
+      "lon": 28.1293,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 12.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T21:00:14.61Z",
+      "lat": 40.8472,
+      "lon": 28.2883,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T11:21:37.61Z",
+      "lat": 40.8512,
+      "lon": 28.4108,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 20.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-08-03T02:05:34.0Z",
+      "lat": 39.8314,
+      "lon": 28.7589,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 4.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-02-23T12:14:32.4Z",
+      "lat": 40.4181,
+      "lon": 29.1608,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 10.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-17T20:53:52.22Z",
+      "lat": 40.7217,
+      "lon": 29.0994,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 11.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-09T05:28:54.1Z",
+      "lat": 40.52,
+      "lon": 28.24,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-12-11T14:37:50.1Z",
+      "lat": 40.0,
+      "lon": 28.2,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-03-08T04:21:06.5Z",
+      "lat": 40.69,
+      "lon": 29.24,
+      "mag": 4.0,
+      "mw": 2.9,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-13T17:46:30.22Z",
+      "lat": 40.8431,
+      "lon": 28.2219,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 10.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-13T04:18:14.11Z",
+      "lat": 40.8397,
+      "lon": 28.3994,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 6.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T14:52:52.42Z",
+      "lat": 40.8408,
+      "lon": 28.3003,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T09:13:04.73Z",
+      "lat": 40.8333,
+      "lon": 28.2297,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 16.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-09-24T01:20:22.26Z",
+      "lat": 39.6689,
+      "lon": 27.4589,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 18.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-08-04T04:31:33.58Z",
+      "lat": 40.9017,
+      "lon": 31.6664,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-14T06:01:46.47Z",
+      "lat": 40.9005,
+      "lon": 31.659,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-10-15T16:57:35.39Z",
+      "lat": 40.8043,
+      "lon": 30.9717,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 4.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-08-19T14:43:48.28Z",
+      "lat": 40.8423,
+      "lon": 28.0998,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-23T01:30:35.8Z",
+      "lat": 40.81,
+      "lon": 31.07,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-03-22T04:22:09.4Z",
+      "lat": 40.06,
+      "lon": 28.64,
+      "mag": 3.9,
+      "mw": 2.8,
+      "dep": 18.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-02T11:58:29.9Z",
+      "lat": 40.788,
+      "lon": 27.9662,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 2.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-05T11:24:21.06Z",
+      "lat": 40.8022,
+      "lon": 28.285,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 13.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-27T22:13:02.75Z",
+      "lat": 40.7462,
+      "lon": 31.6435,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 4.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-25T18:07:10.14Z",
+      "lat": 40.8475,
+      "lon": 28.3986,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T03:16:05.21Z",
+      "lat": 40.8387,
+      "lon": 28.1583,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 16.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-06-13T08:27:13.61Z",
+      "lat": 40.3642,
+      "lon": 27.1103,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 13.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-19T04:43:28.21Z",
+      "lat": 39.6539,
+      "lon": 28.7506,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-02-27T19:52:32.94Z",
+      "lat": 40.2925,
+      "lon": 27.0069,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 7.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-04T08:18:52.23Z",
+      "lat": 40.4253,
+      "lon": 28.8622,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 3.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-05-09T07:20:50.2Z",
+      "lat": 40.38,
+      "lon": 28.65,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 4.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-16T16:36:01.8Z",
+      "lat": 40.77,
+      "lon": 31.5,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-10-23T05:00:47.1Z",
+      "lat": 39.75,
+      "lon": 26.07,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 2.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2021-11-17T18:35:43.0Z",
+      "lat": 40.8,
+      "lon": 31.04,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-07-24T02:19:16.4Z",
+      "lat": 39.89,
+      "lon": 30.48,
+      "mag": 3.8,
+      "mw": 2.7,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-26T16:44:50.16Z",
+      "lat": 41.4819,
+      "lon": 28.6916,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 15.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-05T10:43:49.85Z",
+      "lat": 40.801,
+      "lon": 27.982,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 11.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T14:55:42.2Z",
+      "lat": 40.8567,
+      "lon": 28.3014,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 14.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-08-15T03:20:29.25Z",
+      "lat": 40.4214,
+      "lon": 28.9733,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-05-26T21:38:18.21Z",
+      "lat": 40.8278,
+      "lon": 28.3186,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-12T20:59:09.25Z",
+      "lat": 40.8861,
+      "lon": 31.6633,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 11.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-12T13:31:59.5Z",
+      "lat": 40.88,
+      "lon": 31.78,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-07T08:36:29.8Z",
+      "lat": 40.8,
+      "lon": 27.78,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-02-26T06:29:23.0Z",
+      "lat": 39.57,
+      "lon": 27.15,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-02T10:03:19.2Z",
+      "lat": 40.81,
+      "lon": 31.06,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-01-22T11:13:45.5Z",
+      "lat": 40.28,
+      "lon": 29.67,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-02-11T07:36:25.4Z",
+      "lat": 40.69,
+      "lon": 30.64,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-11-05T05:46:44.4Z",
+      "lat": 40.85,
+      "lon": 28.28,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-02-02T00:57:43.9Z",
+      "lat": 40.86,
+      "lon": 28.19,
+      "mag": 3.7,
+      "mw": 2.6,
+      "dep": 16.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-11-13T08:57:50.09Z",
+      "lat": 40.8307,
+      "lon": 28.24,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 19.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-06T00:40:56.4Z",
+      "lat": 39.936,
+      "lon": 28.8273,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 7.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-16T06:01:26.87Z",
+      "lat": 39.5364,
+      "lon": 26.0273,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 16.2,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-31T10:36:40.62Z",
+      "lat": 40.8207,
+      "lon": 28.2827,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 11.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-06-11T23:33:41.34Z",
+      "lat": 40.8439,
+      "lon": 28.3636,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 8.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-06-09T17:53:25.56Z",
+      "lat": 40.4108,
+      "lon": 27.8922,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 12.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-28T09:58:30.0Z",
+      "lat": 40.8406,
+      "lon": 28.2456,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 10.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-25T17:21:45.54Z",
+      "lat": 40.8317,
+      "lon": 28.4337,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-25T15:32:02.2Z",
+      "lat": 40.8553,
+      "lon": 28.7033,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 6.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T16:24:46.01Z",
+      "lat": 40.8443,
+      "lon": 28.2895,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 17.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T16:07:21.0Z",
+      "lat": 40.8592,
+      "lon": 28.3506,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 7.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T16:05:46.87Z",
+      "lat": 40.8519,
+      "lon": 28.3683,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 7.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T14:43:29.83Z",
+      "lat": 40.8428,
+      "lon": 28.3485,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 21.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T11:39:38.36Z",
+      "lat": 40.8575,
+      "lon": 28.3461,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 11.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:16:13.75Z",
+      "lat": 40.8615,
+      "lon": 28.4205,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 19.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:06:58.68Z",
+      "lat": 40.8903,
+      "lon": 28.3804,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 28.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-07T17:39:58.87Z",
+      "lat": 40.1058,
+      "lon": 28.5689,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-03-19T04:35:25.68Z",
+      "lat": 39.9432,
+      "lon": 28.8112,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 13.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-12-22T12:08:11.69Z",
+      "lat": 40.8417,
+      "lon": 27.9512,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 8.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-12-03T11:12:59.29Z",
+      "lat": 40.3917,
+      "lon": 28.6533,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-11-19T07:46:15.25Z",
+      "lat": 40.29,
+      "lon": 27.0048,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 11.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-08-04T21:34:08.04Z",
+      "lat": 40.7939,
+      "lon": 27.4714,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 14.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-31T09:33:13.24Z",
+      "lat": 40.2933,
+      "lon": 27.0,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 10.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-20T06:21:00.97Z",
+      "lat": 40.6756,
+      "lon": 29.2411,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 9.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-12T19:59:19.02Z",
+      "lat": 40.3003,
+      "lon": 27.0194,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 4.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-02-19T07:45:58.03Z",
+      "lat": 40.4732,
+      "lon": 29.1903,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 5.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-02-17T02:42:05.22Z",
+      "lat": 40.3089,
+      "lon": 27.5433,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-10T17:10:05.27Z",
+      "lat": 40.4117,
+      "lon": 28.8706,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 11.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-20T04:21:26.63Z",
+      "lat": 39.6507,
+      "lon": 27.853,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 6.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-04T07:57:18.2Z",
+      "lat": 40.4175,
+      "lon": 28.8658,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 5.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-10-26T17:18:25.43Z",
+      "lat": 40.5608,
+      "lon": 27.3045,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-08-06T15:29:01.39Z",
+      "lat": 40.7025,
+      "lon": 29.2285,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 14.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-07-06T14:28:13.94Z",
+      "lat": 39.85,
+      "lon": 28.72,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 4.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-04-30T04:02:54.4Z",
+      "lat": 40.8,
+      "lon": 31.07,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-13T02:00:46.9Z",
+      "lat": 40.88,
+      "lon": 31.8,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 1.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-02-05T12:49:57.2Z",
+      "lat": 40.81,
+      "lon": 27.79,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 19.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-02T18:49:36.7Z",
+      "lat": 40.77,
+      "lon": 30.98,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-25T09:00:34.3Z",
+      "lat": 40.82,
+      "lon": 30.93,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-09-05T11:13:51.6Z",
+      "lat": 39.53,
+      "lon": 26.89,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 10.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2021-07-15T04:48:36.9Z",
+      "lat": 39.63,
+      "lon": 28.52,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 3.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-07-12T21:27:36.0Z",
+      "lat": 40.03,
+      "lon": 27.42,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-06-21T12:36:53.5Z",
+      "lat": 39.59,
+      "lon": 27.62,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-04-18T04:33:22.5Z",
+      "lat": 40.73,
+      "lon": 28.72,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-03-21T21:33:56.9Z",
+      "lat": 40.51,
+      "lon": 28.15,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-11-20T04:20:42.0Z",
+      "lat": 40.43,
+      "lon": 28.96,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-09-24T18:06:41.0Z",
+      "lat": 40.82,
+      "lon": 28.17,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-08-29T03:36:26.5Z",
+      "lat": 39.67,
+      "lon": 27.8,
+      "mag": 3.6,
+      "mw": 2.5,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-04-27T17:58:00.3Z",
+      "lat": 39.55,
+      "lon": 26.05,
+      "mag": 3.5,
+      "mw": 2.5,
+      "dep": 20.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2025-12-22T11:37:12.83Z",
+      "lat": 40.8042,
+      "lon": 31.8911,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 8.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-25T08:15:59.15Z",
+      "lat": 40.3875,
+      "lon": 28.8897,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 3.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-02T23:26:39.84Z",
+      "lat": 40.1699,
+      "lon": 28.7046,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-06-11T00:02:16.99Z",
+      "lat": 40.9362,
+      "lon": 31.4475,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 6.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-26T17:45:06.35Z",
+      "lat": 40.8258,
+      "lon": 28.2013,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 15.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-25T19:54:37.32Z",
+      "lat": 40.8461,
+      "lon": 28.4083,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T18:54:46.5Z",
+      "lat": 40.8408,
+      "lon": 28.3506,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T04:08:29.24Z",
+      "lat": 40.8581,
+      "lon": 28.3617,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T20:28:29.16Z",
+      "lat": 40.8594,
+      "lon": 28.2708,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T18:46:27.46Z",
+      "lat": 40.8375,
+      "lon": 28.2108,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T11:23:32.0Z",
+      "lat": 40.8511,
+      "lon": 28.31,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:41:17.89Z",
+      "lat": 40.8361,
+      "lon": 28.4128,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 8.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:33:14.13Z",
+      "lat": 40.8482,
+      "lon": 28.4265,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 20.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-22T20:24:50.35Z",
+      "lat": 40.3911,
+      "lon": 28.0383,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-19T04:09:59.77Z",
+      "lat": 40.4272,
+      "lon": 26.2257,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 16.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-02-09T17:18:09.99Z",
+      "lat": 40.592,
+      "lon": 27.6358,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 12.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-11-02T04:11:19.31Z",
+      "lat": 39.5781,
+      "lon": 27.1086,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 13.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-09-05T16:47:46.74Z",
+      "lat": 40.7586,
+      "lon": 31.3922,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 9.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-04-22T00:57:18.92Z",
+      "lat": 40.4133,
+      "lon": 29.1653,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-20T22:24:32.41Z",
+      "lat": 39.6458,
+      "lon": 28.7667,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-02-25T13:43:52.37Z",
+      "lat": 40.474,
+      "lon": 29.1985,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 9.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-02-04T00:10:54.0Z",
+      "lat": 40.4793,
+      "lon": 26.3568,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 12.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-30T20:43:23.46Z",
+      "lat": 40.2431,
+      "lon": 29.1583,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 9.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-06-07T08:30:09.7Z",
+      "lat": 39.92,
+      "lon": 28.36,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-06-02T00:52:42.2Z",
+      "lat": 40.44,
+      "lon": 29.07,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-16T17:18:15.5Z",
+      "lat": 40.81,
+      "lon": 31.5,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-01-10T06:15:12.7Z",
+      "lat": 40.66,
+      "lon": 30.45,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-01-07T07:55:50.3Z",
+      "lat": 40.73,
+      "lon": 31.43,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 15.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-30T10:29:04.3Z",
+      "lat": 40.61,
+      "lon": 28.96,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-03T23:33:05.4Z",
+      "lat": 40.81,
+      "lon": 30.87,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 15.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-09-29T00:29:25.4Z",
+      "lat": 40.42,
+      "lon": 28.6,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-07-22T15:55:30.7Z",
+      "lat": 40.09,
+      "lon": 27.69,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-06-07T20:06:15.4Z",
+      "lat": 39.8,
+      "lon": 27.97,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-04-30T03:35:55.8Z",
+      "lat": 40.8,
+      "lon": 27.72,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-01-19T02:41:49.5Z",
+      "lat": 40.46,
+      "lon": 29.18,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-12-09T00:11:26.2Z",
+      "lat": 39.54,
+      "lon": 28.21,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-07-22T21:14:25.9Z",
+      "lat": 40.08,
+      "lon": 28.66,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-04-01T19:03:23.7Z",
+      "lat": 40.78,
+      "lon": 27.46,
+      "mag": 3.4,
+      "mw": 2.4,
+      "dep": 16.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-12-18T21:17:32.67Z",
+      "lat": 40.19,
+      "lon": 27.023,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 17.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-09-05T00:10:09.04Z",
+      "lat": 40.8292,
+      "lon": 28.1673,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 15.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-08T21:15:47.64Z",
+      "lat": 40.8335,
+      "lon": 28.1667,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 10.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-06-04T17:35:39.5Z",
+      "lat": 40.8228,
+      "lon": 28.256,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 7.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-13T13:17:06.9Z",
+      "lat": 40.8285,
+      "lon": 28.276,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 13.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-12T06:41:28.39Z",
+      "lat": 40.8375,
+      "lon": 28.3517,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-07T09:22:56.51Z",
+      "lat": 40.8322,
+      "lon": 28.3123,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-26T09:32:43.67Z",
+      "lat": 40.8386,
+      "lon": 28.4575,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 12.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-25T19:55:52.61Z",
+      "lat": 40.8406,
+      "lon": 28.4233,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 6.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-25T11:49:16.63Z",
+      "lat": 40.8533,
+      "lon": 28.4586,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 16.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T17:17:50.28Z",
+      "lat": 40.8406,
+      "lon": 28.2625,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T16:12:22.84Z",
+      "lat": 40.8478,
+      "lon": 28.3994,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T11:12:53.12Z",
+      "lat": 40.8545,
+      "lon": 28.4058,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 20.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-01-10T09:24:54.38Z",
+      "lat": 40.8128,
+      "lon": 28.4473,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 5.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-01-05T15:00:04.06Z",
+      "lat": 40.783,
+      "lon": 27.5317,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 3.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-10-23T10:35:26.25Z",
+      "lat": 39.6664,
+      "lon": 26.5519,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 14.3,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2024-06-17T14:18:59.48Z",
+      "lat": 40.7203,
+      "lon": 27.4219,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 6.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-20T21:41:06.84Z",
+      "lat": 39.6072,
+      "lon": 28.6551,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-04T07:45:33.3Z",
+      "lat": 40.408,
+      "lon": 28.8612,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 9.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-11-16T03:36:57.65Z",
+      "lat": 40.3173,
+      "lon": 27.1508,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 11.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-06-05T10:11:30.5Z",
+      "lat": 40.3277,
+      "lon": 27.5655,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 7.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-06-04T03:23:47.8Z",
+      "lat": 40.26,
+      "lon": 29.23,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-04-02T04:03:53.6Z",
+      "lat": 40.72,
+      "lon": 27.38,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-17T11:00:37.8Z",
+      "lat": 40.81,
+      "lon": 31.54,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-16T11:05:00.1Z",
+      "lat": 40.78,
+      "lon": 31.51,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 4.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-05T05:28:07.8Z",
+      "lat": 40.78,
+      "lon": 30.95,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 6.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-02-24T02:08:23.7Z",
+      "lat": 40.8,
+      "lon": 27.62,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 15.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-02-13T08:01:31.7Z",
+      "lat": 41.14,
+      "lon": 31.35,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-01-30T10:14:05.4Z",
+      "lat": 40.81,
+      "lon": 30.96,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-23T07:42:56.9Z",
+      "lat": 39.96,
+      "lon": 28.09,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-25T22:01:07.9Z",
+      "lat": 40.79,
+      "lon": 30.98,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 6.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-10-27T23:02:28.7Z",
+      "lat": 40.82,
+      "lon": 27.86,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 16.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-08-11T19:23:01.6Z",
+      "lat": 40.55,
+      "lon": 29.29,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-07-28T16:10:49.3Z",
+      "lat": 40.38,
+      "lon": 27.23,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-06-04T03:01:30.3Z",
+      "lat": 39.82,
+      "lon": 27.95,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 6.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-03-02T02:40:12.6Z",
+      "lat": 39.67,
+      "lon": 28.54,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-12-27T03:34:45.8Z",
+      "lat": 39.72,
+      "lon": 27.7,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 15.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-08-29T03:45:32.6Z",
+      "lat": 39.66,
+      "lon": 27.8,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-02-22T01:25:56.8Z",
+      "lat": 40.78,
+      "lon": 27.44,
+      "mag": 3.3,
+      "mw": 2.3,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-11-21T14:44:19.84Z",
+      "lat": 39.5842,
+      "lon": 26.4422,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-03T22:23:32.31Z",
+      "lat": 40.7777,
+      "lon": 27.968,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-09-26T23:28:24.18Z",
+      "lat": 40.3948,
+      "lon": 27.6453,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 12.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-09-26T07:30:14.03Z",
+      "lat": 40.7389,
+      "lon": 31.6339,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-20T16:57:37.77Z",
+      "lat": 40.8143,
+      "lon": 28.2853,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 8.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-04T15:32:47.63Z",
+      "lat": 39.5442,
+      "lon": 29.1389,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-13T11:49:46.26Z",
+      "lat": 40.461,
+      "lon": 29.1593,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 12.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-02T08:30:08.66Z",
+      "lat": 40.8307,
+      "lon": 28.8495,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 19.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-30T06:07:04.51Z",
+      "lat": 40.8817,
+      "lon": 28.3219,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-28T01:24:11.2Z",
+      "lat": 40.8432,
+      "lon": 28.2885,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 12.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-27T10:44:31.11Z",
+      "lat": 40.8447,
+      "lon": 28.3753,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 5.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-27T09:48:41.96Z",
+      "lat": 40.8394,
+      "lon": 28.4033,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-26T10:05:38.46Z",
+      "lat": 40.8531,
+      "lon": 28.3753,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-25T14:21:20.31Z",
+      "lat": 40.8602,
+      "lon": 28.4305,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 15.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T18:56:03.78Z",
+      "lat": 40.8556,
+      "lon": 28.3372,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T12:03:45.52Z",
+      "lat": 40.8582,
+      "lon": 28.397,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 18.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:57:19.15Z",
+      "lat": 40.8438,
+      "lon": 28.4157,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 17.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:05:43.05Z",
+      "lat": 40.8213,
+      "lon": 28.2977,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 12.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T09:56:13.0Z",
+      "lat": 40.8542,
+      "lon": 28.3908,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T09:55:02.44Z",
+      "lat": 40.8662,
+      "lon": 28.426,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-15T03:58:15.67Z",
+      "lat": 40.1236,
+      "lon": 28.5406,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 12.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-12-30T18:02:28.74Z",
+      "lat": 40.7833,
+      "lon": 31.0003,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 11.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-12-05T18:15:39.35Z",
+      "lat": 40.2831,
+      "lon": 26.9911,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 10.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-10-25T19:21:46.4Z",
+      "lat": 40.6728,
+      "lon": 30.5411,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 11.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-08-22T03:52:22.92Z",
+      "lat": 39.6264,
+      "lon": 28.7633,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 5.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-04-13T20:49:22.51Z",
+      "lat": 39.6247,
+      "lon": 28.7672,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 12.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-04-01T06:04:08.07Z",
+      "lat": 39.5894,
+      "lon": 28.2181,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 11.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-02T09:23:31.08Z",
+      "lat": 40.3605,
+      "lon": 27.4578,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-31T10:17:30.0Z",
+      "lat": 40.425,
+      "lon": 28.8878,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 8.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-30T17:55:07.0Z",
+      "lat": 40.4247,
+      "lon": 28.8342,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 9.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-21T14:03:07.81Z",
+      "lat": 40.71,
+      "lon": 27.5398,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-06T10:01:43.94Z",
+      "lat": 40.4097,
+      "lon": 28.8186,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-04T14:46:12.36Z",
+      "lat": 40.4022,
+      "lon": 28.8606,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 14.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-04T09:25:02.34Z",
+      "lat": 40.405,
+      "lon": 28.87,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 14.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-10-28T03:50:12.4Z",
+      "lat": 39.8753,
+      "lon": 29.2305,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 8.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-09-16T12:27:55.84Z",
+      "lat": 40.8125,
+      "lon": 31.0375,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 5.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-07-27T08:32:52.97Z",
+      "lat": 40.7848,
+      "lon": 27.8105,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-07-07T09:03:25.89Z",
+      "lat": 39.5144,
+      "lon": 26.0875,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 10.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2023-06-16T22:20:00.2Z",
+      "lat": 40.81,
+      "lon": 28.07,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 15.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-06-07T23:15:52.8Z",
+      "lat": 39.96,
+      "lon": 28.36,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-06-03T11:07:53.4Z",
+      "lat": 40.43,
+      "lon": 29.08,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-05-20T13:25:05.1Z",
+      "lat": 40.25,
+      "lon": 29.22,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-04-30T11:01:54.7Z",
+      "lat": 40.75,
+      "lon": 27.35,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-04-20T10:41:34.4Z",
+      "lat": 40.42,
+      "lon": 27.03,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-04-09T00:40:31.5Z",
+      "lat": 40.56,
+      "lon": 27.35,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 18.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-02-02T20:25:43.0Z",
+      "lat": 40.67,
+      "lon": 30.44,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-02-02T20:08:41.1Z",
+      "lat": 40.66,
+      "lon": 30.44,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 16.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-02T21:09:01.6Z",
+      "lat": 40.79,
+      "lon": 31.02,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-24T01:02:09.2Z",
+      "lat": 40.77,
+      "lon": 31.0,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 4.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-09-14T00:38:37.6Z",
+      "lat": 40.72,
+      "lon": 27.33,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 17.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-08-12T12:49:27.2Z",
+      "lat": 39.57,
+      "lon": 27.99,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-06-15T19:55:08.0Z",
+      "lat": 39.82,
+      "lon": 27.94,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-06-03T23:03:08.6Z",
+      "lat": 39.81,
+      "lon": 27.94,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-04-07T12:27:46.7Z",
+      "lat": 40.08,
+      "lon": 28.65,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-03-28T13:47:06.5Z",
+      "lat": 40.07,
+      "lon": 28.62,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 6.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-09-17T09:22:21.1Z",
+      "lat": 40.59,
+      "lon": 28.52,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-09-07T14:15:58.8Z",
+      "lat": 40.13,
+      "lon": 27.35,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-12-03T02:38:13.2Z",
+      "lat": 40.59,
+      "lon": 28.97,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-11-20T09:52:55.6Z",
+      "lat": 40.6,
+      "lon": 28.98,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-11-04T11:49:34.7Z",
+      "lat": 40.85,
+      "lon": 28.34,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-05-06T03:08:38.0Z",
+      "lat": 39.61,
+      "lon": 26.08,
+      "mag": 3.2,
+      "mw": 2.2,
+      "dep": 7.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2025-12-02T03:07:16.75Z",
+      "lat": 40.6347,
+      "lon": 27.8592,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 15.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-11-28T22:06:08.46Z",
+      "lat": 40.5092,
+      "lon": 30.1508,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-27T02:48:55.47Z",
+      "lat": 40.3408,
+      "lon": 27.2662,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-26T07:18:01.17Z",
+      "lat": 40.344,
+      "lon": 27.2567,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 10.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-06-25T20:25:30.73Z",
+      "lat": 40.837,
+      "lon": 28.4128,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 9.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-06-08T02:48:00.19Z",
+      "lat": 40.8547,
+      "lon": 28.2714,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 17.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-30T21:34:44.69Z",
+      "lat": 40.724,
+      "lon": 28.626,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-29T14:59:27.73Z",
+      "lat": 40.8373,
+      "lon": 28.1937,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 13.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T06:22:07.76Z",
+      "lat": 40.8356,
+      "lon": 28.1256,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T16:27:21.26Z",
+      "lat": 40.8519,
+      "lon": 28.3853,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T14:06:40.96Z",
+      "lat": 40.8525,
+      "lon": 28.36,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 19.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T12:17:18.52Z",
+      "lat": 40.8402,
+      "lon": 28.354,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 25.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T11:33:57.3Z",
+      "lat": 40.852,
+      "lon": 28.389,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 19.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:31:56.0Z",
+      "lat": 40.8211,
+      "lon": 28.3397,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-03-11T00:26:28.59Z",
+      "lat": 40.335,
+      "lon": 27.7519,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-01-05T09:39:19.39Z",
+      "lat": 40.8318,
+      "lon": 28.0408,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-11-22T00:54:29.51Z",
+      "lat": 40.7306,
+      "lon": 31.3708,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-07-18T17:29:18.13Z",
+      "lat": 40.2044,
+      "lon": 28.8683,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-07-18T15:41:51.86Z",
+      "lat": 40.075,
+      "lon": 27.1778,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 13.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-27T07:21:34.0Z",
+      "lat": 40.3,
+      "lon": 29.0167,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 10.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-23T17:17:37.57Z",
+      "lat": 39.6364,
+      "lon": 28.755,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-31T12:48:35.0Z",
+      "lat": 40.4197,
+      "lon": 28.8739,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-09T01:56:27.79Z",
+      "lat": 40.4133,
+      "lon": 28.8386,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 10.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-24T15:18:55.46Z",
+      "lat": 40.4225,
+      "lon": 28.8339,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 10.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-04T07:37:46.7Z",
+      "lat": 40.4507,
+      "lon": 28.8342,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 2.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-11-06T05:14:11.4Z",
+      "lat": 40.8882,
+      "lon": 31.6852,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 4.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-10-13T19:54:08.74Z",
+      "lat": 40.7763,
+      "lon": 31.0225,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 9.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-10-11T16:36:01.84Z",
+      "lat": 40.835,
+      "lon": 28.2795,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 3.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-07-30T20:19:41.72Z",
+      "lat": 40.8085,
+      "lon": 31.0183,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-06-29T18:47:50.18Z",
+      "lat": 40.2142,
+      "lon": 28.8838,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 4.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-05-26T05:59:33.4Z",
+      "lat": 40.89,
+      "lon": 28.04,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-04-23T18:23:52.2Z",
+      "lat": 39.97,
+      "lon": 28.1,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 6.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-04-09T15:02:04.0Z",
+      "lat": 40.66,
+      "lon": 28.27,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-22T08:19:00.5Z",
+      "lat": 40.79,
+      "lon": 31.51,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 4.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-11T06:25:31.7Z",
+      "lat": 40.85,
+      "lon": 31.72,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-01-17T19:38:47.2Z",
+      "lat": 40.77,
+      "lon": 29.07,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-01-02T09:26:32.9Z",
+      "lat": 40.14,
+      "lon": 27.26,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-01-01T23:52:02.0Z",
+      "lat": 40.62,
+      "lon": 28.97,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-12T12:53:44.7Z",
+      "lat": 40.81,
+      "lon": 30.99,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-22T21:51:55.3Z",
+      "lat": 39.96,
+      "lon": 27.18,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-10-13T14:25:51.8Z",
+      "lat": 40.21,
+      "lon": 27.75,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-10-03T22:57:49.2Z",
+      "lat": 40.86,
+      "lon": 28.43,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 19.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-09-24T13:10:35.9Z",
+      "lat": 40.83,
+      "lon": 28.41,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-09-20T08:10:17.0Z",
+      "lat": 40.87,
+      "lon": 31.7,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 4.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-07-30T07:19:23.2Z",
+      "lat": 39.72,
+      "lon": 27.61,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 6.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-07-19T18:51:34.0Z",
+      "lat": 40.08,
+      "lon": 27.69,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-05-17T13:01:03.8Z",
+      "lat": 41.07,
+      "lon": 26.01,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 10.0,
+      "place": "BULGARIA-GREECE-TURKEY BORDER RG"
+    },
+    {
+      "time": "2022-04-30T06:52:51.8Z",
+      "lat": 40.86,
+      "lon": 31.67,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-04-24T12:13:57.6Z",
+      "lat": 40.86,
+      "lon": 31.69,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-04-22T06:07:58.1Z",
+      "lat": 39.55,
+      "lon": 26.41,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 8.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2022-04-05T14:49:46.2Z",
+      "lat": 40.58,
+      "lon": 27.78,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-03-31T23:18:49.4Z",
+      "lat": 40.33,
+      "lon": 27.2,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-01-17T12:06:49.5Z",
+      "lat": 40.67,
+      "lon": 27.41,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-12-29T14:46:16.9Z",
+      "lat": 40.39,
+      "lon": 27.62,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-12-22T02:28:12.0Z",
+      "lat": 39.83,
+      "lon": 29.13,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 3.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-11-10T05:53:24.4Z",
+      "lat": 39.78,
+      "lon": 26.07,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 3.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2021-10-17T14:00:22.7Z",
+      "lat": 39.86,
+      "lon": 29.29,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-09-23T05:58:00.4Z",
+      "lat": 40.71,
+      "lon": 29.25,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-07-16T12:29:23.8Z",
+      "lat": 40.76,
+      "lon": 27.52,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-06-01T07:32:37.4Z",
+      "lat": 40.41,
+      "lon": 28.66,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-02-27T12:12:06.8Z",
+      "lat": 40.63,
+      "lon": 29.03,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-01-22T18:41:59.4Z",
+      "lat": 39.78,
+      "lon": 26.74,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2020-10-24T04:48:26.5Z",
+      "lat": 39.56,
+      "lon": 28.87,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-10-15T13:55:13.4Z",
+      "lat": 40.87,
+      "lon": 28.74,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-07-14T20:59:37.6Z",
+      "lat": 40.85,
+      "lon": 28.29,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-02-08T03:46:40.8Z",
+      "lat": 39.65,
+      "lon": 26.09,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 12.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2020-01-27T09:33:55.1Z",
+      "lat": 41.24,
+      "lon": 29.57,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-01-04T17:13:03.1Z",
+      "lat": 40.77,
+      "lon": 29.04,
+      "mag": 3.1,
+      "mw": 2.1,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-12-26T23:35:04.55Z",
+      "lat": 40.8112,
+      "lon": 28.065,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-12-20T03:53:35.1Z",
+      "lat": 40.6506,
+      "lon": 30.7572,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-12-15T19:55:17.55Z",
+      "lat": 40.2925,
+      "lon": 27.0342,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-12-09T23:00:11.33Z",
+      "lat": 40.4132,
+      "lon": 28.0515,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 12.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-04T19:06:04.77Z",
+      "lat": 39.6287,
+      "lon": 28.7735,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 9.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-04T12:31:59.05Z",
+      "lat": 40.4328,
+      "lon": 27.1608,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 4.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-04T04:54:07.4Z",
+      "lat": 40.8053,
+      "lon": 27.9555,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-02T23:48:55.59Z",
+      "lat": 40.7852,
+      "lon": 27.9565,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 9.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-02T12:11:31.73Z",
+      "lat": 40.778,
+      "lon": 27.9527,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-27T09:21:46.55Z",
+      "lat": 40.82,
+      "lon": 31.7792,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 8.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-17T14:14:39.97Z",
+      "lat": 40.8494,
+      "lon": 28.2925,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-17T14:00:01.81Z",
+      "lat": 40.4108,
+      "lon": 27.4681,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-09T14:11:18.87Z",
+      "lat": 40.816,
+      "lon": 28.2958,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 6.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-01T22:58:46.08Z",
+      "lat": 40.4911,
+      "lon": 29.2167,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-01T10:00:44.92Z",
+      "lat": 40.4831,
+      "lon": 29.2064,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 9.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-06-12T01:17:30.28Z",
+      "lat": 40.857,
+      "lon": 28.4065,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-10T11:43:59.04Z",
+      "lat": 40.4017,
+      "lon": 28.8838,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-09T23:28:07.34Z",
+      "lat": 40.8345,
+      "lon": 28.2617,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 14.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-07T05:07:28.13Z",
+      "lat": 40.7837,
+      "lon": 28.046,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 12.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-27T15:55:28.1Z",
+      "lat": 40.8617,
+      "lon": 28.4083,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 15.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-26T00:47:13.16Z",
+      "lat": 40.8558,
+      "lon": 28.405,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T23:58:33.42Z",
+      "lat": 40.847,
+      "lon": 28.3182,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 22.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T18:11:50.14Z",
+      "lat": 40.8194,
+      "lon": 28.2878,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-24T00:59:51.93Z",
+      "lat": 40.8433,
+      "lon": 28.3875,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T18:32:14.71Z",
+      "lat": 40.8425,
+      "lon": 28.1328,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T14:47:53.23Z",
+      "lat": 40.8525,
+      "lon": 28.4082,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 20.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T13:59:56.53Z",
+      "lat": 40.8088,
+      "lon": 28.0753,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T13:29:10.8Z",
+      "lat": 40.8417,
+      "lon": 28.363,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 22.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T12:44:00.29Z",
+      "lat": 40.8461,
+      "lon": 28.4081,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T12:33:53.0Z",
+      "lat": 40.8361,
+      "lon": 28.1722,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 6.9,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:29:59.44Z",
+      "lat": 40.8415,
+      "lon": 28.2655,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 15.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:26:05.0Z",
+      "lat": 40.8583,
+      "lon": 28.2333,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T10:13:55.15Z",
+      "lat": 40.8915,
+      "lon": 28.4173,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 19.6,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-02-27T11:27:52.88Z",
+      "lat": 40.4931,
+      "lon": 27.5356,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 14.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-12-12T13:40:55.63Z",
+      "lat": 40.8692,
+      "lon": 31.675,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-11-05T11:59:58.84Z",
+      "lat": 40.4038,
+      "lon": 28.8552,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-08-04T04:33:58.86Z",
+      "lat": 40.8373,
+      "lon": 31.6468,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-06-02T03:59:49.53Z",
+      "lat": 40.3923,
+      "lon": 28.8695,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-05-31T06:32:09.06Z",
+      "lat": 40.2469,
+      "lon": 27.0108,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 16.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-04-07T04:22:46.87Z",
+      "lat": 40.292,
+      "lon": 27.025,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 9.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-03-29T01:33:57.09Z",
+      "lat": 40.2043,
+      "lon": 31.2662,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-02-04T04:17:51.93Z",
+      "lat": 40.2831,
+      "lon": 27.0211,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-27T03:17:34.67Z",
+      "lat": 40.4233,
+      "lon": 28.8389,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 3.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-14T09:50:15.38Z",
+      "lat": 40.4187,
+      "lon": 28.815,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-14T02:40:42.02Z",
+      "lat": 40.4044,
+      "lon": 28.8417,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-09T02:29:39.47Z",
+      "lat": 40.4172,
+      "lon": 28.8522,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.8,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-08T23:21:03.9Z",
+      "lat": 40.704,
+      "lon": 29.0732,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-05T17:28:28.85Z",
+      "lat": 40.4102,
+      "lon": 28.8562,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 9.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-05T14:10:54.42Z",
+      "lat": 40.7807,
+      "lon": 30.8942,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 6.3,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-04T08:49:38.0Z",
+      "lat": 40.4128,
+      "lon": 28.8697,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-12-04T08:15:56.4Z",
+      "lat": 40.3812,
+      "lon": 28.9188,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-09-03T22:30:47.83Z",
+      "lat": 40.461,
+      "lon": 29.9895,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-07-30T13:54:53.73Z",
+      "lat": 40.5722,
+      "lon": 30.7302,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 2.1,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-05-09T08:37:40.9Z",
+      "lat": 40.43,
+      "lon": 26.13,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-05-08T17:27:50.2Z",
+      "lat": 40.45,
+      "lon": 29.27,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-05-02T03:27:56.9Z",
+      "lat": 40.46,
+      "lon": 27.57,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-23T00:32:33.0Z",
+      "lat": 40.77,
+      "lon": 31.5,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-03-05T05:26:54.7Z",
+      "lat": 40.79,
+      "lon": 30.96,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-02-13T03:33:53.1Z",
+      "lat": 40.77,
+      "lon": 27.5,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 15.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-01-29T08:04:27.2Z",
+      "lat": 40.58,
+      "lon": 27.24,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-23T03:03:28.8Z",
+      "lat": 39.99,
+      "lon": 28.16,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-12-08T03:00:26.2Z",
+      "lat": 40.81,
+      "lon": 30.97,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-25T16:07:54.2Z",
+      "lat": 40.84,
+      "lon": 31.05,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-25T03:58:41.5Z",
+      "lat": 40.82,
+      "lon": 31.0,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-11-04T03:54:47.6Z",
+      "lat": 39.76,
+      "lon": 26.59,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 11.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2022-10-05T06:41:30.2Z",
+      "lat": 40.8,
+      "lon": 27.52,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-07-28T16:37:52.5Z",
+      "lat": 40.39,
+      "lon": 27.22,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 6.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-07-25T10:17:09.5Z",
+      "lat": 39.55,
+      "lon": 26.17,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 8.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2022-06-05T10:31:00.6Z",
+      "lat": 39.82,
+      "lon": 27.97,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-06-03T23:22:34.6Z",
+      "lat": 39.82,
+      "lon": 27.95,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-05-14T13:50:41.6Z",
+      "lat": 39.53,
+      "lon": 28.39,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 4.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-05-02T19:40:20.1Z",
+      "lat": 40.89,
+      "lon": 31.59,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2022-04-07T12:36:57.6Z",
+      "lat": 40.09,
+      "lon": 28.68,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-12-04T02:29:28.2Z",
+      "lat": 40.45,
+      "lon": 27.69,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 15.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-11-30T20:34:38.4Z",
+      "lat": 39.54,
+      "lon": 27.85,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-11-01T17:00:41.7Z",
+      "lat": 39.94,
+      "lon": 28.87,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-10-02T08:58:39.9Z",
+      "lat": 39.77,
+      "lon": 27.64,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-05-15T16:32:37.2Z",
+      "lat": 39.59,
+      "lon": 27.6,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-04-20T17:17:51.4Z",
+      "lat": 40.88,
+      "lon": 31.67,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-12-11T04:40:31.8Z",
+      "lat": 40.84,
+      "lon": 28.03,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-12-11T02:51:03.0Z",
+      "lat": 40.63,
+      "lon": 29.05,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 8.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-12-06T11:30:00.3Z",
+      "lat": 40.24,
+      "lon": 28.99,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-12-01T16:22:46.3Z",
+      "lat": 40.59,
+      "lon": 28.98,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 4.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-09-08T22:06:27.3Z",
+      "lat": 40.71,
+      "lon": 27.42,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-08-23T05:53:28.2Z",
+      "lat": 39.52,
+      "lon": 26.07,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2020-07-16T05:18:31.0Z",
+      "lat": 40.76,
+      "lon": 31.9,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-06-04T12:14:49.8Z",
+      "lat": 40.37,
+      "lon": 26.1,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 2.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-05-04T04:04:31.0Z",
+      "lat": 39.51,
+      "lon": 27.03,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-04-24T03:49:02.0Z",
+      "lat": 40.38,
+      "lon": 27.15,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 14.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-03-25T10:15:35.0Z",
+      "lat": 40.55,
+      "lon": 27.41,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-02-17T11:45:31.1Z",
+      "lat": 39.87,
+      "lon": 27.98,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 13.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-01-28T09:47:32.6Z",
+      "lat": 40.12,
+      "lon": 28.92,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 5.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-01-11T05:15:26.4Z",
+      "lat": 40.7,
+      "lon": 27.4,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-01-02T19:35:47.6Z",
+      "lat": 40.01,
+      "lon": 27.78,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-01-02T11:18:40.9Z",
+      "lat": 40.84,
+      "lon": 28.35,
+      "mag": 3.0,
+      "mw": 2.0,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    }
+  ]
+}

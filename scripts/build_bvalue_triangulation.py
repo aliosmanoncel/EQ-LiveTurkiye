@@ -35,11 +35,9 @@ def _parse():
             get('--label',  'FC'))
 INPUT, OUTPUT_PNG, OUTPUT_META, LABEL = _parse()
 
-BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
-
-# Raster çözünürlüğü: 0.04° adım ~ 4 km
-GRID_W = 500   # lon: 25–45° / 500 = 0.04°/px
-GRID_H = 225   # lat: 34–43° / 225 = 0.04°/px
+DEFAULT_BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
+GRID_W = 500
+GRID_H = 225
 
 # b-değeri renk skalası — veri medyanı (1.15) merkez, NAF-tipi düşük b görünür
 B_LOW, B_HIGH = 0.7, 1.3
@@ -67,26 +65,32 @@ def main():
     bvals = np.array([p['b']   for p in grid], dtype=float)
     nvals = np.array([p['n']   for p in grid], dtype=int)
 
+    # Bounds: JSON'dan oku (varsa), yoksa DEFAULT_BOUNDS
+    BOUNDS = data.get('bounds', DEFAULT_BOUNDS)
+    # Aspect-ratio'ya göre çözünürlük
+    dlon = BOUNDS['maxlon'] - BOUNDS['minlon']
+    dlat = BOUNDS['maxlat'] - BOUNDS['minlat']
+    ratio = dlon / dlat if dlat > 0 else 2.0
+    gw = max(200, min(800, int(GRID_H * ratio)))
+    gh = GRID_H
+
     print(f'[*] {len(grid)} nokta yüklendi (N≥50 kriteri geçmiş)')
     print(f'    b: {bvals.min():.3f} – {bvals.max():.3f}  |  ort: {bvals.mean():.3f}')
     print(f'    N aralığı: {nvals.min()} – {nvals.max()}')
+    print(f'    Bounds: {BOUNDS}  |  Grid: {gw}×{gh}')
 
-    # ── Delaunay triangülasyonu ────────────────────────────────────
-    # LinearNDInterpolator: Delaunay + lineer interpolasyon
-    # Üçgen dışı → NaN (şeffaf kalır)
     print('[*] Delaunay triangülasyonu + lineer interpolasyon...')
     interp = LinearNDInterpolator(
         list(zip(lons, lats)),
         bvals,
-        fill_value=np.nan   # veri dışı → şeffaf
+        fill_value=np.nan
     )
 
-    # ── Output grid ───────────────────────────────────────────────
-    grid_lons = np.linspace(BOUNDS['minlon'], BOUNDS['maxlon'], GRID_W)
-    grid_lats = np.linspace(BOUNDS['maxlat'], BOUNDS['minlat'], GRID_H)
+    grid_lons = np.linspace(BOUNDS['minlon'], BOUNDS['maxlon'], gw)
+    grid_lats = np.linspace(BOUNDS['maxlat'], BOUNDS['minlat'], gh)
     LON, LAT  = np.meshgrid(grid_lons, grid_lats)
 
-    z = interp(LON, LAT)   # NaN → veri dışı
+    z = interp(LON, LAT)
 
     n_valid = np.sum(~np.isnan(z))
     n_total = z.size
@@ -105,9 +109,8 @@ def main():
 
     img = Image.fromarray(rgba, 'RGBA')
     img.save(OUTPUT_PNG, optimize=True)
-    print(f'[OK] PNG kaydedildi: {OUTPUT_PNG}  ({GRID_W}×{GRID_H} px)')
+    print(f'[OK] PNG kaydedildi: {OUTPUT_PNG}  ({gw}×{gh} px)')
 
-    # ── Meta JSON ─────────────────────────────────────────────────
     meta = {
         'generated'  : datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
         'method'     : 'Delaunay Triangulation + Linear Interpolation · scipy',
@@ -115,8 +118,8 @@ def main():
         'valid_px'   : int(n_valid),
         'total_px'   : int(n_total),
         'coverage_pct': round(100 * n_valid / n_total, 1),
-        'grid_w'     : GRID_W,
-        'grid_h'     : GRID_H,
+        'grid_w'     : gw,
+        'grid_h'     : gh,
         'b_min_pred' : float(np.nanmin(z)),
         'b_max_pred' : float(np.nanmax(z)),
         'b_norm'     : [B_LOW, B_HIGH],

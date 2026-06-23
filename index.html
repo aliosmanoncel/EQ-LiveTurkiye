@@ -256,7 +256,8 @@
     <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
     <button class="tbtn"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
-    <button class="tbtn"        id="btnForecast" onclick="toggleLayer('forecast')" title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2026) · Wiemer&Wyss (2002)">📍 Forecast</button>
+    <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2026) · Wiemer&Wyss (2002)">📍 Forecast</button>
+    <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km · Öncel&Wyss (2000) · eğitim 1998-2019 → test M≥3 (2020-2026)">🔬 Marmara</button>
   </div>
 
   <div class="sep"></div>
@@ -366,6 +367,9 @@ const FRACTAL_META_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-L
 const FORECAST_PNG_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_forecast.png';
 const FORECAST_META_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_forecast_meta.json';
 const FORECAST_TEST_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/forecast_test_events.json';
+const MAR_FC_PNG_URL     = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_marmara_forecast.png';
+const MAR_FC_META_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_marmara_forecast_meta.json';
+const MAR_FC_TEST_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/forecast_marmara_test_events.json';
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
 const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 
@@ -391,8 +395,12 @@ let showFractal = false;
 let fractalLayer = null;
 
 let showForecast    = false;
-let forecastBgLayer = null;   // b-value PNG (egitim donemi)
-let forecastDotLayer = null;  // test olaylari CircleMarker'lar
+let forecastBgLayer = null;
+let forecastDotLayer = null;
+
+let showMarForecast    = false;
+let marFcBgLayer       = null;
+let marFcDotLayer      = null;
 
 const labelLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
   { maxZoom:18, zIndex:700 }).addTo(map);
@@ -908,13 +916,17 @@ function toggleLayer(type) {
     if (!forecastBgLayer) {
       loadForecastLayer();
     } else {
-      if (showForecast) {
-        forecastBgLayer.addTo(map);
-        forecastDotLayer.addTo(map);
-      } else {
-        map.removeLayer(forecastBgLayer);
-        map.removeLayer(forecastDotLayer);
-      }
+      if (showForecast) { forecastBgLayer.addTo(map); forecastDotLayer.addTo(map); }
+      else { map.removeLayer(forecastBgLayer); map.removeLayer(forecastDotLayer); }
+    }
+  } else if (type === 'marforecast') {
+    showMarForecast = !showMarForecast;
+    document.getElementById('btnMarForecast').classList.toggle('active', showMarForecast);
+    if (!marFcBgLayer) {
+      loadMarmaraForecastLayer();
+    } else {
+      if (showMarForecast) { marFcBgLayer.addTo(map); marFcDotLayer.addTo(map); }
+      else { map.removeLayer(marFcBgLayer); map.removeLayer(marFcDotLayer); }
     }
   } else if (type === 'topo') {
     showTopo = !showTopo;
@@ -1130,6 +1142,56 @@ async function loadForecastLayer() {
     setStatus('Forecast load error: ' + e.message, true);
     showForecast = false;
     document.getElementById('btnForecast').classList.remove('active');
+  }
+}
+
+async function loadMarmaraForecastLayer() {
+  setStatus('Marmara Forecast yükleniyor…');
+  try {
+    const metaRes = await fetch(MAR_FC_META_URL);
+    if (!metaRes.ok) throw new Error('Marmara forecast meta bulunamadı');
+    const meta = await metaRes.json();
+    const b = meta.bounds;
+    marFcBgLayer = L.imageOverlay(MAR_FC_PNG_URL,
+      [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+      { opacity: 0.88, interactive: false }
+    );
+    if (showMarForecast) marFcBgLayer.addTo(map);
+
+    const evRes = await fetch(MAR_FC_TEST_URL);
+    if (!evRes.ok) throw new Error('Marmara test olayları bulunamadı');
+    const evData = await evRes.json();
+
+    marFcDotLayer = L.layerGroup();
+    evData.events.forEach(e => {
+      const m = e.mag;  // ML — b-value hesabıyla tutarlı
+      const r = Math.max(4, (m - 2.5) * 5);
+      const clr = m >= 5.0 ? '#ef4444' : m >= 4.5 ? '#f97316' : m >= 4.0 ? '#fbbf24' : m >= 3.5 ? '#a3e635' : '#94a3b8';
+      const date = e.time ? e.time.slice(0,10) : '';
+      L.circleMarker([e.lat, e.lon], {
+        radius: r, color: '#000', weight: 0.6,
+        fillColor: clr, fillOpacity: 0.80,
+      }).bindPopup(
+        `<b style="color:${clr};font-size:1.1rem">ML${m.toFixed(1)}</b>` +
+        `<br><span style="color:#aaa">${e.place || ''}</span>` +
+        `<br><span style="color:#f59e0b;font-size:.8rem">📅 ${date} · Test</span>` +
+        `<br>Depth: ${(e.dep||0).toFixed(0)} km`
+      ).addTo(marFcDotLayer);
+    });
+    if (showMarForecast) marFcDotLayer.addTo(map);
+
+    // Marmara'ya zoom
+    if (showMarForecast) map.fitBounds([[b.minlat, b.minlon],[b.maxlat, b.maxlon]], {padding:[20,20]});
+
+    setStatus(
+      `🔬 Marmara Pilot · FC R=20km dr=5km · Öncel&Wyss (2000) · ` +
+      `Eğitim: 1998-2019 (${meta.source_pts} nokta) · ` +
+      `Test: ${evData.count} olay ML≥3.0 (2020-2026) · Kırmızı=düşük-b=yüksek stres`
+    );
+  } catch(err) {
+    setStatus('Marmara Forecast error: ' + err.message, true);
+    showMarForecast = false;
+    document.getElementById('btnMarForecast').classList.remove('active');
   }
 }
 
