@@ -5,6 +5,9 @@ on:
     - cron: '0 * * * *'   # Her saat başı (UTC)
   workflow_dispatch:        # Manuel tetikleme (GitHub UI'dan)
 
+permissions:
+  contents: write           # commit + push için gerekli
+
 jobs:
   update:
     runs-on: ubuntu-latest
