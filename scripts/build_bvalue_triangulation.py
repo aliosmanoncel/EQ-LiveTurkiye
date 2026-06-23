@@ -39,8 +39,7 @@ DEFAULT_BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
 GRID_W = 500
 GRID_H = 225
 
-# b-değeri renk skalası — veri medyanı (1.15) merkez, NAF-tipi düşük b görünür
-B_LOW, B_HIGH = 0.7, 1.3
+# B_LOW / B_HIGH: main() içinde P10–P90 adaptif olarak hesaplanıyor
 CMAP = LinearSegmentedColormap.from_list('bvalue_rdylgn', [
     (0.00, '#d73027'),
     (0.25, '#fc8d59'),
@@ -75,9 +74,14 @@ def main():
     gh = GRID_H
 
     print(f'[*] {len(grid)} nokta yüklendi (N≥50 kriteri geçmiş)')
-    print(f'    b: {bvals.min():.3f} – {bvals.max():.3f}  |  ort: {bvals.mean():.3f}')
+    print(f'    b: {bvals.min():.3f} – {bvals.max():.3f}  |  ort: {bvals.mean():.3f}  std: {bvals.std():.3f}')
     print(f'    N aralığı: {nvals.min()} – {nvals.max()}')
     print(f'    Bounds: {BOUNDS}  |  Grid: {gw}×{gh}')
+
+    # Renk skalasi: P10-P90 adaptif (sabit 0.5-1.5 yerine)
+    B_LOW  = float(np.percentile(bvals, 10))
+    B_HIGH = float(np.percentile(bvals, 90))
+    print(f'    Renk skala: P10={B_LOW:.3f} – P90={B_HIGH:.3f}  (adaptif)')
 
     print('[*] Delaunay triangülasyonu + lineer interpolasyon...')
     interp = LinearNDInterpolator(
@@ -122,7 +126,8 @@ def main():
         'grid_h'     : gh,
         'b_min_pred' : float(np.nanmin(z)),
         'b_max_pred' : float(np.nanmax(z)),
-        'b_norm'     : [B_LOW, B_HIGH],
+        'b_norm'     : [round(B_LOW,3), round(B_HIGH,3)],
+        'b_norm_method': 'P10-P90 adaptif',
         'bounds'     : BOUNDS,
         'note'       : 'N<50 nedeniyle veri olmayan alanlar seffaf (NaN->alpha=0)',
     }
