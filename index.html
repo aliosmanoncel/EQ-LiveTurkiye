@@ -143,9 +143,21 @@
         Seismic Hazard (PGA) <span class="tog" id="lgHazardT">▼</span>
       </div>
       <div class="legend-section-body hidden" id="lgHazard">
-        <div style="height:8px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#313695,#4575b4,#74add1,#fee090,#f46d43,#d73027,#a50026)"></div>
-        <div style="display:flex;justify-content:space-between;color:#555;font-size:.68rem"><span>Low</span><span>High PGA</span></div>
-        <div style="color:#555;font-size:.68rem;margin-top:4px">Campbell (1981) GMPE · Vs30=760 m/s<br>Source: EMSC eq_annual (Mw≥4.5)</div>
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">PGA · 475 yıl dönüş periyodu (%10/50yr)</div>
+        <div style="height:12px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#313695,#4575b4,#74add1,#fee090,#f46d43,#d73027,#a50026)"></div>
+        <div style="display:flex;justify-content:space-between;color:#aaa;font-size:.68rem;margin-bottom:4px">
+          <span>0 g</span><span>0.05 g</span><span>0.10 g</span><span>≥0.12 g</span>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px">
+          <span style="background:#313695;color:#fff;font-size:.65rem;padding:1px 5px;border-radius:3px">&lt;0.02g Düşük</span>
+          <span style="background:#fee090;color:#333;font-size:.65rem;padding:1px 5px;border-radius:3px">0.05g Orta</span>
+          <span style="background:#d73027;color:#fff;font-size:.65rem;padding:1px 5px;border-radius:3px">&gt;0.10g Yüksek</span>
+        </div>
+        <div style="color:#666;font-size:.65rem;line-height:1.5">
+          Campbell (1981) GMPE · Vs30=760 m/s<br>
+          Kaynak: EMSC katalog (Mw≥4.5, 1998–2018)<br>
+          Yöntem: Delaunay triangülasyon · N≥75 filtresi
+        </div>
       </div>
     </div>
 
