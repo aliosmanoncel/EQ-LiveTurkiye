@@ -908,6 +908,12 @@ function toggleLayer(type) {
     // Legend bölümünü hazard aktifken aç
     const lgH = document.getElementById('lgHazard');
     if (lgH) { if (showHazard) lgH.classList.remove('hidden'); else lgH.classList.add('hidden'); }
+    // Hazard aktifken etiket katmanını kaldır (TURKEY/şehir yazıları haritayı karıştırıyor)
+    if (showHazard) {
+      if (map.hasLayer(labelLayer)) map.removeLayer(labelLayer);
+    } else {
+      if (!showTopo && !map.hasLayer(labelLayer)) labelLayer.addTo(map);
+    }
     if (!hazardLayer) {
       loadHazardLayer();
     } else {
