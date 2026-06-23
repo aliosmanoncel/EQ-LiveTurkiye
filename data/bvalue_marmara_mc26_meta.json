@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-23T16:56:28Z",
+  "generated": "2026-06-23T17:11:15Z",
   "method": "Delaunay Triangulation + Linear Interpolation · scipy",
   "source_pts": 2811,
   "valid_px": 103270,
@@ -10,10 +10,10 @@
   "b_min_pred": 0.7418534483773722,
   "b_max_pred": 2.7084140643398764,
   "b_norm": [
-    0.899,
-    1.737
+    0.767,
+    1.801
   ],
-  "b_norm_method": "P10-P90 adaptif",
+  "b_norm_method": "mu±1.5sigma (mu=1.284, sigma=0.345)",
   "bounds": {
     "minlat": 39.5,
     "maxlat": 41.5,
