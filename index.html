@@ -231,13 +231,15 @@
   </div>
 
   <!-- Layer toggles -->
-  <div style="display:flex;gap:4px">
+  <div style="display:flex;gap:4px;flex-wrap:wrap">
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
     <button class="tbtn"        id="btnFractal" onclick="toggleLayer('fractal')" title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
+    <button class="tbtn"        id="btnIEB"     onclick="openIEB()"
+      title="EarthScope Interactive Earthquake Browser — Mc istatistik analizi için bölge seçin">📊 İstatistik</button>
   </div>
 
   <div class="sep"></div>
@@ -753,6 +755,28 @@ async function loadHazardLayer() {
   } catch(e) {
     setStatus('Hazard grid load error: ' + e.message, true);
   }
+}
+
+function openIEB() {
+  // Mevcut harita sınırlarını al
+  const b   = map.getBounds();
+  const zm  = Math.min(map.getZoom() + 1, 12);
+  const now = new Date().toISOString().slice(0,10);
+
+  // EarthScope IEB URL — mevcut görüntü alanına odaklı, 1970'ten bugüne, tüm M
+  const url = 'https://www.earthscope.org/app/ieb/index.html'
+    + '?format=text&nodata=404'
+    + `&starttime=1970-01-01&endtime=${now}`
+    + '&minmag=0&maxmag=10&mindepth=0&maxdepth=900'
+    + '&orderby=time-desc&src=usgs&limit=5000'
+    + `&maxlat=${b.getNorth().toFixed(2)}&minlat=${b.getSouth().toFixed(2)}`
+    + `&maxlon=${b.getEast().toFixed(2)}&minlon=${b.getWest().toFixed(2)}`
+    + `&zm=${zm}&mt=ter`;
+
+  window.open(url, 'ieb_window',
+    'width=1100,height=700,menubar=no,toolbar=no,resizable=yes,scrollbars=yes');
+
+  setStatus('EarthScope IEB açıldı · Select New Region → histogram → Mc değerini not alın → b-value katmanını açın');
 }
 
 function toggleLayer(type) {
