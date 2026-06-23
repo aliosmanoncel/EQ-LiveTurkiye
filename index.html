@@ -387,13 +387,13 @@ const map = L.map('map', { center:[38,25], zoom:4 });
 const darkBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
   { attribution:'© OpenStreetMap © CARTO', maxZoom:18, zIndex:1 }).addTo(map);
 
-// ESRI World Terrain Base + Hillshade — kahve/bej arazi, mavi deniz
+// Topografya: etiketsiz açık harita + ESRI Hillshade gölge katmanı
 const topoBase = L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
-  { attribution:'© Esri, USGS, NOAA', maxZoom:13, zIndex:1 });
+  'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png',
+  { attribution:'© OpenStreetMap © CARTO', maxZoom:19, zIndex:1 });
 const topoShade = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
-  { attribution:'© Esri', maxZoom:16, zIndex:2, opacity:0.5 });
+  { attribution:'© Esri, USGS, NOAA', maxZoom:16, zIndex:2, opacity:0.55 });
 
 let showTopo    = false;
 let showFractal = false;
