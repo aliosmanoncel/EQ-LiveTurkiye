@@ -938,16 +938,17 @@ function toggleLayer(type) {
     document.getElementById('btnTopo').classList.toggle('active', showTopo);
     if (showTopo) {
       map.removeLayer(darkBase);
+      map.removeLayer(labelLayer);
       topoBase.addTo(map);
       topoShade.addTo(map);
       topoBase.bringToBack();
-      labelLayer.bringToFront();
       setStatus('Topografya · ESRI World Terrain Base + Hillshade © Esri, USGS, NOAA');
     } else {
       map.removeLayer(topoBase);
       map.removeLayer(topoShade);
       darkBase.addTo(map);
       darkBase.bringToBack();
+      labelLayer.addTo(map);
       labelLayer.bringToFront();
       setStatus('Topografya kapatıldı');
     }
