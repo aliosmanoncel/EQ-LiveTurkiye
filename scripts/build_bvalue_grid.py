@@ -45,11 +45,13 @@ def parse_args():
     args = sys.argv[1:]
     def get(flag, default):
         return type(default)(args[args.index(flag)+1]) if flag in args else default
-    method = get('--method', 'fc').lower()
-    n_fixed = get('--n', N_MIN)
-    r_fixed = get('--r', R_KM)
-    output  = get('--output', 'data/bvalue_grid.json')
-    return method, n_fixed, r_fixed, output
+    method   = get('--method',   'fc').lower()
+    n_fixed  = get('--n',        N_MIN)
+    r_fixed  = get('--r',        R_KM)
+    output   = get('--output',   'data/bvalue_grid.json')
+    year_start = get('--year_start', 1998)
+    year_end   = get('--year_end',   2100)   # varsayilan: tum katalog
+    return method, n_fixed, r_fixed, output, year_start, year_end
 
 
 def haversine(la1, lo1, la2, lo2):
@@ -159,16 +161,19 @@ def compute_fn(events, lats, lons, n_fixed, r_max):
 
 
 def main():
-    method, n_fixed, r_fixed, output = parse_args()
+    method, n_fixed, r_fixed, output, year_start, year_end = parse_args()
     print(f'[*] Yontem: {"Fixed Circle (FC)" if method=="fc" else "Fixed Number (FN)"}'
-          f'  |  N={n_fixed}  R={"sabit "+str(r_fixed)+"km" if method=="fc" else "adaptif (max "+str(R_MAX)+"km)"}')
+          f'  |  N={n_fixed}  R={"sabit "+str(r_fixed)+"km" if method=="fc" else "adaptif (max "+str(R_MAX)+"km)"}'
+          f'  |  Egitim: {year_start}–{year_end}')
 
     with open(INPUT, encoding='utf-8') as f:
         data = json.load(f)
 
     events = [e for e in data['events']
-              if e.get('src') == 'EMSC' and e.get('mag', 0) >= MC]
-    print(f'[*] {len(events)} olay yuklendi (EMSC, mag>={MC})')
+              if e.get('src') == 'EMSC'
+              and e.get('mag', 0) >= MC
+              and year_start <= int(e.get('time', '1900')[:4]) <= year_end]
+    print(f'[*] {len(events)} olay yuklendi (EMSC, mag>={MC}, {year_start}–{year_end})')
 
     # Grid
     lats, lons = [], []
@@ -182,10 +187,10 @@ def main():
 
     if method == 'fc':
         grid, skipped = compute_fc(events, lats, lons, r_fixed, n_fixed)
-        method_label = f'Fixed Circle | R={r_fixed} km | N_min={n_fixed} | Oncel & Wyss (2000)'
+        method_label = f'Fixed Circle | R={r_fixed} km | N_min={n_fixed} | Oncel & Wyss (2000) | {year_start}-{year_end}'
     else:
         grid, skipped = compute_fn(events, lats, lons, n_fixed, R_MAX)
-        method_label = f'Fixed Number | N={n_fixed} | R_max={R_MAX} km | ZMAP (Wiemer 2001)'
+        method_label = f'Fixed Number | N={n_fixed} | R_max={R_MAX} km | ZMAP (Wiemer 2001) | {year_start}-{year_end}'
 
     print(f'[*] Haritlanan: {len(grid)} | Atlanan: {skipped}')
 
@@ -207,9 +212,10 @@ def main():
         p['w'] = round(max(0.0, min(1.0, w)), 4)
 
     out = {
-        'generated' : datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'source'    : 'EMSC 1998-2026 | Aki (1965) MLE + Utsu (1966)',
-        'method'    : method_label,
+        'generated'  : datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'source'     : f'EMSC {year_start}-{year_end} | Aki (1965) MLE + Utsu (1966)',
+        'method'     : method_label,
+        'train_period': [year_start, year_end],
         'b_turkey'  : b_turkey,
         'b_min'     : min(b_vals),
         'b_max'     : max(b_vals),

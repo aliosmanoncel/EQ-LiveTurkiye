@@ -1,0 +1,1480 @@
+{
+  "generated": "2026-06-23T16:12:58Z",
+  "description": "Forecast test olaylari: EMSC 2020-2026 M>=5.0",
+  "train_period": [
+    1998,
+    2019
+  ],
+  "test_period": [
+    2020,
+    2026
+  ],
+  "min_mag": 5.0,
+  "bounds": {
+    "minlat": 34.0,
+    "maxlat": 43.0,
+    "minlon": 25.0,
+    "maxlon": 45.0
+  },
+  "count": 162,
+  "events": [
+    {
+      "time": "2023-02-06T01:17:36.1Z",
+      "lat": 37.17,
+      "lon": 37.08,
+      "mag": 7.8,
+      "mw": 7.8,
+      "dep": 20.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T10:24:49.6Z",
+      "lat": 38.11,
+      "lon": 37.24,
+      "mag": 7.5,
+      "mw": 7.5,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2020-10-30T11:51:25.7Z",
+      "lat": 37.91,
+      "lon": 26.84,
+      "mag": 7.0,
+      "mw": 7.0,
+      "dep": 10.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2020-01-24T17:55:14.2Z",
+      "lat": 38.37,
+      "lon": 39.22,
+      "mag": 6.8,
+      "mw": 6.8,
+      "dep": 15.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-06T01:28:17.1Z",
+      "lat": 37.13,
+      "lon": 36.81,
+      "mag": 6.7,
+      "mw": 6.7,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2022-01-11T01:07:49.3Z",
+      "lat": 35.24,
+      "lon": 31.93,
+      "mag": 6.6,
+      "mw": 6.6,
+      "dep": 25.0,
+      "place": "CYPRUS REGION"
+    },
+    {
+      "time": "2020-05-02T12:51:05.4Z",
+      "lat": 34.14,
+      "lon": 25.7,
+      "mag": 6.6,
+      "mw": 6.6,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2021-10-12T09:24:04.8Z",
+      "lat": 35.04,
+      "lon": 26.27,
+      "mag": 6.4,
+      "mw": 6.4,
+      "dep": 20.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2023-02-20T17:04:29.2Z",
+      "lat": 36.16,
+      "lon": 36.02,
+      "mag": 6.3,
+      "mw": 6.3,
+      "dep": 10.0,
+      "place": "TURKEY-SYRIA BORDER REGION"
+    },
+    {
+      "time": "2025-05-22T03:19:34.6Z",
+      "lat": 35.72,
+      "lon": 25.91,
+      "mag": 6.2,
+      "mw": 6.2,
+      "dep": 53.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2025-04-23T09:49:11.93Z",
+      "lat": 40.8327,
+      "lon": 28.2267,
+      "mag": 6.2,
+      "mw": 6.2,
+      "dep": 15.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-08-10T16:53:47.89Z",
+      "lat": 39.278,
+      "lon": 28.0679,
+      "mag": 6.1,
+      "mw": 6.1,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-02-06T12:02:11.9Z",
+      "lat": 38.07,
+      "lon": 36.47,
+      "mag": 6.0,
+      "mw": 6.1,
+      "dep": 5.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T10:26:48.5Z",
+      "lat": 38.03,
+      "lon": 37.96,
+      "mag": 6.0,
+      "mw": 6.1,
+      "dep": 20.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2022-11-23T01:08:15.6Z",
+      "lat": 40.82,
+      "lon": 30.99,
+      "mag": 6.1,
+      "mw": 6.1,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-10-27T19:48:28.84Z",
+      "lat": 39.1839,
+      "lon": 28.2308,
+      "mag": 6.0,
+      "mw": 6.0,
+      "dep": 6.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-13T22:51:13.26Z",
+      "lat": 35.1779,
+      "lon": 27.0026,
+      "mag": 6.0,
+      "mw": 6.0,
+      "dep": 53.6,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2024-10-16T07:46:32.88Z",
+      "lat": 38.3086,
+      "lon": 38.8285,
+      "mag": 6.0,
+      "mw": 6.0,
+      "dep": 10.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-06T10:36:00.0Z",
+      "lat": 38.18,
+      "lon": 37.77,
+      "mag": 5.8,
+      "mw": 6.0,
+      "dep": 9.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2021-10-19T05:32:32.4Z",
+      "lat": 34.6,
+      "lon": 28.3,
+      "mag": 6.0,
+      "mw": 6.0,
+      "dep": 44.0,
+      "place": "EASTERN MEDITERRANEAN SEA"
+    },
+    {
+      "time": "2021-09-27T06:17:22.2Z",
+      "lat": 35.11,
+      "lon": 25.22,
+      "mag": 6.0,
+      "mw": 6.0,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-02-23T16:00:29.4Z",
+      "lat": 38.42,
+      "lon": 44.55,
+      "mag": 6.0,
+      "mw": 6.0,
+      "dep": 10.0,
+      "place": "TURKEY-IRAN BORDER REGION"
+    },
+    {
+      "time": "2023-02-06T10:51:32.4Z",
+      "lat": 38.3,
+      "lon": 38.13,
+      "mag": 5.7,
+      "mw": 5.9,
+      "dep": 8.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-06T01:26:50.0Z",
+      "lat": 37.22,
+      "lon": 36.93,
+      "mag": 5.7,
+      "mw": 5.9,
+      "dep": 5.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-01-28T18:14:47.2Z",
+      "lat": 38.49,
+      "lon": 44.91,
+      "mag": 5.9,
+      "mw": 5.9,
+      "dep": 15.0,
+      "place": "TURKEY-IRAN BORDER REGION"
+    },
+    {
+      "time": "2023-01-25T12:37:06.4Z",
+      "lat": 35.75,
+      "lon": 28.54,
+      "mag": 5.9,
+      "mw": 5.9,
+      "dep": 35.0,
+      "place": "EASTERN MEDITERRANEAN SEA"
+    },
+    {
+      "time": "2020-09-18T16:28:18.3Z",
+      "lat": 34.93,
+      "lon": 25.27,
+      "mag": 5.9,
+      "mw": 5.9,
+      "dep": 52.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-06-14T14:24:28.4Z",
+      "lat": 39.35,
+      "lon": 40.73,
+      "mag": 5.9,
+      "mw": 5.9,
+      "dep": 5.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2025-06-02T23:17:27.85Z",
+      "lat": 36.65,
+      "lon": 28.25,
+      "mag": 5.8,
+      "mw": 5.8,
+      "dep": 69.0,
+      "place": "DODECANESE IS.-TURKEY BORDER REG"
+    },
+    {
+      "time": "2023-02-06T01:36:28.1Z",
+      "lat": 37.05,
+      "lon": 36.73,
+      "mag": 5.6,
+      "mw": 5.8,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2020-05-18T23:22:34.5Z",
+      "lat": 34.11,
+      "lon": 25.54,
+      "mag": 5.8,
+      "mw": 5.8,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2023-02-20T17:07:36.2Z",
+      "lat": 36.11,
+      "lon": 35.91,
+      "mag": 5.5,
+      "mw": 5.7,
+      "dep": 15.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T02:03:37.5Z",
+      "lat": 37.86,
+      "lon": 37.81,
+      "mag": 5.5,
+      "mw": 5.7,
+      "dep": 5.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2022-11-20T23:25:01.7Z",
+      "lat": 35.83,
+      "lon": 26.42,
+      "mag": 5.5,
+      "mw": 5.7,
+      "dep": 56.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2021-12-29T05:08:09.9Z",
+      "lat": 34.85,
+      "lon": 25.09,
+      "mag": 5.7,
+      "mw": 5.7,
+      "dep": 68.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2021-08-01T04:31:27.4Z",
+      "lat": 36.37,
+      "lon": 27.1,
+      "mag": 5.7,
+      "mw": 5.7,
+      "dep": 14.0,
+      "place": "DODECANESE IS.-TURKEY BORDER REG"
+    },
+    {
+      "time": "2020-02-23T05:53:00.3Z",
+      "lat": 38.44,
+      "lon": 44.49,
+      "mag": 5.7,
+      "mw": 5.7,
+      "dep": 10.0,
+      "place": "TURKEY-IRAN BORDER REGION"
+    },
+    {
+      "time": "2020-01-30T11:21:36.5Z",
+      "lat": 35.08,
+      "lon": 27.8,
+      "mag": 5.7,
+      "mw": 5.7,
+      "dep": 10.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2024-04-18T15:11:25.81Z",
+      "lat": 40.045,
+      "lon": 36.0203,
+      "mag": 5.6,
+      "mw": 5.6,
+      "dep": 7.3,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-03-24T03:16:57.2Z",
+      "lat": 38.42,
+      "lon": 44.92,
+      "mag": 5.6,
+      "mw": 5.6,
+      "dep": 19.0,
+      "place": "TURKEY-IRAN BORDER REGION"
+    },
+    {
+      "time": "2021-12-26T18:59:03.0Z",
+      "lat": 35.03,
+      "lon": 26.94,
+      "mag": 5.6,
+      "mw": 5.6,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-08-04T09:37:35.8Z",
+      "lat": 38.19,
+      "lon": 38.72,
+      "mag": 5.6,
+      "mw": 5.6,
+      "dep": 5.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2020-01-30T01:28:05.3Z",
+      "lat": 35.06,
+      "lon": 27.87,
+      "mag": 5.6,
+      "mw": 5.6,
+      "dep": 10.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2020-01-22T19:22:16.2Z",
+      "lat": 39.06,
+      "lon": 27.84,
+      "mag": 5.6,
+      "mw": 5.6,
+      "dep": 9.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-07-25T05:44:49.29Z",
+      "lat": 37.617,
+      "lon": 35.8885,
+      "mag": 5.5,
+      "mw": 5.5,
+      "dep": 12.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-07T03:13:13.9Z",
+      "lat": 37.83,
+      "lon": 37.63,
+      "mag": 5.5,
+      "mw": 5.5,
+      "dep": 2.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T15:33:34.0Z",
+      "lat": 38.27,
+      "lon": 38.15,
+      "mag": 5.2,
+      "mw": 5.5,
+      "dep": 10.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-06T02:23:14.3Z",
+      "lat": 37.18,
+      "lon": 36.98,
+      "mag": 5.2,
+      "mw": 5.5,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2022-08-31T10:10:10.7Z",
+      "lat": 37.58,
+      "lon": 26.82,
+      "mag": 5.5,
+      "mw": 5.5,
+      "dep": 9.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2021-06-21T22:14:14.9Z",
+      "lat": 36.38,
+      "lon": 27.1,
+      "mag": 5.5,
+      "mw": 5.5,
+      "dep": 11.0,
+      "place": "DODECANESE IS.-TURKEY BORDER REG"
+    },
+    {
+      "time": "2020-12-27T06:37:32.2Z",
+      "lat": 38.49,
+      "lon": 39.21,
+      "mag": 5.5,
+      "mw": 5.5,
+      "dep": 2.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2020-10-30T15:14:56.3Z",
+      "lat": 37.8,
+      "lon": 26.8,
+      "mag": 5.2,
+      "mw": 5.5,
+      "dep": 5.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2020-06-28T17:43:29.0Z",
+      "lat": 36.64,
+      "lon": 28.25,
+      "mag": 5.5,
+      "mw": 5.5,
+      "dep": 64.0,
+      "place": "DODECANESE IS.-TURKEY BORDER REG"
+    },
+    {
+      "time": "2020-06-15T06:51:30.2Z",
+      "lat": 39.35,
+      "lon": 40.75,
+      "mag": 5.5,
+      "mw": 5.5,
+      "dep": 5.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2025-02-18T06:08:09.4Z",
+      "lat": 36.6076,
+      "lon": 25.6178,
+      "mag": 5.1,
+      "mw": 5.4,
+      "dep": 7.9,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-02-08T09:00:41.83Z",
+      "lat": 36.5638,
+      "lon": 25.6014,
+      "mag": 5.1,
+      "mw": 5.4,
+      "dep": 8.3,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-02-07T07:16:15.02Z",
+      "lat": 36.5637,
+      "lon": 25.6312,
+      "mag": 5.1,
+      "mw": 5.4,
+      "dep": 6.7,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2023-02-08T11:11:52.8Z",
+      "lat": 38.02,
+      "lon": 37.66,
+      "mag": 5.4,
+      "mw": 5.4,
+      "dep": 5.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-07T10:18:15.3Z",
+      "lat": 38.14,
+      "lon": 38.52,
+      "mag": 5.4,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-07T07:11:15.2Z",
+      "lat": 38.18,
+      "lon": 38.63,
+      "mag": 5.4,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-06T15:14:36.9Z",
+      "lat": 38.06,
+      "lon": 37.71,
+      "mag": 5.1,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T13:39:25.6Z",
+      "lat": 37.6,
+      "lon": 36.96,
+      "mag": 5.1,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T01:58:23.1Z",
+      "lat": 37.01,
+      "lon": 36.68,
+      "mag": 5.1,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2022-10-02T04:04:01.9Z",
+      "lat": 34.23,
+      "lon": 26.09,
+      "mag": 5.4,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2022-02-13T18:25:56.2Z",
+      "lat": 41.14,
+      "lon": 43.99,
+      "mag": 5.4,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "ARMENIA"
+    },
+    {
+      "time": "2021-12-29T16:47:09.2Z",
+      "lat": 34.87,
+      "lon": 25.12,
+      "mag": 5.1,
+      "mw": 5.4,
+      "dep": 67.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2021-06-25T18:28:41.5Z",
+      "lat": 39.19,
+      "lon": 40.23,
+      "mag": 5.4,
+      "mw": 5.4,
+      "dep": 16.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2021-02-01T08:35:17.4Z",
+      "lat": 38.96,
+      "lon": 26.08,
+      "mag": 5.1,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2020-06-25T10:03:29.6Z",
+      "lat": 38.49,
+      "lon": 44.06,
+      "mag": 5.4,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "TURKEY-IRAN BORDER REGION"
+    },
+    {
+      "time": "2020-05-02T13:33:49.5Z",
+      "lat": 34.07,
+      "lon": 25.57,
+      "mag": 5.4,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-01-28T15:38:33.7Z",
+      "lat": 35.04,
+      "lon": 27.92,
+      "mag": 5.4,
+      "mw": 5.4,
+      "dep": 10.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-11-12T14:23:31.64Z",
+      "lat": 34.8968,
+      "lon": 32.4881,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 9.2,
+      "place": "CYPRUS REGION"
+    },
+    {
+      "time": "2025-11-03T12:35:37.93Z",
+      "lat": 39.1686,
+      "lon": 28.3408,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-09-28T09:59:16.43Z",
+      "lat": 39.2217,
+      "lon": 28.9939,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 8.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-09-21T21:05:49.29Z",
+      "lat": 39.21,
+      "lon": 28.14,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-07-07T17:46:04.63Z",
+      "lat": 35.006,
+      "lon": 26.6582,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 5.8,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2025-04-23T10:02:35.26Z",
+      "lat": 40.864,
+      "lon": 28.4223,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 18.7,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-04-23T09:51:18.21Z",
+      "lat": 40.8443,
+      "lon": 28.3263,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 5.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-02-12T08:29:51.12Z",
+      "lat": 36.6007,
+      "lon": 25.5947,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 9.8,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-02-04T13:04:14.83Z",
+      "lat": 36.5639,
+      "lon": 25.6108,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 8.8,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2023-11-23T14:46:07.68Z",
+      "lat": 38.1354,
+      "lon": 38.5525,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 8.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-07T18:09:59.9Z",
+      "lat": 38.1,
+      "lon": 36.63,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 5.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T20:53:24.3Z",
+      "lat": 38.21,
+      "lon": 38.28,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-06T20:37:53.0Z",
+      "lat": 37.25,
+      "lon": 37.05,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T16:43:29.3Z",
+      "lat": 38.01,
+      "lon": 36.47,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 5.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T13:44:52.1Z",
+      "lat": 37.95,
+      "lon": 37.5,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 12.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T13:07:47.8Z",
+      "lat": 38.32,
+      "lon": 37.45,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 15.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T11:01:34.8Z",
+      "lat": 37.58,
+      "lon": 37.39,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T06:26:22.3Z",
+      "lat": 36.66,
+      "lon": 36.06,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "TURKEY-SYRIA BORDER REGION"
+    },
+    {
+      "time": "2023-02-06T04:18:46.5Z",
+      "lat": 38.23,
+      "lon": 38.57,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-06T02:17:41.4Z",
+      "lat": 37.3,
+      "lon": 36.45,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T01:47:46.7Z",
+      "lat": 37.35,
+      "lon": 41.77,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-01-19T02:22:27.8Z",
+      "lat": 39.46,
+      "lon": 25.86,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 13.0,
+      "place": "AEGEAN SEA"
+    },
+    {
+      "time": "2022-09-27T14:08:34.3Z",
+      "lat": 40.72,
+      "lon": 42.89,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2022-09-03T04:13:10.1Z",
+      "lat": 34.81,
+      "lon": 26.34,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2022-06-12T18:35:19.6Z",
+      "lat": 38.84,
+      "lon": 43.54,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 19.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2022-04-09T14:02:14.7Z",
+      "lat": 38.16,
+      "lon": 38.64,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 7.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2022-02-02T21:03:50.2Z",
+      "lat": 35.07,
+      "lon": 31.91,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 30.0,
+      "place": "CYPRUS REGION"
+    },
+    {
+      "time": "2021-09-28T04:48:09.1Z",
+      "lat": 35.11,
+      "lon": 25.19,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2021-04-13T20:28:04.1Z",
+      "lat": 36.47,
+      "lon": 27.18,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 15.0,
+      "place": "DODECANESE IS.-TURKEY BORDER REG"
+    },
+    {
+      "time": "2020-12-05T12:44:40.7Z",
+      "lat": 36.03,
+      "lon": 31.81,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 98.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-09-20T19:08:06.2Z",
+      "lat": 38.04,
+      "lon": 34.03,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 3.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2020-05-23T22:50:11.2Z",
+      "lat": 34.11,
+      "lon": 25.45,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-05-18T04:18:17.7Z",
+      "lat": 34.08,
+      "lon": 25.6,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-05-02T16:44:25.6Z",
+      "lat": 34.0,
+      "lon": 25.58,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-03-19T17:53:32.2Z",
+      "lat": 38.42,
+      "lon": 39.03,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 21.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2020-02-25T23:03:38.8Z",
+      "lat": 38.33,
+      "lon": 38.77,
+      "mag": 5.0,
+      "mw": 5.3,
+      "dep": 10.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2025-11-12T09:31:25.66Z",
+      "lat": 34.8039,
+      "lon": 32.4658,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 10.2,
+      "place": "CYPRUS REGION"
+    },
+    {
+      "time": "2025-02-10T20:16:29.0Z",
+      "lat": 36.6974,
+      "lon": 25.7161,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 8.2,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-02-09T19:05:39.75Z",
+      "lat": 36.66,
+      "lon": 25.6065,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 14.6,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2023-02-27T09:04:51.1Z",
+      "lat": 38.25,
+      "lon": 38.29,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 5.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-02-25T10:27:12.1Z",
+      "lat": 38.01,
+      "lon": 33.99,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-16T19:47:50.2Z",
+      "lat": 36.22,
+      "lon": 35.7,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2021-11-19T12:40:53.0Z",
+      "lat": 39.81,
+      "lon": 41.92,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 5.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2021-08-03T12:38:21.0Z",
+      "lat": 36.35,
+      "lon": 26.99,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 53.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2020-10-12T04:11:27.8Z",
+      "lat": 35.61,
+      "lon": 26.28,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 11.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-06-26T07:21:12.2Z",
+      "lat": 38.78,
+      "lon": 27.81,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2020-06-05T18:06:20.3Z",
+      "lat": 38.24,
+      "lon": 38.7,
+      "mag": 5.2,
+      "mw": 5.2,
+      "dep": 5.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2025-12-08T10:21:32.42Z",
+      "lat": 37.0157,
+      "lon": 30.8015,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 95.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-02-18T04:46:52.71Z",
+      "lat": 36.6156,
+      "lon": 25.8431,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 8.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-02-12T01:14:55.09Z",
+      "lat": 36.5669,
+      "lon": 25.626,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 10.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-02-10T22:37:25.16Z",
+      "lat": 36.648,
+      "lon": 25.6557,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 8.4,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-02-05T19:09:38.98Z",
+      "lat": 36.6542,
+      "lon": 25.6438,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 10.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-02-04T02:46:06.78Z",
+      "lat": 36.6036,
+      "lon": 25.6456,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 6.6,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2024-08-12T20:56:00.73Z",
+      "lat": 35.0929,
+      "lon": 36.9948,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 9.2,
+      "place": "SYRIA"
+    },
+    {
+      "time": "2023-12-04T07:42:21.01Z",
+      "lat": 40.402,
+      "lon": 28.8598,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 5.4,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2023-04-26T20:00:35.2Z",
+      "lat": 36.34,
+      "lon": 26.39,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 122.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2023-02-08T14:20:26.5Z",
+      "lat": 37.99,
+      "lon": 37.38,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 3.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2022-01-17T23:28:56.3Z",
+      "lat": 39.05,
+      "lon": 35.93,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 1.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2022-01-05T03:21:17.5Z",
+      "lat": 36.07,
+      "lon": 31.26,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 66.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-12-26T15:15:10.8Z",
+      "lat": 35.01,
+      "lon": 26.93,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2021-11-08T17:43:21.4Z",
+      "lat": 37.87,
+      "lon": 32.12,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 5.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2021-08-31T11:04:26.9Z",
+      "lat": 39.01,
+      "lon": 30.16,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 12.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2021-08-07T01:39:45.1Z",
+      "lat": 36.31,
+      "lon": 27.06,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 12.0,
+      "place": "DODECANESE IS.-TURKEY BORDER REG"
+    },
+    {
+      "time": "2021-04-13T20:30:22.0Z",
+      "lat": 36.5,
+      "lon": 27.14,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 12.0,
+      "place": "DODECANESE IS.-TURKEY BORDER REG"
+    },
+    {
+      "time": "2020-10-12T00:30:41.0Z",
+      "lat": 35.69,
+      "lon": 26.31,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 5.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-05-22T03:40:30.0Z",
+      "lat": 34.4,
+      "lon": 25.85,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-01-25T16:30:07.7Z",
+      "lat": 38.35,
+      "lon": 39.03,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 7.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2025-10-02T11:55:04.88Z",
+      "lat": 40.803,
+      "lon": 27.9462,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 12.5,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-05-15T12:46:36.8Z",
+      "lat": 39.058,
+      "lon": 33.2677,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 6.9,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2025-04-23T12:12:57.25Z",
+      "lat": 40.8561,
+      "lon": 28.2847,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 5.2,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2025-02-17T07:49:50.11Z",
+      "lat": 36.6069,
+      "lon": 25.675,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 5.7,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-02-03T09:29:43.56Z",
+      "lat": 36.6183,
+      "lon": 25.6645,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 5.4,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2025-01-21T20:38:44.17Z",
+      "lat": 39.424,
+      "lon": 26.265,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY"
+    },
+    {
+      "time": "2024-09-07T06:31:12.44Z",
+      "lat": 37.2907,
+      "lon": 37.0917,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2024-01-27T05:19:19.62Z",
+      "lat": 37.9802,
+      "lon": 27.1382,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "WESTERN TURKEY"
+    },
+    {
+      "time": "2024-01-25T13:04:06.23Z",
+      "lat": 38.1156,
+      "lon": 38.42,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 8.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2023-03-03T02:53:43.6Z",
+      "lat": 37.85,
+      "lon": 36.65,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 4.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-18T19:31:32.1Z",
+      "lat": 38.08,
+      "lon": 36.61,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 7.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-07T15:48:54.3Z",
+      "lat": 37.98,
+      "lon": 36.46,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2023-02-06T01:59:17.0Z",
+      "lat": 38.79,
+      "lon": 32.06,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2022-10-11T15:48:46.8Z",
+      "lat": 37.31,
+      "lon": 36.3,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 11.0,
+      "place": "CENTRAL TURKEY"
+    },
+    {
+      "time": "2022-06-19T23:24:33.9Z",
+      "lat": 35.18,
+      "lon": 27.16,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 56.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2021-04-17T17:08:01.6Z",
+      "lat": 36.45,
+      "lon": 27.17,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 11.0,
+      "place": "DODECANESE IS.-TURKEY BORDER REG"
+    },
+    {
+      "time": "2020-12-03T05:45:21.9Z",
+      "lat": 38.0,
+      "lon": 41.71,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 14.0,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2020-06-19T07:43:20.7Z",
+      "lat": 34.21,
+      "lon": 25.53,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-05-27T01:09:52.8Z",
+      "lat": 34.11,
+      "lon": 25.67,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-05-18T11:48:07.3Z",
+      "lat": 34.13,
+      "lon": 25.53,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-04-11T10:22:55.8Z",
+      "lat": 35.22,
+      "lon": 26.18,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 21.0,
+      "place": "CRETE, GREECE"
+    },
+    {
+      "time": "2020-02-10T22:46:50.5Z",
+      "lat": 35.04,
+      "lon": 27.91,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    },
+    {
+      "time": "2023-08-10T17:48:00.21Z",
+      "lat": 38.2673,
+      "lon": 38.2649,
+      "mag": 5.2,
+      "mw": 4.1,
+      "dep": 10.9,
+      "place": "EASTERN TURKEY"
+    },
+    {
+      "time": "2020-10-01T11:05:38.5Z",
+      "lat": 36.67,
+      "lon": 26.83,
+      "mag": 5.2,
+      "mw": 4.1,
+      "dep": 151.0,
+      "place": "DODECANESE ISLANDS, GREECE"
+    }
+  ]
+}

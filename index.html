@@ -255,7 +255,8 @@
     <button class="tbtn" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
     <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
-    <button class="tbtn"        id="btnFractal" onclick="toggleLayer('fractal')" title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
+    <button class="tbtn"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
+    <button class="tbtn"        id="btnForecast" onclick="toggleLayer('forecast')" title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2026) · Wiemer&Wyss (2002)">📍 Forecast</button>
   </div>
 
   <div class="sep"></div>
@@ -362,6 +363,9 @@ const BVALUE_META_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-L
 let bvalueMethod = 'fc'; // 'fc' = Fixed Circle | 'fn' = Fixed Number
 const FRACTAL_PNG_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation.png';
 const FRACTAL_META_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation_meta.json';
+const FORECAST_PNG_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_forecast.png';
+const FORECAST_META_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_forecast_meta.json';
+const FORECAST_TEST_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/forecast_test_events.json';
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
 const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 
@@ -385,6 +389,10 @@ const topoRelief = L.tileLayer(
 let showTopo    = false;
 let showFractal = false;
 let fractalLayer = null;
+
+let showForecast    = false;
+let forecastBgLayer = null;   // b-value PNG (egitim donemi)
+let forecastDotLayer = null;  // test olaylari CircleMarker'lar
 
 const labelLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
   { maxZoom:18, zIndex:700 }).addTo(map);
@@ -894,6 +902,20 @@ function toggleLayer(type) {
     } else {
       if (showFractal) fractalLayer.addTo(map); else map.removeLayer(fractalLayer);
     }
+  } else if (type === 'forecast') {
+    showForecast = !showForecast;
+    document.getElementById('btnForecast').classList.toggle('active', showForecast);
+    if (!forecastBgLayer) {
+      loadForecastLayer();
+    } else {
+      if (showForecast) {
+        forecastBgLayer.addTo(map);
+        forecastDotLayer.addTo(map);
+      } else {
+        map.removeLayer(forecastBgLayer);
+        map.removeLayer(forecastDotLayer);
+      }
+    }
   } else if (type === 'topo') {
     showTopo = !showTopo;
     document.getElementById('btnTopo').classList.toggle('active', showTopo);
@@ -1054,6 +1076,60 @@ async function loadFractalLayer() {
     setStatus(`Fraktal D_c · Grassberger-Procaccia (1983) · ${meta.source_pts} nokta → ${meta.grid_w}×${meta.grid_h} raster · R=100km · N≥50 · mor=kümelenme · sarı=homojen`);
   } catch(e) {
     setStatus('Fraktal load error: ' + e.message, true);
+  }
+}
+
+async function loadForecastLayer() {
+  setStatus('Forecast katmanı yükleniyor…');
+  try {
+    // 1) Eğitim dönemi b-value PNG
+    const metaRes = await fetch(FORECAST_META_URL);
+    if (!metaRes.ok) throw new Error('Forecast PNG meta bulunamadı');
+    const meta = await metaRes.json();
+    const b = meta.bounds;
+    forecastBgLayer = L.imageOverlay(FORECAST_PNG_URL,
+      [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+      { opacity: 0.82, interactive: false }
+    );
+    if (showForecast) forecastBgLayer.addTo(map);
+
+    // 2) Test olayları (2020-2026, M≥5.0)
+    const evRes = await fetch(FORECAST_TEST_URL);
+    if (!evRes.ok) throw new Error('Test olayları bulunamadı');
+    const evData = await evRes.json();
+
+    forecastDotLayer = L.layerGroup();
+    evData.events.forEach(e => {
+      const mw = e.mw || e.mag;
+      // Boyut: M5.0→6px, M6.0→10px, M7.0→16px, M7.8→22px
+      const r  = Math.max(5, (mw - 4.5) * 8);
+      // Renk: M≥7→kırmızı, M≥6→turuncu, M≥5.5→sarı, M<5.5→beyaz
+      const clr = mw >= 7.0 ? '#ef4444' : mw >= 6.0 ? '#f97316' : mw >= 5.5 ? '#fbbf24' : '#e2e8f0';
+      const date = e.time ? e.time.slice(0,10) : '';
+      L.circleMarker([e.lat, e.lon], {
+        radius      : r,
+        color       : '#000',
+        weight      : 0.8,
+        fillColor   : clr,
+        fillOpacity : 0.85,
+      }).bindPopup(
+        `<b style="color:${clr};font-size:1.1rem">Mw${mw.toFixed(1)}</b>` +
+        `<br><span style="color:#aaa">${e.place || ''}</span>` +
+        `<br><span style="color:#f59e0b;font-size:.8rem">📅 ${date} · Test dönemi</span>` +
+        `<br>Depth: ${(e.dep||0).toFixed(0)} km`
+      ).addTo(forecastDotLayer);
+    });
+    if (showForecast) forecastDotLayer.addTo(map);
+
+    setStatus(
+      `📍 Forecast · Eğitim: 1998-2019 b-value (FC R=100km) · ` +
+      `Test: ${evData.count} olay M≥5.0 (2020-2026) · ` +
+      `Wiemer & Wyss (2002) · Düşük-b → yüksek stres → büyük deprem lokasyonu`
+    );
+  } catch(e) {
+    setStatus('Forecast load error: ' + e.message, true);
+    showForecast = false;
+    document.getElementById('btnForecast').classList.remove('active');
   }
 }
 
