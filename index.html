@@ -236,6 +236,7 @@
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
+    <button class="tbtn"        id="btnTopo"   onclick="toggleLayer('topo')"   title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
   </div>
 
   <div class="sep"></div>
@@ -306,8 +307,19 @@ const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 ══════════════════════════════════════════ */
 const map = L.map('map', { center:[38,25], zoom:4 });
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
-  { attribution:'© OpenStreetMap © CARTO', maxZoom:18 }).addTo(map);
+const darkBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
+  { attribution:'© OpenStreetMap © CARTO', maxZoom:18, zIndex:1 }).addTo(map);
+
+// ESRI topografya katmanları (zIndex: 2–3, etiket altında)
+const topoHillshade = L.tileLayer(
+  'https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
+  { attribution:'© Esri, USGS, NOAA', maxZoom:16, zIndex:2, opacity:0.45 });
+
+const topoRelief = L.tileLayer(
+  'https://services.arcgisonline.com/arcgis/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
+  { attribution:'© Esri, USGS, NOAA', maxZoom:13, zIndex:3, opacity:0.30 });
+
+let showTopo = false;
 
 const labelLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
   { maxZoom:18, zIndex:700 }).addTo(map);
@@ -766,6 +778,20 @@ function toggleLayer(type) {
       loadBvalueLayer();
     } else {
       if (showBvalue) bvalueLayer.addTo(map); else map.removeLayer(bvalueLayer);
+    }
+  } else if (type === 'topo') {
+    showTopo = !showTopo;
+    document.getElementById('btnTopo').classList.toggle('active', showTopo);
+    if (showTopo) {
+      topoHillshade.addTo(map);
+      topoRelief.addTo(map);
+      // Etiket katmanını en üste taşı
+      labelLayer.bringToFront();
+      setStatus('Topografya · ESRI World Hillshade + Shaded Relief · © Esri, USGS, NOAA');
+    } else {
+      map.removeLayer(topoHillshade);
+      map.removeLayer(topoRelief);
+      setStatus('Topografya katmanı kapatıldı');
     }
   }
 }
