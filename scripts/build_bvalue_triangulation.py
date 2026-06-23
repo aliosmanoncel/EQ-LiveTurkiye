@@ -36,8 +36,8 @@ BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
 GRID_W = 500   # lon: 25–45° / 500 = 0.04°/px
 GRID_H = 225   # lat: 34–43° / 225 = 0.04°/px
 
-# b-değeri renk skalası — sabit
-B_LOW, B_HIGH = 0.5, 1.5
+# b-değeri renk skalası — veri medyanı (1.15) merkez, NAF-tipi düşük b görünür
+B_LOW, B_HIGH = 0.7, 1.3
 CMAP = LinearSegmentedColormap.from_list('bvalue_rdylgn', [
     (0.00, '#d73027'),
     (0.25, '#fc8d59'),
