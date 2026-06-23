@@ -1,13 +1,13 @@
 {
-  "generated": "2026-06-23T16:30:00Z",
-  "description": "Marmara forecast test: EMSC 2020-2026 M>=3.0",
+  "generated": "2026-06-23T16:39:28Z",
+  "description": "Marmara forecast test: EMSC 2020-2030 M>=3.0",
   "train_period": [
     1998,
     2019
   ],
   "test_period": [
     2020,
-    2026
+    2030
   ],
   "min_mag": 3.0,
   "bounds": {

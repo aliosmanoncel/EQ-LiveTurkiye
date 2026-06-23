@@ -26,7 +26,7 @@ OUTPUT     = 'data/forecast_test_events.json'
 
 TRAIN_END  = 2019   # eğitim dönemi sonu (dahil)
 TEST_START = 2020   # test dönemi başlangıcı
-TEST_END   = 2026
+TEST_END   = 2030
 TEST_MINMAG = 5.0   # Yunnan çalışmasıyla aynı eşik
 
 BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)

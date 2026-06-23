@@ -5,7 +5,7 @@ with open('data/eq_historical.json', encoding='utf-8') as f:
     data = json.load(f)
 
 BOUNDS = dict(minlat=39.5, maxlat=41.5, minlon=26.0, maxlon=32.0)
-TEST_START, TEST_END, TEST_MINMAG = 2020, 2026, 3.0
+TEST_START, TEST_END, TEST_MINMAG = 2020, 2030, 3.0
 
 events = []
 for e in data['events']:
