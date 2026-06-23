@@ -1,24 +1,25 @@
 {
-  "generated": "2026-06-23T17:11:15Z",
+  "generated": "2026-06-23T17:14:16Z",
   "method": "Delaunay Triangulation + Linear Interpolation · scipy",
-  "source_pts": 2811,
+  "source_pts": 2055,
   "valid_px": 103270,
   "total_px": 151875,
-  "coverage_pct": 68.0,
+  "coverage_pct": 65.5,
   "grid_w": 675,
   "grid_h": 225,
   "b_min_pred": 0.7418534483773722,
   "b_max_pred": 2.7084140643398764,
   "b_norm": [
-    0.767,
-    1.801
+    0.768,
+    1.744
   ],
-  "b_norm_method": "mu±1.5sigma (mu=1.284, sigma=0.345)",
+  "b_norm_method": "mu+/-1.5sigma, N>=75 filtresi",
   "bounds": {
     "minlat": 39.5,
     "maxlat": 41.5,
     "minlon": 26.0,
     "maxlon": 32.0
   },
-  "note": "N<50 nedeniyle veri olmayan alanlar seffaf (NaN->alpha=0)"
+  "note": "N<50 nedeniyle veri olmayan alanlar seffaf (NaN->alpha=0)",
+  "n_filter": 75
 }
