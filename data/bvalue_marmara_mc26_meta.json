@@ -1,17 +1,17 @@
 {
-  "generated": "2026-06-23T16:51:04Z",
+  "generated": "2026-06-23T16:56:28Z",
   "method": "Delaunay Triangulation + Linear Interpolation · scipy",
-  "source_pts": 652,
-  "valid_px": 62757,
+  "source_pts": 2811,
+  "valid_px": 103270,
   "total_px": 151875,
-  "coverage_pct": 41.3,
+  "coverage_pct": 68.0,
   "grid_w": 675,
   "grid_h": 225,
-  "b_min_pred": 0.6444256040695214,
-  "b_max_pred": 1.5457283406339715,
+  "b_min_pred": 0.7418534483773722,
+  "b_max_pred": 2.7084140643398764,
   "b_norm": [
-    0.734,
-    1.108
+    0.899,
+    1.737
   ],
   "b_norm_method": "P10-P90 adaptif",
   "bounds": {

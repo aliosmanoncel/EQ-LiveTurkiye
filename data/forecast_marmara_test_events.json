@@ -1,11 +1,11 @@
 {
-  "generated": "2026-06-23T16:49:28Z",
-  "description": "Marmara prospektif forecast: egitim 2016-2025 (son 10 yil) | test 2026-06-23 - 2030-06-23 M>=5.0",
+  "generated": "2026-06-23T16:56:27Z",
+  "description": "Marmara forecast: egitim 1998-2018 GK74 declustered | test 2019-01-01-2030-06-23 M>=5.0",
   "train_period": [
-    2016,
-    2025
+    1998,
+    2018
   ],
-  "test_start": "2026-06-23",
+  "test_start": "2019-01-01",
   "test_end": "2030-06-23",
   "min_mag": 5.0,
   "bounds": {
@@ -14,6 +14,117 @@
     "minlon": 26.0,
     "maxlon": 32.0
   },
-  "count": 0,
-  "events": []
+  "count": 11,
+  "events": [
+    {
+      "time": "2025-04-23 09:49:11",
+      "lat": 40.8327,
+      "lon": 28.2267,
+      "mag": 6.2,
+      "mw": 6.2,
+      "dep": 15.2,
+      "place": "WESTERN TURKEY",
+      "src": "EMSC"
+    },
+    {
+      "time": "2022-11-23 01:08:15",
+      "lat": 40.82,
+      "lon": 30.99,
+      "mag": 6.1,
+      "mw": 6.1,
+      "dep": 11.0,
+      "place": "WESTERN TURKEY",
+      "src": "EMSC"
+    },
+    {
+      "time": "2019-09-26 10:59:25",
+      "lat": 40.87,
+      "lon": 28.19,
+      "mag": 5.7,
+      "mw": 5.7,
+      "dep": 7.0,
+      "place": "WESTERN TURKEY",
+      "src": "EMSC"
+    },
+    {
+      "time": "2025-04-23 09:51:18",
+      "lat": 40.8443,
+      "lon": 28.3263,
+      "mag": 5.3,
+      "mw": 5.3,
+      "dep": 5.4,
+      "place": "WESTERN TURKEY",
+      "src": "EMSC"
+    },
+    {
+      "time": "2019-02-20 18:23:28",
+      "lat": 39.63,
+      "lon": 26.45,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 8.0,
+      "place": "NEAR THE COAST OF WESTERN TURKEY",
+      "src": "EMSC"
+    },
+    {
+      "time": "2023-12-04 07:42:21",
+      "lat": 40.402,
+      "lon": 28.8598,
+      "mag": 5.1,
+      "mw": 5.1,
+      "dep": 5.4,
+      "place": "WESTERN TURKEY",
+      "src": "EMSC"
+    },
+    {
+      "time": "2025-04-23 10:02:35",
+      "lat": 40.864,
+      "lon": 28.4223,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 18.7,
+      "place": "WESTERN TURKEY",
+      "src": "EMSC"
+    },
+    {
+      "time": "2025-04-23 12:12:57",
+      "lat": 40.8561,
+      "lon": 28.2847,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 5.2,
+      "place": "WESTERN TURKEY",
+      "src": "EMSC"
+    },
+    {
+      "time": "2025-10-02 11:55:04",
+      "lat": 40.803,
+      "lon": 27.9462,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 12.5,
+      "place": "WESTERN TURKEY",
+      "src": "EMSC"
+    },
+    {
+      "time": "2025-10-02T11:55:04.88Z",
+      "lat": 40.803,
+      "lon": 27.9462,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 12.5,
+      "place": "WESTERN TURKEY",
+      "src": ""
+    },
+    {
+      "time": "2025-10-02T11:55:03.928",
+      "lat": 40.7641,
+      "lon": 27.9515,
+      "mag": 5.0,
+      "mw": 5.0,
+      "dep": 10.0,
+      "place": "22 km S of Marmara Ereğlisi, Turkey",
+      "src": ""
+    }
+  ]
 }
