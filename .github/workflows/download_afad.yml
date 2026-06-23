@@ -1,0 +1,26 @@
+name: Download AFAD Hazard PNG
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download AFAD TSTH PGA475
+        run: |
+          curl -f --max-time 60 -A "Mozilla/5.0 (X11; Linux x86_64)" \
+            "https://tucbs-public-api.csb.gov.tr/trk_afad_tdth_wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=58&STYLES=default&CRS=EPSG:4326&BBOX=32.8,24.468125,45.099,45.991&WIDTH=2000&HEIGHT=1000&FORMAT=image/png&TRANSPARENT=TRUE" \
+            -o data/afad_tsth_pga475.png
+          echo '{"bounds":{"minlat":32.8,"maxlat":45.099,"minlon":24.468,"maxlon":45.991},"layer":"TSTH_PGA_475","source":"AFAD/TUCBS","return_period":"475yr"}' > data/afad_tsth_pga475_meta.json
+          ls -lh data/afad_tsth_pga475.png
+
+      - name: Commit PNG
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add data/afad_tsth_pga475.png data/afad_tsth_pga475_meta.json
+          git commit -m "data: AFAD TSTH_PGA_475 haritasi indirildi (TUCBS WMS)"
+          git push
