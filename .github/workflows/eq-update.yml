@@ -21,21 +21,40 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: eq_hour   (1s,   M>=1.0)
-        run: python scripts/eq_fetch_turkey.py --hours 1    --minmag 1.0 --output data/eq_hour.json
+      # ── EMSC (Avrupa geneli, geniş kapsam) ─────────────────────────────
+      - name: eq_hour   EMSC (1s,   M>=1.0)
+        run: python scripts/eq_fetch_turkey.py --hours 1    --minmag 1.0 --output data/eq_hour.json   --source emsc
 
-      - name: eq_daily  (24s,  M>=1.0)
-        run: python scripts/eq_fetch_turkey.py --hours 24   --minmag 1.0 --output data/eq_daily.json
+      - name: eq_daily  EMSC (24s,  M>=1.0)
+        run: python scripts/eq_fetch_turkey.py --hours 24   --minmag 1.0 --output data/eq_daily.json  --source emsc
 
-      - name: eq_week   (168s, M>=1.5)
-        run: python scripts/eq_fetch_turkey.py --hours 168  --minmag 1.5 --output data/eq_week.json
+      - name: eq_week   EMSC (168s, M>=1.5)
+        run: python scripts/eq_fetch_turkey.py --hours 168  --minmag 1.5 --output data/eq_week.json   --source emsc
 
-      - name: eq_month  (720s, M>=2.5)
-        run: python scripts/eq_fetch_turkey.py --hours 720  --minmag 2.5 --output data/eq_month.json
+      - name: eq_month  EMSC (720s, M>=2.5)
+        run: python scripts/eq_fetch_turkey.py --hours 720  --minmag 2.5 --output data/eq_month.json  --source emsc
 
-      - name: eq_annual (8760s, M>=4.5)
-        run: python scripts/eq_fetch_turkey.py --hours 8760 --minmag 4.5 --output data/eq_annual.json
+      - name: eq_annual EMSC (8760s, M>=4.5)
+        run: python scripts/eq_fetch_turkey.py --hours 8760 --minmag 4.5 --output data/eq_annual.json --source emsc
 
+      # ── AFAD (Türkiye yerel ağı, küçük depremler için daha iyi) ─────────
+      - name: eq_hour   AFAD (1s,   M>=1.0)
+        run: python scripts/eq_fetch_turkey.py --hours 1    --minmag 1.0 --output data/eq_hour_afad.json  --source afad
+        continue-on-error: true
+
+      - name: eq_daily  AFAD (24s,  M>=1.0)
+        run: python scripts/eq_fetch_turkey.py --hours 24   --minmag 1.0 --output data/eq_daily_afad.json --source afad
+        continue-on-error: true
+
+      - name: eq_week   AFAD (168s, M>=1.5)
+        run: python scripts/eq_fetch_turkey.py --hours 168  --minmag 1.5 --output data/eq_week_afad.json  --source afad
+        continue-on-error: true
+
+      - name: eq_month  AFAD (720s, M>=2.5)
+        run: python scripts/eq_fetch_turkey.py --hours 720  --minmag 2.5 --output data/eq_month_afad.json --source afad
+        continue-on-error: true
+
+      # ── Hazard (EMSC aylık veriden) ──────────────────────────────────────
       - name: hazard_grid (Campbell 1981 GMPE, monthly veriden M>=2.5)
         run: python scripts/build_hazard_grid.py --input data/eq_month.json --output data/hazard_grid.json
 
@@ -44,6 +63,7 @@ jobs:
           git config user.name  "eq-bot"
           git config user.email "eq-bot@users.noreply.github.com"
           git add data/eq_hour.json data/eq_daily.json data/eq_week.json data/eq_month.json data/eq_annual.json data/hazard_grid.json
+          git add data/eq_hour_afad.json data/eq_daily_afad.json data/eq_week_afad.json data/eq_month_afad.json || true
           if git diff --cached --quiet; then
             echo "Yeni veri yok, commit atlanıyor."
           else

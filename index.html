@@ -224,8 +224,7 @@
     <label>Kaynak</label>
     <select class="src-sel" id="srcSel">
       <option value="emsc">EMSC</option>
-      <option value="orfeus">ORFEUS</option>
-      <option value="gfz">GFZ</option>
+      <option value="afad">AFAD</option>
       <option value="usgs">USGS</option>
     </select>
   </div>
@@ -296,11 +295,33 @@
 // EMSC izleme alanı (Euro-Mediterranean + Middle East + Central Asia)
 const TURKEY   = { minLat:10, maxLat:75, minLon:-45, maxLon:120 };
 const FAY_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/fay-yolu-aricilik-veri-bankasi/main/data/turkiye_diri_fay.geojson';
-const EQ_HOUR   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_hour.json';   // 1s    M≥1.0
-const EQ_DAILY  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_daily.json';  // 24s   M≥1.0
-const EQ_WEEK   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_week.json';   // 1 hf  M≥1.5
-const EQ_MONTH  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_month.json';  // 1 ay  M≥2.5
-const EQ_ANNUAL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_annual.json'; // 1 yıl M≥4.5
+const BASE = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/';
+const EQ_URLS = {
+  emsc: {
+    hour : BASE + 'eq_hour.json',
+    daily: BASE + 'eq_daily.json',
+    week : BASE + 'eq_week.json',
+    month: BASE + 'eq_month.json',
+    annual:BASE + 'eq_annual.json',
+  },
+  afad: {
+    hour : BASE + 'eq_hour_afad.json',
+    daily: BASE + 'eq_daily_afad.json',
+    week : BASE + 'eq_week_afad.json',
+    month: BASE + 'eq_month_afad.json',
+    annual:BASE + 'eq_annual.json',   // AFAD annual yok → EMSC fallback
+  },
+};
+function getEqUrl(srcName, h) {
+  const s = EQ_URLS[srcName] || EQ_URLS.emsc;
+  return h <= 1 ? s.hour : h <= 24 ? s.daily : h <= 168 ? s.week : h <= 720 ? s.month : s.annual;
+}
+// eski sabitler (geriye dönük uyumluluk — hazard/annual yüklemelerinde kullanılıyor)
+const EQ_HOUR   = EQ_URLS.emsc.hour;
+const EQ_DAILY  = EQ_URLS.emsc.daily;
+const EQ_WEEK   = EQ_URLS.emsc.week;
+const EQ_MONTH  = EQ_URLS.emsc.month;
+const EQ_ANNUAL = EQ_URLS.emsc.annual;
 const HAZARD_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/hazard_grid.json';
 const BVALUE_URL        = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_grid.json';
 const BVALUE_TRIANG_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation.png';
@@ -483,6 +504,7 @@ function renderHeat(evList) {
     }).bindPopup(
       `<b style="color:${c};font-size:1.1rem">${mwLabel}</b>` +
       `<br><span style="color:#aaa">${e.place||'EMSC Region'}</span>` +
+      (e.province ? `<br><span style="color:#888;font-size:.8rem">📍 ${e.province}${e.district ? ' / '+e.district : ''}</span>` : '') +
       `<br>Depth: ${e.dep.toFixed(0)} km` +
       `<br><span style="color:#666">${ago} ago</span>`
     ).addTo(markLayer);
@@ -556,7 +578,7 @@ async function loadData(sourceName, h) {
   /* ── 1. GitHub raw (Actions tarafından saatlik güncellenir) ── */
   setStatus('GitHub veri deposu okunuyor…');
   try {
-    const jsonUrl = h <= 1 ? EQ_HOUR : h <= 24 ? EQ_DAILY : h <= 168 ? EQ_WEEK : h <= 720 ? EQ_MONTH : EQ_ANNUAL;
+    const jsonUrl = getEqUrl(sourceName, h);
     const res  = await fetch(jsonUrl + '?_=' + Date.now());
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
@@ -564,14 +586,16 @@ async function loadData(sourceName, h) {
     // Zaman penceresine göre filtrele
     const cutoff = new Date(Date.now() - h * 3600000);
     const all    = (json.events || []).map(e => ({
-      lat  : e.lat,
-      lon  : e.lon,
-      dep  : e.dep   || 0,
-      mag  : e.mag   || 0,
-      mw   : e.mw    || e.mag || 0,
-      mtype: e.mtype || 'mw',
-      place: e.place || '',
-      time : new Date(e.time)
+      lat     : e.lat,
+      lon     : e.lon,
+      dep     : e.dep      || 0,
+      mag     : e.mag      || 0,
+      mw      : e.mw       || e.mag || 0,
+      mtype   : e.mtype    || 'mw',
+      place   : e.place    || '',
+      province: e.province || '',
+      district: e.district || '',
+      time    : new Date(e.time)
     })).filter(e => e.time >= cutoff && e.mag > 0);
 
     if (all.length === 0) throw new Error('Seçili zaman penceresinde veri yok');
