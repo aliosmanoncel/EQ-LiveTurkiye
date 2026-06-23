@@ -309,7 +309,14 @@ const EQ_URLS = {
     daily: BASE + 'eq_daily_afad.json',
     week : BASE + 'eq_week_afad.json',
     month: BASE + 'eq_month_afad.json',
-    annual:BASE + 'eq_annual.json',   // AFAD annual yok → EMSC fallback
+    annual:BASE + 'eq_annual.json',      // AFAD annual yok → EMSC fallback
+  },
+  usgs: {
+    hour : BASE + 'eq_hour_usgs.json',
+    daily: BASE + 'eq_daily_usgs.json',
+    week : BASE + 'eq_week_usgs.json',
+    month: BASE + 'eq_month_usgs.json',
+    annual:BASE + 'eq_annual_usgs.json',
   },
 };
 function getEqUrl(srcName, h) {

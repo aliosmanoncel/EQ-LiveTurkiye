@@ -20,13 +20,15 @@ if sys.stdout.encoding != 'utf-8':
 # ── Sabitler ─────────────────────────────────────────────────────────
 SOURCES = {
     'emsc' : 'https://www.seismicportal.eu/fdsnws/event/1/query',
+    'usgs' : 'https://earthquake.usgs.gov/fdsnws/event/1/query',
     'koeri': 'http://eida.koeri.boun.edu.tr/fdsnws/event/1/query',
     'afad' : 'https://deprem.afad.gov.tr/apiv2/event/filter',
 }
 
-# EMSC/KOERI için geniş pencere (küresel), AFAD için Türkiye
-EMSC_BOUNDS  = dict(minlat=10.0, maxlat=75.0, minlon=-45.0, maxlon=120.0)
-TR_BOUNDS    = dict(minlat=34.0, maxlat=43.0, minlon=25.0,  maxlon=46.0)
+# Sorgu sınırları: AFAD/KOERI → Türkiye, EMSC → Akdeniz havzası, USGS → küresel
+GLOBAL_BOUNDS = dict(minlat=-90.0, maxlat=90.0,  minlon=-180.0, maxlon=180.0)
+EMSC_BOUNDS   = dict(minlat=10.0,  maxlat=75.0,  minlon=-45.0,  maxlon=120.0)
+TR_BOUNDS     = dict(minlat=34.0,  maxlat=43.0,  minlon=25.0,   maxlon=46.0)
 
 LIMIT = 2000
 
@@ -67,7 +69,12 @@ def to_mw(mag, mag_type):
 # ── EMSC / KOERI (standart FDSN text) ────────────────────────────────
 def fetch_fdsn_text(source, hours, minmag):
     base = SOURCES[source]
-    bnd  = EMSC_BOUNDS if source == 'emsc' else TR_BOUNDS
+    if source == 'usgs':
+        bnd = GLOBAL_BOUNDS
+    elif source == 'emsc':
+        bnd = EMSC_BOUNDS
+    else:
+        bnd = TR_BOUNDS
     now  = datetime.now(timezone.utc)
     t0   = now - timedelta(hours=hours)
     fmt  = lambda d: d.strftime('%Y-%m-%dT%H:%M:%S')
@@ -156,10 +163,10 @@ def main():
         raw    = fetch_afad(hours, minmag)
         events = [e for e in (parse_afad_event(r) for r in raw) if e]
         src_label = 'AFAD TDVMS REST API'
-    elif source in ('emsc', 'koeri'):
+    elif source in ('emsc', 'usgs', 'koeri'):
         lines  = fetch_fdsn_text(source, hours, minmag)
         events = [e for e in (parse_fdsn_line(l) for l in lines) if e]
-        src_label = 'EMSC SeismicPortal FDSN' if source == 'emsc' else 'KOERI EIDA FDSN'
+        src_label = {'emsc': 'EMSC SeismicPortal FDSN', 'usgs': 'USGS FDSN', 'koeri': 'KOERI EIDA FDSN'}[source]
     else:
         log(f'Bilinmeyen kaynak: {source}. Desteklenenler: emsc, afad, koeri')
         sys.exit(1)

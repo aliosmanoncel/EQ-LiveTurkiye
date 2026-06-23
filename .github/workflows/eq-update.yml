@@ -54,6 +54,27 @@ jobs:
         run: python scripts/eq_fetch_turkey.py --hours 720  --minmag 2.5 --output data/eq_month_afad.json --source afad
         continue-on-error: true
 
+      # ── USGS (tüm yeryüzü) ───────────────────────────────────────────────
+      - name: eq_hour   USGS (1s,   M>=1.0)
+        run: python scripts/eq_fetch_turkey.py --hours 1    --minmag 1.0 --output data/eq_hour_usgs.json   --source usgs
+        continue-on-error: true
+
+      - name: eq_daily  USGS (24s,  M>=2.5)
+        run: python scripts/eq_fetch_turkey.py --hours 24   --minmag 2.5 --output data/eq_daily_usgs.json  --source usgs
+        continue-on-error: true
+
+      - name: eq_week   USGS (168s, M>=3.5)
+        run: python scripts/eq_fetch_turkey.py --hours 168  --minmag 3.5 --output data/eq_week_usgs.json   --source usgs
+        continue-on-error: true
+
+      - name: eq_month  USGS (720s, M>=4.0)
+        run: python scripts/eq_fetch_turkey.py --hours 720  --minmag 4.0 --output data/eq_month_usgs.json  --source usgs
+        continue-on-error: true
+
+      - name: eq_annual USGS (8760s, M>=5.0)
+        run: python scripts/eq_fetch_turkey.py --hours 8760 --minmag 5.0 --output data/eq_annual_usgs.json --source usgs
+        continue-on-error: true
+
       # ── Hazard (EMSC aylık veriden) ──────────────────────────────────────
       - name: hazard_grid (Campbell 1981 GMPE, monthly veriden M>=2.5)
         run: python scripts/build_hazard_grid.py --input data/eq_month.json --output data/hazard_grid.json
@@ -64,6 +85,7 @@ jobs:
           git config user.email "eq-bot@users.noreply.github.com"
           git add data/eq_hour.json data/eq_daily.json data/eq_week.json data/eq_month.json data/eq_annual.json data/hazard_grid.json
           git add data/eq_hour_afad.json data/eq_daily_afad.json data/eq_week_afad.json data/eq_month_afad.json || true
+          git add data/eq_hour_usgs.json data/eq_daily_usgs.json data/eq_week_usgs.json data/eq_month_usgs.json data/eq_annual_usgs.json || true
           if git diff --cached --quiet; then
             echo "Yeni veri yok, commit atlanıyor."
           else
