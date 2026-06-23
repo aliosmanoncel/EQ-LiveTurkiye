@@ -818,24 +818,24 @@ let showHazard  = false;
 let bvalueLayer = null;
 let showBvalue  = false;
 
-async function loadHazardLayer() {
+function loadHazardLayer() {
   if (hazardLayer) { if (showHazard) hazardLayer.addTo(map); return; }
-  setStatus('Seismic hazard haritası yükleniyor…');
-  try {
-    const metaRes = await fetch(HAZARD_META_URL);
-    if (!metaRes.ok) throw new Error('meta ' + metaRes.status);
-    const meta = await metaRes.json();
-    const b = meta.bounds;
-    hazardLayer = L.imageOverlay(
-      HAZARD_PNG_URL,
-      [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
-      { opacity: 0.80, interactive: false }
-    );
-    if (showHazard) hazardLayer.addTo(map);
-    setStatus(`Seismic Hazard · max PGA=${meta.pga_max_g.toFixed(3)} g · Campbell (1981) · zoom bağımsız`);
-  } catch(e) {
-    setStatus('Hazard yüklenemedi: ' + e.message, true);
-  }
+  // ESHM20 · European Seismic Hazard Model 2020 · PGA 475yr (10%/50yr)
+  // Kaynak: EFEHR · ETH Zürich · Danciu et al. (2021) · CC-BY 4.0
+  // WMS: efehrmaps.ethz.ch · Katman: hazard_pga_475yr
+  hazardLayer = L.tileLayer.wms(
+    'https://efehrmaps.ethz.ch/cgi-bin/mapserv?map=/var/www/mapfile/sharehazard.01.map',
+    {
+      layers     : 'hazard_pga_475yr',
+      format     : 'image/png',
+      transparent: true,
+      version    : '1.3.0',
+      opacity    : 0.75,
+      attribution: 'ESHM20 © EFEHR · Danciu et al. (2021) CC-BY 4.0',
+    }
+  );
+  if (showHazard) hazardLayer.addTo(map);
+  setStatus('Seismic Hazard · ESHM20 PGA 475yr (10%/50yr) · EFEHR · Danciu et al. (2021)');
 }
 
 function setBvalueMethod(m) {
