@@ -17,9 +17,10 @@
       background:rgba(20,20,20,.94);backdrop-filter:blur(4px);
       border-top:1px solid #2a2a2a;}
     .panel-handle{display:flex;align-items:center;justify-content:center;
-      padding:3px 0;cursor:pointer;border-bottom:1px solid #222;user-select:none}
-    .panel-handle span{color:#444;font-size:.7rem;letter-spacing:2px}
-    .panel-handle:hover span{color:#06b6d4}
+      padding:5px 0;cursor:pointer;border-bottom:1px solid #2a2a2a;user-select:none;
+      background:rgba(6,182,212,.07)}
+    .panel-handle span{color:#06b6d4;font-size:.75rem;letter-spacing:3px;opacity:.7}
+    .panel-handle:hover span{opacity:1}
     .panel-body{padding:7px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
     .panel-body.collapsed{display:none}
 
@@ -55,7 +56,7 @@
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
     /* ── LEGEND ── */
-    .legend{position:fixed;bottom:100px;left:10px;z-index:999;background:rgba(0,0,0,.85);border:1px solid #2a2a2a;border-radius:6px;font-size:.75rem;pointer-events:all;min-width:160px}
+    .legend{position:fixed;bottom:56px;left:10px;z-index:999;background:rgba(0,0,0,.85);border:1px solid #2a2a2a;border-radius:6px;font-size:.75rem;pointer-events:all;min-width:160px}
     .legend-header{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;cursor:pointer;user-select:none}
     .legend-header span{color:#fbbf24;font-weight:700;font-size:.78rem}
     .legend-toggle{color:#555;font-size:.85rem;line-height:1}
@@ -810,12 +811,16 @@ async function loadHazardLayer() {
   }
 }
 
-let panelCollapsed = false;
+let panelCollapsed = true;
 function togglePanel() {
   panelCollapsed = !panelCollapsed;
   document.getElementById('panelBody').classList.toggle('collapsed', panelCollapsed);
   document.getElementById('panelArrow').textContent = panelCollapsed ? '▼ ▼ ▼' : '▲ ▲ ▲';
 }
+// Başlangıçta kapalı
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('panelBody').classList.add('collapsed');
+});
 
 function openIEB() {
   // Mevcut harita sınırlarını al
