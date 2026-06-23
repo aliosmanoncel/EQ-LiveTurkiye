@@ -294,6 +294,8 @@ const EQ_MONTH  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiy
 const EQ_ANNUAL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/eq_annual.json'; // 1 yıl M≥4.5
 const HAZARD_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/hazard_grid.json';
 const BVALUE_URL        = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_grid.json';
+const BVALUE_TRIANG_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation.png';
+const BVALUE_TRIANG_META = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_triangulation_meta.json';
 const BVALUE_KRIGING_URL = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_kriging.png';
 const BVALUE_META_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_kriging_meta.json';
 const EMSC_WS  = 'wss://www.seismicportal.eu/standing_order/websocket';
@@ -833,25 +835,39 @@ function buildBvalueLayer() {
 
 async function loadBvalueLayer() {
   if (bvalueLayer) { if (showBvalue) bvalueLayer.addTo(map); return; }
-  setStatus('b-value Kriging haritası yükleniyor…');
+  setStatus('b-value haritası yükleniyor…');
   try {
-    // Önce Kriging PNG dene (varsa)
-    const metaRes = await fetch(BVALUE_META_URL);
-    if (metaRes.ok) {
-      const meta = await metaRes.json();
+    // 1. Önce Triangülasyon PNG dene (Delaunay · N<50 → şeffaf)
+    const tRes = await fetch(BVALUE_TRIANG_META);
+    if (tRes.ok) {
+      const meta = await tRes.json();
+      const b = meta.bounds;
+      bvalueLayer = L.imageOverlay(BVALUE_TRIANG_URL,
+        [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+        { opacity: 0.85, interactive: false }
+      );
+      if (showBvalue) bvalueLayer.addTo(map);
+      const res2 = await fetch(BVALUE_URL);
+      const bdata = await res2.json();
+      setStatus(`b-value · Delaunay Triangülasyon (lineer) · N≥50 dışı şeffaf · Türkiye b=${bdata.b_turkey} · ${meta.source_pts} nokta → ${meta.grid_w}×${meta.grid_h} raster · R=100km · Öncel&Wyss(2000)`);
+      return;
+    }
+    // 2. Triangülasyon yoksa Kriging PNG dene
+    const kRes = await fetch(BVALUE_META_URL);
+    if (kRes.ok) {
+      const meta = await kRes.json();
       const b = meta.bounds;
       bvalueLayer = L.imageOverlay(BVALUE_KRIGING_URL,
         [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
         { opacity: 0.82, interactive: false }
       );
       if (showBvalue) bvalueLayer.addTo(map);
-      // Ayrıca nokta verisi status için
       const res2 = await fetch(BVALUE_URL);
       const bdata = await res2.json();
-      setStatus(`b-value · Kriging (linear variogram · pykrige) · Türkiye b=${bdata.b_turkey} · ${meta.source_pts} nokta → ${meta.grid_w}×${meta.grid_h} raster · R=100km · Öncel&Wyss(2000)`);
+      setStatus(`b-value · Kriging (linear variogram) · Türkiye b=${bdata.b_turkey} · ${meta.source_pts} nokta → ${meta.grid_w}×${meta.grid_h} raster · R=100km · Öncel&Wyss(2000)`);
       return;
     }
-    // Kriging PNG yoksa IDW canvas'a düş
+    // 3. Her ikisi de yoksa IDW canvas
     setStatus('b-value IDW interpolasyon hesaplaniyor…');
     const res = await fetch(BVALUE_URL);
     bvalueData = await res.json();
