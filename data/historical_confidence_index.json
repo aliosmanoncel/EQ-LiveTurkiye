@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Tarihsel Sismisite Güven Endeksi",
+    "method": "Ambraseys (2002), Ambraseys & Finkel (1995)",
+    "description": "Katalog tamlık (completeness) derinliğine göre epistemik belirsizlik bölgeleri",
+    "generated": "2026-06-24",
+    "zones": [
+      {"id":"MAR","label":"Marmara","years":2000,"color":"#00cc66","confidence":"Yüksek","ref":"Ambraseys (2002) — Mw>6.0 tamamlanmış katalog"},
+      {"id":"KAFZ","label":"KAFZ","years":500,"color":"#ffcc00","confidence":"Orta","ref":"Ambraseys & Finkel (1995) — 1500 sonrası yazılı kayıt"},
+      {"id":"DAFZ","label":"DAFZ","years":200,"color":"#ff4444","confidence":"Düşük","ref":"Modern aletsel + kısıtlı tarihsel (1800+)"}
+    ]
+  },
+  "features": [
+    {
+      "id": "MAR",
+      "label": "Marmara",
+      "years": 2000,
+      "color": "#00cc66",
+      "confidence": "Yüksek",
+      "ref": "Ambraseys (2002)",
+      "polygon": [
+        [41.8,26.0],[41.8,29.5],[41.2,30.5],[40.0,30.5],[39.5,29.0],[39.8,27.0],[40.5,26.0],[41.8,26.0]
+      ]
+    },
+    {
+      "id": "KAFZ",
+      "label": "Kuzey Anadolu Fay Zonu (KAFZ)",
+      "years": 500,
+      "color": "#ffcc00",
+      "confidence": "Orta",
+      "ref": "Ambraseys & Finkel (1995)",
+      "polygon": [
+        [41.5,30.5],[41.5,36.0],[40.5,42.0],[39.5,42.0],[38.8,40.0],[39.5,36.0],[39.5,30.5],[40.0,30.5],[41.2,30.5],[41.5,30.5]
+      ]
+    },
+    {
+      "id": "DAFZ",
+      "label": "Doğu Anadolu Fay Zonu (DAFZ)",
+      "years": 200,
+      "color": "#ff4444",
+      "confidence": "Düşük",
+      "ref": "Modern aletsel + 1800 sonrası",
+      "polygon": [
+        [38.8,40.0],[39.5,42.0],[38.5,42.5],[36.5,36.5],[36.0,36.0],[36.5,35.5],[37.5,36.5],[38.0,37.5],[38.8,40.0]
+      ]
+    }
+  ]
+}

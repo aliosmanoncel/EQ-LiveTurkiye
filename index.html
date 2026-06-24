@@ -389,6 +389,7 @@
       <option value="7.4" selected>Mw 7.4</option>
       <option value="7.8">Mw 7.8</option>
     </select>
+    <button class="tbtn"        id="btnConf"   onclick="toggleLayer('conf')"    title="Tarihsel Sismisite Güven Endeksi · Ambraseys(2002) · Marmara=2000yr / KAFZ=500yr / DAFZ=200yr · Epistemik belirsizlik bölgeleri">🛡 Veri Güveni</button>
     <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2030) · Wiemer&Wyss (2002)">📍 Forecast TR</button>
     <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km Mc=2.6 · Öncel&Wyss (2000) · eğitim 1998-2019 → test ML≥3 (2020-2030)">🔬 Marmara FC</button>
   </div>
@@ -960,6 +961,9 @@ let tlData      = null;
 let tlLayer     = null;
 let showTL      = false;
 let tlTarget    = 7.4;   // aktif senaryo: 6.8 / 7.4 / 7.8
+let confData    = null;
+let confLayer   = null;
+let showConf    = false;
 
 function renderHistLayer() {
   if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
@@ -1187,6 +1191,22 @@ function toggleLayer(type) {
       }
     } else {
       if (tlLayer) { map.removeLayer(tlLayer); tlLayer = null; }
+    }
+  } else if (type === 'conf') {
+    showConf = !showConf;
+    document.getElementById('btnConf').classList.toggle('active', showConf);
+    if (showConf) {
+      if (!confData) {
+        setStatus('Güven Endeksi yükleniyor…');
+        fetch('data/historical_confidence_index.json')
+          .then(r => r.json())
+          .then(d => { confData = d; renderConfLayer(); })
+          .catch(e => setStatus('Güven Endeksi yüklenemedi: ' + e.message, true));
+      } else {
+        renderConfLayer();
+      }
+    } else {
+      if (confLayer) { map.removeLayer(confLayer); confLayer = null; }
     }
   } else if (type === 'fractal') {
     showFractal = !showFractal;
@@ -1514,6 +1534,32 @@ function renderTLLayer() {
 function setTLTarget(m) {
   tlTarget = m;
   if (showTL) renderTLLayer();
+}
+
+// ── Tarihsel Güven Endeksi Katmanı ────────────────────────────────────────
+function renderConfLayer() {
+  if (confLayer) { map.removeLayer(confLayer); confLayer = null; }
+  if (!confData || !showConf) return;
+  const layers = [];
+  for (const f of confData.features) {
+    const latlngs = f.polygon.map(c => [c[0], c[1]]);
+    const poly = L.polygon(latlngs, {
+      color: f.color, weight: 2, opacity: 0.9,
+      fillColor: f.color, fillOpacity: 0.12,
+      dashArray: f.id === 'DAFZ' ? '6,4' : f.id === 'KAFZ' ? '4,3' : null,
+    }).bindPopup(
+      `<b>🛡 ${f.label}</b><br>` +
+      `Katalog Derinliği: <b>${f.years} yıl</b><br>` +
+      `Güven: <b style="color:${f.color}">${f.confidence}</b><br>` +
+      `Kaynak: ${f.ref}<br>` +
+      `<hr style="margin:4px 0">` +
+      `<small>Epistemik belirsizlik sınırı — ` +
+      `${f.id==='MAR'?'Mw>6.0 tamamlanmış katalog (Ambraseys 2002)':f.id==='KAFZ'?'Yazılı kayıt 1500+ (Ambraseys & Finkel 1995)':'Aletsel + kısıtlı tarihsel (1800+)'}</small>`
+    );
+    layers.push(poly);
+  }
+  confLayer = L.layerGroup(layers).addTo(map);
+  setStatus('Tarihsel Güven Endeksi · MAR=2000yr (yeşil) · KAFZ=500yr (sarı) · DAFZ=200yr (kırmızı)');
 }
 
 async function loadBAdaptLayer() {
