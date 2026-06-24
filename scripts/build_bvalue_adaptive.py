@@ -64,7 +64,7 @@ D_KM     = 50.0    # yoğunluk sayım yarıçapı (km)
 STEP     = 0.1     # grid adımı (~11 km)
 BOUNDS   = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
 
-INPUT    = 'data/eq_historical.json'
+INPUT    = 'data/eq_historical.json'    # --input ile override edilebilir
 OUTPUT   = 'data/bvalue_grid_adaptive.json'
 
 # Gaussian yumuşatma
@@ -79,7 +79,8 @@ def parse_args():
     def get(flag, default):
         return type(default)(args[args.index(flag)+1]) if flag in args else default
     global MC, MC_DENS, N_MIN, R_SMALL, R_MID, R_LARGE, THR_HIGH, THR_MID
-    global D_KM, STEP, OUTPUT, SMOOTH
+    global D_KM, STEP, OUTPUT, SMOOTH, INPUT
+    INPUT     = get('--input',     INPUT)
     MC        = get('--mc',        MC)
     MC_DENS   = get('--mc_dens',   MC_DENS)
     N_MIN     = get('--n_min',     N_MIN)
