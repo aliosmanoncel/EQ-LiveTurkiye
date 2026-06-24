@@ -1471,7 +1471,14 @@ function renderBAdaptLayer() {
   }
 
   bAdaptLayer = L.layerGroup(markers).addTo(map);
-  const zonStr = [bAdaptZones.HIGH?'🔴R20':'', bAdaptZones.MID?'🟠R50':'', bAdaptZones.LOW?'🟡R100':''].filter(Boolean).join(' ');
+  const midCount = bAdaptData.grid.filter(p => p.zone === 'MID').length;
+  const btnM = document.getElementById('btnZoneM');
+  if (btnM) {
+    btnM.disabled = midCount === 0;
+    btnM.style.opacity = midCount === 0 ? '0.35' : '1';
+    btnM.title = midCount === 0 ? 'R=50km · Veri yok (mevcut grid\'de MID zon oluşmadı)' : `R=50km · Orta sismisite (${midCount} nokta)`;
+  }
+  const zonStr = [bAdaptZones.HIGH?'🔴R20':'', (bAdaptZones.MID&&midCount>0)?'🟠R50':'', bAdaptZones.LOW?'🟡R100':''].filter(Boolean).join(' ');
   setStatus(
     `b-Adaptif · Öncel (2026) · ${markers.length} nokta [${zonStr}] · ` +
     `🔴 Stres odağı: ${triage.red} · 🟠 Yüksek stres: ${triage.orange} · ` +
