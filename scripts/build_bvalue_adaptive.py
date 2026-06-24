@@ -69,6 +69,10 @@ BOUNDS   = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
 INPUT    = 'data/eq_historical.json'    # --input ile override edilebilir
 OUTPUT   = 'data/bvalue_grid_adaptive.json'
 
+# Katalog süresi (a_annual normalizasyonu için)
+YEAR_START = 1900   # ISC başlangıç yılı
+YEAR_END   = 2026   # güncel yıl
+
 # Gaussian yumuşatma
 SMOOTH   = True    # --no_smooth ile devre dışı
 SIGMA_FACTOR = 0.5 # σ = SIGMA_FACTOR × R_atanan (km cinsinden → derece dönüşümü)
@@ -186,10 +190,17 @@ def compute_adaptive(events_b, lats, lons, density):
             if b is None:
                 skipped += 1
             else:
+                # G-R a-değeri: log10(N) + b*Mc  (Öncel & Wyss 2000)
+                a_raw = round(math.log10(n) + b * MC, 3)
+                # Yıllık normalize: log10(N/ΔT) + b*Mc
+                dt = YEAR_END - YEAR_START
+                a_ann = round(math.log10(n / dt) + b * MC, 3)
                 grid.append({
                     'lat' : lat,
                     'lon' : lon,
                     'b'   : b,
+                    'a'   : a_raw,
+                    'a_ann': a_ann,
                     'n'   : n,
                     'r'   : r_km,
                     'zone': zone,
@@ -309,11 +320,14 @@ def main():
 
     # İstatistik özeti
     b_vals = [p['b'] for p in grid]
+    a_vals = [p['a_ann'] for p in grid]
     zones  = [p['zone'] for p in grid]
     print(f'\n[*] Sonuç özeti:')
     print(f'    Toplam nokta : {len(grid)}')
     print(f'    b aralığı    : {min(b_vals):.3f} – {max(b_vals):.3f}')
     print(f'    b ortalaması : {sum(b_vals)/len(b_vals):.3f}')
+    print(f'    a_ann aralığı: {min(a_vals):.3f} – {max(a_vals):.3f}')
+    print(f'    a_ann ortalam: {sum(a_vals)/len(a_vals):.3f}')
     print(f'    Kırmızı zon  : {zones.count("HIGH")} nokta (R={R_SMALL} km)')
     print(f'    Turuncu zon  : {zones.count("MID")}  nokta (R={R_MID} km)')
     print(f'    Sarı zon     : {zones.count("LOW")}  nokta (R={R_LARGE} km)')
@@ -359,6 +373,10 @@ def main():
         'b_min'      : min(b_vals),
         'b_max'      : max(b_vals),
         'b_mean'     : round(sum(b_vals)/len(b_vals), 3),
+        'a_ann_min'  : round(min(a_vals), 3),
+        'a_ann_max'  : round(max(a_vals), 3),
+        'a_ann_mean' : round(sum(a_vals)/len(a_vals), 3),
+        'catalog_years': YEAR_END - YEAR_START,
         'grid'       : grid,
     }
 
