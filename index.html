@@ -390,6 +390,7 @@
       <option value="7.8">Mw 7.8</option>
     </select>
     <button class="tbtn"        id="btnConf"   onclick="toggleLayer('conf')"    title="Tarihsel Sismisite Güven Endeksi · Ambraseys(2002) · Marmara=2000yr / KAFZ=500yr / DAFZ=200yr · Epistemik belirsizlik bölgeleri">🛡 Veri Güveni</button>
+    <button class="tbtn"        id="btnValid"  onclick="toggleLayer('valid')"   title="T_L Retrospektif Validasyon · Öncel&Wyss(2000) · EPICA tarihsel epicenter ↔ T_L minima · %96 R&lt;50km uyum · Schwartz&Coppersmith(1984)">✅ Validasyon</button>
     <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2030) · Wiemer&Wyss (2002)">📍 Forecast TR</button>
     <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km Mc=2.6 · Öncel&Wyss (2000) · eğitim 1998-2019 → test ML≥3 (2020-2030)">🔬 Marmara FC</button>
   </div>
@@ -964,6 +965,9 @@ let tlTarget    = 7.4;   // aktif senaryo: 6.8 / 7.4 / 7.8
 let confData    = null;
 let confLayer   = null;
 let showConf    = false;
+let validData   = null;
+let validLayer  = null;
+let showValid   = false;
 
 function renderHistLayer() {
   if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
@@ -1191,6 +1195,22 @@ function toggleLayer(type) {
       }
     } else {
       if (tlLayer) { map.removeLayer(tlLayer); tlLayer = null; }
+    }
+  } else if (type === 'valid') {
+    showValid = !showValid;
+    document.getElementById('btnValid').classList.toggle('active', showValid);
+    if (showValid) {
+      if (!validData) {
+        setStatus('Validasyon katmanı yükleniyor…');
+        fetch('data/tl_asperite_validation.json')
+          .then(r => r.json())
+          .then(d => { validData = d; renderValidLayer(); })
+          .catch(e => setStatus('Validasyon yüklenemedi: ' + e.message, true));
+      } else {
+        renderValidLayer();
+      }
+    } else {
+      if (validLayer) { map.removeLayer(validLayer); validLayer = null; }
     }
   } else if (type === 'conf') {
     showConf = !showConf;
@@ -1534,6 +1554,51 @@ function renderTLLayer() {
 function setTLTarget(m) {
   tlTarget = m;
   if (showTL) renderTLLayer();
+}
+
+// ── T_L Retrospektif Validasyon Katmanı ───────────────────────────────────
+function renderValidLayer() {
+  if (validLayer) { map.removeLayer(validLayer); validLayer = null; }
+  if (!validData || !showValid) return;
+  const layers = [];
+  const all = [
+    ...validData.historical_correction.map(e => ({...e, type:'hist'})),
+    ...validData.modern_validation.map(e => ({...e, type:'modern'}))
+  ];
+  let close = 0;
+  for (const ev of all) {
+    const tl = ev.nearest_tl;
+    if (!tl) continue;
+    const off = ev.offset_km;
+    const isClose = off < 50;
+    if (isClose) close++;
+    const epicColor = ev.type === 'modern' ? '#00ffff' : '#ffaa00';
+    const lineColor = isClose ? '#00ff88' : '#ff4444';
+    // Epicenter dairesi
+    const circ = L.circleMarker([ev.lat, ev.lon], {
+      radius: ev.mw >= 7.0 ? 7 : 5,
+      color: epicColor, weight: 1.5, fillColor: epicColor, fillOpacity: 0.6,
+    }).bindPopup(
+      `<b>${ev.type === 'modern' ? '🔵 Modern' : '🟠 Tarihsel'} Epicenter</b><br>` +
+      `${ev.year || ev.time?.slice(0,10)} Mw${Number(ev.mw).toFixed(1)} ${ev.place || ''}<br>` +
+      `<b>T_L Minima:</b> (${tl.lat}, ${tl.lon}) b=${tl.b?.toFixed(3)}<br>` +
+      `Ofset: <b style="color:${lineColor}">${off} km</b> ${isClose ? '✅ R<50km' : '⚠ R>50km'}<br>` +
+      `<hr style="margin:4px 0"><small>Öncel&Wyss (2000) · Schwartz&Coppersmith (1984)</small>`
+    );
+    // T_L minima noktası
+    const minPt = L.circleMarker([tl.lat, tl.lon], {
+      radius: 3, color: '#ffffff', weight: 1, fillColor: '#ffffff', fillOpacity: 0.5,
+    });
+    // Offset çizgisi
+    const line = L.polyline([[ev.lat, ev.lon],[tl.lat, tl.lon]], {
+      color: lineColor, weight: isClose ? 1 : 0.5, opacity: isClose ? 0.7 : 0.3,
+      dashArray: isClose ? null : '3,4',
+    });
+    layers.push(line, minPt, circ);
+  }
+  validLayer = L.layerGroup(layers).addTo(map);
+  const n = all.length;
+  setStatus(`T_L Validasyon · ${n} olay · ✅ ${close}/${n} R<50km (%${Math.round(100*close/n)}) · Öncel&Wyss (2000)`);
 }
 
 // ── Tarihsel Güven Endeksi Katmanı ────────────────────────────────────────
