@@ -375,14 +375,14 @@
     <button class="tbtn"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 · Avrupa Tarihsel Deprem Kataloğu · M≥4 · 1005-1899 · Rovida & Antonucci (2021) INGV">Tarihsel</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
     <button class="tbtn"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Asperite triyajı · Kırmızı=stres odağı">b-Adaptif</button>
-    <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
     <button class="tbtn" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
     <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
     <button class="tbtn"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
   </div>
-  <!-- Layer toggles — satir 2: Forecast -->
+  <!-- Layer toggles — satir 2: b-analiz + Forecast -->
   <div style="display:flex;gap:4px;flex-wrap:nowrap;margin-top:4px">
+    <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
     <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2030) · Wiemer&Wyss (2002)">📍 Forecast TR</button>
     <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km Mc=2.6 · Öncel&Wyss (2000) · eğitim 1998-2019 → test ML≥3 (2020-2030)">🔬 Marmara FC</button>
   </div>
