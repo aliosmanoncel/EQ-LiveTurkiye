@@ -394,6 +394,7 @@
     </select>
     <button class="tbtn"        id="btnConf"   onclick="toggleLayer('conf')"    title="Tarihsel Sismisite Güven Endeksi · Ambraseys(2002) · Marmara=2000yr / KAFZ=500yr / DAFZ=200yr · Epistemik belirsizlik bölgeleri">🛡 Veri Güveni</button>
     <button class="tbtn"        id="btnValid"  onclick="toggleLayer('valid')"   title="T_L Retrospektif Validasyon · Öncel&Wyss(2000) · EPICA tarihsel epicenter ↔ T_L minima · %96 R&lt;50km uyum · Schwartz&Coppersmith(1984)">✅ Validasyon</button>
+    <button class="tbtn"        id="btnDeltaB" onclick="toggleLayer('deltab')"  title="Artçı Baskısı İndeksi · Δb = b(main) - b(all) · Öncel(2026) · Mavi=artçı baskısı / Gri=ana deprem karakterli / Turuncu=stres artçısı">Δb İndeksi</button>
     <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2030) · Wiemer&Wyss (2002)">📍 Forecast TR</button>
     <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km Mc=2.6 · Öncel&Wyss (2000) · eğitim 1998-2019 → test ML≥3 (2020-2030)">🔬 Marmara FC</button>
   </div>
@@ -972,6 +973,9 @@ let showConf    = false;
 let validData   = null;
 let validLayer  = null;
 let showValid   = false;
+let deltaBData  = null;
+let deltaBLayer = null;
+let showDeltaB  = false;
 
 function renderHistLayer() {
   if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
@@ -1215,6 +1219,22 @@ function toggleLayer(type) {
       }
     } else {
       if (validLayer) { map.removeLayer(validLayer); validLayer = null; }
+    }
+  } else if (type === 'deltab') {
+    showDeltaB = !showDeltaB;
+    document.getElementById('btnDeltaB').classList.toggle('active', showDeltaB);
+    if (showDeltaB) {
+      if (!deltaBData) {
+        setStatus('Δb İndeksi yükleniyor…');
+        fetch('data/delta_b_grid.json')
+          .then(r => r.json())
+          .then(d => { deltaBData = d; renderDeltaBLayer(); })
+          .catch(e => setStatus('Δb verisi yüklenemedi: ' + e.message, true));
+      } else {
+        renderDeltaBLayer();
+      }
+    } else {
+      if (deltaBLayer) { map.removeLayer(deltaBLayer); deltaBLayer = null; }
     }
   } else if (type === 'conf') {
     showConf = !showConf;
@@ -1646,6 +1666,54 @@ function renderConfLayer() {
   }
   confLayer = L.layerGroup(layers).addTo(map);
   setStatus('Tarihsel Güven Endeksi · MAR=2000yr (yeşil) · KAFZ=500yr (sarı) · DAFZ=200yr (kırmızı)');
+}
+
+// ── Δb Artçı Baskısı İndeksi Katmanı ─────────────────────────────────────────
+function deltaBColor(db) {
+  // db < -0.10 → mavi  (artçı baskısı: b(all) > b(main))
+  // db ~  0    → gri   (ana deprem karakterli)
+  // db > +0.10 → turuncu (stres artçısı: b(main) > b(all))
+  if (db < -0.30) return '#1a6ef5';
+  if (db < -0.10) return '#64a8f5';
+  if (db >  0.30) return '#e07b00';
+  if (db >  0.10) return '#f5b942';
+  return '#888888';
+}
+
+function renderDeltaBLayer() {
+  if (deltaBLayer) { map.removeLayer(deltaBLayer); deltaBLayer = null; }
+  if (!deltaBData || !showDeltaB) return;
+  const markers = [];
+  let cnt = { artci: 0, ana: 0, stres: 0 };
+  for (const p of deltaBData.grid) {
+    const db   = p.delta_b;
+    const col  = deltaBColor(db);
+    const r_px = p.zone === 'HIGH' ? 5 : p.zone === 'MID' ? 4 : 3;
+    const interp = p.interp === 'artci_baskisi'      ? '🔵 Artçı baskısı — declustering doğru karar'
+                 : p.interp === 'stres_artcisi'       ? '🟠 Stres artçısı — artçılar yüksek stres taşıyor'
+                 : '⚫ Ana deprem karakterli — b(main)≈b(all)';
+    if (p.interp === 'artci_baskisi') cnt.artci++;
+    else if (p.interp === 'stres_artcisi') cnt.stres++;
+    else cnt.ana++;
+    const m = L.circleMarker([p.lat, p.lon], {
+      radius: r_px, color: col, fillColor: col,
+      fillOpacity: 0.75, weight: 0.5, opacity: 0.9
+    }).bindPopup(
+      `<b>Δb Artçı Baskısı İndeksi</b><br>` +
+      `${interp}<br><hr style="margin:4px 0">` +
+      `<b>b(main)</b> = ${p.b_main.toFixed(3)} <small>(N=${p.n_main})</small><br>` +
+      `<b>b(all)</b>  = ${p.b_all.toFixed(3)} <small>(N=${p.n_all})</small><br>` +
+      `<b>Δb</b> = <b style="color:${col}">${db > 0 ? '+' : ''}${db.toFixed(3)}</b><br>` +
+      `Zon: ${p.zone} · R=${p.r}km · (${p.lat},${p.lon})<br>` +
+      `<small>Öncel (2026) · GK74 declustered vs raw · Aki (1965) MLE</small>`
+    );
+    markers.push(m);
+  }
+  deltaBLayer = L.layerGroup(markers).addTo(map);
+  setStatus(
+    `Δb İndeksi · ${markers.length} nokta · ` +
+    `🔵 Artçı baskısı: ${cnt.artci} · ⚫ Ana deprem: ${cnt.ana} · 🟠 Stres artçısı: ${cnt.stres}`
+  );
 }
 
 async function loadBAdaptLayer() {
