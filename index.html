@@ -375,6 +375,9 @@
     <button class="tbtn"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 · Avrupa Tarihsel Deprem Kataloğu · M≥4 · 1005-1899 · Rovida & Antonucci (2021) INGV">Tarihsel</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
     <button class="tbtn"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Asperite triyajı · Kırmızı=stres odağı">b-Adaptif</button>
+    <button class="tbtn active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
+    <button class="tbtn active" id="btnZoneM"  onclick="toggleBAdaptZone('MID')"  style="font-size:.7rem;padding:3px 7px;color:#ffaa00;border-color:#ffaa00" title="R=50km · Orta sismisite">🟠R50</button>
+    <button class="tbtn"        id="btnZoneL"  onclick="toggleBAdaptZone('LOW')"  style="font-size:.7rem;padding:3px 7px;color:#aaa;border-color:#555"       title="R=100km · Düşük sismisite · Geniş alan · Dikkatli yorumla">🟡R100</button>
     <button class="tbtn" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
     <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
@@ -956,6 +959,7 @@ let showBvalue  = false;
 let bAdaptLayer = null;
 let showBAdapt  = false;
 let bAdaptData  = null;
+let bAdaptZones = { HIGH: true, MID: true, LOW: false };  // LOW varsayılan kapalı
 let aValueLayer = null;
 let showAValue  = false;
 let tlData      = null;
@@ -1398,6 +1402,14 @@ async function loadBvalueLayer() {
   }
 }
 
+// ── b-Adaptif Zon Toggle ──────────────────────────────────────────────────
+function toggleBAdaptZone(zone) {
+  bAdaptZones[zone] = !bAdaptZones[zone];
+  const ids = { HIGH: 'btnZoneH', MID: 'btnZoneM', LOW: 'btnZoneL' };
+  document.getElementById(ids[zone]).classList.toggle('active', bAdaptZones[zone]);
+  if (showBAdapt) renderBAdaptLayer();
+}
+
 // ── b-Adaptif Katmanı (Öncel 2026) ────────────────────────────────────────
 function bAdaptColor(b) {
   // Kırmızı (stres odağı b<0.7) → turuncu → sarı → yeşil (sakin b>1.4)
@@ -1431,6 +1443,7 @@ function renderBAdaptLayer() {
   for (const p of bAdaptData.grid) {
     const b     = p.b;
     const zone  = p.zone;
+    if (!bAdaptZones[zone]) continue;  // zon filtresi
     const label = bAdaptTriage(b, zone);
     if (label && label.startsWith('🔴')) triage.red++;
     if (label && label.startsWith('🟠')) triage.orange++;
@@ -1458,10 +1471,11 @@ function renderBAdaptLayer() {
   }
 
   bAdaptLayer = L.layerGroup(markers).addTo(map);
+  const zonStr = [bAdaptZones.HIGH?'🔴R20':'', bAdaptZones.MID?'🟠R50':'', bAdaptZones.LOW?'🟡R100':''].filter(Boolean).join(' ');
   setStatus(
-    `b-Adaptif · Öncel (2026) · ${bAdaptData.count} nokta · ` +
-    `R=20/50/100 km · 🔴 Stres odağı: ${triage.red} · 🟠 Yüksek stres: ${triage.orange} · ` +
-    `b=${bAdaptData.b_min?.toFixed(2)}–${bAdaptData.b_max?.toFixed(2)} · Gaussian yumuşatma σ=0.5×R`
+    `b-Adaptif · Öncel (2026) · ${markers.length} nokta [${zonStr}] · ` +
+    `🔴 Stres odağı: ${triage.red} · 🟠 Yüksek stres: ${triage.orange} · ` +
+    `b=${bAdaptData.b_min?.toFixed(2)}–${bAdaptData.b_max?.toFixed(2)} · Gaussian σ=0.5×R`
   );
 }
 
