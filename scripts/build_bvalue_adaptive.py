@@ -43,8 +43,10 @@ if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 # ── Sabitler ─────────────────────────────────────────────────────────────────
-MC       = 3.0     # Tamamlılık büyüklüğü (b hesabı için)
-MC_DENS  = 2.0     # Yoğunluk sayımı için eşik (daha düşük = daha hassas zon haritası)
+MC       = 2.0     # Tamamlılık büyüklüğü — Mw ölçeğinde
+                   # Scordilis (2006) kuadratik ML→Mw: ML3.0 → Mw≈2.0 (quadratic form)
+                   # Bu nedenle Mw Mc=2.0 ≡ ML Mc=3.0 — eşdeğer eşik
+MC_DENS  = 1.5     # Yoğunluk sayımı eşiği — Mw (ML2.0 ≈ Mw1.4-1.5)
 DM       = 0.05    # Utsu (1966) binom düzeltmesi
 N_MIN    = 50      # b hesabı için minimum olay sayısı
 
@@ -165,7 +167,8 @@ def compute_adaptive(events_b, lats, lons, density):
     """
     print(f'[Aşama 2] Adaptif R ile b-değeri  (N_min={N_MIN}, Mc={MC})')
     grid = []
-    ev_tuples = [(e['lat'], e['lon'], e.get('mag', 0)) for e in events_b]
+    # mw: Scordilis (2006) dönüştürülmüş Mw; yoksa mag(ML) fallback
+    ev_tuples = [(e['lat'], e['lon'], e.get('mw') or e.get('mag', 0)) for e in events_b]
     skipped = 0
 
     total = len(lats) * len(lons)
@@ -262,24 +265,25 @@ def main():
 
     # Yoğunluk kataloğu: 30 yıl, M>=MC_DENS, Türkiye bbox
     year_cut = datetime.now(timezone.utc).year - 30
+    # Yoğunluk: mw alanı tercih; yoksa mag(ML) fallback
     events_dens = [
         e for e in all_events
-        if e.get('mag', 0) >= MC_DENS
+        if (e.get('mw') or e.get('mag', 0)) >= MC_DENS
         and int(e.get('time', '1900')[:4]) >= year_cut
         and BOUNDS['minlat'] <= e.get('lat', 0) <= BOUNDS['maxlat']
         and BOUNDS['minlon'] <= e.get('lon', 0) <= BOUNDS['maxlon']
     ]
     print(f'[*] Yoğunluk kataloğu: {len(events_dens)} olay '
-          f'({year_cut}–bugün, M>={MC_DENS})')
+          f'({year_cut}–bugün, Mw>={MC_DENS})')
 
-    # b-değeri kataloğu: tüm aletsel dönem, M>=MC
+    # b-değeri: mw alanı tercih; yoksa mag(ML) fallback
     events_b = [
         e for e in all_events
-        if e.get('mag', 0) >= MC
+        if (e.get('mw') or e.get('mag', 0)) >= MC
         and BOUNDS['minlat'] <= e.get('lat', 0) <= BOUNDS['maxlat']
         and BOUNDS['minlon'] <= e.get('lon', 0) <= BOUNDS['maxlon']
     ]
-    print(f'[*] b-değeri kataloğu: {len(events_b)} olay (tüm dönem, M>={MC})')
+    print(f'[*] b-değeri kataloğu: {len(events_b)} olay (tüm dönem, Mw>={MC})')
 
     # Grid üret
     lats, lons = [], []
