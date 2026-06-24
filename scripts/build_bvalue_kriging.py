@@ -25,9 +25,12 @@ try:
 except ImportError:
     sys.exit('[!] pykrige kurulu degil: pip install pykrige')
 
-INPUT       = 'data/bvalue_grid.json'
-OUTPUT_PNG  = 'data/bvalue_kriging.png'
-OUTPUT_META = 'data/bvalue_kriging_meta.json'
+# --input / --output argümanları ile override edilebilir
+_args = sys.argv[1:]
+def _get(flag, default): return _args[_args.index(flag)+1] if flag in _args else default
+INPUT       = _get('--input',  'data/bvalue_grid.json')
+OUTPUT_PNG  = _get('--output', 'data/bvalue_kriging.png')
+OUTPUT_META = OUTPUT_PNG.replace('.png', '_meta.json')
 
 BOUNDS = dict(minlat=34.0, maxlat=43.0, minlon=25.0, maxlon=45.0)
 

@@ -244,6 +244,39 @@
       </div>
     </div>
 
+    <!-- b-Adaptif bölümü -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgBAdapt','lgBAdaptT')">
+        b-Adaptif · Öncel (2026) <span class="tog" id="lgBAdaptT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgBAdapt">
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:4px">Değişken R · Sismisite yoğunluğu bazlı zonlama</div>
+        <div style="height:8px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#ff0032,#ff8800,#ffdd00,#00cc44)"></div>
+        <div style="display:flex;justify-content:space-between;color:#555;font-size:.68rem;margin-bottom:5px">
+          <span style="color:#ff0032">b≤0.7 stres</span><span style="color:#888">b=1.0</span><span style="color:#00cc44">b≥1.4 sakin</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:4px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#ff4444" fill-opacity=".85" stroke="#fff" stroke-width="1.5"/></svg>
+            <span style="font-size:.70rem">🔴 Kırmızı zon · R=20 km · Asperite odağı</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="16" height="16"><circle cx="8" cy="8" r="7" fill="#ff8800" fill-opacity=".65" stroke="#333" stroke-width=".5"/></svg>
+            <span style="font-size:.70rem">🟠 Turuncu zon · R=50 km · Geçiş</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="20" height="20"><circle cx="10" cy="10" r="9" fill="#ffdd44" fill-opacity=".55" stroke="#333" stroke-width=".5"/></svg>
+            <span style="font-size:.70rem">🟡 Sarı zon · R=100 km · Moment deficit</span>
+          </div>
+        </div>
+        <div style="color:#666;font-size:.65rem;line-height:1.5">
+          Aki (1965) MLE + Utsu (1966) · Mc=3.0 · N≥50<br>
+          Gaussian yumuşatma σ=0.5×R · 4151 nokta<br>
+          🔴 tıkla → R/zon/yoğunluk/b bilgisi · <b>Öncel (2026)</b>
+        </div>
+      </div>
+    </div>
+
     <!-- Active Faults bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgFay','lgFayT')">
@@ -341,6 +374,7 @@
     <button class="tbtn"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
     <button class="tbtn"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 · Avrupa Tarihsel Deprem Kataloğu · M≥4 · 1005-1899 · Rovida & Antonucci (2021) INGV">Tarihsel</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
+    <button class="tbtn"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Asperite triyajı · Kırmızı=stres odağı">b-Adaptif</button>
     <button class="tbtn" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
     <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
@@ -910,6 +944,9 @@ let showHist    = false;
 let histData    = null;
 let bvalueLayer = null;
 let showBvalue  = false;
+let bAdaptLayer = null;
+let showBAdapt  = false;
+let bAdaptData  = null;
 
 function renderHistLayer() {
   if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
@@ -1098,6 +1135,14 @@ function toggleLayer(type) {
     } else {
       if (showBvalue) bvalueLayer.addTo(map); else map.removeLayer(bvalueLayer);
     }
+  } else if (type === 'badapt') {
+    showBAdapt = !showBAdapt;
+    document.getElementById('btnBAdapt').classList.toggle('active', showBAdapt);
+    if (!bAdaptData) {
+      loadBAdaptLayer();
+    } else {
+      renderBAdaptLayer();
+    }
   } else if (type === 'fractal') {
     showFractal = !showFractal;
     document.getElementById('btnFractal').classList.toggle('active', showFractal);
@@ -1265,6 +1310,85 @@ async function loadBvalueLayer() {
     setStatus(`b-value · IDW · Türkiye b=${bvalueData.b_turkey} · ${bvalueData.count} nokta · R=100km`);
   } catch(e) {
     setStatus('b-value load error: ' + e.message, true);
+  }
+}
+
+// ── b-Adaptif Katmanı (Öncel 2026) ────────────────────────────────────────
+function bAdaptColor(b) {
+  // Kırmızı (stres odağı b<0.7) → turuncu → sarı → yeşil (sakin b>1.4)
+  const t = Math.max(0, Math.min(1, (b - 0.5) / 1.0));
+  const r = Math.round(255 * (1 - t));
+  const g = Math.round(255 * t);
+  return `rgb(${r},${g},50)`;
+}
+
+function bAdaptRadius(zone) {
+  if (zone === 'HIGH') return 5;   // R=20 km — küçük, keskin
+  if (zone === 'MID')  return 7;   // R=50 km
+  return 9;                         // R=100 km — büyük, genel
+}
+
+function bAdaptTriage(b, zone) {
+  // Otomatik asperite etiketleme (Chang vd. 2025 + Öncel & Wyss 2001)
+  if (zone === 'HIGH' && b < 0.7)  return '🔴 Sismik Risk Odak Noktası';
+  if (zone === 'HIGH' && b < 0.85) return '🟠 Yüksek Stres Segmenti';
+  if (b < 0.75)                    return '🟡 Gerilim Birikimi';
+  return null;
+}
+
+function renderBAdaptLayer() {
+  if (bAdaptLayer) { map.removeLayer(bAdaptLayer); bAdaptLayer = null; }
+  if (!bAdaptData || !showBAdapt) return;
+
+  const markers = [];
+  const triage  = { red: 0, orange: 0 };
+
+  for (const p of bAdaptData.grid) {
+    const b     = p.b;
+    const zone  = p.zone;
+    const label = bAdaptTriage(b, zone);
+    if (label && label.startsWith('🔴')) triage.red++;
+    if (label && label.startsWith('🟠')) triage.orange++;
+
+    const bRaw  = p.b_raw !== undefined ? p.b_raw.toFixed(3) : b.toFixed(3);
+    const popup = `
+      <b>b-Adaptif · Öncel (2026)</b><br>
+      ${label ? `<span style="font-size:1.05em">${label}</span><br>` : ''}
+      <b>b =</b> ${b.toFixed(3)}${p.b_raw !== undefined ? ` <small>(ham: ${bRaw})</small>` : ''}<br>
+      <b>Zon:</b> ${zone === 'HIGH' ? '🔴 Kırmızı' : zone === 'MID' ? '🟠 Turuncu' : '🟡 Sarı'}<br>
+      <b>R =</b> ${p.r} km · <b>N =</b> ${p.n}<br>
+      <b>Yoğunluk:</b> ${p.dens} olay/50km<br>
+      <b>Konum:</b> ${p.lat.toFixed(2)}°N ${p.lon.toFixed(2)}°E<br>
+      <small style="color:#aaa">Aki (1965) MLE + Utsu (1966) · Gaussian σ=0.5×R</small>
+    `;
+
+    markers.push(L.circleMarker([p.lat, p.lon], {
+      radius      : bAdaptRadius(zone),
+      fillColor   : bAdaptColor(b),
+      color       : label ? '#fff' : 'rgba(0,0,0,0.3)',
+      weight      : label ? 1.5 : 0.5,
+      fillOpacity : zone === 'HIGH' ? 0.88 : 0.65,
+      opacity     : 0.9,
+    }).bindPopup(popup));
+  }
+
+  bAdaptLayer = L.layerGroup(markers).addTo(map);
+  setStatus(
+    `b-Adaptif · Öncel (2026) · ${bAdaptData.count} nokta · ` +
+    `R=20/50/100 km · 🔴 Stres odağı: ${triage.red} · 🟠 Yüksek stres: ${triage.orange} · ` +
+    `b=${bAdaptData.b_min?.toFixed(2)}–${bAdaptData.b_max?.toFixed(2)} · Gaussian yumuşatma σ=0.5×R`
+  );
+}
+
+async function loadBAdaptLayer() {
+  setStatus('b-Adaptif katmanı yükleniyor… (Öncel 2026)');
+  try {
+    const res = await fetch('data/bvalue_grid_adaptive.json');
+    if (!res.ok) throw new Error('bvalue_grid_adaptive.json bulunamadı');
+    bAdaptData = await res.json();
+    renderBAdaptLayer();
+  } catch(e) {
+    setStatus('b-Adaptif yüklenemedi: ' + e.message, true);
   }
 }
 
