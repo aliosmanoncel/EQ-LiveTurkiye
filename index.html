@@ -383,7 +383,7 @@
   <!-- Layer toggles — satir 2: b-analiz + Forecast -->
   <div style="display:flex;gap:4px;flex-wrap:nowrap;margin-top:4px">
     <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
-    <button class="tbtn"        id="btnTL"     onclick="toggleLayer('tl')"     title="Öncel&Wyss(2000,2001) T_L Yerel Yineleme Süresi · 10^(b·M−a_ann) · Triple-Target: 6.8/7.4/7.8">⏱ T_L Vadesi</button>
+    <button class="tbtn"        id="btnTL"     onclick="toggleLayer('tl')"     title="Öncel&Wyss(2000,2001) T_L Anomalisi · Asperite Yoğunluğu · 10^(b·M−a_ann) · Minima = kilitli asperite · Triple-Target: 6.8/7.4/7.8">🔴 Asperite (T_L)</button>
     <select id="selTL" onchange="setTLTarget(+this.value)" style="background:#1a2a3a;color:#7ecfff;border:1px solid #7ecfff33;border-radius:4px;font-size:11px;padding:2px 4px;cursor:pointer">
       <option value="6.8">Mw 6.8</option>
       <option value="7.4" selected>Mw 7.4</option>
@@ -1493,20 +1493,22 @@ function renderTLLayer() {
     const r = p.zone === 'HIGH' ? 5 : p.zone === 'MID' ? 4 : 3;
     const m = L.circleMarker([p.lat, p.lon], {
       radius: r, color: 'transparent', weight: 0,
-      fillColor: tlColor(tl), fillOpacity: 0.80,
+      fillColor: tlColor(tl), fillOpacity: 0.80, _tl: tl,
     }).bindPopup(
-      `<b>T<sub>L</sub> Yerel Yineleme · Öncel&Wyss (2001)</b><br>` +
+      `<b>Asperite T<sub>L</sub> Anomalisi · Öncel&Wyss (2001)</b><br>` +
       `Senaryo: <b>Mw ${tlTarget}</b><br>` +
-      `T<sub>L</sub> = <b>${tl < 1000 ? tl.toFixed(0) : (tl/1000).toFixed(1)+'k'} yıl</b><br>` +
+      `T<sub>L</sub> = <b>${tl < 1000 ? tl.toFixed(0) : (tl/1000).toFixed(1)+'k'} yıl</b>` +
+      ` <span style="color:#ff6b6b;font-size:10px">${tl < 100 ? '⚠ Asperite Minima' : ''}</span><br>` +
       `b = ${p.b?.toFixed(3)} | a<sub>ann</sub> = ${p.a_ann?.toFixed(3)}<br>` +
       `N = ${p.n} | R = ${p.r} km<br>` +
-      `<hr style="margin:4px 0"><small>T<sub>L</sub> = 10^(b·M − a<sub>ann</sub>)</small>`
+      `<hr style="margin:4px 0"><small>Kırmızı odak = kilitli asperite (nucleation zone)<br>T<sub>L</sub> = 10^(b·M − a<sub>ann</sub>)</small>`
     );
     markers.push(m);
   }
   tlLayer = L.layerGroup(markers).addTo(map);
   const mn = tlData[`${key}_min`]; const mx = tlData[`${key}_max`];
-  setStatus(`T_L Vadesi (Mw ${tlTarget}) · ${markers.length} nokta · ${mn}–${Math.min(mx,99999)} yıl`);
+  const alarm = markers.filter(m => { const t = m.options._tl; return t && t < 100; }).length;
+  setStatus(`Asperite T_L Anomalisi (Mw ${tlTarget}) · ${markers.length} nokta · min=${mn} yıl · ⚠ ${alarm} asperite odağı`);
 }
 
 function setTLTarget(m) {
