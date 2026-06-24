@@ -383,6 +383,12 @@
   <!-- Layer toggles — satir 2: b-analiz + Forecast -->
   <div style="display:flex;gap:4px;flex-wrap:nowrap;margin-top:4px">
     <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
+    <button class="tbtn"        id="btnTL"     onclick="toggleLayer('tl')"     title="Öncel&Wyss(2000,2001) T_L Yerel Yineleme Süresi · 10^(b·M−a_ann) · Triple-Target: 6.8/7.4/7.8">⏱ T_L Vadesi</button>
+    <select id="selTL" onchange="setTLTarget(+this.value)" style="background:#1a2a3a;color:#7ecfff;border:1px solid #7ecfff33;border-radius:4px;font-size:11px;padding:2px 4px;cursor:pointer">
+      <option value="6.8">Mw 6.8</option>
+      <option value="7.4" selected>Mw 7.4</option>
+      <option value="7.8">Mw 7.8</option>
+    </select>
     <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2030) · Wiemer&Wyss (2002)">📍 Forecast TR</button>
     <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km Mc=2.6 · Öncel&Wyss (2000) · eğitim 1998-2019 → test ML≥3 (2020-2030)">🔬 Marmara FC</button>
   </div>
@@ -950,6 +956,10 @@ let showBAdapt  = false;
 let bAdaptData  = null;
 let aValueLayer = null;
 let showAValue  = false;
+let tlData      = null;
+let tlLayer     = null;
+let showTL      = false;
+let tlTarget    = 7.4;   // aktif senaryo: 6.8 / 7.4 / 7.8
 
 function renderHistLayer() {
   if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
@@ -1161,6 +1171,22 @@ function toggleLayer(type) {
       }
     } else {
       if (aValueLayer) { map.removeLayer(aValueLayer); aValueLayer = null; }
+    }
+  } else if (type === 'tl') {
+    showTL = !showTL;
+    document.getElementById('btnTL').classList.toggle('active', showTL);
+    if (showTL) {
+      if (!tlData) {
+        setStatus('T_L Vadesi yükleniyor…');
+        fetch('data/tl_grid_adaptive.json')
+          .then(r => r.json())
+          .then(d => { tlData = d; renderTLLayer(); })
+          .catch(e => setStatus('T_L verisi yüklenemedi: ' + e.message, true));
+      } else {
+        renderTLLayer();
+      }
+    } else {
+      if (tlLayer) { map.removeLayer(tlLayer); tlLayer = null; }
     }
   } else if (type === 'fractal') {
     showFractal = !showFractal;
@@ -1443,6 +1469,49 @@ function renderAValueLayer() {
     `a_ann=${d.a_ann_min?.toFixed(2)}–${d.a_ann_max?.toFixed(2)} · ` +
     `Öncel&Wyss (2000) G-R`
   );
+}
+
+// ── T_L Yerel Yineleme Süresi Katmanı ─────────────────────────────────────
+function tlColor(tl_yr) {
+  // log-skala: <50yr → kırmızı, 50-200yr → turuncu, 200-500yr → sarı,
+  //            500-2000yr → yeşil, >2000yr → mavi
+  const log = Math.log10(Math.max(1, tl_yr));
+  // map log(1..5) → hue 0(red)..240(blue)
+  const t = Math.min(1, Math.max(0, (log - 1) / 4));
+  const hue = Math.round(t * 240);
+  return `hsl(${hue},90%,55%)`;
+}
+
+function renderTLLayer() {
+  if (tlLayer) { map.removeLayer(tlLayer); tlLayer = null; }
+  if (!tlData || !showTL) return;
+  const key = `tl_m${String(tlTarget).replace('.','p')}`;
+  const markers = [];
+  for (const p of tlData.grid) {
+    const tl = p[key];
+    if (tl === undefined) continue;
+    const r = p.zone === 'HIGH' ? 5 : p.zone === 'MID' ? 4 : 3;
+    const m = L.circleMarker([p.lat, p.lon], {
+      radius: r, color: 'transparent', weight: 0,
+      fillColor: tlColor(tl), fillOpacity: 0.80,
+    }).bindPopup(
+      `<b>T<sub>L</sub> Yerel Yineleme · Öncel&Wyss (2001)</b><br>` +
+      `Senaryo: <b>Mw ${tlTarget}</b><br>` +
+      `T<sub>L</sub> = <b>${tl < 1000 ? tl.toFixed(0) : (tl/1000).toFixed(1)+'k'} yıl</b><br>` +
+      `b = ${p.b?.toFixed(3)} | a<sub>ann</sub> = ${p.a_ann?.toFixed(3)}<br>` +
+      `N = ${p.n} | R = ${p.r} km<br>` +
+      `<hr style="margin:4px 0"><small>T<sub>L</sub> = 10^(b·M − a<sub>ann</sub>)</small>`
+    );
+    markers.push(m);
+  }
+  tlLayer = L.layerGroup(markers).addTo(map);
+  const mn = tlData[`${key}_min`]; const mx = tlData[`${key}_max`];
+  setStatus(`T_L Vadesi (Mw ${tlTarget}) · ${markers.length} nokta · ${mn}–${Math.min(mx,99999)} yıl`);
+}
+
+function setTLTarget(m) {
+  tlTarget = m;
+  if (showTL) renderTLLayer();
 }
 
 async function loadBAdaptLayer() {
