@@ -258,6 +258,28 @@ b̄ (Türkiye):      0.737              [Mw ölçeğinde]
 Kumburgaz:         b = 0.618          [Marmara T_L minimumu, Mw 7.4 → 4.734 yr]
 ```
 
+### 12.6 Boşlukların Sismometrik Anlamı — Epistemik Dürüstlük
+
+> NotebookLM değerlendirmesi onaylandı 2026-06-24
+
+Haritadaki **beyaz/boş alanlar** bir eksiklik değil, **"doğruluk filtresi"**dir.
+
+**Üç farklı boşluk tipi:**
+
+| Tip | Kaynak | Yorumu |
+|-----|--------|--------|
+| **Sismik sessizlik** | Tamamen kilitli segment, mikrosismisite üretmiyor | Yüksek stres birikimi / asperite adayı |
+| **Ağ hassasiyeti** | Yerel istasyon kapsama dışı, Mc eşiği yüksek | İstasyon kurulum rehberi |
+| **İstatistiksel eşik** | N < 50 (Aki 1965 kriteri karşılanmıyor) | O noktada b hesabı güvenilmez → boş bırakılır |
+
+**Bugünkü modeldeki karşılığı:**
+- Mc = 2.5 (Mw) → 246 nokta: ISC veri boşlukları N<50'ye düşürüyor → 3. tip boşluk egemen
+- **Mc = 2.0 (Mw) → 2451 nokta:** EMSC (1998-2026) yoğunluğu N≥50 sağlıyor; kalan boşluklar 1. veya 2. tip
+
+**Kumburgaz (b=0.618)**, çevresindeki boşlukların arasından N≥50 disipliniyle süzülerek çıkan **"gürültüsüz asperite sinyali"**dir. Boşluklar olmadan bu anomali gürültüde kaybolurdu.
+
+**Platform karşılığı:** `🛡 Veri Güveni` katmanı (Açık Soru E) epistemik belirsizlik bölgelerini görselleştirir. Boş harita alanı + kırmızı DAFZ poligonu birlikte "burada veri eksik, risk belirsiz" mesajını verir.
+
 **Açık Soru F → TAMAMLANDI** ✅
 
 ---
