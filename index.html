@@ -1149,10 +1149,18 @@ function toggleLayer(type) {
   } else if (type === 'avalue') {
     showAValue = !showAValue;
     document.getElementById('btnAvalue').classList.toggle('active', showAValue);
-    if (!bAdaptData) {
-      loadBAdaptLayerThen(renderAValueLayer);
+    if (showAValue) {
+      if (!bAdaptData) {
+        setStatus('a-Üretkenlik yükleniyor…');
+        fetch('data/bvalue_grid_adaptive.json')
+          .then(r => r.json())
+          .then(d => { bAdaptData = d; renderAValueLayer(); })
+          .catch(e => setStatus('a-Üretkenlik yüklenemedi: ' + e.message, true));
+      } else {
+        renderAValueLayer();
+      }
     } else {
-      renderAValueLayer();
+      if (aValueLayer) { map.removeLayer(aValueLayer); aValueLayer = null; }
     }
   } else if (type === 'fractal') {
     showFractal = !showFractal;
