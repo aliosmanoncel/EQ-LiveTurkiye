@@ -1,1 +1,1 @@
-{"generated":"2026-06-25T04:59:39Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-06-25T08:27:07Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"721340","time":"2026-06-25T08:05:32","lat":41.10333,"lon":32.65806,"dep":7.0,"mag":1.0,"mtype":"ML","mw":0.41,"place":"Merkez (Karabük)","province":"Karabük","district":"Merkez"}]}
