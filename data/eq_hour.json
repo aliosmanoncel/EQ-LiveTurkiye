@@ -1,1 +1,1 @@
-{"generated":"2026-06-26T22:07:02Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-06-26T23:59:51Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260626_0000352","time":"2026-06-26T23:21:16.0Z","lat":24.94,"lon":92.562,"dep":42.0,"mag":3.4,"mtype":"m","mw":3.4,"place":"INDIA-BANGLADESH BORDER REGION"}]}
