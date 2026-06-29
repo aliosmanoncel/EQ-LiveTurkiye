@@ -1,1 +1,1 @@
-{"generated":"2026-06-29T07:25:37Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260629_0000097","time":"2026-06-29T06:34:42.0Z","lat":15.013,"lon":107.578,"dep":10.0,"mag":3.6,"mtype":"m","mw":3.6,"place":"LAOS-VIETNAM BORDER REGION"},{"id":"20260629_0000094","time":"2026-06-29T06:25:58.0Z","lat":38.7742,"lon":36.5394,"dep":7.1,"mag":1.2,"mtype":"ml","mw":0.56,"place":"CENTRAL TURKEY"}]}
+{"generated":"2026-06-29T12:26:20Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
