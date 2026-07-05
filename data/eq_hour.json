@@ -1,1 +1,1 @@
-{"generated":"2026-07-05T19:07:16Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260705_0000277","time":"2026-07-05T18:16:45.1Z","lat":40.965,"lon":19.02,"dep":15.0,"mag":2.4,"mtype":"ml","mw":1.5,"place":"ADRIATIC SEA"},{"id":"20260705_0000275","time":"2026-07-05T18:15:26.0Z","lat":25.27,"lon":95.047,"dep":121.0,"mag":3.0,"mtype":"m","mw":3.0,"place":"MYANMAR"}]}
+{"generated":"2026-07-05T20:51:45Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
