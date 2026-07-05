@@ -1,1 +1,1 @@
-{"generated":"2026-07-05T13:18:38Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260705_0000185","time":"2026-07-05T13:06:54.76Z","lat":46.2738,"lon":12.9258,"dep":8.1,"mag":2.4,"mtype":"ml","mw":1.5,"place":"NORTHERN ITALY"},{"id":"20260705_0000187","time":"2026-07-05T12:38:47.82Z","lat":38.2008,"lon":32.0269,"dep":7.0,"mag":1.2,"mtype":"ml","mw":0.56,"place":"CENTRAL TURKEY"}]}
+{"generated":"2026-07-05T15:09:03Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
