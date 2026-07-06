@@ -1,14 +1,14 @@
 {
-  "generated": "2026-07-06T05:06:15Z",
+  "generated": "2026-07-06T10:05:17Z",
   "method": "Campbell (1981) GMPE · PGAmax · Delaunay triangülasyon",
-  "source_pts": 1852,
+  "source_pts": 1911,
   "valid_px": 97209,
   "total_px": 112500,
   "coverage_pct": 86.4,
   "grid_w": 500,
   "grid_h": 225,
   "pga_min_g": 0.00044999999999999993,
-  "pga_max_g": 0.11818412396221055,
+  "pga_max_g": 0.11978781133695837,
   "pga_norm": [
     0.0,
     0.4
