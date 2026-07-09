@@ -1,1 +1,1 @@
-{"generated":"2026-07-09T21:17:21Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260709_0000290","time":"2026-07-09T20:42:11.98Z","lat":36.4529,"lon":-8.0073,"dep":2.6,"mag":2.1,"mtype":"ml","mw":1.25,"place":"WEST OF GIBRALTAR"},{"id":"20260709_0000287","time":"2026-07-09T20:30:28.0Z","lat":36.9503,"lon":28.9753,"dep":12.3,"mag":1.5,"mtype":"ml","mw":0.78,"place":"DODECANESE IS.-TURKEY BORDER REG"}]}
+{"generated":"2026-07-09T23:05:59Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
