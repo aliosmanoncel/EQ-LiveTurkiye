@@ -1,1 +1,1 @@
-{"generated":"2026-07-12T17:54:58Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-12T18:57:12Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"722765","time":"2026-07-12T18:24:58","lat":40.84111,"lon":31.52333,"dep":8.53,"mag":1.2,"mtype":"ML","mw":0.56,"place":"Merkez (Bolu)","province":"Bolu","district":"Merkez"}]}
