@@ -1,1 +1,1 @@
-{"generated":"2026-07-12T11:54:08Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-12T13:05:32Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"722754","time":"2026-07-12T12:55:46","lat":39.20333,"lon":29.03111,"dep":14.54,"mag":1.5,"mtype":"ML","mw":0.78,"place":"Simav (Kütahya)","province":"Kütahya","district":"Simav"}]}
