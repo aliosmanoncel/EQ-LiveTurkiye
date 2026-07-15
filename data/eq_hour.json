@@ -1,1 +1,1 @@
-{"generated":"2026-07-15T15:22:14Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260715_0000235","time":"2026-07-15T14:43:33.0Z","lat":36.5127,"lon":36.9028,"dep":6.3,"mag":1.6,"mtype":"ml","mw":0.86,"place":"TURKEY-SYRIA BORDER REGION"}]}
+{"generated":"2026-07-15T17:10:28Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260715_0000255","time":"2026-07-15T16:36:11.72Z","lat":38.252,"lon":37.7522,"dep":5.0,"mag":2.5,"mtype":"ml","mw":1.58,"place":"CENTRAL TURKEY"}]}
