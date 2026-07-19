@@ -1,1 +1,1 @@
-{"generated":"2026-07-19T08:06:22Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-19T10:21:46Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"723389","time":"2026-07-19T09:42:03","lat":39.07283,"lon":28.16117,"dep":6.56,"mag":1.2,"mtype":"ML","mw":0.56,"place":"Gördes (Manisa)","province":"Manisa","district":"Gördes"}]}
