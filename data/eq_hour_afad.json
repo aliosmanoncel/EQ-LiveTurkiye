@@ -1,1 +1,1 @@
-{"generated":"2026-07-19T20:06:01Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-19T21:44:35Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"723431","time":"2026-07-19T20:54:51","lat":38.82972,"lon":38.635,"dep":7.0,"mag":1.2,"mtype":"ML","mw":0.56,"place":"Arapgir (Malatya)","province":"Malatya","district":"Arapgir"}]}
