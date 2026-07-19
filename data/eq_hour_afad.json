@@ -1,1 +1,1 @@
-{"generated":"2026-07-19T14:49:32Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-19T15:51:55Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"723408","time":"2026-07-19T15:06:57","lat":37.7925,"lon":36.192,"dep":6.91,"mag":1.2,"mtype":"ML","mw":0.56,"place":"Saimbeyli (Adana)","province":"Adana","district":"Saimbeyli"}]}

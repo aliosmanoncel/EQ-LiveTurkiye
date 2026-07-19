@@ -1,1 +1,1 @@
-{"generated":"2026-07-19T14:49:25Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260719_0000226","time":"2026-07-19T14:00:07.9Z","lat":37.009,"lon":-24.243,"dep":15.0,"mag":2.1,"mtype":"ml","mw":1.25,"place":"AZORES ISLANDS REGION"}]}
+{"generated":"2026-07-19T15:51:46Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260719_0000250","time":"2026-07-19T15:06:57.0Z","lat":37.7925,"lon":36.192,"dep":6.9,"mag":1.2,"mtype":"ml","mw":0.56,"place":"CENTRAL TURKEY"}]}
