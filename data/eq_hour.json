@@ -1,1 +1,1 @@
-{"generated":"2026-07-23T20:55:38Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-23T22:00:40Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260723_0000363","time":"2026-07-23T21:41:40.0Z","lat":26.242,"lon":92.485,"dep":25.0,"mag":2.9,"mtype":"m","mw":2.9,"place":"ASSAM, INDIA"}]}
