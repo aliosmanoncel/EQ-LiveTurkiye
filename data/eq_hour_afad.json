@@ -1,1 +1,1 @@
-{"generated":"2026-07-25T02:05:14Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-25T05:38:03Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"723868","time":"2026-07-25T05:14:04","lat":40.323,"lon":27.09017,"dep":6.14,"mag":2.4,"mtype":"ML","mw":1.5,"place":"Biga (Çanakkale)","province":"Çanakkale","district":"Biga"}]}
