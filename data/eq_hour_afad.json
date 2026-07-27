@@ -1,1 +1,1 @@
-{"generated":"2026-07-27T16:11:38Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-27T18:20:31Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"724069","time":"2026-07-27T17:46:38","lat":35.26867,"lon":28.9705,"dep":28.63,"mag":2.4,"mtype":"ML","mw":1.5,"place":"Akdeniz - [116.07 km] Kaş (Antalya)","province":"Antalya","district":"Kaş"}]}
