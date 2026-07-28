@@ -1,1 +1,1 @@
-{"generated":"2026-07-28T16:00:58Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260728_0000324","time":"2026-07-28T15:38:19.0Z","lat":35.35,"lon":99.52,"dep":9.0,"mag":3.7,"mtype":"m","mw":3.7,"place":"SOUTHERN QINGHAI, CHINA"},{"id":"20260728_0000321","time":"2026-07-28T15:12:42.76Z","lat":42.3602,"lon":-7.8431,"dep":23.0,"mag":1.8,"mtype":"ml","mw":1.02,"place":"SPAIN"}]}
+{"generated":"2026-07-28T18:08:20Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
