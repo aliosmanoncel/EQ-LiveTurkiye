@@ -1,1 +1,1 @@
-{"generated":"2026-07-30T21:00:59Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-30T22:58:54Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"724354","time":"2026-07-30T22:37:16","lat":38.16583,"lon":38.48767,"dep":7.16,"mag":1.0,"mtype":"ML","mw":0.41,"place":"Battalgazi (Malatya)","province":"Malatya","district":"Battalgazi"}]}
