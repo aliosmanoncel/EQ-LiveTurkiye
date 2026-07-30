@@ -1,1 +1,1 @@
-{"generated":"2026-07-30T13:44:38Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-07-30T15:47:15Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"724330","time":"2026-07-30T15:22:56","lat":38.78717,"lon":39.00117,"dep":7.0,"mag":1.4,"mtype":"ML","mw":0.71,"place":"Merkez (Elazığ)","province":"Elazığ","district":"Merkez"}]}
