@@ -1,1 +1,1 @@
-{"generated":"2026-07-31T23:56:20Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":2,"events":[{"id":"724429","time":"2026-07-31T23:19:28","lat":37.66117,"lon":35.83417,"dep":5.04,"mag":1.4,"mtype":"ML","mw":0.71,"place":"Kozan (Adana)","province":"Adana","district":"Kozan"},{"id":"724430","time":"2026-07-31T23:19:30","lat":37.15017,"lon":28.6655,"dep":7.01,"mag":1.7,"mtype":"ML","mw":0.94,"place":"Ula (Muğla)","province":"Muğla","district":"Ula"}]}
+{"generated":"2026-08-01T02:27:52Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
