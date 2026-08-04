@@ -1,1 +1,1 @@
-{"generated":"2026-08-04T15:20:56Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-04T17:38:59Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"724749","time":"2026-08-04T16:40:27","lat":38.55583,"lon":40.52683,"dep":7.35,"mag":1.5,"mtype":"ML","mw":0.78,"place":"Lice (Diyarbakır)","province":"Diyarbakır","district":"Lice"}]}
