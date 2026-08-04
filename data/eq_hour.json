@@ -1,1 +1,1 @@
-{"generated":"2026-08-03T22:02:01Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-04T00:02:40Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260803_0000364","time":"2026-08-03T23:11:50.4Z","lat":36.1148,"lon":26.9797,"dep":29.9,"mag":2.5,"mtype":"ml","mw":1.58,"place":"DODECANESE ISLANDS, GREECE"}]}
