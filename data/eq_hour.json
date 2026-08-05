@@ -1,1 +1,1 @@
-{"generated":"2026-08-05T15:57:43Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-05T17:38:17Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260805_0000301","time":"2026-08-05T17:13:32.0Z","lat":38.3505,"lon":38.7837,"dep":10.3,"mag":1.2,"mtype":"ml","mw":0.56,"place":"EASTERN TURKEY"}]}

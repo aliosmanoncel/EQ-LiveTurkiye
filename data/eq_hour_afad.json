@@ -1,1 +1,1 @@
-{"generated":"2026-08-05T15:57:53Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-05T17:38:26Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"724833","time":"2026-08-05T17:13:32","lat":38.3505,"lon":38.78367,"dep":10.27,"mag":1.2,"mtype":"ML","mw":0.56,"place":"Kale (Malatya)","province":"Malatya","district":"Kale"}]}
