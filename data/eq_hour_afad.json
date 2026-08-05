@@ -1,1 +1,1 @@
-{"generated":"2026-08-05T06:22:07Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-05T11:53:28Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"724810","time":"2026-08-05T11:20:06","lat":38.00983,"lon":36.32167,"dep":7.0,"mag":1.7,"mtype":"ML","mw":0.94,"place":"Göksun (Kahramanmaraş)","province":"Kahramanmaraş","district":"Göksun"}]}
