@@ -1,1 +1,1 @@
-{"generated":"2026-08-07T21:32:58Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-07T22:28:11Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260807_0000298","time":"2026-08-07T21:38:37.0Z","lat":26.886,"lon":86.496,"dep":15.0,"mag":4.0,"mtype":"m","mw":4.0,"place":"NEPAL-INDIA BORDER REGION"},{"id":"20260807_0000299","time":"2026-08-07T21:35:59.13Z","lat":39.2357,"lon":28.9599,"dep":15.2,"mag":1.1,"mtype":"ml","mw":0.49,"place":"WESTERN TURKEY"}]}
