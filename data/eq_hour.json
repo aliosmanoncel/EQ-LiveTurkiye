@@ -1,1 +1,1 @@
-{"generated":"2026-08-08T08:32:42Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-08T09:30:45Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260808_0000104","time":"2026-08-08T08:36:45.0Z","lat":24.169,"lon":82.562,"dep":7.0,"mag":3.7,"mtype":"m","mw":3.7,"place":"MADHYA PRADESH REGION, INDIA"},{"id":"20260808_0000108","time":"2026-08-08T08:31:36.97Z","lat":40.0138,"lon":42.5453,"dep":7.0,"mag":1.6,"mtype":"ml","mw":0.86,"place":"EASTERN TURKEY"}]}

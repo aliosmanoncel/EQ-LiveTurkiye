@@ -1,1 +1,1 @@
-{"generated":"2026-08-08T08:32:51Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-08T09:30:52Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725062","time":"2026-08-08T08:31:37","lat":40.01383,"lon":42.54533,"dep":7.0,"mag":1.5,"mtype":"ML","mw":0.78,"place":"Sarıkamış (Kars)","province":"Kars","district":"Sarıkamış"}]}
