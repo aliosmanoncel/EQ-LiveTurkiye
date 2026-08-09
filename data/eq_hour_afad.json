@@ -1,1 +1,1 @@
-{"generated":"2026-08-09T19:27:29Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-09T20:24:06Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725196","time":"2026-08-09T19:55:53","lat":36.87583,"lon":29.11033,"dep":7.0,"mag":1.0,"mtype":"ML","mw":0.41,"place":"Dalaman (Muğla)","province":"Muğla","district":"Dalaman"}]}
