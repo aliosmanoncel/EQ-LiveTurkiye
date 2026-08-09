@@ -1,1 +1,1 @@
-{"generated":"2026-08-09T08:34:25Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-09T09:33:05Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725152","time":"2026-08-09T08:43:20","lat":36.72983,"lon":38.38183,"dep":7.08,"mag":1.4,"mtype":"ML","mw":0.71,"place":"Ayn el-Arab, Halep (Suriye) - [18.34 km] Suruç (Şanlıurfa)","province":"Şanlıurfa","district":"Suruç"}]}
