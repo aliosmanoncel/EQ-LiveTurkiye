@@ -1,1 +1,1 @@
-{"generated":"2026-08-10T17:45:59Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-10T18:47:28Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725271","time":"2026-08-10T18:26:19","lat":37.21,"lon":36.89267,"dep":7.0,"mag":1.9,"mtype":"ML","mw":1.09,"place":"Nurdağı (Gaziantep)","province":"Gaziantep","district":"Nurdağı"}]}
