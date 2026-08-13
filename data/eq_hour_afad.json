@@ -1,1 +1,1 @@
-{"generated":"2026-08-13T11:51:59Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-13T12:55:34Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725481","time":"2026-08-13T12:07:22","lat":38.72583,"lon":26.45133,"dep":14.17,"mag":1.8,"mtype":"ML","mw":1.02,"place":"Ege Denizi - [07.25 km] Karaburun (İzmir)","province":"İzmir","district":"Karaburun"}]}
