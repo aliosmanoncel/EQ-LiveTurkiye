@@ -1,1 +1,1 @@
-{"generated":"2026-08-13T19:53:07Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-13T20:35:26Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725507","time":"2026-08-13T19:41:40","lat":40.42483,"lon":35.507,"dep":7.0,"mag":1.2,"mtype":"ML","mw":0.56,"place":"Göynücek (Amasya)","province":"Amasya","district":"Göynücek"}]}
