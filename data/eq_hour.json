@@ -1,1 +1,1 @@
-{"generated":"2026-08-14T09:53:53Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260814_0000126","time":"2026-08-14T09:08:33.48Z","lat":41.1857,"lon":47.6408,"dep":11.2,"mag":2.9,"mtype":"ml","mw":1.92,"place":"AZERBAIJAN"},{"id":"20260814_0000119","time":"2026-08-14T09:04:06.123Z","lat":51.5648,"lon":16.1166,"dep":4.0,"mag":2.6,"mtype":"m","mw":2.6,"place":"POLAND"}]}
+{"generated":"2026-08-14T10:52:25Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
