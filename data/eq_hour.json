@@ -1,1 +1,1 @@
-{"generated":"2026-08-14T20:24:25Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-14T21:19:00Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260814_0000275","time":"2026-08-14T21:01:24.04343Z","lat":38.7936,"lon":25.7108,"dep":12.2,"mag":3.3,"mtype":"ml","mw":2.27,"place":"AEGEAN SEA"},{"id":"20260814_0000272","time":"2026-08-14T20:53:38.52Z","lat":39.1687,"lon":28.1425,"dep":5.9,"mag":1.5,"mtype":"ml","mw":0.78,"place":"WESTERN TURKEY"}]}
