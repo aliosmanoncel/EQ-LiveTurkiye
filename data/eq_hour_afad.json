@@ -1,1 +1,1 @@
-{"generated":"2026-08-15T18:19:10Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-15T19:16:44Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725645","time":"2026-08-15T18:28:24","lat":40.45033,"lon":32.1575,"dep":7.0,"mag":1.6,"mtype":"ML","mw":0.86,"place":"Dörtdivan (Bolu)","province":"Bolu","district":"Dörtdivan"}]}
