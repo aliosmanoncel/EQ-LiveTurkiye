@@ -1,1 +1,1 @@
-{"generated":"2026-08-17T14:20:49Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260817_0000449","time":"2026-08-17T13:37:17.478142Z","lat":47.1637,"lon":7.193,"dep":-1.2,"mag":1.8,"mtype":"ml","mw":1.02,"place":"SWITZERLAND"}]}
+{"generated":"2026-08-17T15:19:11Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260817_0000495","time":"2026-08-17T14:37:47.436335Z","lat":36.6202,"lon":21.3162,"dep":15.3,"mag":2.5,"mtype":"ml","mw":1.58,"place":"SOUTHERN GREECE"}]}
