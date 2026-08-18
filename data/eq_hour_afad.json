@@ -1,1 +1,1 @@
-{"generated":"2026-08-18T18:28:03Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-18T19:22:23Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725906","time":"2026-08-18T18:41:03","lat":35.53889,"lon":27.70222,"dep":7.0,"mag":1.8,"mtype":"ML","mw":1.02,"place":"Akdeniz - [126.70 km] Marmaris (Muğla)","province":"Muğla","district":"Marmaris"}]}
