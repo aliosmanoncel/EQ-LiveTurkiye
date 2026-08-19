@@ -6,11 +6,11 @@ Tarih: 2026-06-25 | Yazar: A. O. Öncel
 
 ## Bölüm 12: Katalog Kalibrasyonu ve Mc Paradoksu
 
-### 12.1 Büyüklük Dönüşümü: Scordilis (2006) Kuadratik Formülü
+### 12.1 Büyüklük Dönüşümü: Kuadratik ML→Mw Formülü
 
 Türkiye sismik kataloğu, farklı dönemlerde farklı büyüklük ölçekleri kullanan ağların (ISC 1900–1997, EMSC 1998–2026) birleşiminden oluşmaktadır. b-değeri hesabında enerji tutarlılığı zorunlu olduğundan, tüm ML ve mb büyüklükleri Moment Magnitüdü (Mw) ölçeğine dönüştürülmüştür.
 
-Küçük büyüklükler (ML ≤ 3.5) için Scordilis (2006) kuadratik formu uygulanmıştır:
+Küçük büyüklükler (ML ≤ 3.5) için aşağıdaki kuadratik form uygulanmıştır (Scordilis (2006) ve büyüklük türlerine uygun diğer ampirik dönüşümlerden derlenmiştir — bu spesifik polinomun tek bir kaynağa kesin atfı doğrulanmamıştır):
 
 ```
 Mw = 0.0376 × ML² + 0.646 × ML − 0.269
