@@ -755,19 +755,83 @@ function setStatus(msg, isErr) {
   el.innerHTML = isErr ? `<span class="err">${msg}</span>` : msg;
 }
 
+// Ağ isteklerinin sonsuza dek asılı kalmasını önler (10sn timeout)
+function fetchTimeout(url, opts={}, ms=10000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(t));
+}
+
+/* ══════════════════════════════════════════
+   YENİDEN DENEME (retry) — tek zincir, üstel backoff
+   · loadSeq: eskiyen yüklemeler taze veriyi ezmesin diye sıra no
+   · Aynı anda yalnızca BİR bekleyen deneme olur
+   · 20sn → 40sn → 80sn … tavan 5dk (ağ uzun süre kopuksa API'yi dövmemek için)
+══════════════════════════════════════════ */
+const RETRY_BASE = 20000;   // ilk deneme gecikmesi (20sn)
+const RETRY_MAX  = 300000;  // tavan (5dk)
+let loadSeq      = 0;       // her loadData çağrısına artan kimlik
+let retryTimer   = null;    // bekleyen deneme
+let retryTick    = null;    // geri sayım göstergesi
+let retryCount   = 0;       // ardışık başarısızlık (backoff üssü)
+
+function cancelRetry() {
+  if (retryTimer) { clearTimeout(retryTimer);  retryTimer = null; }
+  if (retryTick)  { clearInterval(retryTick);  retryTick  = null; }
+}
+
+function scheduleRetry(sourceName, h) {
+  cancelRetry();
+  const delay = Math.min(RETRY_BASE * Math.pow(2, retryCount), RETRY_MAX);
+  if (retryCount < 20) retryCount++;
+
+  const offline = navigator.onLine === false;
+  let left = Math.round(delay / 1000);
+  const paint = () => setStatus(
+    offline
+      ? `Çevrimdışı — bağlantı gelince otomatik yenilenecek (${left}sn)`
+      : `Tüm kaynaklar yanıt vermedi — ${left}sn sonra tekrar denenecek.`,
+    true
+  );
+  paint();
+  retryTick = setInterval(() => { left--; if (left > 0) paint(); }, 1000);
+
+  retryTimer = setTimeout(() => { cancelRetry(); loadData(sourceName, h); }, delay);
+}
+
+// Bağlantı geri geldiğinde / sekme öne alındığında beklemeden dene
+function retryNow() {
+  if (!retryTimer) return;              // bekleyen deneme yoksa dokunma
+  cancelRetry();
+  loadData(src, hours);
+}
+window.addEventListener('online', retryNow);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) retryNow();     // arka plan sekmelerde timer'lar kısılır
+});
+
 /* ══════════════════════════════════════════
    VERİ YÜKLEME (tarihsel)
 ══════════════════════════════════════════ */
 async function loadData(sourceName, h) {
   const tag = h<24 ? h+'s' : h===168 ? '1 hafta' : h/24+'g';
 
+  // Yeni yükleme başlıyor: bekleyen denemeyi iptal et, bu çağrıya kimlik ver.
+  // Kullanıcı bu sırada pencere/kaynak değiştirirse eski çağrı stale olur ve
+  // taze veriyi ezmeden sessizce çekilir.
+  cancelRetry();
+  const seq   = ++loadSeq;
+  const stale = () => seq !== loadSeq;
+
   /* ── 1. GitHub raw (Actions tarafından saatlik güncellenir) ── */
   setStatus('GitHub veri deposu okunuyor…');
   try {
     const jsonUrl = getEqUrl(sourceName, h);
-    const res  = await fetch(jsonUrl + '?_=' + Date.now());
+    const res  = await fetchTimeout(jsonUrl + '?_=' + Date.now());
+    if (stale()) return;
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
+    if (stale()) return;
 
     // Zaman penceresine göre filtrele
     const cutoff = new Date(Date.now() - h * 3600000);
@@ -795,10 +859,13 @@ async function loadData(sourceName, h) {
     updateStats(combined);
     const gen = json.generated ? ` · Güncellendi: ${json.generated.slice(11,16)} UTC` : '';
     setStatus(`${combined.length} deprem · GitHub/EMSC · ${tag}${gen}`);
+    retryCount = 0;              // başarı → backoff sıfırlanır
     return;
   } catch(e) {
+    if (stale()) return;
     setStatus(`GitHub: ${e.message} — doğrudan EMSC deneniyor…`, true);
     await new Promise(r => setTimeout(r, 300));
+    if (stale()) return;
   }
 
   /* ── 2. Doğrudan EMSC FDSN (yedek) ── */
@@ -806,9 +873,11 @@ async function loadData(sourceName, h) {
   for (const source of chain) {
     setStatus(`${source.name} deneniyor…`);
     try {
-      const res    = await fetch(source.url);
+      const res    = await fetchTimeout(source.url);
+      if (stale()) return;
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const raw    = source.fmt === 'text' ? await res.text() : await res.json();
+      if (stale()) return;
       const parsed = parseFeatures(source, raw);
       if (parsed.length === 0) throw new Error('Boş yanıt');
       events = parsed;
@@ -816,13 +885,16 @@ async function loadData(sourceName, h) {
       renderHeat(combined);
       updateStats(combined);
       setStatus(`${combined.length} deprem · ${source.name} (doğrudan) · ${tag}`);
+      retryCount = 0;            // başarı → backoff sıfırlanır
       return;
     } catch(e) {
+      if (stale()) return;
       setStatus(`${source.name}: ${e.message}`, true);
       await new Promise(r => setTimeout(r, 400));
+      if (stale()) return;
     }
   }
-  setStatus('Tüm kaynaklar yanıt vermedi.', true);
+  scheduleRetry(sourceName, h);
 }
 
 /* ══════════════════════════════════════════
