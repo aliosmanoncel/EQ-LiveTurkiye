@@ -150,7 +150,7 @@ Marmara Denizi altındaki Kumburgaz segmenti (40.5°N, 28.8°E) bu çalışmada 
 | 1509 İstanbul ofseti | 48 km | EPICA retrospektif eşleşme |
 | 1855 Bursa ofseti | 42 km | EPICA retrospektif eşleşme |
 
-Bu segment, Marmara altında biriken 3.7 metrelik sismik borcun (Ergintav vd. 2014) en olası tahsilat noktasıdır. Ergintav ve diğ. (2014) GPS verilerinde Kumburgaz bölgesini "yüksek kilitlenme" (high locking) zonu olarak saptamıştır; mikrosismisite tabanlı b=0.618 bulgusu bu jeodezik tespiti bağımsız ve tamamlayıcı biçimde desteklemektedir.
+Bu segment, Marmara altında biriken 3.7 metrelik sismik borcun (Ergintav vd. 2014) en olası boşalma noktasıdır — bu, konumsal bir olasılık ifadesidir, bir zamanlama tahmini değildir (bkz. Bölüm 17.5, dizi/olay zamanlaması yalnızca geriye dönük doğrulanabilir bir çerçevede tartışılmalıdır). Ergintav ve diğ. (2014) GPS verilerinde Kumburgaz bölgesini "yüksek kilitlenme" (high locking) zonu olarak saptamıştır; mikrosismisite tabanlı b=0.618 bulgusu bu jeodezik tespiti bağımsız ve tamamlayıcı biçimde desteklemektedir.
 
 ---
 
@@ -196,7 +196,7 @@ EQ-LiveTürkiye'de bu ayrım şöyle uygulanmaktadır:
 | T_L Asperite (T_L) | Main Shock Catalog | Yineleme süresi hesabı |
 | Tarihsel katman | EPICA (tarihsel ham) | Tarihsel büyük olaylar |
 
-**Temel ilke:** Raw = sismik fırtınanın tüm bilgisini taşır. Declustered (Main Shock Catalog) = fayın üzerindeki uzun dönemli stres birikimini ve asperite konumlarını gösteren temiz aynadır. Bu ayrım, T_L anomali haritalarının fiziksel rasyonalitesinin temel taşıdır. Declustered katalog kullanmak, Marmara altındaki 3.7 metrelik sismik borcun tahsil edileceği gerçek "ana saatleri" (mainshock recurrence) hesaplamaya olanak tanımaktadır.
+**Temel ilke:** Raw = sismik fırtınanın tüm bilgisini taşır. Declustered (Main Shock Catalog) = fayın üzerindeki uzun dönemli stres birikimini ve asperite konumlarını gösteren temiz aynadır. Bu ayrım, T_L anomali haritalarının fiziksel rasyonalitesinin temel taşıdır. Declustered katalog kullanmak, T_L anomali haritalarını Marmara'nın bağımsız ana şok dizisine (mainshock recurrence) dayandırmayı sağlar — bu, bir zamanlama/takvim hesabı değil, hangi olayların istatistiksel olarak bağımsız kabul edildiğine dair metodolojik bir seçimdir.
 
 ---
 
@@ -276,14 +276,14 @@ Gözlenen sismisite ile açıklanan: ~1.5 m
 Açıklanamayan borç: ~3.7 m
 ```
 
-Eğer Marmara'da yaygın krip olsaydı bu borcun önemli kısmı sessizce ödenmiş olurdu. Sakic vd. (2016)'nın krip saptayamaması ve Kumburgaz'daki b=0.618 imzası birlikte değerlendirildiğinde, 3.7 metrelik borcun Kumburgaz ve Adalar asperitelerinde depolandığı ve tek seferlik bir Mw ≥ 7.4 kırılmasıyla tahsil edileceği hipotezi fiziksel tutarlılığını korumaktadır.
+Eğer Marmara'da yaygın krip olsaydı bu borcun önemli kısmı sessizce ödenmiş olurdu. Sakic vd. (2016)'nın krip saptayamaması ve Kumburgaz'daki b=0.618 imzası birlikte değerlendirildiğinde, 3.7 metrelik borcun Kumburgaz ve Adalar asperitelerinde depolandığı ve tek seferlik bir Mw ≥ 7.4 kırılmasıyla boşalabileceği hipotezi fiziksel tutarlılığını korumaktadır (zamanlama bu hipotezin kapsamı dışındadır — depremler tahmin edilemediğinden, biriken açığın *ne zaman* boşalacağına dair bir çıkarım yapılamaz).
 
 ### 16.4 Bu Çalışmanın Katkısı
 
 Mevcut literatürde GPS (jeodezi) ve repeater sismisitesi iki ayrı veri seti olarak değerlendirilmekteydi. Bu çalışma, adaptif b-değeri haritalaması ve T_L anomali analizi yoluyla üçüncü bir bağımsız kanıt zinciri sunmaktadır:
 
 - b=0.618 (mikrosismisite) → tam kilitlenme
-- T_L=4734 yıl (Mw7.4) → aşırı vade anomalisi
+- T_L=4734 yıl (Mw7.4) → aşırı yüksek T_L değeri (istatistiksel yineleme aralığı; bir öngörülen deprem tarihi değil, mevcut mikrosismisite oranına dayalı model çıktısıdır)
 - %96 retrospektif eşleşme (EPICA) → asperite kalıcılığı
 - Ergintav (2014) GPS → yüksek kilitlenme zonu
 
