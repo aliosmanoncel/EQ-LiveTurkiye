@@ -1,1 +1,1 @@
-{"generated":"2026-08-19T03:40:10Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-19T04:30:45Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725947","time":"2026-08-19T03:40:28","lat":39.25,"lon":28.11472,"dep":14.76,"mag":1.6,"mtype":"ML","mw":0.86,"place":"Sındırgı (Balıkesir)","province":"Balıkesir","district":"Sındırgı"}]}
