@@ -1,1 +1,1 @@
-{"generated":"2026-08-19T12:33:20Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-19T13:39:01Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"725970","time":"2026-08-19T13:08:18","lat":40.77867,"lon":29.079,"dep":9.51,"mag":2.2,"mtype":"ML","mw":1.33,"place":"Marmara Denizi - [09.70 km] Adalar (İstanbul)","province":"İstanbul","district":"Adalar"}]}
