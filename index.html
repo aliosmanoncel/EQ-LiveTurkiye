@@ -24,6 +24,18 @@
     .panel-body{padding:7px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
     .panel-body.collapsed{display:none}
 
+    .tmPanel{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);
+      width:min(720px,92vw);background:rgba(17,17,17,.97);border:1px solid #2a2a2a;
+      border-top:2px solid #06b6d4;border-radius:8px 8px 0 0;padding:14px 18px;
+      z-index:1001;box-shadow:0 -4px 20px rgba(0,0,0,.5);display:none}
+    .tmPanel.open{display:block}
+    .tmPanel .tmHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;cursor:move;user-select:none;touch-action:none}
+    .tmPanel .tmTitle{color:#06b6d4;font-weight:700;font-size:.85rem}
+    .tmPanel .tmClose{background:none;border:none;color:#888;cursor:pointer;font-size:1rem;line-height:1}
+    .tmPanel .tmMeta{color:#666;font-size:.7rem;margin-bottom:6px}
+    .tmPanel .tmStats{color:#aaa;font-size:.75rem;text-align:center;margin-top:2px}
+    .tmPanel .tmStats b{color:#06b6d4}
+
     .ctrl{display:flex;align-items:center;gap:7px;font-size:.83rem}
     .ctrl label{color:#888;white-space:nowrap}
     .ctrl input[type=range]{width:110px;accent-color:#06b6d4;cursor:pointer}
@@ -369,6 +381,7 @@
   <div style="display:flex;gap:4px;flex-wrap:nowrap">
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
+    <button class="tbtn"        id="btnTimeMag" onclick="toggleTimeMag()" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag</button>
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
     <button class="tbtn"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
@@ -430,6 +443,23 @@
     <span id="countdown" style="color:#444;min-width:32px">300s</span>
   </div>
   </div><!-- /panel-body -->
+</div>
+
+<!-- Zaman–Magnitude Dağılımı (Time–Magnitude Distribution) -->
+<div class="tmPanel" id="tmPanel">
+  <div class="tmHead">
+    <span class="tmTitle">📈 Zaman–Magnitude Dağılımı <span style="color:#666;font-weight:400;">(Time–Magnitude Distribution)</span></span>
+    <button class="tmClose" onclick="toggleTimeMag()">✕</button>
+  </div>
+  <div class="tmMeta" id="tmMeta">—</div>
+  <svg id="tmSvg" width="660" height="200" style="display:block;margin:0 auto"></svg>
+  <div class="tmStats" id="tmStats">—</div>
+
+  <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
+    <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=10 olay)</span></div>
+    <svg id="tmSvgB" width="660" height="140" style="display:block;margin:6px auto"></svg>
+    <div class="tmStats" id="tmStatsB">—</div>
+  </div>
 </div>
 
 <!-- STATUS -->
@@ -699,6 +729,214 @@ function renderHeat(evList) {
   labelLayer.bringToFront();
 }
 
+/* ══════════════════════════════════════════
+   ZAMAN–MAGNİTUDE DAĞILIMI (Time–Magnitude Distribution)
+══════════════════════════════════════════ */
+let showTimeMag = false;
+
+// Mc: Maximum Curvature (Wiemer & Wyss 2000) + Woessner & Wiemer (2005) +0.2 düzeltmesi
+function computeMc(evList) {
+  const mags = evList.map(e => e.mw ?? e.mag).filter(m => m > 0);
+  if (mags.length < 10) return null;
+  const bins = {};
+  mags.forEach(m => {
+    const b = (Math.round(m * 10) / 10).toFixed(1);
+    bins[b] = (bins[b] || 0) + 1;
+  });
+  let maxCount = -1, maxBin = null;
+  for (const b in bins) {
+    if (bins[b] > maxCount) { maxCount = bins[b]; maxBin = parseFloat(b); }
+  }
+  return maxBin !== null ? +(maxBin + 0.2).toFixed(1) : null;
+}
+
+// Aki (1965) MLE b-değeri — Öncel & Wilson (2007, GJI) Eş.4: b = 2.303/(Mmean-Mmin+0.05)
+function computeBvalue(mags, Mc) {
+  const sub = mags.filter(m => m >= Mc);
+  if (sub.length < 10) return null;
+  const mean = sub.reduce((a,b)=>a+b, 0) / sub.length;
+  const denom = mean - Mc + 0.05;
+  return denom > 0 ? 2.303 / denom : null;
+}
+
+// Kayan pencere b-değeri zaman serisi — Öncel & Wilson (2007, GJI, İzmit) §3.1 metodolojisi:
+// sabit N=100 olay pencere, adım=10 olay, Mc sabit/global (pencere başına değil)
+function computeBvalueTimeSeries(evList, Mc) {
+  const N_WIN = 100, STEP = 10;
+  const sorted = [...evList].sort((a,b) => a.time - b.time)
+    .filter(e => (e.mw ?? e.mag) >= Mc);
+  if (sorted.length < N_WIN) return { series: [], N: sorted.length };
+  const series = [];
+  for (let i = 0; i + N_WIN <= sorted.length; i += STEP) {
+    const win  = sorted.slice(i, i + N_WIN);
+    const mags = win.map(e => e.mw ?? e.mag);
+    const b = computeBvalue(mags, Mc);
+    if (b !== null) series.push({ t: win[Math.floor(N_WIN/2)].time.getTime(), b });
+  }
+  return { series, N: sorted.length };
+}
+
+function renderBvalueTS(evList, Mc) {
+  const svgB   = document.getElementById('tmSvgB');
+  const statsB = document.getElementById('tmStatsB');
+  if (Mc === null) {
+    svgB.innerHTML = `<text x="330" y="70" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: N=${evList.length} (Mc hesaplanamadı, min. 10 olay gerekir)</text>`;
+    statsB.textContent = `N=${evList.length} — Mc hesaplanamadı`;
+    return;
+  }
+  const { series, N } = computeBvalueTimeSeries(evList, Mc);
+
+  if (series.length === 0) {
+    svgB.innerHTML = `<text x="330" y="70" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: N=${N} (M≥Mc) — min. 100 olay gerekir (Öncel &amp; Wilson 2007)</text>`;
+    statsB.textContent = `N=${N} (M≥Mc=${Mc}) < 100 — kayan pencere b-değeri hesaplanamıyor`;
+    return;
+  }
+
+  const W=660, H=140, PAD_L=40, PAD_B=22, PAD_T=10, PAD_R=14;
+  const plotW = W-PAD_L-PAD_R, plotH = H-PAD_T-PAD_B;
+  const now = Date.now();
+  const t0 = now - hours*3600000, t1 = now;
+  const bs = series.map(s => s.b);
+  const bMin = Math.min(...bs) - 0.1, bMax = Math.max(...bs) + 0.1;
+
+  const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
+  const y = b => PAD_T + plotH - ((b-bMin)/(bMax-bMin)) * plotH;
+
+  const pts  = series.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ');
+  const dots = series.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="2.5" fill="#06b6d4"><title>b=${s.b.toFixed(2)} · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
+
+  let yTicks = '';
+  const bStep = (bMax-bMin) > 2 ? 0.5 : 0.25;
+  for (let b = Math.ceil(bMin/bStep)*bStep; b <= bMax; b += bStep) {
+    yTicks += `<text x="${PAD_L-6}" y="${y(b)+3}" fill="#888" font-size="8" text-anchor="end">${b.toFixed(2)}</text>`;
+    yTicks += `<line x1="${PAD_L}" y1="${y(b)}" x2="${W-PAD_R}" y2="${y(b)}" stroke="#2a2a2a" stroke-width="0.5"/>`;
+  }
+
+  const bAvg = bs.reduce((a,b)=>a+b, 0) / bs.length;
+
+  svgB.innerHTML = `
+    ${yTicks}
+    <line x1="${PAD_L}" y1="${y(bAvg)}" x2="${W-PAD_R}" y2="${y(bAvg)}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+    <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="1.3" stroke-opacity="0.7"/>
+    ${dots}
+    <line x1="${PAD_L}" y1="${PAD_T+plotH}" x2="${W-PAD_R}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
+    <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
+  `;
+
+  const bLast = bs[bs.length-1];
+  statsB.innerHTML = `b ort. = <b>${bAvg.toFixed(2)}</b> &nbsp;|&nbsp; b son = <b>${bLast.toFixed(2)}</b> &nbsp;|&nbsp; ${series.length} pencere (N=${N})`;
+}
+
+function toggleTimeMag() {
+  showTimeMag = !showTimeMag;
+  document.getElementById('btnTimeMag').classList.toggle('active', showTimeMag);
+  document.getElementById('tmPanel').classList.toggle('open', showTimeMag);
+  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+}
+
+// Time-Mag paneli sürüklenebilir — başlık çubuğundan tutulur, ekran sınırları içinde kalır
+(function initTimeMagDrag(){
+  const panel = document.getElementById('tmPanel');
+  const head  = panel.querySelector('.tmHead');
+  let dragging = false, offX = 0, offY = 0;
+
+  head.addEventListener('pointerdown', e => {
+    if (e.target.closest('.tmClose')) return; // kapat butonuna tıklarken sürükleme başlamasın
+    dragging = true;
+    const r = panel.getBoundingClientRect();
+    panel.style.left = r.left + 'px';
+    panel.style.top  = r.top + 'px';
+    panel.style.bottom = 'auto';
+    panel.style.transform = 'none';
+    offX = e.clientX - r.left;
+    offY = e.clientY - r.top;
+    head.setPointerCapture(e.pointerId);
+  });
+  head.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    let nl = e.clientX - offX, nt = e.clientY - offY;
+    nl = Math.max(0, Math.min(window.innerWidth  - panel.offsetWidth,  nl));
+    nt = Math.max(0, Math.min(window.innerHeight - panel.offsetHeight, nt));
+    panel.style.left = nl + 'px';
+    panel.style.top  = nt + 'px';
+  });
+  head.addEventListener('pointerup',     () => { dragging = false; });
+  head.addEventListener('pointercancel', () => { dragging = false; });
+})();
+
+function renderTimeMag(evList) {
+  if (!showTimeMag) return;
+  const svg    = document.getElementById('tmSvg');
+  const metaEl = document.getElementById('tmMeta');
+  const statsEl= document.getElementById('tmStats');
+
+  const srcSel  = document.getElementById('srcSel');
+  const srcName = (srcSel ? srcSel.value : 'emsc').toUpperCase();
+  const winLabel= hours<24 ? hours+'s' : hours===168 ? '1 hafta' : hours/24+'g';
+
+  if (!evList.length) {
+    svg.innerHTML = '';
+    metaEl.textContent = `${srcName} · ${winLabel} · M≥${minMag} · N=0`;
+    statsEl.textContent = 'Seçili pencerede veri yok';
+    return;
+  }
+
+  const W=660, H=200, PAD_L=40, PAD_B=26, PAD_T=14, PAD_R=14;
+  const plotW = W-PAD_L-PAD_R, plotH = H-PAD_T-PAD_B;
+
+  const now = Date.now();
+  const t0 = now - hours*3600000, t1 = now;
+
+  const mags   = evList.map(e => e.mw ?? e.mag);
+  const magMax = Math.max(...mags, 3) + 0.5;
+  const magMin = 0;
+  const Mc     = computeMc(evList);
+
+  const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
+  const y = m => PAD_T + plotH - ((m-magMin)/(magMax-magMin)) * plotH;
+
+  let dots = '';
+  evList.forEach(e => {
+    const m = e.mw ?? e.mag;
+    const t = e.time.getTime();
+    const r = 2 + m*1.6;
+    const col = m>=5 ? '#ef4444' : m>=4 ? '#f97316' : m>=2.5 ? '#eab308' : '#06b6d4';
+    const dateStr = e.time.toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    dots += `<circle cx="${x(t).toFixed(1)}" cy="${y(m).toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" fill-opacity="0.75" stroke="#111" stroke-width="0.5"><title>M${m.toFixed(1)} · ${dateStr}</title></circle>`;
+  });
+
+  let yTicks = '';
+  const step = magMax > 6 ? 2 : 1;
+  for (let m=0; m<=Math.ceil(magMax); m+=step) {
+    yTicks += `<text x="${PAD_L-8}" y="${y(m)+3}" fill="#888" font-size="9" text-anchor="end">${m}</text>`;
+    yTicks += `<line x1="${PAD_L}" y1="${y(m)}" x2="${W-PAD_R}" y2="${y(m)}" stroke="#2a2a2a" stroke-width="0.5"/>`;
+  }
+
+  let mcLine = '';
+  if (Mc !== null && Mc >= magMin && Mc <= magMax) {
+    mcLine = `<line x1="${PAD_L}" y1="${y(Mc)}" x2="${W-PAD_R}" y2="${y(Mc)}" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3"/>` +
+             `<text x="${W-PAD_R}" y="${y(Mc)-4}" fill="#06b6d4" font-size="9" text-anchor="end">Mc=${Mc}</text>`;
+  }
+
+  const fmt = ts => new Date(ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'}) + ' ' + new Date(ts).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+
+  svg.innerHTML = `
+    ${yTicks}
+    ${mcLine}
+    ${dots}
+    <line x1="${PAD_L}" y1="${PAD_T+plotH}" x2="${W-PAD_R}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
+    <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
+    <text x="${PAD_L}" y="${H-6}" fill="#888" font-size="9" text-anchor="start">${fmt(t0)}</text>
+    <text x="${W-PAD_R}" y="${H-6}" fill="#888" font-size="9" text-anchor="end">${fmt(t1)}</text>
+  `;
+
+  metaEl.textContent = `${srcName} · ${winLabel} · M≥${minMag} · N=${evList.length}`;
+  const mMax = Math.max(...mags).toFixed(1);
+  statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>`;
+
+  renderBvalueTS(evList, Mc);
+}
+
 /* Son büyük deprem için global referans */
 let lastBigEq = null;
 let timerInterval = null;
@@ -857,6 +1095,7 @@ async function loadData(sourceName, h) {
     const combined = [...events, ...liveEvents];
     renderHeat(combined);
     updateStats(combined);
+    renderTimeMag(combined);
     const gen = json.generated ? ` · Güncellendi: ${json.generated.slice(11,16)} UTC` : '';
     setStatus(`${combined.length} deprem · GitHub/EMSC · ${tag}${gen}`);
     retryCount = 0;              // başarı → backoff sıfırlanır
@@ -884,6 +1123,7 @@ async function loadData(sourceName, h) {
       const combined = [...events, ...liveEvents];
       renderHeat(combined);
       updateStats(combined);
+      renderTimeMag(combined);
       setStatus(`${combined.length} deprem · ${source.name} (doğrudan) · ${tag}`);
       retryCount = 0;            // başarı → backoff sıfırlanır
       return;
@@ -955,6 +1195,7 @@ function connectWS() {
       // heat map'i de güncelle
       renderHeat([...events, ...liveEvents]);
       updateStats([...events, ...liveEvents]);
+      renderTimeMag([...events, ...liveEvents]);
     } catch(e) {}
   };
 
