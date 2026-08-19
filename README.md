@@ -9,7 +9,7 @@
 ## Features
 
 - **Seismic heat map** — magnitude-weighted density visualization (EMSC does not currently provide this)
-- **Active fault overlay** — MTA 2013 Turkey active fault database (14,565 fault segments), color-coded by fault type (strike-slip / normal / thrust)
+- **Active fault overlay** — MTA 2026 Turkey active fault database (12,963 fault segments; Elmacı et al., Özel Yayın Serisi-60), color-coded by fault type (strike-slip / normal / thrust)
 - **Magnitude-scaled circles** — color and size by magnitude class (Minor → Major)
 - **EMSC WebSocket live stream** — real-time earthquake events as they are reported
 - **Time windows** — Last 1h / 24h / 48h / 1 week
@@ -25,7 +25,7 @@ Follows EMSC monitoring area: **10–75°N, 45°W–120°E** (Euro-Mediterranean
 |--------|-------|
 | [EMSC SeismicPortal FDSN](https://www.seismicportal.eu/fdsnws/event/1/) | Historical earthquake catalog (M≥2.0, auto-updated hourly) |
 | [EMSC WebSocket](wss://www.seismicportal.eu/standing_order/websocket) | Real-time live event stream |
-| [MTA Active Fault Map 2013](https://github.com/aliosmanoncel/fay-yolu-aricilik-veri-bankasi) | Turkey active fault GeoJSON |
+| [MTA Active Fault Map 2026](https://github.com/aliosmanoncel/fay-yolu-aricilik-veri-bankasi) | Turkey active fault GeoJSON — Elmacı et al., Özel Yayın Serisi-60 |
 
 ## How it works
 
