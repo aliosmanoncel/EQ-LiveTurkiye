@@ -291,18 +291,79 @@ Dört bağımsız yöntemin aynı coğrafi noktada (Kumburgaz, 40.5°N 28.8°E) 
 
 ---
 
+## Bölüm 17: Deprem Dizisi Karakterizasyonu — Swarm / Foreshock / Mainshock-Aftershock Ayrımı
+
+### 17.1 Temel İlke: Foreshock Geriye Dönük Bir Etikettir
+
+Bir deprem, meydana geldiği anda "foreshock" olarak sınıflandırılamaz. Foreshock tanımı, tarifi gereği daha büyük bir olayın (mainshock) *sonradan* gerçekleşmesine bağlıdır (Scholz 2019, §4.4.2). Bu nedenle EQ-LiveTürkiye hiçbir zaman "foreshock tespit edildi" gibi bir uyarı üretmez; üretilebilecek en fazla şey, geçmişte foreshock dizilerinde gözlenen istatistiksel özelliklerle *uyumluluk* derecesidir — kesin bir öngörü değil.
+
+### 17.2 Üç Dizi Tipi ve Ayırt Edici Ölçütler
+
+Scholz (2019, §4.4.2) üç dizi tipini tanımlar:
+
+| Tip | Tanım | Beklenen imza |
+|---|---|---|
+| **Mainshock–aftershock** | Baskın bir ana şok, sonrasında azalan artçı aktivitesi | Omori-Utsu sönümü (p≈1), ΔM büyük (Båth kuralı: ~1 birim), b-değeri normal/düşük |
+| **Foreshock–mainshock–aftershock** | Küçük olaylar → büyük olay → artçılar | Foreshock'lar mainshock hiposantırının yakın çevresinde (nükleasyon süreci, Das & Scholz 1981b) |
+| **Swarm** | *"sequences that often start and end gradually and in which no single earthquake dominates in size"* | Belirgin dominant olay yok, Omori sönümü görülmez, **b-değeri anormal yüksek** (Scholz 1968c; Sykes 1970a) — genelde pore-fluid diffüzyonu kaynaklı, stres gradyanı hiçbir olayın büyümesine izin vermez |
+
+**Kritik düzeltme (yaygın bir yanlış anlamaya karşı):** b-değeri burada *foreshock* göstergesi değil, **swarm** göstergesidir. Yüksek b → swarm eğilimi; düşük b → kilitlenme/mainshock-aftershock tipik davranışı (bkz. Bölüm 12-13, Kumburgaz b=0.618 kilitlenme yorumu — aynı mantığın simetriği).
+
+**Omori yasası** (Scholz 2019, Eşitlik 4.20):
+```
+n(t) = K / (c + t)^p
+```
+n(t): t anındaki artçı oranı, K ve p sabitler, c sıfıra yakın pozitif sayı, p genelde ≈1.
+
+**Utsu (1970) artçı üretkenliği:**
+```
+N_aft = k · 10^(b(M_mainshock − M_eşik))
+```
+
+### 17.3 Sınırlama — Mogi (1963) Sınıflandırmasının Kesinliği Abartılmamalı
+
+Mogi (1963), dizi tiplerini kaynak bölgesinin artan heterojenliğine bağlamıştır. Ancak Scholz (2019, s.223) bunu **"too generalized"** bulur ve Adirondacks (New York) örneğini verir: aynı kratonik bölgede, aynı fay mekanizmasıyla, sadece birkaç km yatay ve birkaç km derinlik farkıyla üç tamamen farklı dizi tipi (swarm, tekil olay, normal artçı dizisi) gözlenmiştir. **Dizi tipini önceden, kesin biçimde belirleyen evrensel bir kural yoktur** — bu epistemik sınırlama, herhangi bir sınıflandırma çıktısında açıkça belirtilmelidir (bkz. Bölüm 12.4 Epistemik Dürüstlük ilkesi).
+
+### 17.4 Vaka Analizi: Adalar Segmenti, 18-19 Ağustos 2026 (gözlemsel, teşhis değil)
+
+AFAD verisinden (40.75-40.80°N, 29.05-29.12°E), 18-19 Ağustos 2026 arası N=20 olay:
+
+- **ΔM = M_max − M_2nd = 3.2 − 2.6 = 0.6** → küçük fark, tek bir dominant olay belirgin değil (Båth kuralının beklediği ~1 birimin altında)
+- M3.2 (en büyük olay), 20 olaylık dizinin **8.'si** — dizinin sonunda değil, ortasında
+- **M3.2 öncesi oran:** 7 olay / 35,3 saat = 0,20 olay/saat
+- **M3.2 sonrası oran:** 12 olay / 6,0 saat = **2,01 olay/saat — 10 kat artış**
+
+Bu, klasik Omori sönümünün (mainshock sonrası azalan aktivite) tersidir. Küçük ΔM, dominant olayın dizinin ortasında kalması ve mainshock sonrası aktivitenin *artması*, üçü birlikte **swarm-tipik davranışla tutarlı** bir gözlemsel örüntü oluşturur. Bu, "Adalar'da swarm var" kesin hükmü değildir — N=20, kısa bir zaman penceresi (41 saat) ve tek bir episoddur; istatistiksel anlamlılık için daha uzun gözlem ve resmi Omori-Utsu fit gerekir.
+
+**Coğrafi not:** Bu segment, Kumburgaz (b=0.618, Bölüm 12-13) ile GFZ'nin (Martínez-Garzón vd. 2025) tanımladığı "Avcılar sismik sessizlik zonu"nun doğusunda, Prens Adaları (Adalar) kilitli segmentine karşılık gelir — Avcılar segmentinin kendisi değildir. GFZ'nin bulgusu, Nisan 2025 M6.2 depreminin artçılarının Avcılar segmentinin doğu kenarında (Adalar'a yakın) durduğunu ve bu bölgede kayma gerilimi/"loading status"un yüksek kaldığını raporlamaktadır.
+
+### 17.5 Uygulama Kısıtları
+
+- Bu bölüm bir **teorik çerçevedir**, henüz haritada canlı bir katman/skor olarak uygulanmamıştır.
+- Herhangi bir gelecekteki uygulama, "Foreshock detected" gibi kesin ifadeler YERİNE "geçmiş foreshock dizilerinde gözlenen özelliklerle uyumlu" gibi geriye-dönük-doğrulanabilir dil kullanmalıdır.
+- N<20-30 olan kısa diziler için istatistiksel güç düşüktür; formel Omori-Utsu fit ve ETAS branching ratio hesapları ancak yeterli örneklem büyüklüğünde anlamlıdır.
+- Mogi (1963) sınıflandırması kaynak bölgesi heterojenliğine dair bir *hipotez*dir, kanıtlanmış bir kural değildir (bkz. §17.3).
+
+---
+
 ## Referanslar
 
 - Aki, K. (1965). Maximum likelihood estimate of b in the formula log N = a − bM. *Bull. Earthq. Res. Inst.*, 43, 237–239.
 - Ambraseys, N. N. (2002). The seismic activity of the Marmara Sea region over the last 2000 years. *Bull. Seismol. Soc. Am.*, 92(1), 1–18.
+- Das, S., & Scholz, C. H. (1981b). Theory of time-dependent rupture in the Earth. *J. Geophys. Res.*, 86(B7), 6039–6051.
 - Ergintav, S., et al. (2014). Istanbul's earthquake hot spots: Geodetic constraints on strain accumulation along faults in the Marmara Seismic Gap. *Geophys. Res. Lett.*, 41, 5783–5788.
 - Gardner, J. K., & Knopoff, L. (1974). Is the sequence of earthquakes in Southern California, with aftershocks removed, Poissonian? *Bull. Seismol. Soc. Am.*, 64(5), 1363–1367.
+- Martínez-Garzón, P., et al. (2025). Eastward earthquake rupture progression along the Main Marmara Fault towards Istanbul. *GFZ Helmholtz Centre for Geosciences* (press communication).
+- Mogi, K. (1963). Some discussions on aftershocks, foreshocks and earthquake swarms — the fracture of a semi-infinite body caused by an inner stress origin and its relation to the earthquake phenomena. *Bull. Earthq. Res. Inst.*, 41, 615–658.
 - Öncel, A. O., & Wyss, M. (2000). The major asperities of the 1999 Mw 7.4 Izmit earthquake defined by the microseismicity of the two decades before it. *Geophys. J. Int.*, 143(2), 501–506.
 - Öncel, A. O., & Wyss, M. (2001). The major asperities of the 1999 Mw 7.1 Düzce, Turkey, earthquake defined by the microseismicity of the decade before it. *Geophys. J. Int.*, 147(2), 499–510.
 - Parsons, T. (2004). Recalculated probability of M ≥ 7 earthquakes beneath the Sea of Marmara, Turkey. *J. Geophys. Res.*, 109, B05304.
+- Scholz, C. H. (2019). *The Mechanics of Earthquakes and Faulting* (3rd ed.). Cambridge University Press. §4.4.2 Earthquake sequences.
 - Scordilis, E. M. (2006). Empirical global relations converting Ms and mb to moment magnitude. *J. Seismol.*, 10(2), 225–236.
 - Schwartz, D. P., & Coppersmith, K. J. (1984). Fault behavior and characteristic earthquakes: Examples from the Wasatch and San Andreas fault zones. *J. Geophys. Res.*, 89(B7), 5681–5698.
 - Utsu, T. (1966). A statistical significance test of the difference in b-value between two earthquake groups. *J. Phys. Earth*, 14(2), 37–40.
+- Utsu, T. (1970). Aftershocks and earthquake statistics (I). *J. Fac. Sci. Hokkaido Univ., Ser. VII*, 3, 129–195.
+- Utsu, T. (1971). Aftershocks and earthquake statistics (III). *J. Fac. Sci. Hokkaido Univ., Ser. VII*, 3, 379–441.
 - Wiemer, S. (2001). A software package to analyze seismicity: ZMAP. *Seismol. Res. Lett.*, 72(3), 373–382.
 - Meghraoui, M., et al. (2021). Earthquake hazard in the Marmara region. *Comptes Rendus Géoscience*, 353(S1), 1–24.
 - Sakic, P., et al. (2016). No significant shallow seismic slip across the North Anatolian Fault zone in the Sea of Marmara. *Geophys. Res. Lett.*, 43(7), 3148–3155.
