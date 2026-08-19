@@ -343,6 +343,7 @@ Bu, klasik Omori sönümünün (mainshock sonrası azalan aktivite) tersidir. K�
 - Herhangi bir gelecekteki uygulama, "Foreshock detected" gibi kesin ifadeler YERİNE "geçmiş foreshock dizilerinde gözlenen özelliklerle uyumlu" gibi geriye-dönük-doğrulanabilir dil kullanmalıdır.
 - N<20-30 olan kısa diziler için istatistiksel güç düşüktür; formel Omori-Utsu fit ve ETAS branching ratio hesapları ancak yeterli örneklem büyüklüğünde anlamlıdır.
 - Mogi (1963) sınıflandırması kaynak bölgesi heterojenliğine dair bir *hipotez*dir, kanıtlanmış bir kural değildir (bkz. §17.3).
+- **Dizi sınıflandırma terminolojisi:** Kod/UI çıktılarında yalnızca "swarm-like", "foreshock-like" veya "aftershock-like" gibi olasılıksal/karakteristik ifadeler kullanılmalıdır; kesin sınıflandırma ("bu swarm'dır", "bu foreshock'tur") yapılmamalıdır. Kesin sınıflandırma yalnızca gerekli geriye dönük kanıtlar sağlandığında bilimsel analiz kapsamında yapılabilir.
 
 ---
 
