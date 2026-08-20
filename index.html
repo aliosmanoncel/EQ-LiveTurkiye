@@ -750,13 +750,16 @@ function computeMc(evList) {
   return maxBin !== null ? +(maxBin + 0.2).toFixed(1) : null;
 }
 
-// Aki (1965) MLE b-değeri — Öncel & Wilson (2007, GJI) Eş.4: b = 2.303/(Mmean-Mmin+0.05)
+// Aki (1965) MLE b-değeri: b = log10(e)/(Mmean-Mmin+0.05) = 0.4343.../(...)
+// DÜZELTME (2026-08): Öncel & Wilson (2007, GJI) Eş.4 metinde "2.303/(...)" olarak
+// basılmış, ancak bu ln(10) ile log10(e)=1/ln(10) karışıklığı (dizgi hatası) —
+// makalenin kendi raporladığı b=1.87 sonucu yalnızca 0.4343 sabitiyle tutarlı.
 function computeBvalue(mags, Mc) {
   const sub = mags.filter(m => m >= Mc);
   if (sub.length < 10) return null;
   const mean = sub.reduce((a,b)=>a+b, 0) / sub.length;
   const denom = mean - Mc + 0.05;
-  return denom > 0 ? 2.303 / denom : null;
+  return denom > 0 ? Math.LOG10E / denom : null;
 }
 
 // Kayan pencere b-değeri zaman serisi — Öncel & Wilson (2007, GJI, İzmit) §3.1 metodolojisi:
