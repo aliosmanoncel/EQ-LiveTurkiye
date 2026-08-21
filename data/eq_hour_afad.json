@@ -1,1 +1,1 @@
-{"generated":"2026-08-21T17:22:22Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-21T18:27:25Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"726536","time":"2026-08-21T17:28:49","lat":38.07317,"lon":37.084,"dep":7.0,"mag":1.6,"mtype":"ML","mw":0.86,"place":"Ekinözü (Kahramanmaraş)","province":"Kahramanmaraş","district":"Ekinözü"}]}
