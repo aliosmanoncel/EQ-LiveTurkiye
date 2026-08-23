@@ -1,1 +1,1 @@
-{"generated":"2026-08-23T07:27:58Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-23T08:21:55Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"726690","time":"2026-08-23T07:45:38","lat":36.937,"lon":28.7855,"dep":7.02,"mag":2.0,"mtype":"ML","mw":1.17,"place":"Köyceğiz (Muğla)","province":"Muğla","district":"Köyceğiz"}]}

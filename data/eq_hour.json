@@ -1,1 +1,1 @@
-{"generated":"2026-08-23T07:27:48Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-23T08:21:46Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260823_0000108","time":"2026-08-23T07:45:37.9Z","lat":36.937,"lon":28.7855,"dep":7.0,"mag":2.1,"mtype":"ml","mw":1.25,"place":"DODECANESE IS.-TURKEY BORDER REG"},{"id":"20260823_0000101","time":"2026-08-23T07:33:03.14Z","lat":51.5133,"lon":16.1692,"dep":0.0,"mag":2.8,"mtype":"m","mw":2.8,"place":"POLAND"}]}
