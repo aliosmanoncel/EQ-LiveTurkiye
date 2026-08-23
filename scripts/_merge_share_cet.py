@@ -11,8 +11,11 @@ YEAR_MAX = 1899
 
 with open('data/epica_europe_historical.json', encoding='utf-8') as f:
     existing = json.load(f)
-west_events = existing['events']
-print(f'Mevcut (EPICA/Batı): {len(west_events)}')
+# Idempotency guard: script yeniden calistirilirsa onceki CET birlestirmesi
+# tekrar eklenmesin diye once CET kayitlari cikarilir (2026-08-23'te bir kez
+# cift-sayim hatasi yasandi, duzeltildi).
+west_events = [e for e in existing['events'] if e.get('reg') != 'CET']
+print(f'Mevcut (EPICA/Batı, CET haric): {len(west_events)}')
 
 df = pd.read_excel('data/SHARE_CET.xls', sheet_name='catalogue')
 df = df[(df['Year'] <= YEAR_MAX) & df['Mw'].notna() & (df['Mw'] >= MW_MIN)]
@@ -54,12 +57,21 @@ years = [e['year'] for e in merged]
 out = {
     'meta': {
         'source': 'EPICA v1.1 (batı/Avrupa) + SHARE-CET (doğu/orta Anadolu)',
-        'reference': 'Rovida & Antonucci (2021) INGV CC-BY 4.0; SHARE-CET (emidius.eu/SHEEC)',
+        'reference': 'Rovida & Antonucci (2021) INGV CC-BY 4.0, doi:10.13127/epica.1.1; '
+                     'Sesetyan, Demircioglu, Rovida, Albini & Stucchi (2011), SHARE-CET, '
+                     'emidius.eu/SHEEC',
         'doi': '10.13127/epica.1.1',
         'mw_min': MW_MIN,
         'count': len(merged),
         'year_range': [min(years), max(years)],
-        'note': 'Tek parca tarihsel katman - bati (EPICA) + dogu (SHARE-CET) birlestirildi, 1900 sonrasi aletsel (ISC/EMSC) katmanla cakismasin diye alinmadi.',
+        'note': 'Tek parca tarihsel katman - bati (EPICA) + dogu (SHARE-CET) birlestirildi, '
+                '1900 sonrasi aletsel (ISC/EMSC) katmanla cakismasin diye alinmadi. '
+                'METODOLOJI NOTU: EPICA ve SHARE-CET 1900-oncesi Mw icin AYNI donusum '
+                'zincirini kullanmiyor - SHARE-CET Soysal ve ark. (1981) tarihsel '
+                'kataloguna dayanip Io->Ms (Kalafat ve ark. 2007) -> Mw (Zare 2012, EMME '
+                'ic raporu) iki asamali donusumu kullanirken, EPICA v1.1 (2021) INGVnin '
+                'kendi guncel homojenizasyon semasini kullanir. Ikisi de Mw skalasinda '
+                'sonuc verir ama tam metodolojik ozdeslik iddia edilmez.',
     },
     'events': merged,
 }
