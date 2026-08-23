@@ -176,10 +176,10 @@
     <!-- Tarihsel Depremler bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgHist','lgHistT')">
-        Tarihsel Depremler (EPICA) <span class="tog" id="lgHistT">▼</span>
+        Tarihsel Depremler <span class="tog" id="lgHistT">▼</span>
       </div>
       <div class="legend-section-body hidden" id="lgHist">
-        <div style="font-size:.68rem;color:#aaa;margin-bottom:4px">Mw · 1005–1899 · Avrupa kapsamı</div>
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:4px">Mw · 1003–1899 · Batı (EPICA) + Doğu (SHARE-CET)</div>
         <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:4px">
           <div style="display:flex;align-items:center;gap:6px">
             <svg width="18" height="18"><circle cx="9" cy="9" r="8" fill="#ff0000" fill-opacity=".85" stroke="#333" stroke-width=".5"/></svg>
@@ -199,9 +199,10 @@
           </div>
         </div>
         <div style="color:#666;font-size:.65rem;line-height:1.5">
-          EPICA v1.1 · Rovida & Antonucci (2021)<br>
-          INGV · CC-BY 4.0 · doi:10.13127/epica.1.1<br>
-          3553 deprem · Enstrümantal öncesi dönem
+          EPICA v1.1 · Rovida & Antonucci (2021) · INGV<br>
+          CC-BY 4.0 · doi:10.13127/epica.1.1<br>
+          + SHARE-CET (Doğu/Orta Anadolu) · emidius.eu/SHEEC<br>
+          3718 deprem · Enstrümantal öncesi dönem
         </div>
       </div>
     </div>
@@ -385,7 +386,7 @@
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
     <button class="tbtn"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
-    <button class="tbtn"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 · Avrupa Tarihsel Deprem Kataloğu · M≥4 · 1005-1899 · Rovida & Antonucci (2021) INGV">Tarihsel</button>
+    <button class="tbtn"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 (Batı) + SHARE-CET (Doğu) Tarihsel Deprem Kataloğu · M≥4 · 1003-1899 · Rovida & Antonucci (2021) INGV + emidius.eu/SHEEC">Tarihsel</button>
     <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
     <button class="tbtn"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Asperite triyajı · Kırmızı=stres odağı">b-Adaptif</button>
     <button class="tbtn active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
@@ -1306,8 +1307,9 @@ function renderHistLayer() {
       fillColor: col, fillOpacity: opacity,
       pane: 'overlayPane',
     });
+    const srcLabel = e.reg === 'CET' ? 'SHARE-CET · emidius.eu' : 'EPICA v1.1 · INGV';
     c.bindTooltip(
-      `<b>${e.loc || e.reg}</b><br>Mw ${e.mag} · ${e.date}<br><span style="color:#aaa;font-size:.75em">EPICA v1.1 · INGV</span>`,
+      `<b>${e.loc || e.reg}</b><br>Mw ${e.mag} · ${e.date}<br><span style="color:#aaa;font-size:.75em">${srcLabel}</span>`,
       { sticky: true, className: 'eq-tip' }
     );
     markers.push(c);
@@ -1468,7 +1470,7 @@ function toggleLayer(type) {
       } else {
         renderHistLayer();
       }
-      setStatus('Tarihsel Depremler · EPICA v1.1 · Avrupa M≥4 · 1005–1899 · Rovida & Antonucci (2021) INGV');
+      setStatus('Tarihsel Depremler · EPICA v1.1 (Batı) + SHARE-CET (Doğu) · M≥4 · 1003–1899');
     } else {
       if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
     }
