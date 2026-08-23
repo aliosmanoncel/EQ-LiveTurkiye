@@ -1,1 +1,1 @@
-{"generated":"2026-08-23T16:17:39Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-23T17:15:03Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"726708","time":"2026-08-23T16:18:15","lat":36.6925,"lon":26.73967,"dep":20.95,"mag":2.0,"mtype":"ML","mw":1.17,"place":"Ege Denizi - [57.89 km] Bodrum (Muğla)","province":"Muğla","district":"Bodrum"}]}
