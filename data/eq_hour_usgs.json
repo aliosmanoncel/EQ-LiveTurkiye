@@ -1,1 +1,1 @@
-{"generated":"2026-08-24T05:32:46Z","source":"USGS FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"nc75424007","time":"2026-08-24T05:12:50.850","lat":38.822334289551,"lon":-122.80449676514,"dep":3.1600000858307,"mag":1.17,"mtype":"md","mw":0.54,"place":"7 km NW of The Geysers, CA"}]}
+{"generated":"2026-08-24T06:42:55Z","source":"USGS FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"ci41534824","time":"2026-08-24T06:09:55.300","lat":36.062833333333,"lon":-117.83783333333,"dep":2.62,"mag":1.0,"mtype":"ml","mw":0.41,"place":"10 km ENE of Coso Junction, CA"}]}
