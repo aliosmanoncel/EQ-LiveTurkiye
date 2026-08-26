@@ -1,1 +1,1 @@
-{"generated":"2026-08-26T03:48:07Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-26T04:33:17Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"726940","time":"2026-08-26T04:13:12","lat":39.66967,"lon":38.80017,"dep":6.91,"mag":1.6,"mtype":"ML","mw":0.86,"place":"Kemah (Erzincan)","province":"Erzincan","district":"Kemah"}]}

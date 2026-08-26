@@ -1,1 +1,1 @@
-{"generated":"2026-08-26T03:47:58Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260826_0000052","time":"2026-08-26T02:52:47.499Z","lat":28.5495,"lon":85.5378,"dep":10.0,"mag":4.4,"mtype":"mb","mw":4.77,"place":"XIZANG-NEPAL BORDER REGION"}]}
+{"generated":"2026-08-26T04:33:05Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260826_0000063","time":"2026-08-26T04:13:13.91Z","lat":39.6697,"lon":38.8002,"dep":6.9,"mag":1.8,"mtype":"ml","mw":1.02,"place":"EASTERN TURKEY"}]}
