@@ -397,6 +397,7 @@
     <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
     <button class="tbtn"        id="btnPlates"  onclick="toggleLayer('plates')"  title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
+    <button class="tbtn"        id="btnGAF"     onclick="toggleLayer('gaf')"     title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
     <button class="tbtn"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
   </div>
   <!-- Layer toggles — satir 2: b-analiz + Forecast -->
@@ -583,9 +584,9 @@ const labelLayer = L.tileLayer(
 ══════════════════════════════════════════ */
 const fayColor = p => {
   const t = ((p&&(p.fault_type||p.type||p.FAY_TIPI||p.fay_tipi||''))+'').toLowerCase();
-  if (t.includes('strike')||t.includes('doğrultu')) return '#f97316';
+  if (t.includes('strike')||t.includes('doğrultu')||t.includes('sinistral')||t.includes('dextral')) return '#f97316';
   if (t.includes('normal'))                         return '#06b6d4';
-  if (t.includes('thrust')||t.includes('bindirme')) return '#ef4444';
+  if (t.includes('thrust')||t.includes('bindirme')||t.includes('reverse')) return '#ef4444';
   return '#666';
 };
 
@@ -1299,6 +1300,8 @@ let deltaBLayer = null;
 let showDeltaB  = false;
 let platesLayer = null;
 let showPlates  = false;
+let gafLayer    = null;
+let showGAF     = false;
 
 function renderHistLayer() {
   if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
@@ -1481,6 +1484,29 @@ function toggleLayer(type) {
       setStatus('Levha Sınırları · USGS/Smithsonian This Dynamic Planet · Global');
     } else {
       if (platesLayer) map.removeLayer(platesLayer);
+    }
+  } else if (type === 'gaf') {
+    showGAF = !showGAF;
+    document.getElementById('btnGAF').classList.toggle('active', showGAF);
+    if (showGAF) {
+      if (!gafLayer) {
+        fetch('data/global_active_faults.geojson').then(r => r.json()).then(gj => {
+          gafLayer = L.geoJSON(gj, {
+            renderer: L.canvas(),
+            style: f => ({ color: fayColor({ type: f.properties && f.properties.slip_type }), weight: 1, opacity: 0.6 }),
+            onEachFeature: (f, layer) => {
+              const p = f.properties || {};
+              layer.bindPopup(`<b style="color:#f97316">${p.name || '—'}</b><br>Tip: ${p.slip_type || '—'}<br><span style="color:#aaa;font-size:.75em">${p.catalog || 'GEM GAF-DB'} · Styron &amp; Pagani (2020)</span>`);
+            }
+          });
+          if (showGAF) gafLayer.addTo(map);
+        });
+      } else {
+        gafLayer.addTo(map);
+      }
+      setStatus('Dünya Diri Fayları · GEM Global Active Faults Database · Styron & Pagani (2020) · CC-BY-SA 4.0');
+    } else {
+      if (gafLayer) map.removeLayer(gafLayer);
     }
   } else if (type === 'hist') {
     showHist = !showHist;
