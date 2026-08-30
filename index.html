@@ -396,6 +396,7 @@
     <button class="tbtn" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
     <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
+    <button class="tbtn"        id="btnPlates"  onclick="toggleLayer('plates')"  title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
     <button class="tbtn"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
   </div>
   <!-- Layer toggles — satir 2: b-analiz + Forecast -->
@@ -1296,6 +1297,8 @@ let showValid   = false;
 let deltaBData  = null;
 let deltaBLayer = null;
 let showDeltaB  = false;
+let platesLayer = null;
+let showPlates  = false;
 
 function renderHistLayer() {
   if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
@@ -1456,6 +1459,28 @@ function toggleLayer(type) {
       setStatus('Avrupa Sismik Tehlike · ESHM20 PGA 475yr (10%/50yr) · EFEHR/ETH Zürich · Danciu et al. (2021)');
     } else {
       map.removeLayer(euHazLayer);
+    }
+  } else if (type === 'plates') {
+    showPlates = !showPlates;
+    document.getElementById('btnPlates').classList.toggle('active', showPlates);
+    if (showPlates) {
+      if (!platesLayer) {
+        fetch('data/plate_boundaries.geojson').then(r => r.json()).then(gj => {
+          platesLayer = L.geoJSON(gj, {
+            style: { color: '#a78bfa', weight: 1.3, opacity: 0.65, dashArray: '4,3' },
+            onEachFeature: (f, layer) => {
+              const name = (f.properties && f.properties.name) || '—';
+              layer.bindPopup(`<b style="color:#a78bfa">${name}</b><br><span style="color:#aaa;font-size:.75em">USGS/Smithsonian · This Dynamic Planet</span>`);
+            }
+          });
+          if (showPlates) platesLayer.addTo(map);
+        });
+      } else {
+        platesLayer.addTo(map);
+      }
+      setStatus('Levha Sınırları · USGS/Smithsonian This Dynamic Planet · Global');
+    } else {
+      if (platesLayer) map.removeLayer(platesLayer);
     }
   } else if (type === 'hist') {
     showHist = !showHist;
