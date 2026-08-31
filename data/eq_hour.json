@@ -1,1 +1,1 @@
-{"generated":"2026-08-31T00:07:56Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-08-31T06:32:38Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260831_0000066","time":"2026-08-31T06:08:15.24Z","lat":37.1317,"lon":-3.5955,"dep":8.5,"mag":1.5,"mtype":"ml","mw":0.78,"place":"SPAIN"}]}
