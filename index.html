@@ -125,6 +125,22 @@
 <div class="regionCtrl">
   <button class="tbtn" id="btnRegionSelect" onclick="regionSelectStart()" title="Basılı tutup haritada sürükleyin">🔲 Bölge Seç</button>
   <button class="tbtn" id="btnRegionClear" onclick="regionDeselect()">✕ Bölgeyi Kaldır</button>
+  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
+    <label style="font-size:.68rem;color:#888;white-space:nowrap">Limit</label>
+    <select id="regionLimit" class="src-sel" style="flex:1;padding:2px 4px;font-size:.72rem" title="Maximum earthquakes — bölge sorgusunun üst sınırı">
+      <option value="200">200</option>
+      <option value="500" selected>500</option>
+      <option value="1000">1000</option>
+      <option value="2000">2000</option>
+    </select>
+  </div>
+  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
+    <label style="font-size:.68rem;color:#888;white-space:nowrap">Sırala</label>
+    <select id="regionOrder" class="src-sel" style="flex:1;padding:2px 4px;font-size:.72rem" title="Limite takılırsa hangi depremler korunacak">
+      <option value="time" selected>En yeni</option>
+      <option value="magnitude">En büyük</option>
+    </select>
+  </div>
 </div>
 
 <!-- SON BÜYÜK DEPREM KARTI -->
@@ -1491,12 +1507,14 @@ map.on('mouseup', regionMouseUp);
 
 async function fetchRegionEvents(bounds) {
   setStatus('Bölgedeki küçük depremler getiriliyor…');
+  const limit   = +document.getElementById('regionLimit').value || 500;
+  const orderby = document.getElementById('regionOrder').value === 'magnitude' ? 'magnitude' : 'time';
   const now = new Date(), s = new Date(now - hours*3600000);
   const fmt = d => d.toISOString().slice(0,19);
   const url = `https://www.seismicportal.eu/fdsnws/event/1/query?format=text`
     + `&minlat=${bounds.getSouth().toFixed(3)}&maxlat=${bounds.getNorth().toFixed(3)}`
     + `&minlon=${bounds.getWest().toFixed(3)}&maxlon=${bounds.getEast().toFixed(3)}`
-    + `&starttime=${fmt(s)}&endtime=${fmt(now)}&minmagnitude=0&limit=2000&orderby=time`;
+    + `&starttime=${fmt(s)}&endtime=${fmt(now)}&minmagnitude=0&limit=${limit}&orderby=${orderby}`;
   try {
     const res = await fetchTimeout(url, {}, 10000);
     const evs = parseEMSCText(await res.text());
@@ -1512,7 +1530,11 @@ async function fetchRegionEvents(bounds) {
       ).addTo(regionLayer);
     });
     regionLayer.addTo(map);
-    setStatus(`Bölgede ${evs.length} deprem (küçükler dahil · seçili zaman penceresi)`);
+    const capped = evs.length >= limit;
+    const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
+    setStatus(capped
+      ? `Bölgede ${evs.length}+ deprem — ilk ${limit} (${orderLabel}) gösteriliyor · limiti artırabilirsiniz`
+      : `Bölgede ${evs.length} deprem (küçükler dahil · seçili zaman penceresi)`);
   } catch(err) {
     setStatus(`Bölge sorgusu hatası: ${err.message}`, true);
   }
