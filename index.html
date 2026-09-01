@@ -46,6 +46,12 @@
     .tbtn{padding:5px 11px;border-radius:5px;border:1px solid #333;background:transparent;color:#888;font-size:.8rem;cursor:pointer;transition:all .12s}
     .tbtn:hover{border-color:#06b6d4;color:#06b6d4}
     .tbtn.active{background:#06b6d4;color:#000;border-color:#06b6d4;font-weight:700}
+    /* Türkiye ⇄ Global anahtarı: bölgesel veri gerektiren katmanlar (Hazard,
+       Risk, ESHM20, b-value ailesi, Fraktal, Forecast, Tarihsel replay)
+       Global modda gizlenir; Kanto gibi Türkiye-dışı içerik tersine sadece
+       Global modda görünür. */
+    body.global-mode .tr-only { display: none !important; }
+    body:not(.global-mode) .global-only { display: none !important; }
 
     .src-sel{padding:4px 8px;border-radius:5px;border:1px solid #333;background:#222;color:#bbb;font-size:.8rem;cursor:pointer}
 
@@ -96,8 +102,13 @@
     .eqlist-empty{padding:10px 11px;color:#555;font-size:.72rem}
 
     /* ── BÖLGE SEÇ (sürükleyip bölge kilitleme — küçük depremleri getirme) ── */
-    .regionCtrl{position:fixed;top:10px;left:270px;z-index:999;display:flex;flex-direction:column;gap:4px}
-    .regionCtrl .tbtn{background:rgba(20,20,20,.9);width:150px;text-align:left}
+    .regionCtrl{position:fixed;top:10px;left:270px;z-index:999;display:flex;flex-direction:column;gap:6px}
+    .regionCtrl .tbtn{background:rgba(20,20,20,.9);width:210px;text-align:left;font-size:.85rem;padding:8px 12px}
+    .regionCtrl .rowbox{display:flex;gap:6px;align-items:center;background:rgba(20,20,20,.9);border-radius:6px;padding:7px 10px}
+    .regionCtrl .rowbox label{font-size:.78rem;color:#999;white-space:nowrap}
+    .regionCtrl .rowbox input,.regionCtrl .rowbox select{font-size:.82rem;padding:5px 7px}
+    .regionCtrl .rowbox input{width:60px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px}
+    .regionCtrl .rowbox select{flex:1}
 
     /* ── NEW EQ FLASH ── */
     @keyframes flashNew{0%{opacity:1;transform:scale(1.6)}100%{opacity:.7;transform:scale(1)}}
@@ -119,52 +130,62 @@
 </head>
 <body>
 
+<div style="position:fixed;z-index:1001;top:8px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px">
+  <div style="display:flex;gap:4px;background:rgba(20,20,20,.92);padding:4px;border-radius:8px;border:1px solid #334">
+    <button id="btnScopeTR"     class="tbtn active" onclick="setGlobalMode(false)" style="padding:4px 10px">🇹🇷 Türkiye</button>
+    <button id="btnScopeGlobal" class="tbtn"        onclick="setGlobalMode(true)"  style="padding:4px 10px">🌍 Global</button>
+  </div>
+  <div id="scopeNote" style="font-size:.68rem;color:#888;background:rgba(20,20,20,.85);padding:2px 8px;border-radius:5px;display:none">
+    Global modda tehlike/risk/b-değeri modelleri mevcut değil — bölgesel veri gerektirirler.
+  </div>
+</div>
+
 <div id="map"></div>
 
 <!-- BÖLGE SEÇ — sürükleyip bölge kilitle, o bölgedeki küçük depremleri getir -->
 <div class="regionCtrl">
   <button class="tbtn" id="btnRegionSelect" onclick="regionSelectStart()" title="Basılı tutup haritada sürükleyin">🔲 Bölge Seç</button>
   <button class="tbtn" id="btnPolygonSelect" onclick="polygonSelectStart()" title="Haritada nokta nokta tıklayarak çokgen çizin (düzensiz kıyı/kuşak şekilleri için)">🔷 Poligon Seç</button>
-  <div id="polygonDrawCtrl" style="display:none;gap:4px;flex-wrap:wrap">
-    <button class="tbtn" style="width:auto;padding:4px 6px;font-size:.68rem" onclick="polygonUndo()" title="Son noktayı sil">↩ Geri Al</button>
-    <button class="tbtn" style="width:auto;padding:4px 6px;font-size:.68rem" onclick="polygonFinish()" title="Poligonu kilitle ve sorgula">✓ Bitir</button>
-    <button class="tbtn" style="width:auto;padding:4px 6px;font-size:.68rem" onclick="polygonCancel()" title="Çizimi iptal et">✕ İptal</button>
+  <div id="polygonDrawCtrl" style="display:none;gap:6px;flex-wrap:wrap">
+    <button class="tbtn" style="width:auto;padding:7px 10px;font-size:.78rem" onclick="polygonUndo()" title="Son noktayı sil">↩ Geri Al</button>
+    <button class="tbtn" style="width:auto;padding:7px 10px;font-size:.78rem" onclick="polygonFinish()" title="Poligonu kilitle ve sorgula">✓ Bitir</button>
+    <button class="tbtn" style="width:auto;padding:7px 10px;font-size:.78rem" onclick="polygonCancel()" title="Çizimi iptal et">✕ İptal</button>
   </div>
   <button class="tbtn" id="btnRegionClear" onclick="regionDeselect()">✕ Bölgeyi Kaldır</button>
-  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
-    <label style="font-size:.68rem;color:#888;white-space:nowrap">Limit</label>
-    <select id="regionLimit" class="src-sel" style="flex:1;padding:2px 4px;font-size:.72rem" title="Maximum earthquakes — bölge sorgusunun üst sınırı" onchange="reapplyRegionQuery()">
+  <div class="rowbox">
+    <label>Limit</label>
+    <select id="regionLimit" class="src-sel" title="Maximum earthquakes — bölge sorgusunun üst sınırı" onchange="reapplyRegionQuery()">
       <option value="200">200</option>
       <option value="500" selected>500</option>
       <option value="1000">1000</option>
       <option value="2000">2000</option>
     </select>
   </div>
-  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
-    <label style="font-size:.68rem;color:#888;white-space:nowrap">Sırala</label>
-    <select id="regionOrder" class="src-sel" style="flex:1;padding:2px 4px;font-size:.72rem" title="Limite takılırsa hangi depremler korunacak" onchange="reapplyRegionQuery()">
+  <div class="rowbox">
+    <label>Sırala</label>
+    <select id="regionOrder" class="src-sel" title="Limite takılırsa hangi depremler korunacak" onchange="reapplyRegionQuery()">
       <option value="time" selected>En yeni</option>
       <option value="magnitude">En büyük</option>
     </select>
   </div>
-  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
-    <label style="font-size:.68rem;color:#888;white-space:nowrap">Mw</label>
-    <input id="regionMagMin" type="number" step="0.1" placeholder="min" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+  <div class="rowbox">
+    <label>Mw</label>
+    <input id="regionMagMin" type="number" step="0.1" placeholder="min" onchange="reapplyRegionQuery()">
     <span style="color:#555">–</span>
-    <input id="regionMagMax" type="number" step="0.1" placeholder="max" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+    <input id="regionMagMax" type="number" step="0.1" placeholder="max" onchange="reapplyRegionQuery()">
   </div>
-  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
-    <label style="font-size:.68rem;color:#888;white-space:nowrap">Derinlik(km)</label>
-    <input id="regionDepMin" type="number" step="1" placeholder="min" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+  <div class="rowbox">
+    <label>Derinlik(km)</label>
+    <input id="regionDepMin" type="number" step="1" placeholder="min" onchange="reapplyRegionQuery()">
     <span style="color:#555">–</span>
-    <input id="regionDepMax" type="number" step="1" placeholder="max" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+    <input id="regionDepMax" type="number" step="1" placeholder="max" onchange="reapplyRegionQuery()">
   </div>
-  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
-    <label style="font-size:.68rem;color:#888;white-space:nowrap">Mc (elle)</label>
-    <input id="regionMcOverride" type="number" step="0.1" placeholder="auto" onchange="renderRegionInfo()" title="Boş = otomatik (Maximum Curvature). Dolu = bu Mc ile b-değeri hesaplanır (Selected-Mc)." style="width:50px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+  <div class="rowbox">
+    <label>Mc (elle)</label>
+    <input id="regionMcOverride" type="number" step="0.1" placeholder="auto" onchange="renderRegionInfo()" title="Boş = otomatik (Maximum Curvature). Dolu = bu Mc ile b-değeri hesaplanır (Selected-Mc).">
   </div>
   <button class="tbtn" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
-  <div id="regionInfo" style="font-size:.65rem;color:#888;line-height:1.5;background:rgba(20,20,20,.9);border-radius:5px;padding:4px 6px;width:230px"></div>
+  <div id="regionInfo" style="font-size:.75rem;color:#999;line-height:1.6;background:rgba(20,20,20,.9);border-radius:6px;padding:8px 10px;width:260px"></div>
 </div>
 
 <!-- SON BÜYÜK DEPREM KARTI -->
@@ -238,6 +259,8 @@
       </div>
     </div>
 
+    <!-- Türkiye/Avrupa-özel katmanların legend'i — Global modda gizli -->
+    <div class="tr-only">
     <!-- Seismic Hazard bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgHazard','lgHazardT')">
@@ -379,6 +402,7 @@
         </div>
       </div>
     </div>
+    </div><!-- /tr-only legend -->
 
     <!-- Tanıklıklar bölümü -->
     <div class="legend-section">
@@ -455,7 +479,7 @@
        loadHistoricalRange()'i kullanır, otomatik canlı yenilemeyi durdurur (aksi halde
        1 saat sonra sessizce üstüne yazılır). fTimeStart/fTimeEnd "analiz penceresi"
        filtresi bu geniş veri kümesinin üzerine aynen uygulanmaya devam eder. -->
-  <div style="display:flex;gap:4px;align-items:center">
+  <div class="tr-only" style="display:flex;gap:4px;align-items:center">
     <span style="font-size:.72rem;color:#888;white-space:nowrap">Tarihsel:</span>
     <button class="tbtn" data-hist="2000" onclick="loadHistoricalRange(2000)" title="Tarihsel katalog: 1900-01-01 – 2026-06-22 (ISC+EMSC) · bu buton 2000'den itibaren gösterir">2000–2026</button>
     <button class="tbtn" data-hist="1990" onclick="loadHistoricalRange(1990)" title="Tarihsel katalog: 1900-01-01 – 2026-06-22 (ISC+EMSC) · bu buton 1990'dan itibaren gösterir">1990–2026</button>
@@ -543,31 +567,32 @@
   </div>
 
   <!-- Layer toggles — satir 1 -->
-  <div style="display:flex;gap:4px;flex-wrap:nowrap">
+  <div style="display:flex;gap:4px;flex-wrap:wrap">
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnTestimony" onclick="toggleLayer('testimony')" title="EMSC Testimonies · hissedilme raporları · seismicportal.eu/testimonies-ws · yeşil=az → mor=çok tanıklık">🗣️ Tanıklıklar</button>
     <button class="tbtn"        id="btnTimeMag" onclick="toggleTimeMag()" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag</button>
-    <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
-    <button class="tbtn"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
-    <button class="tbtn"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
-    <button class="tbtn"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 (Batı) + SHARE-CET (Doğu) Tarihsel Deprem Kataloğu · M≥4 · 1003-1899 · Rovida & Antonucci (2021) INGV + emidius.eu/SHEEC">Tarihsel</button>
-    <button class="tbtn"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
-    <button class="tbtn"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Asperite triyajı · Kırmızı=stres odağı">b-Adaptif</button>
-    <button class="tbtn active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
-    <button class="tbtn active" id="btnZoneM"  onclick="toggleBAdaptZone('MID')"  style="font-size:.7rem;padding:3px 7px;color:#ffaa00;border-color:#ffaa00" title="R=50km · Orta sismisite">🟠R50</button>
-    <button class="tbtn"        id="btnZoneL"  onclick="toggleBAdaptZone('LOW')"  style="font-size:.7rem;padding:3px 7px;color:#aaa;border-color:#555"       title="R=100km · Düşük sismisite · Geniş alan · Dikkatli yorumla">🟡R100</button>
-    <button class="tbtn" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
-    <button class="tbtn" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
+    <button class="tbtn tr-only"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
+    <button class="tbtn tr-only"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
+    <button class="tbtn tr-only"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
+    <button class="tbtn tr-only"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 (Batı) + SHARE-CET (Doğu) Tarihsel Deprem Kataloğu · M≥4 · 1003-1899 · Rovida & Antonucci (2021) INGV + emidius.eu/SHEEC">Tarihsel</button>
+    <button class="tbtn tr-only"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
+    <button class="tbtn tr-only"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Asperite triyajı · Kırmızı=stres odağı">b-Adaptif</button>
+    <button class="tbtn tr-only active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
+    <button class="tbtn tr-only active" id="btnZoneM"  onclick="toggleBAdaptZone('MID')"  style="font-size:.7rem;padding:3px 7px;color:#ffaa00;border-color:#ffaa00" title="R=50km · Orta sismisite">🟠R50</button>
+    <button class="tbtn tr-only"        id="btnZoneL"  onclick="toggleBAdaptZone('LOW')"  style="font-size:.7rem;padding:3px 7px;color:#aaa;border-color:#555"       title="R=100km · Düşük sismisite · Geniş alan · Dikkatli yorumla">🟡R100</button>
+    <button class="tbtn tr-only" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
+    <button class="tbtn tr-only" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
     <button class="tbtn"        id="btnPlates"  onclick="toggleLayer('plates')"  title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
     <button class="tbtn"        id="btnGAF"     onclick="toggleLayer('gaf')"     title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
-    <button class="tbtn"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
+    <button class="tbtn tr-only"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
     <span style="color:#888;font-size:.75rem;align-self:center;margin-left:6px">🟪 Tarihi Şiddet (MMI):</span>
     <button class="tbtn shakebtn" data-shake="murefte1912"   onclick="toggleShakeLayer('murefte1912')"   style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1912 Mürefte</button>
     <button class="tbtn shakebtn" data-shake="yenice1953"    onclick="toggleShakeLayer('yenice1953')"    style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1953 Yenice</button>
     <button class="tbtn shakebtn" data-shake="adapazari1963" onclick="toggleShakeLayer('adapazari1963')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1963 Adapazarı</button>
     <button class="tbtn shakebtn" data-shake="gediz1970"     onclick="toggleShakeLayer('gediz1970')"     style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1970 Gediz</button>
+    <button class="tbtn shakebtn global-only" data-shake="kanto1923" onclick="toggleShakeLayer('kanto1923')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid · Japonya">1923 Kanto</button>
   </div>
 
   <!-- Seismicity renk modu — Seismicity butonunun hemen altında, aynı görsel
@@ -592,8 +617,8 @@
     <button class="tbtn" onclick="applyTestimonyRange()">Uygula</button>
   </div>
 
-  <!-- Layer toggles — satir 2: b-analiz + Forecast -->
-  <div style="display:flex;gap:4px;flex-wrap:nowrap;margin-top:4px">
+  <!-- Layer toggles — satir 2: b-analiz + Forecast (Türkiye/Marmara-özel) -->
+  <div class="tr-only" style="display:flex;gap:4px;flex-wrap:nowrap;margin-top:4px">
     <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
     <button class="tbtn"        id="btnTL"     onclick="toggleLayer('tl')"     title="Öncel&Wyss(2000,2001) T_L Anomalisi · Asperite Yoğunluğu · 10^(b·M−a_ann) · Minima = kilitli asperite · Triple-Target: 6.8/7.4/7.8">🔴 Asperite (T_L)</button>
     <select id="selTL" onchange="setTLTarget(+this.value)" style="background:#1a2a3a;color:#7ecfff;border:1px solid #7ecfff33;border-radius:4px;font-size:11px;padding:2px 4px;cursor:pointer">
@@ -680,7 +705,10 @@
    CONFIG
 ══════════════════════════════════════════ */
 // EMSC izleme alanı (Euro-Mediterranean + Middle East + Central Asia)
-const TURKEY   = { minLat:10, maxLat:75, minLon:-45, maxLon:120 };
+const TURKEY_BBOX = { minLat:10, maxLat:75, minLon:-45, maxLon:120 };
+const WORLD_BBOX  = { minLat:-90, maxLat:90, minLon:-180, maxLon:180 };
+const TURKEY   = { ...TURKEY_BBOX }; // mutable — setGlobalMode() bunun alanlarını değiştirir
+let GLOBAL_MODE = false;
 const FAY_URL    = 'data/turkiye_diri_fay_mta2026.geojson'; // MTA TDFH-2026 KMZ'den doğrudan dönüştürüldü (bkz. DİRİ FAY HATLARI bölümü) — eski repo hatalı fay_tipi içeriyordu
 const BASE = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/';
 const EQ_URLS = {
@@ -733,6 +761,7 @@ const SHAKE_EVENTS = {
   murefte1912:   { label: '1912 Mürefte',   file: 'murefte1912' },
   yenice1953:    { label: '1953 Yenice',    file: 'yenice1953' },
   adapazari1963: { label: '1963 Adapazarı', file: 'adapazari1963' },
+  kanto1923:     { label: '1923 Kanto',     file: 'kanto1923', global: true },
   gediz1970:     { label: '1970 Gediz',     file: '1970_gediz' },
 };
 const FORECAST_PNG_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_forecast.png';
@@ -748,6 +777,27 @@ const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
    HARİTA
 ══════════════════════════════════════════ */
 const map = L.map('map', { center:[38,25], zoom:4 });
+
+/* Türkiye ⇄ Global görünüm anahtarı.
+   TURKEY nesnesinin ALANLARI değiştirilir (referans sabit kalır) — bbox'ı
+   okuyan her yer (getSourceChain, inTurkey/WebSocket filtresi, Bölge Seç)
+   otomatik olarak güncel sınırı görür. loadData()'daki "GitHub raw" adımı
+   Türkiye+çevresi bbox ile üretildiği için Global modda tamamen atlanır. */
+function setGlobalMode(isGlobal) {
+  if (GLOBAL_MODE === isGlobal) return;
+  GLOBAL_MODE = isGlobal;
+  document.body.classList.toggle('global-mode', isGlobal);
+  document.getElementById('btnScopeTR').classList.toggle('active', !isGlobal);
+  document.getElementById('btnScopeGlobal').classList.toggle('active', isGlobal);
+  document.getElementById('scopeNote').style.display = isGlobal ? 'block' : 'none';
+  Object.assign(TURKEY, isGlobal ? WORLD_BBOX : TURKEY_BBOX);
+  map.setView(isGlobal ? [15,20] : [38,25], isGlobal ? 2 : 4, {animate:false});
+  document.title = isGlobal
+    ? 'Dünya Sismik Isı Haritası — Canlı Akış (Global)'
+    : 'Türkiye Sismik Isı Haritası — Canlı Akış';
+  const activeH = document.querySelector('.tbtn[data-h].active');
+  if (activeH) loadData(document.getElementById('srcSel').value, +activeH.dataset.h);
+}
 
 /* URL ile paylaşılabilir görünüm: ?lat=..&lng=..&zoom=.. varsa haritayı oraya
    aç, kullanıcı haritayı hareket ettirdikçe URL'i (replaceState ile, geçmişe
@@ -1465,7 +1515,11 @@ async function loadData(sourceName, h) {
   const seq   = ++loadSeq;
   const stale = () => seq !== loadSeq;
 
-  /* ── 1. GitHub raw (Actions tarafından saatlik güncellenir) ── */
+  /* ── 1. GitHub raw (Actions tarafından saatlik güncellenir) ──
+     Bu dosya Türkiye+çevresi bbox ile üretiliyor (GitHub Actions) — Global
+     modda bu adım tamamen atlanır, doğrudan dünya çapında canlı sorguya
+     geçilir (adım 2), aksi halde Global'de hâlâ Türkiye verisi görünür. */
+  if (!GLOBAL_MODE) {
   setStatus('GitHub veri deposu okunuyor…');
   try {
     const jsonUrl = getEqUrl(sourceName, h);
@@ -1510,8 +1564,9 @@ async function loadData(sourceName, h) {
     await new Promise(r => setTimeout(r, 300));
     if (stale()) return;
   }
+  }
 
-  /* ── 2. Doğrudan EMSC FDSN (yedek) ── */
+  /* ── 2. Doğrudan EMSC FDSN (yedek — Global modda birincil yol) ── */
   const chain = getSourceChain(h);
   for (const source of chain) {
     setStatus(`${source.name} deneniyor…`);
