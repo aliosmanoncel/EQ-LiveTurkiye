@@ -349,6 +349,10 @@
         <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">EMSC "Did You Feel It" · tanıklık sayısı (log ölçek, sürekli)</div>
         <div style="height:8px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#22c55e,#eab308,#f97316,#ef4444,#a855f7)"></div>
         <div style="display:flex;justify-content:space-between;color:#555;font-size:.68rem"><span>1</span><span>~2000+</span></div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
+          <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="#aaa" stroke-width="1.5" stroke-dasharray="2,2"/></svg>
+          <span style="font-size:.68rem;color:#aaa">kesikli çerçeve = Tanıklıklar (Seismicity'nin dolu çizgili dairelerinden ayırt eder)</span>
+        </div>
         <div style="color:#555;font-size:.65rem;margin-top:4px">seismicportal.eu/testimonies-ws · Bossu et al. (2016) · panelde Min/Max filtresi</div>
       </div>
     </div>
@@ -488,6 +492,19 @@
     <button class="tbtn"        id="btnGAF"     onclick="toggleLayer('gaf')"     title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
     <button class="tbtn"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
   </div>
+
+  <!-- 🗣️ Tanıklık Sayısı — Tanıklıklar butonunun (yukarıdaki satırda) hemen altında,
+       aynı görsel blokta tutulur. EMSC'nin kendi #TESTIMONIES Min/Max mantığıyla aynı;
+       minnbtestimonies/maxnbtestimonies API'ye doğrudan gönderilir. Min boş = alt sınır
+       yok, Max boş = üst sınır yok. -->
+  <div class="ctrl">
+    <label>🗣️ Tanıklık Sayısı</label>
+    <input id="tMin" type="number" min="1" step="1" placeholder="min" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+    <span style="color:#555">–</span>
+    <input id="tMax" type="number" min="1" step="1" placeholder="max" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+    <button class="tbtn" onclick="applyTestimonyRange()">Uygula</button>
+  </div>
+
   <!-- Layer toggles — satir 2: b-analiz + Forecast -->
   <div style="display:flex;gap:4px;flex-wrap:nowrap;margin-top:4px">
     <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
@@ -502,17 +519,6 @@
     <button class="tbtn"        id="btnDeltaB" onclick="toggleLayer('deltab')"  title="Katalog Kalite Δb = b(main)-b(all) · Öncel(2026) · 🔵Mavi=artçı baskısı(%9) · ⚫Gri=ana deprem karakterli(%78) · 🟠Turuncu=stres artçısı(%12) · Veri Denetim Laboratuvarı">🔴 Katalog Kalite (Δb)</button>
     <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2030) · Wiemer&Wyss (2002)">📍 Forecast TR</button>
     <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km Mc=2.6 · Öncel&Wyss (2000) · eğitim 1998-2019 → test ML≥3 (2020-2030)">🔬 Marmara FC</button>
-  </div>
-
-  <div class="sep"></div>
-
-  <!-- 🗣️ Tanıklık Sayısı — EMSC'nin kendi #TESTIMONIES Min/Max mantığıyla aynı; minnbtestimonies/maxnbtestimonies API'ye doğrudan gönderilir. Min boş = alt sınır yok, Max boş = üst sınır yok. -->
-  <div class="ctrl">
-    <label>🗣️ Tanıklık</label>
-    <input id="tMin" type="number" min="1" step="1" placeholder="min" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
-    <span style="color:#555">–</span>
-    <input id="tMax" type="number" min="1" step="1" placeholder="max" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
-    <button class="tbtn" onclick="applyTestimonyRange()">Uygula</button>
   </div>
 
   <div class="sep"></div>
@@ -1706,7 +1712,9 @@ async function loadTestimonies() {
       const n = e.ev_nbtestimonies;
       const { c, f, r } = testimonyColor(n);
       L.circleMarker([e.ev_latitude, e.ev_longitude], {
-        radius: r, color: c, weight: 1.5, fillColor: f, fillOpacity: .7
+        // kesikli çerçeve: Seismicity'nin dolu-çizgili dairelerinden renge bakmadan
+        // ayırt edilsin diye (renk skalası kasıtlı olarak EMSC referansıyla aynı kaldı)
+        radius: r, color: c, weight: 2, dashArray: '2,2', fillColor: f, fillOpacity: .55
       }).bindPopup(
         `<b style="color:${c}">🗣️ ${n} tanıklık</b>` +
         `<br><span style="color:#aaa">${e.ev_region || '—'}</span>` +
@@ -1929,6 +1937,10 @@ function toggleLayer(type) {
   } else if (type === 'testimony') {
     showTestimony = !showTestimony;
     document.getElementById('btnTestimony').classList.toggle('active', showTestimony);
+    // Legend'i otomatik aç — Seismicity ile aynı renk ailesini (yeşil→...→mor)
+    // paylaştığı için "bu renk ne anlama geliyor" sorusunu anında yanıtlasın.
+    const lgT = document.getElementById('lgTest');
+    if (lgT) { if (showTestimony) lgT.classList.remove('hidden'); else lgT.classList.add('hidden'); }
     if (showTestimony) {
       loadTestimonies();
     } else {
