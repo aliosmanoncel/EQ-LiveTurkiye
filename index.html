@@ -1070,8 +1070,14 @@ function renderHeat(evList) {
     Math.max(0.05, Math.min(1, ((e.mw??e.mag)-1)/(maxMag-1||1)))
   ]);
 
+  // max: leaflet.heat'in "bu toplam yoğunluğa ulaşan piksel = tam renk" eşiği,
+  // varsayılan 1.0 küçük N (1 hafta/1 ay ~ yüzlerce olay) için kalibre edilmiş.
+  // Tarihsel Katalog gibi büyük N'lerde (onbinlerce olay) aynı eşikle üst üste
+  // binen noktalar HER YERİ doygun kırmızıya boyayıp yoğunluk farkını
+  // görünmez kılıyordu (bildirilen "bozuluyor" sorunu) — N'e göre ölçekliyoruz.
+  const heatMax = Math.max(1, evList.length / 1000);
   heatLayer = L.heatLayer(pts,{
-    radius, blur, maxZoom:12,
+    radius, blur, maxZoom:12, max: heatMax,
     gradient:{ 0:'#00800020', 0.3:'#22c55e', 0.55:'#eab308', 0.75:'#f97316', 0.9:'#ef4444', 1:'#7f1d1d' }
   });
   if (showHeat) heatLayer.addTo(map);
