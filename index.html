@@ -780,6 +780,7 @@ let eqMarkerList = []; // [{e, marker}] — Görünen Depremler paneli için, re
    RANGE FİLTRELER — Magnitude / Derinlik / Zaman
    renderHeat() içinde TEK noktadan uygulanır: harita (heat+circle) ve
    Görünen Depremler listesi (eqMarkerList) hep aynı filtrelenmiş kümeyi görür.
+   NOT: Tanıklıklar (testimony) katmanını KAPSAMAZ — bkz. TANIKLIKLAR bölümü.
 ══════════════════════════════════════════ */
 let filterMagMin = null, filterMagMax = null;
 let filterDepMin = null, filterDepMax = null;
@@ -1588,6 +1589,15 @@ let showTestimony  = false;
    seismicportal.eu/testimonies-ws · her deprem için toplanan tanıklık sayısı
    (ev_nbtestimonies), renk/boyut EMSC'nin kendi Testimonies haritasındaki
    yeşil→sarı→turuncu→kırmızı→mor kademesini izler.
+
+   NOT — RANGE FİLTRELERDEN BAĞIMSIZDIR: bu katman kendi API'sinden
+   (testimonies-ws) ayrı bir fetch ile gelir ve ev_mag_value/ev_depth gibi
+   kendi veri şemasını kullanır; applyRangeFilters() sadece events/liveEvents
+   akışına (renderHeat → eqMarkerList) uygulanır. Yani Mw/Derinlik/Zaman
+   filtresi değiştiğinde Tanıklıklar katmanı ETKİLENMEZ — bu bilinçli bir
+   sınır (2026-09-01, regresyon testiyle doğrulandı), entegrasyon eksikliği
+   değil. İleride birleştirilmek istenirse iki şemanın normalize edilmesi
+   gerekir.
 ══════════════════════════════════════════ */
 function testimonyColor(n) {
   if (n >= 100) return { c:'#a855f7', f:'#6b21a8', r:14 };
