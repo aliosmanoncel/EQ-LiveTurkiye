@@ -153,6 +153,10 @@
     <span style="color:#555">–</span>
     <input id="regionDepMax" type="number" step="1" placeholder="max" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
   </div>
+  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
+    <label style="font-size:.68rem;color:#888;white-space:nowrap">Mc (elle)</label>
+    <input id="regionMcOverride" type="number" step="0.1" placeholder="auto" onchange="renderRegionInfo()" title="Boş = otomatik (Maximum Curvature). Dolu = bu Mc ile b-değeri hesaplanır (Selected-Mc)." style="width:50px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+  </div>
   <button class="tbtn" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
   <div id="regionInfo" style="font-size:.65rem;color:#888;line-height:1.5;background:rgba(20,20,20,.9);border-radius:5px;padding:4px 6px;width:230px"></div>
 </div>
@@ -1540,24 +1544,71 @@ let regionRect   = null;  // L.Rectangle — kilitli bölge
 let regionLayer  = null;  // L.LayerGroup — bölgeye özel küçük depremler
 let regionActive = false; // sürükleme modu açık mı
 let regionStart  = null;  // sürükleme başlangıç LatLng
-let regionEvents = [];    // ham EMSC olayları (Mc/b istatistiği için)
+let regionEvents = [];      // ham EMSC olayları (Mc/b istatistiği için)
+let regionCapped  = false;  // son sorgu limite takıldı mı
+let regionOrderUsed = 'time';
+let regionWindowStart = null, regionWindowEnd = null;
 
 /* Bölgeye özel Mc/b istatistiği — mevcut computeMc()/computeBvalue()
    (Time-Mag panelinde kullanılan aynı fonksiyonlar) bölge kümesine uygulanır.
+   Auto-Mc (Maximum Curvature) / Selected-Mc (elle) ayrımı: #regionMcOverride
+   boşsa otomatik hesaplanır, doluysa kullanıcının girdiği değer kullanılır —
+   ama örneklem yanlılığını DÜZELTMEZ (aşağıdaki blok hala geçerli).
    ÖNEMLİ: "En büyük" sıralaması + limite takılma, örneklemi büyük depremlere
-   doğru yanlı hale getirir (küçük depremler dışarıda kalır) — bu durumda
-   Mc/b sonucu istatistiksel olarak GÜVENİLMEZ, kullanıcıya açıkça belirtilir. */
+   doğru yanlı hale getirir (küçük depremler HİÇ getirilmemiştir) — bu durumda
+   Mc/b sonucu istatistiksel olarak GÜVENİLMEZ; elle Mc girmek bu sorunu
+   çözmez (asıl problem eksik veri, Mc tahmini değil), o yüzden bu durumda
+   hesaplama tamamen engellenir. */
 function computeRegionStatsLine(evs, orderby, capped) {
+  if (orderby === 'magnitude') {
+    return `Mc/b: hesaplanmadı — "En büyük" sıralamasında örneklem yanlı (Mc'yi elle girmek bunu düzeltmez; "En yeni" sıralamasına geçin)`;
+  }
   if (evs.length < 10) return `Mc/b: N=${evs.length} (min. 10 olay gerekir)`;
-  if (orderby === 'magnitude') return `Mc/b: hesaplanmadı — "En büyük" sıralamasında örneklem yanlı (küçük depremler dışlanmış)`;
+
   const mags = evs.map(e => e.mag);
-  const Mc = computeMc(evs);
-  if (Mc === null) return `Mc/b: hesaplanamadı`;
+  const overrideRaw = document.getElementById('regionMcOverride').value;
+  const override = overrideRaw !== '' ? parseFloat(overrideRaw) : null;
+
+  let Mc, mcLabel;
+  if (override != null && !isNaN(override)) {
+    Mc = override;
+    mcLabel = `Selected-Mc = <b>${Mc.toFixed(1)}</b> (elle)`;
+  } else {
+    Mc = computeMc(evs);
+    if (Mc === null) return `Mc/b: hesaplanamadı (N=${evs.length})`;
+    mcLabel = `Auto-Mc = <b>${Mc.toFixed(1)}</b> (Maximum Curvature)`;
+  }
+
   const b = computeBvalue(mags, Mc);
   const nAbove = mags.filter(m => m >= Mc).length;
-  let line = `Mc = <b>${Mc.toFixed(1)}</b> (Maximum Curvature) · b = <b>${b!==null ? b.toFixed(2) : '—'}</b> · N(M≥Mc) = ${nAbove}`;
+  let line = `${mcLabel} · b = <b>${b!==null ? b.toFixed(2) : '—'}</b> · N(M≥Mc) = ${nAbove}`;
   if (capped) line += ` <span style="color:#f59e0b">⚠ limite takıldı, Mc/b düşük olabilir</span>`;
   return line;
+}
+
+// Kalıcı bilgi kutusunu (pencere/eşikler/bölge/Mc-b) son fetch'ten kalan
+// önbelleklenmiş verilerle yeniden çizer — ağ isteği YAPMAZ. Mc override
+// gibi salt-görüntüleme değişikliklerinde kullanılır (reapplyRegionQuery
+// yerine, gereksiz yeniden sorgudan kaçınmak için).
+function renderRegionInfo() {
+  const info = document.getElementById('regionInfo');
+  if (!info || !regionRect) return;
+  const bounds = regionRect.getBounds();
+  const magMin = document.getElementById('regionMagMin').value;
+  const magMax = document.getElementById('regionMagMax').value;
+  const depMin = document.getElementById('regionDepMin').value;
+  const depMax = document.getElementById('regionDepMax').value;
+  const winLabel = HOURS_LABEL[hours] || `${hours} sa`;
+  let line = `Pencere: ${winLabel} (${dfmt(regionWindowStart)} – ${dfmt(regionWindowEnd)})`;
+  if (magMin || magMax) line += ` · Mw ${magMin||'0'}–${magMax||'∞'}`;
+  if (depMin || depMax) line += ` · ${depMin||'0'}–${depMax||'∞'}km`;
+  if (regionEvents.length) {
+    const times = regionEvents.map(e => e.time.getTime());
+    line += `<br>Gösterilen: ${dfmt(new Date(Math.min(...times)))} – ${dfmt(new Date(Math.max(...times)))} (${regionEvents.length} deprem)`;
+  }
+  line += `<br>Bölge: ${bounds.getSouth().toFixed(2)},${bounds.getWest().toFixed(2)} – ${bounds.getNorth().toFixed(2)},${bounds.getEast().toFixed(2)}`;
+  line += `<br>${computeRegionStatsLine(regionEvents, regionOrderUsed, regionCapped)}`;
+  info.innerHTML = line;
 }
 
 function regionSelectStart() {
@@ -1630,28 +1681,15 @@ async function fetchRegionEvents(bounds) {
       ).addTo(regionLayer);
     });
     regionLayer.addTo(map);
-    const capped = evs.length >= limit;
+    regionCapped = evs.length >= limit;
+    regionOrderUsed = orderby;
+    regionWindowStart = s;
+    regionWindowEnd = now;
     const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
-    setStatus(capped
+    setStatus(regionCapped
       ? `Bölgede ${evs.length}+ deprem — ilk ${limit} (${orderLabel}) gösteriliyor · limiti artırabilirsiniz`
       : `Bölgede ${evs.length} deprem gösteriliyor`);
-
-    // Kalıcı bilgi satırı: pencere + eşikler + dönen kümenin gerçek tarih aralığı
-    // (status çubuğu tek satır, sonraki aksiyonla üzerine yazılıyor — bu kalıcı kalır)
-    const info = document.getElementById('regionInfo');
-    if (info) {
-      const winLabel = HOURS_LABEL[hours] || `${hours} sa`;
-      let line = `Pencere: ${winLabel} (${dfmt(s)} – ${dfmt(now)})`;
-      if (magMin || magMax) line += ` · Mw ${magMin||'0'}–${magMax||'∞'}`;
-      if (depMin || depMax) line += ` · ${depMin||'0'}–${depMax||'∞'}km`;
-      if (evs.length) {
-        const times = evs.map(e => e.time.getTime());
-        line += `<br>Gösterilen: ${dfmt(new Date(Math.min(...times)))} – ${dfmt(new Date(Math.max(...times)))} (${evs.length} deprem)`;
-      }
-      line += `<br>Bölge: ${bounds.getSouth().toFixed(2)},${bounds.getWest().toFixed(2)} – ${bounds.getNorth().toFixed(2)},${bounds.getEast().toFixed(2)}`;
-      line += `<br>${computeRegionStatsLine(evs, orderby, capped)}`;
-      info.innerHTML = line;
-    }
+    renderRegionInfo();
     syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
   } catch(err) {
     setStatus(`Bölge sorgusu hatası: ${err.message}`, true);
@@ -1712,7 +1750,10 @@ function regionDeselect() {
   map.getContainer().style.cursor = '';
   regionActive = false;
   regionEvents = [];
+  regionCapped = false;
+  regionWindowStart = regionWindowEnd = null;
   document.getElementById('btnRegionSelect').classList.remove('active');
+  document.getElementById('regionMcOverride').value = '';
   setStatus('');
   const info = document.getElementById('regionInfo');
   if (info) info.innerHTML = '';
