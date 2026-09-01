@@ -1112,14 +1112,20 @@ function renderTimeMag(evList) {
   const metaEl = document.getElementById('tmMeta');
   const statsEl= document.getElementById('tmStats');
 
+  // Bölge seçiliyse Time-Mag/b-değeri analizi TÜM Türkiye/EMSC yerine
+  // sadece bölgeye özel kümeyi (regionEvents) kullanır — kullanıcı bir
+  // bölge çizdiğinde dışındaki alanların istatistiğini görmesi anlamsız.
+  const usingRegion = !!regionRect;
+  if (usingRegion) evList = regionEvents;
+
   const srcSel  = document.getElementById('srcSel');
-  const srcName = (srcSel ? srcSel.value : 'emsc').toUpperCase();
+  const srcName = usingRegion ? 'Bölge' : (srcSel ? srcSel.value : 'emsc').toUpperCase();
   const winLabel= hours<24 ? hours+'s' : hours===168 ? '1 hafta' : hours/24+'g';
 
   if (!evList.length) {
     svg.innerHTML = '';
-    metaEl.textContent = `${srcName} · ${winLabel} · M≥${minMag} · N=0`;
-    statsEl.textContent = 'Seçili pencerede veri yok';
+    metaEl.textContent = usingRegion ? `${srcName} · ${winLabel} · N=0` : `${srcName} · ${winLabel} · M≥${minMag} · N=0`;
+    statsEl.textContent = usingRegion ? 'Seçili bölgede veri yok' : 'Seçili pencerede veri yok';
     return;
   }
 
@@ -1172,7 +1178,7 @@ function renderTimeMag(evList) {
     <text x="${W-PAD_R}" y="${H-6}" fill="#888" font-size="9" text-anchor="end">${fmt(t1)}</text>
   `;
 
-  metaEl.textContent = `${srcName} · ${winLabel} · M≥${minMag} · N=${evList.length}`;
+  metaEl.textContent = usingRegion ? `${srcName} · ${winLabel} · N=${evList.length}` : `${srcName} · ${winLabel} · M≥${minMag} · N=${evList.length}`;
   const mMax = Math.max(...mags).toFixed(1);
   statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>`;
 
@@ -1690,6 +1696,7 @@ async function fetchRegionEvents(bounds) {
       ? `Bölgede ${evs.length}+ deprem — ilk ${limit} (${orderLabel}) gösteriliyor · limiti artırabilirsiniz`
       : `Bölgede ${evs.length} deprem gösteriliyor`);
     renderRegionInfo();
+    if (showTimeMag) renderTimeMag(regionEvents); // panel açıksa bölge verisiyle anında güncelle
     syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
   } catch(err) {
     setStatus(`Bölge sorgusu hatası: ${err.message}`, true);
@@ -1758,6 +1765,7 @@ function regionDeselect() {
   const info = document.getElementById('regionInfo');
   if (info) info.innerHTML = '';
   clearRegionURL();
+  if (showTimeMag) renderTimeMag([...events, ...liveEvents]); // Time-Mag paneli açıksa anında global veriye dönsün
 }
 
 // Limit/Sırala değiştirildiğinde, zaten çizili bölge varsa onu yeni ayarla
