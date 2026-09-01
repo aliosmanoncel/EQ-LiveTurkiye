@@ -776,6 +776,33 @@ function parseFeatures(src, raw) {
 }
 
 /* ══════════════════════════════════════════
+   DATA FLOW NOTE (2026-09-01)
+
+   The application currently has three independent earthquake data flows:
+
+   1. Main Seismicity flow
+      Time window → events → renderHeat() → applyRangeFilters()
+      → map markers + "Görünen Depremler" list
+
+   2. Region Selection flow
+      fetchRegionEvents() → regionLayer
+      Uses its own Limit and Sırala (Newest/Largest) controls.
+      Not affected by the main range filters (Mw/Derinlik/Zaman).
+
+   3. Testimonies flow
+      testimonies-ws API → testimonyLayer
+      Uses a separate API/data schema (ev_mag_value, ev_depth, …).
+      Not affected by the main range filters or region-selection controls.
+
+   These flows are intentionally independent at this stage — verified by
+   regression test, not an oversight. "Limit"/"Sırala" belongs to flow #2
+   only; it is not a global earthquake limit on the main eqMarkerList flow.
+   Future integration may normalize the data sources into a common
+   filter/render pipeline, but that is a deliberate future decision, not
+   a bug to fix.
+══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
    STATE
 ══════════════════════════════════════════ */
 let events      = [];        // mevcut deprem listesi (aktif pencere)
@@ -796,7 +823,8 @@ let eqMarkerList = []; // [{e, marker}] — Görünen Depremler paneli için, re
    RANGE FİLTRELER — Magnitude / Derinlik / Zaman
    renderHeat() içinde TEK noktadan uygulanır: harita (heat+circle) ve
    Görünen Depremler listesi (eqMarkerList) hep aynı filtrelenmiş kümeyi görür.
-   NOT: Tanıklıklar (testimony) katmanını KAPSAMAZ — bkz. TANIKLIKLAR bölümü.
+   NOT: bkz. dosya başındaki DATA FLOW NOTE — Bölge Seç ve Tanıklıklar
+   akışlarını KAPSAMAZ, sadece Ana Seismicity akışına uygulanır.
 ══════════════════════════════════════════ */
 let filterMagMin = null, filterMagMax = null;
 let filterDepMin = null, filterDepMax = null;
@@ -1612,14 +1640,8 @@ let showTestimony  = false;
    (ev_nbtestimonies), renk/boyut EMSC'nin kendi Testimonies haritasındaki
    yeşil→sarı→turuncu→kırmızı→mor kademesini izler.
 
-   NOT — RANGE FİLTRELERDEN BAĞIMSIZDIR: bu katman kendi API'sinden
-   (testimonies-ws) ayrı bir fetch ile gelir ve ev_mag_value/ev_depth gibi
-   kendi veri şemasını kullanır; applyRangeFilters() sadece events/liveEvents
-   akışına (renderHeat → eqMarkerList) uygulanır. Yani Mw/Derinlik/Zaman
-   filtresi değiştiğinde Tanıklıklar katmanı ETKİLENMEZ — bu bilinçli bir
-   sınır (2026-09-01, regresyon testiyle doğrulandı), entegrasyon eksikliği
-   değil. İleride birleştirilmek istenirse iki şemanın normalize edilmesi
-   gerekir.
+   NOT: bkz. dosya başındaki DATA FLOW NOTE — kendi API şemasını kullanır,
+   Ana Seismicity range filtrelerinden ve Bölge Seç kontrollerinden bağımsızdır.
 ══════════════════════════════════════════ */
 function testimonyColor(n) {
   if (n >= 100) return { c:'#a855f7', f:'#6b21a8', r:14 };
