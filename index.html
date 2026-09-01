@@ -141,6 +141,20 @@
       <option value="magnitude">En büyük</option>
     </select>
   </div>
+  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
+    <label style="font-size:.68rem;color:#888;white-space:nowrap">Mw</label>
+    <input id="regionMagMin" type="number" step="0.1" placeholder="min" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+    <span style="color:#555">–</span>
+    <input id="regionMagMax" type="number" step="0.1" placeholder="max" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+  </div>
+  <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
+    <label style="font-size:.68rem;color:#888;white-space:nowrap">Derinlik(km)</label>
+    <input id="regionDepMin" type="number" step="1" placeholder="min" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+    <span style="color:#555">–</span>
+    <input id="regionDepMax" type="number" step="1" placeholder="max" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+  </div>
+  <button class="tbtn" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
+  <div id="regionInfo" style="font-size:.65rem;color:#888;line-height:1.4;background:rgba(20,20,20,.9);border-radius:5px;padding:4px 6px"></div>
 </div>
 
 <!-- SON BÜYÜK DEPREM KARTI -->
@@ -1552,16 +1566,26 @@ async function regionMouseUp() {
 map.on('mousedown', regionMouseDown);
 map.on('mouseup', regionMouseUp);
 
+const HOURS_LABEL = { 1:'1 saat', 24:'24 saat', 168:'1 hafta', 720:'1 ay', 8760:'1 yıl' };
+const dfmt = d => d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+
 async function fetchRegionEvents(bounds) {
   setStatus('Bölgedeki küçük depremler getiriliyor…');
   const limit   = +document.getElementById('regionLimit').value || 500;
   const orderby = document.getElementById('regionOrder').value === 'magnitude' ? 'magnitude' : 'time';
+  const magMin  = document.getElementById('regionMagMin').value;
+  const magMax  = document.getElementById('regionMagMax').value;
+  const depMin  = document.getElementById('regionDepMin').value;
+  const depMax  = document.getElementById('regionDepMax').value;
   const now = new Date(), s = new Date(now - hours*3600000);
   const fmt = d => d.toISOString().slice(0,19);
   const url = `https://www.seismicportal.eu/fdsnws/event/1/query?format=text`
     + `&minlat=${bounds.getSouth().toFixed(3)}&maxlat=${bounds.getNorth().toFixed(3)}`
     + `&minlon=${bounds.getWest().toFixed(3)}&maxlon=${bounds.getEast().toFixed(3)}`
-    + `&starttime=${fmt(s)}&endtime=${fmt(now)}&minmagnitude=0&limit=${limit}&orderby=${orderby}`;
+    + `&starttime=${fmt(s)}&endtime=${fmt(now)}`
+    + `&minmagnitude=${magMin || 0}${magMax ? `&maxmagnitude=${magMax}` : ''}`
+    + `${depMin ? `&mindepth=${depMin}` : ''}${depMax ? `&maxdepth=${depMax}` : ''}`
+    + `&limit=${limit}&orderby=${orderby}`;
   try {
     const res = await fetchTimeout(url, {}, 10000);
     const evs = parseEMSCText(await res.text());
@@ -1573,7 +1597,8 @@ async function fetchRegionEvents(bounds) {
       }).bindPopup(
         `<b style="color:#38bdf8">M ${e.mag.toFixed(1)}</b>` +
         `<br><span style="color:#aaa">${e.place||'EMSC Region'}</span>` +
-        `<br>Depth: ${e.dep.toFixed(0)} km`
+        `<br>Depth: ${e.dep.toFixed(0)} km` +
+        `<br><span style="color:#666">${dfmt(e.time)}</span>`
       ).addTo(regionLayer);
     });
     regionLayer.addTo(map);
@@ -1581,11 +1606,73 @@ async function fetchRegionEvents(bounds) {
     const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
     setStatus(capped
       ? `Bölgede ${evs.length}+ deprem — ilk ${limit} (${orderLabel}) gösteriliyor · limiti artırabilirsiniz`
-      : `Bölgede ${evs.length} deprem (küçükler dahil · seçili zaman penceresi)`);
+      : `Bölgede ${evs.length} deprem gösteriliyor`);
+
+    // Kalıcı bilgi satırı: pencere + eşikler + dönen kümenin gerçek tarih aralığı
+    // (status çubuğu tek satır, sonraki aksiyonla üzerine yazılıyor — bu kalıcı kalır)
+    const info = document.getElementById('regionInfo');
+    if (info) {
+      const winLabel = HOURS_LABEL[hours] || `${hours} sa`;
+      let line = `Pencere: ${winLabel} (${dfmt(s)} – ${dfmt(now)})`;
+      if (magMin || magMax) line += ` · Mw ${magMin||'0'}–${magMax||'∞'}`;
+      if (depMin || depMax) line += ` · ${depMin||'0'}–${depMax||'∞'}km`;
+      if (evs.length) {
+        const times = evs.map(e => e.time.getTime());
+        line += `<br>Gösterilen: ${dfmt(new Date(Math.min(...times)))} – ${dfmt(new Date(Math.max(...times)))} (${evs.length} deprem)`;
+      }
+      info.innerHTML = line;
+    }
+    syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
   } catch(err) {
     setStatus(`Bölge sorgusu hatası: ${err.message}`, true);
   }
 }
+
+/* URL'de bölge seçimini kalıcı kıl — paylaşılan link açıldığında aynı bölge
+   ve ayarlarla yeniden yüklensin (harita görünümünün lat/lng/zoom ile
+   yaptığı şeyin bölge seçimi için karşılığı). */
+function syncRegionURL(bounds, opt) {
+  const url = new URL(location.href);
+  url.searchParams.set('rminlat', bounds.getSouth().toFixed(3));
+  url.searchParams.set('rmaxlat', bounds.getNorth().toFixed(3));
+  url.searchParams.set('rminlon', bounds.getWest().toFixed(3));
+  url.searchParams.set('rmaxlon', bounds.getEast().toFixed(3));
+  url.searchParams.set('rlimit', opt.limit);
+  url.searchParams.set('rorder', opt.orderby);
+  if (opt.magMin) url.searchParams.set('rmagmin', opt.magMin); else url.searchParams.delete('rmagmin');
+  if (opt.magMax) url.searchParams.set('rmagmax', opt.magMax); else url.searchParams.delete('rmagmax');
+  if (opt.depMin) url.searchParams.set('rdepmin', opt.depMin); else url.searchParams.delete('rdepmin');
+  if (opt.depMax) url.searchParams.set('rdepmax', opt.depMax); else url.searchParams.delete('rdepmax');
+  history.replaceState(null, '', url);
+}
+
+function clearRegionURL() {
+  const url = new URL(location.href);
+  ['rminlat','rmaxlat','rminlon','rmaxlon','rlimit','rorder','rmagmin','rmagmax','rdepmin','rdepmax']
+    .forEach(k => url.searchParams.delete(k));
+  history.replaceState(null, '', url);
+}
+
+/* Sayfa yüklendiğinde URL'de bölge parametreleri varsa bölgeyi geri kur.
+   Bu fonksiyon, kullandığı regionRect/fetchRegionEvents/regionMouseUp gibi
+   fonksiyonlar (yukarıda) tanımlandıktan SONRA, aşağıda çağrılır. */
+function restoreRegionFromURL() {
+  const p = new URLSearchParams(location.search);
+  if (!p.has('rminlat')) return;
+  const bounds = L.latLngBounds(
+    [+p.get('rminlat'), +p.get('rminlon')],
+    [+p.get('rmaxlat'), +p.get('rmaxlon')]
+  );
+  if (p.has('rlimit')) document.getElementById('regionLimit').value = p.get('rlimit');
+  if (p.has('rorder')) document.getElementById('regionOrder').value = p.get('rorder');
+  if (p.has('rmagmin')) document.getElementById('regionMagMin').value = p.get('rmagmin');
+  if (p.has('rmagmax')) document.getElementById('regionMagMax').value = p.get('rmagmax');
+  if (p.has('rdepmin')) document.getElementById('regionDepMin').value = p.get('rdepmin');
+  if (p.has('rdepmax')) document.getElementById('regionDepMax').value = p.get('rdepmax');
+  regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+  fetchRegionEvents(bounds);
+}
+restoreRegionFromURL();
 
 function regionDeselect() {
   if (regionRect)  { map.removeLayer(regionRect);  regionRect  = null; }
@@ -1596,6 +1683,9 @@ function regionDeselect() {
   regionActive = false;
   document.getElementById('btnRegionSelect').classList.remove('active');
   setStatus('');
+  const info = document.getElementById('regionInfo');
+  if (info) info.innerHTML = '';
+  clearRegionURL();
 }
 
 // Limit/Sırala değiştirildiğinde, zaten çizili bölge varsa onu yeni ayarla
@@ -1614,6 +1704,7 @@ document.querySelectorAll('.tbtn[data-h]').forEach(b=>b.addEventListener('click'
   hours  = +this.dataset.h;
   minMag = +this.dataset.mag || 1.0;
   resetTimer(); loadData(src, hours);
+  reapplyRegionQuery(); // bölge seçiliyse zaman penceresi değişikliğini yansıt
 }));
 
 document.getElementById('srcSel').addEventListener('change',function(){
