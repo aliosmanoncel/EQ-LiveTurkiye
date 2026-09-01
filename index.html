@@ -208,6 +208,22 @@
       </div>
     </div>
 
+    <!-- Derinlik bölümü — Seismicity "Derinlik" moduna geçilince aktif olur -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgDepth','lgDepthT')">
+        Derinlik (EMSC referans) <span class="tog" id="lgDepthT">▶</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgDepth">
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">Panelde "Seismicity Renk → Derinlik" seçilince aktif</div>
+        <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#713f12;border:2px solid #eab308;vertical-align:middle;margin-right:6px"></span>0–40 km</div>
+        <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#7c2d12;border:2px solid #f97316;vertical-align:middle;margin-right:6px"></span>40–80 km</div>
+        <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#831843;border:2px solid #ec4899;vertical-align:middle;margin-right:6px"></span>80–150 km</div>
+        <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#581c87;border:2px solid #a855f7;vertical-align:middle;margin-right:6px"></span>150–300 km</div>
+        <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#172554;border:2px solid #1e3a8a;vertical-align:middle;margin-right:6px"></span>&gt;300 km</div>
+        <div style="color:#555;font-size:.65rem;margin-top:4px">seismicportal.eu · EMSC Depth haritası referans · nokta boyutu yine Mw'ye göre</div>
+      </div>
+    </div>
+
     <!-- Heat Map gradient -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgHeat','lgHeatT')">
@@ -552,6 +568,16 @@
     <button class="tbtn shakebtn" data-shake="yenice1953"    onclick="toggleShakeLayer('yenice1953')"    style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1953 Yenice</button>
     <button class="tbtn shakebtn" data-shake="adapazari1963" onclick="toggleShakeLayer('adapazari1963')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1963 Adapazarı</button>
     <button class="tbtn shakebtn" data-shake="gediz1970"     onclick="toggleShakeLayer('gediz1970')"     style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1970 Gediz</button>
+  </div>
+
+  <!-- Seismicity renk modu — Seismicity butonunun hemen altında, aynı görsel
+       blokta. İki AYRI EMSC referans şeması: Mw (sarı→turuncu→kırmızı→siyah)
+       ve Derinlik (0-40 sarı/40-80 turuncu/80-150 pembe/150-300 mor/>300 lacivert). -->
+  <div class="ctrl">
+    <label>Seismicity Renk</label>
+    <button class="tbtn active" id="btnColorMag" style="font-size:.7rem;padding:3px 8px" onclick="setSeismicityColorMode('mag')" title="EMSC Magnitude haritası referans">Mw</button>
+    <button class="tbtn" id="btnColorDepth" style="font-size:.7rem;padding:3px 8px" onclick="setSeismicityColorMode('depth')" title="EMSC Depth haritası referans">Derinlik</button>
+    <span id="depthColorHint" style="display:none;font-size:.65rem;color:#888;margin-left:4px">🟡0–40 · 🟠40–80 · 🩷80–150 · 🟣150–300 · 🔵&gt;300 km</span>
   </div>
 
   <!-- 🗣️ Tanıklık Sayısı — Tanıklıklar butonunun (yukarıdaki satırda) hemen altında,
@@ -979,6 +1005,50 @@ function timeBalancedSample(evList, cap) {
 }
 
 /* ══════════════════════════════════════════
+   SEISMICITY RENKLENDİRME MODU — Magnitude / Derinlik
+   İki AYRI referans şeması, EMSC'nin kendi ürettiği iki ayrı haritadan
+   (seismicportal.eu) birebir alınmış — karıştırılmıyor:
+   - Magnitude modu: EMSC'nin M haritasındaki sarı→turuncu→kırmızı→siyah
+   - Derinlik modu:  EMSC'nin derinlik haritasındaki 5 kademeli skala
+     (0–40 sarı · 40–80 turuncu · 80–150 pembe · 150–300 mor · >300 lacivert)
+   Her iki modda da nokta BOYUTU yine magnitude'a göre (EMSC'nin derinlik
+   haritasında da büyüklük lejantı ayrı gösterilir, derinlik SADECE renk
+   kodlar) — renk ile boyut farklı iki değişkeni aynı anda taşır.
+══════════════════════════════════════════ */
+let seismicityColorMode = 'mag'; // 'mag' | 'depth'
+
+function magRadius(m) {
+  if (m >= 7.0) return 18;
+  if (m >= 5.5) return 13;
+  if (m >= 4.0) return 9;
+  if (m >= 2.5) return 5;
+  return 3;
+}
+function magColorInfo(m) {
+  if (m >= 7.0) return { c:'#dc2626', f:'#7f1d1d', r:magRadius(m) }; // Major — koyu kırmızı
+  if (m >= 5.5) return { c:'#ef4444', f:'#991b1b', r:magRadius(m) }; // Strong — kırmızı
+  if (m >= 4.0) return { c:'#f97316', f:'#7c2d12', r:magRadius(m) }; // Moderate — turuncu
+  if (m >= 2.5) return { c:'#eab308', f:'#713f12', r:magRadius(m) }; // Light — sarı
+  return                { c:'#22c55e', f:'#14532d', r:magRadius(m) }; // Minor — yeşil
+}
+function depthColorInfo(dep, m) {
+  const r = magRadius(m);
+  if (dep > 300) return { c:'#1e3a8a', f:'#172554', r }; // >300 km — lacivert
+  if (dep >= 150) return { c:'#a855f7', f:'#581c87', r }; // 150–300 km — mor
+  if (dep >= 80)  return { c:'#ec4899', f:'#831843', r }; // 80–150 km — pembe
+  if (dep >= 40)  return { c:'#f97316', f:'#7c2d12', r }; // 40–80 km — turuncu
+  return                 { c:'#eab308', f:'#713f12', r }; // 0–40 km — sarı
+}
+function setSeismicityColorMode(mode) {
+  seismicityColorMode = mode;
+  document.getElementById('btnColorMag').classList.toggle('active', mode==='mag');
+  document.getElementById('btnColorDepth').classList.toggle('active', mode==='depth');
+  const hint = document.getElementById('depthColorHint');
+  if (hint) hint.style.display = mode==='depth' ? 'block' : 'none';
+  renderHeat([...events, ...liveEvents]);
+}
+
+/* ══════════════════════════════════════════
    RENDER
 ══════════════════════════════════════════ */
 function renderHeat(evList) {
@@ -1006,33 +1076,27 @@ function renderHeat(evList) {
   });
   if (showHeat) heatLayer.addTo(map);
 
-  /* ── Büyüklüğe göre renk + boyut ── */
-  function eqColor(m) {
-    if (m >= 7.0) return { c:'#dc2626', f:'#7f1d1d', r:18 }; // Major — koyu kırmızı
-    if (m >= 5.5) return { c:'#ef4444', f:'#991b1b', r:13 }; // Strong — kırmızı
-    if (m >= 4.0) return { c:'#f97316', f:'#7c2d12', r: 9 }; // Moderate — turuncu
-    if (m >= 2.5) return { c:'#eab308', f:'#713f12', r: 5 }; // Light — sarı
-    return                { c:'#22c55e', f:'#14532d', r: 3 }; // Minor — yeşil
-  }
-
   markLayer = L.layerGroup();
   eqMarkerList = [];
   const visibleSample = timeBalancedSample(evList, VISUAL_SAMPLE_CAP);
   visibleSample.forEach(e=>{
-    const {c, f, r} = eqColor(e.mw ?? e.mag);
+    const mVal = e.mw ?? e.mag;
+    const {c, f, r} = seismicityColorMode === 'depth' ? depthColorInfo(e.dep, mVal) : magColorInfo(mVal);
     const ago = agoDuration(Date.now() - e.time.getTime());
     const mwLabel = (e.mtype && e.mtype.toLowerCase() !== 'mw' && e.mw !== e.mag)
       ? `Mw ${e.mw.toFixed(1)} <span style="color:#888;font-size:0.8rem">(${e.mtype.toUpperCase()} ${e.mag.toFixed(1)})</span>`
       : `Mw ${(e.mw ?? e.mag).toFixed(1)}`;
     const marker = L.circleMarker([e.lat,e.lon],{
       radius: r,
-      color: c, weight: (e.mw??e.mag)>=4 ? 1.5 : 0.5,
-      fillColor: f, fillOpacity: (e.mw??e.mag)>=4 ? 0.75 : 0.45
+      color: c, weight: mVal>=4 ? 1.5 : 0.5,
+      fillColor: f, fillOpacity: mVal>=4 ? 0.75 : 0.45
     }).bindPopup(
       `<b style="color:${c};font-size:1.1rem">${mwLabel}</b>` +
       `<br><span style="color:#aaa">${e.place||'EMSC Region'}</span>` +
       (e.province ? `<br><span style="color:#888;font-size:.8rem">📍 ${e.province}${e.district ? ' / '+e.district : ''}</span>` : '') +
-      `<br>Depth: ${e.dep.toFixed(0)} km` +
+      (seismicityColorMode === 'depth'
+        ? `<br>Depth: <b style="color:${c}">${e.dep.toFixed(0)} km</b>`
+        : `<br>Depth: ${e.dep.toFixed(0)} km`) +
       `<br><span style="color:#666">${ago} ago</span>`
     ).addTo(markLayer);
     eqMarkerList.push({ e, marker });
