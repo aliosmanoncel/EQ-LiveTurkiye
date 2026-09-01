@@ -381,16 +381,33 @@
       </div>
     </div>
 
-    <!-- Active Faults bölümü -->
+    <!-- Diri Faylar (Türkiye) bölümü — MTA TDFH-2026, kırılma yaşına göre -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgFay','lgFayT')">
-        Active Faults <span class="tog" id="lgFayT">▼</span>
+        Diri Faylar — Türkiye (MTA TDFH-2026) <span class="tog" id="lgFayT">▼</span>
       </div>
       <div class="legend-section-body" id="lgFay">
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">Kırılma yaşına göre</div>
+        <div><span class="fl" style="background:#eab308"></span>Deprem Yüzey Kırığı (1900–Günümüz)</div>
+        <div><span class="fl" style="background:#dc2626"></span>Holosen Fayı (11.700 yıl)</div>
+        <div><span class="fl" style="background:#a855f7"></span>Kuvaterner Fayı (2.588.000 yıl)</div>
+        <div><span class="fl" style="background:#374151"></span>Olası Kuvaterner Fayı</div>
+        <div style="color:#555;font-size:.65rem;margin-top:4px">Elmacı ve ark. (2026), MTA Özel Yayın Serisi-60</div>
+      </div>
+    </div>
+
+    <!-- Dünya Diri Fayları (GEM GAF-DB) bölümü — fay mekanizmasına göre -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgGaf','lgGafT')">
+        🌍 Dünya Diri Fayları (GAF-DB) <span class="tog" id="lgGafT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgGaf">
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">Fay mekanizmasına göre</div>
         <div><span class="fl" style="background:#f97316"></span>Strike-slip</div>
         <div><span class="fl" style="background:#06b6d4"></span>Normal</div>
         <div><span class="fl" style="background:#ef4444"></span>Thrust</div>
         <div><span class="fl" style="background:#666"></span>Undefined</div>
+        <div style="color:#555;font-size:.65rem;margin-top:4px">Styron &amp; Pagani (2020), CC-BY-SA 4.0</div>
       </div>
     </div>
 
@@ -638,7 +655,7 @@
 ══════════════════════════════════════════ */
 // EMSC izleme alanı (Euro-Mediterranean + Middle East + Central Asia)
 const TURKEY   = { minLat:10, maxLat:75, minLon:-45, maxLon:120 };
-const FAY_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/fay-yolu-aricilik-veri-bankasi/main/data/turkiye_diri_fay.geojson';
+const FAY_URL    = 'data/turkiye_diri_fay_mta2026.geojson'; // MTA TDFH-2026 KMZ'den doğrudan dönüştürüldü (bkz. DİRİ FAY HATLARI bölümü) — eski repo hatalı fay_tipi içeriyordu
 const BASE = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/';
 const EQ_URLS = {
   emsc: {
@@ -758,8 +775,25 @@ const labelLayer = L.tileLayer(
 /* ══════════════════════════════════════════
    DİRİ FAY HATLARI
 ══════════════════════════════════════════ */
-const fayColor = p => {
-  const t = ((p&&(p.fault_type||p.type||p.FAY_TIPI||p.fay_tipi||''))+'').toLowerCase();
+/* MTA TDFH-2026 kırılma-yaşı sınıflaması (FAYTIPI, doc.kml → styleUrl eşleşmesiyle
+   doğrulandı: 1=sarı/ff00ffff, 2=kırmızı/ff0000ff, 3=mor/ffff00c5, 4=siyah/ff000000).
+   NOT: fay-yolu-aricilik-veri-bankasi reposundaki eski GeoJSON'un fay_tipi alanı
+   BU DEĞİL (dağılımı uyuşmuyor: 1:7377/2:3774/3:1065/4:747 vs gerçek KML'de
+   1:3592/2:6640/3:1906/4:825) — o alan hatalı/yanlış eşleştirilmiş, kullanılmıyor. */
+const FAYTIPI_COLOR = { 1:'#eab308', 2:'#dc2626', 3:'#a855f7', 4:'#374151' };
+const FAYTIPI_LABEL = {
+  1: 'Deprem Yüzey Kırığı (1900–Günümüz)',
+  2: 'Holosen Fayı (11.700 yıl)',
+  3: 'Kuvaterner Fayı (2.588.000 yıl)',
+  4: 'Olası Kuvaterner Fayı'
+};
+const fayColor = p => FAYTIPI_COLOR[p && p.faytipi] || '#666';
+
+// GEM GAF-DB (Dünya Diri Fayları) katmanı için ayrı renklendirme — MTA'nın
+// FAYTIPI'sinden (kırılma yaşı) FARKLI bir şema: fay MEKANİZMASI (slip_type).
+// Önceki fayColor() bunu da kapsıyordu, MTA'yı FAYTIPI'ye geçirince ayrıldı.
+const gafColor = slipType => {
+  const t = ((slipType||'')+'').toLowerCase();
   if (t.includes('strike')||t.includes('doğrultu')||t.includes('sinistral')||t.includes('dextral')) return '#f97316';
   if (t.includes('normal'))                         return '#06b6d4';
   if (t.includes('thrust')||t.includes('bindirme')||t.includes('reverse')) return '#ef4444';
@@ -768,13 +802,13 @@ const fayColor = p => {
 
 fetch(FAY_URL).then(r=>r.json()).then(gj=>{
   L.geoJSON(gj,{
-    style: f=>({ color:fayColor(f.properties), weight:1.1, opacity:0.75 }),
+    style: f=>({ color:fayColor(f.properties), weight: f.properties&&f.properties.faytipi===1 ? 1.6 : 1.1, opacity:0.8 }),
     onEachFeature:(f,layer)=>{
       const p=f.properties||{};
-      const name=p.name||p.NAME||p.FAY_ADI||p.fay_adi||'—';
-      const type=p.fault_type||p.type||p.FAY_TIPI||p.fay_tipi||'—';
-      const slip=p.slip_rate||p.SLIP_RATE||'—';
-      layer.bindPopup(`<b style="color:#f97316">${name}</b><br>Tip: ${type}<br>Kayma: ${slip} cm/yıl`);
+      const name=p.fay_adi||'—';
+      const label=FAYTIPI_LABEL[p.faytipi]||'—';
+      const col=fayColor(p);
+      layer.bindPopup(`<b style="color:${col}">${name}</b><br>${label}${p.uzunluk_km?`<br>Uzunluk: ${p.uzunluk_km} km`:''}`);
     }
   }).addTo(map);
 }).catch(()=>{});
@@ -2340,7 +2374,7 @@ function toggleLayer(type) {
         fetch('data/global_active_faults.geojson').then(r => r.json()).then(gj => {
           gafLayer = L.geoJSON(gj, {
             renderer: L.canvas(),
-            style: f => ({ color: fayColor({ type: f.properties && f.properties.slip_type }), weight: 1, opacity: 0.6 }),
+            style: f => ({ color: gafColor(f.properties && f.properties.slip_type), weight: 1, opacity: 0.6 }),
             onEachFeature: (f, layer) => {
               const p = f.properties || {};
               layer.bindPopup(`<b style="color:#f97316">${p.name || '—'}</b><br>Tip: ${p.slip_type || '—'}<br><span style="color:#aaa;font-size:.75em">${p.catalog || 'GEM GAF-DB'} · Styron &amp; Pagani (2020)</span>`);
