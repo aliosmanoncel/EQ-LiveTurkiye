@@ -2902,7 +2902,7 @@ async function loadShakeLayer(id) {
       { opacity: 0.75, interactive: false }
     );
     if (shakeActive[id]) shakeLayers[id].addTo(map);
-    setStatus(`${meta.event} · ${meta.source} · MMI ${meta.mmi_min}–${meta.mmi_max}`);
+    setStatus(`${meta.event} · ${meta.source}` + (meta.mmi_min != null ? ` · MMI ${meta.mmi_min}–${meta.mmi_max}` : ""));
   } catch(e) {
     setStatus(`${ev.label} şiddet haritası yüklenemedi: ` + e.message, true);
     shakeActive[id] = false;
