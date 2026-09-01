@@ -324,6 +324,22 @@
       </div>
     </div>
 
+    <!-- Tanıklıklar bölümü -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgTest','lgTestT')">
+        Tanıklıklar <span class="tog" id="lgTestT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgTest">
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">EMSC "Did You Feel It" · tanıklık sayısı</div>
+        <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#6b21a8;border:2px solid #a855f7;vertical-align:middle;margin-right:6px"></span>100+ tanıklık</div>
+        <div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#991b1b;border:1.5px solid #ef4444;vertical-align:middle;margin-right:6px"></span>30–99 tanıklık</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7c2d12;border:1.5px solid #f97316;vertical-align:middle;margin-right:6px"></span>10–29 tanıklık</div>
+        <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#713f12;border:1px solid #eab308;vertical-align:middle;margin-right:6px"></span>3–9 tanıklık</div>
+        <div><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#14532d;border:1px solid #22c55e;vertical-align:middle;margin-right:6px"></span>1–2 tanıklık</div>
+        <div style="color:#555;font-size:.65rem;margin-top:4px">seismicportal.eu/testimonies-ws · Bossu et al. (2016)</div>
+      </div>
+    </div>
+
     <!-- Active Faults bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgFay','lgFayT')">
@@ -441,6 +457,7 @@
   <div style="display:flex;gap:4px;flex-wrap:nowrap">
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
+    <button class="tbtn"        id="btnTestimony" onclick="toggleLayer('testimony')" title="EMSC Testimonies · hissedilme raporları · seismicportal.eu/testimonies-ws · yeşil=az → mor=çok tanıklık">🗣️ Tanıklıklar</button>
     <button class="tbtn"        id="btnTimeMag" onclick="toggleTimeMag()" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag</button>
     <button class="tbtn"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
@@ -1563,6 +1580,55 @@ let platesLayer = null;
 let showPlates  = false;
 let gafLayer    = null;
 let showGAF     = false;
+let testimonyLayer = null;
+let showTestimony  = false;
+
+/* ══════════════════════════════════════════
+   TANIKLIKLAR (EMSC Testimonies) — "Did You Feel It" hissedilme raporları
+   seismicportal.eu/testimonies-ws · her deprem için toplanan tanıklık sayısı
+   (ev_nbtestimonies), renk/boyut EMSC'nin kendi Testimonies haritasındaki
+   yeşil→sarı→turuncu→kırmızı→mor kademesini izler.
+══════════════════════════════════════════ */
+function testimonyColor(n) {
+  if (n >= 100) return { c:'#a855f7', f:'#6b21a8', r:14 };
+  if (n >= 30)  return { c:'#ef4444', f:'#991b1b', r:11 };
+  if (n >= 10)  return { c:'#f97316', f:'#7c2d12', r: 8 };
+  if (n >= 3)   return { c:'#eab308', f:'#713f12', r: 6 };
+  return               { c:'#22c55e', f:'#14532d', r: 4 };
+}
+
+async function loadTestimonies() {
+  setStatus('Tanıklıklar (hissedilen depremler) getiriliyor…');
+  const now = new Date(), s = new Date(now - hours*3600000);
+  const fmt = d => d.toISOString().slice(0,19);
+  const url = `https://www.seismicportal.eu/testimonies-ws/api/search`
+    + `?minlat=${TURKEY.minLat}&maxlat=${TURKEY.maxLat}`
+    + `&minlon=${TURKEY.minLon}&maxlon=${TURKEY.maxLon}`
+    + `&starttime=${fmt(s)}&endtime=${fmt(now)}`
+    + `&minnbtestimonies=1&limit=500&format=json&orderby=time`;
+  try {
+    const res = await fetchTimeout(url, {}, 10000);
+    const evs = await res.json();
+    if (testimonyLayer) map.removeLayer(testimonyLayer);
+    testimonyLayer = L.layerGroup();
+    evs.forEach(e => {
+      const n = e.ev_nbtestimonies;
+      const { c, f, r } = testimonyColor(n);
+      L.circleMarker([e.ev_latitude, e.ev_longitude], {
+        radius: r, color: c, weight: 1.5, fillColor: f, fillOpacity: .7
+      }).bindPopup(
+        `<b style="color:${c}">🗣️ ${n} tanıklık</b>` +
+        `<br><span style="color:#aaa">${e.ev_region || '—'}</span>` +
+        `<br>M${(+e.ev_mag_value).toFixed(1)} (${(e.ev_mag_type || '').toUpperCase()}) · ${(+e.ev_depth).toFixed(0)} km` +
+        `<br><span style="color:#666">${new Date(e.ev_event_time.replace(' UTC','Z')).toLocaleString('tr-TR')}</span>`
+      ).addTo(testimonyLayer);
+    });
+    if (showTestimony) testimonyLayer.addTo(map);
+    setStatus(`Tanıklıklar: ${evs.length} deprem hissedildi olarak bildirildi · seçili zaman penceresi`);
+  } catch (err) {
+    setStatus(`Tanıklık sorgusu hatası: ${err.message}`, true);
+  }
+}
 
 function renderHistLayer() {
   if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
@@ -1768,6 +1834,15 @@ function toggleLayer(type) {
       setStatus('Dünya Diri Fayları · GEM Global Active Faults Database · Styron & Pagani (2020) · CC-BY-SA 4.0');
     } else {
       if (gafLayer) map.removeLayer(gafLayer);
+    }
+  } else if (type === 'testimony') {
+    showTestimony = !showTestimony;
+    document.getElementById('btnTestimony').classList.toggle('active', showTestimony);
+    if (showTestimony) {
+      loadTestimonies();
+    } else {
+      if (testimonyLayer) map.removeLayer(testimonyLayer);
+      setStatus('');
     }
   } else if (type === 'hist') {
     showHist = !showHist;
