@@ -81,6 +81,20 @@
     .legend-title{color:#fbbf24;font-weight:700;margin-bottom:3px;font-size:.78rem}
     .fl{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
 
+    /* ── GÖRÜNEN DEPREMLER (ekrandaki bounds'a göre) ── */
+    .eqlist{position:fixed;top:8px;right:10px;z-index:999;background:rgba(0,0,0,.85);border:1px solid #2a2a2a;border-radius:6px;font-size:.75rem;width:280px;max-width:88vw;pointer-events:all}
+    .eqlist-header{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;cursor:pointer;user-select:none}
+    .eqlist-header .title{color:#06b6d4;font-weight:700;font-size:.78rem}
+    .eqlist-toggle{color:#555;font-size:.85rem;line-height:1}
+    .eqlist-body{max-height:38vh;overflow-y:auto;border-top:1px solid #2a2a2a}
+    .eqlist-body.hidden{display:none}
+    .eqlist-row{display:grid;grid-template-columns:38px 44px 1fr;gap:6px;padding:5px 11px;cursor:pointer;border-bottom:1px solid #1e1e1e;align-items:center}
+    .eqlist-row:hover{background:rgba(6,182,212,.12)}
+    .eqlist-row .mag{font-weight:700;text-align:center}
+    .eqlist-row .dep{color:#888;text-align:right}
+    .eqlist-row .time{color:#aaa;font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .eqlist-empty{padding:10px 11px;color:#555;font-size:.72rem}
+
     /* ── NEW EQ FLASH ── */
     @keyframes flashNew{0%{opacity:1;transform:scale(1.6)}100%{opacity:.7;transform:scale(1)}}
     .new-eq{animation:flashNew .6s ease-out}
@@ -110,6 +124,15 @@
   <div class="lc-timer">
     Son M4.5+ depremden bu yana: <b id="lcTimer">—</b>
   </div>
+</div>
+
+<!-- GÖRÜNEN DEPREMLER (harita sınırlarına göre canlı liste) -->
+<div class="eqlist">
+  <div class="eqlist-header" onclick="toggleEqList()">
+    <span class="title" id="eqlTitle">Görünen Depremler: 0</span>
+    <span class="eqlist-toggle" id="eqlToggle">▲</span>
+  </div>
+  <div class="eqlist-body" id="eqlBody"></div>
 </div>
 
 <div class="legend">
@@ -699,6 +722,7 @@ let src         = 'emsc';
 let radius      = 18, blur = 15;
 let cntVal      = REFRESH, cntTimer = null;
 let liveCount   = 0;
+let eqMarkerList = []; // [{e, marker}] — Görünen Depremler paneli için, renderHeat'te doldurulur
 
 /* ══════════════════════════════════════════
    RENDER
@@ -706,7 +730,7 @@ let liveCount   = 0;
 function renderHeat(evList) {
   if (heatLayer)  { map.removeLayer(heatLayer);  heatLayer  = null; }
   if (markLayer)  { map.removeLayer(markLayer);  markLayer  = null; }
-  if (!evList.length) return;
+  if (!evList.length) { eqMarkerList = []; updateEqList(); return; }
 
   const allMags = evList.map(e=>e.mw??e.mag);
   const maxMag  = Math.max(...allMags, 3);
@@ -732,13 +756,14 @@ function renderHeat(evList) {
   }
 
   markLayer = L.layerGroup();
+  eqMarkerList = [];
   evList.forEach(e=>{
     const {c, f, r} = eqColor(e.mw ?? e.mag);
     const ago = agoDuration(Date.now() - e.time.getTime());
     const mwLabel = (e.mtype && e.mtype.toLowerCase() !== 'mw' && e.mw !== e.mag)
       ? `Mw ${e.mw.toFixed(1)} <span style="color:#888;font-size:0.8rem">(${e.mtype.toUpperCase()} ${e.mag.toFixed(1)})</span>`
       : `Mw ${(e.mw ?? e.mag).toFixed(1)}`;
-    L.circleMarker([e.lat,e.lon],{
+    const marker = L.circleMarker([e.lat,e.lon],{
       radius: r,
       color: c, weight: (e.mw??e.mag)>=4 ? 1.5 : 0.5,
       fillColor: f, fillOpacity: (e.mw??e.mag)>=4 ? 0.75 : 0.45
@@ -749,9 +774,11 @@ function renderHeat(evList) {
       `<br>Depth: ${e.dep.toFixed(0)} km` +
       `<br><span style="color:#666">${ago} ago</span>`
     ).addTo(markLayer);
+    eqMarkerList.push({ e, marker });
   });
   if (showCircle) markLayer.addTo(map);
   labelLayer.bringToFront();
+  updateEqList();
 }
 
 /* ══════════════════════════════════════════
@@ -1268,6 +1295,58 @@ function toggleSection(bodyId, iconId) {
   const hidden = body.classList.toggle('hidden');
   icon.textContent = hidden ? '▶' : '▼';
 }
+
+/* ══════════════════════════════════════════
+   GÖRÜNEN DEPREMLER PANELİ (IRIS Seismic Monitor benzeri)
+   — harita hareket ettikçe o an ekranda görünen depremleri listeler,
+     satıra tıklayınca haritada o depreme uçup popup'ını açar
+══════════════════════════════════════════ */
+let eqlVisibleList = [];
+
+function toggleEqList() {
+  const body = document.getElementById('eqlBody');
+  const icon = document.getElementById('eqlToggle');
+  const hidden = body.classList.toggle('hidden');
+  icon.textContent = hidden ? '▼' : '▲';
+}
+
+function updateEqList() {
+  const body  = document.getElementById('eqlBody');
+  const title = document.getElementById('eqlTitle');
+  const bounds = map.getBounds();
+
+  eqlVisibleList = eqMarkerList
+    .filter(({e}) => bounds.contains([e.lat, e.lon]))
+    .sort((a,b) => b.e.time - a.e.time);
+
+  title.textContent = `Görünen Depremler: ${eqlVisibleList.length}`;
+
+  if (!eqlVisibleList.length) {
+    body.innerHTML = '<div class="eqlist-empty">Bu görünümde deprem yok</div>';
+    return;
+  }
+
+  body.innerHTML = eqlVisibleList.map(({e}, i) => {
+    const magNum = e.mw ?? e.mag;
+    const col = magNum>=5.5 ? '#ef4444' : magNum>=4 ? '#f97316' : magNum>=2.5 ? '#eab308' : '#22c55e';
+    const dateStr = e.time.toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    return `<div class="eqlist-row" onclick="focusEq(${i})">
+      <span class="mag" style="color:${col}">${magNum.toFixed(1)}</span>
+      <span class="dep">${e.dep.toFixed(0)}km</span>
+      <span class="time">${(e.place||'EMSC Region')} · ${dateStr}</span>
+    </div>`;
+  }).join('');
+}
+
+function focusEq(idx) {
+  const item = eqlVisibleList[idx];
+  if (!item) return;
+  if (!showCircle) toggleLayer('circle'); // popup görünmesi için "Seismicity" katmanı açık olmalı
+  map.flyTo([item.e.lat, item.e.lon], Math.max(map.getZoom(), 8), { duration: 1.2 });
+  setTimeout(() => item.marker.openPopup(), 450);
+}
+
+map.on('moveend', updateEqList);
 
 /* ══════════════════════════════════════════
    BUTONLAR
