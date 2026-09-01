@@ -127,7 +127,7 @@
   <button class="tbtn" id="btnRegionClear" onclick="regionDeselect()">✕ Bölgeyi Kaldır</button>
   <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
     <label style="font-size:.68rem;color:#888;white-space:nowrap">Limit</label>
-    <select id="regionLimit" class="src-sel" style="flex:1;padding:2px 4px;font-size:.72rem" title="Maximum earthquakes — bölge sorgusunun üst sınırı">
+    <select id="regionLimit" class="src-sel" style="flex:1;padding:2px 4px;font-size:.72rem" title="Maximum earthquakes — bölge sorgusunun üst sınırı" onchange="reapplyRegionQuery()">
       <option value="200">200</option>
       <option value="500" selected>500</option>
       <option value="1000">1000</option>
@@ -136,7 +136,7 @@
   </div>
   <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
     <label style="font-size:.68rem;color:#888;white-space:nowrap">Sırala</label>
-    <select id="regionOrder" class="src-sel" style="flex:1;padding:2px 4px;font-size:.72rem" title="Limite takılırsa hangi depremler korunacak">
+    <select id="regionOrder" class="src-sel" style="flex:1;padding:2px 4px;font-size:.72rem" title="Limite takılırsa hangi depremler korunacak" onchange="reapplyRegionQuery()">
       <option value="time" selected>En yeni</option>
       <option value="magnitude">En büyük</option>
     </select>
@@ -1591,6 +1591,13 @@ function regionDeselect() {
   regionActive = false;
   document.getElementById('btnRegionSelect').classList.remove('active');
   setStatus('');
+}
+
+// Limit/Sırala değiştirildiğinde, zaten çizili bölge varsa onu yeni ayarla
+// yeniden sorgular — önceden sadece bir SONRAKİ yeni sürüklemede etkili
+// oluyordu, mevcut bölge için hiç tetiklenmiyordu (bildirilen hata).
+function reapplyRegionQuery() {
+  if (regionRect) fetchRegionEvents(regionRect.getBounds());
 }
 
 /* ══════════════════════════════════════════
