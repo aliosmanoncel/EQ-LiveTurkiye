@@ -1836,7 +1836,9 @@ function renderRegionInfo() {
   const magMax = document.getElementById('regionMagMax').value;
   const depMin = document.getElementById('regionDepMin').value;
   const depMax = document.getElementById('regionDepMax').value;
-  const winLabel = HOURS_LABEL[hours] || `${hours} sa`;
+  const winLabel = historicalMode
+    ? `Tarihsel Katalog (${regionWindowStart ? regionWindowStart.getFullYear() : '—'}–${regionWindowEnd ? regionWindowEnd.getFullYear() : '—'})`
+    : (HOURS_LABEL[hours] || `${hours} sa`);
   let line = `Pencere: ${winLabel} (${dfmt(regionWindowStart)} – ${dfmt(regionWindowEnd)})`;
   if (magMin || magMax) line += ` · Mw ${magMin||'0'}–${magMax||'∞'}`;
   if (depMin || depMax) line += ` · ${depMin||'0'}–${depMax||'∞'}km`;
@@ -1972,7 +1974,56 @@ map.on('mouseup', regionMouseUp);
 const HOURS_LABEL = { 1:'1 saat', 24:'24 saat', 168:'1 hafta', 720:'1 ay', 8760:'1 yıl' };
 const dfmt = d => d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
 
+/* Tarihsel Katalog modundayken bölge sorgusu YENİ bir EMSC isteği YAPMAZ —
+   zaten bellekte olan tam kataloğu (events, loadHistoricalRange'in doldurduğu,
+   seçili başlangıç yılından bugüne TÜM olaylar) bbox/poligona yerel olarak
+   filtreler. Böylece canlı sorgunun Limit sınırı (varsayılan 500-2000) hiç
+   devreye girmez — "poligon içindeki depremlerin TAMAMI 1900-2026" isteği
+   tam olarak karşılanır, en-yeni-N'e yanlı bir örneklem değil. */
+async function fetchRegionEventsFromHistorical(bounds) {
+  setStatus('Tarihsel katalogdan bölge filtreleniyor…');
+  const magMin = document.getElementById('regionMagMin').value;
+  const magMax = document.getElementById('regionMagMax').value;
+  const depMin = document.getElementById('regionDepMin').value;
+  const depMax = document.getElementById('regionDepMax').value;
+  const poly = regionIsPolygon && regionRect ? regionRect.getLatLngs()[0] : null;
+
+  let evs = events.filter(e =>
+    e.lat >= bounds.getSouth() && e.lat <= bounds.getNorth() &&
+    e.lon >= bounds.getWest()  && e.lon <= bounds.getEast() &&
+    (!magMin || (e.mw??e.mag) >= +magMin) && (!magMax || (e.mw??e.mag) <= +magMax) &&
+    (!depMin || e.dep >= +depMin) && (!depMax || e.dep <= +depMax) &&
+    (!poly || pointInPolygon(e.lat, e.lon, poly))
+  );
+
+  regionEvents = evs; // TAM küme — limit/cap yok, Mc/b tüm yüzyılı yansıtır
+  if (regionLayer) map.removeLayer(regionLayer);
+  regionLayer = L.layerGroup();
+  const visibleSample = timeBalancedSample(evs, VISUAL_SAMPLE_CAP); // sadece GÖRSEL çizim örneklenir
+  visibleSample.forEach(e => {
+    const mVal = e.mw ?? e.mag;
+    L.circleMarker([e.lat, e.lon], {
+      radius: 3.5, color:'#38bdf8', weight:1, fillColor:'#0ea5e9', fillOpacity:.7
+    }).bindPopup(
+      `<b style="color:#38bdf8">Mw ${mVal.toFixed(1)}</b>` +
+      `<br><span style="color:#aaa">${e.place||'—'}</span>` +
+      `<br>Depth: ${e.dep.toFixed(0)} km` +
+      `<br><span style="color:#666">${dfmt(e.time)}</span>`
+    ).addTo(regionLayer);
+  });
+  regionLayer.addTo(map);
+  regionCapped = false; // yerel filtreleme sınırsız
+  regionOrderUsed = 'time'; // yanlılık yok — TÜM eşleşenler alındı, "en büyük" bloğu tetiklenmez
+  regionWindowStart = historicalCache ? new Date(historicalCache.starttime) : null;
+  regionWindowEnd   = historicalCache ? new Date(historicalCache.endtime)   : null;
+  const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
+  setStatus(`Bölgede ${evs.length} deprem — Tarihsel Katalog TAMAMI, limit yok${sampleNote}`);
+  renderRegionInfo();
+  if (showTimeMag) renderTimeMag(regionEvents);
+}
+
 async function fetchRegionEvents(bounds) {
+  if (historicalMode) return fetchRegionEventsFromHistorical(bounds);
   setStatus('Bölgedeki küçük depremler getiriliyor…');
   const limit   = +document.getElementById('regionLimit').value || 500;
   const orderby = document.getElementById('regionOrder').value === 'magnitude' ? 'magnitude' : 'time';
