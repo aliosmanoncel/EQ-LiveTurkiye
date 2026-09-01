@@ -154,7 +154,7 @@
     <input id="regionDepMax" type="number" step="1" placeholder="max" onchange="reapplyRegionQuery()" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
   </div>
   <button class="tbtn" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
-  <div id="regionInfo" style="font-size:.65rem;color:#888;line-height:1.4;background:rgba(20,20,20,.9);border-radius:5px;padding:4px 6px"></div>
+  <div id="regionInfo" style="font-size:.65rem;color:#888;line-height:1.5;background:rgba(20,20,20,.9);border-radius:5px;padding:4px 6px;width:230px"></div>
 </div>
 
 <!-- SON BÜYÜK DEPREM KARTI -->
@@ -1532,6 +1532,25 @@ let regionRect   = null;  // L.Rectangle — kilitli bölge
 let regionLayer  = null;  // L.LayerGroup — bölgeye özel küçük depremler
 let regionActive = false; // sürükleme modu açık mı
 let regionStart  = null;  // sürükleme başlangıç LatLng
+let regionEvents = [];    // ham EMSC olayları (Mc/b istatistiği için)
+
+/* Bölgeye özel Mc/b istatistiği — mevcut computeMc()/computeBvalue()
+   (Time-Mag panelinde kullanılan aynı fonksiyonlar) bölge kümesine uygulanır.
+   ÖNEMLİ: "En büyük" sıralaması + limite takılma, örneklemi büyük depremlere
+   doğru yanlı hale getirir (küçük depremler dışarıda kalır) — bu durumda
+   Mc/b sonucu istatistiksel olarak GÜVENİLMEZ, kullanıcıya açıkça belirtilir. */
+function computeRegionStatsLine(evs, orderby, capped) {
+  if (evs.length < 10) return `Mc/b: N=${evs.length} (min. 10 olay gerekir)`;
+  if (orderby === 'magnitude') return `Mc/b: hesaplanmadı — "En büyük" sıralamasında örneklem yanlı (küçük depremler dışlanmış)`;
+  const mags = evs.map(e => e.mag);
+  const Mc = computeMc(evs);
+  if (Mc === null) return `Mc/b: hesaplanamadı`;
+  const b = computeBvalue(mags, Mc);
+  const nAbove = mags.filter(m => m >= Mc).length;
+  let line = `Mc = <b>${Mc.toFixed(1)}</b> (Maximum Curvature) · b = <b>${b!==null ? b.toFixed(2) : '—'}</b> · N(M≥Mc) = ${nAbove}`;
+  if (capped) line += ` <span style="color:#f59e0b">⚠ limite takıldı, Mc/b düşük olabilir</span>`;
+  return line;
+}
 
 function regionSelectStart() {
   regionDeselect();
@@ -1589,6 +1608,7 @@ async function fetchRegionEvents(bounds) {
   try {
     const res = await fetchTimeout(url, {}, 10000);
     const evs = parseEMSCText(await res.text());
+    regionEvents = evs; // bölge-özel Mc/b istatistiği için sakla
     if (regionLayer) map.removeLayer(regionLayer);
     regionLayer = L.layerGroup();
     evs.forEach(e => {
@@ -1620,6 +1640,8 @@ async function fetchRegionEvents(bounds) {
         const times = evs.map(e => e.time.getTime());
         line += `<br>Gösterilen: ${dfmt(new Date(Math.min(...times)))} – ${dfmt(new Date(Math.max(...times)))} (${evs.length} deprem)`;
       }
+      line += `<br>Bölge: ${bounds.getSouth().toFixed(2)},${bounds.getWest().toFixed(2)} – ${bounds.getNorth().toFixed(2)},${bounds.getEast().toFixed(2)}`;
+      line += `<br>${computeRegionStatsLine(evs, orderby, capped)}`;
       info.innerHTML = line;
     }
     syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
@@ -1681,6 +1703,7 @@ function regionDeselect() {
   map.dragging.enable();
   map.getContainer().style.cursor = '';
   regionActive = false;
+  regionEvents = [];
   document.getElementById('btnRegionSelect').classList.remove('active');
   setStatus('');
   const info = document.getElementById('regionInfo');
