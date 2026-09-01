@@ -124,6 +124,12 @@
 <!-- BÖLGE SEÇ — sürükleyip bölge kilitle, o bölgedeki küçük depremleri getir -->
 <div class="regionCtrl">
   <button class="tbtn" id="btnRegionSelect" onclick="regionSelectStart()" title="Basılı tutup haritada sürükleyin">🔲 Bölge Seç</button>
+  <button class="tbtn" id="btnPolygonSelect" onclick="polygonSelectStart()" title="Haritada nokta nokta tıklayarak çokgen çizin (düzensiz kıyı/kuşak şekilleri için)">🔷 Poligon Seç</button>
+  <div id="polygonDrawCtrl" style="display:none;gap:4px;flex-wrap:wrap">
+    <button class="tbtn" style="width:auto;padding:4px 6px;font-size:.68rem" onclick="polygonUndo()" title="Son noktayı sil">↩ Geri Al</button>
+    <button class="tbtn" style="width:auto;padding:4px 6px;font-size:.68rem" onclick="polygonFinish()" title="Poligonu kilitle ve sorgula">✓ Bitir</button>
+    <button class="tbtn" style="width:auto;padding:4px 6px;font-size:.68rem" onclick="polygonCancel()" title="Çizimi iptal et">✕ İptal</button>
+  </div>
   <button class="tbtn" id="btnRegionClear" onclick="regionDeselect()">✕ Bölgeyi Kaldır</button>
   <div style="display:flex;gap:4px;align-items:center;background:rgba(20,20,20,.9);border-radius:5px;padding:3px 6px">
     <label style="font-size:.68rem;color:#888;white-space:nowrap">Limit</label>
@@ -1661,7 +1667,7 @@ map.on('moveend', updateEqList);
    (mevcut minMag eşiğinden bağımsız, minmagnitude=0) küçük depremleri getir.
    IRIS Interactive Earthquake Browser'daki "Select/Deselect Region" modeli.
 ══════════════════════════════════════════ */
-let regionRect   = null;  // L.Rectangle — kilitli bölge
+let regionRect   = null;  // L.Rectangle VEYA L.Polygon — kilitli bölge (ikisi de .getBounds() destekler)
 let regionLayer  = null;  // L.LayerGroup — bölgeye özel küçük depremler
 let regionActive = false; // sürükleme modu açık mı
 let regionStart  = null;  // sürükleme başlangıç LatLng
@@ -1669,6 +1675,13 @@ let regionEvents = [];      // ham EMSC olayları (Mc/b istatistiği için)
 let regionCapped  = false;  // son sorgu limite takıldı mı
 let regionOrderUsed = 'time';
 let regionWindowStart = null, regionWindowEnd = null;
+let regionIsPolygon = false; // true ise regionRect aslında bir L.Polygon — fetchRegionEvents ek point-in-polygon filtresi uygular
+
+// Poligon çizim durumu (nokta nokta tıklama modu)
+let polygonActive  = false;
+let polygonPoints  = [];
+let polygonPreview = null; // L.Polyline — çizilirken önizleme
+let polygonMarkers = [];   // köşe noktası işaretleri
 
 /* Bölgeye özel Mc/b istatistiği — mevcut computeMc()/computeBvalue()
    (Time-Mag panelinde kullanılan aynı fonksiyonlar) bölge kümesine uygulanır.
@@ -1728,6 +1741,7 @@ function renderRegionInfo() {
     line += `<br>Gösterilen: ${dfmt(new Date(Math.min(...times)))} – ${dfmt(new Date(Math.max(...times)))} (${regionEvents.length} deprem)`;
   }
   line += `<br>Bölge: ${bounds.getSouth().toFixed(2)},${bounds.getWest().toFixed(2)} – ${bounds.getNorth().toFixed(2)},${bounds.getEast().toFixed(2)}`;
+  if (regionIsPolygon) line += ` (poligon, ${regionRect.getLatLngs()[0].length} köşe — sınırlar kapsayan dikdörtgen)`;
   line += `<br>${computeRegionStatsLine(regionEvents, regionOrderUsed, regionCapped)}`;
   info.innerHTML = line;
 }
@@ -1739,6 +1753,92 @@ function regionSelectStart() {
   map.getContainer().style.cursor = 'crosshair';
   document.getElementById('btnRegionSelect').classList.add('active');
   setStatus('Bölge seçmek için haritada basılı tutup sürükleyin');
+}
+
+/* ══════════════════════════════════════════
+   POLİGON SEÇ — nokta nokta tıklayarak çokgen çizme
+   EMSC API poligon sorgusu desteklemiyor: poligonun kapsayan dikdörtgeni
+   (bounding box) ile veri çekilir, sonra istemci tarafında point-in-polygon
+   testiyle gerçek poligon içine filtrelenir (bkz. fetchRegionEvents).
+══════════════════════════════════════════ */
+function polygonSelectStart() {
+  regionDeselect();
+  polygonActive = true;
+  polygonPoints = [];
+  map.dragging.disable();
+  map.getContainer().style.cursor = 'crosshair';
+  document.getElementById('btnPolygonSelect').classList.add('active');
+  document.getElementById('polygonDrawCtrl').style.display = 'flex';
+  setStatus('Poligon çizmek için haritada nokta nokta tıklayın, bitince "✓ Bitir"e basın (en az 3 nokta)');
+  map.on('click', polygonMapClick);
+}
+
+function polygonMapClick(ev) {
+  if (!polygonActive) return;
+  polygonPoints.push(ev.latlng);
+  const dot = L.circleMarker(ev.latlng, { radius:4, color:'#06b6d4', fillColor:'#06b6d4', fillOpacity:1, weight:1.5 }).addTo(map);
+  polygonMarkers.push(dot);
+  redrawPolygonPreview();
+}
+
+function redrawPolygonPreview() {
+  if (polygonPreview) { map.removeLayer(polygonPreview); polygonPreview = null; }
+  if (polygonPoints.length < 2) return;
+  polygonPreview = L.polyline(polygonPoints, { color:'#06b6d4', weight:2, dashArray:'4' }).addTo(map);
+}
+
+function polygonUndo() {
+  if (!polygonPoints.length) return;
+  polygonPoints.pop();
+  const m = polygonMarkers.pop();
+  if (m) map.removeLayer(m);
+  redrawPolygonPreview();
+}
+
+function polygonCancel() {
+  polygonActive = false;
+  map.off('click', polygonMapClick);
+  map.dragging.enable();
+  map.getContainer().style.cursor = '';
+  document.getElementById('btnPolygonSelect').classList.remove('active');
+  document.getElementById('polygonDrawCtrl').style.display = 'none';
+  if (polygonPreview) { map.removeLayer(polygonPreview); polygonPreview = null; }
+  polygonMarkers.forEach(m => map.removeLayer(m));
+  polygonMarkers = [];
+  polygonPoints = [];
+  setStatus('');
+}
+
+async function polygonFinish() {
+  if (polygonPoints.length < 3) { setStatus('Poligon için en az 3 nokta gerekir', true); return; }
+  map.off('click', polygonMapClick);
+  polygonActive = false;
+  map.dragging.enable();
+  map.getContainer().style.cursor = '';
+  document.getElementById('btnPolygonSelect').classList.remove('active');
+  document.getElementById('polygonDrawCtrl').style.display = 'none';
+  if (polygonPreview) { map.removeLayer(polygonPreview); polygonPreview = null; }
+  polygonMarkers.forEach(m => map.removeLayer(m));
+  polygonMarkers = [];
+
+  const pts = polygonPoints.slice();
+  polygonPoints = [];
+  regionIsPolygon = true;
+  regionRect = L.polygon(pts, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+  await fetchRegionEvents(regionRect.getBounds());
+}
+
+// Ray-casting point-in-polygon testi — standart algoritma
+function pointInPolygon(lat, lon, latlngs) {
+  let inside = false;
+  for (let i = 0, j = latlngs.length - 1; i < latlngs.length; j = i++) {
+    const yi = latlngs[i].lat, xi = latlngs[i].lng;
+    const yj = latlngs[j].lat, xj = latlngs[j].lng;
+    const intersect = ((yi > lat) !== (yj > lat)) &&
+      (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
 }
 
 function regionMouseDown(ev) {
@@ -1787,7 +1887,12 @@ async function fetchRegionEvents(bounds) {
     + `&limit=${limit}&orderby=${orderby}`;
   try {
     const res = await fetchTimeout(url, {}, 10000);
-    const evs = parseEMSCText(await res.text());
+    let evs = parseEMSCText(await res.text());
+    const rawCount = evs.length; // limite takılma DURUMU, poligon filtresinden ÖNCEKİ ham bbox sonucuna göre belirlenir
+    if (regionIsPolygon && regionRect) {
+      const poly = regionRect.getLatLngs()[0];
+      evs = evs.filter(e => pointInPolygon(e.lat, e.lon, poly));
+    }
     regionEvents = evs; // bölge-özel Mc/b istatistiği için sakla
     if (regionLayer) map.removeLayer(regionLayer);
     regionLayer = L.layerGroup();
@@ -1802,14 +1907,15 @@ async function fetchRegionEvents(bounds) {
       ).addTo(regionLayer);
     });
     regionLayer.addTo(map);
-    regionCapped = evs.length >= limit;
+    regionCapped = rawCount >= limit; // ham bbox sonucu limite takıldıysa, poligon-sonrası sayı küçük olsa bile uyar
     regionOrderUsed = orderby;
     regionWindowStart = s;
     regionWindowEnd = now;
     const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
+    const shapeLabel = regionIsPolygon ? `poligon (${evs.length}/${rawCount} bbox içinde)` : `${evs.length}`;
     setStatus(regionCapped
-      ? `Bölgede ${evs.length}+ deprem — ilk ${limit} (${orderLabel}) gösteriliyor · limiti artırabilirsiniz`
-      : `Bölgede ${evs.length} deprem gösteriliyor`);
+      ? `Bölgede ${shapeLabel} deprem — bbox ilk ${limit} (${orderLabel}) gösteriliyor · limiti artırabilirsiniz`
+      : `Bölgede ${shapeLabel} deprem gösteriliyor`);
     renderRegionInfo();
     if (showTimeMag) renderTimeMag(regionEvents); // panel açıksa bölge verisiyle anında güncelle
     syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
@@ -1873,6 +1979,7 @@ function regionDeselect() {
   regionActive = false;
   regionEvents = [];
   regionCapped = false;
+  regionIsPolygon = false;
   regionWindowStart = regionWindowEnd = null;
   document.getElementById('btnRegionSelect').classList.remove('active');
   document.getElementById('regionMcOverride').value = '';
@@ -1881,6 +1988,18 @@ function regionDeselect() {
   if (info) info.innerHTML = '';
   clearRegionURL();
   if (showTimeMag) renderTimeMag([...events, ...liveEvents]); // Time-Mag paneli açıksa anında global veriye dönsün
+
+  // Yarım kalmış bir poligon çizimi varsa onu da temizle
+  polygonActive = false;
+  map.off('click', polygonMapClick);
+  if (polygonPreview) { map.removeLayer(polygonPreview); polygonPreview = null; }
+  polygonMarkers.forEach(m => map.removeLayer(m));
+  polygonMarkers = [];
+  polygonPoints = [];
+  const btnPoly = document.getElementById('btnPolygonSelect');
+  if (btnPoly) btnPoly.classList.remove('active');
+  const polyCtrl = document.getElementById('polygonDrawCtrl');
+  if (polyCtrl) polyCtrl.style.display = 'none';
 }
 
 // Limit/Sırala değiştirildiğinde, zaten çizili bölge varsa onu yeni ayarla
