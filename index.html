@@ -95,6 +95,10 @@
     .eqlist-row .time{color:#aaa;font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .eqlist-empty{padding:10px 11px;color:#555;font-size:.72rem}
 
+    /* ── BÖLGE SEÇ (sürükleyip bölge kilitleme — küçük depremleri getirme) ── */
+    .regionCtrl{position:fixed;top:10px;left:260px;z-index:999;display:flex;flex-direction:column;gap:4px}
+    .regionCtrl .tbtn{background:rgba(20,20,20,.9);width:150px;text-align:left}
+
     /* ── NEW EQ FLASH ── */
     @keyframes flashNew{0%{opacity:1;transform:scale(1.6)}100%{opacity:.7;transform:scale(1)}}
     .new-eq{animation:flashNew .6s ease-out}
@@ -116,6 +120,12 @@
 <body>
 
 <div id="map"></div>
+
+<!-- BÖLGE SEÇ — sürükleyip bölge kilitle, o bölgedeki küçük depremleri getir -->
+<div class="regionCtrl">
+  <button class="tbtn" id="btnRegionSelect" onclick="regionSelectStart()" title="Basılı tutup haritada sürükleyin">🔲 Bölge Seç</button>
+  <button class="tbtn" id="btnRegionClear" onclick="regionDeselect()">✕ Bölgeyi Kaldır</button>
+</div>
 
 <!-- SON BÜYÜK DEPREM KARTI -->
 <div id="lastCard" style="display:none">
@@ -1347,6 +1357,89 @@ function focusEq(idx) {
 }
 
 map.on('moveend', updateEqList);
+
+/* ══════════════════════════════════════════
+   BÖLGE SEÇ — sürükleyip bölge kilitle, o bölgeye özel EMSC sorgusuyla
+   (mevcut minMag eşiğinden bağımsız, minmagnitude=0) küçük depremleri getir.
+   IRIS Interactive Earthquake Browser'daki "Select/Deselect Region" modeli.
+══════════════════════════════════════════ */
+let regionRect   = null;  // L.Rectangle — kilitli bölge
+let regionLayer  = null;  // L.LayerGroup — bölgeye özel küçük depremler
+let regionActive = false; // sürükleme modu açık mı
+let regionStart  = null;  // sürükleme başlangıç LatLng
+
+function regionSelectStart() {
+  regionDeselect();
+  regionActive = true;
+  map.dragging.disable();
+  map.getContainer().style.cursor = 'crosshair';
+  document.getElementById('btnRegionSelect').classList.add('active');
+  setStatus('Bölge seçmek için haritada basılı tutup sürükleyin');
+}
+
+function regionMouseDown(ev) {
+  if (!regionActive) return;
+  regionStart = ev.latlng;
+  regionRect = L.rectangle([regionStart, regionStart], { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+  map.on('mousemove', regionMouseMove);
+}
+function regionMouseMove(ev) {
+  if (!regionRect || !regionStart) return;
+  regionRect.setBounds(L.latLngBounds(regionStart, ev.latlng));
+}
+async function regionMouseUp() {
+  if (!regionActive || !regionRect) return;
+  map.off('mousemove', regionMouseMove);
+  map.dragging.enable();
+  map.getContainer().style.cursor = '';
+  regionActive = false;
+  document.getElementById('btnRegionSelect').classList.remove('active');
+  const b = regionRect.getBounds();
+  if (b.getNorth() === b.getSouth() || b.getEast() === b.getWest()) { regionDeselect(); return; } // tıklama, sürükleme değil
+  await fetchRegionEvents(b);
+}
+map.on('mousedown', regionMouseDown);
+map.on('mouseup', regionMouseUp);
+
+async function fetchRegionEvents(bounds) {
+  setStatus('Bölgedeki küçük depremler getiriliyor…');
+  const now = new Date(), s = new Date(now - hours*3600000);
+  const fmt = d => d.toISOString().slice(0,19);
+  const url = `https://www.seismicportal.eu/fdsnws/event/1/query?format=text`
+    + `&minlat=${bounds.getSouth().toFixed(3)}&maxlat=${bounds.getNorth().toFixed(3)}`
+    + `&minlon=${bounds.getWest().toFixed(3)}&maxlon=${bounds.getEast().toFixed(3)}`
+    + `&starttime=${fmt(s)}&endtime=${fmt(now)}&minmagnitude=0&limit=2000&orderby=time`;
+  try {
+    const res = await fetchTimeout(url, {}, 10000);
+    const evs = parseEMSCText(await res.text());
+    if (regionLayer) map.removeLayer(regionLayer);
+    regionLayer = L.layerGroup();
+    evs.forEach(e => {
+      L.circleMarker([e.lat, e.lon], {
+        radius: 3.5, color:'#38bdf8', weight:1, fillColor:'#0ea5e9', fillOpacity:.7
+      }).bindPopup(
+        `<b style="color:#38bdf8">M ${e.mag.toFixed(1)}</b>` +
+        `<br><span style="color:#aaa">${e.place||'EMSC Region'}</span>` +
+        `<br>Depth: ${e.dep.toFixed(0)} km`
+      ).addTo(regionLayer);
+    });
+    regionLayer.addTo(map);
+    setStatus(`Bölgede ${evs.length} deprem (küçükler dahil · seçili zaman penceresi)`);
+  } catch(err) {
+    setStatus(`Bölge sorgusu hatası: ${err.message}`, true);
+  }
+}
+
+function regionDeselect() {
+  if (regionRect)  { map.removeLayer(regionRect);  regionRect  = null; }
+  if (regionLayer) { map.removeLayer(regionLayer); regionLayer = null; }
+  map.off('mousemove', regionMouseMove);
+  map.dragging.enable();
+  map.getContainer().style.cursor = '';
+  regionActive = false;
+  document.getElementById('btnRegionSelect').classList.remove('active');
+  setStatus('');
+}
 
 /* ══════════════════════════════════════════
    BUTONLAR
