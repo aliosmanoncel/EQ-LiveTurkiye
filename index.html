@@ -491,6 +491,7 @@
     <button class="tbtn"        id="btnPlates"  onclick="toggleLayer('plates')"  title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
     <button class="tbtn"        id="btnGAF"     onclick="toggleLayer('gaf')"     title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
     <button class="tbtn"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
+    <button class="tbtn"        id="btnShakeGediz" onclick="toggleLayer('shakegediz')" title="1970 Gediz M7.3 · USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer color-relief regrid, pilot katman">🟪 Şiddet: 1970 Gediz</button>
   </div>
 
   <!-- 🗣️ Tanıklık Sayısı — Tanıklıklar butonunun (yukarıdaki satırda) hemen altında,
@@ -642,6 +643,8 @@ const BVALUE_META_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-L
 let bvalueMethod = 'fc'; // 'fc' = Fixed Circle | 'fn' = Fixed Number
 const FRACTAL_PNG_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation.png';
 const FRACTAL_META_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation_meta.json';
+const SHAKE_GEDIZ_PNG_URL  = 'data/shakemap_1970_gediz.png';
+const SHAKE_GEDIZ_META_URL = 'data/shakemap_1970_gediz_meta.json';
 const FORECAST_PNG_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_forecast.png';
 const FORECAST_META_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_forecast_meta.json';
 const FORECAST_TEST_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/forecast_test_events.json';
@@ -690,6 +693,8 @@ const topoShade = L.tileLayer(
 let showTopo    = false;
 let showFractal = false;
 let fractalLayer = null;
+let showShakeGediz = false;
+let shakeGedizLayer = null;
 
 let showForecast    = false;
 let forecastBgLayer = null;
@@ -2096,6 +2101,14 @@ function toggleLayer(type) {
       if (showMarForecast) { marFcBgLayer.addTo(map); marFcDotLayer.addTo(map); }
       else { map.removeLayer(marFcBgLayer); map.removeLayer(marFcDotLayer); }
     }
+  } else if (type === 'shakegediz') {
+    showShakeGediz = !showShakeGediz;
+    document.getElementById('btnShakeGediz').classList.toggle('active', showShakeGediz);
+    if (!shakeGedizLayer) {
+      loadShakeGedizLayer();
+    } else {
+      if (showShakeGediz) shakeGedizLayer.addTo(map); else map.removeLayer(shakeGedizLayer);
+    }
   } else if (type === 'topo') {
     showTopo = !showTopo;
     document.getElementById('btnTopo').classList.toggle('active', showTopo);
@@ -2579,6 +2592,27 @@ async function loadFractalLayer() {
     setStatus(`Fraktal D_c · Grassberger-Procaccia (1983) · ${meta.source_pts} nokta → ${meta.grid_w}×${meta.grid_h} raster · R=100km · N≥50 · mor=kümelenme · sarı=homojen`);
   } catch(e) {
     setStatus('Fraktal load error: ' + e.message, true);
+  }
+}
+
+async function loadShakeGedizLayer() {
+  if (shakeGedizLayer) { if (showShakeGediz) shakeGedizLayer.addTo(map); return; }
+  setStatus('1970 Gediz şiddet haritası yükleniyor…');
+  try {
+    const metaRes = await fetch(SHAKE_GEDIZ_META_URL);
+    if (!metaRes.ok) throw new Error('meta bulunamadı');
+    const meta = await metaRes.json();
+    const b = meta.bounds;
+    shakeGedizLayer = L.imageOverlay(SHAKE_GEDIZ_PNG_URL,
+      [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+      { opacity: 0.75, interactive: false }
+    );
+    if (showShakeGediz) shakeGedizLayer.addTo(map);
+    setStatus(`${meta.event} · ${meta.source} · MMI ${meta.mmi_min}–${meta.mmi_max} · pilot katman`);
+  } catch(e) {
+    setStatus('Şiddet haritası yüklenemedi: ' + e.message, true);
+    showShakeGediz = false;
+    document.getElementById('btnShakeGediz').classList.remove('active');
   }
 }
 

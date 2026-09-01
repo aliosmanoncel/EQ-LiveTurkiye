@@ -1,0 +1,10 @@
+{
+  "event": "1970-03-28 Gediz M7.3",
+  "source": "USGS ShakeMap (tarihsel/sentetik MMI modeli) + Surfer color-relief regrid (yalnizca gorsellestirme cozunurlugu artirildi, veri kaynagi degismedi)",
+  "z_field": "MMI",
+  "mmi_min": 2.6,
+  "mmi_max": 7.8,
+  "bounds": { "minlat": 38, "maxlat": 40, "minlon": 28, "maxlon": 32 },
+  "grid_points": 160056,
+  "note": "Renk skalasi Surfer varsayilan mavi->kirmizi rainbow; deger yerini gostermez, sadece bagil siddet."
+}
