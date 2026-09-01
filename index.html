@@ -411,6 +411,21 @@
 
   <div class="sep"></div>
 
+  <!-- Tarihsel Katalog — data/eq_historical.json (ISC+EMSC birleşik, 1900-01-01 – 2026-06-22).
+       Yukarıdaki 1s/24s/1Hafta/1Ay/1Yıl'dan AYRI bir veri modu: loadData()'yı değil
+       loadHistoricalRange()'i kullanır, otomatik canlı yenilemeyi durdurur (aksi halde
+       1 saat sonra sessizce üstüne yazılır). fTimeStart/fTimeEnd "analiz penceresi"
+       filtresi bu geniş veri kümesinin üzerine aynen uygulanmaya devam eder. -->
+  <div style="display:flex;gap:4px;align-items:center">
+    <span style="font-size:.72rem;color:#888;white-space:nowrap">Tarihsel:</span>
+    <button class="tbtn" data-hist="2000" onclick="loadHistoricalRange(2000)" title="Tarihsel katalog: 1900-01-01 – 2026-06-22 (ISC+EMSC) · bu buton 2000'den itibaren gösterir">2000–2026</button>
+    <button class="tbtn" data-hist="1990" onclick="loadHistoricalRange(1990)" title="Tarihsel katalog: 1900-01-01 – 2026-06-22 (ISC+EMSC) · bu buton 1990'dan itibaren gösterir">1990–2026</button>
+    <button class="tbtn" data-hist="1900" onclick="loadHistoricalRange(1900)" title="Tarihsel katalog: 1900-01-01 – 2026-06-22 (ISC+EMSC) · tüm katalog">1900–2026</button>
+  </div>
+  <div id="histHint" style="font-size:10px;color:#888;margin-top:2px;letter-spacing:0.3px"></div>
+
+  <div class="sep"></div>
+
   <!-- Range Filtreler: Magnitude / Derinlik / Zaman — harita + Görünen Depremler listesi aynı filtrelenmiş kümeyi kullanır -->
   <div class="ctrl">
     <label>Mw</label>
@@ -905,6 +920,24 @@ function resetFilterInputs() {
   renderHeat([...events, ...liveEvents]);
 }
 
+/* Zaman-dengeli görsel örnekleme — N büyükse (Tarihsel Katalog modu, N~84000)
+   marker/popup DOM oluşturma maliyeti tarayıcıyı dondurur (ölçüldü: 25sn).
+   SADECE GÖRSEL çizim için kullanılır: zaman ekseninde eşit aralıklarla
+   seçer, BÜYÜKLÜĞE GÖRE SEÇMEZ — aksi halde Mc/b/G-R görselleştirmesinde
+   örnekleme yanlılığı oluşurdu. Mc/b HESAPLAMALARI her zaman orijinal
+   (örneklenmemiş) evList üzerinden yapılır, bu fonksiyonun çıktısı asla
+   computeMc()/computeBvalue()'ya verilmez.
+══════════════════════════════════════════ */
+const VISUAL_SAMPLE_CAP = 3000;
+function timeBalancedSample(evList, cap) {
+  if (evList.length <= cap) return evList;
+  const sorted = [...evList].sort((a,b) => a.time - b.time);
+  const step = sorted.length / cap;
+  const out = [];
+  for (let i = 0; i < cap; i++) out.push(sorted[Math.floor(i * step)]);
+  return out;
+}
+
 /* ══════════════════════════════════════════
    RENDER
 ══════════════════════════════════════════ */
@@ -944,7 +977,8 @@ function renderHeat(evList) {
 
   markLayer = L.layerGroup();
   eqMarkerList = [];
-  evList.forEach(e=>{
+  const visibleSample = timeBalancedSample(evList, VISUAL_SAMPLE_CAP);
+  visibleSample.forEach(e=>{
     const {c, f, r} = eqColor(e.mw ?? e.mag);
     const ago = agoDuration(Date.now() - e.time.getTime());
     const mwLabel = (e.mtype && e.mtype.toLowerCase() !== 'mw' && e.mw !== e.mag)
@@ -1117,15 +1151,20 @@ function renderTimeMag(evList) {
   // bölge çizdiğinde dışındaki alanların istatistiğini görmesi anlamsız.
   const usingRegion = !!regionRect;
   if (usingRegion) evList = regionEvents;
+  const usingHistorical = historicalMode && !usingRegion;
 
   const srcSel  = document.getElementById('srcSel');
-  const srcName = usingRegion ? 'Bölge' : (srcSel ? srcSel.value : 'emsc').toUpperCase();
-  const winLabel= hours<24 ? hours+'s' : hours===168 ? '1 hafta' : hours/24+'g';
+  const srcName = usingRegion ? 'Bölge' : usingHistorical ? 'Tarihsel Katalog' : (srcSel ? srcSel.value : 'emsc').toUpperCase();
+  const winLabel= usingHistorical
+    ? `${new Date(Date.now() - hours*3600000).getFullYear()}–${new Date().getFullYear()}`
+    : hours<24 ? hours+'s' : hours===168 ? '1 hafta' : hours/24+'g';
+  const sampleNote = evList.length > VISUAL_SAMPLE_CAP
+    ? ` · Görsel: ${VISUAL_SAMPLE_CAP} olay örnekleniyor, Hesaplamalar: ${evList.length} olay` : '';
 
   if (!evList.length) {
     svg.innerHTML = '';
-    metaEl.textContent = usingRegion ? `${srcName} · ${winLabel} · N=0` : `${srcName} · ${winLabel} · M≥${minMag} · N=0`;
-    statsEl.textContent = usingRegion ? 'Seçili bölgede veri yok' : 'Seçili pencerede veri yok';
+    metaEl.textContent = (usingRegion || usingHistorical) ? `${srcName} · ${winLabel} · N=0` : `${srcName} · ${winLabel} · M≥${minMag} · N=0`;
+    statsEl.textContent = usingRegion ? 'Seçili bölgede veri yok' : usingHistorical ? 'Seçili aralıkta veri yok' : 'Seçili pencerede veri yok';
     return;
   }
 
@@ -1143,8 +1182,12 @@ function renderTimeMag(evList) {
   const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
   const y = m => PAD_T + plotH - ((m-magMin)/(magMax-magMin)) * plotH;
 
+  // SVG çizimi örneklenir (performans) — Mc (yukarıda) ve b-değeri (aşağıda
+  // renderBvalueTS) HER ZAMAN tam evList üzerinden hesaplanır, bu örneklemeden
+  // etkilenmez.
+  const dotSample = timeBalancedSample(evList, VISUAL_SAMPLE_CAP);
   let dots = '';
-  evList.forEach(e => {
+  dotSample.forEach(e => {
     const m = e.mw ?? e.mag;
     const t = e.time.getTime();
     const r = 2 + m*1.6;
@@ -1178,7 +1221,9 @@ function renderTimeMag(evList) {
     <text x="${W-PAD_R}" y="${H-6}" fill="#888" font-size="9" text-anchor="end">${fmt(t1)}</text>
   `;
 
-  metaEl.textContent = usingRegion ? `${srcName} · ${winLabel} · N=${evList.length}` : `${srcName} · ${winLabel} · M≥${minMag} · N=${evList.length}`;
+  metaEl.textContent = (usingRegion || usingHistorical)
+    ? `${srcName} · ${winLabel} · N=${evList.length}${sampleNote}`
+    : `${srcName} · ${winLabel} · M≥${minMag} · N=${evList.length}${sampleNote}`;
   const mMax = Math.max(...mags).toFixed(1);
   statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>`;
 
@@ -1288,6 +1333,7 @@ function scheduleRetry(sourceName, h) {
 // Bağlantı geri geldiğinde / sekme öne alındığında beklemeden dene
 function retryNow() {
   if (!retryTimer) return;              // bekleyen deneme yoksa dokunma
+  if (historicalMode) return;           // Tarihsel Katalog modundayken normal veriyle üzerine yazma
   cancelRetry();
   loadData(src, hours);
 }
@@ -1383,6 +1429,75 @@ async function loadData(sourceName, h) {
     }
   }
   scheduleRetry(sourceName, h);
+}
+
+/* ══════════════════════════════════════════
+   TARİHSEL KATALOG — data/eq_historical.json (ISC+EMSC birleşik)
+   1900-01-01 – 2026-06-22 · 83.918 olay · Türkiye+çevresi bbox
+   1s/24s/1Hafta/1Ay/1Yıl'dan AYRI bir mod: statik dosya bir kez indirilip
+   önbelleğe alınır (14MB), starttime'dan itibaren filtrelenip mevcut
+   events/renderHeat/renderTimeMag pipeline'ına aynen bağlanır — analiz
+   fonksiyonları (computeMc/computeBvalue) YENİDEN YAZILMADI.
+══════════════════════════════════════════ */
+let historicalMode  = false;
+let historicalCache = null; // { events, completeness, starttime, endtime, source } — bir kez indirilir
+
+async function loadHistoricalRange(startYear) {
+  cancelRetry();
+  const seq = ++loadSeq;
+  const stale = () => seq !== loadSeq;
+
+  historicalMode = true;
+  if (cntTimer) clearInterval(cntTimer); // otomatik canlı yenileme DURUR — aksi halde 1sa sonra sessizce üstüne yazılır
+
+  document.querySelectorAll('.tbtn[data-h]').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tbtn[data-hist]').forEach(x => x.classList.toggle('active', +x.dataset.hist === startYear));
+
+  setStatus('Tarihsel katalog yükleniyor (14MB, ilk seferde biraz sürebilir)…');
+  try {
+    if (!historicalCache) {
+      const res = await fetchTimeout('data/eq_historical.json', {}, 30000);
+      if (stale()) return;
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      historicalCache = await res.json();
+      if (stale()) return;
+    }
+    const cat   = historicalCache;
+    const start = new Date(`${startYear}-01-01T00:00:00Z`);
+    const all = (cat.events || [])
+      .map(e => ({
+        lat: e.lat, lon: e.lon, dep: e.dep || 0, mag: e.mag || 0,
+        mw: e.mw || e.mag || 0, mtype: e.mtype || 'mw',
+        place: e.place || '', province: '', district: '',
+        time: new Date(e.time)
+      }))
+      .filter(e => e.time >= start && e.mag > 0);
+
+    if (all.length === 0) throw new Error('Seçili tarih aralığında veri yok');
+
+    events = all;
+    minMag = 0; // eşiği tarihsel katalog belirliyor (bkz. completeness), sabit bir minMag dayatmıyoruz
+    hours  = Math.ceil((Date.now() - start.getTime()) / 3600000); // Time-Mag x-ekseni + Bölge Seç penceresi tutarlı kalsın
+    const autoR = 100; // çok geniş zaman aralığı → Macro
+    if (autoR !== activeR) setHeatRadius(autoR, true);
+
+    const combined = [...events, ...liveEvents];
+    renderHeat(combined);
+    updateStats(combined);
+    renderTimeMag(combined);
+    reapplyRegionQuery(); // bölge seçiliyse aynı geniş pencereyle yeniden sorgulasın
+
+    const hint = document.getElementById('histHint');
+    if (hint) {
+      const compLine = (cat.completeness || []).map(c => `${c.period}: Mc≈${c.Mc}`).join(' · ');
+      hint.textContent = `Katalog completeness (${cat.source || 'ISC+EMSC'}): ${compLine} — bu, aşağıdaki hesaplanan Mc ile AYNI şey değildir`;
+    }
+    setStatus(`${all.length} deprem · Tarihsel katalog (${cat.source || 'ISC+EMSC'}) · ${startYear}–${(cat.endtime || '2026').slice(0,4)} · katalog sonu: ${cat.endtime || '—'}`);
+    retryCount = 0;
+  } catch (err) {
+    if (stale()) return;
+    setStatus(`Tarihsel katalog hatası: ${err.message}`, true);
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -1780,7 +1895,11 @@ function reapplyRegionQuery() {
 ══════════════════════════════════════════ */
 document.querySelectorAll('.tbtn[data-h]').forEach(b=>b.addEventListener('click',function(){
   document.querySelectorAll('.tbtn[data-h]').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tbtn[data-hist]').forEach(x=>x.classList.remove('active'));
   this.classList.add('active');
+  historicalMode = false; // Tarihsel Katalog modundan çıkılıyor
+  const hint = document.getElementById('histHint');
+  if (hint) hint.textContent = '';
   hours  = +this.dataset.h;
   minMag = +this.dataset.mag || 1.0;
   resetTimer(); loadData(src, hours);
