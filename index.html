@@ -551,6 +551,25 @@ const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 ══════════════════════════════════════════ */
 const map = L.map('map', { center:[38,25], zoom:4 });
 
+/* URL ile paylaşılabilir görünüm: ?lat=..&lng=..&zoom=.. varsa haritayı oraya
+   aç, kullanıcı haritayı hareket ettirdikçe URL'i (replaceState ile, geçmişe
+   girmeden) güncel tut — IRIS Seismic Monitor'daki gibi izlenebilir bölge linki. */
+(() => {
+  const p = new URLSearchParams(location.search);
+  const lat = parseFloat(p.get('lat')), lng = parseFloat(p.get('lng')), zoom = parseFloat(p.get('zoom'));
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    map.setView([lat, lng], Number.isFinite(zoom) ? zoom : map.getZoom());
+  }
+  map.on('moveend', () => {
+    const c = map.getCenter();
+    const url = new URL(location.href);
+    url.searchParams.set('lat', c.lat.toFixed(4));
+    url.searchParams.set('lng', c.lng.toFixed(4));
+    url.searchParams.set('zoom', map.getZoom());
+    history.replaceState(null, '', url);
+  });
+})();
+
 const darkBase = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
   { attribution:'© Esri, HERE, Garmin, © OpenStreetMap contributors', maxZoom:16, zIndex:1 }).addTo(map);
