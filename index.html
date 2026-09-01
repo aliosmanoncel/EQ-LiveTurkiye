@@ -346,13 +346,10 @@
         Tanıklıklar <span class="tog" id="lgTestT">▼</span>
       </div>
       <div class="legend-section-body hidden" id="lgTest">
-        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">EMSC "Did You Feel It" · tanıklık sayısı</div>
-        <div><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#6b21a8;border:2px solid #a855f7;vertical-align:middle;margin-right:6px"></span>100+ tanıklık</div>
-        <div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#991b1b;border:1.5px solid #ef4444;vertical-align:middle;margin-right:6px"></span>30–99 tanıklık</div>
-        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7c2d12;border:1.5px solid #f97316;vertical-align:middle;margin-right:6px"></span>10–29 tanıklık</div>
-        <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#713f12;border:1px solid #eab308;vertical-align:middle;margin-right:6px"></span>3–9 tanıklık</div>
-        <div><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#14532d;border:1px solid #22c55e;vertical-align:middle;margin-right:6px"></span>1–2 tanıklık</div>
-        <div style="color:#555;font-size:.65rem;margin-top:4px">seismicportal.eu/testimonies-ws · Bossu et al. (2016)</div>
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">EMSC "Did You Feel It" · tanıklık sayısı (log ölçek, sürekli)</div>
+        <div style="height:8px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#22c55e,#eab308,#f97316,#ef4444,#a855f7)"></div>
+        <div style="display:flex;justify-content:space-between;color:#555;font-size:.68rem"><span>1</span><span>~2000+</span></div>
+        <div style="color:#555;font-size:.65rem;margin-top:4px">seismicportal.eu/testimonies-ws · Bossu et al. (2016) · panelde Min/Max filtresi</div>
       </div>
     </div>
 
@@ -505,6 +502,17 @@
     <button class="tbtn"        id="btnDeltaB" onclick="toggleLayer('deltab')"  title="Katalog Kalite Δb = b(main)-b(all) · Öncel(2026) · 🔵Mavi=artçı baskısı(%9) · ⚫Gri=ana deprem karakterli(%78) · 🟠Turuncu=stres artçısı(%12) · Veri Denetim Laboratuvarı">🔴 Katalog Kalite (Δb)</button>
     <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2030) · Wiemer&Wyss (2002)">📍 Forecast TR</button>
     <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km Mc=2.6 · Öncel&Wyss (2000) · eğitim 1998-2019 → test ML≥3 (2020-2030)">🔬 Marmara FC</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- 🗣️ Tanıklık Sayısı — EMSC'nin kendi #TESTIMONIES Min/Max mantığıyla aynı; minnbtestimonies/maxnbtestimonies API'ye doğrudan gönderilir. Min boş = alt sınır yok, Max boş = üst sınır yok. -->
+  <div class="ctrl">
+    <label>🗣️ Tanıklık</label>
+    <input id="tMin" type="number" min="1" step="1" placeholder="min" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+    <span style="color:#555">–</span>
+    <input id="tMax" type="number" min="1" step="1" placeholder="max" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+    <button class="tbtn" onclick="applyTestimonyRange()">Uygula</button>
   </div>
 
   <div class="sep"></div>
@@ -1643,23 +1651,52 @@ let showTestimony  = false;
    NOT: bkz. dosya başındaki DATA FLOW NOTE — kendi API şemasını kullanır,
    Ana Seismicity range filtrelerinden ve Bölge Seç kontrollerinden bağımsızdır.
 ══════════════════════════════════════════ */
+/* Sürekli renk skalası: log10(n) tabanlı, yeşil→sarı→turuncu→kırmızı→mor.
+   Sabit sınıflar yerine tanıklık sayısı arttıkça renk sürekli ilerler;
+   n=1 yeşile yakın, n≈2000+ mor doygunluğa ulaşır (EMSC'nin kendi haritasına
+   görsel olarak en yakın davranış, ama eşikler EMSC'nin resmi sınıfları
+   değildir — kanıtlanmamış birebir eşleşme iddia edilmiyor). */
+const TESTIMONY_COLOR_STOPS = [
+  { at: 0,    rgb: [34,197,94]  }, // #22c55e yeşil
+  { at: 0.25, rgb: [234,179,8]  }, // #eab308 sarı
+  { at: 0.5,  rgb: [249,115,22] }, // #f97316 turuncu
+  { at: 0.75, rgb: [239,68,68]  }, // #ef4444 kırmızı
+  { at: 1,    rgb: [168,85,247] }  // #a855f7 mor
+];
 function testimonyColor(n) {
-  if (n >= 100) return { c:'#a855f7', f:'#6b21a8', r:14 };
-  if (n >= 30)  return { c:'#ef4444', f:'#991b1b', r:11 };
-  if (n >= 10)  return { c:'#f97316', f:'#7c2d12', r: 8 };
-  if (n >= 3)   return { c:'#eab308', f:'#713f12', r: 6 };
-  return               { c:'#22c55e', f:'#14532d', r: 4 };
+  const t = Math.max(0, Math.min(1, Math.log10(Math.max(1, n)) / Math.log10(2000)));
+  let lo = TESTIMONY_COLOR_STOPS[0], hi = TESTIMONY_COLOR_STOPS[TESTIMONY_COLOR_STOPS.length - 1];
+  for (let i = 0; i < TESTIMONY_COLOR_STOPS.length - 1; i++) {
+    if (t >= TESTIMONY_COLOR_STOPS[i].at && t <= TESTIMONY_COLOR_STOPS[i+1].at) {
+      lo = TESTIMONY_COLOR_STOPS[i]; hi = TESTIMONY_COLOR_STOPS[i+1]; break;
+    }
+  }
+  const span = (hi.at - lo.at) || 1;
+  const lt = (t - lo.at) / span;
+  const rgb = lo.rgb.map((v, i) => Math.round(v + (hi.rgb[i] - v) * lt));
+  const c = `rgb(${rgb.join(',')})`;
+  const f = `rgb(${rgb.map(v => Math.round(v * 0.55)).join(',')})`;
+  const r = 4 + t * 10;
+  return { c, f, r };
+}
+
+function applyTestimonyRange() {
+  if (showTestimony) loadTestimonies();
+  else setStatus('Tanıklık aralığı ayarlandı — göstermek için 🗣️ Tanıklıklar katmanını açın');
 }
 
 async function loadTestimonies() {
   setStatus('Tanıklıklar (hissedilen depremler) getiriliyor…');
+  const minRaw = document.getElementById('tMin').value;
+  const maxRaw = document.getElementById('tMax').value;
+  const min = minRaw ? +minRaw : 1; // API tarafında güvenli varsayılan: en az 1 tanıklık (0-tanıklıklı olay göstermenin anlamı yok)
   const now = new Date(), s = new Date(now - hours*3600000);
   const fmt = d => d.toISOString().slice(0,19);
   const url = `https://www.seismicportal.eu/testimonies-ws/api/search`
     + `?minlat=${TURKEY.minLat}&maxlat=${TURKEY.maxLat}`
     + `&minlon=${TURKEY.minLon}&maxlon=${TURKEY.maxLon}`
     + `&starttime=${fmt(s)}&endtime=${fmt(now)}`
-    + `&minnbtestimonies=1&limit=500&format=json&orderby=time`;
+    + `&minnbtestimonies=${min}${maxRaw ? `&maxnbtestimonies=${maxRaw}` : ''}&limit=500&format=json&orderby=time`;
   try {
     const res = await fetchTimeout(url, {}, 10000);
     const evs = await res.json();
