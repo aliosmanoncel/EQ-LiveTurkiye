@@ -505,7 +505,11 @@
     <button class="tbtn"        id="btnPlates"  onclick="toggleLayer('plates')"  title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
     <button class="tbtn"        id="btnGAF"     onclick="toggleLayer('gaf')"     title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
     <button class="tbtn"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
-    <button class="tbtn"        id="btnShakeGediz" onclick="toggleLayer('shakegediz')" title="1970 Gediz M7.3 · USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer color-relief regrid, pilot katman">🟪 Şiddet: 1970 Gediz</button>
+    <span style="color:#888;font-size:.75rem;align-self:center;margin-left:6px">🟪 Tarihi Şiddet (MMI):</span>
+    <button class="tbtn shakebtn" data-shake="murefte1912"   onclick="toggleShakeLayer('murefte1912')"   style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1912 Mürefte</button>
+    <button class="tbtn shakebtn" data-shake="yenice1953"    onclick="toggleShakeLayer('yenice1953')"    style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1953 Yenice</button>
+    <button class="tbtn shakebtn" data-shake="adapazari1963" onclick="toggleShakeLayer('adapazari1963')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1963 Adapazarı</button>
+    <button class="tbtn shakebtn" data-shake="gediz1970"     onclick="toggleShakeLayer('gediz1970')"     style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1970 Gediz</button>
   </div>
 
   <!-- 🗣️ Tanıklık Sayısı — Tanıklıklar butonunun (yukarıdaki satırda) hemen altında,
@@ -657,8 +661,12 @@ const BVALUE_META_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-L
 let bvalueMethod = 'fc'; // 'fc' = Fixed Circle | 'fn' = Fixed Number
 const FRACTAL_PNG_URL    = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation.png';
 const FRACTAL_META_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/fractal_triangulation_meta.json';
-const SHAKE_GEDIZ_PNG_URL  = 'data/shakemap_1970_gediz.png';
-const SHAKE_GEDIZ_META_URL = 'data/shakemap_1970_gediz_meta.json';
+const SHAKE_EVENTS = {
+  murefte1912:   { label: '1912 Mürefte',   file: 'murefte1912' },
+  yenice1953:    { label: '1953 Yenice',    file: 'yenice1953' },
+  adapazari1963: { label: '1963 Adapazarı', file: 'adapazari1963' },
+  gediz1970:     { label: '1970 Gediz',     file: '1970_gediz' },
+};
 const FORECAST_PNG_URL   = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_forecast.png';
 const FORECAST_META_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/bvalue_forecast_meta.json';
 const FORECAST_TEST_URL  = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/forecast_test_events.json';
@@ -707,8 +715,8 @@ const topoShade = L.tileLayer(
 let showTopo    = false;
 let showFractal = false;
 let fractalLayer = null;
-let showShakeGediz = false;
-let shakeGedizLayer = null;
+const shakeLayers = {}; // id -> L.imageOverlay | null
+const shakeActive = {}; // id -> bool
 
 let showForecast    = false;
 let forecastBgLayer = null;
@@ -2215,14 +2223,6 @@ function toggleLayer(type) {
       if (showMarForecast) { marFcBgLayer.addTo(map); marFcDotLayer.addTo(map); }
       else { map.removeLayer(marFcBgLayer); map.removeLayer(marFcDotLayer); }
     }
-  } else if (type === 'shakegediz') {
-    showShakeGediz = !showShakeGediz;
-    document.getElementById('btnShakeGediz').classList.toggle('active', showShakeGediz);
-    if (!shakeGedizLayer) {
-      loadShakeGedizLayer();
-    } else {
-      if (showShakeGediz) shakeGedizLayer.addTo(map); else map.removeLayer(shakeGedizLayer);
-    }
   } else if (type === 'topo') {
     showTopo = !showTopo;
     document.getElementById('btnTopo').classList.toggle('active', showTopo);
@@ -2709,24 +2709,36 @@ async function loadFractalLayer() {
   }
 }
 
-async function loadShakeGedizLayer() {
-  if (shakeGedizLayer) { if (showShakeGediz) shakeGedizLayer.addTo(map); return; }
-  setStatus('1970 Gediz şiddet haritası yükleniyor…');
+function toggleShakeLayer(id) {
+  shakeActive[id] = !shakeActive[id];
+  document.querySelector(`.shakebtn[data-shake="${id}"]`).classList.toggle('active', shakeActive[id]);
+  if (!shakeLayers[id]) {
+    loadShakeLayer(id);
+  } else if (shakeActive[id]) {
+    shakeLayers[id].addTo(map);
+  } else {
+    map.removeLayer(shakeLayers[id]);
+  }
+}
+
+async function loadShakeLayer(id) {
+  const ev = SHAKE_EVENTS[id];
+  setStatus(`${ev.label} şiddet haritası yükleniyor…`);
   try {
-    const metaRes = await fetch(SHAKE_GEDIZ_META_URL);
+    const metaRes = await fetch(`data/shakemap_${ev.file}_meta.json`);
     if (!metaRes.ok) throw new Error('meta bulunamadı');
     const meta = await metaRes.json();
     const b = meta.bounds;
-    shakeGedizLayer = L.imageOverlay(SHAKE_GEDIZ_PNG_URL,
+    shakeLayers[id] = L.imageOverlay(`data/shakemap_${ev.file}.png`,
       [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
       { opacity: 0.75, interactive: false }
     );
-    if (showShakeGediz) shakeGedizLayer.addTo(map);
-    setStatus(`${meta.event} · ${meta.source} · MMI ${meta.mmi_min}–${meta.mmi_max} · pilot katman`);
+    if (shakeActive[id]) shakeLayers[id].addTo(map);
+    setStatus(`${meta.event} · ${meta.source} · MMI ${meta.mmi_min}–${meta.mmi_max}`);
   } catch(e) {
-    setStatus('Şiddet haritası yüklenemedi: ' + e.message, true);
-    showShakeGediz = false;
-    document.getElementById('btnShakeGediz').classList.remove('active');
+    setStatus(`${ev.label} şiddet haritası yüklenemedi: ` + e.message, true);
+    shakeActive[id] = false;
+    document.querySelector(`.shakebtn[data-shake="${id}"]`).classList.remove('active');
   }
 }
 

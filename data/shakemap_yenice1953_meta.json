@@ -1,0 +1,14 @@
+{
+  "event": "1953-03-18 Yenice-Gönen M7.3",
+  "source": "USGS ShakeMap (tarihsel/sentetik MMI modeli) + Surfer color-relief regrid (yalnizca gorsellestirme cozunurlugu artirildi, veri kaynagi degismedi)",
+  "z_field": "MMI",
+  "mmi_min": 2.5,
+  "mmi_max": 7.8,
+  "bounds": {
+    "minlat": 37.0,
+    "maxlat": 42.0,
+    "minlon": 25.0,
+    "maxlon": 31.0
+  },
+  "note": "Renk skalasi Surfer varsayilan mavi->kirmizi rainbow; dusuk deger (arka plan) seffaf yapildi, sadece hissedilir siddet alani gosterilir."
+}

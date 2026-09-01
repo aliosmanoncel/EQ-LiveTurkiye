@@ -1,0 +1,14 @@
+{
+  "event": "1912-08-09 Mürefte (Şarköy-Mürefte) M7.3",
+  "source": "USGS ShakeMap (tarihsel/sentetik MMI modeli) + Surfer color-relief regrid (yalnizca gorsellestirme cozunurlugu artirildi, veri kaynagi degismedi)",
+  "z_field": "MMI",
+  "mmi_min": 2.6,
+  "mmi_max": 7.6,
+  "bounds": {
+    "minlat": 40.0,
+    "maxlat": 42.0,
+    "minlon": 25.0,
+    "maxlon": 29.0
+  },
+  "note": "Renk skalasi Surfer varsayilan mavi->kirmizi rainbow; dusuk deger (arka plan) seffaf yapildi, sadece hissedilir siddet alani gosterilir."
+}
