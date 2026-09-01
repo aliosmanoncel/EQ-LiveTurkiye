@@ -360,6 +360,31 @@
 
   <div class="sep"></div>
 
+  <!-- Range Filtreler: Magnitude / Derinlik / Zaman — harita + Görünen Depremler listesi aynı filtrelenmiş kümeyi kullanır -->
+  <div class="ctrl">
+    <label>Mw</label>
+    <input id="fMagMin" type="number" step="0.1" placeholder="min" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+    <span style="color:#555">–</span>
+    <input id="fMagMax" type="number" step="0.1" placeholder="max" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+  </div>
+  <div class="ctrl">
+    <label>Derinlik (km)</label>
+    <input id="fDepMin" type="number" step="1" placeholder="min" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+    <span style="color:#555">–</span>
+    <input id="fDepMax" type="number" step="1" placeholder="max" style="width:44px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+  </div>
+  <div class="ctrl">
+    <label>Zaman</label>
+    <input id="fTimeStart" type="datetime-local" style="width:142px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+    <span style="color:#555">–</span>
+    <input id="fTimeEnd" type="datetime-local" style="width:142px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.72rem">
+  </div>
+  <button class="tbtn" onclick="applyFilterInputs()">Filtrele</button>
+  <button class="tbtn" onclick="resetFilterInputs()" title="Filtreleri temizle">✕</button>
+  <span id="filterCount" style="color:#06b6d4;font-size:.78rem;font-weight:700"></span>
+
+  <div class="sep"></div>
+
   <!-- Zoom Presets -->
   <div style="display:flex;gap:4px">
     <button class="tbtn preset-btn" data-preset="emsc"    onclick="zoomPreset('emsc')"    title="EMSC full region">EMSC</button>
@@ -735,9 +760,54 @@ let liveCount   = 0;
 let eqMarkerList = []; // [{e, marker}] — Görünen Depremler paneli için, renderHeat'te doldurulur
 
 /* ══════════════════════════════════════════
+   RANGE FİLTRELER — Magnitude / Derinlik / Zaman
+   renderHeat() içinde TEK noktadan uygulanır: harita (heat+circle) ve
+   Görünen Depremler listesi (eqMarkerList) hep aynı filtrelenmiş kümeyi görür.
+══════════════════════════════════════════ */
+let filterMagMin = null, filterMagMax = null;
+let filterDepMin = null, filterDepMax = null;
+let filterTimeStart = null, filterTimeEnd = null;
+
+function applyRangeFilters(evList) {
+  if (filterMagMin==null && filterMagMax==null && filterDepMin==null && filterDepMax==null && !filterTimeStart && !filterTimeEnd) return evList;
+  return evList.filter(e => {
+    const m = e.mw ?? e.mag;
+    if (filterMagMin!=null && m < filterMagMin) return false;
+    if (filterMagMax!=null && m > filterMagMax) return false;
+    if (filterDepMin!=null && e.dep < filterDepMin) return false;
+    if (filterDepMax!=null && e.dep > filterDepMax) return false;
+    if (filterTimeStart && e.time < filterTimeStart) return false;
+    if (filterTimeEnd && e.time > filterTimeEnd) return false;
+    return true;
+  });
+}
+
+function applyFilterInputs() {
+  const num = id => { const v = document.getElementById(id).value; return v==='' ? null : parseFloat(v); };
+  filterMagMin = num('fMagMin'); filterMagMax = num('fMagMax');
+  filterDepMin = num('fDepMin'); filterDepMax = num('fDepMax');
+  const ts = document.getElementById('fTimeStart').value, te = document.getElementById('fTimeEnd').value;
+  filterTimeStart = ts ? new Date(ts) : null;
+  filterTimeEnd   = te ? new Date(te) : null;
+  renderHeat([...events, ...liveEvents]);
+}
+
+function resetFilterInputs() {
+  ['fMagMin','fMagMax','fDepMin','fDepMax','fTimeStart','fTimeEnd'].forEach(id => document.getElementById(id).value = '');
+  filterMagMin = filterMagMax = filterDepMin = filterDepMax = filterTimeStart = filterTimeEnd = null;
+  renderHeat([...events, ...liveEvents]);
+}
+
+/* ══════════════════════════════════════════
    RENDER
 ══════════════════════════════════════════ */
 function renderHeat(evList) {
+  const rawTotal = evList.length;
+  evList = applyRangeFilters(evList);
+  const filterOn = rawTotal !== evList.length || filterMagMin!=null || filterMagMax!=null || filterDepMin!=null || filterDepMax!=null || filterTimeStart || filterTimeEnd;
+  const cntEl = document.getElementById('filterCount');
+  if (cntEl) cntEl.textContent = filterOn ? `${evList.length} / ${rawTotal}` : '';
+
   if (heatLayer)  { map.removeLayer(heatLayer);  heatLayer  = null; }
   if (markLayer)  { map.removeLayer(markLayer);  markLayer  = null; }
   if (!evList.length) { eqMarkerList = []; updateEqList(); return; }
