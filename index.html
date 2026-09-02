@@ -199,6 +199,7 @@
     <input id="regionMcOverride" type="number" step="0.1" placeholder="auto" onchange="renderRegionInfo()" title="Boş = otomatik (Maximum Curvature). Dolu = bu Mc ile b-değeri hesaplanır (Selected-Mc).">
   </div>
   <button class="tbtn" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
+  <button class="tbtn" onclick="exportRegionCSV()" title="Bölgedeki TÜM depremleri (görsel örneklemeden etkilenmeden) CSV olarak indir — mag/mtype orijinal ölçüm, mw dönüştürülmüş değer, ayrı sütunlar">⬇ CSV İndir</button>
   <div id="regionInfo" style="font-size:.75rem;color:#999;line-height:1.6;background:rgba(20,20,20,.9);border-radius:6px;padding:8px 10px;width:260px"></div>
 </div>
 
@@ -951,7 +952,7 @@ function parseEMSCText(text) {
       const dep = parseFloat(c[4]) || 0;
       const mag = parseFloat(c[10]);
       if (isNaN(lat)||isNaN(lon)||isNaN(mag)) return null;
-      return { lat, lon, dep, mag, place: (c[12]||'').trim(), time: new Date(c[1].trim()) };
+      return { lat, lon, dep, mag, mtype: (c[9]||'').trim(), place: (c[12]||'').trim(), time: new Date(c[1].trim()) };
     }).filter(Boolean);
 }
 
@@ -2281,6 +2282,38 @@ function regionDeselect() {
 // oluyordu, mevcut bölge için hiç tetiklenmiyordu (bildirilen hata).
 function reapplyRegionQuery() {
   if (regionRect) fetchRegionEvents(regionRect.getBounds());
+}
+
+/* Seçili bölge/poligonun TAM verisini (regionEvents — görsel örneklemeden
+   ETKİLENMEZ) CSV olarak indirir. mag/mtype = orijinal ölçüm, mw = dönüştürülmüş
+   değer AYRI sütunlar — "bu Mw mi?" sorusuna dosyanın kendisi cevap versin diye. */
+function exportRegionCSV() {
+  if (!regionEvents.length) { setStatus('İndirilecek veri yok — önce bir bölge seçin', true); return; }
+  const bounds = regionRect ? regionRect.getBounds() : null;
+  const lines = [];
+  lines.push(`# EQ-LiveTurkiye bölge dışa aktarımı — ${new Date().toISOString()}`);
+  if (bounds) lines.push(`# Bölge (kapsayan dikdörtgen${regionIsPolygon ? ', gerçek şekil poligon' : ''}): ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}`);
+  lines.push(`# Kayıt sayısı: ${regionEvents.length}`);
+  lines.push(`# mw sütunu DÖNÜŞTÜRÜLMÜŞ değerdir, mag/mtype ORİJİNAL ölçümdür:`);
+  lines.push(`#   1900-2026 (ISC+EMSC, Tarihsel Katalog): Scordilis (2006) Mw dönüşümü`);
+  lines.push(`#   1003-1899 (EPICA+SHARE-CET, Tarihsel Katalog): EPICA kendi 2021 homojenizasyonu; SHARE-CET Io→Ms→Mw iki aşamalı zincir — birbiriyle TAM tutarlı değildir, derinlik (depth_km) bu dönemde yoktur`);
+  lines.push(`#   Canlı/güncel EMSC sorgusu: mtype = orijinal ölçüm tipi (ml/mb/ms vb.)`);
+  lines.push('time_utc,lat,lon,depth_km,mag,mtype,mw,place');
+  regionEvents.forEach(e => {
+    const dep = e.dep==null ? '' : e.dep.toFixed(1);
+    const place = (e.place||'').replace(/"/g,'""');
+    lines.push(`${e.time.toISOString()},${e.lat},${e.lon},${dep},${e.mag??''},${e.mtype||''},${e.mw??e.mag??''},"${place}"`);
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `eqliveturkiye_bolge_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setStatus(`${regionEvents.length} kayıt CSV olarak indirildi`);
 }
 
 /* ══════════════════════════════════════════
