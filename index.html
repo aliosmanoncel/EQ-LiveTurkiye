@@ -104,7 +104,12 @@
     .eqlist-empty{padding:10px 11px;color:#555;font-size:.72rem}
 
     /* ── BÖLGE SEÇ (sürükleyip bölge kilitleme — küçük depremleri getirme) ── */
-    .regionCtrl{position:fixed;top:10px;left:270px;z-index:999;display:flex;flex-direction:column;gap:6px}
+    .regionCtrl{position:fixed;top:10px;left:270px;z-index:999}
+    .regionCtrl-header{display:flex;align-items:center;justify-content:space-between;gap:10px;width:210px;background:rgba(0,0,0,.85);border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;cursor:pointer;user-select:none}
+    .regionCtrl-header .title{color:#06b6d4;font-weight:700;font-size:.82rem}
+    .regionCtrl-toggle{color:#555;font-size:.85rem;line-height:1}
+    .regionCtrl-body{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+    .regionCtrl-body.hidden{display:none}
     .regionCtrl .tbtn{background:rgba(20,20,20,.9);width:210px;text-align:left;font-size:.85rem;padding:8px 12px}
     .regionCtrl .rowbox{display:flex;gap:6px;align-items:center;background:rgba(20,20,20,.9);border-radius:6px;padding:7px 10px}
     .regionCtrl .rowbox label{font-size:.78rem;color:#999;white-space:nowrap}
@@ -115,6 +120,7 @@
        konumlandırma zaten mobilde taşıyordu (bilinen sınırlama, backlog'da);
        burada amaç masaüstü büyütmesinin taşmayı DAHA DA artırmasını önlemek. */
     @media (max-width: 600px) {
+      .regionCtrl-header{width:150px;padding:5px 8px}
       .regionCtrl .tbtn{width:150px;font-size:.75rem;padding:5px 8px}
       .regionCtrl .rowbox{padding:3px 6px;gap:4px}
       .regionCtrl .rowbox label{font-size:.68rem}
@@ -157,6 +163,11 @@
 
 <!-- BÖLGE SEÇ — sürükleyip bölge kilitle, o bölgedeki küçük depremleri getir -->
 <div class="regionCtrl">
+  <div class="regionCtrl-header" onclick="toggleRegionCtrl()">
+    <span class="title">🔍 Bölge Analizi</span>
+    <span class="regionCtrl-toggle" id="rcToggle">▼</span>
+  </div>
+  <div class="regionCtrl-body hidden" id="rcBody">
   <button class="tbtn" id="btnRegionSelect" onclick="regionSelectStart()" title="Basılı tutup haritada sürükleyin">🔲 Bölge Seç</button>
   <button class="tbtn" id="btnPolygonSelect" onclick="polygonSelectStart()" title="Haritada nokta nokta tıklayarak çokgen çizin (düzensiz kıyı/kuşak şekilleri için)">🔷 Poligon Seç</button>
   <div id="polygonDrawCtrl" style="display:none;gap:6px;flex-wrap:wrap">
@@ -204,6 +215,7 @@
   <button class="tbtn" id="btnRegionRefresh" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
   <button class="tbtn" onclick="exportRegionCSV()" title="Bölgedeki TÜM depremleri (görsel örneklemeden etkilenmeden) CSV olarak indir — mag/mtype orijinal ölçüm, mw dönüştürülmüş değer, ayrı sütunlar">⬇ CSV İndir</button>
   <div id="regionInfo" style="font-size:.75rem;color:#999;line-height:1.6;background:rgba(20,20,20,.9);border-radius:6px;padding:8px 10px;width:260px"></div>
+  </div>
 </div>
 
 <!-- SON BÜYÜK DEPREM KARTI -->
@@ -1846,6 +1858,13 @@ function toggleEqList() {
   icon.textContent = hidden ? '▼' : '▲';
 }
 
+function toggleRegionCtrl() {
+  const body = document.getElementById('rcBody');
+  const icon = document.getElementById('rcToggle');
+  const hidden = body.classList.toggle('hidden');
+  icon.textContent = hidden ? '▼' : '▲';
+}
+
 function updateEqList() {
   const body  = document.getElementById('eqlBody');
   const title = document.getElementById('eqlTitle');
@@ -2246,6 +2265,10 @@ function restoreRegionFromURL() {
   if (p.has('rdepmax')) document.getElementById('regionDepMax').value = p.get('rdepmax');
   regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
   fetchRegionEvents(bounds);
+  // Linkle paylaşılan bölge varsa paneli otomatik aç — aksi halde sonuçlar
+  // (regionInfo/CSV) kapalı panelin arkasında görünmez kalır.
+  const body = document.getElementById('rcBody');
+  if (body && body.classList.contains('hidden')) toggleRegionCtrl();
 }
 restoreRegionFromURL();
 
