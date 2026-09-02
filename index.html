@@ -495,9 +495,11 @@
        filtresi bu geniş veri kümesinin üzerine aynen uygulanmaya devam eder. -->
   <div class="tr-only" style="display:flex;gap:4px;align-items:center">
     <span style="font-size:.72rem;color:#888;white-space:nowrap">Tarihsel:</span>
-    <button class="tbtn" data-hist="2000" onclick="loadHistoricalRange(2000)" title="Tarihsel katalog: 1900-01-01 – 2026-06-22 (ISC+EMSC) · bu buton 2000'den itibaren gösterir">2000–2026</button>
-    <button class="tbtn" data-hist="1990" onclick="loadHistoricalRange(1990)" title="Tarihsel katalog: 1900-01-01 – 2026-06-22 (ISC+EMSC) · bu buton 1990'dan itibaren gösterir">1990–2026</button>
-    <button class="tbtn" data-hist="1900" onclick="loadHistoricalRange(1900)" title="Tarihsel katalog: 1900-01-01 – 2026-06-22 (ISC+EMSC) · tüm katalog">1900–2026</button>
+    <button class="tbtn" data-hist="2000" onclick="loadHistoricalRange(2000)" title="ISC+EMSC · son ~26 yıl">2000–2026</button>
+    <button class="tbtn" data-hist="1990" onclick="loadHistoricalRange(1990)" title="ISC+EMSC · son ~36 yıl">1990–2026</button>
+    <button class="tbtn" data-hist="1965" onclick="loadHistoricalRange(1965)" title="WWSSN sonrası · standardize edilmiş modern aletsel (post-instrumental) dönem, 1965'ten itibaren">1965–2026</button>
+    <button class="tbtn" data-hist="1900" onclick="loadHistoricalRange(1900)" title="Aletsel dönem (post-instrumental) başlangıcı · ISC+EMSC, 1900-01-01 – 2026-06-22">1900–2026</button>
+    <button class="tbtn" data-hist="1000" onclick="loadHistoricalRange(1000)" title="TAM katalog: pre-instrumental (1003-1899, EPICA+SHARE-CET makrosismik) + aletsel (1900+, ISC+EMSC) birleşik — 1003'ten itibaren gösterir">1000–2026</button>
   </div>
   <div id="histHint" style="font-size:10px;color:#888;margin-top:2px;letter-spacing:0.3px"></div>
 
@@ -1026,8 +1028,10 @@ function applyRangeFilters(evList) {
     const m = e.mw ?? e.mag;
     if (filterMagMin!=null && m < filterMagMin) return false;
     if (filterMagMax!=null && m > filterMagMax) return false;
-    if (filterDepMin!=null && e.dep < filterDepMin) return false;
-    if (filterDepMax!=null && e.dep > filterDepMax) return false;
+    // e.dep===null → derinlik bilinmeyen tarihsel (1003-1899) kayıt: derinlik
+    // filtresi uygulanmaz (yok sayılır), "0 km sığ" gibi yanlış bir eşleşme olmasın
+    if (filterDepMin!=null && e.dep!=null && e.dep < filterDepMin) return false;
+    if (filterDepMax!=null && e.dep!=null && e.dep > filterDepMax) return false;
     if (filterTimeStart && e.time < filterTimeStart) return false;
     if (filterTimeEnd && e.time > filterTimeEnd) return false;
     return true;
@@ -1097,6 +1101,7 @@ function magColorInfo(m) {
 }
 function depthColorInfo(dep, m) {
   const r = magRadius(m);
+  if (dep == null) return { c:'#6b7280', f:'#374151', r }; // bilinmiyor (pre-instrumental) — nötr gri
   if (dep > 300) return { c:'#1e3a8a', f:'#172554', r }; // >300 km — lacivert
   if (dep >= 150) return { c:'#a855f7', f:'#581c87', r }; // 150–300 km — mor
   if (dep >= 80)  return { c:'#ec4899', f:'#831843', r }; // 80–150 km — pembe
@@ -1164,7 +1169,8 @@ function renderHeat(evList) {
       `<b style="color:${c};font-size:1.1rem">${mwLabel}</b>` +
       `<br><span style="color:#aaa">${e.place||'EMSC Region'}</span>` +
       (e.province ? `<br><span style="color:#888;font-size:.8rem">📍 ${e.province}${e.district ? ' / '+e.district : ''}</span>` : '') +
-      (seismicityColorMode === 'depth'
+      (e.dep==null ? `<br>Depth: bilinmiyor (pre-instrumental kayıt)` :
+       seismicityColorMode === 'depth'
         ? `<br>Depth: <b style="color:${c}">${e.dep.toFixed(0)} km</b>`
         : `<br>Depth: ${e.dep.toFixed(0)} km`) +
       `<br><span style="color:#666">${ago} ago</span>`
@@ -1619,7 +1625,22 @@ async function loadData(sourceName, h) {
    fonksiyonları (computeMc/computeBvalue) YENİDEN YAZILMADI.
 ══════════════════════════════════════════ */
 let historicalMode  = false;
-let historicalCache = null; // { events, completeness, starttime, endtime, source } — bir kez indirilir
+let historicalCache = null; // { events, completeness, starttime, endtime, source } — ISC+EMSC, 1900-2026, bir kez indirilir
+let epicaCache       = null; // EPICA v1.1 + SHARE-CET, 1003-1899, bir kez indirilir (sadece startYear<=1899 seçilince)
+
+// EPICA/SHARE-CET şeması ({lon,lat,mag,year,date,loc,reg}) eq_historical.json'ın
+// normalize edilmiş olay şemasına çevrilir. Derinlik (dep) bu katalogda YOK —
+// null bırakılır, popup/filtre kodu bunu açıkça "bilinmiyor" olarak ele alır
+// (0 km gibi yanlış bir "sığ deprem" izlenimi vermemek için).
+function normalizeEpicaEvent(e) {
+  return {
+    lat: e.lat, lon: e.lon, dep: null,
+    mag: e.mag, mw: e.mag, mtype: 'mw',
+    place: e.loc || (e.reg === 'CET' ? 'Doğu Anadolu/Kafkasya (SHARE-CET)' : 'Avrupa/Batı Anadolu (EPICA)'),
+    province: '', district: '',
+    time: new Date(`${e.date}T00:00:00Z`)
+  };
+}
 
 async function loadHistoricalRange(startYear) {
   cancelRetry();
@@ -1643,7 +1664,7 @@ async function loadHistoricalRange(startYear) {
     }
     const cat   = historicalCache;
     const start = new Date(`${startYear}-01-01T00:00:00Z`);
-    const all = (cat.events || [])
+    let all = (cat.events || [])
       .map(e => ({
         lat: e.lat, lon: e.lon, dep: e.dep || 0, mag: e.mag || 0,
         mw: e.mw || e.mag || 0, mtype: e.mtype || 'mw',
@@ -1651,6 +1672,23 @@ async function loadHistoricalRange(startYear) {
         time: new Date(e.time)
       }))
       .filter(e => e.time >= start && e.mag > 0);
+
+    // 1900 öncesi istendiyse EPICA+SHARE-CET'i de yükleyip birleştir (cumulatif aralık)
+    let usedEpica = false;
+    if (startYear <= 1899) {
+      if (!epicaCache) {
+        const res2 = await fetchTimeout('data/epica_europe_historical.json', {}, 20000);
+        if (stale()) return;
+        if (res2.ok) epicaCache = await res2.json();
+      }
+      if (epicaCache) {
+        const epicaEvents = (epicaCache.events || [])
+          .map(normalizeEpicaEvent)
+          .filter(e => e.time >= start && e.mag > 0);
+        all = [...epicaEvents, ...all];
+        usedEpica = true;
+      }
+    }
 
     if (all.length === 0) throw new Error('Seçili tarih aralığında veri yok');
 
@@ -1669,9 +1707,15 @@ async function loadHistoricalRange(startYear) {
     const hint = document.getElementById('histHint');
     if (hint) {
       const compLine = (cat.completeness || []).map(c => `${c.period}: Mc≈${c.Mc}`).join(' · ');
-      hint.textContent = `Katalog completeness (${cat.source || 'ISC+EMSC'}): ${compLine} — bu, aşağıdaki hesaplanan Mc ile AYNI şey değildir`;
+      let text = `Katalog completeness (${cat.source || 'ISC+EMSC'}): ${compLine} — bu, aşağıdaki hesaplanan Mc ile AYNI şey değildir`;
+      if (usedEpica) {
+        text += ` ⚠ 1003–1899 (EPICA+SHARE-CET) FARKLI bir Mw dönüşüm zinciri kullanır ve derinlik bilgisi içermez — ` +
+                `bu dönemi kapsayan Mc/b sonuçları büyük-depreme-yanlı, dikkatli yorumlanmalı.`;
+      }
+      hint.textContent = text;
     }
-    setStatus(`${all.length} deprem · Tarihsel katalog (${cat.source || 'ISC+EMSC'}) · ${startYear}–${(cat.endtime || '2026').slice(0,4)} · katalog sonu: ${cat.endtime || '—'}`);
+    const sourceLabel = usedEpica ? `${cat.source || 'ISC+EMSC'} + EPICA/SHARE-CET` : (cat.source || 'ISC+EMSC');
+    setStatus(`${all.length} deprem · Tarihsel katalog (${sourceLabel}) · ${startYear}–${(cat.endtime || '2026').slice(0,4)} · katalog sonu: ${cat.endtime || '—'}`);
     retryCount = 0;
   } catch (err) {
     if (stale()) return;
@@ -1819,7 +1863,7 @@ function updateEqList() {
     const dateStr = e.time.toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
     return `<div class="eqlist-row" onclick="focusEq(${i})">
       <span class="mag" style="color:${col}">${magNum.toFixed(1)}</span>
-      <span class="dep">${e.dep.toFixed(0)}km</span>
+      <span class="dep">${e.dep==null ? '—' : e.dep.toFixed(0)+'km'}</span>
       <span class="time">${(e.place||'EMSC Region')} · ${dateStr}</span>
     </div>`;
   }).join('');
@@ -2076,7 +2120,7 @@ async function fetchRegionEventsFromHistorical(bounds) {
     }).bindPopup(
       `<b style="color:#38bdf8">Mw ${mVal.toFixed(1)}</b>` +
       `<br><span style="color:#aaa">${e.place||'—'}</span>` +
-      `<br>Depth: ${e.dep.toFixed(0)} km` +
+      `<br>Depth: ${e.dep==null ? 'bilinmiyor (pre-instrumental)' : e.dep.toFixed(0)+' km'}` +
       `<br><span style="color:#666">${dfmt(e.time)}</span>`
     ).addTo(regionLayer);
   });
