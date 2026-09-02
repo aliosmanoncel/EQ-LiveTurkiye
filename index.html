@@ -54,6 +54,8 @@
     body:not(.global-mode) .global-only { display: none !important; }
 
     .src-sel{padding:4px 8px;border-radius:5px;border:1px solid #333;background:#222;color:#bbb;font-size:.8rem;cursor:pointer}
+    .src-sel:disabled{opacity:.35;cursor:not-allowed}
+    .rowbox.disabledRow label{opacity:.35}
 
     /* ── STATUS (panel'in hemen üstünde yüzer) ── */
     .sbar{position:fixed;bottom:0;left:0;right:0;z-index:499;
@@ -163,7 +165,7 @@
     <button class="tbtn" style="width:auto;padding:7px 10px;font-size:.78rem" onclick="polygonCancel()" title="Çizimi iptal et">✕ İptal</button>
   </div>
   <button class="tbtn" id="btnRegionClear" onclick="regionDeselect()">✕ Bölgeyi Kaldır</button>
-  <div class="rowbox">
+  <div class="rowbox" id="regionLimitRow">
     <label>Limit</label>
     <select id="regionLimit" class="src-sel" title="Maximum earthquakes — bölge sorgusunun üst sınırı. EMSC sunucusu 20.000'i tam onurlandırıyor, ötesini kendi tavanına (20.000) kesiyor." onchange="reapplyRegionQuery()">
       <option value="200">200</option>
@@ -175,13 +177,14 @@
       <option value="20000">20000 (EMSC tavanı)</option>
     </select>
   </div>
-  <div class="rowbox">
+  <div class="rowbox" id="regionOrderRow">
     <label>Sırala</label>
     <select id="regionOrder" class="src-sel" title="Limite takılırsa hangi depremler korunacak" onchange="reapplyRegionQuery()">
       <option value="time" selected>En yeni</option>
       <option value="magnitude">En büyük</option>
     </select>
   </div>
+  <div id="regionModeNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ Tarihsel Katalog modunda Limit/Sırala geçersizdir — aralıktaki TÜM depremler gösterilir.</div>
   <div class="rowbox">
     <label>Mw</label>
     <input id="regionMagMin" type="number" step="0.1" placeholder="min" onchange="reapplyRegionQuery()">
@@ -198,7 +201,7 @@
     <label>Mc (elle)</label>
     <input id="regionMcOverride" type="number" step="0.1" placeholder="auto" onchange="renderRegionInfo()" title="Boş = otomatik (Maximum Curvature). Dolu = bu Mc ile b-değeri hesaplanır (Selected-Mc).">
   </div>
-  <button class="tbtn" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
+  <button class="tbtn" id="btnRegionRefresh" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
   <button class="tbtn" onclick="exportRegionCSV()" title="Bölgedeki TÜM depremleri (görsel örneklemeden etkilenmeden) CSV olarak indir — mag/mtype orijinal ölçüm, mw dönüştürülmüş değer, ayrı sütunlar">⬇ CSV İndir</button>
   <div id="regionInfo" style="font-size:.75rem;color:#999;line-height:1.6;background:rgba(20,20,20,.9);border-radius:6px;padding:8px 10px;width:260px"></div>
 </div>
@@ -1649,6 +1652,7 @@ async function loadHistoricalRange(startYear) {
   const stale = () => seq !== loadSeq;
 
   historicalMode = true;
+  updateRegionCtrlForMode();
   if (cntTimer) clearInterval(cntTimer); // otomatik canlı yenileme DURUR — aksi halde 1sa sonra sessizce üstüne yazılır
 
   document.querySelectorAll('.tbtn[data-h]').forEach(x => x.classList.remove('active'));
@@ -2284,6 +2288,28 @@ function reapplyRegionQuery() {
   if (regionRect) fetchRegionEvents(regionRect.getBounds());
 }
 
+// Tarihsel Katalog modunda bölge sorgusu YENİDEN AĞ İSTEĞİ yapmıyor, tam
+// kataloğu sınırsız/yerel filtreliyor (bkz. fetchRegionEventsFromHistorical) —
+// bu yüzden Limit/Sırala'nın hiçbir etkisi yok ve "Yenile" hep aynı sonucu
+// üretiyor. Kullanıcı bunu fark edip sordu; kafa karışıklığını önlemek için
+// bu kontrolleri o moddayken görsel olarak devre dışı bırakıyoruz.
+function updateRegionCtrlForMode() {
+  const limitSel = document.getElementById('regionLimit');
+  const orderSel = document.getElementById('regionOrder');
+  const limitRow = document.getElementById('regionLimitRow');
+  const orderRow = document.getElementById('regionOrderRow');
+  const note     = document.getElementById('regionModeNote');
+  const refresh  = document.getElementById('btnRegionRefresh');
+  if (limitSel) limitSel.disabled = historicalMode;
+  if (orderSel) orderSel.disabled = historicalMode;
+  if (limitRow) limitRow.classList.toggle('disabledRow', historicalMode);
+  if (orderRow) orderRow.classList.toggle('disabledRow', historicalMode);
+  if (note) note.style.display = historicalMode ? 'block' : 'none';
+  if (refresh) refresh.title = historicalMode
+    ? 'Tarihsel modda statik veri elle tekrar filtrelenir; Zaman/Tarihsel Katalog ve Mw/Derinlik değiştikçe zaten otomatik güncellenir — genelde gerekmez'
+    : 'Bölgeyi seçili ayarlarla elle yeniden sorgula';
+}
+
 /* Seçili bölge/poligonun TAM verisini (regionEvents — görsel örneklemeden
    ETKİLENMEZ) CSV olarak indirir. mag/mtype = orijinal ölçüm, mw = dönüştürülmüş
    değer AYRI sütunlar — "bu Mw mi?" sorusuna dosyanın kendisi cevap versin diye. */
@@ -2324,6 +2350,7 @@ document.querySelectorAll('.tbtn[data-h]').forEach(b=>b.addEventListener('click'
   document.querySelectorAll('.tbtn[data-hist]').forEach(x=>x.classList.remove('active'));
   this.classList.add('active');
   historicalMode = false; // Tarihsel Katalog modundan çıkılıyor
+  updateRegionCtrlForMode();
   const hint = document.getElementById('histHint');
   if (hint) hint.textContent = '';
   hours  = +this.dataset.h;
