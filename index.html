@@ -109,6 +109,17 @@
     .regionCtrl .rowbox input,.regionCtrl .rowbox select{font-size:.82rem;padding:5px 7px}
     .regionCtrl .rowbox input{width:60px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px}
     .regionCtrl .rowbox select{flex:1}
+    /* Dar ekranlarda paneli eski (küçük) boyutuna döndür — sabit left:270px
+       konumlandırma zaten mobilde taşıyordu (bilinen sınırlama, backlog'da);
+       burada amaç masaüstü büyütmesinin taşmayı DAHA DA artırmasını önlemek. */
+    @media (max-width: 600px) {
+      .regionCtrl .tbtn{width:150px;font-size:.75rem;padding:5px 8px}
+      .regionCtrl .rowbox{padding:3px 6px;gap:4px}
+      .regionCtrl .rowbox label{font-size:.68rem}
+      .regionCtrl .rowbox input,.regionCtrl .rowbox select{font-size:.72rem;padding:2px 4px}
+      .regionCtrl .rowbox input{width:44px}
+      #regionInfo{width:230px !important;font-size:.65rem !important;padding:4px 6px !important}
+    }
 
     /* ── NEW EQ FLASH ── */
     @keyframes flashNew{0%{opacity:1;transform:scale(1.6)}100%{opacity:.7;transform:scale(1)}}
