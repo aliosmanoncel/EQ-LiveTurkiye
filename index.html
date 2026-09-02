@@ -165,11 +165,14 @@
   <button class="tbtn" id="btnRegionClear" onclick="regionDeselect()">✕ Bölgeyi Kaldır</button>
   <div class="rowbox">
     <label>Limit</label>
-    <select id="regionLimit" class="src-sel" title="Maximum earthquakes — bölge sorgusunun üst sınırı" onchange="reapplyRegionQuery()">
+    <select id="regionLimit" class="src-sel" title="Maximum earthquakes — bölge sorgusunun üst sınırı. EMSC sunucusu 20.000'i tam onurlandırıyor, ötesini kendi tavanına (20.000) kesiyor." onchange="reapplyRegionQuery()">
       <option value="200">200</option>
       <option value="500" selected>500</option>
       <option value="1000">1000</option>
       <option value="2000">2000</option>
+      <option value="5000">5000</option>
+      <option value="10000">10000</option>
+      <option value="20000">20000 (EMSC tavanı)</option>
     </select>
   </div>
   <div class="rowbox">
@@ -2114,10 +2117,14 @@ async function fetchRegionEvents(bounds) {
       const poly = regionRect.getLatLngs()[0];
       evs = evs.filter(e => pointInPolygon(e.lat, e.lon, poly));
     }
-    regionEvents = evs; // bölge-özel Mc/b istatistiği için sakla
+    regionEvents = evs; // bölge-özel Mc/b istatistiği HER ZAMAN tam evs üzerinden — örnekleme sadece aşağıdaki çizimi etkiler
     if (regionLayer) map.removeLayer(regionLayer);
     regionLayer = L.layerGroup();
-    evs.forEach(e => {
+    // Limit yüksek (5000+) seçilebildiği için marker/popup oluşturma DOM
+    // maliyeti Tarihsel Katalog'da yaşanan donmayı burada da yaratabilir —
+    // aynı zaman-dengeli örnekleme (sadece GÖRSEL çizim) uygulanır.
+    const visibleSample = timeBalancedSample(evs, VISUAL_SAMPLE_CAP);
+    visibleSample.forEach(e => {
       L.circleMarker([e.lat, e.lon], {
         radius: 3.5, color:'#38bdf8', weight:1, fillColor:'#0ea5e9', fillOpacity:.7
       }).bindPopup(
@@ -2134,9 +2141,11 @@ async function fetchRegionEvents(bounds) {
     regionWindowEnd = now;
     const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
     const shapeLabel = regionIsPolygon ? `poligon (${evs.length}/${rawCount} bbox içinde)` : `${evs.length}`;
+    const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` · görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor` : '';
+    const limitNote = limit >= 20000 ? '· EMSC sunucu tavanı (20.000), artırılamaz' : '· limiti artırabilirsiniz';
     setStatus(regionCapped
-      ? `Bölgede ${shapeLabel} deprem — bbox ilk ${limit} (${orderLabel}) gösteriliyor · limiti artırabilirsiniz`
-      : `Bölgede ${shapeLabel} deprem gösteriliyor`);
+      ? `Bölgede ${shapeLabel} deprem — bbox ilk ${limit} (${orderLabel}) gösteriliyor ${limitNote}${sampleNote}`
+      : `Bölgede ${shapeLabel} deprem gösteriliyor${sampleNote}`);
     renderRegionInfo();
     if (showTimeMag) renderTimeMag(regionEvents); // panel açıksa bölge verisiyle anında güncelle
     syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
