@@ -1,1 +1,1 @@
-{"generated":"2026-09-03T07:37:38Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-09-03T12:28:39Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"727675","time":"2026-09-03T12:14:52","lat":38.77817,"lon":27.12933,"dep":9.56,"mag":3.2,"mtype":"ML","mw":2.18,"place":"Yunusemre (Manisa)","province":"Manisa","district":"Yunusemre"}]}
