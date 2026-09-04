@@ -1,1 +1,1 @@
-{"generated":"2026-09-04T14:41:36Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-09-04T17:58:22Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"727789","time":"2026-09-04T17:03:27","lat":38.26867,"lon":37.7295,"dep":26.37,"mag":1.2,"mtype":"ML","mw":0.56,"place":"Akçadağ (Malatya)","province":"Malatya","district":"Akçadağ"}]}

@@ -1,1 +1,1 @@
-{"generated":"2026-09-04T14:41:29Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260904_0000194","time":"2026-09-04T14:03:11.0Z","lat":28.36,"lon":104.94,"dep":5.0,"mag":3.0,"mtype":"m","mw":3.0,"place":"EASTERN SICHUAN, CHINA"}]}
+{"generated":"2026-09-04T17:58:15Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20260904_0000250","time":"2026-09-04T17:03:27.0Z","lat":38.2687,"lon":37.7295,"dep":26.4,"mag":1.2,"mtype":"ml","mw":0.56,"place":"CENTRAL TURKEY"}]}
