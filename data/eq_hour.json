@@ -1,1 +1,1 @@
-{"generated":"2026-09-05T20:53:07Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260905_0000223","time":"2026-09-05T20:00:05.23Z","lat":34.3233,"lon":-5.8454,"dep":10.0,"mag":3.2,"mtype":"ml","mw":2.18,"place":"MOROCCO"},{"id":"20260905_0000226","time":"2026-09-05T19:58:21.0Z","lat":26.252,"lon":93.018,"dep":10.0,"mag":2.9,"mtype":"m","mw":2.9,"place":"ASSAM, INDIA"}]}
+{"generated":"2026-09-05T22:34:12Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
