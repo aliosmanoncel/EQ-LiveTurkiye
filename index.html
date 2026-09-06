@@ -614,7 +614,7 @@
   <!-- Layer toggles — satir 1 -->
   <div style="display:flex;gap:4px;flex-wrap:wrap">
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
-    <button class="tbtn"        id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
+    <button class="tbtn active" id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnTestimony" onclick="toggleLayer('testimony')" title="EMSC Testimonies · hissedilme raporları · seismicportal.eu/testimonies-ws · yeşil=az → mor=çok tanıklık">🗣️ Tanıklıklar</button>
     <button class="tbtn"        id="btnTimeMag" onclick="toggleTimeMag()" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag</button>
     <button class="tbtn tr-only"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
@@ -1185,7 +1185,7 @@ function renderHeat(evList) {
     const mVal = e.mw ?? e.mag;
     const {c, f, r} = seismicityColorMode === 'depth' ? depthColorInfo(e.dep, mVal) : magColorInfo(mVal);
     const ago = agoDuration(Date.now() - e.time.getTime());
-    const mwLabel = (e.mtype && e.mtype.toLowerCase() !== 'mw' && e.mw !== e.mag)
+    const mwLabel = (e.mtype && e.mtype.toLowerCase() !== 'mw' && e.mw != null && e.mw !== e.mag)
       ? `Mw ${e.mw.toFixed(1)} <span style="color:#888;font-size:0.8rem">(${e.mtype.toUpperCase()} ${e.mag.toFixed(1)})</span>`
       : `Mw ${(e.mw ?? e.mag).toFixed(1)}`;
     const marker = L.circleMarker([e.lat,e.lon],{
@@ -2398,7 +2398,7 @@ document.getElementById('srcSel').addEventListener('change',function(){
 });
 
 let showHeat   = true;
-let showCircle = false;
+let showCircle = true; // EMSC World gibi depremler ilk açılışta nokta olarak görünsün — Seismicity'nin kapalı olması layman için "veri yok" izlenimi veriyordu
 
 let hazardLayer = null;
 let showHazard  = false;
