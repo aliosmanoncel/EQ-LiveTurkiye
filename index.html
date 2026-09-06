@@ -134,7 +134,7 @@
     .new-eq{animation:flashNew .6s ease-out}
 
     /* ── SON BÜYÜK DEPREM KARTI ── */
-    #lastCard{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:999;
+    #lastCard{position:fixed;top:180px;left:50%;transform:translateX(-50%);z-index:999;
       background:rgba(0,0,0,.78);border:1px solid #2a2a2a;border-radius:7px;
       padding:5px 14px;min-width:220px;max-width:340px;text-align:center;
       pointer-events:none;cursor:pointer}
@@ -150,12 +150,30 @@
 <body>
 
 <div style="position:fixed;z-index:1001;top:8px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px">
+  <!-- Zaman Penceresi — EMSC World'deki gibi her zaman üstte görünür (panel kapalıyken bile) -->
+  <div style="display:flex;gap:4px;background:rgba(20,20,20,.92);padding:4px;border-radius:8px;border:1px solid #334">
+    <button class="tbtn" data-h="1"    data-mag="1.0" title="Son 1 saat · M≥1.0">1s</button>
+    <button class="tbtn active" data-h="24"   data-mag="1.0" title="Son 24 saat · M≥1.0">24s</button>
+    <button class="tbtn" data-h="168"  data-mag="1.5" title="Son 1 hafta · M≥1.5">1 Hafta</button>
+    <button class="tbtn" data-h="720"  data-mag="2.5" title="Son 1 ay · M≥2.5 (API limiti nedeniyle yüksek eşik)">1 Ay</button>
+    <button class="tbtn" data-h="8760" data-mag="4.5" title="Son 1 yıl · M≥4.5">1 Yıl</button>
+  </div>
   <div style="display:flex;gap:4px;background:rgba(20,20,20,.92);padding:4px;border-radius:8px;border:1px solid #334">
     <button id="btnScopeTR"     class="tbtn active" onclick="setGlobalMode(false)" style="padding:4px 10px">🇹🇷 Türkiye</button>
     <button id="btnScopeGlobal" class="tbtn"        onclick="setGlobalMode(true)"  style="padding:4px 10px">🌍 Global</button>
   </div>
   <div id="scopeNote" style="font-size:.68rem;color:#888;background:rgba(20,20,20,.85);padding:2px 8px;border-radius:5px;display:none">
     Global modda tehlike/risk/b-değeri modelleri mevcut değil — bölgesel veri gerektirirler.
+  </div>
+  <!-- Harita/Katman kısayolları — EMSC World'deki "Aerial/Terrain/Labels/Faults" köşe kutusundan
+       ilham alındı: layman için en sık aranan katmanlar (harita stili, fay hatları, etiketler)
+       panel açılmadan, ilk bakışta erişilebilir olsun. Detaylı analiz katmanları (Hazard/Risk/
+       b-değeri/Fraktal) bilinçli olarak alttaki gizli panelde kalıyor. -->
+  <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:380px;background:rgba(20,20,20,.92);padding:4px;border-radius:8px;border:1px solid #334">
+    <button class="tbtn"        id="btnTopo"   onclick="toggleLayer('topo')"   title="ESRI World Hillshade + Shaded Relief topografya katmanı">🗺️ Topografya</button>
+    <button class="tbtn"        id="btnPlates" onclick="toggleLayer('plates')" title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
+    <button class="tbtn"        id="btnGAF"    onclick="toggleLayer('gaf')"    title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
+    <button class="tbtn active" id="btnLabels" onclick="toggleLayer('labels')" title="Yer adı / şehir etiketleri katmanı">🏷️ Etiketler</button>
   </div>
 </div>
 
@@ -490,15 +508,7 @@
     <span id="panelArrow">▲ ▲ ▲</span>
   </div>
   <div class="panel-body" id="panelBody">
-  <!-- Zaman -->
-  <div style="display:flex;gap:4px">
-    <button class="tbtn" data-h="1"    data-mag="1.0" title="Son 1 saat · M≥1.0">1s</button>
-    <button class="tbtn" data-h="24"   data-mag="1.0" title="Son 24 saat · M≥1.0">24s</button>
-    <button class="tbtn active" data-h="168"  data-mag="1.5" title="Son 1 hafta · M≥1.5">1 Hafta</button>
-    <button class="tbtn" data-h="720"  data-mag="2.5" title="Son 1 ay · M≥2.5 (API limiti nedeniyle yüksek eşik)">1 Ay</button>
-    <button class="tbtn" data-h="8760" data-mag="4.5" title="Son 1 yıl · M≥4.5">1 Yıl</button>
-  </div>
-  <div id="magHint" style="font-size:10px;color:#888;margin-top:2px;letter-spacing:0.3px">
+  <div id="magHint" style="font-size:10px;color:#888;letter-spacing:0.3px">
     Eşik: 1s/24s M≥1.0 · 1Hafta M≥1.5 · 1Ay M≥2.5 · 1Yıl M≥4.5
   </div>
 
@@ -615,9 +625,6 @@
     <button class="tbtn tr-only"        id="btnZoneL"  onclick="toggleBAdaptZone('LOW')"  style="font-size:.7rem;padding:3px 7px;color:#aaa;border-color:#555"       title="R=100km · Düşük sismisite · Geniş alan · Dikkatli yorumla">🟡R100</button>
     <button class="tbtn tr-only" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
     <button class="tbtn tr-only" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
-    <button class="tbtn"        id="btnTopo"    onclick="toggleLayer('topo')"    title="ESRI World Hillshade + Shaded Relief topografya katmanı">Topografya</button>
-    <button class="tbtn"        id="btnPlates"  onclick="toggleLayer('plates')"  title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
-    <button class="tbtn"        id="btnGAF"     onclick="toggleLayer('gaf')"     title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
     <button class="tbtn tr-only"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
     <span style="color:#888;font-size:.75rem;align-self:center;margin-left:6px">🟪 Tarihi Şiddet (MMI):</span>
     <button class="tbtn shakebtn" data-shake="murefte1912"   onclick="toggleShakeLayer('murefte1912')"   style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1912 Mürefte</button>
@@ -863,6 +870,7 @@ const topoShade = L.tileLayer(
   { attribution:'© Esri, USGS, NOAA', maxZoom:16, zIndex:2, opacity:0.55 });
 
 let showTopo    = false;
+let showLabels  = true; // labelLayer varsayılan açık — Etiketler tuşuyla kullanıcı kapatabilir
 let showFractal = false;
 let fractalLayer = null;
 const shakeLayers = {}; // id -> L.imageOverlay | null
@@ -1019,8 +1027,8 @@ let liveEvents  = [];        // WS ile gelen yeni depremler
 let heatLayer   = null;
 let markLayer   = null;
 let liveMarkers = L.layerGroup().addTo(map);
-let hours       = 168;
-let minMag      = 1.5; // zaman penceresine göre değişir
+let hours       = 24;
+let minMag      = 1.0; // zaman penceresine göre değişir
 let src         = 'emsc';
 let radius      = 18, blur = 15;
 let cntVal      = REFRESH, cntTimer = null;
@@ -2613,7 +2621,7 @@ function toggleLayer(type) {
     if (showHazard) {
       if (map.hasLayer(labelLayer)) map.removeLayer(labelLayer);
     } else {
-      if (!showTopo && !map.hasLayer(labelLayer)) labelLayer.addTo(map);
+      if (showLabels && !showTopo && !map.hasLayer(labelLayer)) labelLayer.addTo(map);
     }
     if (!hazardLayer) {
       loadHazardLayer();
@@ -2628,7 +2636,7 @@ function toggleLayer(type) {
     if (showRisk) {
       if (map.hasLayer(labelLayer)) map.removeLayer(labelLayer);
     } else {
-      if (!showTopo && !showHazard && !map.hasLayer(labelLayer)) labelLayer.addTo(map);
+      if (showLabels && !showTopo && !showHazard && !map.hasLayer(labelLayer)) labelLayer.addTo(map);
     }
     if (!riskLayer) {
       riskLayer = L.tileLayer(
@@ -2648,7 +2656,7 @@ function toggleLayer(type) {
     const lgEH = document.getElementById('lgEuHaz');
     if (lgEH) { if (showEuHaz) lgEH.classList.remove('hidden'); else lgEH.classList.add('hidden'); }
     if (showEuHaz && map.hasLayer(labelLayer)) map.removeLayer(labelLayer);
-    else if (!showEuHaz && !showTopo && !showHazard && !showRisk && !map.hasLayer(labelLayer)) labelLayer.addTo(map);
+    else if (showLabels && !showEuHaz && !showTopo && !showHazard && !showRisk && !map.hasLayer(labelLayer)) labelLayer.addTo(map);
     if (!euHazLayer) {
       euHazLayer = L.tileLayer.wms(
         'https://efehrmaps.ethz.ch/cgi-bin/mapserv?map=/var/www/mapfile/eshm20data.map',
@@ -2883,9 +2891,19 @@ function toggleLayer(type) {
       map.removeLayer(topoShade);
       darkBase.addTo(map);
       darkBase.bringToBack();
-      labelLayer.addTo(map);
-      labelLayer.bringToFront();
+      if (showLabels) { labelLayer.addTo(map); labelLayer.bringToFront(); }
       setStatus('Topografya kapatıldı');
+    }
+  } else if (type === 'labels') {
+    showLabels = !showLabels;
+    document.getElementById('btnLabels').classList.toggle('active', showLabels);
+    if (showLabels) {
+      if (!showTopo && !showHazard && !showRisk && !showEuHaz && !map.hasLayer(labelLayer)) {
+        labelLayer.addTo(map);
+        labelLayer.bringToFront();
+      }
+    } else {
+      if (map.hasLayer(labelLayer)) map.removeLayer(labelLayer);
     }
   }
 }
