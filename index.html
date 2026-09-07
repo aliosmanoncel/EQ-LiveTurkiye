@@ -2699,17 +2699,22 @@ function toggleLayer(type) {
     if (showPlates) {
       if (!platesLayer) {
         fetch('data/plate_boundaries.geojson').then(r => r.json()).then(gj => {
+          // Kıtasal ölçekli plaka sınırı ile MTA'nın detaylı fay çizgileri farklı
+          // veri setleri — MTA görsel olarak öncelikli kalsın diye opaklık düşük
+          // tutuldu ve bringToBack() ile MTA'nın ARKASINA itiliyor (veri kırpılmadı,
+          // sadece görsel hiyerarşi; KAF/DAF'ın plaka sınırı bağlamı hâlâ görünür).
           platesLayer = L.geoJSON(gj, {
-            style: { color: '#a78bfa', weight: 1.3, opacity: 0.65, dashArray: '4,3' },
+            style: { color: '#a78bfa', weight: 1.3, opacity: 0.35, dashArray: '4,3' },
             onEachFeature: (f, layer) => {
               const name = (f.properties && f.properties.name) || '—';
               layer.bindPopup(`<b style="color:#a78bfa">${name}</b><br><span style="color:#aaa;font-size:.75em">USGS/Smithsonian · This Dynamic Planet</span>`);
             }
           });
-          if (showPlates) platesLayer.addTo(map);
+          if (showPlates) { platesLayer.addTo(map); platesLayer.bringToBack(); }
         });
       } else {
         platesLayer.addTo(map);
+        platesLayer.bringToBack();
       }
       setStatus('Levha Sınırları · USGS/Smithsonian This Dynamic Planet · Global');
     } else {
