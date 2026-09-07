@@ -13,7 +13,7 @@
     #map{position:fixed;inset:0;z-index:1}
 
     /* ── PANEL (sbar üstünde yüzer) ── */
-    .panel{position:fixed;bottom:26px;left:0;right:0;z-index:1000;
+    .panel{position:fixed;bottom:42px;left:0;right:0;z-index:1000;
       background:rgba(20,20,20,.94);backdrop-filter:blur(4px);
       border-top:1px solid #2a2a2a;}
     .panel-handle{display:flex;align-items:center;justify-content:center;
@@ -24,7 +24,7 @@
     .panel-body{padding:7px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
     .panel-body.collapsed{display:none}
 
-    .tmPanel{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);
+    .tmPanel{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);
       width:min(720px,92vw);background:rgba(17,17,17,.97);border:1px solid #2a2a2a;
       border-top:2px solid #06b6d4;border-radius:8px 8px 0 0;padding:14px 18px;
       z-index:1001;box-shadow:0 -4px 20px rgba(0,0,0,.5);display:none}
@@ -58,14 +58,17 @@
     .rowbox.disabledRow label{opacity:.35}
 
     /* ── STATUS (panel'in hemen üstünde yüzer) ── */
-    .sbar{position:fixed;bottom:0;left:0;right:0;z-index:499;
+    /* İki seviyeli alt bar: üstte istatistik (daha okunaklı), altta kaynak/durum
+       (daha soluk) — ikisi aynı görsel düzlemdeyken "hangisi önemli" belirsizdi. */
+    .sbar{position:fixed;left:0;right:0;z-index:499;
       background:rgba(14,14,14,.88);backdrop-filter:blur(4px);
-      border-top:1px solid #1e1e1e;padding:3px 18px;
-      font-size:.72rem;color:#555;display:flex;gap:18px;align-items:center;flex-wrap:nowrap;overflow:hidden}
+      display:flex;gap:18px;align-items:center;flex-wrap:nowrap;overflow:hidden}
     .sbar b{color:#06b6d4}
     .sbar .err{color:#ef4444}
     .sbar a{color:#444;text-decoration:none}
     .sbar a:hover{color:#06b6d4}
+    .sbar-stats{bottom:18px;border-top:1px solid #1e1e1e;padding:4px 18px;font-size:.74rem;color:#999}
+    .sbar-source{bottom:0;padding:2px 18px;font-size:.66rem;color:#444}
 
     /* ── LIVE BADGE ── */
     .live-badge{display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:700;padding:3px 8px;border-radius:4px;border:1px solid #333}
@@ -76,7 +79,7 @@
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
     /* ── LEGEND ── */
-    .legend{position:fixed;bottom:56px;left:10px;z-index:999;background:rgba(0,0,0,.85);border:1px solid #2a2a2a;border-radius:6px;font-size:.75rem;pointer-events:all;min-width:160px;max-width:250px}
+    .legend{position:fixed;bottom:72px;left:10px;z-index:999;background:rgba(0,0,0,.85);border:1px solid #2a2a2a;border-radius:6px;font-size:.75rem;pointer-events:all;min-width:160px;max-width:250px}
     .legend-header{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;cursor:pointer;user-select:none}
     .legend-header span{color:#fbbf24;font-weight:700;font-size:.78rem}
     .legend-toggle{color:#555;font-size:.85rem;line-height:1}
@@ -136,11 +139,11 @@
     /* ── SON BÜYÜK DEPREM KARTI ── */
     #lastCard{position:fixed;top:104px;left:50%;transform:translateX(-50%);z-index:999;
       background:rgba(0,0,0,.78);border:1px solid #2a2a2a;border-radius:7px;
-      padding:5px 14px;min-width:220px;max-width:340px;text-align:center;
+      padding:4px 12px;min-width:190px;max-width:300px;text-align:center;
       pointer-events:none;cursor:pointer}
-    #lastCard .lc-mag{font-size:1.5rem;font-weight:900;line-height:1.1;letter-spacing:-1px}
-    #lastCard .lc-place{font-size:.72rem;color:#aaa;margin:1px 0 3px}
-    #lastCard .lc-timer{font-size:.68rem;color:#555;border-top:1px solid #1e1e1e;padding-top:3px;margin-top:2px}
+    #lastCard .lc-mag{font-size:1.15rem;font-weight:900;line-height:1.1;letter-spacing:-1px}
+    #lastCard .lc-place{font-size:.68rem;color:#aaa;margin:1px 0 2px}
+    #lastCard .lc-timer{font-size:.64rem;color:#555;border-top:1px solid #1e1e1e;padding-top:2px;margin-top:1px}
     #lastCard .lc-timer b{color:#f97316}
     .mag-hi{color:#ef4444}
     .mag-md{color:#f97316}
@@ -175,11 +178,11 @@
      gibi sağ üst köşeye, "Görünen Depremler" listesinin altına yerleştirildi. Detaylı
      analiz katmanları (Hazard/Risk/b-değeri/Fraktal) bilinçli olarak alttaki gizli panelde
      kalıyor. -->
-<div style="position:fixed;z-index:998;top:50px;right:10px;display:flex;flex-direction:column;gap:4px;background:rgba(20,20,20,.92);padding:6px;border-radius:8px;border:1px solid #334;width:170px">
-  <button class="tbtn"        id="btnTopo"   onclick="toggleLayer('topo')"   style="width:100%;text-align:left" title="ESRI World Hillshade + Shaded Relief topografya katmanı">🗺️ Topografya</button>
-  <button class="tbtn"        id="btnPlates" onclick="toggleLayer('plates')" style="width:100%;text-align:left" title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
-  <button class="tbtn"        id="btnGAF"    onclick="toggleLayer('gaf')"    style="width:100%;text-align:left" title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
-  <button class="tbtn active" id="btnLabels" onclick="toggleLayer('labels')" style="width:100%;text-align:left" title="Yer adı / şehir etiketleri katmanı">🏷️ Etiketler</button>
+<div style="position:fixed;z-index:998;top:50px;right:10px;display:flex;flex-direction:column;gap:3px;background:rgba(20,20,20,.92);padding:5px;border-radius:8px;border:1px solid #334;width:150px">
+  <button class="tbtn"        id="btnTopo"   onclick="toggleLayer('topo')"   style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="ESRI World Hillshade + Shaded Relief topografya katmanı">🗺️ Topografya</button>
+  <button class="tbtn"        id="btnPlates" onclick="toggleLayer('plates')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
+  <button class="tbtn"        id="btnGAF"    onclick="toggleLayer('gaf')"    style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
+  <button class="tbtn active" id="btnLabels" onclick="toggleLayer('labels')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Yer adı / şehir etiketleri katmanı">🏷️ Etiketler</button>
 </div>
 
 <!-- BÖLGE SEÇ — sürükleyip bölge kilitle, o bölgedeki küçük depremleri getir -->
@@ -251,7 +254,7 @@
 <!-- GÖRÜNEN DEPREMLER (harita sınırlarına göre canlı liste) -->
 <div class="eqlist">
   <div class="eqlist-header" onclick="toggleEqList()">
-    <span class="title" id="eqlTitle">Görünen Depremler: 0</span>
+    <span class="title" id="eqlTitle">Haritada: 0</span>
     <span class="eqlist-toggle" id="eqlToggle">▼</span>
   </div>
   <div class="eqlist-body hidden" id="eqlBody"></div>
@@ -726,15 +729,18 @@
 </div>
 
 <!-- STATUS -->
-<div class="sbar">
-  <span id="statusTxt">Yükleniyor…</span>
+<div class="sbar sbar-stats">
   <span>Toplam: <b id="sCnt">—</b></span>
   <span>Mw≥3: <b id="sM3">—</b></span>
   <span>Mw≥4: <b id="sM4">—</b></span>
   <span>Mw≥5: <b id="sM5">—</b></span>
   <span>Maks: <b id="sMx">—</b></span>
   <span>Güncelleme: <b id="sUpd">—</b></span>
+</div>
+<div class="sbar sbar-source">
+  <span id="statusTxt">Yükleniyor…</span>
   <span style="margin-left:auto">
+    Kaynak:
     <a href="https://deprem.afad.gov.tr/last-earthquakes.html" target="_blank">↗ AFAD</a> &nbsp;
     <a href="http://www.koeri.boun.edu.tr/sismo/2/tr/son-depremler/" target="_blank">↗ KANDİLLİ</a> &nbsp;
     <a href="https://www.emsc-csem.org/Earthquake_information/" target="_blank">↗ EMSC</a> &nbsp;
@@ -1115,7 +1121,7 @@ let seismicityColorMode = 'mag'; // 'mag' | 'depth'
 function magRadius(m) {
   if (m >= 7.0) return 18;
   if (m >= 5.5) return 13;
-  if (m >= 4.0) return 9;
+  if (m >= 4.0) return 8; // Mw6+ (üstteki iki basamak) büyük kalsın diye sadece bu basamak küçültüldü
   if (m >= 2.5) return 5;
   return 3;
 }
@@ -1885,7 +1891,7 @@ function updateEqList() {
     .filter(({e}) => bounds.contains([e.lat, e.lon]))
     .sort((a,b) => b.e.time - a.e.time);
 
-  title.textContent = `Görünen Depremler: ${eqlVisibleList.length}`;
+  title.textContent = `Haritada: ${eqlVisibleList.length}`;
 
   if (!eqlVisibleList.length) {
     body.innerHTML = '<div class="eqlist-empty">Bu görünümde deprem yok</div>';
