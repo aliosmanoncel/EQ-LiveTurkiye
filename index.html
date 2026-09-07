@@ -180,6 +180,7 @@
      kalıyor. -->
 <div style="position:fixed;z-index:998;top:50px;right:10px;display:flex;flex-direction:column;gap:3px;background:rgba(20,20,20,.92);padding:5px;border-radius:8px;border:1px solid #334;width:150px">
   <button class="tbtn"        id="btnTopo"   onclick="toggleLayer('topo')"   style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="ESRI World Hillshade + Shaded Relief topografya katmanı">🗺️ Topografya</button>
+  <button class="tbtn"        id="btnAerial" onclick="toggleLayer('aerial')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Uydu Görüntüsü · Esri World Imagery © Esri, Maxar, Earthstar Geographics">🛰️ Uydu Görüntüsü</button>
   <button class="tbtn"        id="btnPlates" onclick="toggleLayer('plates')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
   <button class="tbtn"        id="btnGAF"    onclick="toggleLayer('gaf')"    style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
   <button class="tbtn active" id="btnLabels" onclick="toggleLayer('labels')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Yer adı / şehir etiketleri katmanı">🏷️ Etiketler</button>
@@ -878,7 +879,14 @@ const topoShade = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
   { attribution:'© Esri, USGS, NOAA', maxZoom:16, zIndex:2, opacity:0.55 });
 
+// Uydu Görüntüsü: EMSC World'deki "Aerial Map" karşılığı — kendi etiketi yok,
+// Etiketler katmanıyla (labelLayer) birlikte kullanılmak üzere tasarlandı.
+const aerialBase = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  { attribution:'© Esri, Maxar, Earthstar Geographics', maxZoom:19, zIndex:1 });
+
 let showTopo    = false;
+let showAerial  = false;
 let showLabels  = true; // labelLayer varsayılan açık — Etiketler tuşuyla kullanıcı kapatabilir
 let showFractal = false;
 let fractalLayer = null;
@@ -2887,6 +2895,11 @@ function toggleLayer(type) {
     }
   } else if (type === 'topo') {
     showTopo = !showTopo;
+    if (showTopo && showAerial) { // taban katmanları birbirini dışlar (EMSC'deki radio-buton mantığı)
+      showAerial = false;
+      document.getElementById('btnAerial').classList.remove('active');
+      map.removeLayer(aerialBase);
+    }
     document.getElementById('btnTopo').classList.toggle('active', showTopo);
     if (showTopo) {
       map.removeLayer(darkBase);
@@ -2902,6 +2915,28 @@ function toggleLayer(type) {
       darkBase.bringToBack();
       if (showLabels) { labelLayer.addTo(map); labelLayer.bringToFront(); }
       setStatus('Topografya kapatıldı');
+    }
+  } else if (type === 'aerial') {
+    showAerial = !showAerial;
+    if (showAerial && showTopo) { // taban katmanları birbirini dışlar
+      showTopo = false;
+      document.getElementById('btnTopo').classList.remove('active');
+      map.removeLayer(topoBase);
+      map.removeLayer(topoShade);
+      if (showLabels) { labelLayer.addTo(map); labelLayer.bringToFront(); } // topo etiketleri kapatmıştı, geri aç
+    }
+    document.getElementById('btnAerial').classList.toggle('active', showAerial);
+    if (showAerial) {
+      map.removeLayer(darkBase);
+      aerialBase.addTo(map);
+      aerialBase.bringToBack();
+      labelLayer.bringToFront();
+      setStatus('Uydu Görüntüsü · Esri World Imagery © Esri, Maxar, Earthstar Geographics');
+    } else {
+      map.removeLayer(aerialBase);
+      darkBase.addTo(map);
+      darkBase.bringToBack();
+      setStatus('Uydu görünümü kapatıldı');
     }
   } else if (type === 'labels') {
     showLabels = !showLabels;
