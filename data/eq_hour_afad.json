@@ -1,1 +1,1 @@
-{"generated":"2026-09-07T23:22:10Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-09-08T02:33:34Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"728048","time":"2026-09-08T01:43:34","lat":36.93633,"lon":29.2985,"dep":7.0,"mag":1.2,"mtype":"ML","mw":0.56,"place":"Çameli (Denizli)","province":"Denizli","district":"Çameli"}]}
