@@ -1,1 +1,1 @@
-{"generated":"2026-09-08T19:47:05Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-09-08T22:16:27Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"728121","time":"2026-09-08T21:33:42","lat":38.12933,"lon":37.86733,"dep":7.0,"mag":1.7,"mtype":"ML","mw":0.94,"place":"Doğanşehir (Malatya)","province":"Malatya","district":"Doğanşehir"}]}

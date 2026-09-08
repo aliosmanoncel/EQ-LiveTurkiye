@@ -1,1 +1,1 @@
-{"generated":"2026-09-08T19:46:57Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-09-08T22:16:20Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20260908_0000292","time":"2026-09-08T21:33:42.5Z","lat":38.1293,"lon":37.8673,"dep":7.0,"mag":1.7,"mtype":"ml","mw":0.94,"place":"CENTRAL TURKEY"},{"id":"20260908_0000288","time":"2026-09-08T21:17:19.33Z","lat":27.9432,"lon":-18.072,"dep":27.1,"mag":2.1,"mtype":"ml","mw":1.25,"place":"CANARY ISLANDS, SPAIN REGION"}]}
