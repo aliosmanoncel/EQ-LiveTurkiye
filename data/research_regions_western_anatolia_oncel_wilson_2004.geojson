@@ -1,0 +1,243 @@
+{
+ "type": "FeatureCollection",
+ "metadata": {
+  "title": "Oncel & Wilson (2004) Western Turkey macro-tectonic zones (Shear / Extensional / Compressional)",
+  "source": "Oncel, A.O. and Wilson, T. (2004), J. Geophys. Res., 109, B11306, doi:10.1029/2004JB003101",
+  "source_figure": "Figure 1, left panel (geographic map with 3 macro-zone outlines), PDF page 3",
+  "study_area_text": "Paper text / axis: 23-31E, 33-43N",
+  "scope": "Phase 0 (in progress) -- only the 3 macro-zones (Shear/Extensional/Compressional) are in scope; the 25 sub-zones (1-25) are explicitly NOT digitized in this dataset",
+  "status": "IN PROGRESS: Shear Zone complete and approved; Extensional and Compressional not yet added",
+  "geometry_status": "reconstructed / not original GIS boundary -- see each feature's own 'provenance' and 'vertex_notes' properties",
+  "digitized_by": "Claude (calibrated pixel tracing from the user's Zotero PDF copy), reviewed and approved per-zone with the user",
+  "digitized_date": "2026-09-10"
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_name": "Shear Zone",
+    "member_zones": [
+     1,
+     2,
+     3,
+     4,
+     7,
+     8,
+     9
+    ],
+    "source": "Oncel & Wilson (2004)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2004), Correlation of seismotectonic variables and GPS strain measurements in western Turkey, J. Geophys. Res., 109, B11306, doi:10.1029/2004JB003101",
+    "figure": "Figure 1 (left panel, geographic map with Shear/Extensional/Compressional Zone outlines)",
+    "publication_year": 2004,
+    "region": "Western Turkey / Aegean",
+    "status": "reconstructed / not original GIS boundary",
+    "provenance": "This polygon is a RECONSTRUCTION of the zone outline visible in the published Figure 1 raster, not the authors' original GIS/digitizing data (which is not publicly available). It was produced by calibrating a high-resolution PDF-page render against the figure's own axis tick marks (23-31E / 33-43N), then tracing the red-dotted 'Shear Zone' line color (RGB ~175,34,32) via a mix of automated connected-component pixel analysis and manual verification against zoomed crops. Some vertices (see vertex_notes) are medium-confidence visual reconstructions, not exact original coordinates.",
+    "geometry_method": "calibrated pixel tracing (PyMuPDF page render at 8x scale, axis calibrated from tick-mark pixel positions; red-dotted line color-thresholded, connected-component isolated, corner positions refined by row-by-row pixel sampling for the Zone 6/7 shared-boundary section)",
+    "confidence": "mixed -- see vertex_notes for per-vertex confidence (high/medium-high/medium)",
+    "known_limitation": "Vertex 8 (NE corner of Zone 1, ~30.2E/41.0N) sits in a zone of coastline/frame-edge ambiguity and was deliberately NOT chased to sub-pixel precision; treat as approximate. Coastal-tracing vertices (2-6, 15-16) are smoothed from a chain of pixel fragments along the coastline, not exact coastline-following coordinates.",
+    "verified_against": "Zones 1,2,3,4,7,8,9 confirmed enclosed by this polygon; Zones 5,6 (Extensional) confirmed excluded, in a rendered overlay check against the source figure (2026-09-10)",
+    "vertex_notes": [
+     {
+      "index": 0,
+      "lon": 23.6,
+      "lat": 38.75,
+      "confidence": "medium",
+      "note": "West loop SW corner, coastal-tracing region"
+     },
+     {
+      "index": 1,
+      "lon": 23.6,
+      "lat": 39.7,
+      "confidence": "medium",
+      "note": "West loop NW corner, coastal-tracing region"
+     },
+     {
+      "index": 2,
+      "lon": 24.4,
+      "lat": 40.56,
+      "confidence": "medium",
+      "note": "Coastal diagonal (zone 4 area), smoothed from a chain of nearby pixel fragments"
+     },
+     {
+      "index": 3,
+      "lon": 25.39,
+      "lat": 40.57,
+      "confidence": "medium",
+      "note": "Coastal diagonal (zone 3/4 area)"
+     },
+     {
+      "index": 4,
+      "lon": 25.87,
+      "lat": 40.63,
+      "confidence": "medium",
+      "note": "Coastal diagonal (zone 3 area)"
+     },
+     {
+      "index": 5,
+      "lon": 26.48,
+      "lat": 40.72,
+      "confidence": "medium",
+      "note": "Coastal diagonal (zone 2/3 area)"
+     },
+     {
+      "index": 6,
+      "lon": 27.26,
+      "lat": 40.91,
+      "confidence": "medium",
+      "note": "Coastal diagonal approaching zone 1, zone2-1 transition"
+     },
+     {
+      "index": 7,
+      "lon": 27.95,
+      "lat": 41.0,
+      "confidence": "high",
+      "note": "Zone 1 NW corner, close to top frame"
+     },
+     {
+      "index": 8,
+      "lon": 30.2,
+      "lat": 41.0,
+      "confidence": "medium",
+      "note": "Zone 1 NE corner -- INTENTIONALLY NOT over-precise: sits in a coastline/frame-edge ambiguity zone (raw automated trace suggested up to lon 30.71, likely coastline jag, not the true corner); 30.20 approximates the panel's own right frame/tick position instead of chasing sub-pixel coastline noise"
+     },
+     {
+      "index": 9,
+      "lon": 30.2,
+      "lat": 40.0,
+      "confidence": "medium",
+      "note": "Zone 1 SE corner"
+     },
+     {
+      "index": 10,
+      "lon": 27.9,
+      "lat": 40.0,
+      "confidence": "high",
+      "note": "Zone 1 SW corner -- shared boundary with Extensional Zone (zones 5/6), drawn with alternating red/orange styling in the source figure"
+     },
+     {
+      "index": 11,
+      "lon": 27.36,
+      "lat": 39.84,
+      "confidence": "high",
+      "note": "Turn corner, confirmed by row-by-row pixel sampling of the alternating-color line"
+     },
+     {
+      "index": 12,
+      "lon": 26.96,
+      "lat": 39.84,
+      "confidence": "high",
+      "note": "Horizontal-to-vertical turn, pixel-sampled (corrected from an initial estimate of 27.26)"
+     },
+     {
+      "index": 13,
+      "lon": 26.96,
+      "lat": 38.85,
+      "confidence": "high",
+      "note": "Same vertical edge (constant longitude) as vertex 12 -- shared Shear(7)/Extensional(6) boundary, alternating red/orange styling"
+     },
+     {
+      "index": 14,
+      "lon": 26.8,
+      "lat": 38.75,
+      "confidence": "medium-high",
+      "note": "Vertical-to-horizontal turn corner, refined via pixel sampling"
+     },
+     {
+      "index": 15,
+      "lon": 25.53,
+      "lat": 38.75,
+      "confidence": "medium",
+      "note": "Horizontal closing segment (zone 7/8 boundary area)"
+     },
+     {
+      "index": 16,
+      "lon": 24.4,
+      "lat": 38.84,
+      "confidence": "medium",
+      "note": "Horizontal closing segment, entering the west loop"
+     }
+    ],
+    "checkpoint": "Shear Zone -- approved 2026-09-10; Extensional and Compressional Zones not yet digitized"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       23.6,
+       38.75
+      ],
+      [
+       23.6,
+       39.7
+      ],
+      [
+       24.4,
+       40.56
+      ],
+      [
+       25.39,
+       40.57
+      ],
+      [
+       25.87,
+       40.63
+      ],
+      [
+       26.48,
+       40.72
+      ],
+      [
+       27.26,
+       40.91
+      ],
+      [
+       27.95,
+       41.0
+      ],
+      [
+       30.2,
+       41.0
+      ],
+      [
+       30.2,
+       40.0
+      ],
+      [
+       27.9,
+       40.0
+      ],
+      [
+       27.36,
+       39.84
+      ],
+      [
+       26.96,
+       39.84
+      ],
+      [
+       26.96,
+       38.85
+      ],
+      [
+       26.8,
+       38.75
+      ],
+      [
+       25.53,
+       38.75
+      ],
+      [
+       24.4,
+       38.84
+      ],
+      [
+       23.6,
+       38.75
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}
