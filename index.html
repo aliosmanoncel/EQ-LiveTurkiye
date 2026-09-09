@@ -108,6 +108,10 @@
 
     /* ── BÖLGE SEÇ (sürükleyip bölge kilitleme — küçük depremleri getirme) ── */
     .regionCtrl{position:fixed;top:10px;left:270px;z-index:999}
+    /* Araştırma Bölgesi (literatür) — .regionCtrl'nin TÜM iç görünümünü
+       (header/body/tbtn/rowbox) miras alır (aynı sınıflar), sadece konumu
+       ayrı: ikisi de varsayılanda aynı anda görünsün, üst üste binmesin. */
+    .litRegionCtrl{top:10px;left:500px}
     /* Panel sürüklenebilir — header hem aç/kapa hem taşıma tutamacı (bkz. initRegionCtrlDrag).
        touch-action:none dokunmatikte sürüklerken sayfanın kaymasını engeller. */
     .regionCtrl-header{display:flex;align-items:center;justify-content:space-between;gap:10px;width:210px;background:rgba(0,0,0,.85);border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;cursor:grab;user-select:none;touch-action:none}
@@ -130,6 +134,7 @@
        düzeltiliyor, sürükleme özelliği bozulmuyor. */
     @media (max-width: 600px) {
       .regionCtrl{left:8px;top:92px}
+      .litRegionCtrl{left:8px;top:140px}
       .regionCtrl-header{width:150px;padding:5px 8px}
       .regionCtrl .tbtn{width:150px;font-size:.75rem;padding:5px 8px}
       .regionCtrl .rowbox{padding:3px 6px;gap:4px}
@@ -256,15 +261,22 @@
   <button class="tbtn" id="btnRegionRefresh" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
   <button class="tbtn" onclick="exportRegionCSV()" title="Bölgedeki TÜM depremleri (görsel örneklemeden etkilenmeden) CSV olarak indir — mag/mtype orijinal ölçüm, mw dönüştürülmüş değer, ayrı sütunlar">⬇ CSV İndir</button>
   <div id="regionInfo" style="font-size:.75rem;color:#999;line-height:1.6;background:rgba(20,20,20,.9);border-radius:6px;padding:8px 10px;width:260px"></div>
+  </div>
+</div>
 
-  <div class="sep"></div>
-  <!-- Araştırma Bölgesi (literatür-tabanlı, statik GeoJSON) — Faz 1A.
-       KASITLI OLARAK regionRect/fetchRegionEvents'ten AYRI: burada seçilen
-       poligon sadece haritada çizilir, hiçbir EMSC/USGS/AFAD sorgusu
-       tetiklemez. Böylece "doğru bölgeyi çiziyor muyuz" (1A) sorusu,
-       "doğru bölgeden veri çekiyor muyuz" (1B, henüz yok) sorusundan
-       bağımsız doğrulanabilir. -->
-  <div style="font-size:.72rem;color:#a855f7;font-weight:600">📚 Araştırma Bölgesi (literatür)</div>
+<!-- ARAŞTIRMA BÖLGESİ (literatür-tabanlı, statik GeoJSON) — Faz 1A/1B.
+     "Bölge Analizi"nden AYRI, kendi başlığı/sürüklemesi/aç-kapa'sı olan
+     bağımsız panel — canlı sorgu kutusunun altında gömülüyse Marmara
+     bölümü bile scroll gerektiriyordu; Batı Anadolu (2004) eklendiğinde
+     bu daha da kötüleşirdi. KASITLI OLARAK regionRect/fetchRegionEvents'ten
+     AYRI: burada seçilen poligon sadece haritada çizilir, EMSC/USGS/AFAD
+     sorgusu ancak "▶ Bu bölgede sorgula" (Faz 1B) ile açıkça tetiklenir. -->
+<div class="regionCtrl litRegionCtrl">
+  <div class="regionCtrl-header" onclick="toggleLitRegionCtrl()">
+    <span class="title" style="color:#a855f7">📚 Araştırma Bölgesi</span>
+    <span class="regionCtrl-toggle" id="lrcToggle">▼</span>
+  </div>
+  <div class="regionCtrl-body hidden" id="lrcBody">
   <div class="rowbox">
     <label>Çalışma</label>
     <select id="litRegionGroupSel" class="src-sel" onchange="onLitRegionGroupChange()">
@@ -1934,16 +1946,23 @@ function toggleRegionCtrl() {
   icon.textContent = hidden ? '▼' : '▲';
 }
 
-/* Bölge Analizi paneli sürüklenebilir (taşınabilir) — Marmara gibi
-   haritanın sol/batı tarafındaki araştırma bölgeleri panel yüzünden
-   görünmüyor/zoom-out gerektiriyordu; kullanıcı paneli kenara çekebilsin
-   diye. Pointer Events (mouse+dokunmatik tek kod yolu) kullanılıyor;
-   5px'ten küçük hareketler sürükleme sayılmaz, mevcut aç/kapa tıklaması
-   bozulmaz (bkz. regionCtrlWasDragged / toggleRegionCtrl). */
-(function initRegionCtrlDrag() {
-  const panel  = document.querySelector('.regionCtrl');
-  const header = document.querySelector('.regionCtrl-header');
-  if (!panel || !header) return;
+let litRegionCtrlWasDragged = false; // aynı ayrım, Araştırma Bölgesi paneli için
+function toggleLitRegionCtrl() {
+  if (litRegionCtrlWasDragged) { litRegionCtrlWasDragged = false; return; }
+  const body = document.getElementById('lrcBody');
+  const icon = document.getElementById('lrcToggle');
+  const hidden = body.classList.toggle('hidden');
+  icon.textContent = hidden ? '▼' : '▲';
+}
+
+/* Panelleri sürüklenebilir (taşınabilir) yapan ORTAK yardımcı — hem
+   "Bölge Analizi" hem "Araştırma Bölgesi" panelleri bunu kullanır (altta
+   iki kez çağrılıyor). Marmara gibi haritanın sol/batı tarafındaki
+   araştırma bölgeleri panel yüzünden görünmüyor/zoom-out gerektiriyordu;
+   kullanıcı paneli kenara çekebilsin diye. Pointer Events (mouse+dokunmatik
+   tek kod yolu) kullanılıyor; 5px'ten küçük hareketler sürükleme sayılmaz,
+   panelin kendi aç/kapa tıklaması bozulmaz (bkz. setWasDragged callback). */
+function makeDraggablePanel(panel, header, setWasDragged) {
   let startX = 0, startY = 0, startLeft = 0, startTop = 0, dragging = false, moved = false;
 
   header.addEventListener('pointerdown', (e) => {
@@ -1975,7 +1994,18 @@ function toggleRegionCtrl() {
     dragging = false;
     header.classList.remove('dragging');
     header.releasePointerCapture(e.pointerId);
-    if (moved) regionCtrlWasDragged = true; // hemen ardından gelecek click'i toggleRegionCtrl yutsun
+    if (moved) setWasDragged(); // hemen ardından gelecek click'i panelin toggle'ı yutsun
+  });
+}
+
+(function initDraggablePanels() {
+  document.querySelectorAll('.regionCtrl').forEach(panel => {
+    const header = panel.querySelector('.regionCtrl-header');
+    if (!header) return;
+    const isLit = panel.classList.contains('litRegionCtrl');
+    makeDraggablePanel(panel, header, () => {
+      if (isLit) litRegionCtrlWasDragged = true; else regionCtrlWasDragged = true;
+    });
   });
 })();
 
