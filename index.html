@@ -249,6 +249,30 @@
   <button class="tbtn" id="btnRegionRefresh" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
   <button class="tbtn" onclick="exportRegionCSV()" title="Bölgedeki TÜM depremleri (görsel örneklemeden etkilenmeden) CSV olarak indir — mag/mtype orijinal ölçüm, mw dönüştürülmüş değer, ayrı sütunlar">⬇ CSV İndir</button>
   <div id="regionInfo" style="font-size:.75rem;color:#999;line-height:1.6;background:rgba(20,20,20,.9);border-radius:6px;padding:8px 10px;width:260px"></div>
+
+  <div class="sep"></div>
+  <!-- Araştırma Bölgesi (literatür-tabanlı, statik GeoJSON) — Faz 1A.
+       KASITLI OLARAK regionRect/fetchRegionEvents'ten AYRI: burada seçilen
+       poligon sadece haritada çizilir, hiçbir EMSC/USGS/AFAD sorgusu
+       tetiklemez. Böylece "doğru bölgeyi çiziyor muyuz" (1A) sorusu,
+       "doğru bölgeden veri çekiyor muyuz" (1B, henüz yok) sorusundan
+       bağımsız doğrulanabilir. -->
+  <div style="font-size:.72rem;color:#a855f7;font-weight:600">📚 Araştırma Bölgesi (literatür)</div>
+  <div class="rowbox">
+    <label>Çalışma</label>
+    <select id="litRegionGroupSel" class="src-sel" onchange="onLitRegionGroupChange()">
+      <option value="">— Seçiniz —</option>
+      <option value="ow2006_marmara">Marmara — Öncel &amp; Wilson (2006)</option>
+    </select>
+  </div>
+  <div class="rowbox" id="litRegionZoneRow" style="display:none">
+    <label>Zone</label>
+    <select id="litRegionZoneSel" class="src-sel" onchange="onLitRegionZoneChange()">
+      <option value="">—</option>
+    </select>
+  </div>
+  <button class="tbtn" id="btnLitRegionClear" onclick="litRegionClear()" style="display:none">✕ Araştırma Bölgesini Kaldır</button>
+  <div id="litRegionInfo" style="display:none;font-size:.72rem;color:#ccc;line-height:1.5;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;width:260px"></div>
   </div>
 </div>
 
@@ -2450,6 +2474,101 @@ function regionDeselect() {
   if (btnPoly) btnPoly.classList.remove('active');
   const polyCtrl = document.getElementById('polygonDrawCtrl');
   if (polyCtrl) polyCtrl.style.display = 'none';
+}
+
+/* ══════════════════════════════════════════
+   ARAŞTIRMA BÖLGESİ (literatür-tabanlı) — Faz 1A
+   Statik GeoJSON'dan (data/research_regions_*.geojson) seçilen zone'u
+   haritada çizer. KASITLI OLARAK regionRect'i KULLANMAZ — kendi ayrı
+   litRegionLayer'ı var, bu yüzden mevcut Limit/Sırala/Mw/Derinlik/Yenile
+   kontrolleri (hepsi regionRect'e bağlı) bu seçimden ETKİLENMEZ ve ona
+   hiçbir ağ isteği tetiklemez. EMSC/USGS/AFAD sorgusuna bağlama işi
+   ayrı bir Faz 1B checkpoint'i — burada YOK.
+══════════════════════════════════════════ */
+const LIT_REGION_SOURCES = {
+  ow2006_marmara: {
+    url:   'data/research_regions_marmara_oncel_wilson_2006.geojson',
+    label: "Öncel & Wilson (2006) — Marmara",
+  }
+};
+let litRegionCache = {};   // { [key]: geojson } — sekme açıkken tekrar indirmeye gerek yok
+let litRegionLayer = null; // L.Rectangle — seçili araştırma bölgesi (regionRect'ten TAMAMEN ayrı)
+
+async function onLitRegionGroupChange() {
+  const key = document.getElementById('litRegionGroupSel').value;
+  const zoneRow = document.getElementById('litRegionZoneRow');
+  const zoneSel = document.getElementById('litRegionZoneSel');
+  litRegionClear();
+  if (!key) { zoneRow.style.display = 'none'; return; }
+  zoneRow.style.display = '';
+  zoneSel.innerHTML = '<option value="">Yükleniyor…</option>';
+  try {
+    if (!litRegionCache[key]) {
+      const res = await fetchTimeout(LIT_REGION_SOURCES[key].url, {}, 10000);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      litRegionCache[key] = await res.json();
+    }
+    const geo = litRegionCache[key];
+    const opts = geo.features
+      .slice()
+      .sort((a, b) => a.properties.zone_id - b.properties.zone_id)
+      .map(f => {
+        const nf = f.properties.notable_feature;
+        const label = nf ? `Zone ${f.properties.zone_id} — ${nf.split(';')[0]}` : `Zone ${f.properties.zone_id}`;
+        return `<option value="${f.properties.zone_id}">${label}</option>`;
+      })
+      .join('');
+    zoneSel.innerHTML = '<option value="">— Zone seçin —</option>' + opts;
+  } catch (err) {
+    zoneSel.innerHTML = '<option value="">Yüklenemedi</option>';
+    setStatus(`Araştırma bölgesi verisi yüklenemedi: ${err.message}`, true);
+  }
+}
+
+function onLitRegionZoneChange() {
+  const groupKey = document.getElementById('litRegionGroupSel').value;
+  const zoneId   = document.getElementById('litRegionZoneSel').value;
+  if (litRegionLayer) { map.removeLayer(litRegionLayer); litRegionLayer = null; }
+  const info = document.getElementById('litRegionInfo');
+  const btnClear = document.getElementById('btnLitRegionClear');
+  if (!groupKey || !zoneId) { info.style.display = 'none'; btnClear.style.display = 'none'; return; }
+
+  const geo = litRegionCache[groupKey];
+  const feat = geo.features.find(f => String(f.properties.zone_id) === String(zoneId));
+  if (!feat) return;
+
+  // GeoJSON'daki GERÇEK halka L.geoJSON ile çizilir (bounds'tan yeniden
+  // dikdörtgen üretilmez) — bu dataset'te 15 zone da eksene hizalı gerçek
+  // dikdörtgen olduğu doğrulandı (bkz. commit metadata), ama render burada
+  // buna GÜVENMEZ: ileride eklenecek Öncel & Wilson (2004) gibi düzensiz
+  // poligonlu bir çalışma aynı kod yolundan geçtiğinde de gerçek şekli
+  // (bounding box'ı değil) doğru çizer.
+  litRegionLayer = L.geoJSON(feat, {
+    style: { color: '#a855f7', weight: 2, fillColor: '#a855f7', fillOpacity: .12, dashArray: '3' }
+  }).addTo(map);
+  const bounds = litRegionLayer.getBounds();
+  map.fitBounds(bounds, { padding: [40, 40] });
+
+  const p = feat.properties;
+  btnClear.style.display = '';
+  info.style.display = 'block';
+  info.innerHTML =
+    `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id}</b>` +
+    (p.notable_feature ? `<br>${p.notable_feature}` : '') +
+    `<br><span style="color:#666">${p.source_full}</span>` +
+    `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
+    `<br><span style="color:#f59e0b">⚠ Faz 1A: yalnızca görsel seçim — EMSC/USGS/AFAD sorgusu henüz bağlanmadı</span>`;
+  setStatus(`Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id} çizildi (sorgu entegrasyonu Faz 1B'de)`);
+}
+
+function litRegionClear() {
+  if (litRegionLayer) { map.removeLayer(litRegionLayer); litRegionLayer = null; }
+  const zoneSel = document.getElementById('litRegionZoneSel');
+  if (zoneSel) zoneSel.value = '';
+  const info = document.getElementById('litRegionInfo');
+  if (info) { info.style.display = 'none'; info.innerHTML = ''; }
+  const btnClear = document.getElementById('btnLitRegionClear');
+  if (btnClear) btnClear.style.display = 'none';
 }
 
 // Limit/Sırala değiştirildiğinde, zaten çizili bölge varsa onu yeni ayarla
