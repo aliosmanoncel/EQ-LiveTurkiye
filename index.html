@@ -201,16 +201,24 @@
     <button class="tbtn" style="width:auto;padding:7px 10px;font-size:.78rem" onclick="polygonCancel()" title="Çizimi iptal et">✕ İptal</button>
   </div>
   <button class="tbtn" id="btnRegionClear" onclick="regionDeselect()">✕ Bölgeyi Kaldır</button>
+  <div class="rowbox" id="regionSourceRow">
+    <label>Kaynak</label>
+    <select id="regionSourceSel" class="src-sel" title="Bölge sorgusu için deprem kataloğu · EMSC/USGS = canlı FDSN sorgusu (poligon anında sorgulanır) · AFAD = önceden çekilmiş, saatlik güncellenen statik katalog (poligon filtresi tarayıcıda uygulanır)" onchange="onRegionSourceChange()">
+      <option value="emsc" selected>EMSC (canlı)</option>
+      <option value="usgs">USGS (canlı)</option>
+      <option value="afad">AFAD (statik)</option>
+    </select>
+  </div>
   <div class="rowbox" id="regionLimitRow">
     <label>Limit</label>
-    <select id="regionLimit" class="src-sel" title="Maximum earthquakes — bölge sorgusunun üst sınırı. EMSC sunucusu 20.000'i tam onurlandırıyor, ötesini kendi tavanına (20.000) kesiyor." onchange="reapplyRegionQuery()">
+    <select id="regionLimit" class="src-sel" title="Maximum earthquakes — bölge sorgusunun üst sınırı. Sunucu üst sınırı 20.000'in ötesini kendi tavanına kesiyor." onchange="reapplyRegionQuery()">
       <option value="200">200</option>
       <option value="500" selected>500</option>
       <option value="1000">1000</option>
       <option value="2000">2000</option>
       <option value="5000">5000</option>
       <option value="10000">10000</option>
-      <option value="20000">20000 (EMSC tavanı)</option>
+      <option value="20000">20000 (üst sınır)</option>
     </select>
   </div>
   <div class="rowbox" id="regionOrderRow">
@@ -221,6 +229,7 @@
     </select>
   </div>
   <div id="regionModeNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ Tarihsel Katalog modunda Limit/Sırala geçersizdir — aralıktaki TÜM depremler gösterilir.</div>
+  <div id="regionAfadNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ AFAD: GitHub Action ile saatlik güncellenen önceden çekilmiş katalog — canlı API sorgusu değildir (AFAD sunucusu tarayıcıdan gelen isteği reddediyor), poligon filtresi tarayıcıda uygulanır. "1 Yıl" penceresinde AFAD verisi yok → en geniş pencere olan "1 Ay" kullanılır.</div>
   <div class="rowbox">
     <label>Mw</label>
     <input id="regionMagMin" type="number" step="0.1" placeholder="min" onchange="reapplyRegionQuery()">
@@ -1942,6 +1951,7 @@ let regionCapped  = false;  // son sorgu limite takıldı mı
 let regionOrderUsed = 'time';
 let regionWindowStart = null, regionWindowEnd = null;
 let regionIsPolygon = false; // true ise regionRect aslında bir L.Polygon — fetchRegionEvents ek point-in-polygon filtresi uygular
+let regionSource = 'emsc';   // 'emsc' | 'usgs' | 'afad' — Bölge Analizi'nin KENDİ kaynak seçimi, üstteki genel Kaynak (srcSel/src) ile bağımsız (bkz. DATA FLOW NOTE)
 
 // Poligon çizim durumu (nokta nokta tıklama modu)
 let polygonActive  = false;
@@ -1990,6 +2000,16 @@ function computeRegionStatsLine(evs, orderby, capped) {
 // önbelleklenmiş verilerle yeniden çizer — ağ isteği YAPMAZ. Mc override
 // gibi salt-görüntüleme değişikliklerinde kullanılır (reapplyRegionQuery
 // yerine, gereksiz yeniden sorgudan kaçınmak için).
+// Bölge Analizi'nin o anki kaynağını okunur biçimde etiketler — AFAD'ın
+// canlı EMSC/USGS ile AYNI görsel statüde görünmemesi kullanıcı isteğiydi:
+// statik/önceden-çekilmiş olduğu regionInfo'da HER ZAMAN açıkça yazsın.
+function regionSourceLabel() {
+  if (historicalMode) return 'Tarihsel Katalog (ISC+EMSC, statik)';
+  if (regionSource === 'usgs') return 'USGS (canlı sorgu)';
+  if (regionSource === 'afad') return 'AFAD (önceden çekilmiş katalog, statik)';
+  return 'EMSC (canlı sorgu)';
+}
+
 function renderRegionInfo() {
   const info = document.getElementById('regionInfo');
   if (!info || !regionRect) return;
@@ -2000,8 +2020,10 @@ function renderRegionInfo() {
   const depMax = document.getElementById('regionDepMax').value;
   const winLabel = historicalMode
     ? `Tarihsel Katalog (${regionWindowStart ? regionWindowStart.getFullYear() : '—'}–${regionWindowEnd ? regionWindowEnd.getFullYear() : '—'})`
+    : (regionSource === 'afad' && hours > 720) ? (HOURS_LABEL[720] + ' — AFAD 1 yıl sağlamıyor')
     : (HOURS_LABEL[hours] || `${hours} sa`);
-  let line = `Pencere: ${winLabel} (${dfmt(regionWindowStart)} – ${dfmt(regionWindowEnd)})`;
+  let line = `Kaynak: <b>${regionSourceLabel()}</b>`;
+  line += `<br>Pencere: ${winLabel} (${dfmt(regionWindowStart)} – ${dfmt(regionWindowEnd)})`;
   if (magMin || magMax) line += ` · Mw ${magMin||'0'}–${magMax||'∞'}`;
   if (depMin || depMax) line += ` · ${depMin||'0'}–${depMax||'∞'}km`;
   if (regionEvents.length) {
@@ -2184,9 +2206,24 @@ async function fetchRegionEventsFromHistorical(bounds) {
   if (showTimeMag) renderTimeMag(regionEvents);
 }
 
+/* Bölge Analizi kaynak yönlendirici — kendi regionSource seçimine göre
+   (üstteki genel Kaynak/srcSel'den BAĞIMSIZ, bkz. DATA FLOW NOTE) üç ayrı
+   veri yoluna dağıtır:
+   - Tarihsel Katalog aktifse: statik tam katalog (değişmedi)
+   - AFAD: önceden çekilmiş statik dosya + client-side poligon filtresi
+     (AFAD'ın apiv2 sunucusu tarayıcıdan gelen Origin header'lı isteği WAF
+     seviyesinde reddediyor — EMSC/USGS'nin aksine canlı sorgu YAPILAMIYOR)
+   - EMSC / USGS: ikisi de FDSN uyumlu ve CORS'a tam açık, aynı canlı
+     bbox+poligon sorgu mantığı fetchRegionEventsLive'da paylaşılıyor */
 async function fetchRegionEvents(bounds) {
   if (historicalMode) return fetchRegionEventsFromHistorical(bounds);
-  setStatus('Bölgedeki küçük depremler getiriliyor…');
+  if (regionSource === 'afad') return fetchRegionEventsFromAfad(bounds);
+  return fetchRegionEventsLive(bounds, regionSource === 'usgs' ? 'usgs' : 'emsc');
+}
+
+async function fetchRegionEventsLive(bounds, provider) {
+  const providerLabel = provider === 'usgs' ? 'USGS' : 'EMSC';
+  setStatus(`Bölgedeki küçük depremler ${providerLabel}'den getiriliyor…`);
   const limit   = +document.getElementById('regionLimit').value || 500;
   const orderby = document.getElementById('regionOrder').value === 'magnitude' ? 'magnitude' : 'time';
   const magMin  = document.getElementById('regionMagMin').value;
@@ -2195,16 +2232,20 @@ async function fetchRegionEvents(bounds) {
   const depMax  = document.getElementById('regionDepMax').value;
   const now = new Date(), s = new Date(now - hours*3600000);
   const fmt = d => d.toISOString().slice(0,19);
-  const url = `https://www.seismicportal.eu/fdsnws/event/1/query?format=text`
-    + `&minlat=${bounds.getSouth().toFixed(3)}&maxlat=${bounds.getNorth().toFixed(3)}`
-    + `&minlon=${bounds.getWest().toFixed(3)}&maxlon=${bounds.getEast().toFixed(3)}`
-    + `&starttime=${fmt(s)}&endtime=${fmt(now)}`
+  const south = bounds.getSouth().toFixed(3), north = bounds.getNorth().toFixed(3);
+  const west  = bounds.getWest().toFixed(3),  east  = bounds.getEast().toFixed(3);
+  const common = `&starttime=${fmt(s)}&endtime=${fmt(now)}`
     + `&minmagnitude=${magMin || 0}${magMax ? `&maxmagnitude=${magMax}` : ''}`
     + `${depMin ? `&mindepth=${depMin}` : ''}${depMax ? `&maxdepth=${depMax}` : ''}`
     + `&limit=${limit}&orderby=${orderby}`;
+  const url = provider === 'usgs'
+    ? `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson`
+      + `&minlatitude=${south}&maxlatitude=${north}&minlongitude=${west}&maxlongitude=${east}` + common
+    : `https://www.seismicportal.eu/fdsnws/event/1/query?format=text`
+      + `&minlat=${south}&maxlat=${north}&minlon=${west}&maxlon=${east}` + common;
   try {
     const res = await fetchTimeout(url, {}, 10000);
-    let evs = parseEMSCText(await res.text());
+    let evs = provider === 'usgs' ? parseGeoJSON(await res.json()) : parseEMSCText(await res.text());
     const rawCount = evs.length; // limite takılma DURUMU, poligon filtresinden ÖNCEKİ ham bbox sonucuna göre belirlenir
     if (regionIsPolygon && regionRect) {
       const poly = regionRect.getLatLngs()[0];
@@ -2213,16 +2254,19 @@ async function fetchRegionEvents(bounds) {
     regionEvents = evs; // bölge-özel Mc/b istatistiği HER ZAMAN tam evs üzerinden — örnekleme sadece aşağıdaki çizimi etkiler
     if (regionLayer) map.removeLayer(regionLayer);
     regionLayer = L.layerGroup();
+    const markerColor = provider === 'usgs' ? '#a78bfa' : '#38bdf8';
+    const markerFill  = provider === 'usgs' ? '#8b5cf6' : '#0ea5e9';
+    const regionLabel = provider === 'usgs' ? 'USGS Region' : 'EMSC Region';
     // Limit yüksek (5000+) seçilebildiği için marker/popup oluşturma DOM
     // maliyeti Tarihsel Katalog'da yaşanan donmayı burada da yaratabilir —
     // aynı zaman-dengeli örnekleme (sadece GÖRSEL çizim) uygulanır.
     const visibleSample = timeBalancedSample(evs, VISUAL_SAMPLE_CAP);
     visibleSample.forEach(e => {
       L.circleMarker([e.lat, e.lon], {
-        radius: 3.5, color:'#38bdf8', weight:1, fillColor:'#0ea5e9', fillOpacity:.7
+        radius: 3.5, color: markerColor, weight:1, fillColor: markerFill, fillOpacity:.7
       }).bindPopup(
-        `<b style="color:#38bdf8">M ${e.mag.toFixed(1)}</b>` +
-        `<br><span style="color:#aaa">${e.place||'EMSC Region'}</span>` +
+        `<b style="color:${markerColor}">M ${e.mag.toFixed(1)}</b>` +
+        `<br><span style="color:#aaa">${e.place||regionLabel}</span>` +
         `<br>Depth: ${e.dep.toFixed(0)} km` +
         `<br><span style="color:#666">${dfmt(e.time)}</span>`
       ).addTo(regionLayer);
@@ -2235,15 +2279,81 @@ async function fetchRegionEvents(bounds) {
     const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
     const shapeLabel = regionIsPolygon ? `poligon (${evs.length}/${rawCount} bbox içinde)` : `${evs.length}`;
     const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` · görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor` : '';
-    const limitNote = limit >= 20000 ? '· EMSC sunucu tavanı (20.000), artırılamaz' : '· limiti artırabilirsiniz';
+    const limitNote = limit >= 20000 ? `· ${providerLabel} üst sınırı, artırılamaz` : '· limiti artırabilirsiniz';
     setStatus(regionCapped
-      ? `Bölgede ${shapeLabel} deprem — bbox ilk ${limit} (${orderLabel}) gösteriliyor ${limitNote}${sampleNote}`
-      : `Bölgede ${shapeLabel} deprem gösteriliyor${sampleNote}`);
+      ? `Bölgede ${shapeLabel} deprem (${providerLabel}, canlı) — bbox ilk ${limit} (${orderLabel}) gösteriliyor ${limitNote}${sampleNote}`
+      : `Bölgede ${shapeLabel} deprem gösteriliyor (${providerLabel}, canlı)${sampleNote}`);
     renderRegionInfo();
     if (showTimeMag) renderTimeMag(regionEvents); // panel açıksa bölge verisiyle anında güncelle
     syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
   } catch(err) {
-    setStatus(`Bölge sorgusu hatası: ${err.message}`, true);
+    setStatus(`Bölge sorgusu hatası (${providerLabel}): ${err.message}`, true);
+  }
+}
+
+/* AFAD — canlı poligon sorgusu YAPILAMIYOR: apiv2/event/filter sunucusu
+   (BigIP WAF) tarayıcının gönderdiği Origin header'ını görünce isteği
+   "Request Rejected" ile reddediyor (curl ile Origin başlıksız çalışıyor,
+   Origin'li — yani her tarayıcı isteğinde olduğu gibi — reddediyor; test
+   2026-09-09). Bu yüzden GitHub Action zaten saatte bir data/eq_*_afad.json
+   dosyalarını sunucu tarafında (Origin'siz) üretiyor — burada o STATİK
+   dosyaları indirip bounds/poligon ile TARAYICIDA filtreliyoruz; Tarihsel
+   Katalog moduyla aynı model. "1 Yıl" penceresinde AFAD dosyası yok, en
+   geniş pencere olan "1 Ay"a (720 saat) düşülür ve kullanıcıya bildirilir. */
+async function fetchRegionEventsFromAfad(bounds) {
+  setStatus('AFAD önceden çekilmiş katalogdan bölge filtreleniyor…');
+  const magMin = document.getElementById('regionMagMin').value;
+  const magMax = document.getElementById('regionMagMax').value;
+  const depMin = document.getElementById('regionDepMin').value;
+  const depMax = document.getElementById('regionDepMax').value;
+  const afadHours = hours > 720 ? 720 : hours;
+  const clamped = afadHours !== hours;
+  const url = getEqUrl('afad', afadHours);
+  try {
+    const res = await fetchTimeout(url + '?_=' + Date.now(), {}, 10000);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    let evs = (json.events || []).map(e => ({
+      lat: e.lat, lon: e.lon, dep: e.dep || 0, mag: e.mag || 0, mw: e.mw ?? e.mag,
+      mtype: e.mtype || '', place: e.place || '', time: new Date(e.time)
+    })).filter(e =>
+      e.lat >= bounds.getSouth() && e.lat <= bounds.getNorth() &&
+      e.lon >= bounds.getWest()  && e.lon <= bounds.getEast() &&
+      (!magMin || e.mag >= +magMin) && (!magMax || e.mag <= +magMax) &&
+      (!depMin || e.dep >= +depMin) && (!depMax || e.dep <= +depMax)
+    );
+    if (regionIsPolygon && regionRect) {
+      const poly = regionRect.getLatLngs()[0];
+      evs = evs.filter(e => pointInPolygon(e.lat, e.lon, poly));
+    }
+    regionEvents = evs; // statik dosya zaten AFAD'ın kendi minmag eşiğiyle sınırlı — ek limit/örnekleme yanlılığı yok
+    if (regionLayer) map.removeLayer(regionLayer);
+    regionLayer = L.layerGroup();
+    const visibleSample = timeBalancedSample(evs, VISUAL_SAMPLE_CAP);
+    visibleSample.forEach(e => {
+      L.circleMarker([e.lat, e.lon], {
+        radius: 3.5, color:'#f59e0b', weight:1, fillColor:'#d97706', fillOpacity:.7
+      }).bindPopup(
+        `<b style="color:#f59e0b">M ${e.mag.toFixed(1)}</b>` +
+        `<br><span style="color:#aaa">${e.place||'AFAD'}</span>` +
+        `<br>Depth: ${e.dep.toFixed(0)} km` +
+        `<br><span style="color:#666">${dfmt(e.time)}</span>`
+      ).addTo(regionLayer);
+    });
+    regionLayer.addTo(map);
+    regionCapped = false;
+    regionOrderUsed = 'time';
+    const genTime = json.generated ? new Date(json.generated) : new Date();
+    regionWindowStart = new Date(genTime.getTime() - afadHours*3600000);
+    regionWindowEnd = genTime;
+    const shapeLabel = regionIsPolygon ? `poligon (${evs.length} eşleşen)` : `${evs.length}`;
+    const clampNote = clamped ? ` · ⚠ AFAD'da 1 yıllık veri yok, ${HOURS_LABEL[afadHours]} penceresi gösteriliyor` : '';
+    setStatus(`Bölgede ${shapeLabel} deprem (AFAD, önceden çekilmiş — saatlik güncellenir)${clampNote}`);
+    renderRegionInfo();
+    if (showTimeMag) renderTimeMag(regionEvents);
+    syncRegionURL(bounds, { limit: evs.length, orderby:'time', magMin, magMax, depMin, depMax });
+  } catch(err) {
+    setStatus(`AFAD statik veri hatası: ${err.message}`, true);
   }
 }
 
@@ -2258,6 +2368,10 @@ function syncRegionURL(bounds, opt) {
   url.searchParams.set('rmaxlon', bounds.getEast().toFixed(3));
   url.searchParams.set('rlimit', opt.limit);
   url.searchParams.set('rorder', opt.orderby);
+  // regionSource === 'emsc' (varsayılan) iken parametreyi YAZMIYORUZ — eski
+  // paylaşılan linkler (rsource hiç yoktu) EMSC ile açılmaya devam etsin diye.
+  if (regionSource !== 'emsc') url.searchParams.set('rsource', regionSource);
+  else url.searchParams.delete('rsource');
   if (opt.magMin) url.searchParams.set('rmagmin', opt.magMin); else url.searchParams.delete('rmagmin');
   if (opt.magMax) url.searchParams.set('rmagmax', opt.magMax); else url.searchParams.delete('rmagmax');
   if (opt.depMin) url.searchParams.set('rdepmin', opt.depMin); else url.searchParams.delete('rdepmin');
@@ -2267,14 +2381,18 @@ function syncRegionURL(bounds, opt) {
 
 function clearRegionURL() {
   const url = new URL(location.href);
-  ['rminlat','rmaxlat','rminlon','rmaxlon','rlimit','rorder','rmagmin','rmagmax','rdepmin','rdepmax']
+  ['rminlat','rmaxlat','rminlon','rmaxlon','rlimit','rorder','rsource','rmagmin','rmagmax','rdepmin','rdepmax']
     .forEach(k => url.searchParams.delete(k));
   history.replaceState(null, '', url);
 }
 
 /* Sayfa yüklendiğinde URL'de bölge parametreleri varsa bölgeyi geri kur.
    Bu fonksiyon, kullandığı regionRect/fetchRegionEvents/regionMouseUp gibi
-   fonksiyonlar (yukarıda) tanımlandıktan SONRA, aşağıda çağrılır. */
+   fonksiyonlar (yukarıda) tanımlandıktan SONRA, aşağıda çağrılır.
+   rsource: 'emsc'|'usgs'|'afad' — paylaşılan linkte hangi kaynakla bakıldıysa
+   karşı taraf AYNI kaynakla açsın diye (bilimsel paylaşımda "AFAD'a göre X"
+   ile "EMSC'ye göre X" farklı şeyler). Parametre yoksa/bilinmiyorsa EMSC
+   (eski linklerle geriye dönük uyumlu varsayılan). */
 function restoreRegionFromURL() {
   const p = new URLSearchParams(location.search);
   if (!p.has('rminlat')) return;
@@ -2284,6 +2402,11 @@ function restoreRegionFromURL() {
   );
   if (p.has('rlimit')) document.getElementById('regionLimit').value = p.get('rlimit');
   if (p.has('rorder')) document.getElementById('regionOrder').value = p.get('rorder');
+  const rsrc = p.get('rsource');
+  regionSource = ['emsc','usgs','afad'].includes(rsrc) ? rsrc : 'emsc';
+  const srcSel = document.getElementById('regionSourceSel');
+  if (srcSel) srcSel.value = regionSource;
+  updateRegionCtrlForMode();
   if (p.has('rmagmin')) document.getElementById('regionMagMin').value = p.get('rmagmin');
   if (p.has('rmagmax')) document.getElementById('regionMagMax').value = p.get('rmagmax');
   if (p.has('rdepmin')) document.getElementById('regionDepMin').value = p.get('rdepmin');
@@ -2347,15 +2470,32 @@ function updateRegionCtrlForMode() {
   const limitRow = document.getElementById('regionLimitRow');
   const orderRow = document.getElementById('regionOrderRow');
   const note     = document.getElementById('regionModeNote');
+  const afadNote = document.getElementById('regionAfadNote');
   const refresh  = document.getElementById('btnRegionRefresh');
-  if (limitSel) limitSel.disabled = historicalMode;
-  if (orderSel) orderSel.disabled = historicalMode;
-  if (limitRow) limitRow.classList.toggle('disabledRow', historicalMode);
-  if (orderRow) orderRow.classList.toggle('disabledRow', historicalMode);
+  const isAfad   = !historicalMode && regionSource === 'afad';
+  // Tarihsel Katalog VE AFAD ikisi de statik/önceden-çekilmiş veri —
+  // Limit/Sırala yalnızca canlı FDSN sorgusunda (EMSC/USGS) anlamlı.
+  const staticMode = historicalMode || isAfad;
+  if (limitSel) limitSel.disabled = staticMode;
+  if (orderSel) orderSel.disabled = staticMode;
+  if (limitRow) limitRow.classList.toggle('disabledRow', staticMode);
+  if (orderRow) orderRow.classList.toggle('disabledRow', staticMode);
   if (note) note.style.display = historicalMode ? 'block' : 'none';
+  if (afadNote) afadNote.style.display = isAfad ? 'block' : 'none';
   if (refresh) refresh.title = historicalMode
     ? 'Tarihsel modda statik veri elle tekrar filtrelenir; Zaman/Tarihsel Katalog ve Mw/Derinlik değiştikçe zaten otomatik güncellenir — genelde gerekmez'
-    : 'Bölgeyi seçili ayarlarla elle yeniden sorgula';
+    : isAfad
+      ? 'AFAD statik katalog elle tekrar filtrelenir — saatlik AFAD dosyası zaten güncel, yeni bir canlı sorgu YAPILMAZ'
+      : 'Bölgeyi seçili ayarlarla elle yeniden sorgula';
+}
+
+// Bölge Analizi kaynak seçici (EMSC/USGS/AFAD) değiştiğinde: Limit/Sırala
+// görünürlüğünü güncelle ve zaten çizili bir bölge varsa yeni kaynakla
+// yeniden sorgula (Limit/Sırala değişince reapplyRegionQuery'nin yaptığı gibi).
+function onRegionSourceChange() {
+  regionSource = document.getElementById('regionSourceSel').value;
+  updateRegionCtrlForMode();
+  if (regionRect) fetchRegionEvents(regionRect.getBounds());
 }
 
 /* Seçili bölge/poligonun TAM verisini (regionEvents — görsel örneklemeden
