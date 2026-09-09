@@ -273,6 +273,7 @@
   </div>
   <button class="tbtn" id="btnLitRegionClear" onclick="litRegionClear()" style="display:none">✕ Araştırma Bölgesini Kaldır</button>
   <div id="litRegionInfo" style="display:none;font-size:.72rem;color:#ccc;line-height:1.5;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;width:260px"></div>
+  <button class="tbtn" id="btnLitRegionQuery" onclick="litRegionCommitToQuery()" style="display:none;background:#3b0764;border-color:#a855f7" title="Bu araştırma bölgesinin geometrisini aktif sorgu alanına (regionRect) kopyalar ve seçili Kaynak (EMSC/USGS/AFAD) ile canlı sorgular — otomatik değildir, sadece bu butona basınca çalışır">▶ Bu bölgede sorgula</button>
   </div>
 </div>
 
@@ -2531,7 +2532,8 @@ function onLitRegionZoneChange() {
   if (litRegionLayer) { map.removeLayer(litRegionLayer); litRegionLayer = null; }
   const info = document.getElementById('litRegionInfo');
   const btnClear = document.getElementById('btnLitRegionClear');
-  if (!groupKey || !zoneId) { info.style.display = 'none'; btnClear.style.display = 'none'; return; }
+  const btnQuery = document.getElementById('btnLitRegionQuery');
+  if (!groupKey || !zoneId) { info.style.display = 'none'; btnClear.style.display = 'none'; btnQuery.style.display = 'none'; return; }
 
   const geo = litRegionCache[groupKey];
   const feat = geo.features.find(f => String(f.properties.zone_id) === String(zoneId));
@@ -2551,14 +2553,15 @@ function onLitRegionZoneChange() {
 
   const p = feat.properties;
   btnClear.style.display = '';
+  btnQuery.style.display = '';
   info.style.display = 'block';
   info.innerHTML =
     `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id}</b>` +
     (p.notable_feature ? `<br>${p.notable_feature}` : '') +
     `<br><span style="color:#666">${p.source_full}</span>` +
     `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
-    `<br><span style="color:#f59e0b">⚠ Faz 1A: yalnızca görsel seçim — EMSC/USGS/AFAD sorgusu henüz bağlanmadı</span>`;
-  setStatus(`Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id} çizildi (sorgu entegrasyonu Faz 1B'de)`);
+    `<br><span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span>`;
+  setStatus(`Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id} çizildi`);
 }
 
 function litRegionClear() {
@@ -2569,6 +2572,43 @@ function litRegionClear() {
   if (info) { info.style.display = 'none'; info.innerHTML = ''; }
   const btnClear = document.getElementById('btnLitRegionClear');
   if (btnClear) btnClear.style.display = 'none';
+  const btnQuery = document.getElementById('btnLitRegionQuery');
+  if (btnQuery) btnQuery.style.display = 'none';
+}
+
+/* ══════════════════════════════════════════
+   ARAŞTIRMA BÖLGESİ → CANLI SORGU — Faz 1B
+   KASITLI, kullanıcı-tetikli "commit" adımı: litRegionLayer (öneri
+   katmanı, salt-görsel) hiçbir zaman otomatik/sessiz olarak regionRect'e
+   (canlı sorgu motorunun TEK execution-state'i) yazılmaz — sadece bu
+   fonksiyon, yani "▶ Bu bölgede sorgula" butonuna basınca çalışır.
+   Önce regionDeselect() ile önceki elle-çizilmiş bölge (varsa) temizlenir
+   — regionRect için tek bir aktif değer olduğu garanti edilir. litRegionLayer
+   bu işlemden ETKİLENMEZ, haritada durmaya devam eder (öneri/literatür
+   katmanı olarak ayrı kalır).
+   Geometri kopyalanırken şekil türü korunur: 4 köşeli dikdörtgense
+   L.rectangle (bugünkü Marmara verisi), değilse L.polygon + regionIsPolygon
+   — ileride düzensiz poligonlu bir çalışma (Öncel & Wilson 2004 vb.)
+   eklendiğinde kod değişmeden doğru çalışır. */
+function litRegionCommitToQuery() {
+  if (!litRegionLayer) return;
+  const sub = litRegionLayer.getLayers ? litRegionLayer.getLayers()[0] : litRegionLayer;
+  if (!sub || !sub.getLatLngs) return;
+  const latlngs = sub.getLatLngs()[0];
+  const bounds  = litRegionLayer.getBounds();
+
+  const uniqueCorners = new Set(latlngs.map(ll => `${ll.lat.toFixed(6)},${ll.lng.toFixed(6)}`)).size;
+
+  regionDeselect(); // TEK execution-state garantisi: önceki elle-çizilmiş bölge varsa kaldırılır
+
+  if (uniqueCorners > 4) {
+    regionIsPolygon = true;
+    regionRect = L.polygon(latlngs, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+  } else {
+    regionIsPolygon = false;
+    regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+  }
+  fetchRegionEvents(regionRect.getBounds());
 }
 
 // Limit/Sırala değiştirildiğinde, zaten çizili bölge varsa onu yeni ayarla
