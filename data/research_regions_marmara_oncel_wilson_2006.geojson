@@ -1,0 +1,652 @@
+{
+ "type": "FeatureCollection",
+ "metadata": {
+  "title": "Oncel & Wilson (2006) Marmara Sea seismic research-region subdivisions (15 zones)",
+  "source": "Oncel, A.O. and Wilson, T. (2006), Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+  "source_figure": "Figure 1 (map panel, raster image embedded on PDF page 209)",
+  "study_area_text": "Paper text: 39.76 to 41 N latitude, 26.3 to 30.0 E longitude",
+  "study_area_measured_frame": {
+   "minlon": 26.313,
+   "minlat": 39.771,
+   "maxlon": 29.985,
+   "maxlat": 40.999
+  },
+  "geometry_method": "Figure 1 raster extracted natively from the PDF (no re-render/no resampling); axis calibrated from tick-mark pixel positions, not gridline guesses (x-scale 301.57 px/deg from 8 ticks 26.5-30.0E; y-scale 349.0 px/deg from 3 ticks 40.0/40.5/41.0N, cross-checked against the bottom frame landing at 39.771N vs the paper's stated 39.76N -- 0.011deg / ~1.2km agreement). All 15 zone boundaries were detected as dark-pixel-run line segments in the calibrated frame, deduplicated into 16 canonical shared boundary lines (8 lon, 8 lat) so adjacent zones share IDENTICAL edge coordinates (verified: sum of the 15 zone areas equals the outer frame's area to within floating-point rounding, i.e. exact tiling, no gaps/no overlaps), then re-drawn as a semi-transparent overlay on the original image and visually confirmed against the source's own printed boundary lines (see verify_left.png / verify_right.png).",
+  "known_deviation": "Zone 13 has an unexplained diagonal line near its NW corner in the source figure, not connected to any other zone number; treated as a non-boundary annotation (fault trace or label leader line, not resolved) and excluded from the digitized polygon, which is a simple rectangle.",
+  "digitized_by": "Claude (pixel digitization from the user's Zotero PDF copy), reviewed against a rendered verification overlay",
+  "digitized_date": "2026-09-09",
+  "not_included": "The 25-zone / 3-macro-zone Oncel & Wilson (2004) western Anatolia regionalization is a separate, irregular (non-grid) figure and is explicitly NOT part of this Phase-0 dataset."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 1,
+    "zone_name": "Zone 1",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": "1999 Izmit rupture area (eastern end, near epicenter)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       29.72,
+       40.5
+      ],
+      [
+       29.985,
+       40.5
+      ],
+      [
+       29.985,
+       40.999
+      ],
+      [
+       29.72,
+       40.999
+      ],
+      [
+       29.72,
+       40.5
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 2,
+    "zone_name": "Zone 2",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       29.306,
+       40.5
+      ],
+      [
+       29.72,
+       40.5
+      ],
+      [
+       29.72,
+       40.999
+      ],
+      [
+       29.306,
+       40.999
+      ],
+      [
+       29.306,
+       40.5
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 3,
+    "zone_name": "Zone 3",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": "Prince's Island (Adalar) segment; near Northern Boundary Fault (NBF)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.888,
+       40.714
+      ],
+      [
+       29.306,
+       40.714
+      ],
+      [
+       29.306,
+       40.999
+      ],
+      [
+       28.888,
+       40.999
+      ],
+      [
+       28.888,
+       40.714
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 4,
+    "zone_name": "Zone 4",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": "Cinarcik Fault / Cinarcik Basin; near Southern Boundary Fault (SBF)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.888,
+       40.5
+      ],
+      [
+       29.306,
+       40.5
+      ],
+      [
+       29.306,
+       40.714
+      ],
+      [
+       28.888,
+       40.714
+      ],
+      [
+       28.888,
+       40.5
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 5,
+    "zone_name": "Zone 5",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": "Central Marmara Fault (CMF) area"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.022,
+       40.746
+      ],
+      [
+       28.888,
+       40.746
+      ],
+      [
+       28.888,
+       40.999
+      ],
+      [
+       28.022,
+       40.999
+      ],
+      [
+       28.022,
+       40.746
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 6,
+    "zone_name": "Zone 6",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.022,
+       40.5
+      ],
+      [
+       28.888,
+       40.5
+      ],
+      [
+       28.888,
+       40.746
+      ],
+      [
+       28.022,
+       40.746
+      ],
+      [
+       28.022,
+       40.5
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 7,
+    "zone_name": "Zone 7",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       29.054,
+       40.319
+      ],
+      [
+       29.985,
+       40.319
+      ],
+      [
+       29.985,
+       40.5
+      ],
+      [
+       29.054,
+       40.5
+      ],
+      [
+       29.054,
+       40.319
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 8,
+    "zone_name": "Zone 8",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.022,
+       40.319
+      ],
+      [
+       29.054,
+       40.319
+      ],
+      [
+       29.054,
+       40.5
+      ],
+      [
+       28.022,
+       40.5
+      ],
+      [
+       28.022,
+       40.319
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 9,
+    "zone_name": "Zone 9",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       29.014,
+       39.987
+      ],
+      [
+       29.985,
+       39.987
+      ],
+      [
+       29.985,
+       40.319
+      ],
+      [
+       29.014,
+       40.319
+      ],
+      [
+       29.014,
+       39.987
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 10,
+    "zone_name": "Zone 10",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.46,
+       39.987
+      ],
+      [
+       29.014,
+       39.987
+      ],
+      [
+       29.014,
+       40.319
+      ],
+      [
+       28.46,
+       40.319
+      ],
+      [
+       28.46,
+       39.987
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 11,
+    "zone_name": "Zone 11",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.022,
+       39.771
+      ],
+      [
+       28.46,
+       39.771
+      ],
+      [
+       28.46,
+       40.319
+      ],
+      [
+       28.022,
+       40.319
+      ],
+      [
+       28.022,
+       39.771
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 12,
+    "zone_name": "Zone 12",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.46,
+       39.771
+      ],
+      [
+       29.985,
+       39.771
+      ],
+      [
+       29.985,
+       39.987
+      ],
+      [
+       28.46,
+       39.987
+      ],
+      [
+       28.46,
+       39.771
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 13,
+    "zone_name": "Zone 13",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": "Near western end of NAFZ trace; Ganos Fault to the east"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       26.313,
+       40.631
+      ],
+      [
+       28.022,
+       40.631
+      ],
+      [
+       28.022,
+       40.999
+      ],
+      [
+       26.313,
+       40.999
+      ],
+      [
+       26.313,
+       40.631
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 14,
+    "zone_name": "Zone 14",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       26.313,
+       40.319
+      ],
+      [
+       28.022,
+       40.319
+      ],
+      [
+       28.022,
+       40.631
+      ],
+      [
+       26.313,
+       40.631
+      ],
+      [
+       26.313,
+       40.319
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_id": 15,
+    "zone_name": "Zone 15",
+    "source": "Oncel & Wilson (2006)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2006), Evaluation of earthquake potential along the Northern Anatolian Fault Zone in the Marmara Sea using comparisons of GPS strain and seismotectonic parameters, Tectonophysics, 418, 205-218, doi:10.1016/j.tecto.2006.02.006",
+    "publication_year": 2006,
+    "figure": "Figure 1",
+    "region": "Marmara Sea",
+    "geometry_method": "georeferenced pixel digitization (axis-tick calibration + verification reprojection overlay against source raster, 2026-09-09)",
+    "geometry_confidence_deg": 0.015,
+    "notable_feature": null
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       26.313,
+       39.771
+      ],
+      [
+       28.022,
+       39.771
+      ],
+      [
+       28.022,
+       40.319
+      ],
+      [
+       26.313,
+       40.319
+      ],
+      [
+       26.313,
+       39.771
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}
