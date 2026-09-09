@@ -108,7 +108,10 @@
 
     /* ── BÖLGE SEÇ (sürükleyip bölge kilitleme — küçük depremleri getirme) ── */
     .regionCtrl{position:fixed;top:10px;left:270px;z-index:999}
-    .regionCtrl-header{display:flex;align-items:center;justify-content:space-between;gap:10px;width:210px;background:rgba(0,0,0,.85);border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;cursor:pointer;user-select:none}
+    /* Panel sürüklenebilir — header hem aç/kapa hem taşıma tutamacı (bkz. initRegionCtrlDrag).
+       touch-action:none dokunmatikte sürüklerken sayfanın kaymasını engeller. */
+    .regionCtrl-header{display:flex;align-items:center;justify-content:space-between;gap:10px;width:210px;background:rgba(0,0,0,.85);border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;cursor:grab;user-select:none;touch-action:none}
+    .regionCtrl-header.dragging{cursor:grabbing}
     .regionCtrl-header .title{color:#06b6d4;font-weight:700;font-size:.82rem}
     .regionCtrl-toggle{color:#555;font-size:.85rem;line-height:1}
     .regionCtrl-body{display:flex;flex-direction:column;gap:6px;margin-top:6px}
@@ -1917,12 +1920,60 @@ function toggleEqList() {
   icon.textContent = hidden ? '▼' : '▲';
 }
 
+let regionCtrlWasDragged = false; // header hem tıklama (aç/kapa) hem sürükleme tutamacı — ayrımı burada
+
 function toggleRegionCtrl() {
+  if (regionCtrlWasDragged) { regionCtrlWasDragged = false; return; } // sürüklemenin sonundaki click'i yut
   const body = document.getElementById('rcBody');
   const icon = document.getElementById('rcToggle');
   const hidden = body.classList.toggle('hidden');
   icon.textContent = hidden ? '▼' : '▲';
 }
+
+/* Bölge Analizi paneli sürüklenebilir (taşınabilir) — Marmara gibi
+   haritanın sol/batı tarafındaki araştırma bölgeleri panel yüzünden
+   görünmüyor/zoom-out gerektiriyordu; kullanıcı paneli kenara çekebilsin
+   diye. Pointer Events (mouse+dokunmatik tek kod yolu) kullanılıyor;
+   5px'ten küçük hareketler sürükleme sayılmaz, mevcut aç/kapa tıklaması
+   bozulmaz (bkz. regionCtrlWasDragged / toggleRegionCtrl). */
+(function initRegionCtrlDrag() {
+  const panel  = document.querySelector('.regionCtrl');
+  const header = document.querySelector('.regionCtrl-header');
+  if (!panel || !header) return;
+  let startX = 0, startY = 0, startLeft = 0, startTop = 0, dragging = false, moved = false;
+
+  header.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    moved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    const rect = panel.getBoundingClientRect();
+    startLeft = rect.left;
+    startTop  = rect.top;
+    header.setPointerCapture(e.pointerId);
+  });
+
+  header.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if (!moved && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+      moved = true;
+      header.classList.add('dragging');
+    }
+    if (!moved) return;
+    const maxLeft = window.innerWidth  - header.offsetWidth - 4;
+    const maxTop  = window.innerHeight - 40;
+    panel.style.left = Math.max(4, Math.min(maxLeft, startLeft + dx)) + 'px';
+    panel.style.top  = Math.max(4, Math.min(maxTop,  startTop  + dy)) + 'px';
+  });
+
+  header.addEventListener('pointerup', (e) => {
+    dragging = false;
+    header.classList.remove('dragging');
+    header.releasePointerCapture(e.pointerId);
+    if (moved) regionCtrlWasDragged = true; // hemen ardından gelecek click'i toggleRegionCtrl yutsun
+  });
+})();
 
 function updateEqList() {
   const body  = document.getElementById('eqlBody');
