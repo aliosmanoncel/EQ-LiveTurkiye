@@ -6,7 +6,7 @@
   "source_figure": "Figure 1, left panel (geographic map with 3 macro-zone outlines), PDF page 3",
   "study_area_text": "Paper text / axis: 23-31E, 33-43N",
   "scope": "Phase 0 (in progress) -- only the 3 macro-zones (Shear/Extensional/Compressional) are in scope; the 25 sub-zones (1-25) are explicitly NOT digitized in this dataset",
-  "status": "IN PROGRESS: Shear Zone complete and approved; Extensional and Compressional not yet added",
+  "status": "IN PROGRESS: Shear Zone and Extensional Zone complete and approved; Compressional Zone not yet added",
   "geometry_status": "reconstructed / not original GIS boundary -- see each feature's own 'provenance' and 'vertex_notes' properties",
   "digitized_by": "Claude (calibrated pixel tracing from the user's Zotero PDF copy), reviewed and approved per-zone with the user",
   "digitized_date": "2026-09-10"
@@ -234,6 +234,289 @@
       [
        23.6,
        38.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "zone_name": "Extensional Zone",
+    "member_zones": [
+     5,
+     6,
+     10,
+     11,
+     12,
+     13,
+     15,
+     16,
+     17,
+     18,
+     19
+    ],
+    "source": "Oncel & Wilson (2004)",
+    "source_full": "Oncel, A.O. and Wilson, T. (2004), Correlation of seismotectonic variables and GPS strain measurements in western Turkey, J. Geophys. Res., 109, B11306, doi:10.1029/2004JB003101",
+    "figure": "Figure 1 (left panel, geographic map with Shear/Extensional/Compressional Zone outlines)",
+    "publication_year": 2004,
+    "region": "Western Turkey / Aegean",
+    "status": "reconstructed / not original GIS boundary",
+    "provenance": "This geometry is a RECONSTRUCTION of the orange-dashed 'Extensional Zone' outline visible in the published Figure 1 raster, not the authors' original GIS/digitizing data. Produced from the SAME calibrated, north-up render used for the Shear Zone (calibration: x0=62.5px/lon0=23.0E/sx=207.2px per degree, y0=62.5px/lat0=43.0N/sy=199.8px per degree), by color-isolating the orange line (RGB target 199,129,35, tolerance 35), row/column band-scanning to locate corner pixels, and cross-checking every candidate corner against zoomed crops of the source image before accepting it. No smoothing, interpolation, or geometric regularization was applied -- vertices follow the actually-detected line pixels, including its real, non-rectilinear character. Where this polygon shares a boundary with the already-approved Shear Zone (the Zone 6/7 edge), the exact Shear Zone vertex coordinates were reused verbatim rather than re-measured, to guarantee a zero-gap shared edge.",
+    "geometry_method": "calibrated pixel tracing (same 2004_geo_panel_rot.png render and calibration as Shear Zone); orange line color-thresholded and isolated from an OR-combined multi-row/column band scan (dash-gap tolerant); corner longitudes/latitudes read directly from band-scan cluster centroids; ambiguous junctions (Zone 18 east closure) additionally checked against 2x-upscaled visual crops before being accepted",
+    "topology_note": "The source figure draws the Extensional Zone as TWO separate, non-overlapping pieces that only touch, not one single simple ring. This is represented as a MultiPolygon: Part A = zones 6,5,11,10,15,17,16,12,13 (the main NE block, sharing its NW top edge with Shear Zone's zone-7 boundary); Part B = zones 18,19 (a thin wedge/strip south of Part A, touching Part A at two shared vertices (26.47,36.96) and (27.70,36.96) but not merged into a single ring, because the drawn dashed line genuinely does not close as one simple polygon at those points).",
+    "confidence": "mixed -- see vertex_notes for per-vertex/per-part confidence (high/medium-high/medium)",
+    "known_limitation": "Part B vertex index 4 (~27.80E/36.70N, the SE closing corner of the Zone 18/19 wedge, where the orange Extensional line transitions to the white Compressional line) could NOT be pinned down to better than roughly +/-0.1-0.2 degrees: the upper (lat~37.00) and lower (lat~36.66) branches of the dashed line converge in a short, dash-gapped run and the exact orange-to-white handoff pixel is ambiguous. The coordinate given is a reasonable midpoint of the observed convergence, explicitly NOT a precision measurement, and should not be treated as more accurate than +/-0.15 degrees. No attempt was made to smooth or regularize this corner into a 'cleaner' shape.",
+    "verified_against": "Both parts rendered as an overlay on the source figure (2026-09-10) and visually confirmed to closely track the orange dashed line; Part A's shared NW edge visually confirmed identical to Shear Zone's already-approved zone 6/7 boundary; Part B's wedge shape (vertex vertex vertex) visually confirmed against a 2x-upscaled crop of zones 18/19",
+    "vertex_notes": [
+     {
+      "part": "A",
+      "index": 0,
+      "lon": 26.96,
+      "lat": 38.85,
+      "confidence": "high",
+      "note": "Reused verbatim from Shear Zone vertex 13 -- shared Zone 6/7 corner, guarantees zero-gap shared edge"
+     },
+     {
+      "part": "A",
+      "index": 1,
+      "lon": 26.97,
+      "lat": 39.8,
+      "confidence": "high",
+      "note": "Vertical connector, long continuous pixel run (n=160 px) confirmed in band scan"
+     },
+     {
+      "part": "A",
+      "index": 2,
+      "lon": 30.03,
+      "lat": 39.8,
+      "confidence": "high",
+      "note": "NE corner, top edge of zones 6/5"
+     },
+     {
+      "part": "A",
+      "index": 3,
+      "lon": 30.03,
+      "lat": 36.72,
+      "confidence": "high",
+      "note": "SE corner -- east edge is one continuous unbroken line from lat 39.8 down to 36.72, confirmed by full-column scan"
+     },
+     {
+      "part": "A",
+      "index": 4,
+      "lon": 28.04,
+      "lat": 36.72,
+      "confidence": "high",
+      "note": "Bottom edge, eastern segment (south of zones 16/17)"
+     },
+     {
+      "part": "A",
+      "index": 5,
+      "lon": 27.8,
+      "lat": 36.72,
+      "confidence": "medium-high",
+      "note": "Corner before the small vertical step"
+     },
+     {
+      "part": "A",
+      "index": 6,
+      "lon": 27.8,
+      "lat": 37.0,
+      "confidence": "medium",
+      "note": "Top of the short vertical step connector (dash-gapped, 3 short runs found spanning lat 36.66-37.10)"
+     },
+     {
+      "part": "A",
+      "index": 7,
+      "lon": 27.7,
+      "lat": 36.96,
+      "confidence": "medium",
+      "note": "Bottom edge, western segment begins (south of zone 15)"
+     },
+     {
+      "part": "A",
+      "index": 8,
+      "lon": 26.47,
+      "lat": 36.96,
+      "confidence": "high",
+      "note": "West end of the long straight bottom-edge run (continuous lon 25.68-27.7 at this latitude); also touches Part B here without merging into it"
+     },
+     {
+      "part": "A",
+      "index": 9,
+      "lon": 26.47,
+      "lat": 38.06,
+      "confidence": "high",
+      "note": "Vertical connector up to the zone 12/13 block, confirmed continuous across 3 independent band scans (lat 36.96/37.49/37.88/38.06)"
+     },
+     {
+      "part": "A",
+      "index": 10,
+      "lon": 25.14,
+      "lat": 38.06,
+      "confidence": "high",
+      "note": "Zone 12/13 south edge, west end"
+     },
+     {
+      "part": "A",
+      "index": 11,
+      "lon": 25.13,
+      "lat": 38.7,
+      "confidence": "high",
+      "note": "Zone 13 west edge, top -- closes back to vertex 0 via the shared top edge with Shear Zone"
+     },
+     {
+      "part": "B",
+      "index": 0,
+      "lon": 23.63,
+      "lat": 37.06,
+      "confidence": "medium",
+      "note": "Westmost vertex of the Zone 18/19 wedge, located by automated corner clustering, cross-checked visually against a 2x-upscaled crop"
+     },
+     {
+      "part": "B",
+      "index": 1,
+      "lon": 26.0,
+      "lat": 36.96,
+      "confidence": "medium",
+      "note": "Upper branch of the wedge merging into the main east-west line"
+     },
+     {
+      "part": "B",
+      "index": 2,
+      "lon": 26.47,
+      "lat": 36.96,
+      "confidence": "high",
+      "note": "Touches Part A vertex 8 at this exact coordinate (shared point, not a merged ring)"
+     },
+     {
+      "part": "B",
+      "index": 3,
+      "lon": 27.7,
+      "lat": 36.96,
+      "confidence": "medium",
+      "note": "Touches Part A vertex 7 at this exact coordinate"
+     },
+     {
+      "part": "B",
+      "index": 4,
+      "lon": 27.8,
+      "lat": 36.7,
+      "confidence": "medium",
+      "note": "UNRESOLVED PRECISION: SE closing corner where the orange Extensional line hands off to the white Compressional line. Observed convergence spans roughly lat 36.66-37.00 in a dash-gapped, ambiguous run; true corner could plausibly be anywhere within about +/-0.1-0.2 degrees of the coordinate given. Not chased further to avoid inventing false precision; revisit if/when the Compressional Zone is digitized and its own NW corner can cross-check this point."
+     },
+     {
+      "part": "B",
+      "index": 5,
+      "lon": 27.07,
+      "lat": 36.26,
+      "confidence": "high",
+      "note": "Lower branch, exact orange color match (RGB 199,129,35, distance 0) confirmed by direct pixel sampling"
+     },
+     {
+      "part": "B",
+      "index": 6,
+      "lon": 25.4,
+      "lat": 36.26,
+      "confidence": "medium",
+      "note": "Lower branch continuing toward the wedge vertex"
+     }
+    ],
+    "checkpoint": "Extensional Zone -- approved 2026-09-10 (Part A unconditionally; Part B approved with vertex #4 explicitly left as medium-confidence/unresolved pending Compressional Zone cross-check); commit deferred until final geometric review"
+   },
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        26.96,
+        38.85
+       ],
+       [
+        26.97,
+        39.8
+       ],
+       [
+        30.03,
+        39.8
+       ],
+       [
+        30.03,
+        36.72
+       ],
+       [
+        28.04,
+        36.72
+       ],
+       [
+        27.8,
+        36.72
+       ],
+       [
+        27.8,
+        37.0
+       ],
+       [
+        27.7,
+        36.96
+       ],
+       [
+        26.47,
+        36.96
+       ],
+       [
+        26.47,
+        38.06
+       ],
+       [
+        25.14,
+        38.06
+       ],
+       [
+        25.13,
+        38.7
+       ],
+       [
+        26.96,
+        38.85
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        23.63,
+        37.06
+       ],
+       [
+        26.0,
+        36.96
+       ],
+       [
+        26.47,
+        36.96
+       ],
+       [
+        27.7,
+        36.96
+       ],
+       [
+        27.8,
+        36.7
+       ],
+       [
+        27.07,
+        36.26
+       ],
+       [
+        25.4,
+        36.26
+       ],
+       [
+        23.63,
+        37.06
+       ]
       ]
      ]
     ]
