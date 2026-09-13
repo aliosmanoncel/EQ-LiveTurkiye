@@ -599,18 +599,21 @@
 
   <div class="sep"></div>
 
-  <!-- Tarihsel Katalog — data/eq_historical.json (ISC+EMSC birleşik, 1900-01-01 – 2026-06-22).
-       Yukarıdaki 1s/24s/1Hafta/1Ay/1Yıl'dan AYRI bir veri modu: loadData()'yı değil
-       loadHistoricalRange()'i kullanır, otomatik canlı yenilemeyi durdurur (aksi halde
-       1 saat sonra sessizce üstüne yazılır). fTimeStart/fTimeEnd "analiz penceresi"
-       filtresi bu geniş veri kümesinin üzerine aynen uygulanmaya devam eder. -->
+  <!-- Tarihsel Katalog — data/eq_historical.json (ISC+EMSC, 1900-2026) + data/epica_europe_historical.json
+       (EPICA+SHARE-CET, 1003-1899). Yukarıdaki 1s/24s/1Hafta/1Ay/1Yıl'dan AYRI bir veri modu:
+       loadData()'yı değil toggleHistoricalWindow()/rebuildHistoricalView()'ı kullanır, otomatik
+       canlı yenilemeyi durdurur (aksi halde 1 saat sonra sessizce üstüne yazılır). Butonlar
+       çoklu seçim (toggle) — birden fazlası aynı anda açık olabilir, seçili pencerelerin
+       birleşimi gösterilir (aralıklar çakışmadığından çift sayım olmaz), 2026-09-13.
+       fTimeStart/fTimeEnd "analiz penceresi" filtresi bu geniş veri kümesinin üzerine
+       aynen uygulanmaya devam eder. -->
   <div class="tr-only" style="display:flex;gap:4px;align-items:center">
-    <span style="font-size:.72rem;color:#888;white-space:nowrap">Tarihsel:</span>
-    <button class="tbtn" data-hist="1998" onclick="loadHistoricalRange(1998)" title="Yalnızca EMSC (1998-01-01'den itibaren, tek/homojen kaynak) · Scordilis (2006) Mw dönüşümü uygulanmış — magnitude heterojenliği azaltılmış">EMSC 1998–2026</button>
-    <button class="tbtn" data-hist="1900" data-hist-end="1970" onclick="loadHistoricalRange(1900,1970)" title="Yalnızca ISC (1900-01-01 – 1970-12-31, tek/homojen kaynak, EarthScope-öncesi dönem) · Scordilis (2006) Mw dönüşümü uygulanmış">ISC 1900–1970</button>
-    <button class="tbtn" data-hist="1971" data-hist-end="1997" onclick="loadHistoricalRange(1971,1997)" title="Yalnızca ISC (1971-01-01 – 1997-12-31, tek/homojen kaynak, EMSC dönemi hariç) · Scordilis (2006) Mw dönüşümü uygulanmış">ISC 1971–1997</button>
-    <button class="tbtn" data-hist="1003" data-hist-end="1899" data-hist-src="EPICA" onclick="loadHistoricalRange(1003,1899,'EPICA')" title="Yalnızca EPICA v1.1 (batı/Avrupa/Batı Anadolu, tek kaynak) · Rovida &amp; Antonucci (2021) INGV homojenizasyonu">EPICA 1003–1899</button>
-    <button class="tbtn" data-hist="1003" data-hist-end="1899" data-hist-src="SHARE-CET" onclick="loadHistoricalRange(1003,1899,'SHARE-CET')" title="Yalnızca SHARE-CET (doğu/orta Anadolu-Kafkasya, tek kaynak) · Soysal ve ark. (1981) → Io-Ms (Kalafat ve ark. 2007) → Mw (Zare 2012) dönüşüm zinciri — EPICA'dan FARKLI metodoloji">SHARE-CET 1003–1899</button>
+    <span style="font-size:.72rem;color:#888;white-space:nowrap">Tarihsel (çoklu seçim):</span>
+    <button class="tbtn" data-hist="1998" onclick="toggleHistoricalWindow(this,1998)" title="Yalnızca EMSC (1998-01-01'den itibaren, tek/homojen kaynak) · Scordilis (2006) Mw dönüşümü uygulanmış — magnitude heterojenliği azaltılmış · birden fazla pencere aynı anda seçilebilir">EMSC 1998–2026</button>
+    <button class="tbtn" data-hist="1900" data-hist-end="1970" onclick="toggleHistoricalWindow(this,1900,1970)" title="Yalnızca ISC (1900-01-01 – 1970-12-31, tek/homojen kaynak, EarthScope-öncesi dönem) · Scordilis (2006) Mw dönüşümü uygulanmış · birden fazla pencere aynı anda seçilebilir">ISC 1900–1970</button>
+    <button class="tbtn" data-hist="1971" data-hist-end="1997" onclick="toggleHistoricalWindow(this,1971,1997)" title="Yalnızca ISC (1971-01-01 – 1997-12-31, tek/homojen kaynak, EMSC dönemi hariç) · Scordilis (2006) Mw dönüşümü uygulanmış · birden fazla pencere aynı anda seçilebilir">ISC 1971–1997</button>
+    <button class="tbtn" data-hist="1003" data-hist-end="1899" data-hist-src="EPICA" onclick="toggleHistoricalWindow(this,1003,1899,'EPICA')" title="Yalnızca EPICA v1.1 (batı/Avrupa/Batı Anadolu, tek kaynak) · Rovida &amp; Antonucci (2021) INGV homojenizasyonu · birden fazla pencere aynı anda seçilebilir">EPICA 1003–1899</button>
+    <button class="tbtn" data-hist="1003" data-hist-end="1899" data-hist-src="SHARE-CET" onclick="toggleHistoricalWindow(this,1003,1899,'SHARE-CET')" title="Yalnızca SHARE-CET (doğu/orta Anadolu-Kafkasya, tek kaynak) · Soysal ve ark. (1981) → Io-Ms (Kalafat ve ark. 2007) → Mw (Zare 2012) dönüşüm zinciri — EPICA'dan FARKLI metodoloji · birden fazla pencere aynı anda seçilebilir">SHARE-CET 1003–1899</button>
   </div>
   <div id="histHint" style="font-size:10px;color:#888;margin-top:2px;letter-spacing:0.3px"></div>
 
@@ -1764,25 +1767,76 @@ function normalizeEpicaEvent(e) {
   };
 }
 
-async function loadHistoricalRange(startYear, endYear, epicaOnlySrc) {
+// Tek bir tarihsel pencerenin (startYear/endYear/epicaOnlySrc) olaylarını cat/epica
+// kaynaklarından filtreler — birden fazla pencere seçiliyken bunların birleşimi
+// alınabilsin diye rebuildHistoricalView() içinde her aktif buton için ayrı çağrılır.
+function filterHistoricalWindow(cat, epicaCache, startYear, endYear, epicaOnlySrc) {
+  const start = new Date(`${startYear}-01-01T00:00:00Z`);
+  const end   = endYear ? new Date(`${endYear}-12-31T23:59:59.999Z`) : null; // endYear yoksa üst sınır yok, katalog sonuna kadar
+  let winEvents = (cat.events || [])
+    .map(e => ({
+      lat: e.lat, lon: e.lon, dep: e.dep || 0, mag: e.mag || 0,
+      mw: e.mw || e.mag || 0, mtype: e.mtype || 'mw',
+      place: e.place || '', province: '', district: '',
+      src: e.src || '', time: new Date(e.time)
+    }))
+    .filter(e => e.time >= start && (!end || e.time <= end) && e.mag > 0);
+
+  let usedEpica = false;
+  if (startYear <= 1899 && epicaCache) {
+    let epicaEvents = (epicaCache.events || [])
+      .map(normalizeEpicaEvent)
+      .filter(e => e.time >= start && (!end || e.time <= end) && e.mag > 0);
+    if (epicaOnlySrc) epicaEvents = epicaEvents.filter(e => e.src === epicaOnlySrc); // tek-kaynak buton: yalnızca EPICA ya da yalnızca SHARE-CET
+    winEvents = [...epicaEvents, ...winEvents];
+    usedEpica = epicaEvents.length > 0;
+  }
+  return { events: winEvents, start, end, usedEpica };
+}
+
+// Aktif tarihsel pencereler — her biri {key, startYear, endYear, epicaOnlySrc}.
+// Aralıklar birbirini kapsamayacak şekilde tasarlandığından (1003-1899 / 1900-1970 /
+// 1971-1997 / 1998-2026) birden fazlası aynı anda seçiliyken çift saymadan
+// birleştirilebilir, 2026-09-13.
+let activeHistWindows = [];
+
+async function toggleHistoricalWindow(btn, startYear, endYear, epicaOnlySrc) {
+  const key = `${startYear}|${endYear || ''}|${epicaOnlySrc || ''}`;
+  const idx = activeHistWindows.findIndex(w => w.key === key);
+  if (idx >= 0) {
+    activeHistWindows.splice(idx, 1);
+    btn.classList.remove('active');
+  } else {
+    activeHistWindows.push({ key, startYear, endYear, epicaOnlySrc });
+    btn.classList.add('active');
+  }
+  await rebuildHistoricalView();
+}
+
+async function rebuildHistoricalView() {
   cancelRetry();
   const seq = ++loadSeq;
   const stale = () => seq !== loadSeq;
 
+  document.querySelectorAll('.tbtn[data-h]').forEach(x => x.classList.remove('active'));
+
+  if (activeHistWindows.length === 0) {
+    historicalMode = false;
+    updateRegionCtrlForMode();
+    events = [];
+    const hint = document.getElementById('histHint');
+    if (hint) hint.textContent = '';
+    const combined = [...liveEvents];
+    renderHeat(combined);
+    updateStats(combined);
+    renderTimeMag(combined);
+    setStatus('Tarihsel pencere seçili değil');
+    return;
+  }
+
   historicalMode = true;
   updateRegionCtrlForMode();
   if (cntTimer) clearInterval(cntTimer); // otomatik canlı yenileme DURUR — aksi halde 1sa sonra sessizce üstüne yazılır
-
-  document.querySelectorAll('.tbtn[data-h]').forEach(x => x.classList.remove('active'));
-  // data-hist tek başına benzersiz değil (örn. "1900–2026" ve "ISC 1900–1970" ikisi de data-hist="1900",
-  // "EPICA 1003–1899" ve "SHARE-CET 1003–1899" ikisi de data-hist="1003" data-hist-end="1899") —
-  // eşleştirme data-hist-end + data-hist-src üçlüsüyle yapılır; hiçbiri yoksa undefined, parametre
-  // verilmemişse de undefined olduğundan eski butonlar birbirini etkilemeden eskisi gibi çalışır, 2026-09-13
-  document.querySelectorAll('.tbtn[data-hist]').forEach(x => {
-    const xEnd = x.dataset.histEnd ? +x.dataset.histEnd : undefined;
-    const xSrc = x.dataset.histSrc || undefined;
-    x.classList.toggle('active', +x.dataset.hist === startYear && xEnd === endYear && xSrc === epicaOnlySrc);
-  });
 
   setStatus('Tarihsel katalog yükleniyor (14MB, ilk seferde biraz sürebilir)…');
   try {
@@ -1793,41 +1847,32 @@ async function loadHistoricalRange(startYear, endYear, epicaOnlySrc) {
       historicalCache = await res.json();
       if (stale()) return;
     }
-    const cat   = historicalCache;
-    const start = new Date(`${startYear}-01-01T00:00:00Z`);
-    const end   = endYear ? new Date(`${endYear}-12-31T23:59:59.999Z`) : null; // endYear verilmezse eski davranış: üst sınır yok, katalog sonuna kadar
-    let all = (cat.events || [])
-      .map(e => ({
-        lat: e.lat, lon: e.lon, dep: e.dep || 0, mag: e.mag || 0,
-        mw: e.mw || e.mag || 0, mtype: e.mtype || 'mw',
-        place: e.place || '', province: '', district: '',
-        src: e.src || '', time: new Date(e.time)
-      }))
-      .filter(e => e.time >= start && (!end || e.time <= end) && e.mag > 0);
+    const cat = historicalCache;
 
-    // 1900 öncesi istendiyse EPICA+SHARE-CET'i de yükleyip birleştir (cumulatif aralık)
-    let usedEpica = false;
-    if (startYear <= 1899) {
-      if (!epicaCache) {
-        const res2 = await fetchTimeout('data/epica_europe_historical.json', {}, 20000);
-        if (stale()) return;
-        if (res2.ok) epicaCache = await res2.json();
-      }
-      if (epicaCache) {
-        let epicaEvents = (epicaCache.events || [])
-          .map(normalizeEpicaEvent)
-          .filter(e => e.time >= start && (!end || e.time <= end) && e.mag > 0);
-        if (epicaOnlySrc) epicaEvents = epicaEvents.filter(e => e.src === epicaOnlySrc); // tek-kaynak buton: yalnızca EPICA ya da yalnızca SHARE-CET
-        all = [...epicaEvents, ...all];
-        usedEpica = true;
-      }
+    const needsEpica = activeHistWindows.some(w => w.startYear <= 1899);
+    if (needsEpica && !epicaCache) {
+      const res2 = await fetchTimeout('data/epica_europe_historical.json', {}, 20000);
+      if (stale()) return;
+      if (res2.ok) epicaCache = await res2.json();
     }
 
-    if (all.length === 0) throw new Error('Seçili tarih aralığında veri yok');
+    let all = [];
+    let overallStart = null, overallEnd = null, anyOpenEnded = false, usedEpicaAny = false;
+    for (const w of activeHistWindows) {
+      const win = filterHistoricalWindow(cat, epicaCache, w.startYear, w.endYear, w.epicaOnlySrc);
+      all = all.concat(win.events);
+      if (win.usedEpica) usedEpicaAny = true;
+      if (overallStart === null || win.start < overallStart) overallStart = win.start;
+      if (win.end) { if (overallEnd === null || win.end > overallEnd) overallEnd = win.end; }
+      else anyOpenEnded = true;
+    }
+
+    if (all.length === 0) throw new Error('Seçili pencere(ler)de veri yok');
 
     events = all;
     minMag = 0; // eşiği tarihsel katalog belirliyor (bkz. completeness), sabit bir minMag dayatmıyoruz
-    hours  = Math.ceil(((end || new Date()).getTime() - start.getTime()) / 3600000); // Time-Mag x-ekseni + Bölge Seç penceresi tutarlı kalsın — üst sınırlı pencerelerde (endYear) bugüne kadar değil, pencere sonuna kadar
+    const endRef = anyOpenEnded ? new Date() : overallEnd;
+    hours = Math.ceil((endRef.getTime() - overallStart.getTime()) / 3600000); // Time-Mag x-ekseni + Bölge Seç penceresi tutarlı kalsın
     const autoR = 100; // çok geniş zaman aralığı → Macro
     if (autoR !== activeR) setHeatRadius(autoR, true);
 
@@ -1841,20 +1886,19 @@ async function loadHistoricalRange(startYear, endYear, epicaOnlySrc) {
     if (hint) {
       const compLine = (cat.completeness || []).map(c => `${c.period}: Mc≈${c.Mc}`).join(' · ');
       let text = `Katalog completeness (${cat.source || 'ISC+EMSC'}): ${compLine} — bu, aşağıdaki hesaplanan Mc ile AYNI şey değildir`;
-      if (usedEpica) {
-        const epicaLabel = epicaOnlySrc || 'EPICA+SHARE-CET';
-        text += ` ⚠ 1003–1899 (${epicaLabel}) FARKLI bir Mw dönüşüm zinciri kullanır ve derinlik bilgisi içermez — ` +
+      if (usedEpicaAny) {
+        text += ` ⚠ 1003–1899 dönemi FARKLI bir Mw dönüşüm zinciri kullanır ve derinlik bilgisi içermez — ` +
                 `bu dönemi kapsayan Mc/b sonuçları büyük-depreme-yanlı, dikkatli yorumlanmalı.`;
       }
       hint.textContent = text;
     }
-    // Kaynak etiketi, seçilen pencerede GERÇEKTEN bulunan olayların src alanından türetilir
-    // (cat.source metadata'sı tüm kataloğu tanımlar, tek bir alt-pencereyi değil; normalizeEpicaEvent
-    // de artık src:'EPICA'/'SHARE-CET' verdiğinden ayrı bir epica-eki gerekmiyor — 2026-09-13)
+    // Kaynak etiketi, SEÇİLİ TÜM pencerelerde GERÇEKTEN bulunan olayların src alanından
+    // türetilir (cat.source metadata'sı tüm kataloğu tanımlar, seçimi değil), 2026-09-13
     const srcsInWindow = [...new Set(all.map(e => e.src).filter(Boolean))];
     const sourceLabel = srcsInWindow.join('+') || cat.source || 'ISC+EMSC';
-    const endLabel = endYear || (cat.endtime || '2026').slice(0,4);
-    setStatus(`${all.length} deprem · Tarihsel katalog (${sourceLabel}) · ${startYear}–${endLabel} · katalog sonu: ${cat.endtime || '—'}`);
+    const startLabel = overallStart.getUTCFullYear();
+    const endLabel = anyOpenEnded ? (cat.endtime || '2026').slice(0,4) : overallEnd.getUTCFullYear();
+    setStatus(`${all.length} deprem · Tarihsel katalog (${sourceLabel}) · ${startLabel}–${endLabel} · katalog sonu: ${cat.endtime || '—'}`);
     retryCount = 0;
   } catch (err) {
     if (stale()) return;
@@ -2313,8 +2357,8 @@ const HOURS_LABEL = { 1:'1 saat', 24:'24 saat', 168:'1 hafta', 720:'1 ay', 8760:
 const dfmt = d => d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
 
 /* Tarihsel Katalog modundayken bölge sorgusu YENİ bir EMSC isteği YAPMAZ —
-   zaten bellekte olan tam kataloğu (events, loadHistoricalRange'in doldurduğu,
-   seçili başlangıç yılından bugüne TÜM olaylar) bbox/poligona yerel olarak
+   zaten bellekte olan tam kataloğu (events, rebuildHistoricalView'ın doldurduğu,
+   seçili tarihsel pencere(ler)deki TÜM olaylar) bbox/poligona yerel olarak
    filtreler. Böylece canlı sorgunun Limit sınırı (varsayılan 500-2000) hiç
    devreye girmez — "poligon içindeki depremlerin TAMAMI 1900-2026" isteği
    tam olarak karşılanır, en-yeni-N'e yanlı bir örneklem değil. */
