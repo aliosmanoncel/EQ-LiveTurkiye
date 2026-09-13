@@ -3177,6 +3177,11 @@ function openIEB() {
     + '&orderby=time-desc&src=usgs&limit=5000'
     + `&maxlat=${b.getNorth().toFixed(2)}&minlat=${b.getSouth().toFixed(2)}`
     + `&maxlon=${b.getEast().toFixed(2)}&minlon=${b.getWest().toFixed(2)}`
+    // sbl=1 = "show bounding box lines" -- olmadan IEB sadece pan/zoom yapar,
+    // kutu çizmez ve tüm görünür alanı sayar; bununla hem kutu görünür çizilir
+    // hem de olay sayısı bu sınırla filtrelenir (kullanıcının elle seçtiği
+    // bölgenin URL'inde bu parametrenin varlığı fark edilerek eklendi, 2026-09-13)
+    + '&sbl=1'
     + `&zm=${zm}&mt=ter`;
 
   window.open(url, 'ieb_window',
