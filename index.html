@@ -282,6 +282,7 @@
     <select id="litRegionGroupSel" class="src-sel" onchange="onLitRegionGroupChange()">
       <option value="">— Seçiniz —</option>
       <option value="ow2006_marmara">Marmara — Öncel &amp; Wilson (2006)</option>
+      <option value="ow2004_western_anatolia">Batı Anadolu — Öncel &amp; Wilson (2004)</option>
     </select>
   </div>
   <div class="rowbox" id="litRegionZoneRow" style="display:none">
@@ -2599,6 +2600,10 @@ const LIT_REGION_SOURCES = {
   ow2006_marmara: {
     url:   'data/research_regions_marmara_oncel_wilson_2006.geojson',
     label: "Öncel & Wilson (2006) — Marmara",
+  },
+  ow2004_western_anatolia: {
+    url:   'data/research_regions_western_anatolia_oncel_wilson_2004.geojson',
+    label: "Öncel & Wilson (2004) — Batı Anadolu",
   }
 };
 let litRegionCache = {};   // { [key]: geojson } — sekme açıkken tekrar indirmeye gerek yok
@@ -2619,16 +2624,28 @@ async function onLitRegionGroupChange() {
       litRegionCache[key] = await res.json();
     }
     const geo = litRegionCache[key];
-    const opts = geo.features
-      .slice()
-      .sort((a, b) => a.properties.zone_id - b.properties.zone_id)
-      .map(f => {
-        const nf = f.properties.notable_feature;
-        const label = nf ? `Zone ${f.properties.zone_id} — ${nf.split(';')[0]}` : `Zone ${f.properties.zone_id}`;
-        return `<option value="${f.properties.zone_id}">${label}</option>`;
-      })
-      .join('');
-    zoneSel.innerHTML = '<option value="">— Zone seçin —</option>' + opts;
+    // Schema-aware dal: 2006 verisi her feature'a sayısal zone_id atar (15 alt-bölge,
+    // her biri kendi gerçek poligonu). 2004 verisi (Shear/Extensional/Compressional)
+    // zone_id KULLANMAZ -- yalnızca 3 makro-zon feature'ı vardır; her biri kendi
+    // member_zones sayı listesini (1-25) taşır ama bu 25 alt-bölgenin AYRI bir
+    // geometrisi yoktur (Faz 0 kapsamı dışında bırakıldı, bkz. commit 5bac775f).
+    // zone_id varsa mevcut (2006) davranış hiç değişmeden çalışır; yoksa zone_name
+    // bazlı makro-zon seçimi kurulur -- iki dataset birbirine zorla uydurulmaz.
+    const hasZoneId = geo.features.length > 0 && geo.features[0].properties.zone_id !== undefined;
+    const opts = hasZoneId
+      ? geo.features
+          .slice()
+          .sort((a, b) => a.properties.zone_id - b.properties.zone_id)
+          .map(f => {
+            const nf = f.properties.notable_feature;
+            const label = nf ? `Zone ${f.properties.zone_id} — ${nf.split(';')[0]}` : `Zone ${f.properties.zone_id}`;
+            return `<option value="${f.properties.zone_id}">${label}</option>`;
+          })
+          .join('')
+      : geo.features
+          .map(f => `<option value="${f.properties.zone_name}">${f.properties.zone_name}</option>`)
+          .join('');
+    zoneSel.innerHTML = (hasZoneId ? '<option value="">— Zone seçin —</option>' : '<option value="">— Makro-zon seçin —</option>') + opts;
   } catch (err) {
     zoneSel.innerHTML = '<option value="">Yüklenemedi</option>';
     setStatus(`Araştırma bölgesi verisi yüklenemedi: ${err.message}`, true);
@@ -2637,16 +2654,20 @@ async function onLitRegionGroupChange() {
 
 function onLitRegionZoneChange() {
   const groupKey = document.getElementById('litRegionGroupSel').value;
-  const zoneId   = document.getElementById('litRegionZoneSel').value;
+  const zoneKey  = document.getElementById('litRegionZoneSel').value;
   if (litRegionLayer) { map.removeLayer(litRegionLayer); litRegionLayer = null; }
   const info = document.getElementById('litRegionInfo');
   const btnClear = document.getElementById('btnLitRegionClear');
   const btnQuery = document.getElementById('btnLitRegionQuery');
   const onlyThisRow = document.getElementById('litRegionOnlyThisRow');
-  if (!groupKey || !zoneId) { info.style.display = 'none'; btnClear.style.display = 'none'; btnQuery.style.display = 'none'; onlyThisRow.style.display = 'none'; return; }
+  if (!groupKey || !zoneKey) { info.style.display = 'none'; btnClear.style.display = 'none'; btnQuery.style.display = 'none'; onlyThisRow.style.display = 'none'; return; }
 
   const geo = litRegionCache[groupKey];
-  const feat = geo.features.find(f => String(f.properties.zone_id) === String(zoneId));
+  // bkz. onLitRegionGroupChange -- aynı schema-aware ayrım burada da uygulanır
+  const hasZoneId = geo.features.length > 0 && geo.features[0].properties.zone_id !== undefined;
+  const feat = hasZoneId
+    ? geo.features.find(f => String(f.properties.zone_id) === String(zoneKey))
+    : geo.features.find(f => f.properties.zone_name === zoneKey);
   if (!feat) return;
 
   // GeoJSON'daki GERÇEK halka L.geoJSON ile çizilir (bounds'tan yeniden
@@ -2666,13 +2687,26 @@ function onLitRegionZoneChange() {
   btnQuery.style.display = '';
   onlyThisRow.style.display = 'flex';
   info.style.display = 'block';
+  const titleLine = hasZoneId
+    ? `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id}</b>`
+    : `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name}</b>`;
+  // 25 sayısal alt-bölge (member_zones) burada SADECE bilgi amaçlı listelenir --
+  // seçilebilir değildir, çünkü kaynak GeoJSON'da ayrı bir geometrileri yoktur
+  // (Faz 0 kapsamı dışında bırakıldı). Sayılar kaynak veriden olduğu gibi
+  // gösterilir, yeniden numaralandırılmaz veya tahmin edilmez.
+  const memberZonesLine = (!hasZoneId && Array.isArray(p.member_zones))
+    ? `<br><span style="color:#888">Alt bölgeler (metinden doğrulanmış üyelik; ayrı geometri olarak dijitalleştirilmedi): ${p.member_zones.join(', ')}</span>`
+    : '';
   info.innerHTML =
-    `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id}</b>` +
+    titleLine +
     (p.notable_feature ? `<br>${p.notable_feature}` : '') +
+    memberZonesLine +
     `<br><span style="color:#666">${p.source_full}</span>` +
     `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
     `<br><span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span>`;
-  setStatus(`Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id} çizildi`);
+  setStatus(hasZoneId
+    ? `Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id} çizildi`
+    : `Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name} çizildi`);
 }
 
 function litRegionClear() {
@@ -2722,16 +2756,28 @@ function litRegionCommitToQuery() {
   if (!litRegionLayer) return;
   const sub = litRegionLayer.getLayers ? litRegionLayer.getLayers()[0] : litRegionLayer;
   if (!sub || !sub.getLatLngs) return;
-  const latlngs = sub.getLatLngs()[0];
+  const rawLatLngs = sub.getLatLngs();
   const bounds  = litRegionLayer.getBounds();
 
-  const uniqueCorners = new Set(latlngs.map(ll => `${ll.lat.toFixed(6)},${ll.lng.toFixed(6)}`)).size;
+  // Çok-parçalı (MultiPolygon, ör. Extensional Zone Part A/B) geometrilerde
+  // getLatLngs() bir seviye daha derindir: [[ring],[ring2],...] -- her ring
+  // ayrı bir parçadır. Basit tek-halkalı bir poligon/dikdörtgende ise
+  // rawLatLngs[0] zaten düz bir LatLng dizisidir (rawLatLngs[0][0].lat sayı).
+  // Bu ayrım yapılmadan doğrudan rawLatLngs[0] kullanılsaydı (eski kod), çok
+  // parçalı geometrilerde "Bu bölgede sorgula" .click() üzerinden sessizce
+  // TypeError ile başarısız olurdu (2026-09-13, Batı Anadolu 2004 wiring
+  // sırasında bulundu). 2006'nın basit dikdörtgenleri bu daldan etkilenmez.
+  const isMultiPart = Array.isArray(rawLatLngs[0]) && Array.isArray(rawLatLngs[0][0]);
+  const outerRings  = isMultiPart ? rawLatLngs.map(part => part[0]) : [rawLatLngs[0]];
+  const uniqueCorners = new Set(
+    outerRings.flat().map(ll => `${ll.lat.toFixed(6)},${ll.lng.toFixed(6)}`)
+  ).size;
 
   regionDeselect(); // TEK execution-state garantisi: önceki elle-çizilmiş bölge varsa kaldırılır
 
-  if (uniqueCorners > 4) {
+  if (isMultiPart || uniqueCorners > 4) {
     regionIsPolygon = true;
-    regionRect = L.polygon(latlngs, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+    regionRect = L.polygon(outerRings, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
   } else {
     regionIsPolygon = false;
     regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
