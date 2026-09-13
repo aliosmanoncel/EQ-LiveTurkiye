@@ -607,6 +607,7 @@
   <div class="tr-only" style="display:flex;gap:4px;align-items:center">
     <span style="font-size:.72rem;color:#888;white-space:nowrap">Tarihsel:</span>
     <button class="tbtn" data-hist="1998" onclick="loadHistoricalRange(1998)" title="Yalnızca EMSC (1998-01-01'den itibaren, tek/homojen kaynak) · Scordilis (2006) Mw dönüşümü uygulanmış — magnitude heterojenliği azaltılmış">EMSC 1998–2026</button>
+    <button class="tbtn" data-hist="1971" data-hist-end="1997" onclick="loadHistoricalRange(1971,1997)" title="Yalnızca ISC (1971-01-01 – 1997-12-31, tek/homojen kaynak, EMSC dönemi hariç) · Scordilis (2006) Mw dönüşümü uygulanmış">ISC 1971–1997</button>
     <button class="tbtn" data-hist="2000" onclick="loadHistoricalRange(2000)" title="ISC+EMSC · son ~26 yıl">2000–2026</button>
     <button class="tbtn" data-hist="1990" onclick="loadHistoricalRange(1990)" title="ISC+EMSC · son ~36 yıl">1990–2026</button>
     <button class="tbtn" data-hist="1965" onclick="loadHistoricalRange(1965)" title="WWSSN sonrası · standardize edilmiş modern aletsel (post-instrumental) dönem, 1965'ten itibaren">1965–2026</button>
@@ -1763,7 +1764,7 @@ function normalizeEpicaEvent(e) {
   };
 }
 
-async function loadHistoricalRange(startYear) {
+async function loadHistoricalRange(startYear, endYear) {
   cancelRetry();
   const seq = ++loadSeq;
   const stale = () => seq !== loadSeq;
@@ -1786,14 +1787,15 @@ async function loadHistoricalRange(startYear) {
     }
     const cat   = historicalCache;
     const start = new Date(`${startYear}-01-01T00:00:00Z`);
+    const end   = endYear ? new Date(`${endYear}-12-31T23:59:59.999Z`) : null; // endYear verilmezse eski davranış: üst sınır yok, katalog sonuna kadar
     let all = (cat.events || [])
       .map(e => ({
         lat: e.lat, lon: e.lon, dep: e.dep || 0, mag: e.mag || 0,
         mw: e.mw || e.mag || 0, mtype: e.mtype || 'mw',
         place: e.place || '', province: '', district: '',
-        time: new Date(e.time)
+        src: e.src || '', time: new Date(e.time)
       }))
-      .filter(e => e.time >= start && e.mag > 0);
+      .filter(e => e.time >= start && (!end || e.time <= end) && e.mag > 0);
 
     // 1900 öncesi istendiyse EPICA+SHARE-CET'i de yükleyip birleştir (cumulatif aralık)
     let usedEpica = false;
@@ -1806,7 +1808,7 @@ async function loadHistoricalRange(startYear) {
       if (epicaCache) {
         const epicaEvents = (epicaCache.events || [])
           .map(normalizeEpicaEvent)
-          .filter(e => e.time >= start && e.mag > 0);
+          .filter(e => e.time >= start && (!end || e.time <= end) && e.mag > 0);
         all = [...epicaEvents, ...all];
         usedEpica = true;
       }
@@ -1816,7 +1818,7 @@ async function loadHistoricalRange(startYear) {
 
     events = all;
     minMag = 0; // eşiği tarihsel katalog belirliyor (bkz. completeness), sabit bir minMag dayatmıyoruz
-    hours  = Math.ceil((Date.now() - start.getTime()) / 3600000); // Time-Mag x-ekseni + Bölge Seç penceresi tutarlı kalsın
+    hours  = Math.ceil(((end || new Date()).getTime() - start.getTime()) / 3600000); // Time-Mag x-ekseni + Bölge Seç penceresi tutarlı kalsın — üst sınırlı pencerelerde (endYear) bugüne kadar değil, pencere sonuna kadar
     const autoR = 100; // çok geniş zaman aralığı → Macro
     if (autoR !== activeR) setHeatRadius(autoR, true);
 
@@ -1836,8 +1838,14 @@ async function loadHistoricalRange(startYear) {
       }
       hint.textContent = text;
     }
-    const sourceLabel = usedEpica ? `${cat.source || 'ISC+EMSC'} + EPICA/SHARE-CET` : (cat.source || 'ISC+EMSC');
-    setStatus(`${all.length} deprem · Tarihsel katalog (${sourceLabel}) · ${startYear}–${(cat.endtime || '2026').slice(0,4)} · katalog sonu: ${cat.endtime || '—'}`);
+    // Kaynak etiketi, seçilen pencerede GERÇEKTEN bulunan olayların src alanından türetilir
+    // (cat.source metadata'sı tüm kataloğu tanımlar, tek bir alt-pencereyi değil — 2026-09-13)
+    const srcsInWindow = [...new Set(all.map(e => e.src).filter(Boolean))];
+    const sourceLabel = usedEpica
+      ? `${srcsInWindow.join('+') || (cat.source || 'ISC+EMSC')} + EPICA/SHARE-CET`
+      : (srcsInWindow.join('+') || cat.source || 'ISC+EMSC');
+    const endLabel = endYear || (cat.endtime || '2026').slice(0,4);
+    setStatus(`${all.length} deprem · Tarihsel katalog (${sourceLabel}) · ${startYear}–${endLabel} · katalog sonu: ${cat.endtime || '—'}`);
     retryCount = 0;
   } catch (err) {
     if (stale()) return;
