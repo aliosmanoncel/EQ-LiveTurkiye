@@ -30,19 +30,34 @@ MC = [
 LIMIT    = 20000
 OUTPUT   = 'data/eq_historical.json'
 
-# ── Scordilis (2006) Mw donusumu ─────────────────────────────────────
+# ── Buyukluk homojenizasyonu — provenance-farkinda mimari (Stage 2A, 2026-09-13) ──
+# 2026-09-13 audit: eski ikinci-dereceden ML/MD/Mc->Mw formulunun kaynagi
+# dogrulanamadi — Scordilis (2006) boyle bir iliski onermeyi kendi Sonuc
+# bolumunde acikca reddediyor ("no general globally valid relation between
+# ML and MW magnitudes can be proposed"), Kadirioglu & Kartal (2016) ise
+# farkli form/katsayi/aralik kullaniyor ve M<3.3 icin dogrulanmis degil.
+# Bu yuzden ML/MD/Mc icin HENUZ hicbir donusum uygulanmiyor: orijinal
+# mag/mtype korunuyor, "mw" yalnizca gercekten dogrulanmis durumlarda
+# (native Mw, Scordilis 2006 mb/Ms) dolduruluyor. Detay ve kaynaklar:
+# seismo-report/eqlive-turkey-methodology.html §4.
 def to_mw(mag, mtype):
+    """(mw, mw_method) dondurur. mw None ise dogrulanmis bir donusum yok
+    demektir — cagiran taraf orijinal mag'i kullanmali (index.html zaten
+    her tuketim noktasinda `e.mw ?? e.mag` / `e.mw || e.mag` deseniyle
+    bunu otomatik yapiyor, ayrica degisiklik gerekmiyor)."""
     mt = (mtype or '').lower().strip()
     if mt in ('mw','mww','mwb','mwc','mwr','mwp',''):
-        return round(mag, 2)
+        return round(mag, 2), 'native'
     if mt == 'mb' and 3.5 <= mag <= 6.2:
-        return round(0.85*mag + 1.03, 2)
-    if mt in ('ml','md','mc') and 1.0 <= mag <= 6.5:
-        return round(0.0376*mag**2 + 0.646*mag - 0.269, 2)
+        return round(0.85*mag + 1.03, 2), 'scordilis2006_mb'
     if mt in ('ms','ms_20'):
-        if 3.0 <= mag <= 6.1: return round(0.646*mag + 2.079, 2)
-        if mag > 6.1:          return round(0.994*mag + 0.115, 2)
-    return round(mag, 2)
+        if 3.0 <= mag <= 6.1:
+            return round(0.646*mag + 2.079, 2), 'scordilis2006_ms_lo'
+        if mag > 6.1:
+            return round(0.994*mag + 0.115, 2), 'scordilis2006_ms_hi'
+    if mt in ('ml', 'md', 'mc'):
+        return None, 'unconverted_' + mt
+    return None, 'unconverted_' + (mt or 'unknown')
 
 def parse_line(line, source):
     c = [x.strip() for x in line.split('|')]
@@ -50,17 +65,19 @@ def parse_line(line, source):
     try:
         mag   = float(c[10])
         mtype = c[9]
+        mw, mw_method = to_mw(mag, mtype)
         return {
-            'id'    : c[0],
-            'time'  : c[1],
-            'lat'   : float(c[2]),
-            'lon'   : float(c[3]),
-            'dep'   : float(c[4]) if c[4] else 10.0,
-            'mag'   : mag,
-            'mtype' : mtype,
-            'mw'    : to_mw(mag, mtype),
-            'place' : c[12] if len(c) > 12 else '',
-            'src'   : source,
+            'id'        : c[0],
+            'time'      : c[1],
+            'lat'       : float(c[2]),
+            'lon'       : float(c[3]),
+            'dep'       : float(c[4]) if c[4] else 10.0,
+            'mag'       : mag,
+            'mtype'     : mtype,
+            'mw'        : mw,
+            'mw_method' : mw_method,
+            'place'     : c[12] if len(c) > 12 else '',
+            'src'       : source,
         }
     except (ValueError, IndexError):
         return None
