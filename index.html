@@ -299,6 +299,7 @@
     Sadece bu bölgeyi göster
   </label>
   <button class="tbtn" id="btnLitRegionQuery" onclick="litRegionCommitToQuery()" style="display:none;background:#3b0764;border-color:#a855f7" title="Bu araştırma bölgesinin geometrisini aktif sorgu alanına (regionRect) kopyalar ve seçili Kaynak (EMSC/USGS/AFAD) ile canlı sorgular — otomatik değildir, sadece bu butona basınca çalışır">▶ Bu bölgede sorgula</button>
+  <button class="tbtn" id="btnRegionDecluster" onclick="toggleRegionDecluster()" style="display:none" title="GK74 (Gardner-Knopoff 1974) declustering — yalnızca data/eq_historical_dc.json'da eşleşen (statik ISC+EMSC) olaylara uygulanır; EPICA/SHARE-CET ve canlı EMSC/USGS/AFAD olayları bu eşleştirmede yer almadığından her zaman ham bırakılır. Temel sorgu değişmez, sadece info kutusu/harita/Time-Mag görünümü filtrelenir.">🔻 Decluster (GK74)</button>
   </div>
 </div>
 
@@ -1682,11 +1683,11 @@ function renderTimeMag(evList) {
   // sadece bölgeye özel kümeyi (regionEvents) kullanır — kullanıcı bir
   // bölge çizdiğinde dışındaki alanların istatistiğini görmesi anlamsız.
   const usingRegion = !!regionRect;
-  if (usingRegion) evList = regionEvents;
+  if (usingRegion) evList = applyGk74Filter(regionEvents);
   const usingHistorical = historicalMode && !usingRegion;
 
   const srcSel  = document.getElementById('srcSel');
-  const srcName = usingRegion ? 'Bölge' : usingHistorical ? 'Tarihsel Katalog' : (srcSel ? srcSel.value : 'emsc').toUpperCase();
+  const srcName = usingRegion ? (regionDeclusterOn ? 'Bölge (GK74)' : 'Bölge') : usingHistorical ? 'Tarihsel Katalog' : (srcSel ? srcSel.value : 'emsc').toUpperCase();
   const winLabel= usingHistorical
     ? `${new Date(Date.now() - hours*3600000).getFullYear()}–${new Date().getFullYear()}`
     : hours<24 ? hours+'s' : hours===168 ? '1 hafta' : hours/24+'g';
@@ -2020,7 +2021,7 @@ function filterHistoricalWindow(cat, epicaCache, startYear, endYear, epicaOnlySr
       lat: e.lat, lon: e.lon, dep: e.dep || 0, mag: e.mag || 0,
       mw: e.mw || e.mag || 0, mtype: e.mtype || 'mw',
       place: e.place || '', province: '', district: '',
-      src: e.src || '', time: new Date(e.time)
+      src: e.src || '', time: new Date(e.time), id: e.id || ''
     }))
     .filter(e => e.time >= start && (!end || e.time <= end) && e.mag > 0);
 
@@ -2393,11 +2394,47 @@ let regionWindowStart = null, regionWindowEnd = null;
 let regionIsPolygon = false; // true ise regionRect aslında bir L.Polygon — fetchRegionEvents ek point-in-polygon filtresi uygular
 let regionSource = 'emsc';   // 'emsc' | 'usgs' | 'afad' — Bölge Analizi'nin KENDİ kaynak seçimi, üstteki genel Kaynak (srcSel/src) ile bağımsız (bkz. DATA FLOW NOTE)
 
+/* GK74 (Gardner-Knopoff 1974) declustering — YALNIZCA Araştırma Bölgesi
+   panelinde, sadece data/eq_historical_dc.json'da id eşleşmesi bulunan
+   (statik ISC+EMSC) olaylara uygulanır. Algoritma JS'de YENİDEN YAZILMAZ —
+   scripts/decluster_gk74.py'nin ürettiği hazır ana-şok id kümesi bir kez
+   yüklenip Set olarak önbelleklenir. Eşleşmeyen olaylar (EPICA/SHARE-CET,
+   canlı EMSC/USGS/AFAD — bunların hiçbirinde id alanı yok) HER ZAMAN ham
+   bırakılır, sessizce çıkarılmaz (2026-09-13, kullanıcı onaylı kapsam). */
+let gk74MainshockIds = null; // Set<string> | null — henüz yüklenmediyse null
+let gk74Loading      = null; // Promise — eşzamanlı çift-tıklamada tekrar fetch'i önler
+let regionDeclusterOn = false; // Araştırma Bölgesi decluster toggle durumu — varsayılan OFF/ham
+
 // Poligon çizim durumu (nokta nokta tıklama modu)
 let polygonActive  = false;
 let polygonPoints  = [];
 let polygonPreview = null; // L.Polyline — çizilirken önizleme
 let polygonMarkers = [];   // köşe noktası işaretleri
+
+// eq_historical_dc.json (GK74 ana-şok id kümesi) bir kez indirilip Set'e
+// alınır; sonraki toggle'lar dosyayı tekrar fetch etmez.
+async function ensureGk74Loaded() {
+  if (gk74MainshockIds) return gk74MainshockIds;
+  if (gk74Loading) return gk74Loading;
+  gk74Loading = fetchTimeout('data/eq_historical_dc.json', {}, 20000)
+    .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
+    .then(json => {
+      gk74MainshockIds = new Set((json.events || []).map(e => e.id));
+      return gk74MainshockIds;
+    })
+    .catch(err => { gk74Loading = null; throw err; });
+  return gk74Loading;
+}
+
+// GK74 filtresi: decluster kapalıysa ya da katalog henüz yüklenmediyse
+// olduğu gibi (ham) döner. Açıkken de yalnızca id'si ana-şok kümesinde
+// bulunan olaylar tutulur; id'si OLMAYAN olaylar (EPICA/SHARE-CET, canlı
+// EMSC/USGS/AFAD) eşleşme aranmadan ham bırakılır (kapsam dışı, sessizce
+// çıkarılmaz — 2026-09-13 kullanıcı onaylı tasarım).
+function applyGk74Filter(evList) {
+  if (!regionDeclusterOn || !gk74MainshockIds) return evList;
+  return evList.filter(e => !e.id || gk74MainshockIds.has(e.id));
+}
 
 /* Bölgeye özel Mc/b istatistiği — mevcut computeMc()/computeBvalue()
    (Time-Mag panelinde kullanılan aynı fonksiyonlar) bölge kümesine uygulanır.
@@ -2474,7 +2511,11 @@ function renderRegionInfo() {
   }
   line += `<br>Bölge: ${bounds.getSouth().toFixed(2)},${bounds.getWest().toFixed(2)} – ${bounds.getNorth().toFixed(2)},${bounds.getEast().toFixed(2)}`;
   if (regionIsPolygon) line += ` (poligon, ${regionRect.getLatLngs()[0].length} köşe — sınırlar kapsayan dikdörtgen)`;
-  line += `<br>${computeRegionStatsLine(regionEvents, regionOrderUsed, regionCapped)}`;
+  const statsEvs = applyGk74Filter(regionEvents);
+  if (regionDeclusterOn) {
+    line += `<br><span style="color:#f472b6">🔻 N=${regionEvents.length} (ham) → N=${statsEvs.length} (GK74)</span>`;
+  }
+  line += `<br>${computeRegionStatsLine(statsEvs, regionOrderUsed, regionCapped)}`;
   info.innerHTML = line;
 }
 
@@ -2799,6 +2840,84 @@ async function fetchRegionEventsFromAfad(bounds) {
   }
 }
 
+/* GK74 decluster toggle'ı sonrası harita katmanını YENİDEN SORGU YAPMADAN
+   yeniden çizer — regionEvents (ham) hiç değişmez, applyGk74Filter() sadece
+   bu çizim için uygulanır. Her kaynağın (Tarihsel/EMSC/USGS/AFAD) kendi
+   marker stili korunur; canlı/AFAD olaylarında id olmadığından filtre orada
+   fiilen no-op'tur (hepsi ham kalır), yalnızca Tarihsel Katalog görünümü
+   fiilen değişir — bkz. applyGk74Filter kapsam notu. */
+function redrawRegionMarkers() {
+  if (!regionLayer) return;
+  map.removeLayer(regionLayer);
+  regionLayer = L.layerGroup();
+  const evs = applyGk74Filter(regionEvents);
+  const visibleSample = timeBalancedSample(evs, VISUAL_SAMPLE_CAP);
+  if (historicalMode) {
+    visibleSample.forEach(e => {
+      const mVal = e.mw ?? e.mag;
+      L.circleMarker([e.lat, e.lon], {
+        radius: 3.5, color:'#38bdf8', weight:1, fillColor:'#0ea5e9', fillOpacity:.7
+      }).bindPopup(
+        `<b style="color:#38bdf8">Mw ${mVal.toFixed(1)}</b>` +
+        `<br><span style="color:#aaa">${e.place||'—'}</span>` +
+        `<br>Depth: ${e.dep==null ? 'bilinmiyor (pre-instrumental)' : e.dep.toFixed(0)+' km'}` +
+        `<br><span style="color:#666">${dfmt(e.time)}</span>`
+      ).addTo(regionLayer);
+    });
+  } else if (regionSource === 'afad') {
+    visibleSample.forEach(e => {
+      L.circleMarker([e.lat, e.lon], {
+        radius: 3.5, color:'#f59e0b', weight:1, fillColor:'#d97706', fillOpacity:.7
+      }).bindPopup(
+        `<b style="color:#f59e0b">M ${e.mag.toFixed(1)}</b>` +
+        `<br><span style="color:#aaa">${e.place||'AFAD'}</span>` +
+        `<br>Depth: ${e.dep.toFixed(0)} km` +
+        `<br><span style="color:#666">${dfmt(e.time)}</span>`
+      ).addTo(regionLayer);
+    });
+  } else {
+    const provider = regionSource === 'usgs' ? 'usgs' : 'emsc';
+    const markerColor = provider === 'usgs' ? '#a78bfa' : '#38bdf8';
+    const markerFill  = provider === 'usgs' ? '#8b5cf6' : '#0ea5e9';
+    const regionLabel = provider === 'usgs' ? 'USGS Region' : 'EMSC Region';
+    visibleSample.forEach(e => {
+      L.circleMarker([e.lat, e.lon], {
+        radius: 3.5, color: markerColor, weight:1, fillColor: markerFill, fillOpacity:.7
+      }).bindPopup(
+        `<b style="color:${markerColor}">M ${e.mag.toFixed(1)}</b>` +
+        `<br><span style="color:#aaa">${e.place||regionLabel}</span>` +
+        `<br>Depth: ${e.dep.toFixed(0)} km` +
+        `<br><span style="color:#666">${dfmt(e.time)}</span>`
+      ).addTo(regionLayer);
+    });
+  }
+  regionLayer.addTo(map);
+}
+
+// Araştırma Bölgesi panelindeki "🔻 Decluster (GK74)" butonu — temel
+// regionEvents/fetch mantığına DOKUNMAZ, yalnızca görünüm/analiz katmanını
+// (info kutusu, harita işaretçileri, Time-Mag/Mc/b/GR) filtreler.
+async function toggleRegionDecluster() {
+  const btn = document.getElementById('btnRegionDecluster');
+  if (!regionDeclusterOn) {
+    if (!gk74MainshockIds) {
+      btn.disabled = true;
+      setStatus('GK74 declustered katalog yükleniyor…');
+      try { await ensureGk74Loaded(); }
+      catch (err) { setStatus(`GK74 kataloğu yüklenemedi: ${err.message}`, true); btn.disabled = false; return; }
+      btn.disabled = false;
+    }
+    regionDeclusterOn = true;
+    btn.classList.add('active');
+  } else {
+    regionDeclusterOn = false;
+    btn.classList.remove('active');
+  }
+  renderRegionInfo();
+  redrawRegionMarkers();
+  if (showTimeMag) renderTimeMag(regionEvents);
+}
+
 /* URL'de bölge seçimini kalıcı kıl — paylaşılan link açıldığında aynı bölge
    ve ayarlarla yeniden yüklensin (harita görünümünün lat/lng/zoom ile
    yaptığı şeyin bölge seçimi için karşılığı). */
@@ -2875,6 +2994,9 @@ function regionDeselect() {
   regionWindowStart = regionWindowEnd = null;
   document.getElementById('btnRegionSelect').classList.remove('active');
   document.getElementById('regionMcOverride').value = '';
+  regionDeclusterOn = false;
+  const btnDecluster = document.getElementById('btnRegionDecluster');
+  if (btnDecluster) { btnDecluster.style.display = 'none'; btnDecluster.classList.remove('active'); }
   setStatus('');
   const info = document.getElementById('regionInfo');
   if (info) info.innerHTML = '';
@@ -3118,6 +3240,8 @@ function litRegionCommitToQuery() {
     regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
   }
   fetchRegionEvents(regionRect.getBounds());
+  const btnDecluster = document.getElementById('btnRegionDecluster');
+  if (btnDecluster) btnDecluster.style.display = '';
 
   // "Sadece bu bölgeyi göster" — işaretliyse genel Heat Map/Seismicity
   // katmanlarını (yalnızca ZATEN açıksa) kapatır, harita sadece bu sorgunun
