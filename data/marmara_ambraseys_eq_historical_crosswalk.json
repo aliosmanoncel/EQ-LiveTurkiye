@@ -1,0 +1,275 @@
+{
+ "metadata": {
+  "purpose": "Manual, event-by-event crosswalk between the 9 post-1899 Ambraseys (2002) Table 1 events and data/eq_historical.json (ISC 1900-1997 + EMSC 1998-2026), per user instruction (2026-09-12) to resolve 'same event?' scientifically rather than via automated lat/lon/time-proximity dedup.",
+  "method": "For each flagged Ambraseys event, data/eq_historical.json was searched within +-3 days and +-0.7 degrees of the Ambraseys coordinates; every candidate found is listed, and a manual same-event judgement is recorded with its rationale. No records were merged or removed from either source file -- this file only records the relationship.",
+  "epica_share_cet_note": "data/epica_europe_historical.json (EPICA+SHARE-CET) is capped at year<=1899 and therefore cannot contain any of these 9 events by construction -- not queried.",
+  "no_dedup_performed": true,
+  "display_policy": "NOT YET DECIDED. Options to consider when the UI toggle is eventually built: (a) show both markers independently with a visual link (e.g. connecting line or shared canonical_event_id shown in both popups) when both layers are active; (b) show only the Ambraseys marker for pre-1970 events (better historical-context magnitude) and note the eq_historical.json record in its popup; (c) always show both, colored/labeled by source, and let the user judge. This decision is explicitly deferred to the index.html integration step and is NOT implemented in this data-only pass.",
+  "created": "2026-09-12"
+ },
+ "crosswalk": [
+  {
+   "canonical_event_id": "MARMARA-1912-08-09-GANOS",
+   "ambraseys": {
+    "no": 47,
+    "date": "1912-08-09",
+    "lat": 40.7,
+    "lon": 27.2,
+    "magnitude": {
+     "value": 7.3,
+     "type": "Ms"
+    },
+    "region": "Ganos"
+   },
+   "match_status": "matched",
+   "eq_historical": {
+    "id": "16958205",
+    "time": "1912-08-09T01:29:03.827",
+    "lat": 40.6375,
+    "lon": 27.0234,
+    "magnitude": {
+     "value": 7.6,
+     "type": "Mw"
+    },
+    "src": "ISC"
+   },
+   "distance_km_approx": 18,
+   "match_confidence": "medium-high",
+   "match_basis": "Same calendar date; epicenters ~0.06 lat / ~0.18 lon apart (~18 km), consistent with early-20th-century macroseismic location uncertainty. Magnitude differs by 0.3 (Ms7.3 vs Mw7.6), plausible given different scales/eras but not identical -- treated as the same physical event (the well-known 1912 Ganos-Murefte earthquake) rather than a coincidence.",
+   "note": null
+  },
+  {
+   "canonical_event_id": "MARMARA-1912-09-13-GANOS",
+   "ambraseys": {
+    "no": 48,
+    "date": "1912-09-13",
+    "lat": 40.7,
+    "lon": 27.0,
+    "magnitude": {
+     "value": 6.8,
+     "type": "Ms"
+    },
+    "region": "Ganos"
+   },
+   "match_status": "no_match_found",
+   "eq_historical": null,
+   "distance_km_approx": null,
+   "match_confidence": "n/a",
+   "match_basis": "No candidate found in data/eq_historical.json within +-3 days / +-0.7 degrees of the Ambraseys coordinates. Not unexpected: ISC catalog coverage of Turkey for 1912 secondary/aftershock-sized events is sparse; this is a known large aftershock of the Aug 1912 Ganos-Murefte sequence per historical seismology literature, absent from the instrumental record used here.",
+   "note": "Genuine gap in eq_historical.json, not an extraction error on either side."
+  },
+  {
+   "canonical_event_id": "MARMARA-1944-10-06-EDREMIT",
+   "ambraseys": {
+    "no": 49,
+    "date": "1944-10-06",
+    "lat": 39.5,
+    "lon": 26.5,
+    "magnitude": {
+     "value": 6.8,
+     "type": "Ms"
+    },
+    "region": "Edremit"
+   },
+   "match_status": "matched",
+   "eq_historical": {
+    "id": "899568",
+    "time": "1944-10-06T02:34:47.883",
+    "lat": 39.5016,
+    "lon": 26.5965,
+    "magnitude": {
+     "value": 6.82,
+     "type": "MS"
+    },
+    "mw": 6.89,
+    "src": "ISC"
+   },
+   "distance_km_approx": 8,
+   "match_confidence": "high",
+   "match_basis": "Identical date; epicenters ~0.1 lon apart (~8 km); magnitude essentially identical (6.8 vs 6.82, both reported as Ms) -- very likely the same underlying magnitude assessment.",
+   "note": null
+  },
+  {
+   "canonical_event_id": "MARMARA-1953-03-18-GONEN",
+   "ambraseys": {
+    "no": 50,
+    "date": "1953-03-18",
+    "lat": 40.1,
+    "lon": 27.4,
+    "magnitude": {
+     "value": 7.1,
+     "type": "Ms"
+    },
+    "region": "Gonen"
+   },
+   "match_status": "matched",
+   "eq_historical": {
+    "id": "891561",
+    "time": "1953-03-18T19:06:17.742",
+    "lat": 40.1752,
+    "lon": 27.6478,
+    "magnitude": {
+     "value": 7.2,
+     "type": "Mw"
+    },
+    "src": "ISC"
+   },
+   "distance_km_approx": 23,
+   "match_confidence": "high",
+   "match_basis": "Identical date; epicenters ~0.25 lon apart (~23 km, within expected location uncertainty for this era); magnitude very close (Ms7.1 vs Mw7.2).",
+   "note": null
+  },
+  {
+   "canonical_event_id": "MARMARA-1957-05-26-ABANT",
+   "ambraseys": {
+    "no": 51,
+    "date": "1957-05-26",
+    "lat": 40.7,
+    "lon": 31.0,
+    "magnitude": {
+     "value": 7.1,
+     "type": "Ms"
+    },
+    "region": "Abant"
+   },
+   "match_status": "matched",
+   "eq_historical": {
+    "id": "886602",
+    "time": "1957-05-26T06:33:37.955",
+    "lat": 40.7301,
+    "lon": 31.0902,
+    "magnitude": {
+     "value": 7.2,
+     "type": "Mw"
+    },
+    "src": "ISC"
+   },
+   "distance_km_approx": 8,
+   "match_confidence": "high",
+   "match_basis": "Identical date; epicenters ~8 km apart; magnitude very close (Ms7.1 vs Mw7.2). Two additional smaller ISC events the same day (886606 Ms5.88, 886613 Ms5.66, ~09:36 and next-day 11:01) are NOT the same event -- likely a foreshock and an early aftershock, listed here for transparency but not linked to this canonical_event_id.",
+   "note": "886606 (Ms5.88, same-day foreshock) and 886613 (Ms5.66, next-day aftershock) found nearby but excluded from this match as distinct events."
+  },
+  {
+   "canonical_event_id": "MARMARA-1964-10-06-MANYAS",
+   "ambraseys": {
+    "no": 52,
+    "date": "1964-10-06",
+    "lat": 40.1,
+    "lon": 28.2,
+    "magnitude": {
+     "value": 6.8,
+     "type": "Ms"
+    },
+    "region": "Manyas"
+   },
+   "match_status": "matched",
+   "eq_historical": {
+    "id": "863310",
+    "time": "1964-10-06T14:31:22.711",
+    "lat": 40.2491,
+    "lon": 28.2323,
+    "magnitude": {
+     "value": 6.8,
+     "type": "MW"
+    },
+    "src": "ISC"
+   },
+   "distance_km_approx": 17,
+   "match_confidence": "high",
+   "match_basis": "Identical date; epicenters ~0.15 lat apart (~17 km); magnitude identical (6.8), though reported as Ms (Ambraseys) vs MW (ISC) -- same numeric value across different scales is a coincidence worth noting, not proof of identical methodology.",
+   "note": null
+  },
+  {
+   "canonical_event_id": "MARMARA-1967-07-22-MUDURNU",
+   "ambraseys": {
+    "no": 53,
+    "date": "1967-07-22",
+    "lat": 40.7,
+    "lon": 30.7,
+    "magnitude": {
+     "value": 7.2,
+     "type": "Ms"
+    },
+    "region": "Mudurnu"
+   },
+   "match_status": "matched",
+   "eq_historical": {
+    "id": "833573",
+    "time": "1967-07-22T16:56:58.363",
+    "lat": 40.6575,
+    "lon": 30.7001,
+    "magnitude": {
+     "value": 7.4,
+     "type": "MW"
+    },
+    "src": "ISC"
+   },
+   "distance_km_approx": 5,
+   "match_confidence": "high",
+   "match_basis": "Identical date; epicenters ~5 km apart; magnitude close (Ms7.2 vs Mw7.4). Numerous smaller ISC events (mb 4.5-5.2) the same day/next day nearby are aftershocks, NOT linked to this canonical_event_id.",
+   "note": "12 smaller same-day/next-day aftershocks (mb 4.46-5.16) found nearby, excluded from this match."
+  },
+  {
+   "canonical_event_id": "MARMARA-1999-08-17-IZMIT",
+   "ambraseys": {
+    "no": 54,
+    "date": "1999-08-17",
+    "lat": 40.7,
+    "lon": 30.0,
+    "magnitude": {
+     "value": 7.4,
+     "type": "Ms"
+    },
+    "region": "Izmit"
+   },
+   "match_status": "matched_with_magnitude_caveat",
+   "eq_historical": {
+    "id": "19990817_0000001",
+    "time": "1999-08-17T00:01:38.9Z",
+    "lat": 40.7494,
+    "lon": 29.9716,
+    "magnitude": {
+     "value": 6.3,
+     "type": "mb"
+    },
+    "mw": 6.3,
+    "src": "EMSC"
+   },
+   "distance_km_approx": 6,
+   "match_confidence": "high (identity) / caveat on magnitude",
+   "match_basis": "Identical date; epicenters ~6 km apart (very close) -- essentially certain this is the same physical event (the 1999 Izmit/Kocaeli earthquake). HOWEVER the eq_historical.json record's own magnitude (mb 6.3, carried through as mw 6.3) is a well-known case of an early/preliminary real-time magnitude estimate that was never revised in this static snapshot -- the widely-accepted moment magnitude for this earthquake is Mw ~7.4-7.6 (e.g. USGS, Harvard CMT). Ambraseys' Ms7.4 is much closer to the accepted value than eq_historical.json's own mb6.3.",
+   "note": "IMPORTANT: this is not a case of Ambraseys over- or under-estimating -- eq_historical.json itself under-represents this specific event's true size. Flagged so a future display policy does not treat eq_historical.json's value as the \"authoritative\" one by default."
+  },
+  {
+   "canonical_event_id": "MARMARA-1999-11-12-DUZCE",
+   "ambraseys": {
+    "no": 55,
+    "date": "1999-11-12",
+    "lat": 40.8,
+    "lon": 31.2,
+    "magnitude": {
+     "value": 7.1,
+     "type": "Ms"
+    },
+    "region": "Duzce"
+   },
+   "match_status": "matched_with_magnitude_caveat",
+   "eq_historical": {
+    "id": "19991112_0000008",
+    "time": "1999-11-12T16:57:21.4Z",
+    "lat": 40.8043,
+    "lon": 31.1994,
+    "magnitude": {
+     "value": 6.0,
+     "type": "mb"
+    },
+    "mw": 6.13,
+    "src": "EMSC"
+   },
+   "distance_km_approx": 0.6,
+   "match_confidence": "high (identity) / caveat on magnitude",
+   "match_basis": "Identical date; epicenters ~0.6 km apart (essentially the same point) -- certain match (the 1999 Duzce earthquake). Same magnitude-underestimate pattern as Izmit above: eq_historical.json carries mb6.0/mw6.13 for this record, well below the widely-accepted Mw ~7.1-7.2 for this earthquake. Ambraseys' Ms7.1 matches the accepted value closely; eq_historical.json's own value does not.",
+   "note": "Same magnitude-underestimate caveat as MARMARA-1999-08-17-IZMIT -- likely a systematic artifact of this particular EMSC static snapshot never being updated with the reviewed/CMT solution for either 1999 mainshock."
+  }
+ ]
+}

@@ -428,6 +428,25 @@
       </div>
     </div>
 
+    <!-- Marmara Tarihsel (Ambraseys 2002) bölümü — EPICA/SHARE-CET katmanından KASITLI olarak
+         ayrı tutuldu: farklı büyüklük ölçeği (Ms) ve farklı homojenizasyon yöntemi, 2026-09-12 -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgAmbraseys','lgAmbraseysT')">
+        Marmara Tarihsel · Ambraseys 2002 <span class="tog" id="lgAmbraseysT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgAmbraseys">
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:4px">Ms ≥ 6.8 · 32–1999 · yalnızca Marmara Denizi bölgesi</div>
+        <div style="color:#666;font-size:.65rem;line-height:1.5">
+          Ambraseys, N. (2002), BSSA 92(1):1–18, Table 1<br>
+          55 olay · büyüklük Ms olarak korunmuştur (Mw'ye çevrilmedi)<br>
+          9 olay (1912–1999) mevcut ISC+EMSC kataloğuyla (eq_historical.json) çapraz kontrol edildi —<br>
+          8'i eşleşti (bkz. popup), 1912 Eylül Ganos'ta eşleşme YOK (kataloğun gerçek bir boşluğu)<br>
+          1999 İzmit/Düzce popup'larında büyüklük-kaynağı uyarısı gösterilir<br>
+          1900-öncesi 46 olay EPICA/SHARE-CET ile çapraz kontrol edilmedi (ayrı, yapılmamış bir iş)
+        </div>
+      </div>
+    </div>
+
     <!-- Avrupa Hazard bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgEuHaz','lgEuHazT')">
@@ -678,6 +697,7 @@
     <button class="tbtn tr-only"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
     <button class="tbtn tr-only"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
     <button class="tbtn tr-only"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 (Batı) + SHARE-CET (Doğu) Tarihsel Deprem Kataloğu · M≥4 · 1003-1899 · Rovida & Antonucci (2021) INGV + emidius.eu/SHEEC">Tarihsel</button>
+    <button class="tbtn tr-only"        id="btnAmbraseys" onclick="toggleLayer('ambraseys')" title="Marmara Tarihsel · Ambraseys 2002 · Table 1 — Ms ≥ 6.8, 32–1999; kaynak büyüklüğü Ms olarak korunmuştur">Marmara Tarihsel · Ambraseys 2002</button>
     <button class="tbtn tr-only"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
     <button class="tbtn tr-only"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Asperite triyajı · Kırmızı=stres odağı">b-Adaptif</button>
     <button class="tbtn tr-only active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
@@ -2807,6 +2827,10 @@ let showEuHaz   = false;
 let histLayer   = null;
 let showHist    = false;
 let histData    = null;
+let ambraseysLayer     = null;
+let showAmbraseys      = false;
+let ambraseysData      = null;
+let ambraseysCrosswalk = null; // data/marmara_ambraseys_eq_historical_crosswalk.json, keyed lookup built in renderAmbraseysLayer()
 let bvalueLayer = null;
 let showBvalue  = false;
 let bAdaptLayer = null;
@@ -2938,6 +2962,54 @@ function renderHistLayer() {
     markers.push(c);
   });
   histLayer = L.layerGroup(markers).addTo(map);
+}
+
+/* Marmara Tarihsel (Ambraseys 2002) — data/marmara_historical_ambraseys_2002.json
+   Her Ambraseys olayı KENDİ tek marker'ı olarak çizilir (55 marker toplam); ikinci,
+   bağımsız bir "eq_historical" marker'ı ASLA burada oluşturulmaz. canonical_event_id
+   üzerinden crosswalk (data/marmara_ambraseys_eq_historical_crosswalk.json) sadece
+   popup içeriğini zenginleştirir — aynı fiziksel olay için mevcut katalogdaki
+   kaydı gösterir (ve 1999 İzmit/Düzce için büyüklük-kaynağı uyarısı ekler), 2026-09-12. */
+function renderAmbraseysLayer() {
+  if (ambraseysLayer) { map.removeLayer(ambraseysLayer); ambraseysLayer = null; }
+  if (!ambraseysData || !showAmbraseys) return;
+  const cwByCanonicalId = {};
+  (ambraseysCrosswalk && ambraseysCrosswalk.crosswalk || []).forEach(cw => {
+    cwByCanonicalId[cw.canonical_event_id] = cw;
+  });
+  const markers = [];
+  ambraseysData.events.forEach(e => {
+    const ms = e.magnitude.value;
+    const r = Math.max(3, Math.min(18, (ms - 4) * 4 + 3));
+    const opacity = ms >= 6 ? 0.85 : ms >= 5 ? 0.70 : 0.50;
+    const col = ms >= 7 ? '#ff0000' : ms >= 6 ? '#ff6600' : ms >= 5 ? '#ffaa00' : '#ffdd44';
+    const c = L.circleMarker([e.lat, e.lon], {
+      radius: r, color: '#333', weight: 0.5,
+      fillColor: col, fillOpacity: opacity,
+      pane: 'overlayPane',
+    });
+    let html = `<b style="color:${col}">${e.region}</b><br>${e.date} · Ms ${ms}<br>`
+      + `<span style="color:#aaa;font-size:.75em">Ambraseys (2002), Table 1, no.${e.no}</span>`;
+    const cw = e.canonical_event_id ? cwByCanonicalId[e.canonical_event_id] : null;
+    if (cw && cw.match_status === 'no_match_found') {
+      html += `<hr style="border-color:#444;margin:4px 0">`
+        + `✨ <b>Mevcut ISC+EMSC kataloğunda (eq_historical.json) kaydı yok</b><br>`
+        + `<span style="color:#aaa;font-size:.7em">Bu, kataloğun gerçek bir boşluğu — Ambraseys katmanının kendine özgü katkısı</span>`;
+    } else if (cw && cw.eq_historical) {
+      const eh = cw.eq_historical;
+      html += `<hr style="border-color:#444;margin:4px 0">`
+        + `🔗 Aynı fiziksel olay, mevcut katalogda da var:<br>`
+        + `${eh.magnitude.type} ${eh.magnitude.value}${eh.mw !== undefined ? ' (mw ' + eh.mw + ')' : ''} · ${eh.src}`;
+      if (cw.match_status === 'matched_with_magnitude_caveat') {
+        html += `<br><span style="color:#f59e0b;font-size:.72rem">⚠ Mevcut katalog kaydı erken/ön büyüklük tahmini olabilir — Ambraseys'in Ms değeri kabul gören büyüklüğe daha yakındır</span>`;
+      }
+    } else if (!e.canonical_event_id) {
+      html += `<br><span style="color:#666;font-size:.65em">1900-öncesi · EPICA/SHARE-CET ile çapraz kontrol edilmedi</span>`;
+    }
+    c.bindPopup(html);
+    markers.push(c);
+  });
+  ambraseysLayer = L.layerGroup(markers).addTo(map);
 }
 
 function loadHazardLayer() {
@@ -3159,6 +3231,28 @@ function toggleLayer(type) {
       setStatus('Tarihsel Depremler · EPICA v1.1 (Batı) + SHARE-CET (Doğu) · M≥4 · 1003–1899');
     } else {
       if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
+    }
+  } else if (type === 'ambraseys') {
+    showAmbraseys = !showAmbraseys;
+    document.getElementById('btnAmbraseys').classList.toggle('active', showAmbraseys);
+    const lgA = document.getElementById('lgAmbraseys');
+    if (lgA) { if (showAmbraseys) lgA.classList.remove('hidden'); else lgA.classList.add('hidden'); }
+    if (showAmbraseys) {
+      if (!ambraseysData) {
+        Promise.all([
+          fetch('data/marmara_historical_ambraseys_2002.json').then(r => r.json()),
+          fetch('data/marmara_ambraseys_eq_historical_crosswalk.json').then(r => r.json()),
+        ]).then(([d, cw]) => {
+          ambraseysData = d;
+          ambraseysCrosswalk = cw;
+          renderAmbraseysLayer();
+        }).catch(e => setStatus('Ambraseys 2002 katalogu yüklenemedi: ' + e.message, true));
+      } else {
+        renderAmbraseysLayer();
+      }
+      setStatus('Marmara Tarihsel · Ambraseys (2002) Table 1 · Ms ≥ 6.8 · 32–1999');
+    } else {
+      if (ambraseysLayer) { map.removeLayer(ambraseysLayer); ambraseysLayer = null; }
     }
   } else if (type === 'bvalue') {
     showBvalue = !showBvalue;
