@@ -607,11 +607,11 @@
   <div class="tr-only" style="display:flex;gap:4px;align-items:center">
     <span style="font-size:.72rem;color:#888;white-space:nowrap">Tarihsel:</span>
     <button class="tbtn" data-hist="1998" onclick="loadHistoricalRange(1998)" title="Yalnızca EMSC (1998-01-01'den itibaren, tek/homojen kaynak) · Scordilis (2006) Mw dönüşümü uygulanmış — magnitude heterojenliği azaltılmış">EMSC 1998–2026</button>
+    <button class="tbtn" data-hist="1900" data-hist-end="1970" onclick="loadHistoricalRange(1900,1970)" title="Yalnızca ISC (1900-01-01 – 1970-12-31, tek/homojen kaynak, EarthScope-öncesi dönem) · Scordilis (2006) Mw dönüşümü uygulanmış">ISC 1900–1970</button>
     <button class="tbtn" data-hist="1971" data-hist-end="1997" onclick="loadHistoricalRange(1971,1997)" title="Yalnızca ISC (1971-01-01 – 1997-12-31, tek/homojen kaynak, EMSC dönemi hariç) · Scordilis (2006) Mw dönüşümü uygulanmış">ISC 1971–1997</button>
     <button class="tbtn" data-hist="2000" onclick="loadHistoricalRange(2000)" title="ISC+EMSC · son ~26 yıl">2000–2026</button>
-    <button class="tbtn" data-hist="1990" onclick="loadHistoricalRange(1990)" title="ISC+EMSC · son ~36 yıl">1990–2026</button>
-    <button class="tbtn" data-hist="1965" onclick="loadHistoricalRange(1965)" title="WWSSN sonrası · standardize edilmiş modern aletsel (post-instrumental) dönem, 1965'ten itibaren">1965–2026</button>
-    <button class="tbtn" data-hist="1900" onclick="loadHistoricalRange(1900)" title="Aletsel dönem (post-instrumental) başlangıcı · ISC+EMSC, 1900-01-01 – 2026-06-22">1900–2026</button>
+    <button class="tbtn" data-hist="1003" data-hist-end="1899" data-hist-src="EPICA" onclick="loadHistoricalRange(1003,1899,'EPICA')" title="Yalnızca EPICA v1.1 (batı/Avrupa/Batı Anadolu, tek kaynak) · Rovida &amp; Antonucci (2021) INGV homojenizasyonu">EPICA 1003–1899</button>
+    <button class="tbtn" data-hist="1003" data-hist-end="1899" data-hist-src="SHARE-CET" onclick="loadHistoricalRange(1003,1899,'SHARE-CET')" title="Yalnızca SHARE-CET (doğu/orta Anadolu-Kafkasya, tek kaynak) · Soysal ve ark. (1981) → Io-Ms (Kalafat ve ark. 2007) → Mw (Zare 2012) dönüşüm zinciri — EPICA'dan FARKLI metodoloji">SHARE-CET 1003–1899</button>
     <button class="tbtn" data-hist="1000" onclick="loadHistoricalRange(1000)" title="TAM katalog: pre-instrumental (1003-1899, EPICA+SHARE-CET makrosismik) + aletsel (1900+, ISC+EMSC) birleşik — 1003'ten itibaren gösterir">1000–2026</button>
   </div>
   <div id="histHint" style="font-size:10px;color:#888;margin-top:2px;letter-spacing:0.3px"></div>
@@ -1755,16 +1755,18 @@ let epicaCache       = null; // EPICA v1.1 + SHARE-CET, 1003-1899, bir kez indir
 // null bırakılır, popup/filtre kodu bunu açıkça "bilinmiyor" olarak ele alır
 // (0 km gibi yanlış bir "sığ deprem" izlenimi vermemek için).
 function normalizeEpicaEvent(e) {
+  const isCet = e.reg === 'CET';
   return {
     lat: e.lat, lon: e.lon, dep: null,
     mag: e.mag, mw: e.mag, mtype: 'mw',
-    place: e.loc || (e.reg === 'CET' ? 'Doğu Anadolu/Kafkasya (SHARE-CET)' : 'Avrupa/Batı Anadolu (EPICA)'),
+    place: e.loc || (isCet ? 'Doğu Anadolu/Kafkasya (SHARE-CET)' : 'Avrupa/Batı Anadolu (EPICA)'),
     province: '', district: '',
+    src: isCet ? 'SHARE-CET' : 'EPICA', // tek-kaynak buton filtresi ve durum çubuğu etiketi için, 2026-09-13
     time: new Date(`${e.date}T00:00:00Z`)
   };
 }
 
-async function loadHistoricalRange(startYear, endYear) {
+async function loadHistoricalRange(startYear, endYear, epicaOnlySrc) {
   cancelRetry();
   const seq = ++loadSeq;
   const stale = () => seq !== loadSeq;
@@ -1774,7 +1776,15 @@ async function loadHistoricalRange(startYear, endYear) {
   if (cntTimer) clearInterval(cntTimer); // otomatik canlı yenileme DURUR — aksi halde 1sa sonra sessizce üstüne yazılır
 
   document.querySelectorAll('.tbtn[data-h]').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.tbtn[data-hist]').forEach(x => x.classList.toggle('active', +x.dataset.hist === startYear));
+  // data-hist tek başına benzersiz değil (örn. "1900–2026" ve "ISC 1900–1970" ikisi de data-hist="1900",
+  // "EPICA 1003–1899" ve "SHARE-CET 1003–1899" ikisi de data-hist="1003" data-hist-end="1899") —
+  // eşleştirme data-hist-end + data-hist-src üçlüsüyle yapılır; hiçbiri yoksa undefined, parametre
+  // verilmemişse de undefined olduğundan eski butonlar birbirini etkilemeden eskisi gibi çalışır, 2026-09-13
+  document.querySelectorAll('.tbtn[data-hist]').forEach(x => {
+    const xEnd = x.dataset.histEnd ? +x.dataset.histEnd : undefined;
+    const xSrc = x.dataset.histSrc || undefined;
+    x.classList.toggle('active', +x.dataset.hist === startYear && xEnd === endYear && xSrc === epicaOnlySrc);
+  });
 
   setStatus('Tarihsel katalog yükleniyor (14MB, ilk seferde biraz sürebilir)…');
   try {
@@ -1806,9 +1816,10 @@ async function loadHistoricalRange(startYear, endYear) {
         if (res2.ok) epicaCache = await res2.json();
       }
       if (epicaCache) {
-        const epicaEvents = (epicaCache.events || [])
+        let epicaEvents = (epicaCache.events || [])
           .map(normalizeEpicaEvent)
           .filter(e => e.time >= start && (!end || e.time <= end) && e.mag > 0);
+        if (epicaOnlySrc) epicaEvents = epicaEvents.filter(e => e.src === epicaOnlySrc); // tek-kaynak buton: yalnızca EPICA ya da yalnızca SHARE-CET
         all = [...epicaEvents, ...all];
         usedEpica = true;
       }
@@ -1833,17 +1844,17 @@ async function loadHistoricalRange(startYear, endYear) {
       const compLine = (cat.completeness || []).map(c => `${c.period}: Mc≈${c.Mc}`).join(' · ');
       let text = `Katalog completeness (${cat.source || 'ISC+EMSC'}): ${compLine} — bu, aşağıdaki hesaplanan Mc ile AYNI şey değildir`;
       if (usedEpica) {
-        text += ` ⚠ 1003–1899 (EPICA+SHARE-CET) FARKLI bir Mw dönüşüm zinciri kullanır ve derinlik bilgisi içermez — ` +
+        const epicaLabel = epicaOnlySrc || 'EPICA+SHARE-CET';
+        text += ` ⚠ 1003–1899 (${epicaLabel}) FARKLI bir Mw dönüşüm zinciri kullanır ve derinlik bilgisi içermez — ` +
                 `bu dönemi kapsayan Mc/b sonuçları büyük-depreme-yanlı, dikkatli yorumlanmalı.`;
       }
       hint.textContent = text;
     }
     // Kaynak etiketi, seçilen pencerede GERÇEKTEN bulunan olayların src alanından türetilir
-    // (cat.source metadata'sı tüm kataloğu tanımlar, tek bir alt-pencereyi değil — 2026-09-13)
+    // (cat.source metadata'sı tüm kataloğu tanımlar, tek bir alt-pencereyi değil; normalizeEpicaEvent
+    // de artık src:'EPICA'/'SHARE-CET' verdiğinden ayrı bir epica-eki gerekmiyor — 2026-09-13)
     const srcsInWindow = [...new Set(all.map(e => e.src).filter(Boolean))];
-    const sourceLabel = usedEpica
-      ? `${srcsInWindow.join('+') || (cat.source || 'ISC+EMSC')} + EPICA/SHARE-CET`
-      : (srcsInWindow.join('+') || cat.source || 'ISC+EMSC');
+    const sourceLabel = srcsInWindow.join('+') || cat.source || 'ISC+EMSC';
     const endLabel = endYear || (cat.endtime || '2026').slice(0,4);
     setStatus(`${all.length} deprem · Tarihsel katalog (${sourceLabel}) · ${startYear}–${endLabel} · katalog sonu: ${cat.endtime || '—'}`);
     retryCount = 0;
