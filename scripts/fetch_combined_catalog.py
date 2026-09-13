@@ -162,8 +162,11 @@ def dedup(evs_dict, tol_sec=60, tol_km=50):
             dk = hav(ev['lat'], ev['lon'], k['lat'], k['lon'])
             if dk < tol_km:
                 duplicate = True
-                # Mw buyuk olani tut
-                if ev['mw'] > k['mw']:
+                # Mw buyuk olani tut (mw None ise -- Stage 2A sonrasi ml/md/mc/
+                # tanimsiz tipler icin normal -- karsilastirma icin mag'e dus)
+                ev_m = ev['mw'] if ev['mw'] is not None else ev['mag']
+                k_m  = k['mw']  if k['mw']  is not None else k['mag']
+                if ev_m > k_m:
                     kept.remove(k)
                     kept.append(ev)
                 break
@@ -195,7 +198,7 @@ def main():
     from collections import Counter
     ct = Counter(e['mtype'] for e in cleaned)
     print('Mtype:', ct.most_common(8))
-    mws = [e['mw'] for e in cleaned]
+    mws = [e['mw'] if e['mw'] is not None else e['mag'] for e in cleaned]  # ozet yazdirma icin mag'e dus
     print(f'Mw aralik: {min(mws):.1f} – {max(mws):.1f}  |  Ort: {sum(mws)/len(mws):.2f}')
 
     # Dönem bazlı sayılar
