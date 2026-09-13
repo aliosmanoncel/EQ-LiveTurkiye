@@ -809,6 +809,24 @@
     <svg id="tmSvgB" width="660" height="140" style="display:block;margin:6px auto"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
   </div>
+
+  <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
+    <div class="tmTitle" style="font-size:.78rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      📉 Gutenberg-Richter Frekans-Büyüklük Dağılımı
+      <span style="color:#666;font-weight:400;">(aynı olay kümesi · Mc çizgisi yalnızca aktif eşiği gösterir, otomatik seçmez)</span>
+      <span style="margin-left:auto;font-weight:400;color:#888;font-size:.85em;">Bin:
+        <select id="grBinSize" onchange="onGrBinSizeChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.85em;padding:1px 3px;">
+          <option value="0.1" selected>0.1</option>
+          <option value="0.2">0.2</option>
+          <option value="0.5">0.5</option>
+          <option value="1">1</option>
+        </select>
+      </span>
+      <button onclick="exportGrCSV()" style="background:none;border:1px solid #334;color:#888;border-radius:4px;font-size:.8em;padding:1px 6px;cursor:pointer;" title="Bin verisini (magnitude, bin-içi N, kümülatif N) CSV olarak indir">⬇ CSV</button>
+    </div>
+    <svg id="tmSvgGR" width="660" height="180" style="display:block;margin:6px auto"></svg>
+    <div class="tmStats" id="tmStatsGR">—</div>
+  </div>
 </div>
 
 <!-- STATUS -->
@@ -1338,6 +1356,14 @@ function computeBvalue(mags, Mc) {
   return denom > 0 ? Math.LOG10E / denom : null;
 }
 
+// Aki (1965) MLE için %95 güven limiti: ±1.9·b/√n — bu projede benimsenen
+// katsayı (kaynağı doğrulanana kadar belirli bir yayına atfedilmemiştir;
+// bazı Öncel çalışmalarında 1.96 kullanılmıştır, 2026-09-13).
+function bConfidence95(b, n) {
+  if (b === null || !n) return null;
+  return 1.9 * b / Math.sqrt(n);
+}
+
 // Kayan pencere b-değeri zaman serisi — Öncel & Wilson (2007, GJI, İzmit) §3.1 metodolojisi:
 // sabit N=100 olay pencere, adım=10 olay, Mc sabit/global (pencere başına değil)
 function computeBvalueTimeSeries(evList, Mc) {
@@ -1350,7 +1376,7 @@ function computeBvalueTimeSeries(evList, Mc) {
     const win  = sorted.slice(i, i + N_WIN);
     const mags = win.map(e => e.mw ?? e.mag);
     const b = computeBvalue(mags, Mc);
-    if (b !== null) series.push({ t: win[Math.floor(N_WIN/2)].time.getTime(), b });
+    if (b !== null) series.push({ t: win[Math.floor(N_WIN/2)].time.getTime(), b, err: bConfidence95(b, N_WIN) });
   }
   return { series, N: sorted.length };
 }
@@ -1376,34 +1402,184 @@ function renderBvalueTS(evList, Mc) {
   const now = Date.now();
   const t0 = now - hours*3600000, t1 = now;
   const bs = series.map(s => s.b);
-  const bMin = Math.min(...bs) - 0.1, bMax = Math.max(...bs) + 0.1;
+  // Varsayılan görünüm 0.4-1.6 (literatürdeki tipik b aralığı, b=1 küresel referans
+  // civarında) — veri veya hata çubukları bu sınırın dışına taşarsa eksen sadece
+  // gereken kadar genişler, daralmaz (2026-09-13, kullanıcı geri bildirimi).
+  const DEFAULT_B_LO = 0.4, DEFAULT_B_HI = 1.6, B_STEP = 0.25;
+  const dataLo = Math.min(...series.map(s => s.b - (s.err||0)));
+  const dataHi = Math.max(...series.map(s => s.b + (s.err||0)));
+  const bMin = Math.min(DEFAULT_B_LO, dataLo - 0.05);
+  const bMax = Math.max(DEFAULT_B_HI, dataHi + 0.05);
 
   const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
   const y = b => PAD_T + plotH - ((b-bMin)/(bMax-bMin)) * plotH;
 
   const pts  = series.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ');
-  const dots = series.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="2.5" fill="#06b6d4"><title>b=${s.b.toFixed(2)} · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
+  // Aki (1965) %95 güven aralığı (±1.9·b/√n) — her pencere için dikey çubuk
+  const errBars = series.map(s => {
+    if (!s.err) return '';
+    const xc = x(s.t).toFixed(1);
+    return `<line x1="${xc}" y1="${y(s.b - s.err).toFixed(1)}" x2="${xc}" y2="${y(s.b + s.err).toFixed(1)}" stroke="#06b6d4" stroke-width="1" stroke-opacity="0.35"/>`;
+  }).join('');
+  const dots = series.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="2.5" fill="#06b6d4"><title>b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} (%95) · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
 
   let yTicks = '';
-  const bStep = (bMax-bMin) > 2 ? 0.5 : 0.25;
-  for (let b = Math.ceil(bMin/bStep)*bStep; b <= bMax; b += bStep) {
+  for (let b = Math.ceil(bMin/B_STEP)*B_STEP; b <= bMax + 1e-9; b += B_STEP) {
     yTicks += `<text x="${PAD_L-6}" y="${y(b)+3}" fill="#888" font-size="8" text-anchor="end">${b.toFixed(2)}</text>`;
     yTicks += `<line x1="${PAD_L}" y1="${y(b)}" x2="${W-PAD_R}" y2="${y(b)}" stroke="#2a2a2a" stroke-width="0.5"/>`;
+  }
+
+  const xTicksArrB = timeAxisTicks(t0, t1);
+  let xTicksB = '';
+  xTicksArrB.forEach((tk, i) => {
+    const xc = x(tk.t);
+    const anchor = i === 0 ? 'start' : i === xTicksArrB.length - 1 ? 'end' : 'middle';
+    xTicksB += `<line x1="${xc.toFixed(1)}" y1="${PAD_T}" x2="${xc.toFixed(1)}" y2="${PAD_T+plotH}" stroke="#2a2a2a" stroke-width="0.5"/>`;
+    xTicksB += `<text x="${xc.toFixed(1)}" y="${H-6}" fill="#888" font-size="9" text-anchor="${anchor}">${tk.label}</text>`;
+  });
+
+  // b=1.0 karşılaştırma referansı — "küresel ortalama" değil, sadece görsel kıyas çizgisi
+  let refLine1 = '';
+  if (1.0 >= bMin && 1.0 <= bMax) {
+    refLine1 = `<line x1="${PAD_L}" y1="${y(1.0)}" x2="${W-PAD_R}" y2="${y(1.0)}" stroke="#666" stroke-width="1" stroke-dasharray="2,3"/>` +
+               `<text x="${PAD_L+4}" y="${y(1.0)-3}" fill="#888" font-size="8">b = 1.0 reference</text>`;
   }
 
   const bAvg = bs.reduce((a,b)=>a+b, 0) / bs.length;
 
   svgB.innerHTML = `
     ${yTicks}
+    ${xTicksB}
+    ${refLine1}
     <line x1="${PAD_L}" y1="${y(bAvg)}" x2="${W-PAD_R}" y2="${y(bAvg)}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+    ${errBars}
     <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="1.3" stroke-opacity="0.7"/>
     ${dots}
     <line x1="${PAD_L}" y1="${PAD_T+plotH}" x2="${W-PAD_R}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
     <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
   `;
 
-  const bLast = bs[bs.length-1];
-  statsB.innerHTML = `b ort. = <b>${bAvg.toFixed(2)}</b> &nbsp;|&nbsp; b son = <b>${bLast.toFixed(2)}</b> &nbsp;|&nbsp; ${series.length} pencere (N=${N})`;
+  const bLast = series[series.length-1];
+  const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
+  statsB.innerHTML = `b ort. = <b>${bAvg.toFixed(2)}</b> &nbsp;|&nbsp; b son = <b>${bLast.b.toFixed(2)}${lastErrStr}</b> <span style="color:#888;font-size:.85em">(%95, n=100)</span> &nbsp;|&nbsp; ${series.length} pencere (N=${N})`;
+}
+
+const SUPERSCRIPT_DIGITS = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const toSuperscript = n => String(n).split('').map(c => SUPERSCRIPT_DIGITS[c] || c).join('');
+
+// Gutenberg-Richter frekans-büyüklük dağılımı (kümülatif + bin-içi, log10 N) —
+// Mirwald, Mizrahi, Enescu & Wiemer (2026, GRL) örneğindeki gösterim biçimine göre.
+// Grafik SADECE görsel tanı aracıdır: Mc'yi otomatik seçmez, kullanıcı gözle
+// değerlendirip mevcut "Mc (elle)" kutusuna kendi girer, 2026-09-13.
+let lastGrEvList = null, lastGrMc = null, lastGrPoints = null, lastGrDM = null;
+
+function onGrBinSizeChange() {
+  if (lastGrEvList) renderGutenbergRichter(lastGrEvList, lastGrMc);
+}
+
+// EarthScope IEB'nin "Earthquake Stats → Export as CSV" özelliğiyle aynı fikir:
+// o an ekranda gösterilen bin verisini (magnitude, bin-içi N, kümülatif N) indirir.
+// Kullanıcının kendi tamamlılık analizini (log N - M grafiği) harici araçlarla
+// yapabilmesi için — grafiğin kendisi Mc seçmediği gibi bu da yapmaz, 2026-09-13.
+function exportGrCSV() {
+  if (!lastGrPoints) { setStatus('İndirilecek veri yok — önce Time-Mag panelini açın', true); return; }
+  const lines = [];
+  lines.push(`# EQ-LiveTurkiye Gutenberg-Richter bin verisi — ${new Date().toISOString()}`);
+  lines.push(`# ΔM = ${lastGrDM} · Mc (aktif) = ${lastGrMc !== null ? lastGrMc : '—'}`);
+  lines.push('magnitude,n_bin,n_cumulative');
+  lastGrPoints.forEach(p => lines.push(`${p.m},${p.nonCum},${p.cum}`));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `eqliveturkiye_gr_bin_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function renderGutenbergRichter(evList, Mc) {
+  lastGrEvList = evList; lastGrMc = Mc;
+  const svg   = document.getElementById('tmSvgGR');
+  const stats = document.getElementById('tmStatsGR');
+  const mags  = evList.map(e => e.mw ?? e.mag).filter(m => m > 0);
+  if (mags.length < 10) {
+    svg.innerHTML = `<text x="330" y="90" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: N=${mags.length} (min. 10 olay gerekir)</text>`;
+    stats.textContent = `N=${mags.length}`;
+    return;
+  }
+
+  const DM = parseFloat(document.getElementById('grBinSize').value) || 0.1;
+  const mMax = Math.max(...mags);
+  const binCount = Math.floor(mMax / DM) + 2;
+  const nonCum = new Array(binCount).fill(0);
+  mags.forEach(m => {
+    const idx = Math.min(binCount - 1, Math.max(0, Math.floor((m + 1e-9) / DM)));
+    nonCum[idx]++;
+  });
+  const cum = new Array(binCount).fill(0);
+  let running = 0;
+  for (let i = binCount - 1; i >= 0; i--) { running += nonCum[i]; cum[i] = running; }
+
+  const points = [];
+  for (let i = 0; i < binCount; i++) points.push({ m: +(i * DM).toFixed(2), nonCum: nonCum[i], cum: cum[i] });
+  lastGrPoints = points; lastGrDM = DM; // exportGrCSV() bu son hesaplanan bin verisini kullanır
+  const plottedCum    = points.filter(p => p.cum    > 0);
+  const plottedNonCum = points.filter(p => p.nonCum > 0);
+
+  const W=660, H=180, PAD_L=42, PAD_B=26, PAD_T=10, PAD_R=14;
+  const plotW = W-PAD_L-PAD_R, plotH = H-PAD_T-PAD_B;
+  const mAxisMax = Math.ceil(mMax) + 0.5;
+  const nMax = Math.max(...plottedCum.map(p => p.cum), 1);
+  const logMax = Math.max(1, Math.ceil(Math.log10(nMax)));
+
+  const x = m => PAD_L + Math.max(0, m) / mAxisMax * plotW;
+  const y = n => PAD_T + plotH - (Math.log10(Math.max(1, n)) / logMax) * plotH;
+
+  let yTicks = '';
+  for (let e = 0; e <= logMax; e++) {
+    const yy = y(Math.pow(10, e));
+    yTicks += `<text x="${PAD_L-6}" y="${yy+3}" fill="#888" font-size="8" text-anchor="end">10${toSuperscript(e)}</text>`;
+    yTicks += `<line x1="${PAD_L}" y1="${yy}" x2="${W-PAD_R}" y2="${yy}" stroke="#2a2a2a" stroke-width="0.5"/>`;
+  }
+  let xTicks = '';
+  const mStep = mAxisMax > 6 ? 2 : 1;
+  for (let m = 0; m <= mAxisMax; m += mStep) {
+    xTicks += `<text x="${x(m).toFixed(1)}" y="${H-8}" fill="#888" font-size="9" text-anchor="middle">${m}</text>`;
+  }
+
+  let mcLine = '';
+  if (Mc !== null && Mc >= 0 && Mc <= mAxisMax) {
+    mcLine = `<line x1="${x(Mc).toFixed(1)}" y1="${PAD_T}" x2="${x(Mc).toFixed(1)}" y2="${PAD_T+plotH}" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3"/>` +
+             `<text x="${x(Mc).toFixed(1)}" y="${PAD_T+10}" fill="#06b6d4" font-size="8" text-anchor="middle">Mc=${Mc}</text>`;
+  }
+
+  const SQ = 3; // kare yarı-kenar
+  const cumMarkers = plottedCum.map(p => {
+    const cx = x(p.m), cy = y(p.cum);
+    return `<rect x="${(cx-SQ).toFixed(1)}" y="${(cy-SQ).toFixed(1)}" width="${SQ*2}" height="${SQ*2}" fill="#e2e8f0" stroke="#111" stroke-width="0.4"><title>N(≥M)=${p.cum} @ M=${p.m}</title></rect>`;
+  }).join('');
+  const TR = 3.2; // ucgen yaricapi
+  const nonCumMarkers = plottedNonCum.map(p => {
+    const cx = x(p.m), cy = y(p.nonCum);
+    const p1 = `${cx},${(cy-TR).toFixed(1)}`, p2 = `${(cx-TR).toFixed(1)},${(cy+TR*0.8).toFixed(1)}`, p3 = `${(cx+TR).toFixed(1)},${(cy+TR*0.8).toFixed(1)}`;
+    return `<polygon points="${p1} ${p2} ${p3}" fill="#22c55e" fill-opacity="0.85" stroke="#111" stroke-width="0.3"><title>N(bin)=${p.nonCum} @ M=${p.m}</title></polygon>`;
+  }).join('');
+
+  svg.innerHTML = `
+    ${yTicks}
+    ${xTicks}
+    ${mcLine}
+    ${cumMarkers}
+    ${nonCumMarkers}
+    <line x1="${PAD_L}" y1="${PAD_T+plotH}" x2="${W-PAD_R}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
+    <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
+    <text x="${(PAD_L+plotW/2).toFixed(1)}" y="${H-1}" fill="#888" font-size="8" text-anchor="middle">Magnitude</text>
+  `;
+
+  const mcStr = Mc !== null ? ` · Mc=${Mc}` : '';
+  stats.innerHTML = `<span style="color:#e2e8f0">■</span> kümülatif N(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">▲</span> bin-içi N &nbsp;|&nbsp; ΔM=${DM} · N=${mags.length} · Mmax=${mMax.toFixed(1)}${mcStr}`;
 }
 
 function toggleTimeMag() {
@@ -1443,6 +1619,53 @@ function toggleTimeMag() {
   head.addEventListener('pointercancel', () => { dragging = false; });
 })();
 
+// Time-Mag ve Rolling b-değeri grafiklerinde ORTAK zaman ekseni tik üreticisi —
+// aralık ≥2 yılsa yıl başına tik (uzun yıl sayısında adım büyütülür, ~8 tikten
+// fazla olmasın), <2 yıl ama ≥45 günse ay başına tik, daha kısaysa 5 eşit
+// aralıklı gün/saat tiki. Sadece başlangıç/bitiş etiketiyle kalınmasın diye
+// eklendi (2026-09-13, kullanıcı geri bildirimi).
+function timeAxisTicks(t0, t1) {
+  const spanDays  = (t1 - t0) / 86400000;
+  const spanYears = spanDays / 365.25;
+  const ticks = [];
+  if (spanYears >= 2) {
+    const yStart = new Date(t0).getUTCFullYear();
+    const yEnd   = new Date(t1).getUTCFullYear();
+    const step   = Math.max(1, Math.ceil((yEnd - yStart + 1) / 8));
+    for (let y = yStart; y <= yEnd; y += step) {
+      const t = Date.UTC(y, 0, 1);
+      if (t >= t0 && t <= t1) ticks.push({ t, label: String(y) });
+    }
+  } else if (spanDays >= 45) {
+    const d0 = new Date(t0);
+    let cursor = Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth(), 1);
+    if (cursor < t0) cursor = Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth() + 1, 1);
+    let lastYear = null;
+    while (cursor <= t1) {
+      const dt = new Date(cursor);
+      const y  = dt.getUTCFullYear();
+      const label = dt.toLocaleDateString('tr-TR', { month: 'short' }) + (y !== lastYear ? ` ${y}` : '');
+      ticks.push({ t: cursor, label });
+      lastYear = y;
+      cursor = Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth() + 1, 1);
+    }
+  } else {
+    const N = 5;
+    for (let i = 0; i <= N; i++) {
+      const t = t0 + (t1 - t0) * i / N;
+      const d = new Date(t);
+      // 2-45 gün aralığında sadece gün/ay göstermek aynı takvim gününe düşen
+      // ardışık tikleri (5 eşit aralıkta) görsel olarak tekrar ettirebiliyordu —
+      // bu aralıkta saat de eklenir, ayırt edicilik sağlanır (2026-09-13)
+      const label = spanDays >= 2
+        ? d.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+        : d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+      ticks.push({ t, label });
+    }
+  }
+  return ticks;
+}
+
 function renderTimeMag(evList) {
   if (!showTimeMag) return;
   const svg    = document.getElementById('tmSvg');
@@ -1480,7 +1703,13 @@ function renderTimeMag(evList) {
   const mags   = evList.map(e => e.mw ?? e.mag);
   const magMax = Math.max(...mags, 3) + 0.5;
   const magMin = 0;
-  const Mc     = computeMc(evList);
+  // Bölge seçiliyken elle girilen Mc (regionMcOverride), computeRegionStatsLine()'daki
+  // davranışla tutarlı olsun diye burada da uygulanır — aksi halde bu panel kullanıcının
+  // girdiği değeri sessizce yok sayıp kendi otomatik MAXC'sini kullanırdı, 2026-09-13
+  const mcOverrideRaw = usingRegion ? document.getElementById('regionMcOverride').value : '';
+  const mcOverride = mcOverrideRaw !== '' ? parseFloat(mcOverrideRaw) : null;
+  const mcIsManual = mcOverride != null && !isNaN(mcOverride);
+  const Mc = mcIsManual ? mcOverride : computeMc(evList);
 
   const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
   const y = m => PAD_T + plotH - ((m-magMin)/(magMax-magMin)) * plotH;
@@ -1512,25 +1741,32 @@ function renderTimeMag(evList) {
              `<text x="${W-PAD_R}" y="${y(Mc)-4}" fill="#06b6d4" font-size="9" text-anchor="end">Mc=${Mc}</text>`;
   }
 
-  const fmt = ts => new Date(ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'}) + ' ' + new Date(ts).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  const xTicksArr = timeAxisTicks(t0, t1);
+  let xTicks = '';
+  xTicksArr.forEach((tk, i) => {
+    const xc = x(tk.t);
+    const anchor = i === 0 ? 'start' : i === xTicksArr.length - 1 ? 'end' : 'middle';
+    xTicks += `<line x1="${xc.toFixed(1)}" y1="${PAD_T}" x2="${xc.toFixed(1)}" y2="${PAD_T+plotH}" stroke="#2a2a2a" stroke-width="0.5"/>`;
+    xTicks += `<text x="${xc.toFixed(1)}" y="${H-6}" fill="#888" font-size="9" text-anchor="${anchor}">${tk.label}</text>`;
+  });
 
   svg.innerHTML = `
     ${yTicks}
+    ${xTicks}
     ${mcLine}
     ${dots}
     <line x1="${PAD_L}" y1="${PAD_T+plotH}" x2="${W-PAD_R}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
     <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
-    <text x="${PAD_L}" y="${H-6}" fill="#888" font-size="9" text-anchor="start">${fmt(t0)}</text>
-    <text x="${W-PAD_R}" y="${H-6}" fill="#888" font-size="9" text-anchor="end">${fmt(t1)}</text>
   `;
 
   metaEl.textContent = (usingRegion || usingHistorical)
     ? `${srcName} · ${winLabel} · N=${evList.length}${sampleNote}`
     : `${srcName} · ${winLabel} · M≥${minMag} · N=${evList.length}${sampleNote}`;
   const mMax = Math.max(...mags).toFixed(1);
-  statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>`;
+  statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>${mcIsManual ? ' (elle)' : ''}`;
 
   renderBvalueTS(evList, Mc);
+  renderGutenbergRichter(evList, Mc);
 }
 
 /* Son büyük deprem için global referans */
@@ -2189,7 +2425,9 @@ function computeRegionStatsLine(evs, orderby, capped) {
 
   const b = computeBvalue(mags, Mc);
   const nAbove = mags.filter(m => m >= Mc).length;
-  let line = `${mcLabel} · b = <b>${b!==null ? b.toFixed(2) : '—'}</b> · N(M≥Mc) = ${nAbove}`;
+  const bErr = b !== null ? bConfidence95(b, nAbove) : null;
+  const bLabel = b !== null ? `${b.toFixed(2)}${bErr !== null ? ` ± ${bErr.toFixed(2)}` : ''}` : '—';
+  let line = `${mcLabel} · b = <b>${bLabel}</b>${bErr !== null ? ' <span style="color:#888;font-size:.85em">(%95)</span>' : ''} · N(M≥Mc) = ${nAbove}`;
   if (capped) line += ` <span style="color:#f59e0b">⚠ limite takıldı, Mc/b düşük olabilir</span>`;
   return line;
 }
