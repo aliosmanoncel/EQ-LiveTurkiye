@@ -3159,12 +3159,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function openIEB() {
-  // Mevcut harita sınırlarını al
-  const b   = map.getBounds();
+  // Bölge seçiliyse (regionRect: manuel çizim veya Araştırma Bölgesi'nden
+  // "Bu bölgede sorgula" ile committed -- L.rectangle/L.polygon farketmez,
+  // getBounds() ikisinde de çalışır) IEB'yi TAM o bölgenin sınırlarıyla açar.
+  // Seçili bölge yoksa mevcut harita görünümüne (map.getBounds()) döner --
+  // önceki davranış hiç değişmez.
+  const usingRegion = !!regionRect;
+  const b   = usingRegion ? regionRect.getBounds() : map.getBounds();
   const zm  = Math.min(map.getZoom() + 1, 12);
   const now = new Date().toISOString().slice(0,10);
 
-  // EarthScope IEB URL — mevcut görüntü alanına odaklı, 1970'ten bugüne, tüm M
+  // EarthScope IEB URL — seçili bölge veya mevcut görüntü alanına odaklı, 1970'ten bugüne, tüm M
   const url = 'https://www.earthscope.org/app/ieb/index.html'
     + '?format=text&nodata=404'
     + `&starttime=1970-01-01&endtime=${now}`
@@ -3177,7 +3182,9 @@ function openIEB() {
   window.open(url, 'ieb_window',
     'width=1100,height=700,menubar=no,toolbar=no,resizable=yes,scrollbars=yes');
 
-  setStatus('EarthScope IEB açıldı · Select New Region → histogram → Mc değerini not alın → b-value katmanını açın');
+  setStatus(usingRegion
+    ? 'EarthScope IEB açıldı · Seçili bölge sınırlarıyla · Mc değerini not alın → b-value katmanını açın'
+    : 'EarthScope IEB açıldı · Mevcut harita görünümüyle · Select New Region → histogram → Mc değerini not alın → b-value katmanını açın');
 }
 
 function toggleLayer(type) {
