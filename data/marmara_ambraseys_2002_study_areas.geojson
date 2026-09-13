@@ -1,0 +1,86 @@
+{
+ "type": "FeatureCollection",
+ "metadata": {
+  "title": "Ambraseys (2002) Figure 1 study-area boundaries -- Region A (Marmara Sea region) and Region B (Marmara Basin)",
+  "source": "Ambraseys (2002), Figure 1",
+  "source_full": "Ambraseys, N. (2002), The Seismic Activity of the Marmara Sea Region over the Last 2000 Years, Bulletin of the Seismological Society of America, 92(1), 1-18",
+  "doi": "10.1785/0120000843",
+  "figure": "Figure 1 (location map, inset showing study areas A and B), p.2",
+  "publication_year": 2002,
+  "region_A": "Marmara Sea region",
+  "region_B": "Marmara Basin",
+  "purpose": "These two rectangles are the paper's own nested study-area definitions, digitized for transparency/context alongside data/marmara_historical_ambraseys_2002.json (the 55-event Table 1 catalog) and data/marmara_ambraseys_eq_historical_crosswalk.json. They are NOT earthquake data -- they represent the geographic extent the paper's analysis is scoped to.",
+  "region_distinction": "Region A ('Marmara Sea region') is the paper's full study area and corresponds to the geographic scope of the 55-event Table 1 catalog (all catalog events fall within/near Region A). Region B ('Marmara Basin') is explicitly a SMALLER, nested sub-area (~4x smaller by area, 'half as long and half as wide' per the source text) used specifically for the seismic-moment-release-rate analysis (Figures 9, 11, 13) and the shear-velocity comparison (Table 3) -- it is NOT the area the 55-event catalog was selected from, and should not be presented as such.",
+  "geometry_method": "digitized from Figure 1 inset",
+  "coordinate_status": "figure-derived, not explicitly stated in text -- the source text gives only relative/qualitative descriptions of Region B ('4 times smaller', 'half as long and half as wide', '210-km-long'), no numeric lat/lon for either region. Coordinates below were obtained by calibrating the figure's own axis tick marks (24/28/32 deg longitude at top, 42/38 deg latitude at right) via pixel-position detection, then reading the four dashed-rectangle edges for each region against that calibration.",
+  "coordinate_validation": "independently reproduced by two distinct pixel-based measurement methods (row/column ink-density peak detection, and connected-component dash-cluster detection with outlier rejection); differences between the two methods were <0.02 degrees on every edge of both rectangles. Values below are the average of the two methods.",
+  "calibration_reference": "x0=1494px/lon0=24.0E/sx=432.8px per degree; y0=1774px/lat0=42.0N/sy=620.25px per degree (calibrated against the raw embedded page-1 figure image, 6150x6507px, extracted from the user's own Zotero PDF copy)",
+  "known_limitations": [
+   "Both regions are simple axis-aligned rectangles as drawn in the source figure -- no attempt was made to infer a more complex boundary; the paper itself draws them as plain dashed boxes.",
+   "Edge precision is estimated at roughly +/-0.02 degrees (~1-2 km) based on the two-method cross-validation; this is a hand-drawn inset map in a location-reference figure, not a precision GIS boundary.",
+   "Region B should not be interpreted as 'the area the 55-event catalog covers' -- that is Region A. Region B is a narrower analytical sub-area used only for specific moment-release and shear-velocity calculations discussed in the paper."
+  ],
+  "digitized_by": "Claude (calibrated pixel tracing from the user's Zotero PDF copy of Figure 1), 2026-09-13",
+  "status": "reconstructed / not original GIS boundary -- see geometry_method and coordinate_status"
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "region_label": "A",
+    "region_name": "Marmara Sea region",
+    "description": "Ambraseys (2002)'s full study area -- corresponds to the geographic scope of the 55-event Table 1 historical earthquake catalog (data/marmara_historical_ambraseys_2002.json). All 55 catalog events fall within or near this boundary.",
+    "source": "Ambraseys (2002), Figure 1",
+    "source_full": "Ambraseys, N. (2002), The Seismic Activity of the Marmara Sea Region over the Last 2000 Years, Bulletin of the Seismological Society of America, 92(1), 1-18",
+    "figure": "Figure 1 (location map inset), p.2",
+    "publication_year": 2002,
+    "geometry_method": "digitized from Figure 1 inset",
+    "coordinate_status": "figure-derived, not explicitly stated in text",
+    "coordinate_validation": "independently reproduced by two pixel-based measurement methods; differences <0.02 degrees",
+    "confidence": "medium-high",
+    "bounds": { "minlon": 25.74, "maxlon": 31.13, "minlat": 39.34, "maxlat": 41.57 }
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [25.74, 39.34],
+      [31.13, 39.34],
+      [31.13, 41.57],
+      [25.74, 41.57],
+      [25.74, 39.34]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "region_label": "B",
+    "region_name": "Marmara Basin",
+    "description": "A smaller, nested sub-area (~4x smaller than Region A) used specifically for the seismic-moment-release-rate analysis (Figures 9, 11, 13) and shear-velocity comparison (Table 3) in Ambraseys (2002). This is NOT the area the 55-event catalog was drawn from -- that is Region A.",
+    "source": "Ambraseys (2002), Figure 1",
+    "source_full": "Ambraseys, N. (2002), The Seismic Activity of the Marmara Sea Region over the Last 2000 Years, Bulletin of the Seismological Society of America, 92(1), 1-18",
+    "figure": "Figure 1 (location map inset), p.2",
+    "publication_year": 2002,
+    "geometry_method": "digitized from Figure 1 inset",
+    "coordinate_status": "figure-derived, not explicitly stated in text",
+    "coordinate_validation": "independently reproduced by two pixel-based measurement methods; differences <0.02 degrees",
+    "confidence": "medium-high",
+    "bounds": { "minlon": 27.29, "maxlon": 30.11, "minlat": 39.92, "maxlat": 40.96 }
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [27.29, 39.92],
+      [30.11, 39.92],
+      [30.11, 40.96],
+      [27.29, 40.96],
+      [27.29, 39.92]
+     ]
+    ]
+   }
+  }
+ ]
+}
