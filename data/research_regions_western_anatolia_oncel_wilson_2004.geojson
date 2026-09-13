@@ -250,6 +250,7 @@
      11,
      12,
      13,
+     14,
      15,
      16,
      17,
@@ -266,7 +267,7 @@
     "geometry_method": "calibrated pixel tracing (same 2004_geo_panel_rot.png render and calibration as Shear Zone); orange line color-thresholded and isolated from an OR-combined multi-row/column band scan (dash-gap tolerant); corner longitudes/latitudes read directly from band-scan cluster centroids; ambiguous junctions (Zone 18 east closure) additionally checked against 2x-upscaled visual crops before being accepted",
     "topology_note": "The source figure draws the Extensional Zone as TWO separate, non-overlapping pieces that only touch, not one single simple ring. This is represented as a MultiPolygon: Part A = zones 6,5,11,10,15,17,16,12,13 (the main NE block, sharing its NW top edge with Shear Zone's zone-7 boundary); Part B = zones 18,19 (a thin wedge/strip south of Part A, touching Part A at two shared vertices (26.47,36.96) and (27.70,36.96) but not merged into a single ring, because the drawn dashed line genuinely does not close as one simple polygon at those points).",
     "confidence": "mixed -- see vertex_notes for per-vertex/per-part confidence (high/medium-high/medium)",
-    "known_limitation": "Part B vertex index 4 (~27.80E/36.70N, the SE closing corner of the Zone 18/19 wedge, where the orange Extensional line transitions to the white Compressional line) could NOT be pinned down to better than roughly +/-0.1-0.2 degrees: the upper (lat~37.00) and lower (lat~36.66) branches of the dashed line converge in a short, dash-gapped run and the exact orange-to-white handoff pixel is ambiguous. The coordinate given is a reasonable midpoint of the observed convergence, explicitly NOT a precision measurement, and should not be treated as more accurate than +/-0.15 degrees. No attempt was made to smooth or regularize this corner into a 'cleaner' shape.",
+    "known_limitation": "Part B vertex index 4 (~27.80E/36.70N, the SE closing corner of the Zone 18/19 wedge, where the orange Extensional line transitions to the white Compressional line) could NOT be pinned down to better than roughly +/-0.1-0.2 degrees: the upper (lat~37.00) and lower (lat~36.66) branches of the dashed line converge in a short, dash-gapped run and the exact orange-to-white handoff pixel is ambiguous. The coordinate given is a reasonable midpoint of the observed convergence, explicitly NOT a precision measurement, and should not be treated as more accurate than +/-0.15 degrees. No attempt was made to smooth or regularize this corner into a 'cleaner' shape. CORRECTION HISTORY (2026-09-10): Part A's ring-closing segment (previously a direct (25.13,38.7)->(26.96,38.85) diagonal) was found during a Phase 0 cross-zone audit to deviate from the true pixel-confirmed shared Shear/Extensional boundary (flat at lat~38.75 then a sharp jump at lon~26.95), causing a 0.053 deg^2 overlap with Shear Zone. Corrected by inserting vertices 12-13, reusing Shear Zone's already-approved vertices 15 and 14 verbatim (no new independent measurement). See vertex_notes indices 11-13.",
     "verified_against": "Both parts rendered as an overlay on the source figure (2026-09-10) and visually confirmed to closely track the orange dashed line; Part A's shared NW edge visually confirmed identical to Shear Zone's already-approved zone 6/7 boundary; Part B's wedge shape (vertex vertex vertex) visually confirmed against a 2x-upscaled crop of zones 18/19",
     "vertex_notes": [
      {
@@ -363,7 +364,23 @@
       "lon": 25.13,
       "lat": 38.7,
       "confidence": "high",
-      "note": "Zone 13 west edge, top -- closes back to vertex 0 via the shared top edge with Shear Zone"
+      "note": "Zone 13 west edge, top -- CORRECTED 2026-09-10: no longer closes directly to vertex 0; see vertices 12-13 (correction)"
+     },
+     {
+      "part": "A",
+      "index": 12,
+      "lon": 25.53,
+      "lat": 38.75,
+      "confidence": "high",
+      "note": "CORRECTION (2026-09-10): reused verbatim from Shear Zone vertex 15. Replaces a direct (25.13,38.7)->(26.96,38.85) diagonal that was found, during the Phase 0 cross-zone audit, to bulge up to ~0.09 deg north of the true shared boundary (confirmed by pixel scan: the true line is flat at lat~38.72-38.77 from lon~25.14 to ~26.94, then jumps sharply north at lon~26.95) -- this caused a 0.053 deg^2 spurious overlap with Shear Zone. No new independent measurement was made for this point; Shear's already-approved coordinate is reused as-is."
+     },
+     {
+      "part": "A",
+      "index": 13,
+      "lon": 26.8,
+      "lat": 38.75,
+      "confidence": "high",
+      "note": "CORRECTION (2026-09-10): reused verbatim from Shear Zone vertex 14, for the same reason as vertex 12 above. The remaining short (26.8,38.75)->(26.96,38.85) closing segment still approximates the true sharp jump (pixel-confirmed at lon~26.95) with a minor, low-impact diagonal over only 0.16 deg of longitude."
      },
      {
       "part": "B",
@@ -422,7 +439,7 @@
       "note": "Lower branch continuing toward the wedge vertex"
      }
     ],
-    "checkpoint": "Extensional Zone -- approved 2026-09-10 (Part A unconditionally; Part B approved with vertex #4 explicitly left as medium-confidence/unresolved pending Compressional Zone cross-check); commit deferred until final geometric review"
+    "checkpoint": "Extensional Zone -- approved 2026-09-10 (Part A unconditionally; Part B approved with vertex #4 explicitly left as medium-confidence/unresolved pending Compressional Zone cross-check); committed as abdc307. CORRECTED 2026-09-13: (1) Part A's closing segment adjusted (vertices 12-13 inserted, reusing Shear Zone's own vertices) to eliminate a 0.053 deg^2 overlap with Shear Zone found during Phase 0 audit. (2) member_zones corrected to include zone 14, which a Phase 0 audit found was geometrically enclosed by Part A's east edge (lon 30.03, confirmed against a zoomed crop of the source figure showing zone 14 sitting immediately west of the orange boundary line, alongside already-listed zones 10/11/16/17) but had been omitted from the member_zones list by oversight -- no geometry change was needed for this fix, only the classification list."
    },
    "geometry": {
     "type": "MultiPolygon",
@@ -476,6 +493,14 @@
        [
         25.13,
         38.7
+       ],
+       [
+        25.53,
+        38.75
+       ],
+       [
+        26.8,
+        38.75
        ],
        [
         26.96,
