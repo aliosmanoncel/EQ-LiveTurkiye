@@ -292,6 +292,10 @@
   </div>
   <button class="tbtn" id="btnLitRegionClear" onclick="litRegionClear()" style="display:none">✕ Araştırma Bölgesini Kaldır</button>
   <div id="litRegionInfo" style="display:none;font-size:.72rem;color:#ccc;line-height:1.5;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;width:260px"></div>
+  <label id="litRegionOnlyThisRow" style="display:none;align-items:center;gap:6px;font-size:.72rem;color:#ccc;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;cursor:pointer" title="İşaretliyse 'Bu bölgede sorgula' tıklandığında genel Heat Map/Seismicity katmanları geçici olarak kapatılır (yalnızca zaten açıksa) — 'Araştırma Bölgesini Kaldır' ile geri açılır. Varsayılan kapalı: mevcut harita görünümü değişmez.">
+    <input type="checkbox" id="litRegionOnlyThis">
+    Sadece bu bölgeyi göster
+  </label>
   <button class="tbtn" id="btnLitRegionQuery" onclick="litRegionCommitToQuery()" style="display:none;background:#3b0764;border-color:#a855f7" title="Bu araştırma bölgesinin geometrisini aktif sorgu alanına (regionRect) kopyalar ve seçili Kaynak (EMSC/USGS/AFAD) ile canlı sorgular — otomatik değildir, sadece bu butona basınca çalışır">▶ Bu bölgede sorgula</button>
   </div>
 </div>
@@ -2638,7 +2642,8 @@ function onLitRegionZoneChange() {
   const info = document.getElementById('litRegionInfo');
   const btnClear = document.getElementById('btnLitRegionClear');
   const btnQuery = document.getElementById('btnLitRegionQuery');
-  if (!groupKey || !zoneId) { info.style.display = 'none'; btnClear.style.display = 'none'; btnQuery.style.display = 'none'; return; }
+  const onlyThisRow = document.getElementById('litRegionOnlyThisRow');
+  if (!groupKey || !zoneId) { info.style.display = 'none'; btnClear.style.display = 'none'; btnQuery.style.display = 'none'; onlyThisRow.style.display = 'none'; return; }
 
   const geo = litRegionCache[groupKey];
   const feat = geo.features.find(f => String(f.properties.zone_id) === String(zoneId));
@@ -2659,6 +2664,7 @@ function onLitRegionZoneChange() {
   const p = feat.properties;
   btnClear.style.display = '';
   btnQuery.style.display = '';
+  onlyThisRow.style.display = 'flex';
   info.style.display = 'block';
   info.innerHTML =
     `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id}</b>` +
@@ -2679,6 +2685,23 @@ function litRegionClear() {
   if (btnClear) btnClear.style.display = 'none';
   const btnQuery = document.getElementById('btnLitRegionQuery');
   if (btnQuery) btnQuery.style.display = 'none';
+  const onlyThisRow = document.getElementById('litRegionOnlyThisRow');
+  if (onlyThisRow) onlyThisRow.style.display = 'none';
+  litRegionRestoreLayers(); // "Sadece bu bölgeyi göster" ile kapatılmışsa geri aç
+}
+
+// "Sadece bu bölgeyi göster" — litRegionCommitToQuery'nin AÇTIĞI katmanları
+// (yalnızca biz kapattıysak) geri getirir. Kullanıcı Legend'den kendisi
+// kapatmışsa buraya hiç dokunmayız (litRegionAutoHid* bayrakları sadece
+// BİZİM tetiklediğimiz kapatmayı işaretler). Geri açmadan önce mevcut
+// showHeat/showCircle durumuna da bakılır: kullanıcı bölge sorgusu AÇIKKEN
+// katmanı Legend'den kendisi zaten tekrar açmışsa, burada ikinci kez
+// toggleLayer çağırmak onu YANLIŞLIKLA kapatırdı — bu yüzden sadece hâlâ
+// bizim kapattığımız haliyle (kapalı) duruyorsa geri açılır.
+let litRegionAutoHidHeat = false, litRegionAutoHidCircle = false;
+function litRegionRestoreLayers() {
+  if (litRegionAutoHidHeat)   { if (!showHeat)   toggleLayer('heat');   litRegionAutoHidHeat   = false; }
+  if (litRegionAutoHidCircle) { if (!showCircle) toggleLayer('circle'); litRegionAutoHidCircle = false; }
 }
 
 /* ══════════════════════════════════════════
@@ -2714,6 +2737,17 @@ function litRegionCommitToQuery() {
     regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
   }
   fetchRegionEvents(regionRect.getBounds());
+
+  // "Sadece bu bölgeyi göster" — işaretliyse genel Heat Map/Seismicity
+  // katmanlarını (yalnızca ZATEN açıksa) kapatır, harita sadece bu sorgunun
+  // sonucunu gösterir. Kullanıcı zaten kapatmışsa dokunmayız (toggleLayer
+  // bir TOGGLE — kör çağırmak yanlışlıkla geri açardı). "Araştırma
+  // Bölgesini Kaldır" ile geri açılır (litRegionRestoreLayers).
+  const onlyThis = document.getElementById('litRegionOnlyThis');
+  if (onlyThis && onlyThis.checked) {
+    if (showHeat)   { toggleLayer('heat');   litRegionAutoHidHeat   = true; }
+    if (showCircle) { toggleLayer('circle'); litRegionAutoHidCircle = true; }
+  }
 }
 
 // Limit/Sırala değiştirildiğinde, zaten çizili bölge varsa onu yeni ayarla
