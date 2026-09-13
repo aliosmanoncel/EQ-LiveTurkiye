@@ -283,6 +283,7 @@
       <option value="">— Seçiniz —</option>
       <option value="ow2006_marmara">Marmara — Öncel &amp; Wilson (2006)</option>
       <option value="ow2004_western_anatolia">Batı Anadolu — Öncel &amp; Wilson (2004)</option>
+      <option value="ambraseys2002_studyareas">Marmara — Ambraseys (2002) Çalışma Alanları</option>
     </select>
   </div>
   <div class="rowbox" id="litRegionZoneRow" style="display:none">
@@ -2604,6 +2605,10 @@ const LIT_REGION_SOURCES = {
   ow2004_western_anatolia: {
     url:   'data/research_regions_western_anatolia_oncel_wilson_2004.geojson',
     label: "Öncel & Wilson (2004) — Batı Anadolu",
+  },
+  ambraseys2002_studyareas: {
+    url:   'data/marmara_ambraseys_2002_study_areas.geojson',
+    label: "Marmara — Ambraseys (2002) Çalışma Alanları",
   }
 };
 let litRegionCache = {};   // { [key]: geojson } — sekme açıkken tekrar indirmeye gerek yok
@@ -2632,6 +2637,11 @@ async function onLitRegionGroupChange() {
     // zone_id varsa mevcut (2006) davranış hiç değişmeden çalışır; yoksa zone_name
     // bazlı makro-zon seçimi kurulur -- iki dataset birbirine zorla uydurulmaz.
     const hasZoneId = geo.features.length > 0 && geo.features[0].properties.zone_id !== undefined;
+    // Üçüncü şema: Ambraseys (2002) çalışma-alanı dosyası zone_id/zone_name YERİNE
+    // region_label/region_name kullanır (Region A/B, basit dikdörtgen, member_zones
+    // YOK). hasZoneId zaten false olduğunda devreye girer -- 2004'ün zone_name
+    // dalına ASLA karışmaz (o dal aşağıda değişmeden duruyor).
+    const hasRegionLabel = !hasZoneId && geo.features.length > 0 && geo.features[0].properties.region_label !== undefined;
     const opts = hasZoneId
       ? geo.features
           .slice()
@@ -2642,10 +2652,15 @@ async function onLitRegionGroupChange() {
             return `<option value="${f.properties.zone_id}">${label}</option>`;
           })
           .join('')
-      : geo.features
-          .map(f => `<option value="${f.properties.zone_name}">${f.properties.zone_name}</option>`)
-          .join('');
-    zoneSel.innerHTML = (hasZoneId ? '<option value="">— Zone seçin —</option>' : '<option value="">— Makro-zon seçin —</option>') + opts;
+      : hasRegionLabel
+        ? geo.features
+            .map(f => `<option value="${f.properties.region_label}">Region ${f.properties.region_label} — ${f.properties.region_name}</option>`)
+            .join('')
+        : geo.features
+            .map(f => `<option value="${f.properties.zone_name}">${f.properties.zone_name}</option>`)
+            .join('');
+    const placeholder = hasZoneId ? '— Zone seçin —' : hasRegionLabel ? '— Bölge seçin —' : '— Makro-zon seçin —';
+    zoneSel.innerHTML = `<option value="">${placeholder}</option>` + opts;
   } catch (err) {
     zoneSel.innerHTML = '<option value="">Yüklenemedi</option>';
     setStatus(`Araştırma bölgesi verisi yüklenemedi: ${err.message}`, true);
@@ -2663,11 +2678,14 @@ function onLitRegionZoneChange() {
   if (!groupKey || !zoneKey) { info.style.display = 'none'; btnClear.style.display = 'none'; btnQuery.style.display = 'none'; onlyThisRow.style.display = 'none'; return; }
 
   const geo = litRegionCache[groupKey];
-  // bkz. onLitRegionGroupChange -- aynı schema-aware ayrım burada da uygulanır
+  // bkz. onLitRegionGroupChange -- aynı 3-şema ayrımı burada da uygulanır
   const hasZoneId = geo.features.length > 0 && geo.features[0].properties.zone_id !== undefined;
+  const hasRegionLabel = !hasZoneId && geo.features.length > 0 && geo.features[0].properties.region_label !== undefined;
   const feat = hasZoneId
     ? geo.features.find(f => String(f.properties.zone_id) === String(zoneKey))
-    : geo.features.find(f => f.properties.zone_name === zoneKey);
+    : hasRegionLabel
+      ? geo.features.find(f => f.properties.region_label === zoneKey)
+      : geo.features.find(f => f.properties.zone_name === zoneKey);
   if (!feat) return;
 
   // GeoJSON'daki GERÇEK halka L.geoJSON ile çizilir (bounds'tan yeniden
@@ -2689,24 +2707,35 @@ function onLitRegionZoneChange() {
   info.style.display = 'block';
   const titleLine = hasZoneId
     ? `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id}</b>`
-    : `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name}</b>`;
+    : hasRegionLabel
+      ? `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — Region ${p.region_label}: ${p.region_name}</b>`
+      : `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name}</b>`;
   // 25 sayısal alt-bölge (member_zones) burada SADECE bilgi amaçlı listelenir --
   // seçilebilir değildir, çünkü kaynak GeoJSON'da ayrı bir geometrileri yoktur
   // (Faz 0 kapsamı dışında bırakıldı). Sayılar kaynak veriden olduğu gibi
   // gösterilir, yeniden numaralandırılmaz veya tahmin edilmez.
-  const memberZonesLine = (!hasZoneId && Array.isArray(p.member_zones))
+  const memberZonesLine = (!hasZoneId && !hasRegionLabel && Array.isArray(p.member_zones))
     ? `<br><span style="color:#888">Alt bölgeler (metinden doğrulanmış üyelik; ayrı geometri olarak dijitalleştirilmedi): ${p.member_zones.join(', ')}</span>`
+    : '';
+  // Ambraseys çalışma-alanı (region_label) için: description alanı zaten
+  // epistemik uyarıları taşıyor (ör. Region B, 55-olay kapsama alanı DEĞİLDİR) --
+  // olduğu gibi gösterilir, yeni bir yorum/kesinlik iddiası eklenmez.
+  const descriptionLine = (hasRegionLabel && p.description)
+    ? `<br><span style="color:#888">${p.description}</span>`
     : '';
   info.innerHTML =
     titleLine +
     (p.notable_feature ? `<br>${p.notable_feature}` : '') +
     memberZonesLine +
+    descriptionLine +
     `<br><span style="color:#666">${p.source_full}</span>` +
     `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
     `<br><span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span>`;
   setStatus(hasZoneId
     ? `Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id} çizildi`
-    : `Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name} çizildi`);
+    : hasRegionLabel
+      ? `Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — Region ${p.region_label} çizildi`
+      : `Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name} çizildi`);
 }
 
 function litRegionClear() {
