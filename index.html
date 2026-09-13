@@ -801,12 +801,12 @@
     <button class="tmClose" onclick="toggleTimeMag()">✕</button>
   </div>
   <div class="tmMeta" id="tmMeta">—</div>
-  <svg id="tmSvg" width="660" height="200" style="display:block;margin:0 auto"></svg>
+  <svg id="tmSvg" viewBox="0 0 660 200" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;height:auto;max-width:660px"></svg>
   <div class="tmStats" id="tmStats">—</div>
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
     <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=10 olay)</span></div>
-    <svg id="tmSvgB" width="660" height="140" style="display:block;margin:6px auto"></svg>
+    <svg id="tmSvgB" viewBox="0 0 660 140" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
   </div>
 
@@ -824,7 +824,7 @@
       </span>
       <button onclick="exportGrCSV()" style="background:none;border:1px solid #334;color:#888;border-radius:4px;font-size:.8em;padding:1px 6px;cursor:pointer;" title="Bin verisini (magnitude, bin-içi N, kümülatif N) CSV olarak indir">⬇ CSV</button>
     </div>
-    <svg id="tmSvgGR" width="660" height="180" style="display:block;margin:6px auto"></svg>
+    <svg id="tmSvgGR" viewBox="0 0 420 400" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;max-width:400px;height:auto"></svg>
     <div class="tmStats" id="tmStatsGR">—</div>
   </div>
 </div>
@@ -1505,7 +1505,7 @@ function renderGutenbergRichter(evList, Mc) {
   const stats = document.getElementById('tmStatsGR');
   const mags  = evList.map(e => e.mw ?? e.mag).filter(m => m > 0);
   if (mags.length < 10) {
-    svg.innerHTML = `<text x="330" y="90" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: N=${mags.length} (min. 10 olay gerekir)</text>`;
+    svg.innerHTML = `<text x="210" y="200" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: N=${mags.length} (min. 10 olay gerekir)</text>`;
     stats.textContent = `N=${mags.length}`;
     return;
   }
@@ -1528,9 +1528,14 @@ function renderGutenbergRichter(evList, Mc) {
   const plottedCum    = points.filter(p => p.cum    > 0);
   const plottedNonCum = points.filter(p => p.nonCum > 0);
 
-  const W=660, H=180, PAD_L=42, PAD_B=26, PAD_T=10, PAD_R=14;
+  // Kareye yakın en-boy oranı (literatürdeki GR grafik geleneği — bkz. Mirwald
+  // ve ark. 2026 örneği) — diğer iki grafik gibi geniş/yassı DEĞİL, 2026-09-13.
+  const W=420, H=400, PAD_L=42, PAD_B=28, PAD_T=10, PAD_R=14;
   const plotW = W-PAD_L-PAD_R, plotH = H-PAD_T-PAD_B;
-  const mAxisMax = Math.ceil(mMax) + 0.5;
+  // Eksen tamamen veriye uyarlanır: Mmax + 1 (yaygın GR grafik geleneği) —
+  // sabit bir üst sınır dayatılmaz, küçük Mmax'ta gereksiz boş alan bırakmaz
+  // (2026-09-13, kullanıcı geri bildirimi — önceki sabit 0-8 varsayımı kaldırıldı).
+  const mAxisMax = Math.ceil(mMax) + 1;
   const nMax = Math.max(...plottedCum.map(p => p.cum), 1);
   const logMax = Math.max(1, Math.ceil(Math.log10(nMax)));
 
@@ -1544,8 +1549,9 @@ function renderGutenbergRichter(evList, Mc) {
     yTicks += `<line x1="${PAD_L}" y1="${yy}" x2="${W-PAD_R}" y2="${yy}" stroke="#2a2a2a" stroke-width="0.5"/>`;
   }
   let xTicks = '';
-  const mStep = mAxisMax > 6 ? 2 : 1;
-  for (let m = 0; m <= mAxisMax; m += mStep) {
+  // "0" etiketi gösterilmez — gerçek verilerde M=0 anlamlı bir değer değil,
+  // "sıfır" burada "veri yok" ile karışabilir; eksen yine 0'dan başlar (2026-09-13)
+  for (let m = 1; m <= mAxisMax; m += 1) {
     xTicks += `<text x="${x(m).toFixed(1)}" y="${H-8}" fill="#888" font-size="9" text-anchor="middle">${m}</text>`;
   }
 
@@ -1555,16 +1561,16 @@ function renderGutenbergRichter(evList, Mc) {
              `<text x="${x(Mc).toFixed(1)}" y="${PAD_T+10}" fill="#06b6d4" font-size="8" text-anchor="middle">Mc=${Mc}</text>`;
   }
 
-  const SQ = 3; // kare yarı-kenar
+  // Kümülatif = dolu daire, bin-içi = boş (içi boş) daire — üçgen/kare yerine,
+  // literatürdeki "filled vs. open circle" GR grafik geleneğine uygun, 2026-09-13
+  const R_CIRCLE = 2.6;
   const cumMarkers = plottedCum.map(p => {
     const cx = x(p.m), cy = y(p.cum);
-    return `<rect x="${(cx-SQ).toFixed(1)}" y="${(cy-SQ).toFixed(1)}" width="${SQ*2}" height="${SQ*2}" fill="#e2e8f0" stroke="#111" stroke-width="0.4"><title>N(≥M)=${p.cum} @ M=${p.m}</title></rect>`;
+    return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R_CIRCLE}" fill="#e2e8f0" stroke="#111" stroke-width="0.4"><title>N(≥M)=${p.cum} @ M=${p.m}</title></circle>`;
   }).join('');
-  const TR = 3.2; // ucgen yaricapi
   const nonCumMarkers = plottedNonCum.map(p => {
     const cx = x(p.m), cy = y(p.nonCum);
-    const p1 = `${cx},${(cy-TR).toFixed(1)}`, p2 = `${(cx-TR).toFixed(1)},${(cy+TR*0.8).toFixed(1)}`, p3 = `${(cx+TR).toFixed(1)},${(cy+TR*0.8).toFixed(1)}`;
-    return `<polygon points="${p1} ${p2} ${p3}" fill="#22c55e" fill-opacity="0.85" stroke="#111" stroke-width="0.3"><title>N(bin)=${p.nonCum} @ M=${p.m}</title></polygon>`;
+    return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R_CIRCLE}" fill="none" stroke="#22c55e" stroke-width="1.1"><title>N(bin)=${p.nonCum} @ M=${p.m}</title></circle>`;
   }).join('');
 
   svg.innerHTML = `
@@ -1579,7 +1585,7 @@ function renderGutenbergRichter(evList, Mc) {
   `;
 
   const mcStr = Mc !== null ? ` · Mc=${Mc}` : '';
-  stats.innerHTML = `<span style="color:#e2e8f0">■</span> kümülatif N(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">▲</span> bin-içi N &nbsp;|&nbsp; ΔM=${DM} · N=${mags.length} · Mmax=${mMax.toFixed(1)}${mcStr}`;
+  stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif N(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi N &nbsp;|&nbsp; ΔM=${DM} · N=${mags.length} · Mmax=${mMax.toFixed(1)}${mcStr}`;
 }
 
 function toggleTimeMag() {
