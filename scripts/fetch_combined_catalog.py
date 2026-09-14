@@ -107,18 +107,59 @@ def fetch_period(base_url, start_year, end_year, source, chunk=5):
     return fetch_period_mc(base_url, start_year, end_year, MINMAG, source, chunk)
 
 def fetch_period_mc(base_url, start_year, end_year, minmag, source, chunk=5):
-    """Yillara bolunmus dilimler halinde, verilen Mc ile ceker."""
+    """Yillara bolunmus dilimler halinde, verilen Mc ile ceker. Her dilim
+    icinde LIMIT'e carpma durumu fetch_chunk_safe tarafindan otomatik
+    olarak alt-donemlere bolunerek (recursive subdivision) guvenceye
+    alinir -- 2026-09-14 audit: 2008-2013 EMSC dilimi N=LIMIT=20000
+    dondurup 2012-02..2012-12'yi sessizce dusurmustu, bkz.
+    seismo-report/eqlive-turkey-methodology.html."""
     all_evs = {}
     cur = start_year
     while cur < end_year:
         nxt = min(cur + chunk, end_year)
-        s, e = f'{cur}-01-01', f'{nxt}-01-01'
-        evs  = fetch_chunk_mc(base_url, s, e, minmag, source)
+        start_dt, end_dt = datetime(cur, 1, 1), datetime(nxt, 1, 1)
+        evs = fetch_chunk_safe(base_url, start_dt, end_dt, minmag, source)
         for ev in evs:
             all_evs[ev['id']] = ev
-        print(f'  {s} → {e}: {len(evs)} olay ({len(all_evs)} toplam)')
+        print(f'  {start_dt.date()} → {end_dt.date()}: {len(evs)} olay ({len(all_evs)} toplam)')
         cur = nxt
     return all_evs
+
+# LIMIT'e esit sayida olay donen bir sorgu "tamamlandi" degil "belki kesildi"
+# demektir (bkz. yukaridaki 2008-2013 bulgusu). Bu esik altina inilirse
+# (orn. 1 saatlik bir aralikta bile LIMIT kadar olay varsa) artik bolmenin
+# anlami kalmaz -- bu durumda sessizce eksik veri kabul ETMEYIP acikca hata
+# verilir.
+MIN_SUBDIVIDE_SECONDS = 3600
+
+def fetch_chunk_safe(base_url, start_dt, end_dt, minmag, source, delay=1.5):
+    """[start_dt, end_dt) yari-acik araligini ceker. Donen olay sayisi tam
+    LIMIT ise sorgunun kesilmis olabilecegini varsayar, araligi ortadan
+    ikiye bolup her yariyi ayri ayri (gerekirse tekrar bolerek) ceker;
+    sinirdaki olasi cakisma cagiran tarafta id bazli dedup ile giderilir."""
+    start_s = start_dt.strftime('%Y-%m-%dT%H:%M:%S')
+    end_s   = end_dt.strftime('%Y-%m-%dT%H:%M:%S')
+    evs = fetch_chunk_mc(base_url, start_s, end_s, minmag, source, delay)
+    if len(evs) < LIMIT:
+        return evs
+
+    span = end_dt - start_dt
+    if span.total_seconds() <= MIN_SUBDIVIDE_SECONDS:
+        raise RuntimeError(
+            f'[GUARD] {source} {start_s}..{end_s}: LIMIT={LIMIT} olaya '
+            f'ulasildi ve aralik artik anlamli sekilde bolunemeyecek kadar '
+            f'kucuk ({span}). Veri sessizce eksik birakilmiyor -- elle '
+            f'inceleme gerekir.'
+        )
+    mid_dt = start_dt + span / 2
+    print(f'    [SUBDIVIDE] {source} {start_s}..{end_s} tam LIMIT={LIMIT} '
+          f'dondurdu, ikiye bolunuyor (orta nokta: {mid_dt})')
+    left  = fetch_chunk_safe(base_url, start_dt, mid_dt, minmag, source, delay)
+    right = fetch_chunk_safe(base_url, mid_dt, end_dt, minmag, source, delay)
+    merged = {}
+    for e in left + right:
+        merged[e['id']] = e
+    return list(merged.values())
 
 def fetch_chunk_mc(base_url, start, end, minmag, source, delay=1.5):
     params = (f"?format=text&starttime={start}&endtime={end}"
