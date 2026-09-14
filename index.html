@@ -89,6 +89,7 @@
     .legend-section-title{color:#fbbf24;font-weight:700;font-size:.75rem;margin-bottom:2px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
     .legend-section-title .tog{color:#555;font-size:.8rem}
     .legend-section-body.hidden{display:none}
+    #stationYearCtrl.hidden{display:none}
     .legend-title{color:#fbbf24;font-weight:700;margin-bottom:3px;font-size:.78rem}
     .fl{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
 
@@ -195,7 +196,13 @@
   <button class="tbtn"        id="btnAerial" onclick="toggleLayer('aerial')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Uydu Görüntüsü · Esri World Imagery © Esri, Maxar, Earthstar Geographics">🛰️ Uydu Görüntüsü</button>
   <button class="tbtn"        id="btnPlates" onclick="toggleLayer('plates')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
   <button class="tbtn"        id="btnGAF"    onclick="toggleLayer('gaf')"    style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
+  <button class="tbtn"        id="btnStations" onclick="toggleLayer('stations')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="İstasyon Ağı · AFAD (statik, deprem.afad.gov.tr) + KOERI (gerçek Açılış tarihine göre zaman filtreli, koeri.boun.edu.tr) · RQ-Mc-EMSC Network Effect (seismo-report §8) için keşif/diagnostic katmanı — Mc hesabına veya canlı sorguya bağlı DEĞİLDİR">📡 İstasyon Ağı</button>
   <button class="tbtn active" id="btnLabels" onclick="toggleLayer('labels')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Yer adı / şehir etiketleri katmanı">🏷️ Etiketler</button>
+  <div id="stationYearCtrl" class="hidden" style="border-top:1px solid #334;margin-top:2px;padding-top:5px;font-size:.68rem;color:#aaa">
+    <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span>KOERI yılı</span><span id="stationYearVal">2026</span></div>
+    <input type="range" id="stationYearSlider" min="1997" max="2026" value="2026" style="width:100%" oninput="updateStationYear(this.value)">
+    <div style="margin-top:3px;color:#666">AFAD: statik (tarih verisi güvenilir değil)</div>
+  </div>
 </div>
 
 <!-- BÖLGE SEÇ — sürükleyip bölge kilitle, o bölgedeki küçük depremleri getir -->
@@ -582,6 +589,21 @@
         <div><span class="fl" style="background:#ef4444"></span>Thrust</div>
         <div><span class="fl" style="background:#666"></span>Undefined</div>
         <div style="color:#555;font-size:.65rem;margin-top:4px">Styron &amp; Pagani (2020), CC-BY-SA 4.0</div>
+      </div>
+    </div>
+
+    <!-- İstasyon Ağı — RQ-Mc-EMSC Network Effect (seismo-report §8) keşif/diagnostic katmanı.
+         Bilinçli olarak izole: bu katman hiçbir Mc hesabına, b-değeri ızgarasına veya canlı
+         EMSC sorgu mekanizmasına bağlı değildir — yalnızca statik AFAD/KOERI konum verisini
+         görselleştirir. -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgStations','lgStationsT')">
+        📡 İstasyon Ağı <span class="tog" id="lgStationsT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgStations">
+        <div><span class="fl" style="background:#06b6d4;height:8px;border-radius:50%;width:8px"></span>AFAD (statik, <span id="lgAfadCount">—</span> istasyon)</div>
+        <div><span class="fl" style="background:#f97316;height:8px;border-radius:50%;width:8px"></span>KOERI (<span id="lgKoeriCount">—</span>, seçili yıla kadar)</div>
+        <div style="color:#555;font-size:.65rem;margin-top:4px">Keşif/diagnostic katmanı · Mc hesabına bağlı değildir · deprem.afad.gov.tr + koeri.boun.edu.tr</div>
       </div>
     </div>
 
@@ -3395,6 +3417,18 @@ let platesLayer = null;
 let showPlates  = false;
 let gafLayer    = null;
 let showGAF     = false;
+
+// İstasyon Ağı — RQ-Mc-EMSC Network Effect (seismo-report §8) keşif/diagnostic katmanı.
+// data/afad_stations.json + data/koeri_stations.json HARİCEN, bu oturumda önceden
+// çekilip statik dosya olarak kaydedildi (canlı sitenin AFAD/KOERI'ye kendi istek
+// atmasını önlemek için — bkz. RQ-Mc-EMSC'deki rate-limit dersi). Bu katman
+// bilerek izole: Mc hesabına, b-değeri ızgarasına veya canlı EMSC akışına dokunmaz.
+let afadStationsLayer  = null;
+let koeriStationsLayer = null;
+let showStations       = false;
+let afadStationsData   = null;
+let koeriStationsData  = null;
+let stationYear        = 2026;
 let testimonyLayer = null;
 let showTestimony  = false;
 
@@ -3549,6 +3583,66 @@ function renderAmbraseysLayer() {
     markers.push(c);
   });
   ambraseysLayer = L.layerGroup(markers).addTo(map);
+}
+
+// İstasyon Ağı — RQ-Mc-EMSC Network Effect (seismo-report §8) keşif/diagnostic katmanı.
+// data/afad_stations.json ve data/koeri_stations.json bu oturumda AYRI bir işlemle,
+// tek seferlik ve nazik bir çekimle önceden üretilmiş statik dosyalardır — bu fonksiyon
+// AFAD'ın veya KOERI'nin canlı API'sine HİÇ istek atmaz (RQ-Mc-EMSC'nin bulk-tarama
+// rate-limit dersi burada da geçerli: canlı sitenin her ziyaretçisi bu istekleri
+// tekrarlarsa aynı soruna yol açar). AFAD'ın kendi API'si per-istasyon açılış/kapanış
+// tarihini güvenilir döndürmediği için (bkz. seismo-report §8.2) AFAD istasyonları
+// zaman filtresi OLMADAN, statik gösterilir; yalnızca KOERI'nin gerçek Açılış
+// tarihleri zaman filtresine tabidir.
+function loadStationsLayer() {
+  const afadP  = afadStationsData  ? Promise.resolve(afadStationsData)  : fetch('data/afad_stations.json').then(r => r.json()).then(d => { afadStationsData = d; return d; });
+  const koeriP = koeriStationsData ? Promise.resolve(koeriStationsData) : fetch('data/koeri_stations.json').then(r => r.json()).then(d => { koeriStationsData = d; return d; });
+  Promise.all([afadP, koeriP]).then(([afad, koeri]) => {
+    if (!afadStationsLayer) {
+      afadStationsLayer = L.layerGroup(
+        afad.stations.map(s => L.circleMarker([s.lat, s.lon], {
+          radius: 3, color: '#06b6d4', weight: 1, fillColor: '#06b6d4', fillOpacity: 0.6
+        }).bindPopup(`<b style="color:#06b6d4">${s.code}</b><br>${s.province || '—'} / ${s.district || '—'}<br><span style="color:#aaa;font-size:.75em">AFAD · ağ: ${s.network || '—'} · statik konum, tarih verisi yok</span>`))
+      );
+    }
+    if (showStations) afadStationsLayer.addTo(map);
+    const lgA = document.getElementById('lgAfadCount');
+    if (lgA) lgA.textContent = afad.count;
+
+    const slider = document.getElementById('stationYearSlider');
+    if (slider && !slider.dataset.init) {
+      const years = koeri.stations.map(s => parseInt(s.opened.slice(0, 4), 10));
+      slider.min = Math.min(...years);
+      slider.max = new Date().getFullYear();
+      slider.value = slider.max;
+      stationYear = parseInt(slider.value, 10);
+      slider.dataset.init = '1';
+      const v = document.getElementById('stationYearVal');
+      if (v) v.textContent = slider.value;
+    }
+    renderKoeriForYear(stationYear);
+  }).catch(e => setStatus('İstasyon Ağı yüklenemedi: ' + e.message));
+}
+
+function updateStationYear(val) {
+  stationYear = parseInt(val, 10);
+  const v = document.getElementById('stationYearVal');
+  if (v) v.textContent = val;
+  renderKoeriForYear(stationYear);
+}
+
+function renderKoeriForYear(year) {
+  if (!koeriStationsData) return;
+  if (koeriStationsLayer) map.removeLayer(koeriStationsLayer);
+  const active = koeriStationsData.stations.filter(s => parseInt(s.opened.slice(0, 4), 10) <= year);
+  koeriStationsLayer = L.layerGroup(
+    active.map(s => L.circleMarker([s.lat, s.lon], {
+      radius: 4, color: '#f97316', weight: 1, fillColor: '#f97316', fillOpacity: 0.75
+    }).bindPopup(`<b style="color:#f97316">${s.code}</b> · ${s.place}<br>Açılış: ${s.opened}<br><span style="color:#aaa;font-size:.75em">KOERI · gerçek kuruluş tarihi</span>`))
+  );
+  if (showStations) koeriStationsLayer.addTo(map);
+  const lgK = document.getElementById('lgKoeriCount');
+  if (lgK) lgK.textContent = active.length + ' / ' + koeriStationsData.count;
 }
 
 function loadHazardLayer() {
@@ -3749,6 +3843,23 @@ function toggleLayer(type) {
       setStatus('Dünya Diri Fayları · GEM Global Active Faults Database · Styron & Pagani (2020) · CC-BY-SA 4.0');
     } else {
       if (gafLayer) map.removeLayer(gafLayer);
+    }
+  } else if (type === 'stations') {
+    // RQ-Mc-EMSC Network Effect (seismo-report §8) keşif/diagnostic katmanı.
+    // Statik data/afad_stations.json + data/koeri_stations.json kullanır —
+    // canlı EMSC akışına, Mc hesabına veya b-değeri ızgarasına dokunmaz.
+    showStations = !showStations;
+    document.getElementById('btnStations').classList.toggle('active', showStations);
+    const syc = document.getElementById('stationYearCtrl');
+    if (syc) { if (showStations) syc.classList.remove('hidden'); else syc.classList.add('hidden'); }
+    const lgS = document.getElementById('lgStations');
+    if (lgS) { if (showStations) lgS.classList.remove('hidden'); else lgS.classList.add('hidden'); }
+    if (showStations) {
+      loadStationsLayer();
+      setStatus('İstasyon Ağı · AFAD (statik) + KOERI (zaman filtreli) · keşif/diagnostic katmanı — RQ-Mc-EMSC §8');
+    } else {
+      if (afadStationsLayer)  map.removeLayer(afadStationsLayer);
+      if (koeriStationsLayer) map.removeLayer(koeriStationsLayer);
     }
   } else if (type === 'testimony') {
     showTestimony = !showTestimony;
