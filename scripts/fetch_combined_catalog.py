@@ -25,7 +25,13 @@ MC = [
     (1965, 1980, 4.5, ISC_URL,  'ISC'),   # tablo 4.0 + 0.5 = 4.5
     (1980, 1990, 4.0, ISC_URL,  'ISC'),   # tablo 3.0 + 1.0 = 4.0
     (1990, 1998, 3.5, ISC_URL,  'ISC'),   # tablo 2.5 + 1.0 = 3.5
-    (1998, 2026, 3.0, EMSC_URL, 'EMSC'), # tablo 1.8-2.5 + 0.5 → 3.0 (EMSC alt siniri)
+    (1998, 9999, 3.0, EMSC_URL, 'EMSC'), # tablo 1.8-2.5 + 0.5 → 3.0 (EMSC alt siniri)
+    # ust sinir 9999 = sentinel; main()'deki `min(end_yr, now.year+1)` bu
+    # sayesinde HER ZAMAN gercek guncel yili secer. 2026-09-14 QC'de bulundu:
+    # burada onceden sabit "2026" yaziliydi, bu da fetch'i her calistirmada
+    # (hangi yil olursa olsun) 2026-01-01'de sessizce kesiyordu -- 2026 yilinin
+    # tamami (~8.5 ay, tahmini 2500-3000 olay) hic cekilmemisti. LIMIT=20000
+    # bug'undan tamamen bagimsiz, ayri bir kesilme kaynagiydi.
 ]
 LIMIT    = 20000
 OUTPUT   = 'data/eq_historical.json'
