@@ -288,9 +288,14 @@
     <label>Çalışma</label>
     <select id="litRegionGroupSel" class="src-sel" onchange="onLitRegionGroupChange()">
       <option value="">— Seçiniz —</option>
-      <option value="ow2006_marmara">Marmara — Öncel &amp; Wilson (2006)</option>
-      <option value="ow2004_western_anatolia">Batı Anadolu — Öncel &amp; Wilson (2004)</option>
-      <option value="ambraseys2002_studyareas">Marmara — Ambraseys (2002) Çalışma Alanları</option>
+      <optgroup label="🧪 Pilot Bölge — Yöntem Doğrulama (Published vs Reproduced)">
+        <option value="ow2007_izmit_pilot" title="Mc=2.9, N=100, kaydırma=10, Aki MLE — KOERI/ZEQDB ile PASS (bkz. seismo-report metodoloji raporu Tablo 4d)">İzmit–Sapanca — Öncel &amp; Wilson (2007) [PASS ✓]</option>
+      </optgroup>
+      <optgroup label="🔬 Araştırma Bölgesi — Bilimsel Uygulama">
+        <option value="ow2006_marmara">Marmara — Öncel &amp; Wilson (2006)</option>
+        <option value="ow2004_western_anatolia">Batı Anadolu — Öncel &amp; Wilson (2004)</option>
+        <option value="ambraseys2002_studyareas">Marmara — Ambraseys (2002) Çalışma Alanları</option>
+      </optgroup>
     </select>
   </div>
   <div class="rowbox" id="litRegionZoneRow" style="display:none">
@@ -3048,6 +3053,10 @@ function regionDeselect() {
    ayrı bir Faz 1B checkpoint'i — burada YOK.
 ══════════════════════════════════════════ */
 const LIT_REGION_SOURCES = {
+  ow2007_izmit_pilot: {
+    url:   'data/research_regions_izmit_oncel_wilson_2007.geojson',
+    label: "Öncel & Wilson (2007) — İzmit-Sapanca (Pilot Bölge)",
+  },
   ow2006_marmara: {
     url:   'data/research_regions_marmara_oncel_wilson_2006.geojson',
     label: "Öncel & Wilson (2006) — Marmara",
@@ -3144,8 +3153,10 @@ function onLitRegionZoneChange() {
   // buna GÜVENMEZ: ileride eklenecek Öncel & Wilson (2004) gibi düzensiz
   // poligonlu bir çalışma aynı kod yolundan geçtiğinde de gerçek şekli
   // (bounding box'ı değil) doğru çizer.
+  const isPilot = groupKey === 'ow2007_izmit_pilot'; // Pilot Bölge = yöntem doğrulama, Araştırma Bölgesi'nden görsel olarak ayrılır
+  const litColor = isPilot ? '#f5a623' : '#a855f7';
   litRegionLayer = L.geoJSON(feat, {
-    style: { color: '#a855f7', weight: 2, fillColor: '#a855f7', fillOpacity: .12, dashArray: '3' }
+    style: { color: litColor, weight: isPilot ? 3 : 2, fillColor: litColor, fillOpacity: .12, dashArray: isPilot ? '6,3' : '3' }
   }).addTo(map);
   const bounds = litRegionLayer.getBounds();
   map.fitBounds(bounds, { padding: [40, 40] });
@@ -3156,10 +3167,10 @@ function onLitRegionZoneChange() {
   onlyThisRow.style.display = 'flex';
   info.style.display = 'block';
   const titleLine = hasZoneId
-    ? `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id}</b>`
+    ? `<b style="color:${litColor}">${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id}</b>`
     : hasRegionLabel
-      ? `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — Region ${p.region_label}: ${p.region_name}</b>`
-      : `<b style="color:#a855f7">${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name}</b>`;
+      ? `<b style="color:${litColor}">${LIT_REGION_SOURCES[groupKey].label} — Region ${p.region_label}: ${p.region_name}</b>`
+      : `<b style="color:${litColor}">${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name}</b>`;
   // 25 sayısal alt-bölge (member_zones) burada SADECE bilgi amaçlı listelenir --
   // seçilebilir değildir, çünkü kaynak GeoJSON'da ayrı bir geometrileri yoktur
   // (Faz 0 kapsamı dışında bırakıldı). Sayılar kaynak veriden olduğu gibi
@@ -3181,11 +3192,12 @@ function onLitRegionZoneChange() {
     `<br><span style="color:#666">${p.source_full}</span>` +
     `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
     `<br><span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span>`;
+  const modeLabel = isPilot ? '🧪 PİLOT BÖLGE (Yöntem Doğrulama)' : 'Araştırma Bölgesi';
   setStatus(hasZoneId
-    ? `Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id} çizildi`
+    ? `${modeLabel}: ${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id} çizildi`
     : hasRegionLabel
-      ? `Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — Region ${p.region_label} çizildi`
-      : `Araştırma Bölgesi: ${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name} çizildi`);
+      ? `${modeLabel}: ${LIT_REGION_SOURCES[groupKey].label} — Region ${p.region_label} çizildi`
+      : `${modeLabel}: ${LIT_REGION_SOURCES[groupKey].label} — ${p.zone_name} çizildi`);
 }
 
 function litRegionClear() {

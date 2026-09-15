@@ -1,0 +1,35 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "title": "Öncel & Wilson (2007) study area -- İzmit-Sapanca fault, pre-1999 seismicity analysis",
+    "source": "Öncel, A. O. & Wilson, T. (2007), Anomalous seismicity preceding the 1999 Izmit event, NW Turkey, Geophysical Journal International, 169(1), 259-270",
+    "doi": "10.1111/j.1365-246X.2006.03298.x",
+    "publication_year": 2007,
+    "role": "PILOT_BOLGE",
+    "purpose": "Bu kutu Pilot Bolge (yontem dogrulama) amaciyla kullanilir -- Arastirma Bolgesi (bilimsel uygulama) amaciyla DEGIL. Dogrulanmis algoritma (N=100/kaydirma=10/Aki MLE) Arastirma Bolgesi'ne tasinir, bu kutunun kendi Mc/b/LogN degerleri tasinmaz."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "region_label": "A",
+        "region_name": "İzmit–Sapanca Fayı (Pilot Bölge)",
+        "description": "🧪 PILOT BÖLGE — Yöntem Doğrulama modu (Araştırma Bölgesi DEĞİL). Sabit test koşulları: KOERI/ZEQDB · 1991-01-05→1999-06-06 · Mc=2.9 (sabit) · N=100 · kaydırma=10 · Aki (1965) MLE · MD/xM, dönüşümsüz. Sonuç: b(t) ve Log N için PASS (bkz. seismo-report/eqlive-turkey-methodology.html §5, Tablo 4d). Bu kutunun Mc/b/Log N değerleri katalog-bağımlıdır ve Araştırma Bölgesi'ne aktarılmaz — yalnızca doğrulanmış N=100/kaydırma=10/Aki-MLE algoritması aktarılır.",
+        "source": "Öncel & Wilson (2007), Figure 1",
+        "source_full": "Öncel, A. O. & Wilson, T. (2007), Anomalous seismicity preceding the 1999 Izmit event, NW Turkey, Geophysical Journal International, 169(1), 259-270, doi:10.1111/j.1365-246X.2006.03298.x",
+        "figure": "Figure 1 (study area), p.260",
+        "publication_year": 2007
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [29.0, 40.5],
+          [31.0, 40.5],
+          [31.0, 41.0],
+          [29.0, 41.0],
+          [29.0, 40.5]
+        ]]
+      }
+    }
+  ]
+}
