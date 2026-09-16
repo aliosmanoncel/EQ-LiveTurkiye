@@ -1535,8 +1535,13 @@ function renderBvalueTS(evList, Mc) {
 
   const W=660, H=140, PAD_L=40, PAD_B=22, PAD_T=10, PAD_R=14;
   const plotW = W-PAD_L-PAD_R, plotH = H-PAD_T-PAD_B;
-  const now = Date.now();
-  const t0 = now - hours*3600000, t1 = now;
+  // Eksen, nominal secili pencereye (hours) DEGIL, pencerelerin gercek zaman
+  // araligina gore olceklenir -- ornegin Limit'e takilip veri nominal
+  // pencerenin (or. 365 gun) yalnizca kucuk bir kismini dolduruyorsa, eksen
+  // artik bos alan birakip veriyi kenara sikistirmaz (2026-09-16, kullanici
+  // geri bildirimi: "1 aylik veri 1 ay, 10 yillik veri 10 yil gostermeli").
+  let t0 = series[0].t, t1 = series[series.length - 1].t;
+  if (t1 <= t0) t1 = t0 + 1;
   const bs = series.map(s => s.b);
   // Varsayılan görünüm 0.4-1.6 (literatürdeki tipik b aralığı, b=1 küresel referans
   // civarında) — veri veya hata çubukları bu sınırın dışına taşarsa eksen sadece
@@ -1885,8 +1890,14 @@ function renderTimeMag(evList) {
   const W=660, H=200, PAD_L=40, PAD_B=26, PAD_T=14, PAD_R=14;
   const plotW = W-PAD_L-PAD_R, plotH = H-PAD_T-PAD_B;
 
-  const now = Date.now();
-  const t0 = now - hours*3600000, t1 = now;
+  // Eksen, nominal secili pencereye (hours) DEGIL, evList'teki olaylarin
+  // gercek zaman araligina gore olceklenir -- ornegin Limit'e takilip veri
+  // nominal pencerenin (or. 365 gun) yalnizca kucuk bir kismini
+  // dolduruyorsa, eksen artik bos alan birakip veriyi kenara sikistirmaz
+  // (2026-09-16, kullanici geri bildirimi).
+  const evTimes = evList.map(e => e.time.getTime());
+  let t0 = Math.min(...evTimes), t1 = Math.max(...evTimes);
+  if (t1 <= t0) t1 = t0 + 1;
 
   const mags   = evList.map(e => e.mw ?? e.mag);
   const magMax = Math.max(...mags, 3) + 0.5;
