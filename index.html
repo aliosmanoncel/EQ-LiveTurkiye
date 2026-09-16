@@ -846,6 +846,10 @@
       <optgroup label="📍 Regional Relations — Türkiye / KOERI">
         <option value="civgin2019">Çıvgın &amp; Scordilis (2019) — ML → Mw</option>
       </optgroup>
+      <optgroup label="🔀 Dispatch / Birleşik Strateji">
+        <option value="combined_dispatch">Birleşik: Scordilis(2006) mb/Ms + Çıvgın(2019) ML</option>
+        <option value="combined_dispatch_highmag_exclusion">Birleşik (M≥6.0 hariç — duyarlılık testi)</option>
+      </optgroup>
     </select>
     <span id="tmConversionNote" style="color:#666;"></span>
   </div>
@@ -1415,7 +1419,15 @@ const MAG_CONVERSIONS = {
     reference: 'Scordilis, E. M. (2006). Empirical global relations converting Ms and mb to moment magnitude. Journal of Seismology, 10(2), 225–236.',
     // ml/md/mc tipli olaylarda bu bağıntının uygulama alanı yoktur -- makalenin
     // kendisi de genel-geçerli bir ML->Mw bağıntısı önermeyi açıkça reddeder.
-    applicable(e) { return ['mb', 'ms'].includes((e.mtype || '').toLowerCase()); },
+    // Geçerlilik aralığı dışındaki mb/ms olayları da (2026-09-16) uygulanamaz
+    // sayılır -- formülün dışına taşan olay "sessizce" dönüştürülmez, orijinal
+    // büyüklüğüyle (Original magnitude retained) kalır.
+    applicable(e) {
+      const t = (e.mtype || '').toLowerCase(), m = e.mag;
+      if (t === 'mb') return m >= 3.5 && m <= 6.2;
+      if (t === 'ms') return m >= 3.0 && m <= 8.3;
+      return false;
+    },
     convert(e) {
       const t = (e.mtype || '').toLowerCase(), m = e.mag;
       if (t === 'mb') return 0.85 * m + 1.03;
@@ -1427,8 +1439,40 @@ const MAG_CONVERSIONS = {
     inputTypes: ['ml'], outputType: 'Mw',
     validRange: 'ML: 1.7–6.7 (KOERI ağı)',
     reference: 'Çıvgın, B. & Scordilis, E. M. (2019). Investigating the consistency of online earthquake catalogs of Turkey and surroundings. Journal of Seismology, 23(6), 1255–1278. doi:10.1007/s10950-019-09863-w (KOERI’nin resmi ML→Mw bağıntısı, makale içinde alıntılanmıştır.)',
-    applicable(e) { return (e.mtype || '').toLowerCase() === 'ml'; },
+    // Geçerlilik aralığı dışı ML olayları da (2026-09-16, scordilis2006 ile
+    // tutarlılık için) uygulanamaz sayılır -- bkz. yukarıdaki not.
+    applicable(e) {
+      const t = (e.mtype || '').toLowerCase(), m = e.mag;
+      return t === 'ml' && m >= 1.7 && m <= 6.7;
+    },
     convert(e) { return 0.93 * e.mag + 0.29; }
+  },
+  combined_dispatch: {
+    label: 'Birleşik Dispatch: Scordilis(2006) mb/Ms + Çıvgın&Scordilis(2019) ML',
+    scope: 'dispatch', region: 'Türkiye (yalnızca ML kolu için)',
+    inputTypes: ['mb', 'ms', 'ml'], outputType: 'Mw',
+    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3 · ML: 1.7–6.7 (KOERI ağı)',
+    reference: 'Bu tek bir ampirik bağıntı DEĞİLDİR -- bir dispatch stratejisidir: her olay yalnızca kendi mtype alanına göre yukarıdaki iki tekil, ayrı ayrı doğrulanmış bağıntıdan birine yönlendirilir (mb/Ms → Scordilis 2006; ML → Çıvgın & Scordilis 2019). Bu ikisi keyfi bir eşleştirme değildir: Çıvgın & Scordilis (2019, s.1262) kendi ML→Mw regresyonunu türetmeden önce, kendi mb/Ms→Mw homojenizasyon adımı için Lolli ve ark. (2014/2015) ve Zare ve ark. (2014) ile karşılaştırmalı test yapmış ve "these tests" sonrasında doğrudan şunu yazmıştır: "we decided that the conversion formulas of Scordilis (2006)... are the most appropriate for our data set" (Eş. 19-20, tam olarak bizim scordilis2006 kaydımızdaki formüller). Yani bu dispatch, makalenin kendi iç referans-çerçevesiyle birebir tutarlıdır. Kaynak detayları için ilgili tekil kayıtlara bakınız. Büyüklüğü tahmin ederek başka bir dönüşüm zinciri OLUŞTURMAZ.',
+    // mtype tek bir string alan olduğundan (bkz. veri şeması) ve alt-dallar
+    // birbirini dışlayan eşitlik kontrolleri kullandığından, bir olay yapısal
+    // olarak asla iki dala birden düşemez -- çifte sayım riski mimari olarak yoktur.
+    // applicable() KENDİ mantığını tekrarlamaz -- tekil kayıtların applicable()'ına
+    // devreder, böylece geçerlilik-aralığı kontrolü TEK bir yerde tanımlı kalır
+    // (2026-09-16, kullanıcı talebi: aralık dışı olay sessizce dönüştürülmemeli).
+    applicable(e) { return MAG_CONVERSIONS.scordilis2006.applicable(e) || MAG_CONVERSIONS.civgin2019.applicable(e); },
+    convert(e) {
+      const t = (e.mtype || '').toLowerCase();
+      return t === 'ml' ? MAG_CONVERSIONS.civgin2019.convert(e) : MAG_CONVERSIONS.scordilis2006.convert(e);
+    }
+  },
+  combined_dispatch_highmag_exclusion: {
+    label: 'Birleşik Dispatch (M≥6.0 hariç — duyarlılık testi)',
+    scope: 'dispatch', region: 'Türkiye (yalnızca ML kolu için)',
+    inputTypes: ['mb', 'ms', 'ml'], outputType: 'Mw',
+    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3 · ML: 1.7–6.7 (KOERI ağı) · M<6.0',
+    reference: 'combined_dispatch ile AYNI iki bağıntıyı kullanır (Scordilis 2006 + Çıvgın & Scordilis 2019); TEK fark, M≥6.0 olaylarının dönüşüm dışı bırakılmasıdır. Yeni bir ampirik bağıntı DEĞİLDİR -- amaç, yüksek-magnitüdlü kuyruğun (bir kısmı EMSC tarafından hâlâ mb/Ms olarak, moment-tensör Mw yerine raporlanır) Mc/b-değeri/GoF üzerindeki etkisini combined_dispatch ile karşılaştırarak ÖLÇMEKTİR -- "etki yoktur" varsayılmaz, duyarlılık testiyle gösterilir (2026-09-16).',
+    applicable(e) { return MAG_CONVERSIONS.combined_dispatch.applicable(e) && e.mag < 6.0; },
+    convert(e) { return MAG_CONVERSIONS.combined_dispatch.convert(e); }
   }
   // Gelecekte eklenecek adaylar (henüz uygulanmadı, yalnızca kayıt notu):
   // Kadirioğlu & Kartal (2016, Türkiye) ve Tan (2021, Türkiye/ISC) --
@@ -1447,21 +1491,32 @@ function onTmConversionChange() {
 // olaylar için .mw alanı override edilmiş sığ kopyalar üretir; applicable
 // olmayan olaylar hiç kopyalanmadan ORİJİNAL referansıyla geri döner
 // (Original magnitude retained). mode='none' iken hiçbir dönüşüm yapılmaz.
+// highMag: hiçbir bağıntıya özel değildir -- M>=6.0 kuyruğunda kaç olayın
+// dönüştürüldüğüne dair jenerik bir QC/tanı sayacıdır (2026-09-16). "Bu kuyruk
+// Mc/b'yi etkilemez" diye VARSAYILMAZ -- combined_dispatch_highmag_exclusion
+// ile duyarlılık testi yapılıp ÖLÇÜLMESİ için bu sayaç bilgi sağlar.
+const HIGHMAG_QC_THRESHOLD = 6.0;
+
 function applyMagConversionForDisplay(evList, mode) {
   const conv = MAG_CONVERSIONS[mode] || MAG_CONVERSIONS.none;
   if (mode === 'none') {
-    return { list: evList, nApplicable: evList.length, nNotApplicable: 0 };
+    return { list: evList, nApplicable: evList.length, nNotApplicable: 0,
+             highMag: { threshold: HIGHMAG_QC_THRESHOLD, total: 0, converted: 0 } };
   }
-  let nApplicable = 0, nNotApplicable = 0;
+  let nApplicable = 0, nNotApplicable = 0, highMagTotal = 0, highMagConverted = 0;
   const list = evList.map(e => {
+    const isHighMag = (e.mag || 0) >= HIGHMAG_QC_THRESHOLD;
+    if (isHighMag) highMagTotal++;
     if (conv.applicable(e)) {
       nApplicable++;
+      if (isHighMag) highMagConverted++;
       return { ...e, mw: conv.convert(e) };
     }
     nNotApplicable++;
     return e;
   });
-  return { list, nApplicable, nNotApplicable };
+  return { list, nApplicable, nNotApplicable,
+           highMag: { threshold: HIGHMAG_QC_THRESHOLD, total: highMagTotal, converted: highMagConverted } };
 }
 
 // Mc: Maximum Curvature (Wiemer & Wyss 2000) + Woessner & Wiemer (2005) +0.2 düzeltmesi
@@ -1892,11 +1947,15 @@ function renderTimeMag(evList) {
     convNoteEl.textContent = '';
     convNoteEl.title = '';
   } else {
-    const scopeLabel = convEntry.scope === 'global' ? 'Global' : `Regional — ${convEntry.region}`;
+    const scopeLabel = convEntry.scope === 'global' ? 'Global'
+      : convEntry.scope === 'dispatch' ? 'Dispatch (mtype bazlı, tek bağıntı DEĞİL)'
+      : `Regional — ${convEntry.region}`;
     const applyNote = convResult.nNotApplicable > 0
       ? `${convResult.nApplicable} dönüştürüldü, ${convResult.nNotApplicable} olayda uygulanamadı → Original magnitude retained`
       : `${convResult.nApplicable} olayın tümüne uygulandı`;
-    convNoteEl.textContent = `Scope: ${scopeLabel} · Input: ${convEntry.inputTypes.join('/').toUpperCase()} → ${convEntry.outputType} · ${applyNote}`;
+    const hm = convResult.highMag;
+    const highMagNote = hm.total > 0 ? ` · QC: M≥${hm.threshold} kuyruğu ${hm.converted}/${hm.total} dönüştürüldü` : '';
+    convNoteEl.textContent = `Scope: ${scopeLabel} · Input: ${convEntry.inputTypes.join('/').toUpperCase()} → ${convEntry.outputType} · ${applyNote}${highMagNote}`;
     convNoteEl.title = `Valid range: ${convEntry.validRange}\nReference: ${convEntry.reference}`;
   }
 
