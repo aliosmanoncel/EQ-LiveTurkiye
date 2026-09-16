@@ -1624,14 +1624,28 @@ function renderBvalueTS(evList, Mc) {
   let t0 = series[0].t, t1 = series[series.length - 1].t;
   if (t1 <= t0) t1 = t0 + 1;
   const bs = series.map(s => s.b);
-  // Varsayılan görünüm 0.4-1.6 (literatürdeki tipik b aralığı, b=1 küresel referans
-  // civarında) — veri veya hata çubukları bu sınırın dışına taşarsa eksen sadece
-  // gereken kadar genişler, daralmaz (2026-09-13, kullanıcı geri bildirimi).
-  const DEFAULT_B_LO = 0.4, DEFAULT_B_HI = 1.6, B_STEP = 0.25;
-  const dataLo = Math.min(...series.map(s => s.b - (s.err||0)));
-  const dataHi = Math.max(...series.map(s => s.b + (s.err||0)));
-  const bMin = Math.min(DEFAULT_B_LO, dataLo - 0.05);
-  const bMax = Math.max(DEFAULT_B_HI, dataHi + 0.05);
+  // ÖNCEKİ KARARIN GERİ ALINMASI (2026-09-13'te "eksen 0.4-1.6'yı hep
+  // kapsasın, daralmasın" kilitlenmişti): veri gerçekte dar bir bantta
+  // (ör. 0.7-0.9) dalgalanıyorsa, sabit 1.2 birimlik zorunlu pencere
+  // gerçek değişimi yassı gösteriyordu (2026-09-17, kullanıcı geri
+  // bildirimi). Eksen artık VERİNİN kendi aralığına göre ölçekleniyor;
+  // aşırı sıkışmayı (gürültüyü abartmayı) önlemek için yalnızca minimum
+  // bir toplam açıklık (MIN_SPAN=0.20) garanti ediliyor, üst sınır DEĞİL.
+  const B_STEP = 0.25, MIN_SPAN = 0.20;
+  // Eksen yalnızca b DEĞERLERİNİN kendi aralığına göre ölçeklenir (hata
+  // çubukları dahil edilmez -- büyük err'li tek bir pencere whisker'ı
+  // çerçeve kenarını hafifçe aşabilir, bilinen/kabul edilen bir ödün).
+  // Dolgu oransal (aralığın %10'u, en az 0.05); DEFAULT_B_LO/HI (0.4/1.6)
+  // artık bu hesaba hiçbir şekilde müdahale etmez (2026-09-17).
+  const dataLo = Math.min(...bs);
+  const dataHi = Math.max(...bs);
+  const padding = Math.max((dataHi - dataLo) * 0.10, 0.05);
+  let bMin = dataLo - padding, bMax = dataHi + padding;
+  if (bMax - bMin < MIN_SPAN) {
+    const mid = (bMin + bMax) / 2;
+    bMin = mid - MIN_SPAN / 2; bMax = mid + MIN_SPAN / 2;
+  }
+  bMin = Math.max(0, bMin); // b fiziksel olarak negatif olamaz
 
   const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
   const y = b => PAD_T + plotH - ((b-bMin)/(bMax-bMin)) * plotH;
