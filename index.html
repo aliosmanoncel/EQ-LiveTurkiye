@@ -29,8 +29,12 @@
       border-top:2px solid #06b6d4;border-radius:8px 8px 0 0;padding:14px 18px;
       z-index:1001;box-shadow:0 -4px 20px rgba(0,0,0,.5);display:none}
     .tmPanel.open{display:block}
+    .tmPanel.fullscreen{left:10px;right:10px;top:10px;bottom:10px;width:auto;max-width:none;
+      max-height:none;transform:none;overflow-y:auto;z-index:1002}
     .tmPanel .tmHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;cursor:move;user-select:none;touch-action:none}
     .tmPanel .tmTitle{color:#06b6d4;font-weight:700;font-size:.85rem}
+    .tmPanel .tmFullscreenBtn{background:none;border:none;color:#888;cursor:pointer;font-size:1rem;line-height:1;margin-right:8px}
+    .tmPanel .tmFullscreenBtn.active{color:#06b6d4}
     .tmPanel .tmClose{background:none;border:none;color:#888;cursor:pointer;font-size:1rem;line-height:1}
     .tmPanel .tmMeta{color:#666;font-size:.7rem;margin-bottom:6px}
     .tmPanel .tmStats{color:#aaa;font-size:.75rem;text-align:center;margin-top:2px}
@@ -826,7 +830,10 @@
 <div class="tmPanel" id="tmPanel">
   <div class="tmHead">
     <span class="tmTitle">📈 Zaman–Magnitude Dağılımı <span style="color:#666;font-weight:400;">(Time–Magnitude Distribution)</span></span>
-    <button class="tmClose" onclick="toggleTimeMag()">✕</button>
+    <span>
+      <button class="tmFullscreenBtn" id="tmFullscreenBtn" onclick="toggleTimeMagFullscreen(event)" title="Tam ekran aç/kapat — çok sayıda parametre/grafik olduğu için küçük pencerede görülemeyen üst kısmı (Magnitude Conversion seçici dahil) erişilebilir kılar">⛶</button>
+      <button class="tmClose" onclick="toggleTimeMag()">✕</button>
+    </span>
   </div>
   <div class="tmMeta" id="tmMeta">—</div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.72rem;color:#888;margin-bottom:6px;" title="EQ-LiveTürkiye önerilen bir dönüşüm bağıntısı belirlemez — yayımlanmış bağıntılar alternatif analiz seçenekleri olarak sunulur, seçilen bağıntının Mc/b-değeri üzerindeki etkisini görmenizi sağlar. Üretim kataloğu/b-değeri ızgarası bu seçimden ETKİLENMEZ, yalnızca bu panel içi görüntüleme.">
@@ -1724,6 +1731,31 @@ function toggleTimeMag() {
   if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
 }
 
+// Tam ekran toggle -- mevcut sürükleme (initTimeMagDrag) inline left/top/
+// bottom/transform ayarlıyor; fullscreen'e girerken bu inline stil
+// tamamen kaydedilip temizlenir (CSS .fullscreen kuralları devreye
+// girsin diye), çıkarken AYNEN geri yüklenir -- sürükleme/kapatma
+// mantığına dokunulmaz, 2026-09-16.
+let tmFullscreen = false;
+let tmSavedInlineStyle = null;
+function toggleTimeMagFullscreen(evt) {
+  if (evt) evt.stopPropagation(); // tmHead'in sürükleme handler'ını tetiklemesin
+  const panel = document.getElementById('tmPanel');
+  const btn = document.getElementById('tmFullscreenBtn');
+  tmFullscreen = !tmFullscreen;
+  if (tmFullscreen) {
+    tmSavedInlineStyle = panel.getAttribute('style') || '';
+    panel.removeAttribute('style');
+    panel.classList.add('fullscreen');
+  } else {
+    panel.classList.remove('fullscreen');
+    if (tmSavedInlineStyle) panel.setAttribute('style', tmSavedInlineStyle);
+    else panel.removeAttribute('style');
+  }
+  btn.classList.toggle('active', tmFullscreen);
+  btn.title = tmFullscreen ? 'Tam ekrandan çık' : 'Tam ekran aç/kapat — çok sayıda parametre/grafik olduğu için küçük pencerede görülemeyen üst kısmı (Magnitude Conversion seçici dahil) erişilebilir kılar';
+}
+
 // Time-Mag paneli sürüklenebilir — başlık çubuğundan tutulur, ekran sınırları içinde kalır
 (function initTimeMagDrag(){
   const panel = document.getElementById('tmPanel');
@@ -1731,7 +1763,8 @@ function toggleTimeMag() {
   let dragging = false, offX = 0, offY = 0;
 
   head.addEventListener('pointerdown', e => {
-    if (e.target.closest('.tmClose')) return; // kapat butonuna tıklarken sürükleme başlamasın
+    if (e.target.closest('.tmClose') || e.target.closest('.tmFullscreenBtn')) return; // kapat/tam-ekran butonlarına tıklarken sürükleme başlamasın
+    if (tmFullscreen) return; // tam ekrandayken sürükleme devre dışı -- inline stil CSS .fullscreen ile çakışmasın
     dragging = true;
     const r = panel.getBoundingClientRect();
     panel.style.left = r.left + 'px';
