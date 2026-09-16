@@ -863,7 +863,7 @@
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
     <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=10 olay)</span></div>
-    <svg id="tmSvgB" viewBox="0 0 660 140" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
+    <svg id="tmSvgB" viewBox="0 0 660 260" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
   </div>
 
@@ -1593,7 +1593,13 @@ function renderBvalueTS(evList, Mc) {
     return;
   }
 
-  const W=660, H=140, PAD_L=40, PAD_B=22, PAD_T=10, PAD_R=14;
+  // H önceden 140'tı (en-boy ~4.7:1, "banner" gibi basık) -- yayınlanmış
+  // time-varying b-değeri figürlerinin standart, daha dengeli oranına
+  // yaklaştırmak için 260'a çıkarıldı (~2.5:1). Veri/hesaplama/pencereleme
+  // DEĞİŞMEDİ -- polyline zaten ham noktaları birleştiriyor, hiçbir
+  // smoothing/interpolasyon yok; "aşırı düz" görünüm yalnızca sıkışık
+  // dikey ölçekten kaynaklanıyordu (2026-09-16, kullanıcı geri bildirimi).
+  const W=660, H=260, PAD_L=40, PAD_B=22, PAD_T=10, PAD_R=14;
   const plotW = W-PAD_L-PAD_R, plotH = H-PAD_T-PAD_B;
   // Eksen, nominal secili pencereye (hours) DEGIL, pencerelerin gercek zaman
   // araligina gore olceklenir -- ornegin Limit'e takilip veri nominal
