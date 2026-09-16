@@ -173,9 +173,10 @@
   <!-- Zaman Penceresi — EMSC World'deki gibi her zaman üstte görünür (panel kapalıyken bile) -->
   <div style="display:flex;gap:4px;background:rgba(20,20,20,.92);padding:4px;border-radius:8px;border:1px solid #334">
     <button class="tbtn" data-h="1"    data-mag="1.0" title="Son 1 saat · M≥1.0">1s</button>
-    <button class="tbtn active" data-h="24"   data-mag="1.0" title="Son 24 saat · M≥1.0">24s</button>
+    <button class="tbtn" data-h="24"   data-mag="1.0" title="Son 24 saat · M≥1.0">24s</button>
     <button class="tbtn" data-h="168"  data-mag="1.5" title="Son 1 hafta · M≥1.5">1 Hafta</button>
     <button class="tbtn" data-h="720"  data-mag="2.5" title="Son 1 ay · M≥2.5 (API limiti nedeniyle yüksek eşik)">1 Ay</button>
+    <button class="tbtn active" data-h="2160" data-mag="3.0" title="Son 90 gün · M≥3.0 (API limiti nedeniyle yükseltilmiş eşik) — varsayılan">90 Gün</button>
     <button class="tbtn" data-h="8760" data-mag="4.5" title="Son 1 yıl · M≥4.5">1 Yıl</button>
   </div>
   <div style="display:flex;gap:4px;background:rgba(20,20,20,.92);padding:4px;border-radius:8px;border:1px solid #334">
@@ -1201,8 +1202,8 @@ let liveEvents  = [];        // WS ile gelen yeni depremler
 let heatLayer   = null;
 let markLayer   = null;
 let liveMarkers = L.layerGroup().addTo(map);
-let hours       = 24;
-let minMag      = 1.0; // zaman penceresine göre değişir
+let hours       = 2160; // 90 gün -- varsayılan (2026-09-17, "24s" yerine)
+let minMag      = 3.0; // zaman penceresine göre değişir; 90 gün butonuyla eşleşir
 let src         = 'emsc';
 let radius      = 18, blur = 15;
 let cntVal      = REFRESH, cntTimer = null;
