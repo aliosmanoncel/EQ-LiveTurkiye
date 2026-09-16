@@ -268,7 +268,15 @@
   </div>
   <div class="rowbox">
     <label>Mc (elle)</label>
-    <input id="regionMcOverride" type="number" step="0.1" placeholder="auto" onchange="renderRegionInfo()" title="Boş = otomatik (Maximum Curvature). Dolu = bu Mc ile b-değeri hesaplanır (Selected-Mc).">
+    <select id="regionMcOverride" class="src-sel" onchange="renderRegionInfo()" title="Otomatik = Maximum Curvature. Seçili değer = bu Mc ile b-değeri hesaplanır (Selected-Mc).">
+      <option value="" selected>Otomatik</option>
+      <option value="2.5">Mc 2.5</option>
+      <option value="3.0">Mc 3.0</option>
+      <option value="3.5">Mc 3.5</option>
+      <option value="4.0">Mc 4.0</option>
+      <option value="4.5">Mc 4.5</option>
+      <option value="5.0">Mc 5.0</option>
+    </select>
   </div>
   <button class="tbtn" id="btnRegionRefresh" onclick="reapplyRegionQuery()" title="Bölgeyi seçili ayarlarla elle yeniden sorgula">🔄 Yenile</button>
   <button class="tbtn" onclick="exportRegionCSV()" title="Bölgedeki TÜM depremleri (görsel örneklemeden etkilenmeden) CSV olarak indir — mag/mtype orijinal ölçüm, mw dönüştürülmüş değer, ayrı sütunlar">⬇ CSV İndir</button>
