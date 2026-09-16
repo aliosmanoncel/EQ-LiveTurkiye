@@ -219,6 +219,7 @@
   <div class="regionCtrl-body hidden" id="rcBody">
   <button class="tbtn" id="btnRegionSelect" onclick="regionSelectStart()" title="Basılı tutup haritada sürükleyin">🔲 Bölge Seç</button>
   <button class="tbtn" id="btnPolygonSelect" onclick="polygonSelectStart()" title="Haritada nokta nokta tıklayarak çokgen çizin (düzensiz kıyı/kuşak şekilleri için)">🔷 Poligon Seç</button>
+  <button class="tbtn" id="btnMapViewQuery" onclick="mapViewCommitToQuery()" title="Haritanın ŞU ANKİ görünür sınırlarını bölge olarak kullanır ve sorgular — otomatik değildir, pan/zoom'da kendiliğinden güncellenmez, yalnızca bu butona basınca çalışır">🗺️ Bu Görünümde Sorgula</button>
   <div id="polygonDrawCtrl" style="display:none;gap:6px;flex-wrap:wrap">
     <button class="tbtn" style="width:auto;padding:7px 10px;font-size:.78rem" onclick="polygonUndo()" title="Son noktayı sil">↩ Geri Al</button>
     <button class="tbtn" style="width:auto;padding:7px 10px;font-size:.78rem" onclick="polygonFinish()" title="Poligonu kilitle ve sorgula">✓ Bitir</button>
@@ -3590,6 +3591,25 @@ function litRegionRestoreLayers() {
    L.rectangle (bugünkü Marmara verisi), değilse L.polygon + regionIsPolygon
    — ileride düzensiz poligonlu bir çalışma (Öncel & Wilson 2004 vb.)
    eklendiğinde kod değişmeden doğru çalışır. */
+// "🗺️ Bu Görünümde Sorgula" -- litRegionCommitToQuery()'nin basitleştirilmiş
+// hali: geometri her zaman haritanın o anki map.getBounds() dikdörtgenidir,
+// poligon dalı yok. AYNI TEK execution-state garantisini kullanır
+// (regionDeselect() önce çağrılır). KASITLI OLARAK otomatik değildir --
+// pan/zoom map olayına bağlanmaz, yalnızca bu buton tıklanınca çalışır
+// (2026-09-17, kullanıcı talebi: "her pan/zoom'da yeniden hesaplanmasın").
+// regionRect set edildikten sonra mevcut tüm boru hattı (fetchRegionEvents,
+// renderRegionInfo, regionMcOverride, Time-Mag'in usingRegion kontrolü)
+// hiçbir değişiklik gerekmeden bu bölgeyi kullanır.
+function mapViewCommitToQuery() {
+  const bounds = map.getBounds();
+  regionDeselect();
+  regionIsPolygon = false;
+  regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+  fetchRegionEvents(regionRect.getBounds());
+  const btnDecluster = document.getElementById('btnRegionDecluster');
+  if (btnDecluster) btnDecluster.style.display = '';
+}
+
 function litRegionCommitToQuery() {
   if (!litRegionLayer) return;
   const sub = litRegionLayer.getLayers ? litRegionLayer.getLayers()[0] : litRegionLayer;
