@@ -1399,6 +1399,19 @@ let showTimeMag = false;
    değişen tek şey giriş büyüklükleridir, 2026-09-16.
 ─────────────────────────────────────────────────────────────── */
 let mcConversionMode = 'none';
+// Çıvgın & Scordilis (2019)'un kendi başlığı "Turkey and surroundings" --
+// bölgesel bir ML->Mw bağıntısının coğrafi kapsamı, magnitude type/aralık
+// kontrolünden BAĞIMSIZ olarak ayrıca uygulanmalı (RQ-Mag-Applicability,
+// 2026-09-17: Latin Amerika'da bir ML olayının bu bağıntıyla sessizce
+// dönüştürüldüğü canlı testte bulundu). TURKEY_BBOX (yukarıda) EMSC canlı
+// sorgusunun geniş görüş alanı (Avrupa+Orta Asya) içindir, bu iş için
+// KULLANILMAZ -- bu, projenin Python tarafında zaten kullanılan dar
+// TR_BOUNDS (eq_fetch_turkey.py) kutusuyla aynı ölçek/gerekçeye sahiptir.
+const TURKEY_REGIONAL_BBOX = { minLat: 34, maxLat: 43, minLon: 24, maxLon: 47 };
+function inTurkeyRegional(e) {
+  return e.lat >= TURKEY_REGIONAL_BBOX.minLat && e.lat <= TURKEY_REGIONAL_BBOX.maxLat &&
+         e.lon >= TURKEY_REGIONAL_BBOX.minLon && e.lon <= TURKEY_REGIONAL_BBOX.maxLon;
+}
 // Genişletilebilir "Magnitude Relation Bank" kaydı. Yeni bir bağıntı eklemek
 // yalnızca buraya yeni bir anahtar + <select>'e karşılık gelen <option>
 // eklemeyi gerektirir. renderTimeMag() / computeMc() / computeBvalueTimeSeries()
@@ -1440,15 +1453,17 @@ const MAG_CONVERSIONS = {
     }
   },
   civgin2019: {
-    label: 'Çıvgın & Scordilis (2019)', scope: 'regional', region: 'Türkiye',
+    label: 'Çıvgın & Scordilis (2019)', scope: 'regional', region: 'Türkiye ve çevresi',
     inputTypes: ['ml'], outputType: 'Mw',
-    validRange: 'ML: 1.7–6.7 (KOERI ağı)',
-    reference: 'Çıvgın, B. & Scordilis, E. M. (2019). Investigating the consistency of online earthquake catalogs of Turkey and surroundings. Journal of Seismology, 23(6), 1255–1278. doi:10.1007/s10950-019-09863-w (KOERI’nin resmi ML→Mw bağıntısı, makale içinde alıntılanmıştır.)',
+    validRange: 'ML: 1.7–6.7 · Türkiye/çevresi (34–43°K, 24–47°D) dışında uygulanmaz',
+    reference: 'Çıvgın, B. & Scordilis, E. M. (2019). Investigating the consistency of online earthquake catalogs of Turkey and surroundings. Journal of Seismology, 23(6), 1255–1278. doi:10.1007/s10950-019-09863-w (KOERI’nin resmi ML→Mw bağıntısı, makale içinde alıntılanmıştır; bağıntı KOERI ağı için türetilmiştir, dolayısıyla Türkiye/çevresi dışındaki ağlara uygulanabilir olduğu iddia edilmez.)',
     // Geçerlilik aralığı dışı ML olayları da (2026-09-16, scordilis2006 ile
-    // tutarlılık için) uygulanamaz sayılır -- bkz. yukarıdaki not.
+    // tutarlılık için) uygulanamaz sayılır. Coğrafi kapsam kontrolü ayrıca
+    // eklendi (2026-09-17, RQ-Mag-Applicability) -- magnitude type/aralık
+    // uygunluğu, coğrafi uygunluğun YERİNE GEÇMEZ; ikisi de sağlanmalı.
     applicable(e) {
       const t = (e.mtype || '').toLowerCase(), m = e.mag;
-      return t === 'ml' && m >= 1.7 && m <= 6.7;
+      return t === 'ml' && m >= 1.7 && m <= 6.7 && inTurkeyRegional(e);
     },
     convert(e) { return 0.93 * e.mag + 0.29; }
   },
