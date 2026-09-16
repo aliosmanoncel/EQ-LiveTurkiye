@@ -332,6 +332,11 @@
 <div class="eqlist">
   <div class="eqlist-header" onclick="toggleEqList()">
     <span class="title" id="eqlTitle">Haritada: 0</span>
+    <select id="eqlSortSel" onclick="event.stopPropagation()" onchange="onEqlSortChange()" title="Listeyi sırala" style="background:#1a1a2e;color:#aaa;border:1px solid #333;border-radius:4px;font-size:.68rem;padding:1px 2px;max-width:92px">
+      <option value="time_desc" selected>Yeni→Eski</option>
+      <option value="mag_desc">Büyük→Küçük</option>
+      <option value="mag_asc">Küçük→Büyük</option>
+    </select>
     <span class="eqlist-toggle" id="eqlToggle">▼</span>
   </div>
   <div class="eqlist-body hidden" id="eqlBody"></div>
@@ -2543,6 +2548,7 @@ function toggleSection(bodyId, iconId) {
      satıra tıklayınca haritada o depreme uçup popup'ını açar
 ══════════════════════════════════════════ */
 let eqlVisibleList = [];
+let eqlSortMode = 'time_desc'; // 'time_desc' (varsayılan) | 'mag_desc' | 'mag_asc'
 
 function toggleEqList() {
   const body = document.getElementById('eqlBody');
@@ -2624,6 +2630,19 @@ function makeDraggablePanel(panel, header, setWasDragged) {
   });
 })();
 
+// Zaman/eşik filtreleme mantığına (hours, minMag vb.) dokunmaz -- eqMarkerList
+// zaten o mantıkla dolduruluyor; burada yalnızca GÖRÜNTÜLEME sırası değişir.
+function eqlSortComparator(a, b) {
+  if (eqlSortMode === 'mag_desc') return (b.e.mw ?? b.e.mag) - (a.e.mw ?? a.e.mag);
+  if (eqlSortMode === 'mag_asc')  return (a.e.mw ?? a.e.mag) - (b.e.mw ?? b.e.mag);
+  return b.e.time - a.e.time; // 'time_desc' varsayılan
+}
+
+function onEqlSortChange() {
+  eqlSortMode = document.getElementById('eqlSortSel').value;
+  updateEqList();
+}
+
 function updateEqList() {
   const body  = document.getElementById('eqlBody');
   const title = document.getElementById('eqlTitle');
@@ -2631,7 +2650,7 @@ function updateEqList() {
 
   eqlVisibleList = eqMarkerList
     .filter(({e}) => bounds.contains([e.lat, e.lon]))
-    .sort((a,b) => b.e.time - a.e.time);
+    .sort(eqlSortComparator);
 
   title.textContent = `Haritada: ${eqlVisibleList.length}`;
 
