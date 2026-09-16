@@ -829,6 +829,19 @@
     <button class="tmClose" onclick="toggleTimeMag()">✕</button>
   </div>
   <div class="tmMeta" id="tmMeta">—</div>
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.72rem;color:#888;margin-bottom:6px;" title="EQ-LiveTürkiye önerilen bir dönüşüm bağıntısı belirlemez — yayımlanmış bağıntılar alternatif analiz seçenekleri olarak sunulur, seçilen bağıntının Mc/b-değeri üzerindeki etkisini görmenizi sağlar. Üretim kataloğu/b-değeri ızgarası bu seçimden ETKİLENMEZ, yalnızca bu panel içi görüntüleme.">
+    Magnitude Conversion:
+    <select id="tmConversionSel" onchange="onTmConversionChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.85em;padding:1px 4px;">
+      <option value="none" selected>Original / None</option>
+      <optgroup label="🌐 Global Relations">
+        <option value="scordilis2006">Scordilis (2006) — mb/Ms → Mw</option>
+      </optgroup>
+      <optgroup label="📍 Regional Relations — Türkiye / KOERI">
+        <option value="civgin2019">Çıvgın &amp; Scordilis (2019) — ML → Mw</option>
+      </optgroup>
+    </select>
+    <span id="tmConversionNote" style="color:#666;"></span>
+  </div>
   <svg id="tmSvg" viewBox="0 0 660 200" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;height:auto;max-width:660px"></svg>
   <div class="tmStats" id="tmStats">—</div>
 
@@ -1356,6 +1369,94 @@ function renderHeat(evList) {
 ══════════════════════════════════════════ */
 let showTimeMag = false;
 
+/* ── Magnitude Conversion Laboratory ──────────────────────────
+   EQ-LiveTürkiye herhangi bir dönüşüm bağıntısını "önerilen/doğru"
+   olarak belirlemez. Yayımlanmış bağıntılar kullanıcıya alternatif
+   analiz seçenekleri olarak sunulur; seçilen bağıntının Mc ve
+   b-değeri üzerindeki etkisi Time-Mag panelinde şeffaf biçimde
+   gösterilir (reproducible sensitivity analysis).
+   KESİNLİKLE İZOLE: yalnızca bu panelin görüntülediği event
+   kopyalarının .mw alanını değiştirir — e.mag/e.mw, events[],
+   liveEvents[], regionEvents[], to_mw() (Python tarafı) veya
+   b-değeri ızgarası HİÇBİR ŞEKİLDE etkilenmez. Mc yöntemi (MAXC+0.2)
+   ve b-değeri yöntemi (Aki MLE) her seçenekte AYNI kalır — deneyde
+   değişen tek şey giriş büyüklükleridir, 2026-09-16.
+─────────────────────────────────────────────────────────────── */
+let mcConversionMode = 'none';
+// Genişletilebilir "Magnitude Relation Bank" kaydı. Yeni bir bağıntı eklemek
+// yalnızca buraya yeni bir anahtar + <select>'e karşılık gelen <option>
+// eklemeyi gerektirir. renderTimeMag() / computeMc() / computeBvalueTimeSeries()
+// / renderGutenbergRichter() bu kayda göre DEĞİL, yalnızca e.mw'ye göre çalışır
+// -- hiçbiri belirli bir bağıntı adını (ör. "Scordilis") hard-code etmez.
+// Sabit alan şeması: key, label, scope (none|global|regional), region
+// (scope='regional' ise ülke/ağ adı, aksi halde null), inputTypes (kapsadığı
+// mtype listesi), outputType, validRange, reference, applicable(e), convert(e).
+// applicable() ve convert() KASITLI OLARAK ayrı iki adımdır -- uygulanabilirlik
+// kontrolü olmadan hiçbir olay dönüştürülmez, "sessiz yanlış dönüşüm" riski
+// böylece mimari olarak engellenir, 2026-09-16.
+const MAG_CONVERSIONS = {
+  none: {
+    label: 'Original / None', scope: 'none', region: null,
+    inputTypes: null, outputType: null, validRange: null, reference: null,
+    applicable(e) { return true; },
+    convert(e) { return e.mw ?? e.mag; }
+  },
+  scordilis2006: {
+    label: 'Scordilis (2006)', scope: 'global', region: null,
+    inputTypes: ['mb', 'ms'], outputType: 'Mw',
+    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3',
+    reference: 'Scordilis, E. M. (2006). Empirical global relations converting Ms and mb to moment magnitude. Journal of Seismology, 10(2), 225–236.',
+    // ml/md/mc tipli olaylarda bu bağıntının uygulama alanı yoktur -- makalenin
+    // kendisi de genel-geçerli bir ML->Mw bağıntısı önermeyi açıkça reddeder.
+    applicable(e) { return ['mb', 'ms'].includes((e.mtype || '').toLowerCase()); },
+    convert(e) {
+      const t = (e.mtype || '').toLowerCase(), m = e.mag;
+      if (t === 'mb') return 0.85 * m + 1.03;
+      return m <= 6.1 ? 0.646 * m + 2.079 : 0.994 * m + 0.115; // t === 'ms'
+    }
+  },
+  civgin2019: {
+    label: 'Çıvgın & Scordilis (2019)', scope: 'regional', region: 'Türkiye',
+    inputTypes: ['ml'], outputType: 'Mw',
+    validRange: 'ML: 1.7–6.7 (KOERI ağı)',
+    reference: 'Çıvgın, B. & Scordilis, E. M. (2019). Investigating the consistency of online earthquake catalogs of Turkey and surroundings. Journal of Seismology, 23(6), 1255–1278. doi:10.1007/s10950-019-09863-w (KOERI’nin resmi ML→Mw bağıntısı, makale içinde alıntılanmıştır.)',
+    applicable(e) { return (e.mtype || '').toLowerCase() === 'ml'; },
+    convert(e) { return 0.93 * e.mag + 0.29; }
+  }
+  // Gelecekte eklenecek adaylar (henüz uygulanmadı, yalnızca kayıt notu):
+  // Kadirioğlu & Kartal (2016, Türkiye) ve Tan (2021, Türkiye/ISC) --
+  // ML>=2.8-3.3 floor kısıtları nedeniyle önce ayrı bir kapsam-uyarısı
+  // tasarımı gerektiriyor. "Custom / User-defined" (kullanıcının kendi a,b
+  // katsayılarını girebildiği genel doğrusal bağıntı) de mimari olarak bu
+  // registry'ye bir sonraki adayla aynı şekilde eklenebilir, henüz yok.
+};
+
+function onTmConversionChange() {
+  mcConversionMode = document.getElementById('tmConversionSel').value;
+  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+}
+
+// evList'in KENDİSİNİ değiştirmez. Yalnızca applicable(e)==true olan
+// olaylar için .mw alanı override edilmiş sığ kopyalar üretir; applicable
+// olmayan olaylar hiç kopyalanmadan ORİJİNAL referansıyla geri döner
+// (Original magnitude retained). mode='none' iken hiçbir dönüşüm yapılmaz.
+function applyMagConversionForDisplay(evList, mode) {
+  const conv = MAG_CONVERSIONS[mode] || MAG_CONVERSIONS.none;
+  if (mode === 'none') {
+    return { list: evList, nApplicable: evList.length, nNotApplicable: 0 };
+  }
+  let nApplicable = 0, nNotApplicable = 0;
+  const list = evList.map(e => {
+    if (conv.applicable(e)) {
+      nApplicable++;
+      return { ...e, mw: conv.convert(e) };
+    }
+    nNotApplicable++;
+    return e;
+  });
+  return { list, nApplicable, nNotApplicable };
+}
+
 // Mc: Maximum Curvature (Wiemer & Wyss 2000) + Woessner & Wiemer (2005) +0.2 düzeltmesi
 function computeMc(evList) {
   const mags = evList.map(e => e.mw ?? e.mag).filter(m => m > 0);
@@ -1713,6 +1814,26 @@ function renderTimeMag(evList) {
   if (usingRegion) evList = applyGk74Filter(regionEvents);
   const usingHistorical = historicalMode && !usingRegion;
 
+  // Magnitude Conversion Laboratory: evList'in kendisi DEĞİL, yalnızca bu
+  // panelin göstereceği sığ kopyalar dönüştürülür (bkz. applyMagConversionForDisplay
+  // tanımı yukarıda) -- events/liveEvents/regionEvents ve production b-değeri
+  // ızgarası bundan etkilenmez.
+  const convResult = applyMagConversionForDisplay(evList, mcConversionMode);
+  evList = convResult.list;
+  const convEntry = MAG_CONVERSIONS[mcConversionMode];
+  const convNoteEl = document.getElementById('tmConversionNote');
+  if (mcConversionMode === 'none') {
+    convNoteEl.textContent = '';
+    convNoteEl.title = '';
+  } else {
+    const scopeLabel = convEntry.scope === 'global' ? 'Global' : `Regional — ${convEntry.region}`;
+    const applyNote = convResult.nNotApplicable > 0
+      ? `${convResult.nApplicable} dönüştürüldü, ${convResult.nNotApplicable} olayda uygulanamadı → Original magnitude retained`
+      : `${convResult.nApplicable} olayın tümüne uygulandı`;
+    convNoteEl.textContent = `Scope: ${scopeLabel} · Input: ${convEntry.inputTypes.join('/').toUpperCase()} → ${convEntry.outputType} · ${applyNote}`;
+    convNoteEl.title = `Valid range: ${convEntry.validRange}\nReference: ${convEntry.reference}`;
+  }
+
   const srcSel  = document.getElementById('srcSel');
   const srcName = usingRegion ? (regionDeclusterOn ? 'Bölge (GK74)' : 'Bölge') : usingHistorical ? 'Tarihsel Katalog' : (srcSel ? srcSel.value : 'emsc').toUpperCase();
   const winLabel= usingHistorical
@@ -1797,7 +1918,8 @@ function renderTimeMag(evList) {
     ? `${srcName} · ${winLabel} · N=${evList.length}${sampleNote}`
     : `${srcName} · ${winLabel} · M≥${minMag} · N=${evList.length}${sampleNote}`;
   const mMax = Math.max(...mags).toFixed(1);
-  statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>${mcIsManual ? ' (elle)' : ''}`;
+  const convStatsStr = mcConversionMode === 'none' ? '' : ` &nbsp;|&nbsp; Magnitude Conversion: <b>${convEntry.label}</b>`;
+  statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>${mcIsManual ? ' (elle)' : ''}${convStatsStr}`;
 
   renderBvalueTS(evList, Mc);
   renderGutenbergRichter(evList, Mc);
