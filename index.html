@@ -1988,7 +1988,11 @@ function renderTimeMag(evList) {
 
   const mags   = evList.map(e => e.mw ?? e.mag);
   const magMax = Math.max(...mags, 3) + 0.5;
-  const magMin = 0;
+  // Sabit 0 yerine gerçek veri minimumuna göre küçük bir marj bırakılır --
+  // Mc-altı olaylar GİZLENMEZ (0'dan başlatmıyoruz diye Mc'nin altında da
+  // olay olduğu görünür kalır), yalnızca 0..Mmin arasındaki boş/gereksiz
+  // alan sıkıştırılır (2026-09-16, kullanıcı geri bildirimi).
+  const magMin = Math.max(0, Math.min(...mags) - 0.5);
   // Bölge seçiliyken elle girilen Mc (regionMcOverride), computeRegionStatsLine()'daki
   // davranışla tutarlı olsun diye burada da uygulanır — aksi halde bu panel kullanıcının
   // girdiği değeri sessizce yok sayıp kendi otomatik MAXC'sini kullanırdı, 2026-09-13
@@ -2016,7 +2020,7 @@ function renderTimeMag(evList) {
 
   let yTicks = '';
   const step = magMax > 6 ? 2 : 1;
-  for (let m=0; m<=Math.ceil(magMax); m+=step) {
+  for (let m=Math.ceil(magMin); m<=Math.ceil(magMax); m+=step) {
     yTicks += `<text x="${PAD_L-8}" y="${y(m)+3}" fill="#888" font-size="9" text-anchor="end">${m}</text>`;
     yTicks += `<line x1="${PAD_L}" y1="${y(m)}" x2="${W-PAD_R}" y2="${y(m)}" stroke="#2a2a2a" stroke-width="0.5"/>`;
   }
