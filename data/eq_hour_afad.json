@@ -1,1 +1,1 @@
-{"generated":"2026-09-17T12:56:23Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-09-17T17:26:45Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"728864","time":"2026-09-17T16:50:36","lat":38.20667,"lon":27.65583,"dep":10.27,"mag":2.2,"mtype":"ML","mw":1.33,"place":"Bayındır (İzmir)","province":"İzmir","district":"Bayındır"}]}
