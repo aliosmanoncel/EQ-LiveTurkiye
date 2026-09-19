@@ -255,6 +255,13 @@
   </div>
   <div id="regionModeNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ Tarihsel Katalog modunda Limit/Sırala geçersizdir — aralıktaki TÜM depremler gösterilir.</div>
   <div id="regionAfadNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ AFAD: GitHub Action ile saatlik güncellenen önceden çekilmiş katalog — canlı API sorgusu değildir (AFAD sunucusu tarayıcıdan gelen isteği reddediyor), poligon filtresi tarayıcıda uygulanır. "1 Yıl" penceresinde AFAD verisi yok → en geniş pencere olan "1 Ay" kullanılır.</div>
+  <div class="rowbox" id="regionDateRangeRow">
+    <label>Tarih (canlı)</label>
+    <input id="regionDateFrom" type="date" style="width:118px" title="EMSC/USGS canlı sorgusu için başlangıç tarihi. Boş bırakılırsa üstteki zaman penceresi (1s..1Yıl) kullanılır. Uzun aralıklar (ör. 1971-2026) yalnızca burada seçilebilir — üstteki butonlar en fazla 1 yılla sınırlıdır." onchange="reapplyRegionQuery()">
+    <span style="color:#555">–</span>
+    <input id="regionDateTo" type="date" style="width:118px" title="Bitiş tarihi. Boş bırakılırsa şimdiki zaman kullanılır." onchange="reapplyRegionQuery()">
+  </div>
+  <div id="regionDateRangeNote" style="display:none;font-size:.7rem;color:#666;line-height:1.4;width:210px">Yalnızca EMSC/USGS canlı sorgusunda geçerlidir — Tarihsel Katalog ve AFAD kendi tarih aralığını kullanır.</div>
   <div class="rowbox">
     <label>Mw</label>
     <input id="regionMagMin" type="number" step="0.1" placeholder="min" onchange="reapplyRegionQuery()">
@@ -3107,11 +3114,20 @@ async function fetchRegionEventsLive(bounds, provider) {
   const magMax  = document.getElementById('regionMagMax').value;
   const depMin  = document.getElementById('regionDepMin').value;
   const depMax  = document.getElementById('regionDepMax').value;
-  const now = new Date(), s = new Date(now - hours*3600000);
+  // Üstteki zaman butonları (1s..1Yıl, "hours") en fazla 1 yıla kadar çıkar --
+  // uzun aralıklı canlı sorgular (ör. 1971-2026, EarthScope IEB benzeri) için
+  // BAĞIMSIZ bir tarih girişi burada; boşsa eski davranışa (hours) düşer
+  // (2026-09-18, kullanıcı geri bildirimi -- EMSC/USGS'nin kendisi yıllarca
+  // geriye gidebiliyor, darboğaz yalnızca bu UI'daki hours sınırıydı).
+  const dateFromVal = document.getElementById('regionDateFrom')?.value;
+  const dateToVal   = document.getElementById('regionDateTo')?.value;
+  const now = new Date();
+  const s   = dateFromVal ? new Date(dateFromVal + 'T00:00:00') : new Date(now - hours*3600000);
+  const endT = dateToVal ? new Date(dateToVal + 'T23:59:59') : now;
   const fmt = d => d.toISOString().slice(0,19);
   const south = bounds.getSouth().toFixed(3), north = bounds.getNorth().toFixed(3);
   const west  = bounds.getWest().toFixed(3),  east  = bounds.getEast().toFixed(3);
-  const common = `&starttime=${fmt(s)}&endtime=${fmt(now)}`
+  const common = `&starttime=${fmt(s)}&endtime=${fmt(endT)}`
     + `&minmagnitude=${magMin || 0}${magMax ? `&maxmagnitude=${magMax}` : ''}`
     + `${depMin ? `&mindepth=${depMin}` : ''}${depMax ? `&maxdepth=${depMax}` : ''}`
     + `&limit=${limit}&orderby=${orderby}`;
@@ -3152,7 +3168,7 @@ async function fetchRegionEventsLive(bounds, provider) {
     regionCapped = rawCount >= limit; // ham bbox sonucu limite takıldıysa, poligon-sonrası sayı küçük olsa bile uyar
     regionOrderUsed = orderby;
     regionWindowStart = s;
-    regionWindowEnd = now;
+    regionWindowEnd = endT;
     const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
     const shapeLabel = regionIsPolygon ? `poligon (${evs.length}/${rawCount} bbox içinde)` : `${evs.length}`;
     const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` · görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor` : '';
@@ -3694,15 +3710,23 @@ function updateRegionCtrlForMode() {
   const orderRow = document.getElementById('regionOrderRow');
   const note     = document.getElementById('regionModeNote');
   const afadNote = document.getElementById('regionAfadNote');
+  const dateRow  = document.getElementById('regionDateRangeRow');
+  const dateNote = document.getElementById('regionDateRangeNote');
+  const dateFrom = document.getElementById('regionDateFrom');
+  const dateTo   = document.getElementById('regionDateTo');
   const refresh  = document.getElementById('btnRegionRefresh');
   const isAfad   = !historicalMode && regionSource === 'afad';
   // Tarihsel Katalog VE AFAD ikisi de statik/önceden-çekilmiş veri —
-  // Limit/Sırala yalnızca canlı FDSN sorgusunda (EMSC/USGS) anlamlı.
+  // Limit/Sırala/Tarih(canlı) yalnızca canlı FDSN sorgusunda (EMSC/USGS) anlamlı.
   const staticMode = historicalMode || isAfad;
   if (limitSel) limitSel.disabled = staticMode;
   if (orderSel) orderSel.disabled = staticMode;
   if (limitRow) limitRow.classList.toggle('disabledRow', staticMode);
   if (orderRow) orderRow.classList.toggle('disabledRow', staticMode);
+  if (dateFrom) dateFrom.disabled = staticMode;
+  if (dateTo)   dateTo.disabled = staticMode;
+  if (dateRow)  dateRow.classList.toggle('disabledRow', staticMode);
+  if (dateNote) dateNote.style.display = staticMode ? 'block' : 'none';
   if (note) note.style.display = historicalMode ? 'block' : 'none';
   if (afadNote) afadNote.style.display = isAfad ? 'block' : 'none';
   if (refresh) refresh.title = historicalMode
