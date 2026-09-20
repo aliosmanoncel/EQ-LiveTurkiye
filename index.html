@@ -202,6 +202,7 @@
   <button class="tbtn"        id="btnPlates" onclick="toggleLayer('plates')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
   <button class="tbtn"        id="btnGAF"    onclick="toggleLayer('gaf')"    style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
   <button class="tbtn"        id="btnStations" onclick="toggleLayer('stations')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="İstasyon Ağı · AFAD (statik, deprem.afad.gov.tr) + KOERI (gerçek Açılış tarihine göre zaman filtreli, koeri.boun.edu.tr) · RQ-Mc-EMSC Network Effect (seismo-report §8) için keşif/diagnostic katmanı — Mc hesabına veya canlı sorguya bağlı DEĞİLDİR">📡 İstasyon Ağı</button>
+  <button class="tbtn"        id="btnCityNet" onclick="toggleLayer('citynet')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Şehir Tabanlı İzleme · bir metropol alanının kendi yerel sismograf ağı (Türkiye ulusal AFAD/KOERI ağının aksine) · ilk örnek: Hong Kong Observatory 8-istasyon ağı (1979/1997) · konumlar yaklaşık (bkz. popup)">🏙️ Şehir Tabanlı İzleme</button>
   <button class="tbtn active" id="btnLabels" onclick="toggleLayer('labels')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Yer adı / şehir etiketleri katmanı">🏷️ Etiketler</button>
   <div id="stationYearCtrl" class="hidden" style="border-top:1px solid #334;margin-top:2px;padding-top:5px;font-size:.68rem;color:#aaa">
     <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span>KOERI yılı</span><span id="stationYearVal">2026</span></div>
@@ -473,6 +474,39 @@
       </div>
     </div>
 
+    <!-- Hong Kong Tarihsel bölümü — GEO Publication No. 1/2012 Regional Earthquake Catalogue
+         (Table C2, Appendix C). EPICA/SHARE-CET'den KASITLI olarak ayrı: farklı coğrafya,
+         farklı kaynak, farklı yarıçap-referans noktası (HKO, 500km) ve farklı Mw dönüşüm
+         zinciri (EAGP macroseismic I1/I2/N + enstrümantal M) — bkz. data/hongkong_historical.json meta.note. -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgHistHK','lgHistHKT')">
+        🇭🇰 Hong Kong Tarihsel <span class="tog" id="lgHistHKT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgHistHK">
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:4px">Mw · 1067–2005 · Hong Kong'un 500km çevresi (<span id="lgHistHKCount">—</span> deprem)</div>
+        <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:4px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="18" height="18"><circle cx="9" cy="9" r="8" fill="#ff0000" fill-opacity=".85" stroke="#333" stroke-width=".5"/></svg>
+            <span style="font-size:.72rem">Mw ≥ 7.0</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="14" height="14"><circle cx="7" cy="7" r="6" fill="#ff6600" fill-opacity=".85" stroke="#333" stroke-width=".5"/></svg>
+            <span style="font-size:.72rem">Mw 6.0 – 6.9</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4.5" fill="#ffaa00" fill-opacity=".70" stroke="#333" stroke-width=".5"/></svg>
+            <span style="font-size:.72rem">Mw 5.0 – 5.9</span>
+          </div>
+        </div>
+        <div style="color:#666;font-size:.65rem;line-height:1.5">
+          GEO Publication No. 1/2012 · Geotechnical Engineering Office, HKSAR<br>
+          Pappin ve ark. (Arup) + EAGP · Mw≥5.0 · HKO'dan (Tsim Sha Tsui) 500km<br>
+          Mw, EAGP'nin makrosismik (I1/I2/N) veya aletsel (M) verisinden dönüştürülmüş<br>
+          Bu proje taraf bağımsız doğrulama yapmadı (kaynak: Appendix B metodoloji)
+        </div>
+      </div>
+    </div>
+
     <!-- Marmara Tarihsel (Ambraseys 2002) bölümü — EPICA/SHARE-CET katmanından KASITLI olarak
          ayrı tutuldu: farklı büyüklük ölçeği (Ms) ve farklı homojenizasyon yöntemi, 2026-09-12 -->
     <div class="legend-section">
@@ -638,6 +672,21 @@
       </div>
     </div>
 
+    <!-- Şehir Tabanlı İzleme — İstasyon Ağı'ndan AYRI bir kategori: Türkiye'nin ulusal
+         AFAD/KOERI ağı yerine tek bir şehrin/metropol alanının kendi yerel ağını gösterir.
+         Jenerik: data/city_networks.json'a yeni şehir eklemek yeterli, kod değişmez.
+         İlk örnek: Hong Kong Observatory 8-istasyon ağı — konumlar HKO'nun yayınladığı
+         kesin koordinat DEĞİL, yer adının yaklaşık coğrafi konumu (bkz. popup). -->
+    <div class="legend-section">
+      <div class="legend-section-title" onclick="toggleSection('lgCityNet','lgCityNetT')">
+        🏙️ Şehir Tabanlı İzleme <span class="tog" id="lgCityNetT">▼</span>
+      </div>
+      <div class="legend-section-body hidden" id="lgCityNet">
+        <div><span class="fl" style="background:#a855f7;height:8px;border-radius:50%;width:8px"></span>Hong Kong Observatory (<span id="lgCityNetCount">—</span> istasyon)</div>
+        <div style="color:#555;font-size:.65rem;margin-top:4px">Konumlar yaklaşık (OSM/Wikipedia yer adı) · HKO kesin istasyon koordinatı yayınlamıyor · hko.gov.hk</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -706,6 +755,7 @@
     <button class="tbtn preset-btn" data-preset="aegean"  onclick="zoomPreset('aegean')"  title="Ege Bölgesi">EGE</button>
     <button class="tbtn preset-btn" data-preset="daf"     onclick="zoomPreset('daf')"     title="Doğu Anadolu Fayı">DAF</button>
     <button class="tbtn preset-btn" data-preset="kaf"     onclick="zoomPreset('kaf')"     title="Kuzey Anadolu Fayı">KAF</button>
+    <button class="tbtn preset-btn" data-preset="hongkong" onclick="zoomPreset('hongkong')" title="Hong Kong — araştırma bölgesi. Bilinen en güncel/resmi sismik kaynak-bölge modeli: Pappin ve ark. (2015) 20 kaynak-bölgesi, GEO/HKIE'nin (r1175.pdf) onayladığı güncel PSHA temeli. Bu buton yalnızca basit bir zoom/bbox kısayoludur — 20 bölgenin poligon sınırları makalenin Figure 3-4'ünde yalnızca görsel olarak mevcut, sayısal koordinat yayınlanmamış; burada dijitalleştirilmedi (kaynak: Referans-Kitaplar/Hong-Kong). Gerçek b-değeri/Mc analizi için 🔲 Bölge Seç veya 📚 Araştırma Bölgesi panelindeki canlı EMSC/USGS sorgusu kullanılabilir.">HK</button>
   </div>
 
   <div class="sep"></div>
@@ -761,6 +811,7 @@
     <button class="tbtn tr-only"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
     <button class="tbtn tr-only"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 (Batı) + SHARE-CET (Doğu) Tarihsel Deprem Kataloğu · M≥4 · 1003-1899 · Rovida & Antonucci (2021) INGV + emidius.eu/SHEEC">Tarihsel</button>
     <button class="tbtn tr-only"        id="btnAmbraseys" onclick="toggleLayer('ambraseys')" title="Marmara Tarihsel · Ambraseys 2002 · Table 1 — Ms ≥ 6.8, 32–1999; kaynak büyüklüğü Ms olarak korunmuştur">Marmara Tarihsel · Ambraseys 2002</button>
+    <button class="tbtn"                id="btnHistHK" onclick="toggleLayer('histhk')"  title="Hong Kong Tarihsel · GEO Publication No. 1/2012 (Geotechnical Engineering Office) Regional Earthquake Catalogue · Mw≥5.0 · 500km yarıçap (HKO, Tsim Sha Tsui) · 1067-2005 · EAGP verisi, bağımsız doğrulanmadı">🇭🇰 HK Tarihsel</button>
     <button class="tbtn tr-only"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
     <button class="tbtn tr-only"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Asperite triyajı · Kırmızı=stres odağı">b-Adaptif</button>
     <button class="tbtn tr-only active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
@@ -3810,6 +3861,9 @@ let showEuHaz   = false;
 let histLayer   = null;
 let showHist    = false;
 let histData    = null;
+let histHKLayer = null;
+let showHistHK  = false;
+let histHKData  = null;
 let ambraseysLayer     = null;
 let showAmbraseys      = false;
 let ambraseysData      = null;
@@ -3851,6 +3905,14 @@ let showStations       = false;
 let afadStationsData   = null;
 let koeriStationsData  = null;
 let stationYear        = 2026;
+
+// Şehir Tabanlı İzleme — İstasyon Ağı'nın jenerik genişletmesi, bkz. yukarıdaki legend notu.
+// data/city_networks.json'daki HER şehir tek bir katman olarak çizilir (tek şehir bile olsa
+// generic map/reduce — yeni şehir eklendiğinde kod değişmeden büyür).
+let cityNetLayer = null;
+let showCityNet  = false;
+let cityNetData  = null;
+
 let testimonyLayer = null;
 let showTestimony  = false;
 
@@ -3959,6 +4021,36 @@ function renderHistLayer() {
   histLayer = L.layerGroup(markers).addTo(map);
 }
 
+/* Hong Kong Tarihsel — data/hongkong_historical.json (GEO Pub. No. 1/2012, Table C2).
+   EPICA/SHARE-CET katmanından TAMAMEN AYRI veri/render — coğrafyası, kaynağı ve Mw dönüşüm
+   zinciri farklı, iki katman asla karıştırılmaz. */
+function renderHistHKLayer() {
+  if (histHKLayer) { map.removeLayer(histHKLayer); histHKLayer = null; }
+  if (!histHKData || !showHistHK) return;
+  const markers = [];
+  histHKData.events.forEach(e => {
+    const r = Math.max(3, Math.min(18, (e.mw - 4) * 4 + 3));
+    const opacity = e.mw >= 6 ? 0.85 : e.mw >= 5 ? 0.70 : 0.50;
+    const col = e.mw >= 7 ? '#ff0000' : e.mw >= 6 ? '#ff6600' : '#ffaa00';
+    const c = L.circleMarker([e.lat, e.lon], {
+      radius: r, color: '#333', weight: 0.5,
+      fillColor: col, fillOpacity: opacity,
+      pane: 'overlayPane',
+    });
+    const dateLabel = [e.year, e.month, e.day].filter(v => v != null).join('-');
+    c.bindTooltip(
+      `<b>${e.location || '—'}</b><br>Mw ${e.mw}${e.ms != null ? ' (Ms ' + e.ms + ')' : ''} · ${dateLabel}`
+      + `${e.intensity ? '<br>Şiddet: ' + e.intensity : ''}<br>`
+      + `<span style="color:#aaa;font-size:.75em">GEO Pub. 1/2012 · yöntem: ${e.method || '—'}${e.depth_km != null ? ' · derinlik ' + e.depth_km + 'km' : ''}</span>`,
+      { sticky: true, className: 'eq-tip' }
+    );
+    markers.push(c);
+  });
+  histHKLayer = L.layerGroup(markers).addTo(map);
+  const lgC = document.getElementById('lgHistHKCount');
+  if (lgC) lgC.textContent = histHKData.events.length;
+}
+
 /* Marmara Tarihsel (Ambraseys 2002) — data/marmara_historical_ambraseys_2002.json
    Her Ambraseys olayı KENDİ tek marker'ı olarak çizilir (55 marker toplam); ikinci,
    bağımsız bir "eq_historical" marker'ı ASLA burada oluşturulmaz. canonical_event_id
@@ -4065,6 +4157,36 @@ function renderKoeriForYear(year) {
   if (showStations) koeriStationsLayer.addTo(map);
   const lgK = document.getElementById('lgKoeriCount');
   if (lgK) lgK.textContent = active.length + ' / ' + koeriStationsData.count;
+}
+
+// Şehir Tabanlı İzleme — data/city_networks.json jenerik olarak okunur, her şehir
+// kendi popup'ında provenance (source_url + source_note) taşır. İstasyon Ağı'nın
+// (AFAD/KOERI) aksine bu katman Türkiye ulusal ağı DEĞİL, tek bir metropol alanının
+// yerel ağı — bilinçli olarak ayrı renk (mor) ve ayrı legend bölümü kullanıyor.
+function loadCityNetLayer() {
+  if (cityNetLayer) { if (showCityNet) cityNetLayer.addTo(map); return; }
+  fetch('data/city_networks.json').then(r => r.json()).then(d => {
+    cityNetData = d;
+    const markers = [];
+    let total = 0;
+    d.cities.forEach(city => {
+      total += city.stations.length;
+      city.stations.forEach(s => {
+        markers.push(L.circleMarker([s.lat, s.lon], {
+          radius: 4, color: '#a855f7', weight: 1, fillColor: '#a855f7', fillOpacity: 0.75
+        }).bindPopup(
+          `<b style="color:#a855f7">${s.name}</b><br>${city.name} (${city.authority})<br>`
+          + `<span style="color:#aaa;font-size:.75em">Kuruluş: ${city.established} · Yükseltme: ${city.upgraded} · ${s.components}</span><br>`
+          + `<span style="color:#888;font-size:.7em">Konum yaklaşık — kaynak: ${s.geocode_source}${s.note ? ' · ' + s.note : ''}</span><br>`
+          + `<a href="${city.source_url}" target="_blank" rel="noopener" style="color:#a855f7;font-size:.7em">${city.source_url}</a>`
+        ));
+      });
+    });
+    cityNetLayer = L.layerGroup(markers);
+    if (showCityNet) cityNetLayer.addTo(map);
+    const lgC = document.getElementById('lgCityNetCount');
+    if (lgC) lgC.textContent = total;
+  }).catch(e => setStatus('Şehir Tabanlı İzleme yüklenemedi: ' + e.message));
 }
 
 function loadHazardLayer() {
@@ -4283,6 +4405,17 @@ function toggleLayer(type) {
       if (afadStationsLayer)  map.removeLayer(afadStationsLayer);
       if (koeriStationsLayer) map.removeLayer(koeriStationsLayer);
     }
+  } else if (type === 'citynet') {
+    showCityNet = !showCityNet;
+    document.getElementById('btnCityNet').classList.toggle('active', showCityNet);
+    const lgC = document.getElementById('lgCityNet');
+    if (lgC) { if (showCityNet) lgC.classList.remove('hidden'); else lgC.classList.add('hidden'); }
+    if (showCityNet) {
+      loadCityNetLayer();
+      setStatus('Şehir Tabanlı İzleme · Hong Kong Observatory 8-istasyon ağı (yaklaşık konumlar)');
+    } else if (cityNetLayer) {
+      map.removeLayer(cityNetLayer);
+    }
   } else if (type === 'testimony') {
     showTestimony = !showTestimony;
     document.getElementById('btnTestimony').classList.toggle('active', showTestimony);
@@ -4315,6 +4448,26 @@ function toggleLayer(type) {
       setStatus('Tarihsel Depremler · EPICA v1.1 (Batı) + SHARE-CET (Doğu) · M≥4 · 1003–1899');
     } else {
       if (histLayer) { map.removeLayer(histLayer); histLayer = null; }
+    }
+  } else if (type === 'histhk') {
+    showHistHK = !showHistHK;
+    document.getElementById('btnHistHK').classList.toggle('active', showHistHK);
+    const lgHK = document.getElementById('lgHistHK');
+    if (lgHK) { if (showHistHK) lgHK.classList.remove('hidden'); else lgHK.classList.add('hidden'); }
+    if (showHistHK) {
+      if (!histHKData) {
+        fetch('data/hongkong_historical.json')
+          .then(r => r.json())
+          .then(d => {
+            histHKData = d;
+            renderHistHKLayer();
+          });
+      } else {
+        renderHistHKLayer();
+      }
+      setStatus('Hong Kong Tarihsel · GEO Pub. 1/2012 · Mw≥5.0 · 500km · 1067–2005');
+    } else {
+      if (histHKLayer) { map.removeLayer(histHKLayer); histHKLayer = null; }
     }
   } else if (type === 'ambraseys') {
     showAmbraseys = !showAmbraseys;
@@ -5150,6 +5303,7 @@ const PRESETS = {
   aegean:  { lat:38,    lon:26,   zoom:7, r:10,  label:'Ege',     focus:'Aegean — Extensional Tectonics'              },
   daf:     { lat:37.5,  lon:37.5, zoom:7, r:10,  label:'DAF',     focus:'East Anatolian Fault — 2023 M7.8 Sequence'   },
   kaf:     { lat:40.0,  lon:32.0, zoom:7, r:10,  label:'KAF',     focus:'North Anatolian Fault — 1939 Erzincan M7.9'  },
+  hongkong:{ lat:22.35, lon:114.15,zoom:10,r:10,  label:'Hong Kong', focus:'Hong Kong — Pappin et al. (2015) 20-Source-Zone Model (GEO/HKIE)' },
 };
 
 let activePreset = null;

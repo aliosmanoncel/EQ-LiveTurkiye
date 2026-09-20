@@ -1,0 +1,28 @@
+{
+  "concept": "Şehir Tabanlı İzleme — İstasyon Ağı katmanının genişletilmiş bir kategorisi. Türkiye'nin ulusal AFAD/KOERI ağının aksine, bir şehrin/metropol alanının kendi yoğun yerel sismograf ağını gösterir. Yeni şehir eklemek için bu dosyaya yeni bir obje eklemek yeterli — index.html'deki kod jeneriktir.",
+  "cities": [
+    {
+      "id": "hongkong",
+      "name": "Hong Kong Kısa-Periyot Sismograf Ağı",
+      "name_en": "Hong Kong Short-period Seismograph Network",
+      "authority": "Hong Kong Observatory (HKO)",
+      "established": 1979,
+      "upgraded": 1997,
+      "upgraded_note": "1979'da 3 istasyonla kuruldu, 1997'de 7-8 istasyonluk dijital ağa yükseltildi (HKO'nun kendi sayfaları istasyon sayısını 7 veya 8 olarak farklı veriyor — bkz. source_note).",
+      "source_url": "https://www.hko.gov.hk/en/wservice/tsheet/seismo.htm",
+      "source_url_alt": "https://www.weather.gov.hk/en/gts/equake/sp_seismo_network_intro.htm",
+      "source_note": "HKO'nun ana tanıtım sayfası (seismo.htm) 8 istasyon sayıyor (Siu Lam dahil); HKO'nun ayrı 'Short-period Seismograph Network' sayfası 7 istasyon sayıyor (Siu Lam hariç). İkisi de kesin koordinat yayınlamıyor, yalnızca bir harita figürü (Figure 1) gösteriyor. Aşağıdaki koordinatlar HKO'nun yayınladığı resmi istasyon koordinatları DEĞİLDİR — yer adının OpenStreetMap/Wikipedia üzerindeki yaklaşık coğrafi konumudur (kaynak: 'geocode_source' alanı). Konum işaretçileri bu nedenle YAKLAŞIKTIR, kesin sismometre koordinatı olarak kullanılmamalıdır.",
+      "stations": [
+        { "name": "Cape D'Aguilar",  "lat": 22.2047,   "lon": 114.2563,  "components": "vertical", "geocode_source": "latitude.to gazetteer" },
+        { "name": "Cheung Chau",     "lat": 22.2106,   "lon": 114.0289,  "components": "vertical", "geocode_source": "Wikipedia (Cheung Chau)" },
+        { "name": "Keung Shan",      "lat": 22.2320,   "lon": 113.8813,  "components": "vertical", "geocode_source": "Wikipedia (Keung Shan)" },
+        { "name": "Lead Mine Pass",  "lat": 22.4125,   "lon": 114.1580,  "components": "vertical", "geocode_source": "Wikipedia (Lead Mine Pass)", "note": "Borehole seismometer, 24m derinlik (HKO)" },
+        { "name": "Luk Keng",        "lat": 22.5256,   "lon": 114.2153,  "components": "vertical", "geocode_source": "Wikipedia (Luk Keng, North District)" },
+        { "name": "Siu Lam",         "lat": 22.3687,   "lon": 114.0116,  "components": "vertical", "geocode_source": "Wikipedia (Siu Lam)", "note": "Yalnızca ana sayfada (seismo.htm) listeleniyor; HKO'nun ayrı ağ sayfasında yok — bkz. source_note" },
+        { "name": "Tsim Bei Tsui",   "lat": 22.4850,   "lon": 114.0100,  "components": "3-component", "geocode_source": "Wikipedia (Tsim Bei Tsui)" },
+        { "name": "Yuen Ng Fan",     "lat": 22.3779,   "lon": 114.3372,  "components": "3-component", "geocode_source": "OpenStreetMap Nominatim (Sai Kung District)" }
+      ],
+      "count": 8
+    }
+  ]
+}
