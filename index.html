@@ -308,6 +308,14 @@
     <span class="regionCtrl-toggle" id="lrcToggle">▼</span>
   </div>
   <div class="regionCtrl-body hidden" id="lrcBody">
+  <div class="rowbox" id="litRegionModeRow">
+    <label>Şekil</label>
+    <div style="display:flex;gap:4px">
+      <button class="tbtn active" id="btnLitModePolygon" onclick="setLitRegionMode('polygon')" style="width:auto;padding:5px 10px;font-size:.75rem">Poligon</button>
+      <button class="tbtn" id="btnLitModeCircle" onclick="setLitRegionMode('circle')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Merkez + yarıçap (USGS Earthquake Catalog'un Geographic Region → Circle mantığıyla aynı: distance(event, center) ≤ R). Bir kaynak zonu tanımı DEĞİLDİR, sadece araştırma alanı sorgusudur.">Circle</button>
+    </div>
+  </div>
+  <div id="litRegionPolygonUI">
   <div class="rowbox">
     <label>Çalışma</label>
     <select id="litRegionGroupSel" class="src-sel" onchange="onLitRegionGroupChange()">
@@ -328,6 +336,23 @@
     <select id="litRegionZoneSel" class="src-sel" onchange="onLitRegionZoneChange()">
       <option value="">—</option>
     </select>
+  </div>
+  </div>
+  <div id="litRegionCircleUI" style="display:none">
+    <div class="rowbox">
+      <label>Merkez Enlemi</label>
+      <input type="number" id="litCircleLat" step="0.0001" placeholder="22.3000" style="width:90px">
+    </div>
+    <div class="rowbox">
+      <label>Merkez Boylamı</label>
+      <input type="number" id="litCircleLon" step="0.0001" placeholder="114.1670" style="width:90px">
+    </div>
+    <div class="rowbox">
+      <label>Yarıçap (km)</label>
+      <input type="number" id="litCircleRadius" step="1" placeholder="500" style="width:90px">
+    </div>
+    <button class="tbtn" id="btnLitCirclePick" onclick="litCirclePickStart()" title="Haritada tıklayın — merkez lat/lon otomatik dolar ve daire çizilir">📍 Haritadan Merkez Seç</button>
+    <button class="tbtn" id="btnLitCircleDraw" onclick="drawLitRegionCircle()" style="background:#3b0764;border-color:#a855f7">⭕ Daireyi Çiz</button>
   </div>
   <button class="tbtn" id="btnLitRegionClear" onclick="litRegionClear()" style="display:none">✕ Araştırma Bölgesini Kaldır</button>
   <div id="litRegionInfo" style="display:none;font-size:.72rem;color:#ccc;line-height:1.5;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;width:260px"></div>
@@ -2848,6 +2873,12 @@ let regionOrderUsed = 'time';
 let regionWindowStart = null, regionWindowEnd = null;
 let regionIsPolygon = false; // true ise regionRect aslında bir L.Polygon — fetchRegionEvents ek point-in-polygon filtresi uygular
 let regionSource = 'emsc';   // 'emsc' | 'usgs' | 'afad' — Bölge Analizi'nin KENDİ kaynak seçimi, üstteki genel Kaynak (srcSel/src) ile bağımsız (bkz. DATA FLOW NOTE)
+// Circle bölge modu — regionIsPolygon'a PARALEL, birbirini dışlayan bir bayrak (ikisi aynı anda true olmaz).
+// USGS Earthquake Catalog'un "Geographic Region → Circle" (center lat/lon + maxradiuskm) mantığıyla
+// aynı: distance(event, center) ≤ R. Circle bir KAYNAK ZONU değildir, sadece araştırma alanı sorgusudur.
+let regionIsCircle = false;        // true ise regionRect bir L.Circle — fetchRegionEvents ek point-in-circle filtresi uygular
+let regionCircleCenter = null;     // { lat, lon } — regionIsCircle true iken dolu
+let regionCircleRadiusKm = null;   // km — regionIsCircle true iken dolu
 
 /* GK74 (Gardner-Knopoff 1974) declustering — YALNIZCA Araştırma Bölgesi
    panelinde, sadece data/eq_historical_dc.json'da id eşleşmesi bulunan
@@ -2901,7 +2932,14 @@ function applyGk74Filter(evList) {
    Mc/b sonucu istatistiksel olarak GÜVENİLMEZ; elle Mc girmek bu sorunu
    çözmez (asıl problem eksik veri, Mc tahmini değil), o yüzden bu durumda
    hesaplama tamamen engellenir. */
-function computeRegionStatsLine(evs, orderby, capped) {
+// areaKm2 (opsiyonel, 4. parametre): verilirse Pappin ve ark. (2015, Table 1)
+// ile AYNI formülle bir "Aktivite Yoğunluğu" (N(M≥Mc) yıllık oranı / alan × 10⁶)
+// satırı eklenir — o makalenin Figure 6 eğrileri alan-normalize DEĞİLDİR (y-ekseni
+// düz "Annual frequency"), alan normalizasyonu sadece Table 1'in "Density (per
+// 10^6 km²)" sütununda ayrıca yapılmıştır. Şu an yalnızca Circle modunda
+// çağrılır çünkü alan (π·R²) orada kesin/basit; poligon için jeodezik alan
+// hesabı henüz yok, o yüzden areaKm2 poligon modunda hiç geçirilmez.
+function computeRegionStatsLine(evs, orderby, capped, areaKm2) {
   if (orderby === 'magnitude') {
     return `Mc/b: hesaplanmadı — "En büyük" sıralamasında örneklem yanlı (Mc'yi elle girmek bunu düzeltmez; "En yeni" sıralamasına geçin)`;
   }
@@ -2926,6 +2964,14 @@ function computeRegionStatsLine(evs, orderby, capped) {
   const bErr = b !== null ? bConfidence95(b, nAbove) : null;
   const bLabel = b !== null ? `${b.toFixed(2)}${bErr !== null ? ` ± ${bErr.toFixed(2)}` : ''}` : '—';
   let line = `${mcLabel} · b = <b>${bLabel}</b>${bErr !== null ? ' <span style="color:#888;font-size:.85em">(%95)</span>' : ''} · N(M≥Mc) = ${nAbove}`;
+  if (areaKm2 && regionWindowStart && regionWindowEnd) {
+    const years = (regionWindowEnd - regionWindowStart) / (365.25*24*3600*1000);
+    if (years > 0) {
+      const annualRate = nAbove / years;
+      const density = annualRate / areaKm2 * 1e6; // Pappin ve ark. (2015) Table 1 ile aynı formül
+      line += ` · Aktivite Yoğunluğu = <b>${density.toFixed(2)}</b>/10⁶km²/yıl`;
+    }
+  }
   if (capped) line += ` <span style="color:#f59e0b">⚠ limite takıldı, Mc/b düşük olabilir</span>`;
   return line;
 }
@@ -2969,11 +3015,13 @@ function renderRegionInfo() {
   }
   line += `<br>Bölge: ${bounds.getSouth().toFixed(2)},${bounds.getWest().toFixed(2)} – ${bounds.getNorth().toFixed(2)},${bounds.getEast().toFixed(2)}`;
   if (regionIsPolygon) line += ` (poligon, ${regionRect.getLatLngs()[0].length} köşe — sınırlar kapsayan dikdörtgen)`;
+  if (regionIsCircle && regionCircleCenter) line += ` (daire, merkez ${regionCircleCenter.lat.toFixed(3)},${regionCircleCenter.lon.toFixed(3)}, R=${regionCircleRadiusKm}km — sınırlar kapsayan dikdörtgen)`;
   const statsEvs = applyGk74Filter(regionEvents);
   if (regionDeclusterOn) {
     line += `<br><span style="color:#f472b6">🔻 N=${regionEvents.length} (ham) → N=${statsEvs.length} (GK74)</span>`;
   }
-  line += `<br>${computeRegionStatsLine(statsEvs, regionOrderUsed, regionCapped)}`;
+  const circleAreaKm2 = (regionIsCircle && regionCircleRadiusKm) ? Math.PI * regionCircleRadiusKm * regionCircleRadiusKm : null;
+  line += `<br>${computeRegionStatsLine(statsEvs, regionOrderUsed, regionCapped, circleAreaKm2)}`;
   info.innerHTML = line;
 }
 
@@ -3072,6 +3120,12 @@ function pointInPolygon(lat, lon, latlngs) {
   return inside;
 }
 
+// Circle bölge testi — haversineKm() (aşağıda tanımlı, function hoisting ile burada da erişilebilir)
+// merkeze olan great-circle mesafesini hesaplar; USGS'in latitude+longitude+maxradiuskm modeliyle aynı mantık.
+function pointInCircle(lat, lon, centerLat, centerLon, radiusKm) {
+  return haversineKm(centerLat, centerLon, lat, lon) <= radiusKm;
+}
+
 function regionMouseDown(ev) {
   if (!regionActive) return;
   regionStart = ev.latlng;
@@ -3112,13 +3166,15 @@ async function fetchRegionEventsFromHistorical(bounds) {
   const depMin = document.getElementById('regionDepMin').value;
   const depMax = document.getElementById('regionDepMax').value;
   const poly = regionIsPolygon && regionRect ? regionRect.getLatLngs()[0] : null;
+  const circleActive = regionIsCircle && regionCircleCenter;
 
   let evs = events.filter(e =>
     e.lat >= bounds.getSouth() && e.lat <= bounds.getNorth() &&
     e.lon >= bounds.getWest()  && e.lon <= bounds.getEast() &&
     (!magMin || (e.mw??e.mag) >= +magMin) && (!magMax || (e.mw??e.mag) <= +magMax) &&
     (!depMin || e.dep >= +depMin) && (!depMax || e.dep <= +depMax) &&
-    (!poly || pointInPolygon(e.lat, e.lon, poly))
+    (!poly || pointInPolygon(e.lat, e.lon, poly)) &&
+    (!circleActive || pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm))
   );
 
   regionEvents = evs; // TAM küme — limit/cap yok, Mc/b tüm yüzyılı yansıtır
@@ -3178,6 +3234,7 @@ async function fetchRegionEventsFromHKLocal(bounds) {
   const depMin = document.getElementById('regionDepMin').value;
   const depMax = document.getElementById('regionDepMax').value;
   const poly = regionIsPolygon && regionRect ? regionRect.getLatLngs()[0] : null;
+  const circleActive = regionIsCircle && regionCircleCenter;
   try {
     if (!hkLocalCache) {
       const res = await fetchTimeout('data/hongkong_local_catalog.json', {}, 10000);
@@ -3193,7 +3250,8 @@ async function fetchRegionEventsFromHKLocal(bounds) {
       e.lon >= bounds.getWest()  && e.lon <= bounds.getEast() &&
       (!magMin || e.mag >= +magMin) && (!magMax || e.mag <= +magMax) &&
       (!depMin || (e.dep!=null && e.dep >= +depMin)) && (!depMax || (e.dep!=null && e.dep <= +depMax)) &&
-      (!poly || pointInPolygon(e.lat, e.lon, poly))
+      (!poly || pointInPolygon(e.lat, e.lon, poly)) &&
+      (!circleActive || pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm))
     );
     regionEvents = evs; // TAM küme — limit/cap yok, Mc/b tüm katalog aralığını yansıtır
     if (regionLayer) map.removeLayer(regionLayer);
@@ -3262,6 +3320,9 @@ async function fetchRegionEventsLive(bounds, provider) {
       const poly = regionRect.getLatLngs()[0];
       evs = evs.filter(e => pointInPolygon(e.lat, e.lon, poly));
     }
+    if (regionIsCircle && regionCircleCenter) {
+      evs = evs.filter(e => pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm));
+    }
     regionEvents = evs; // bölge-özel Mc/b istatistiği HER ZAMAN tam evs üzerinden — örnekleme sadece aşağıdaki çizimi etkiler
     if (regionLayer) map.removeLayer(regionLayer);
     regionLayer = L.layerGroup();
@@ -3288,7 +3349,7 @@ async function fetchRegionEventsLive(bounds, provider) {
     regionWindowStart = s;
     regionWindowEnd = endT;
     const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
-    const shapeLabel = regionIsPolygon ? `poligon (${evs.length}/${rawCount} bbox içinde)` : `${evs.length}`;
+    const shapeLabel = regionIsPolygon ? `poligon (${evs.length}/${rawCount} bbox içinde)` : regionIsCircle ? `daire (${evs.length}/${rawCount} bbox içinde)` : `${evs.length}`;
     const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` · görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor` : '';
     const limitNote = limit >= 20000 ? `· ${providerLabel} üst sınırı, artırılamaz` : '· limiti artırabilirsiniz';
     setStatus(regionCapped
@@ -3337,6 +3398,9 @@ async function fetchRegionEventsFromAfad(bounds) {
       const poly = regionRect.getLatLngs()[0];
       evs = evs.filter(e => pointInPolygon(e.lat, e.lon, poly));
     }
+    if (regionIsCircle && regionCircleCenter) {
+      evs = evs.filter(e => pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm));
+    }
     regionEvents = evs; // statik dosya zaten AFAD'ın kendi minmag eşiğiyle sınırlı — ek limit/örnekleme yanlılığı yok
     if (regionLayer) map.removeLayer(regionLayer);
     regionLayer = L.layerGroup();
@@ -3357,7 +3421,7 @@ async function fetchRegionEventsFromAfad(bounds) {
     const genTime = json.generated ? new Date(json.generated) : new Date();
     regionWindowStart = new Date(genTime.getTime() - afadHours*3600000);
     regionWindowEnd = genTime;
-    const shapeLabel = regionIsPolygon ? `poligon (${evs.length} eşleşen)` : `${evs.length}`;
+    const shapeLabel = regionIsPolygon ? `poligon (${evs.length} eşleşen)` : regionIsCircle ? `daire (${evs.length} eşleşen)` : `${evs.length}`;
     const clampNote = clamped ? ` · ⚠ AFAD'da 1 yıllık veri yok, ${HOURS_LABEL[afadHours]} penceresi gösteriliyor` : '';
     setStatus(`Bölgede ${shapeLabel} deprem (AFAD, önceden çekilmiş — saatlik güncellenir)${clampNote}`);
     renderRegionInfo();
@@ -3519,6 +3583,9 @@ function regionDeselect() {
   regionEvents = [];
   regionCapped = false;
   regionIsPolygon = false;
+  regionIsCircle = false;
+  regionCircleCenter = null;
+  regionCircleRadiusKm = null;
   regionWindowStart = regionWindowEnd = null;
   document.getElementById('btnRegionSelect').classList.remove('active');
   document.getElementById('regionMcOverride').value = '';
@@ -3576,7 +3643,67 @@ const LIT_REGION_SOURCES = {
   }
 };
 let litRegionCache = {};   // { [key]: geojson } — sekme açıkken tekrar indirmeye gerek yok
-let litRegionLayer = null; // L.Rectangle — seçili araştırma bölgesi (regionRect'ten TAMAMEN ayrı)
+let litRegionLayer = null; // L.GeoJSON (poligon) veya L.Circle — seçili araştırma bölgesi (regionRect'ten TAMAMEN ayrı)
+
+/* Araştırma Bölgesi — Poligon/Circle şekil anahtarı. Circle, USGS Earthquake
+   Catalog'un "Geographic Region → Circle" (center lat/lon + maxradiuskm) modeliyle
+   aynı mantığı kullanır: distance(event, center) ≤ R. Circle bir kaynak zonu DEĞİLDİR,
+   sadece kullanıcı tanımlı bir araştırma alanı sorgusudur — mevcut Poligon akışına
+   (onLitRegionGroupChange/onLitRegionZoneChange) hiçbir şekilde dokunmaz. */
+let litRegionMode = 'polygon'; // 'polygon' | 'circle'
+function setLitRegionMode(mode) {
+  if (litRegionMode === mode) return;
+  litRegionClear(); // önceki moddan kalan çizim/seçim varsa temizle
+  litRegionMode = mode;
+  document.getElementById('btnLitModePolygon').classList.toggle('active', mode === 'polygon');
+  document.getElementById('btnLitModeCircle').classList.toggle('active', mode === 'circle');
+  document.getElementById('litRegionPolygonUI').style.display = mode === 'polygon' ? '' : 'none';
+  document.getElementById('litRegionCircleUI').style.display = mode === 'circle' ? '' : 'none';
+}
+
+let litCirclePicking = false;
+function litCirclePickStart() {
+  if (litCirclePicking) return;
+  litCirclePicking = true;
+  document.getElementById('btnLitCirclePick').classList.add('active');
+  map.getContainer().style.cursor = 'crosshair';
+  map.once('click', (ev) => {
+    document.getElementById('litCircleLat').value = ev.latlng.lat.toFixed(4);
+    document.getElementById('litCircleLon').value = ev.latlng.lng.toFixed(4);
+    litCirclePicking = false;
+    document.getElementById('btnLitCirclePick').classList.remove('active');
+    map.getContainer().style.cursor = '';
+    drawLitRegionCircle();
+  });
+}
+
+function drawLitRegionCircle() {
+  const lat = parseFloat(document.getElementById('litCircleLat').value);
+  const lon = parseFloat(document.getElementById('litCircleLon').value);
+  const radiusKm = parseFloat(document.getElementById('litCircleRadius').value);
+  if (!isFinite(lat) || !isFinite(lon) || !isFinite(radiusKm) || radiusKm <= 0) {
+    setStatus('Circle için geçerli Merkez Enlemi/Boylamı/Yarıçap girin', true);
+    return;
+  }
+  if (litRegionLayer) { map.removeLayer(litRegionLayer); litRegionLayer = null; }
+  litRegionLayer = L.circle([lat, lon], {
+    color:'#a855f7', weight:2, fillColor:'#a855f7', fillOpacity:.12, dashArray:'3', radius: radiusKm*1000
+  }).addTo(map);
+  const bounds = litRegionLayer.getBounds();
+  map.fitBounds(bounds, { padding:[40,40] });
+
+  document.getElementById('btnLitRegionClear').style.display = '';
+  document.getElementById('btnLitRegionQuery').style.display = '';
+  document.getElementById('litRegionOnlyThisRow').style.display = 'flex';
+  const info = document.getElementById('litRegionInfo');
+  info.style.display = 'block';
+  info.innerHTML =
+    `<b style="color:#a855f7">Circle — merkez ${lat.toFixed(4)}, ${lon.toFixed(4)}, R=${radiusKm}km</b>` +
+    `<br><span style="color:#888">distance(event, center) ≤ ${radiusKm}km — bu YALNIZCA araştırma alanı sorgusudur, bir kaynak zonu tanımı DEĞİLDİR.</span>` +
+    `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
+    `<br><span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span>`;
+  setStatus(`Araştırma Bölgesi: Circle çizildi (merkez ${lat.toFixed(4)},${lon.toFixed(4)}, R=${radiusKm}km)`);
+}
 
 async function onLitRegionGroupChange() {
   const key = document.getElementById('litRegionGroupSel').value;
@@ -3779,6 +3906,30 @@ function mapViewCommitToQuery() {
 
 function litRegionCommitToQuery() {
   if (!litRegionLayer) return;
+
+  // CIRCLE dalı — L.Circle, aşağıdaki poligon mantığının varsaydığı getLayers()/
+  // getLatLngs() API'sine sahip değildir, bu yüzden en başta ayrı ele alınır ve
+  // aşağıdaki poligon koduna hiç girmez (o kod tamamen değişmeden kalır).
+  if (litRegionLayer instanceof L.Circle) {
+    const center = litRegionLayer.getLatLng();
+    const radiusKm = litRegionLayer.getRadius() / 1000;
+    regionDeselect(); // TEK execution-state garantisi (poligon dalındaki ile aynı ilke)
+    regionIsPolygon = false;
+    regionIsCircle = true;
+    regionCircleCenter = { lat: center.lat, lon: center.lng };
+    regionCircleRadiusKm = radiusKm;
+    regionRect = L.circle(center, { radius: radiusKm*1000, color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+    fetchRegionEvents(regionRect.getBounds());
+    const btnDecluster = document.getElementById('btnRegionDecluster');
+    if (btnDecluster) btnDecluster.style.display = '';
+    const onlyThis = document.getElementById('litRegionOnlyThis');
+    if (onlyThis && onlyThis.checked) {
+      if (showHeat)   { toggleLayer('heat');   litRegionAutoHidHeat   = true; }
+      if (showCircle) { toggleLayer('circle'); litRegionAutoHidCircle = true; }
+    }
+    return;
+  }
+
   const sub = litRegionLayer.getLayers ? litRegionLayer.getLayers()[0] : litRegionLayer;
   if (!sub || !sub.getLatLngs) return;
   const rawLatLngs = sub.getLatLngs();
