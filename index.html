@@ -1095,7 +1095,13 @@ function setGlobalMode(isGlobal) {
   document.getElementById('btnScopeGlobal').classList.toggle('active', isGlobal);
   document.getElementById('scopeNote').style.display = isGlobal ? 'block' : 'none';
   Object.assign(TURKEY, isGlobal ? WORLD_BBOX : TURKEY_BBOX);
-  map.setView(isGlobal ? [15,20] : [38,25], isGlobal ? 2 : 4, {animate:false});
+  // Aktif bir araştırma bölgesi varsa (regionRect = commit edilmiş Circle/Poligon
+  // sorgusu, litRegionLayer = henüz commit edilmemiş görsel seçim) harita görünümünü
+  // EZME — kullanıcı "Global'e bastım, bölgem kayboldu mu?" yanılgısına düşmesin.
+  // Scope ≠ Map View ≠ Research Area: sadece veri kaynağı/kapsamı değişir.
+  if (!regionRect && !litRegionLayer) {
+    map.setView(isGlobal ? [15,20] : [38,25], isGlobal ? 2 : 4, {animate:false});
+  }
   document.title = isGlobal
     ? 'Dünya Sismik Isı Haritası — Canlı Akış (Global)'
     : 'Türkiye Sismik Isı Haritası — Canlı Akış';
