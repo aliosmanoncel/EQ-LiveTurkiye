@@ -233,6 +233,7 @@
       <option value="emsc" selected>EMSC (canlı)</option>
       <option value="usgs">USGS (canlı)</option>
       <option value="afad">AFAD (statik)</option>
+      <option value="hk_local">HK Yerel Katalog (statik)</option>
     </select>
   </div>
   <div class="rowbox" id="regionLimitRow">
@@ -256,6 +257,7 @@
   </div>
   <div id="regionModeNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ Tarihsel Katalog modunda Limit/Sırala geçersizdir — aralıktaki TÜM depremler gösterilir.</div>
   <div id="regionAfadNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ AFAD: GitHub Action ile saatlik güncellenen önceden çekilmiş katalog — canlı API sorgusu değildir (AFAD sunucusu tarayıcıdan gelen isteği reddediyor), poligon filtresi tarayıcıda uygulanır. "1 Yıl" penceresinde AFAD verisi yok → en geniş pencere olan "1 Ay" kullanılır.</div>
+  <div id="regionHKLocalNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ HK Yerel Katalog: GEO Pub. 1/2012 Appendix D, statik — 1970-2011, 150km yarıçap, ML (Mw dönüşümü YOK). Bu aralık/alan dışındaki bölge seçimlerinde boş sonuç döner. Zaman/Limit/Sırala geçersizdir, TÜM eşleşen olaylar gösterilir.</div>
   <div class="rowbox" id="regionDateRangeRow">
     <label>Tarih (canlı)</label>
     <input id="regionDateFrom" type="date" style="width:118px" title="EMSC/USGS canlı sorgusu için başlangıç tarihi. Boş bırakılırsa üstteki zaman penceresi (1s..1Yıl) kullanılır. Uzun aralıklar (ör. 1971-2026) yalnızca burada seçilebilir — üstteki butonlar en fazla 1 yılla sınırlıdır." onchange="reapplyRegionQuery()">
@@ -2939,6 +2941,7 @@ function regionSourceLabel() {
   if (historicalMode) return 'Tarihsel Katalog (ISC+EMSC, statik)';
   if (regionSource === 'usgs') return 'USGS (canlı sorgu)';
   if (regionSource === 'afad') return 'AFAD (önceden çekilmiş katalog, statik)';
+  if (regionSource === 'hk_local') return 'HK Yerel Katalog (GEO Pub. 1/2012 Appendix D, ML, statik)';
   return 'EMSC (canlı sorgu)';
 }
 
@@ -2952,11 +2955,13 @@ function renderRegionInfo() {
   const depMax = document.getElementById('regionDepMax').value;
   const winLabel = historicalMode
     ? `Tarihsel Katalog (${regionWindowStart ? regionWindowStart.getFullYear() : '—'}–${regionWindowEnd ? regionWindowEnd.getFullYear() : '—'})`
+    : regionSource === 'hk_local'
+    ? `HK Yerel Katalog (${regionWindowStart ? regionWindowStart.getFullYear() : '—'}–${regionWindowEnd ? regionWindowEnd.getFullYear() : '—'})`
     : (regionSource === 'afad' && hours > 720) ? (HOURS_LABEL[720] + ' — AFAD 1 yıl sağlamıyor')
     : (HOURS_LABEL[hours] || `${hours} sa`);
   let line = `Kaynak: <b>${regionSourceLabel()}</b>`;
   line += `<br>Pencere: ${winLabel} (${dfmt(regionWindowStart)} – ${dfmt(regionWindowEnd)})`;
-  if (magMin || magMax) line += ` · Mw ${magMin||'0'}–${magMax||'∞'}`;
+  if (magMin || magMax) line += ` · ${regionSource === 'hk_local' ? 'ML' : 'Mw'} ${magMin||'0'}–${magMax||'∞'}`;
   if (depMin || depMax) line += ` · ${depMin||'0'}–${depMax||'∞'}km`;
   if (regionEvents.length) {
     const times = regionEvents.map(e => e.time.getTime());
@@ -3154,7 +3159,68 @@ async function fetchRegionEventsFromHistorical(bounds) {
 async function fetchRegionEvents(bounds) {
   if (historicalMode) return fetchRegionEventsFromHistorical(bounds);
   if (regionSource === 'afad') return fetchRegionEventsFromAfad(bounds);
+  if (regionSource === 'hk_local') return fetchRegionEventsFromHKLocal(bounds);
   return fetchRegionEventsLive(bounds, regionSource === 'usgs' ? 'usgs' : 'emsc');
+}
+
+// HK Yerel Katalog — data/hongkong_local_catalog.json (GEO Pub. 1/2012, Appendix D,
+// Table D1). fetchRegionEventsFromHistorical ile AYNI mantık: statik, sınırsız, tam
+// kataloğu yerel olarak filtreler (AFAD'ın "hours ago from now" penceresi buraya
+// UYMAZ — kataloğun son olayı 2011'de, "şimdiden geriye X saat" anlamsız olurdu).
+// ML kullanılır, Mw dönüşümü YAPILMAZ (kaynak: meta.note) — mag alanına doğrudan
+// ML yazılır, mw alanı hiç set edilmez ki her yerdeki `e.mw ?? e.mag` fallback'i
+// ML'yi doğru okusun.
+let hkLocalCache = null;
+async function fetchRegionEventsFromHKLocal(bounds) {
+  setStatus('HK Yerel Katalog (statik, 1970-2011) taranıyor…');
+  const magMin = document.getElementById('regionMagMin').value;
+  const magMax = document.getElementById('regionMagMax').value;
+  const depMin = document.getElementById('regionDepMin').value;
+  const depMax = document.getElementById('regionDepMax').value;
+  const poly = regionIsPolygon && regionRect ? regionRect.getLatLngs()[0] : null;
+  try {
+    if (!hkLocalCache) {
+      const res = await fetchTimeout('data/hongkong_local_catalog.json', {}, 10000);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      hkLocalCache = await res.json();
+    }
+    let evs = hkLocalCache.events.map(e => ({
+      lat: e.lat, lon: e.lon, dep: e.depth_km, mag: e.ml, mtype: 'ML',
+      place: e.hko_listed ? 'Hong Kong (HKO doğrulamalı)' : 'EAGP/Guangdong',
+      time: new Date(Date.UTC(e.year, (e.month||1)-1, e.day||1, e.hour||0, e.min||0))
+    })).filter(e =>
+      e.lat >= bounds.getSouth() && e.lat <= bounds.getNorth() &&
+      e.lon >= bounds.getWest()  && e.lon <= bounds.getEast() &&
+      (!magMin || e.mag >= +magMin) && (!magMax || e.mag <= +magMax) &&
+      (!depMin || (e.dep!=null && e.dep >= +depMin)) && (!depMax || (e.dep!=null && e.dep <= +depMax)) &&
+      (!poly || pointInPolygon(e.lat, e.lon, poly))
+    );
+    regionEvents = evs; // TAM küme — limit/cap yok, Mc/b tüm katalog aralığını yansıtır
+    if (regionLayer) map.removeLayer(regionLayer);
+    regionLayer = L.layerGroup();
+    const visibleSample = timeBalancedSample(evs, VISUAL_SAMPLE_CAP);
+    visibleSample.forEach(e => {
+      L.circleMarker([e.lat, e.lon], {
+        radius: 3.5, color:'#a855f7', weight:1, fillColor:'#a855f7', fillOpacity:.7
+      }).bindPopup(
+        `<b style="color:#a855f7">ML ${e.mag.toFixed(1)}</b>` +
+        `<br><span style="color:#aaa">${e.place}</span>` +
+        `<br>Depth: ${e.dep==null ? 'bilinmiyor' : e.dep.toFixed(0)+' km'}` +
+        `<br><span style="color:#666">${dfmt(e.time)}</span>`
+      ).addTo(regionLayer);
+    });
+    regionLayer.addTo(map);
+    regionCapped = false;
+    regionOrderUsed = 'time';
+    regionWindowStart = new Date(Date.UTC(hkLocalCache.meta.year_range[0], 0, 1));
+    regionWindowEnd   = new Date(Date.UTC(hkLocalCache.meta.year_range[1], 8, 30));
+    const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
+    setStatus(`Bölgede ${evs.length} deprem — HK Yerel Katalog TAMAMI (ML, 1970-2011), limit yok${sampleNote}`);
+    renderRegionInfo();
+    if (showTimeMag) renderTimeMag(regionEvents);
+  } catch (err) {
+    setStatus(`HK Yerel Katalog hatası: ${err.message}`, true);
+  }
 }
 
 async function fetchRegionEventsLive(bounds, provider) {
@@ -3776,15 +3842,17 @@ function updateRegionCtrlForMode() {
   const orderRow = document.getElementById('regionOrderRow');
   const note     = document.getElementById('regionModeNote');
   const afadNote = document.getElementById('regionAfadNote');
+  const hkNote   = document.getElementById('regionHKLocalNote');
   const dateRow  = document.getElementById('regionDateRangeRow');
   const dateNote = document.getElementById('regionDateRangeNote');
   const dateFrom = document.getElementById('regionDateFrom');
   const dateTo   = document.getElementById('regionDateTo');
   const refresh  = document.getElementById('btnRegionRefresh');
   const isAfad   = !historicalMode && regionSource === 'afad';
-  // Tarihsel Katalog VE AFAD ikisi de statik/önceden-çekilmiş veri —
-  // Limit/Sırala/Tarih(canlı) yalnızca canlı FDSN sorgusunda (EMSC/USGS) anlamlı.
-  const staticMode = historicalMode || isAfad;
+  const isHKLocal = !historicalMode && regionSource === 'hk_local';
+  // Tarihsel Katalog, AFAD VE HK Yerel Katalog üçü de statik/önceden-çekilmiş
+  // veri — Limit/Sırala/Tarih(canlı) yalnızca canlı FDSN sorgusunda (EMSC/USGS) anlamlı.
+  const staticMode = historicalMode || isAfad || isHKLocal;
   if (limitSel) limitSel.disabled = staticMode;
   if (orderSel) orderSel.disabled = staticMode;
   if (limitRow) limitRow.classList.toggle('disabledRow', staticMode);
@@ -3795,11 +3863,14 @@ function updateRegionCtrlForMode() {
   if (dateNote) dateNote.style.display = staticMode ? 'block' : 'none';
   if (note) note.style.display = historicalMode ? 'block' : 'none';
   if (afadNote) afadNote.style.display = isAfad ? 'block' : 'none';
+  if (hkNote) hkNote.style.display = isHKLocal ? 'block' : 'none';
   if (refresh) refresh.title = historicalMode
     ? 'Tarihsel modda statik veri elle tekrar filtrelenir; Zaman/Tarihsel Katalog ve Mw/Derinlik değiştikçe zaten otomatik güncellenir — genelde gerekmez'
     : isAfad
       ? 'AFAD statik katalog elle tekrar filtrelenir — saatlik AFAD dosyası zaten güncel, yeni bir canlı sorgu YAPILMAZ'
-      : 'Bölgeyi seçili ayarlarla elle yeniden sorgula';
+      : isHKLocal
+        ? 'HK Yerel Katalog statik dosya elle tekrar filtrelenir — 1970-2011 sabit, yeni bir canlı sorgu YAPILMAZ'
+        : 'Bölgeyi seçili ayarlarla elle yeniden sorgula';
 }
 
 // Bölge Analizi kaynak seçici (EMSC/USGS/AFAD) değiştiğinde: Limit/Sırala
