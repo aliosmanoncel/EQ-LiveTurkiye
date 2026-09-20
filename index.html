@@ -3559,6 +3559,16 @@ async function onLitRegionGroupChange() {
             .join('');
     const placeholder = hasZoneId ? '— Zone seçin —' : hasRegionLabel ? '— Bölge seçin —' : '— Makro-zon seçin —';
     zoneSel.innerHTML = `<option value="">${placeholder}</option>` + opts;
+    // Tek alt-bölgeli çalışmalarda (şu an sadece Hong Kong) ikinci "Bölge seçin"
+    // adımı gereksiz bir ekstra tıklama oluşturuyordu — kullanıcı "Çalışma"yı
+    // seçip haritada hiçbir şey olmadığını görüyordu. Birden fazla alt-bölgesi
+    // olan çalışmalarda (Marmara/Batı Anadolu/Ambraseys) mevcut iki-adımlı akış
+    // AYNEN korunur — sadece tam olarak TEK seçenek varsa otomatik seçilip çizilir.
+    if (geo.features.length === 1) {
+      const only = geo.features[0].properties;
+      zoneSel.value = hasZoneId ? only.zone_id : hasRegionLabel ? only.region_label : only.zone_name;
+      onLitRegionZoneChange();
+    }
   } catch (err) {
     zoneSel.innerHTML = '<option value="">Yüklenemedi</option>';
     setStatus(`Araştırma bölgesi verisi yüklenemedi: ${err.message}`, true);
