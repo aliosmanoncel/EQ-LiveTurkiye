@@ -317,6 +317,7 @@
         <option value="ow2006_marmara">Marmara — Öncel &amp; Wilson (2006)</option>
         <option value="ow2004_western_anatolia">Batı Anadolu — Öncel &amp; Wilson (2004)</option>
         <option value="ambraseys2002_studyareas">Marmara — Ambraseys (2002) Çalışma Alanları</option>
+        <option value="hongkong_500km" title="500km yarıçap, GEO Publication No. 1/2012 Regional Earthquake Catalogue ile aynı referans nokta/kapsam — resmi sismik zonasyon (Pappin ve ark. 2015) DEĞİL, sadece analiz geometrisi">Hong Kong</option>
       </optgroup>
     </select>
   </div>
@@ -3502,6 +3503,10 @@ const LIT_REGION_SOURCES = {
   ambraseys2002_studyareas: {
     url:   'data/marmara_ambraseys_2002_study_areas.geojson',
     label: "Marmara — Ambraseys (2002) Çalışma Alanları",
+  },
+  hongkong_500km: {
+    url:   'data/research_regions_hongkong_500km.geojson',
+    label: "Hong Kong",
   }
 };
 let litRegionCache = {};   // { [key]: geojson } — sekme açıkken tekrar indirmeye gerek yok
