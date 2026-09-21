@@ -2185,8 +2185,6 @@ async function exportTimeMagPNG() {
   }
 
   const W = 720, PAD = 26, LH = 17, CHART_GAP = 16;
-  const metaText = (document.getElementById('tmMeta').textContent || '').trim();
-  const regionLine = regionRect ? regionBoundsLine().replace(/<[^>]+>/g, '') : '';
   const innerW = W - 2 * PAD;
 
   const measureCv = document.createElement('canvas');
@@ -2204,9 +2202,24 @@ async function exportTimeMagPNG() {
     if (cur) lines.push(cur);
     return lines.length ? lines : [''];
   }
-
-  const metaLines = wrapText(metaText, innerW, '12px Arial');
-  const regionLines = regionLine ? wrapText('📍 ' + regionLine, innerW, '12px Arial') : [];
+  // <br> etiketlerini satır sonuna çevirip metni öyle böler -- tmMeta.innerHTML
+  // (renderTimeMag'de usingRegion iken bölge satırını ZATEN içeriyor, bkz.
+  // regionBoundsLine() çağrısı orada) düz textContent olarak okunsaydı <br>
+  // hiçbir ayraç bırakmadan yutulur, "N=14Bölge:..." gibi birleşik/hatalı bir
+  // satır ortaya çıkardı -- bu düzeltmeden önce canlıda gözlemlenen gerçek
+  // hata buydu (2026-09-21). Ayrı bir "regionLines" bloğu da KASITLI OLARAK
+  // kaldırıldı -- bölge bilgisi burada zaten tek kaynaktan (tmMeta) geliyor,
+  // ikinci kez eklemek mükerrer satıra yol açıyordu.
+  function htmlToLines(html) {
+    return (html || '')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+      .split('\n')
+      .map(s => s.trim())
+      .filter(Boolean);
+  }
+  const metaRawLines = htmlToLines(document.getElementById('tmMeta').innerHTML);
+  const metaLines = metaRawLines.flatMap(l => wrapText(l, innerW, '12px Arial').map(w => ({ text: w, isRegion: l.startsWith('Bölge:') })));
 
   const chartBlocks = svgSpecs.map((spec, i) => {
     const img = images[i];
@@ -2216,7 +2229,7 @@ async function exportTimeMagPNG() {
     return { img, dispW, dispH, label: spec.label, statsLines };
   });
 
-  let totalH = PAD + 26 + 6 + metaLines.length * LH + regionLines.length * LH + 14;
+  let totalH = PAD + 26 + 6 + metaLines.length * LH + 14;
   chartBlocks.forEach(b => { totalH += 20 + b.dispH + 8 + b.statsLines.length * 15 + CHART_GAP; });
   totalH += 26; // footer
 
@@ -2235,12 +2248,11 @@ async function exportTimeMagPNG() {
   y += 26;
 
   ctx.font = '12px Arial';
-  ctx.fillStyle = '#9ab0c5';
-  metaLines.forEach(l => { ctx.fillText(l, PAD, y); y += LH; });
-  if (regionLines.length) {
-    ctx.fillStyle = '#7ecbff';
-    regionLines.forEach(l => { ctx.fillText(l, PAD, y); y += LH; });
-  }
+  metaLines.forEach(l => {
+    ctx.fillStyle = l.isRegion ? '#7ecbff' : '#9ab0c5';
+    ctx.fillText(l.text, PAD, y);
+    y += LH;
+  });
   y += 14;
 
   chartBlocks.forEach(b => {
