@@ -1,0 +1,25 @@
+{
+  "generated": "2026-06-23T17:22:22Z",
+  "method": "Ordinary Kriging · Gaussian variogram · pykrige",
+  "variogram": {
+    "model": "gaussian",
+    "range_deg": 0.5,
+    "sill": 0.11870727700712289,
+    "nugget": 0.01
+  },
+  "source_pts": 2811,
+  "grid_w": 675,
+  "grid_h": 225,
+  "b_norm": [
+    0.767,
+    1.801
+  ],
+  "b_norm_method": "mu+/-1.5sigma (mu=1.284, sigma=0.345)",
+  "bounds": {
+    "minlat": 39.5,
+    "maxlat": 41.5,
+    "minlon": 26.0,
+    "maxlon": 32.0
+  },
+  "coverage_pct": 100.0
+}

@@ -1,0 +1,22 @@
+{
+  "generated": "2026-06-24T12:06:59Z",
+  "method": "Ordinary Kriging · linear variogram · pykrige",
+  "variogram": "linear",
+  "source_pts": 4151,
+  "fit_pts": 2000,
+  "pred_pts": 4151,
+  "grid_w": 400,
+  "grid_h": 180,
+  "b_min_pred": 0.6759999999999924,
+  "b_max_pred": 1.0102323402557887,
+  "b_norm": [
+    0.5,
+    1.5
+  ],
+  "bounds": {
+    "minlat": 34.0,
+    "maxlat": 43.0,
+    "minlon": 25.0,
+    "maxlon": 45.0
+  }
+}
