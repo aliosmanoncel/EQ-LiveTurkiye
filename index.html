@@ -973,6 +973,13 @@
     <div class="tmTitle" style="font-size:.78rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       📉 Gutenberg-Richter Frekans-Büyüklük Dağılımı
       <span style="color:#666;font-weight:400;">(aynı olay kümesi · Mc çizgisi yalnızca aktif eşiği gösterir, otomatik seçmez)</span>
+      <span style="font-weight:400;color:#888;font-size:.85em;display:inline-flex;align-items:center;gap:3px;" title="Bölüm 5.2 spesifikasyonu: (a) Ham = ham kümülatif N(≥M); (b) Oran = N/T yıllık oran (λ); (c) Yoğunluk = N/(T·A) /10⁶km²/yıl — Pappin ve ark. (2015) ile aynı formül. (b)/(c) yalnızca Circle bölge modunda hesaplanabilir (alan kesin bilinir); değilse otomatik Ham'a döner.">
+        <span style="display:inline-flex;border:1px solid #334;border-radius:4px;overflow:hidden;">
+          <button id="grModeRaw" onclick="setGrNormMode('raw')" style="background:#334155;color:#e2e8f0;border:none;font-size:.85em;padding:1px 6px;cursor:pointer;" title="Ham kümülatif N(≥M) — normalize edilmemiş, varsayılan">Ham</button>
+          <button id="grModeRate" onclick="setGrNormMode('rate')" style="background:transparent;color:#e2e8f0;border:none;border-left:1px solid #334;font-size:.85em;padding:1px 6px;cursor:pointer;" title="Zaman normalize: N/T, yıllık oran (λ) — yalnızca Circle bölgesinde">Oran</button>
+          <button id="grModeDensity" onclick="setGrNormMode('density')" style="background:transparent;color:#e2e8f0;border:none;border-left:1px solid #334;font-size:.85em;padding:1px 6px;cursor:pointer;" title="Zaman+Alan normalize: N/(T·A), /10⁶km²/yıl — yalnızca Circle bölgesinde">Yoğunluk</button>
+        </span>
+      </span>
       <span style="margin-left:auto;font-weight:400;color:#888;font-size:.85em;">Bin:
         <select id="grBinSize" onchange="onGrBinSizeChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.85em;padding:1px 3px;">
           <option value="0.1" selected>0.1</option>
@@ -1853,7 +1860,7 @@ function renderBvalueTS(evList, Mc) {
     `</div>`;
 }
 
-const SUPERSCRIPT_DIGITS = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const SUPERSCRIPT_DIGITS = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
 const toSuperscript = n => String(n).split('').map(c => SUPERSCRIPT_DIGITS[c] || c).join('');
 
 // Gutenberg-Richter frekans-büyüklük dağılımı (kümülatif + bin-içi, log10 N) —
@@ -1863,6 +1870,22 @@ const toSuperscript = n => String(n).split('').map(c => SUPERSCRIPT_DIGITS[c] ||
 let lastGrEvList = null, lastGrMc = null, lastGrPoints = null, lastGrDM = null;
 
 function onGrBinSizeChange() {
+  if (lastGrEvList) renderGutenbergRichter(lastGrEvList, lastGrMc);
+}
+
+// Bölüm 5.2 spesifikasyonu: (a) raw = ham N(≥M), (b) rate = N/T yıllık oran,
+// (c) density = N/(T·A) /10⁶km²/yıl (Pappin ve ark. 2015 ile aynı formül,
+// computeRegionStatsLine()'daki Aktivite Yoğunluğu ile AYNI tanım). Fit
+// (a/b_GR/GoF) her zaman RAW sayımlar üzerinden hesaplanır -- normalize
+// yalnızca çizim/y-ekseni katmanında uygulanır, b-value ölçek-bağımsız
+// olduğu için fit'i etkilemez. 2026-09-22.
+let grNormMode = 'raw';
+function setGrNormMode(mode) {
+  grNormMode = mode;
+  ['raw','rate','density'].forEach(m => {
+    const btn = document.getElementById('grMode' + m.charAt(0).toUpperCase() + m.slice(1));
+    if (btn) btn.style.background = (m === mode) ? '#334155' : 'transparent';
+  });
   if (lastGrEvList) renderGutenbergRichter(lastGrEvList, lastGrMc);
 }
 
@@ -1917,6 +1940,20 @@ function renderGutenbergRichter(evList, Mc) {
   const plottedCum    = points.filter(p => p.cum    > 0);
   const plottedNonCum = points.filter(p => p.nonCum > 0);
 
+  // Normalize mod (Bölüm 5.2): (b)/(c) yalnızca Circle bölge modunda mümkün --
+  // alan yalnızca orada kesin biliniyor (π·R²), Poligon/Dikdörtgen'de alan
+  // hesaplanmıyor. Uygun değilse sessizce 'raw'a döner, kullanıcıya stats
+  // satırında bildirilir (aşağıda). T, computeRegionStatsLine() ile AYNI
+  // kaynaktan (regionWindowStart/End) okunur -- iki farklı T tanımı olmasın diye.
+  const circleReady = regionIsCircle && regionCircleRadiusKm && regionWindowStart && regionWindowEnd;
+  const years = circleReady ? (regionWindowEnd - regionWindowStart) / (365.25*24*3600*1000) : null;
+  const areaKm2 = circleReady ? Math.PI * regionCircleRadiusKm * regionCircleRadiusKm : null;
+  let effMode = grNormMode, modeFallback = false;
+  if (effMode !== 'raw' && !(circleReady && years > 0)) { effMode = 'raw'; modeFallback = true; }
+  const normFactor = effMode === 'raw' ? 1 : effMode === 'rate' ? years : (years * areaKm2 / 1e6);
+  const dispCum    = p => p.cum    / normFactor;
+  const dispNonCum = p => p.nonCum / normFactor;
+
   // Kareye yakın en-boy oranı (literatürdeki GR grafik geleneği — bkz. Mirwald
   // ve ark. 2026 örneği) — diğer iki grafik gibi geniş/yassı DEĞİL, 2026-09-13.
   const W=420, H=400, PAD_L=42, PAD_B=28, PAD_T=10, PAD_R=14;
@@ -1925,14 +1962,28 @@ function renderGutenbergRichter(evList, Mc) {
   // sabit bir üst sınır dayatılmaz, küçük Mmax'ta gereksiz boş alan bırakmaz
   // (2026-09-13, kullanıcı geri bildirimi — önceki sabit 0-8 varsayımı kaldırıldı).
   const mAxisMax = Math.ceil(mMax) + 1;
-  const nMax = Math.max(...plottedCum.map(p => p.cum), 1);
-  const logMax = Math.max(1, Math.ceil(Math.log10(nMax)));
+  // 'raw' modda eskisiyle BİREBİR aynı davranış (taban her zaman 10^0=1).
+  // Normalize modlarda değerler 1'in altına düşebildiği için (örn. yıllık
+  // oran 0.3), taban veriye göre esnetilir -- Math.max(1,n) burada YANLIŞ
+  // olurdu (her şeyi tabana yapıştırırdı).
+  let logBot, logTop;
+  if (effMode === 'raw') {
+    logBot = 0;
+    logTop = Math.max(1, Math.ceil(Math.log10(Math.max(...plottedCum.map(p => p.cum), 1))));
+  } else {
+    const vals = plottedCum.map(dispCum).filter(v => v > 0);
+    const vMax = Math.max(...vals, 1e-6), vMin = Math.min(...vals, vMax);
+    logTop = Math.ceil(Math.log10(vMax));
+    logBot = Math.floor(Math.log10(vMin));
+    if (logTop <= logBot) logTop = logBot + 1;
+  }
+  const logRange = logTop - logBot;
 
   const x = m => PAD_L + Math.max(0, m) / mAxisMax * plotW;
-  const y = n => PAD_T + plotH - (Math.log10(Math.max(1, n)) / logMax) * plotH;
+  const y = v => PAD_T + plotH - ((Math.log10(Math.max(v, Math.pow(10, logBot))) - logBot) / logRange) * plotH;
 
   let yTicks = '';
-  for (let e = 0; e <= logMax; e++) {
+  for (let e = logBot; e <= logTop; e++) {
     const yy = y(Math.pow(10, e));
     yTicks += `<text x="${PAD_L-6}" y="${yy+3}" fill="#888" font-size="8" text-anchor="end">10${toSuperscript(e)}</text>`;
     yTicks += `<line x1="${PAD_L}" y1="${yy}" x2="${W-PAD_R}" y2="${yy}" stroke="#2a2a2a" stroke-width="0.5"/>`;
@@ -1970,15 +2021,15 @@ function renderGutenbergRichter(evList, Mc) {
       fitBins.forEach(p => { sumAbsDiff += Math.abs(p.cum - synthCum(p.m)); sumObs += p.cum; });
       const gofR = sumObs > 0 ? 100 * (1 - sumAbsDiff / sumObs) : null;
       const mFitStart = Math.max(Mc, 0), mFitEnd = mMax;
-      const xStart = x(mFitStart), yStart = y(synthCum(mFitStart));
-      const xEnd   = x(mFitEnd),   yEnd   = y(synthCum(mFitEnd));
+      const xStart = x(mFitStart), yStart = y(synthCum(mFitStart) / normFactor);
+      const xEnd   = x(mFitEnd),   yEnd   = y(synthCum(mFitEnd) / normFactor);
       // Görsel katman -- hesaplama mantığına (bFit/aFit/gofR/Mc) dokunmaz.
       // "Aynı başlangıç noktası = aynı sonuç" yanılgısını azaltmak için
       // (Mc, N≥Mc) başlangıcı işaretlenir ve b değeri çizgi üzerine
       // doğrudan yazılır -- iki senaryo Mc/N≥Mc'de örtüşse bile eğim
       // (b_GR) farklıysa bu artık grafikte de görünür (2026-09-16).
       const mLabel = mFitStart + (mFitEnd - mFitStart) * 0.55;
-      const xLabel = x(mLabel), yLabel = y(synthCum(mLabel));
+      const xLabel = x(mLabel), yLabel = y(synthCum(mLabel) / normFactor);
       fitLine = `<line x1="${xStart.toFixed(1)}" y1="${yStart.toFixed(1)}" x2="${xEnd.toFixed(1)}" y2="${yEnd.toFixed(1)}" stroke="#f5a623" stroke-width="1.3" stroke-dasharray="2,2"/>` +
                 `<circle cx="${xStart.toFixed(1)}" cy="${yStart.toFixed(1)}" r="3" fill="#f5a623" stroke="#111" stroke-width="0.6"><title>Fit başlangıcı: Mc=${Mc}, N≥Mc=${nAboveMc}</title></circle>` +
                 `<text x="${(xLabel+4).toFixed(1)}" y="${(yLabel-4).toFixed(1)}" fill="#f5a623" font-size="9" font-weight="700">b=${bFit.toFixed(2)}</text>`;
@@ -1991,13 +2042,16 @@ function renderGutenbergRichter(evList, Mc) {
   // Kümülatif = dolu daire, bin-içi = boş (içi boş) daire — üçgen/kare yerine,
   // literatürdeki "filled vs. open circle" GR grafik geleneğine uygun, 2026-09-13
   const R_CIRCLE = 2.6;
+  const normUnit = effMode === 'rate' ? '/yıl' : effMode === 'density' ? '/10⁶km²/yıl' : '';
   const cumMarkers = plottedCum.map(p => {
-    const cx = x(p.m), cy = y(p.cum);
-    return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R_CIRCLE}" fill="#e2e8f0" stroke="#111" stroke-width="0.4"><title>N(≥M)=${p.cum} @ M=${p.m}</title></circle>`;
+    const cx = x(p.m), cy = y(dispCum(p));
+    const dispStr = effMode !== 'raw' ? ` (${dispCum(p).toFixed(3)}${normUnit})` : '';
+    return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R_CIRCLE}" fill="#e2e8f0" stroke="#111" stroke-width="0.4"><title>N(≥M)=${p.cum}${dispStr} @ M=${p.m}</title></circle>`;
   }).join('');
   const nonCumMarkers = plottedNonCum.map(p => {
-    const cx = x(p.m), cy = y(p.nonCum);
-    return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R_CIRCLE}" fill="none" stroke="#22c55e" stroke-width="1.1"><title>N(bin)=${p.nonCum} @ M=${p.m}</title></circle>`;
+    const cx = x(p.m), cy = y(dispNonCum(p));
+    const dispStr = effMode !== 'raw' ? ` (${dispNonCum(p).toFixed(3)}${normUnit})` : '';
+    return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${R_CIRCLE}" fill="none" stroke="#22c55e" stroke-width="1.1"><title>N(bin)=${p.nonCum}${dispStr} @ M=${p.m}</title></circle>`;
   }).join('');
 
   svg.innerHTML = `
@@ -2013,7 +2067,15 @@ function renderGutenbergRichter(evList, Mc) {
   `;
 
   const mcStr = Mc !== null ? ` · Mc=${Mc}` : '';
-  stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif N(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi N &nbsp;|&nbsp; <span style="color:#f5a623">┄</span> GR fit &nbsp;|&nbsp; ΔM=${DM} · N=${mags.length} · Mmax=${mMax.toFixed(1)}${mcStr}${fitStatsStr}`;
+  const modeLabel = effMode === 'rate' ? `Oran (N/T, λ) · T=${years.toFixed(1)}yıl`
+                   : effMode === 'density' ? `Yoğunluk (N/(T·A)) · T=${years.toFixed(1)}yıl, A=${Math.round(areaKm2).toLocaleString('tr-TR')}km²`
+                   : null;
+  const modeStr = modeLabel
+    ? ` &nbsp;|&nbsp; <span style="color:#a855f7">Mod: ${modeLabel}</span>`
+    : modeFallback
+    ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">⚠ Oran/Yoğunluk yalnızca Circle bölge modunda hesaplanır — Ham gösteriliyor</span>`
+    : '';
+  stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif N(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi N &nbsp;|&nbsp; <span style="color:#f5a623">┄</span> GR fit &nbsp;|&nbsp; ΔM=${DM} · N=${mags.length} · Mmax=${mMax.toFixed(1)}${mcStr}${fitStatsStr}${modeStr}`;
 }
 
 function toggleTimeMag() {
