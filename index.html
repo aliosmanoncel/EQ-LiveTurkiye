@@ -935,6 +935,7 @@
   <div class="tmHead">
     <span class="tmTitle">📈 Zaman–Magnitude Dağılımı <span style="color:#666;font-weight:400;">(Time–Magnitude Distribution)</span></span>
     <span>
+      <button class="tmFullscreenBtn" id="tmPngBtn" onclick="exportTimeMagPNG()" title="Üç grafiği (Time-Mag, b-değeri, Gutenberg-Richter) + bölge/yöntem bilgisini tek bir PNG görseli olarak indir — Blogger'a doğrudan yüklenebilir">🖼️ PNG</button>
       <button class="tmFullscreenBtn" id="tmFullscreenBtn" onclick="toggleTimeMagFullscreen(event)" title="Tam ekran aç/kapat — çok sayıda parametre/grafik olduğu için küçük pencerede görülemeyen üst kısmı (Magnitude Conversion seçici dahil) erişilebilir kılar">⛶</button>
       <button class="tmClose" onclick="toggleTimeMag()">✕</button>
     </span>
@@ -2139,6 +2140,137 @@ function tmSelectPoint(t, m) {
   el.innerHTML = `📍 Seçili nokta: <b>M${m.toFixed(1)}</b> · <b>${dateStr}</b>`;
 }
 
+// Time-Mag panelini (3 SVG grafik + kaynak/pencere/bölge/Mc/b metadata'sı) TEK
+// bir PNG görseline birleştirip indirir -- Blogger'a veya bir rapora doğrudan
+// görsel olarak eklenebilecek "report-ready" bir çıktı (2026-09-21, kullanıcı
+// isteği: "EQ-Live çalışmaları raporlara eklenir"). Sadece grafikleri değil,
+// hangi bölge/kaynak/yöntemle üretildiğini de görsele gömer -- aksi halde
+// PNG'nin kendisine bakan biri için "bu hangi bölgeden üretildi?" sorusu
+// cevapsız kalırdı (bkz. regionBoundsLine()). PDF değil PNG -- bu sürümde
+// ek kütüphane gerektirmeyen, güvenilir tek format olarak seçildi; gerçek
+// çok sayfalı PDF ayrı, daha büyük bir iş maddesi olarak bekletiliyor.
+async function exportTimeMagPNG() {
+  const svgSpecs = [
+    { id: 'tmSvg',   statsId: 'tmStats',   label: 'Zaman–Magnitude Dağılımı' },
+    { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Wilson & Öncel 2007)' },
+    { id: 'tmSvgGR', statsId: 'tmStatsGR', label: 'Gutenberg-Richter Frekans-Büyüklük Dağılımı' },
+  ];
+  const svgEls = svgSpecs.map(s => document.getElementById(s.id));
+  if (svgEls.some(el => !el) || !showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
+
+  function svgToImage(svgEl) {
+    return new Promise((resolve, reject) => {
+      let xml = new XMLSerializer().serializeToString(svgEl);
+      if (!/ xmlns=/.test(xml)) xml = xml.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+      const vb = (svgEl.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
+      if (vb.length === 4 && !/ width=/.test(xml)) xml = xml.replace('<svg', `<svg width="${vb[2]}" height="${vb[3]}"`);
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('SVG render hatası (' + svgEl.id + ')'));
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+    });
+  }
+
+  const btn = document.getElementById('tmPngBtn');
+  const oldLabel = btn ? btn.textContent : null;
+  if (btn) { btn.textContent = '⏳…'; btn.disabled = true; }
+
+  let images;
+  try {
+    images = await Promise.all(svgEls.map(svgToImage));
+  } catch (e) {
+    alert('Görsel oluşturulamadı: ' + e.message);
+    if (btn) { btn.textContent = oldLabel; btn.disabled = false; }
+    return;
+  }
+
+  const W = 720, PAD = 26, LH = 17, CHART_GAP = 16;
+  const metaText = (document.getElementById('tmMeta').textContent || '').trim();
+  const regionLine = regionRect ? regionBoundsLine().replace(/<[^>]+>/g, '') : '';
+  const innerW = W - 2 * PAD;
+
+  const measureCv = document.createElement('canvas');
+  const mctx = measureCv.getContext('2d');
+  function wrapText(text, maxW, font) {
+    mctx.font = font;
+    const words = (text || '').split(' ').filter(Boolean);
+    const lines = [];
+    let cur = '';
+    words.forEach(w => {
+      const test = cur ? cur + ' ' + w : w;
+      if (mctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = w; }
+      else cur = test;
+    });
+    if (cur) lines.push(cur);
+    return lines.length ? lines : [''];
+  }
+
+  const metaLines = wrapText(metaText, innerW, '12px Arial');
+  const regionLines = regionLine ? wrapText('📍 ' + regionLine, innerW, '12px Arial') : [];
+
+  const chartBlocks = svgSpecs.map((spec, i) => {
+    const img = images[i];
+    const dispW = innerW;
+    const dispH = Math.round(dispW * (img.naturalHeight / img.naturalWidth));
+    const statsLines = wrapText((document.getElementById(spec.statsId).textContent || '').trim(), innerW, '11px Arial');
+    return { img, dispW, dispH, label: spec.label, statsLines };
+  });
+
+  let totalH = PAD + 26 + 6 + metaLines.length * LH + regionLines.length * LH + 14;
+  chartBlocks.forEach(b => { totalH += 20 + b.dispH + 8 + b.statsLines.length * 15 + CHART_GAP; });
+  totalH += 26; // footer
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = totalH;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0a0e15';
+  ctx.fillRect(0, 0, W, totalH);
+  ctx.textBaseline = 'top';
+
+  let y = PAD;
+  ctx.fillStyle = '#e2e8f0';
+  ctx.font = 'bold 18px Arial';
+  ctx.fillText('EQ-Live Türkiye — Deprem Analizi Raporu', PAD, y);
+  y += 26;
+
+  ctx.font = '12px Arial';
+  ctx.fillStyle = '#9ab0c5';
+  metaLines.forEach(l => { ctx.fillText(l, PAD, y); y += LH; });
+  if (regionLines.length) {
+    ctx.fillStyle = '#7ecbff';
+    regionLines.forEach(l => { ctx.fillText(l, PAD, y); y += LH; });
+  }
+  y += 14;
+
+  chartBlocks.forEach(b => {
+    ctx.fillStyle = '#06b6d4';
+    ctx.font = 'bold 13px Arial';
+    ctx.fillText(b.label, PAD, y);
+    y += 20;
+    ctx.drawImage(b.img, PAD, y, b.dispW, b.dispH);
+    y += b.dispH + 8;
+    ctx.fillStyle = '#aaa';
+    ctx.font = '11px Arial';
+    b.statsLines.forEach(l => { ctx.fillText(l, PAD, y); y += 15; });
+    y += CHART_GAP;
+  });
+
+  ctx.fillStyle = '#556';
+  ctx.font = '10px Arial';
+  ctx.fillText(`EQ-Live Türkiye · aliosmanoncel.github.io/EQ-LiveTurkiye · Üretim: ${new Date().toLocaleString('tr-TR')}`, PAD, y);
+
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `EQ-Live-Analiz-${new Date().toISOString().slice(0,10)}.png`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    if (btn) { btn.textContent = oldLabel; btn.disabled = false; }
+  }, 'image/png');
+}
+
 function renderTimeMag(evList) {
   if (!showTimeMag) return;
   const svg    = document.getElementById('tmSvg');
@@ -2272,8 +2404,12 @@ function renderTimeMag(evList) {
     <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
   `;
 
-  metaEl.textContent = (usingRegion || usingHistorical)
-    ? `${srcName} · ${winLabel} · N=${evList.length}${sampleNote}`
+  // usingRegion iken bölge geometrisi (dikdörtgen/poligon/daire sınırları) ayrıca
+  // gösterilir -- grafiğe bakan biri hangi alanın kullanıldığını görsün diye
+  // (2026-09-21, kullanıcı isteği: PNG/PDF olarak dışa aktarılan bir grafikte
+  // "bu hangi bölgeden üretildi?" sorusu cevapsız kalmamalı).
+  metaEl.innerHTML = (usingRegion || usingHistorical)
+    ? `${srcName} · ${winLabel} · N=${evList.length}${sampleNote}${usingRegion ? `<br>${regionBoundsLine()}` : ''}`
     : `${srcName} · ${winLabel} · M≥${minMag} · N=${evList.length}${sampleNote}`;
   const mMax = Math.max(...mags).toFixed(1);
   const convStatsStr = mcConversionMode === 'none' ? '' : ` &nbsp;|&nbsp; Magnitude Conversion: <b>${convEntry.label}</b>`;
@@ -3035,10 +3171,23 @@ function regionSourceLabel() {
   return 'EMSC (canlı sorgu)';
 }
 
+// regionRect'in (dikdörtgen/poligon/daire) sınırlarını okunur bir metne çevirir —
+// renderRegionInfo() ve Time-Mag panelindeki bölge özeti (renderTimeMag) ile PNG
+// dışa aktarma arasında ORTAK kullanılır, mantık tek yerde tanımlı kalır
+// (2026-09-21, kullanıcı isteği: Time-Mag grafiğinde de hangi bölgenin
+// kullanıldığının görünmesi).
+function regionBoundsLine() {
+  if (!regionRect) return '';
+  const bounds = regionRect.getBounds();
+  let line = `Bölge: ${bounds.getSouth().toFixed(2)},${bounds.getWest().toFixed(2)} – ${bounds.getNorth().toFixed(2)},${bounds.getEast().toFixed(2)}`;
+  if (regionIsPolygon) line += ` (poligon, ${regionRect.getLatLngs()[0].length} köşe — sınırlar kapsayan dikdörtgen)`;
+  if (regionIsCircle && regionCircleCenter) line += ` (daire, merkez ${regionCircleCenter.lat.toFixed(3)},${regionCircleCenter.lon.toFixed(3)}, R=${regionCircleRadiusKm}km — sınırlar kapsayan dikdörtgen)`;
+  return line;
+}
+
 function renderRegionInfo() {
   const info = document.getElementById('regionInfo');
   if (!info || !regionRect) return;
-  const bounds = regionRect.getBounds();
   const magMin = document.getElementById('regionMagMin').value;
   const magMax = document.getElementById('regionMagMax').value;
   const depMin = document.getElementById('regionDepMin').value;
@@ -3059,9 +3208,7 @@ function renderRegionInfo() {
     const times = regionEvents.map(e => e.time.getTime());
     line += `<br>Gösterilen: ${dfmt(new Date(Math.min(...times)))} – ${dfmt(new Date(Math.max(...times)))} (${regionEvents.length} deprem)`;
   }
-  line += `<br>Bölge: ${bounds.getSouth().toFixed(2)},${bounds.getWest().toFixed(2)} – ${bounds.getNorth().toFixed(2)},${bounds.getEast().toFixed(2)}`;
-  if (regionIsPolygon) line += ` (poligon, ${regionRect.getLatLngs()[0].length} köşe — sınırlar kapsayan dikdörtgen)`;
-  if (regionIsCircle && regionCircleCenter) line += ` (daire, merkez ${regionCircleCenter.lat.toFixed(3)},${regionCircleCenter.lon.toFixed(3)}, R=${regionCircleRadiusKm}km — sınırlar kapsayan dikdörtgen)`;
+  line += `<br>${regionBoundsLine()}`;
   const statsEvs = applyGk74Filter(regionEvents);
   if (regionDeclusterOn) {
     line += `<br><span style="color:#f472b6">🔻 N=${regionEvents.length} (ham) → N=${statsEvs.length} (GK74)</span>`;
