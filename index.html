@@ -180,11 +180,12 @@
     <button class="tbtn" data-h="8760" data-mag="4.5" title="Son 1 yıl · M≥4.5">1 Yıl</button>
   </div>
   <div style="display:flex;gap:4px;background:rgba(20,20,20,.92);padding:4px;border-radius:8px;border:1px solid #334">
-    <button id="btnScopeTR"     class="tbtn active" onclick="setGlobalMode(false)" style="padding:4px 10px">🇹🇷 Türkiye</button>
-    <button id="btnScopeGlobal" class="tbtn"        onclick="setGlobalMode(true)"  style="padding:4px 10px">🌍 Global</button>
+    <button id="btnScopeTR"     class="tbtn active" onclick="setScope('tr')"     style="padding:4px 10px" title="Türkiye + çevresi · Kaynak: EMSC">🇹🇷 Türkiye</button>
+    <button id="btnScopeEmsc"   class="tbtn"        onclick="setScope('emsc')"   style="padding:4px 10px" title="Dünya çapında · Kaynak: EMSC">🌐 EMSC</button>
+    <button id="btnScopeGlobal" class="tbtn"        onclick="setScope('global')" style="padding:4px 10px" title="Dünya çapında · Kaynak: USGS">🌍 Global</button>
   </div>
   <div id="scopeNote" style="font-size:.68rem;color:#888;background:rgba(20,20,20,.85);padding:2px 8px;border-radius:5px;display:none">
-    Global modda tehlike/risk/b-değeri modelleri mevcut değil — bölgesel veri gerektirirler.
+    Global/EMSC modunda tehlike/risk/b-değeri modelleri mevcut değil — bölgesel veri gerektirirler.
   </div>
 </div>
 
@@ -1011,7 +1012,7 @@
 // EMSC izleme alanı (Euro-Mediterranean + Middle East + Central Asia)
 const TURKEY_BBOX = { minLat:10, maxLat:75, minLon:-45, maxLon:120 };
 const WORLD_BBOX  = { minLat:-90, maxLat:90, minLon:-180, maxLon:180 };
-const TURKEY   = { ...TURKEY_BBOX }; // mutable — setGlobalMode() bunun alanlarını değiştirir
+const TURKEY   = { ...TURKEY_BBOX }; // mutable — setScope() bunun alanlarını değiştirir
 let GLOBAL_MODE = false;
 const FAY_URL    = 'data/turkiye_diri_fay_mta2026.geojson'; // MTA TDFH-2026 KMZ'den doğrudan dönüştürüldü (bkz. DİRİ FAY HATLARI bölümü) — eski repo hatalı fay_tipi içeriyordu
 const BASE = 'https://raw.githubusercontent.com/aliosmanoncel/EQ-LiveTurkiye/main/data/';
@@ -1082,31 +1083,40 @@ const REFRESH  = 3600; // 1 saat — GitHub Actions ile senkron
 ══════════════════════════════════════════ */
 const map = L.map('map', { center:[38,25], zoom:4 });
 
-/* Türkiye ⇄ Global görünüm anahtarı.
+/* Türkiye ⇄ EMSC ⇄ Global görünüm anahtarı (üç ayrı buton, tek anahtar).
+   Kapsam (bbox) VE varsayılan Kaynak (srcSel) birlikte değişir:
+     tr     → bölgesel bbox (TURKEY_BBOX) + Kaynak: EMSC
+     emsc   → dünya bbox (WORLD_BBOX)     + Kaynak: EMSC
+     global → dünya bbox (WORLD_BBOX)     + Kaynak: USGS
    TURKEY nesnesinin ALANLARI değiştirilir (referans sabit kalır) — bbox'ı
    okuyan her yer (getSourceChain, inTurkey/WebSocket filtresi, Bölge Seç)
    otomatik olarak güncel sınırı görür. loadData()'daki "GitHub raw" adımı
-   Türkiye+çevresi bbox ile üretildiği için Global modda tamamen atlanır. */
-function setGlobalMode(isGlobal) {
-  if (GLOBAL_MODE === isGlobal) return;
+   Türkiye+çevresi bbox ile üretildiği için dünya bbox'ında (emsc/global)
+   tamamen atlanır. srcSel dropdown'u kullanıcı isterse elle değiştirebilir
+   — bu sadece varsayılanı belirler, kilitlemez. */
+let TOP_SCOPE = 'tr'; // 'tr' | 'emsc' | 'global'
+function setScope(scope) {
+  if (TOP_SCOPE === scope) return;
+  TOP_SCOPE = scope;
+  const isGlobal = scope !== 'tr';
   GLOBAL_MODE = isGlobal;
   document.body.classList.toggle('global-mode', isGlobal);
-  document.getElementById('btnScopeTR').classList.toggle('active', !isGlobal);
-  document.getElementById('btnScopeGlobal').classList.toggle('active', isGlobal);
+  document.getElementById('btnScopeTR').classList.toggle('active', scope === 'tr');
+  document.getElementById('btnScopeEmsc').classList.toggle('active', scope === 'emsc');
+  document.getElementById('btnScopeGlobal').classList.toggle('active', scope === 'global');
   document.getElementById('scopeNote').style.display = isGlobal ? 'block' : 'none';
   Object.assign(TURKEY, isGlobal ? WORLD_BBOX : TURKEY_BBOX);
-  // Aktif bir araştırma bölgesi varsa (regionRect = commit edilmiş Circle/Poligon
-  // sorgusu, litRegionLayer = henüz commit edilmemiş görsel seçim) harita görünümünü
-  // EZME — kullanıcı "Global'e bastım, bölgem kayboldu mu?" yanılgısına düşmesin.
-  // Scope ≠ Map View ≠ Research Area: sadece veri kaynağı/kapsamı değişir.
-  if (!regionRect && !litRegionLayer) {
-    map.setView(isGlobal ? [15,20] : [38,25], isGlobal ? 2 : 4, {animate:false});
-  }
-  document.title = isGlobal
-    ? 'Dünya Sismik Isı Haritası — Canlı Akış (Global)'
+  map.setView(isGlobal ? [15,20] : [38,25], isGlobal ? 2 : 4, {animate:false});
+  document.title = scope === 'global'
+    ? 'Dünya Sismik Isı Haritası — Canlı Akış (Global · USGS)'
+    : scope === 'emsc'
+    ? 'Dünya Sismik Isı Haritası — Canlı Akış (EMSC)'
     : 'Türkiye Sismik Isı Haritası — Canlı Akış';
+  src = scope === 'global' ? 'usgs' : 'emsc';
+  const srcSelEl = document.getElementById('srcSel');
+  if (srcSelEl) srcSelEl.value = src;
   const activeH = document.querySelector('.tbtn[data-h].active');
-  if (activeH) loadData(document.getElementById('srcSel').value, +activeH.dataset.h);
+  if (activeH) loadData(src, +activeH.dataset.h);
 }
 
 /* URL ile paylaşılabilir görünüm: ?lat=..&lng=..&zoom=.. varsa haritayı oraya
@@ -1215,29 +1225,30 @@ fetch(FAY_URL).then(r=>r.json()).then(gj=>{
    EMSC: format=text (pipe-separated) — çalışan format
    USGS: format=geojson — yedek
 ══════════════════════════════════════════ */
-function getSourceChain(hours) {
+function getSourceChain(hours, preferSource) {
   const now = new Date(), s = new Date(now - hours*3600000);
   const fmt = d => d.toISOString().slice(0,19);
   const time = `&starttime=${fmt(s)}&endtime=${fmt(now)}`;
 
-  return [
-    {
-      name: 'EMSC',
-      fmt:  'text',
-      url:  `https://www.seismicportal.eu/fdsnws/event/1/query?format=text`
-           +`&minlat=${TURKEY.minLat}&maxlat=${TURKEY.maxLat}`
-           +`&minlon=${TURKEY.minLon}&maxlon=${TURKEY.maxLon}`
-           +`${time}&minmagnitude=${minMag}&limit=2000&orderby=time`
-    },
-    {
-      name: 'USGS',
-      fmt:  'geojson',
-      url:  `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson`
-           +`&minlatitude=${TURKEY.minLat}&maxlatitude=${TURKEY.maxLat}`
-           +`&minlongitude=${TURKEY.minLon}&maxlongitude=${TURKEY.maxLon}`
-           +`${time}&minmagnitude=${minMag}&limit=2000&orderby=time`
-    }
-  ];
+  const emsc = {
+    name: 'EMSC',
+    fmt:  'text',
+    url:  `https://www.seismicportal.eu/fdsnws/event/1/query?format=text`
+         +`&minlat=${TURKEY.minLat}&maxlat=${TURKEY.maxLat}`
+         +`&minlon=${TURKEY.minLon}&maxlon=${TURKEY.maxLon}`
+         +`${time}&minmagnitude=${minMag}&limit=2000&orderby=time`
+  };
+  const usgs = {
+    name: 'USGS',
+    fmt:  'geojson',
+    url:  `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson`
+         +`&minlatitude=${TURKEY.minLat}&maxlatitude=${TURKEY.maxLat}`
+         +`&minlongitude=${TURKEY.minLon}&maxlongitude=${TURKEY.maxLon}`
+         +`${time}&minmagnitude=${minMag}&limit=2000&orderby=time`
+  };
+  // Global butonunda (Kaynak: USGS) USGS önce denenir, EMSC yedek kalır;
+  // aksi halde (tr/emsc, Kaynak: EMSC) sıra değişmez.
+  return preferSource === 'usgs' ? [usgs, emsc] : [emsc, usgs];
 }
 
 /* EMSC text formatı: # ile başlayan header satırları atla
@@ -2426,8 +2437,10 @@ async function loadData(sourceName, h) {
   }
   }
 
-  /* ── 2. Doğrudan EMSC FDSN (yedek — Global modda birincil yol) ── */
-  const chain = getSourceChain(h);
+  /* ── 2. Doğrudan FDSN sorgusu (yedek — emsc/global kapsamında birincil yol) ──
+     sourceName'e göre öncelik sırası belirlenir: Global (usgs) → USGS önce,
+     tr/emsc (emsc) → EMSC önce; diğeri her durumda yedek olarak denenir. */
+  const chain = getSourceChain(h, sourceName);
   for (const source of chain) {
     setStatus(`${source.name} deneniyor…`);
     try {
