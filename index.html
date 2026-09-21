@@ -959,6 +959,7 @@
   </div>
   <svg id="tmSvg" viewBox="0 0 660 200" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;height:auto;max-width:660px"></svg>
   <div class="tmStats" id="tmStats">—</div>
+  <div class="tmStats" id="tmSelected" style="min-height:1em;">💡 Bir noktaya tıklayın veya üzerine gelin → tarihi burada görün</div>
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
     <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=10 olay)</span></div>
@@ -2123,11 +2124,32 @@ function timeAxisTicks(t0, t1) {
   return ticks;
 }
 
+// Zaman-Magnitude grafiğinde bir noktaya tıklandığında çağrılır -- SVG'nin
+// yerleşik <title> tooltip'i yalnızca fare ile üzerine gelince (hover)
+// çalışıyor ve küçük/üst üste binen noktalarda güvenilir değil; bu yüzden
+// tıklamayla kalıcı, okunur bir tarih/magnitude gösterimi eklendi
+// (2026-09-21, kullanıcı geri bildirimi: "tıkladığım zaman tarih olmadığı
+// için nereden başladığını bilmiyorum" -- Mc/tamlık değişiminin tarihini
+// bulmak için nokta bazlı tıklama gerekiyordu).
+function tmSelectPoint(t, m) {
+  const el = document.getElementById('tmSelected');
+  if (!el) return;
+  const d = new Date(t);
+  const dateStr = d.toLocaleString('tr-TR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+  el.innerHTML = `📍 Seçili nokta: <b>M${m.toFixed(1)}</b> · <b>${dateStr}</b>`;
+}
+
 function renderTimeMag(evList) {
   if (!showTimeMag) return;
   const svg    = document.getElementById('tmSvg');
   const metaEl = document.getElementById('tmMeta');
   const statsEl= document.getElementById('tmStats');
+  // Yeni bir sorgu/pencere/bölge geldiğinde önceki tıklamadan kalan seçili
+  // nokta artık ekrandaki veriye ait olmayabilir -- sessizce yanıltmasın diye
+  // ipucuna sıfırlanır (2026-09-21, kullanıcı geri bildirimi: tıklanan noktanın
+  // tarihi görünmüyordu).
+  const selEl = document.getElementById('tmSelected');
+  if (selEl) selEl.innerHTML = '💡 Bir noktaya tıklayın veya üzerine gelin → tarihi burada görün';
 
   // Bölge seçiliyse Time-Mag/b-değeri analizi TÜM Türkiye/EMSC yerine
   // sadece bölgeye özel kümeyi (regionEvents) kullanır — kullanıcı bir
@@ -2216,7 +2238,7 @@ function renderTimeMag(evList) {
     const r = 2 + m*1.6;
     const col = m>=5 ? '#ef4444' : m>=4 ? '#f97316' : m>=2.5 ? '#eab308' : '#06b6d4';
     const dateStr = e.time.toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-    dots += `<circle cx="${x(t).toFixed(1)}" cy="${y(m).toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" fill-opacity="0.75" stroke="#111" stroke-width="0.5"><title>M${m.toFixed(1)} · ${dateStr}</title></circle>`;
+    dots += `<circle cx="${x(t).toFixed(1)}" cy="${y(m).toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" fill-opacity="0.75" stroke="#111" stroke-width="0.5" style="cursor:pointer" onclick="tmSelectPoint(${t},${m.toFixed(2)})"><title>M${m.toFixed(1)} · ${dateStr}</title></circle>`;
   });
 
   let yTicks = '';
