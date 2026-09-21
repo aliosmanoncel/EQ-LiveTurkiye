@@ -4708,7 +4708,7 @@ function loadCityNetLayer() {
         }).bindPopup(
           `<b style="color:#a855f7">${s.name}</b><br>${city.name} (${city.authority})<br>`
           + `<span style="color:#aaa;font-size:.75em">Kuruluş: ${city.established} · Yükseltme: ${city.upgraded} · ${s.components}</span><br>`
-          + `<span style="color:#888;font-size:.7em">Konum yaklaşık — kaynak: ${s.geocode_source}${s.note ? ' · ' + s.note : ''}</span><br>`
+          + `<span style="color:#888;font-size:.7em">${s.geocode_source && s.geocode_source.includes('GERÇEK') ? 'Konum doğrulanmış (resmi)' : 'Konum yaklaşık'} — kaynak: ${s.geocode_source}${s.note ? ' · ' + s.note : ''}</span><br>`
           + `<a href="${city.source_url}" target="_blank" rel="noopener" style="color:#a855f7;font-size:.7em">${city.source_url}</a>`
         ));
       });

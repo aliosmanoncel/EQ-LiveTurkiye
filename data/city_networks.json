@@ -1,28 +1,34 @@
 {
-  "concept": "Şehir Tabanlı İzleme — İstasyon Ağı katmanının genişletilmiş bir kategorisi. Türkiye'nin ulusal AFAD/KOERI ağının aksine, bir şehrin/metropol alanının kendi yoğun yerel sismograf ağını gösterir. Yeni şehir eklemek için bu dosyaya yeni bir obje eklemek yeterli — index.html'deki kod jeneriktir.",
+  "concept": "Şehir Tabanlı İzleme — İstasyon Ağı katmanının genişletilmiş bir kategorisi. Türkiye'nin ulusal AFAD/KOERI ağının aksine, bir şehrin/metropol alanının kendi yoğun yerel sismograf ağını gösterir. Yeni şehir eklemek için bu dosyaya yeni bir obje eklemek yeterli — index.html'deki kod jeneriktir. ÖNEMLİ AYRIM: bu dosya yalnızca bir kurumun KENDİ işlettiği fiziksel istasyonları temsil eder (network_role: 'local_seismic_monitoring'). Bir kurumun ayrıca topladığı DIŞ bültenler/uyarılar (ör. HKO'nun Çin Deprem İdaresi, Guangdong, USGS, tsunami merkezlerinden topladığı bilgiler) bu dosyaya İSTASYON olarak eklenmez — onlar 'external_sources' gibi ayrı bir alanda, ayrı bir kavram olarak tutulmalıdır.",
   "cities": [
     {
       "id": "hongkong",
-      "name": "Hong Kong Kısa-Periyot Sismograf Ağı",
-      "name_en": "Hong Kong Short-period Seismograph Network",
+      "name": "Hong Kong Sismograf Ağı (Kısa-Periyot + Broadband)",
+      "name_en": "Hong Kong Seismograph Network (Short-period + Broadband)",
       "authority": "Hong Kong Observatory (HKO)",
+      "network": "HK",
+      "operator": "Hong Kong Observatory, China",
+      "network_role": "local_seismic_monitoring",
       "established": 1979,
       "upgraded": 1997,
-      "upgraded_note": "1979'da 3 istasyonla kuruldu, 1997'de 7-8 istasyonluk dijital ağa yükseltildi (HKO'nun kendi sayfaları istasyon sayısını 7 veya 8 olarak farklı veriyor — bkz. source_note).",
+      "upgraded_note": "1979'da kuruldu, 1997'de dijital ağa yükseltildi. İki farklı HKO kaynağı yükseltme öncesi/sonrası istasyon sayısını FARKLI veriyor — seismo.htm '3 istasyondan 7/8 istasyona' der, r1175 (Reprint 1175, 'Earthquake Monitoring and Probabilistic Seismic Hazard') 'four stations to nine stations in 1997 (Tam et al, 1997)' der. Tek bir sayı seçilmedi, ikisi de kaynak-atıflı olarak burada duruyor.",
       "source_url": "https://www.hko.gov.hk/en/wservice/tsheet/seismo.htm",
       "source_url_alt": "https://www.weather.gov.hk/en/gts/equake/sp_seismo_network_intro.htm",
-      "source_note": "HKO'nun ana tanıtım sayfası (seismo.htm) 8 istasyon sayıyor (Siu Lam dahil); HKO'nun ayrı 'Short-period Seismograph Network' sayfası 7 istasyon sayıyor (Siu Lam hariç). İkisi de kesin koordinat yayınlamıyor, yalnızca bir harita figürü (Figure 1) gösteriyor. Aşağıdaki koordinatlar HKO'nun yayınladığı resmi istasyon koordinatları DEĞİLDİR — yer adının OpenStreetMap/Wikipedia üzerindeki yaklaşık coğrafi konumudur (kaynak: 'geocode_source' alanı). Konum işaretçileri bu nedenle YAKLAŞIKTIR, kesin sismometre koordinatı olarak kullanılmamalıdır.",
+      "source_note": "HKO'nun ana tanıtım sayfası (seismo.htm) 8 kısa-periyot istasyon sayıyor (Siu Lam dahil); ayrı 'Short-period Seismograph Network' sayfası 7 sayıyor (Siu Lam hariç). r1175.pdf (HKO Reprint 1175) ayrıca '8 kısa-periyot + 2 broadband' der. Kısa-periyot istasyonların HİÇBİRİ için HKO resmi koordinat yayınlamıyor (yalnızca bir harita figürü) — bu 8 istasyonun koordinatları YAKLAŞIKTIR (yer adının OSM/Wikipedia konumu, 'geocode_source' alanına bkz.), kesin sismometre koordinatı değildir. Broadband istasyonlardan Po Shan İSTİSNADIR: FDSN (fdsn.org/networks/detail/HK/) + EarthScope/IRIS FDSNWS station sorgusuyla (service.earthscope.org/fdsnws/station/1/query?network=HK) doğrulanmış GERÇEK, resmi koordinatı var. TOPLAM istasyon sayısı (8+2=10) FDSN kaydıyla tam doğrulanmadı — FDSN sorgusu yalnızca Po Shan'ı (HKPS) döndürdü, ikinci broadband istasyon (HKO HQ) ve 8 kısa-periyot istasyon uluslararası FDSN federasyonuna gerçek-zamanlı yayınlanmıyor (yerel ağda kalıyor olabilir), bu yüzden 10 rakamı r1175.pdf metnine dayanır, FDSN'e değil.",
       "stations": [
-        { "name": "Cape D'Aguilar",  "lat": 22.2047,   "lon": 114.2563,  "components": "vertical", "geocode_source": "latitude.to gazetteer" },
-        { "name": "Cheung Chau",     "lat": 22.2106,   "lon": 114.0289,  "components": "vertical", "geocode_source": "Wikipedia (Cheung Chau)" },
-        { "name": "Keung Shan",      "lat": 22.2320,   "lon": 113.8813,  "components": "vertical", "geocode_source": "Wikipedia (Keung Shan)" },
-        { "name": "Lead Mine Pass",  "lat": 22.4125,   "lon": 114.1580,  "components": "vertical", "geocode_source": "Wikipedia (Lead Mine Pass)", "note": "Borehole seismometer, 24m derinlik (HKO)" },
-        { "name": "Luk Keng",        "lat": 22.5256,   "lon": 114.2153,  "components": "vertical", "geocode_source": "Wikipedia (Luk Keng, North District)" },
-        { "name": "Siu Lam",         "lat": 22.3687,   "lon": 114.0116,  "components": "vertical", "geocode_source": "Wikipedia (Siu Lam)", "note": "Yalnızca ana sayfada (seismo.htm) listeleniyor; HKO'nun ayrı ağ sayfasında yok — bkz. source_note" },
-        { "name": "Tsim Bei Tsui",   "lat": 22.4850,   "lon": 114.0100,  "components": "3-component", "geocode_source": "Wikipedia (Tsim Bei Tsui)" },
-        { "name": "Yuen Ng Fan",     "lat": 22.3779,   "lon": 114.3372,  "components": "3-component", "geocode_source": "OpenStreetMap Nominatim (Sai Kung District)" }
+        { "name": "Cape D'Aguilar",  "lat": 22.2047,   "lon": 114.2563,  "components": "vertical", "station_type": "short-period", "geocode_source": "latitude.to gazetteer" },
+        { "name": "Cheung Chau",     "lat": 22.2106,   "lon": 114.0289,  "components": "vertical", "station_type": "short-period", "geocode_source": "Wikipedia (Cheung Chau)" },
+        { "name": "Keung Shan",      "lat": 22.2320,   "lon": 113.8813,  "components": "vertical", "station_type": "short-period", "geocode_source": "Wikipedia (Keung Shan)" },
+        { "name": "Lead Mine Pass",  "lat": 22.4125,   "lon": 114.1580,  "components": "vertical", "station_type": "short-period", "geocode_source": "Wikipedia (Lead Mine Pass)", "note": "Borehole seismometer, 24m derinlik (HKO)" },
+        { "name": "Luk Keng",        "lat": 22.5256,   "lon": 114.2153,  "components": "vertical", "station_type": "short-period", "geocode_source": "Wikipedia (Luk Keng, North District)" },
+        { "name": "Siu Lam",         "lat": 22.3687,   "lon": 114.0116,  "components": "vertical", "station_type": "short-period", "geocode_source": "Wikipedia (Siu Lam)", "note": "Yalnızca ana sayfada (seismo.htm) listeleniyor; HKO'nun ayrı ağ sayfasında yok — bkz. source_note" },
+        { "name": "Tsim Bei Tsui",   "lat": 22.4850,   "lon": 114.0100,  "components": "3-component", "station_type": "short-period", "geocode_source": "Wikipedia (Tsim Bei Tsui)" },
+        { "name": "Yuen Ng Fan",     "lat": 22.3779,   "lon": 114.3372,  "components": "3-component", "station_type": "short-period", "geocode_source": "OpenStreetMap Nominatim (Sai Kung District)" },
+        { "name": "Po Shan Seismograph Station", "lat": 22.277599, "lon": 114.141502, "components": "3-component", "station_type": "broadband", "network_code": "HK", "station_code": "HKPS", "elevation_m": 196.3, "start_date": "2009-10-29", "geocode_source": "FDSN/EarthScope FDSNWS station sorgusu (network=HK) — GERÇEK, resmi koordinat, yaklaşık değil", "note": "2010'dan beri Global Seismographic Network'ün affiliated broadband istasyonu; verisi IRIS'e gerçek-zamanlı aktarılıyor (r1175.pdf)" },
+        { "name": "HKO Headquarters, Tsim Sha Tsui", "lat": 22.3013, "lon": 114.1746, "components": "3-component", "station_type": "broadband", "network_code": "HK", "geocode_source": "OpenStreetMap Nominatim (Hong Kong Observatory HQ binası) — YAKLAŞIK, FDSN'de bulunamadı", "note": "r1175.pdf metninde broadband istasyon olarak adı geçiyor ('Po Shan Road, Mid-levels and the HKO's Headquarters, Tsim Sha Tsui'), ama FDSN/IRIS uluslararası federasyonunda kayıtlı değil — sadece Po Shan (HKPS) kayıtlı." }
       ],
-      "count": 8
+      "count": 10,
+      "count_note": "8 kısa-periyot (koordinatları yaklaşık) + 2 broadband (Po Shan=FDSN doğrulanmış gerçek koordinat, HKO HQ=yaklaşık). Toplam '10' rakamı r1175.pdf'in metin ifadesine dayanır ('eight short-period... and two broadband'); FDSN sorgusu yalnızca 1 istasyonu (Po Shan) doğruladı, tam liste için bağımsız bir doğrulama yapılmadı."
     }
   ]
 }
