@@ -935,7 +935,8 @@
   <div class="tmHead">
     <span class="tmTitle">📈 Zaman–Magnitude Dağılımı <span style="color:#666;font-weight:400;">(Time–Magnitude Distribution)</span></span>
     <span>
-      <button class="tmFullscreenBtn" id="tmPngBtn" onclick="exportTimeMagPNG()" title="Üç grafiği (Time-Mag, b-değeri, Gutenberg-Richter) + bölge/yöntem bilgisini tek bir PNG görseli olarak indir — Blogger'a doğrudan yüklenebilir">🖼️ PNG</button>
+      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event)" title="Üç grafiği (Time-Mag, b-değeri, Gutenberg-Richter) + bölge/yöntem bilgisini, ekrandakiyle AYNI koyu temada tek bir PNG olarak indir — Blogger/web paylaşımı için">🖼️ PNG — Web</button>
+      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event)" title="Aynı üç grafiği beyaz zemin/koyu metinli bir düzende PNG olarak indir — akademik rapor, Word veya PDF'e gömmek için; grafiklerin kendi renkleri değişmez, yalnızca başlık/metin rengi">📄 PNG — Rapor</button>
       <button class="tmFullscreenBtn" id="tmFullscreenBtn" onclick="toggleTimeMagFullscreen(event)" title="Tam ekran aç/kapat — çok sayıda parametre/grafik olduğu için küçük pencerede görülemeyen üst kısmı (Magnitude Conversion seçici dahil) erişilebilir kılar">⛶</button>
       <button class="tmClose" onclick="toggleTimeMag()">✕</button>
     </span>
@@ -2149,7 +2150,22 @@ function tmSelectPoint(t, m) {
 // cevapsız kalırdı (bkz. regionBoundsLine()). PDF değil PNG -- bu sürümde
 // ek kütüphane gerektirmeyen, güvenilir tek format olarak seçildi; gerçek
 // çok sayfalı PDF ayrı, daha büyük bir iş maddesi olarak bekletiliyor.
-async function exportTimeMagPNG() {
+// theme: 'dark' (varsayılan, ekrandakiyle aynı — web/Blogger için) veya
+// 'light' (beyaz zemin, koyu metin — akademik rapor/Word/PDF'e gömmek için).
+// Grafiklerin kendisi (SVG nokta/çizgi renkleri) İKİ TEMADA DA DEĞİŞMEZ --
+// yalnızca bu fonksiyonun kendi çizdiği başlık/metadata/footer metni ve
+// canvas arka planı tema paletine göre değişir (2026-09-21, kullanıcı isteği:
+// "aynı analizden hem Blogger'a uygun koyu tema hem de rapora doğrudan
+// eklenebilecek açık tema"). Var olan dark-tema davranışı/commit'i
+// KORUNMUŞTUR -- bu, üzerine eklenen küçük, kontrollü bir varyant.
+async function exportTimeMagPNG(theme, evt) {
+  theme = theme === 'light' ? 'light' : 'dark';
+  const PALETTE = {
+    dark:  { bg:'#0a0e15', title:'#e2e8f0', meta:'#9ab0c5', region:'#7ecbff', label:'#06b6d4', stats:'#aaaaaa', footer:'#556' },
+    light: { bg:'#ffffff', title:'#111827', meta:'#334155', region:'#0369a1', label:'#0e7490', stats:'#475569', footer:'#64748b' },
+  };
+  const pal = PALETTE[theme];
+
   const svgSpecs = [
     { id: 'tmSvg',   statsId: 'tmStats',   label: 'Zaman–Magnitude Dağılımı' },
     { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Wilson & Öncel 2007)' },
@@ -2171,7 +2187,7 @@ async function exportTimeMagPNG() {
     });
   }
 
-  const btn = document.getElementById('tmPngBtn');
+  const btn = evt && evt.currentTarget ? evt.currentTarget : null;
   const oldLabel = btn ? btn.textContent : null;
   if (btn) { btn.textContent = '⏳…'; btn.disabled = true; }
 
@@ -2237,38 +2253,41 @@ async function exportTimeMagPNG() {
   canvas.width = W;
   canvas.height = totalH;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#0a0e15';
+  ctx.fillStyle = pal.bg;
   ctx.fillRect(0, 0, W, totalH);
   ctx.textBaseline = 'top';
 
   let y = PAD;
-  ctx.fillStyle = '#e2e8f0';
+  ctx.fillStyle = pal.title;
   ctx.font = 'bold 18px Arial';
   ctx.fillText('EQ-Live Türkiye — Deprem Analizi Raporu', PAD, y);
   y += 26;
 
   ctx.font = '12px Arial';
   metaLines.forEach(l => {
-    ctx.fillStyle = l.isRegion ? '#7ecbff' : '#9ab0c5';
+    ctx.fillStyle = l.isRegion ? pal.region : pal.meta;
     ctx.fillText(l.text, PAD, y);
     y += LH;
   });
   y += 14;
 
+  // Grafiklerin kendisi (b.img -- SVG'den üretilen, nokta/çizgi renkleri
+  // sabit) HER İKİ TEMADA DA AYNEN çiziliyor -- yalnızca çevresindeki
+  // başlık/istatistik metni tema paletine göre renk değiştiriyor.
   chartBlocks.forEach(b => {
-    ctx.fillStyle = '#06b6d4';
+    ctx.fillStyle = pal.label;
     ctx.font = 'bold 13px Arial';
     ctx.fillText(b.label, PAD, y);
     y += 20;
     ctx.drawImage(b.img, PAD, y, b.dispW, b.dispH);
     y += b.dispH + 8;
-    ctx.fillStyle = '#aaa';
+    ctx.fillStyle = pal.stats;
     ctx.font = '11px Arial';
     b.statsLines.forEach(l => { ctx.fillText(l, PAD, y); y += 15; });
     y += CHART_GAP;
   });
 
-  ctx.fillStyle = '#556';
+  ctx.fillStyle = pal.footer;
   ctx.font = '10px Arial';
   ctx.fillText(`EQ-Live Türkiye · aliosmanoncel.github.io/EQ-LiveTurkiye · Üretim: ${new Date().toLocaleString('tr-TR')}`, PAD, y);
 
@@ -2276,7 +2295,7 @@ async function exportTimeMagPNG() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `EQ-Live-Analiz-${new Date().toISOString().slice(0,10)}.png`;
+    a.download = `EQ-Live-Analiz-${theme === 'light' ? 'Rapor' : 'Web'}-${new Date().toISOString().slice(0,10)}.png`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 5000);
     if (btn) { btn.textContent = oldLabel; btn.disabled = false; }
