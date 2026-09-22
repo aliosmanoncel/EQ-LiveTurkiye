@@ -861,6 +861,8 @@
     <button class="tbtn shakebtn" data-shake="elbistan2023"  onclick="toggleShakeLayer('elbistan2023')"  style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us6000jlqa) · Kahramanmaraş çift depremi (2. şok) · Surfer regrid">2023 Elbistan</button>
     <button class="tbtn shakebtn global-only" data-shake="kanto1923" onclick="toggleShakeLayer('kanto1923')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid · Japonya">1923 Kanto</button>
     <button class="tbtn shakebtn global-only" data-shake="chile1960" onclick="toggleShakeLayer('chile1960')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/makrosismik model) · Surfer regrid · Şili · Kayıtlara geçen en büyük deprem (Mw9.5)">1960 Şili</button>
+    <span style="color:#888;font-size:.75rem;align-self:center;margin-left:6px">⚫ Fay Düzlemi Çözümleri (GCMT):</span>
+    <button class="tbtn" id="btnFocalMech" onclick="toggleLayer('focalmech')" style="font-size:.7rem;padding:3px 7px" title="Global CMT (globalcmt.org) doğrulanmış moment-tensör çözümleri · sarsıntı şiddeti (MMI) DEĞİL, kaynak mekanizmasıdır · şu an yalnızca 2020 Elazığ + 2023 Pazarcık + 2023 Elbistan">Beachball</button>
   </div>
 
   <!-- Seismicity renk modu — Seismicity butonunun hemen altında, aynı görsel
@@ -4503,6 +4505,9 @@ let showGAF     = false;
 let afadStationsLayer  = null;
 let koeriStationsLayer = null;
 let showStations       = false;
+let showFocalMech      = false;
+let focalMechLayer     = null;
+let focalMechData      = null;
 let afadStationsData   = null;
 let koeriStationsData  = null;
 let stationYear        = 2026;
@@ -4760,6 +4765,40 @@ function renderKoeriForYear(year) {
   if (lgK) lgK.textContent = active.length + ' / ' + koeriStationsData.count;
 }
 
+// Fay Düzlemi Çözümleri (Global CMT) — data/focal_mechanisms.json, her giriş
+// globalcmt.org'un kendi webCMTgif servisiyle üretilmiş, önceden indirilip
+// arşivlenmiş beachball PNG'sini taşır (moment tensör bileşenlerinden yeniden
+// hesaplanmıyor — GCMT'nin kendi resmi render'ı doğrudan kullanılıyor, yanlış
+// işaret/yönelim riski taşıyan özel bir çizim algoritması YAZILMADI). Marker
+// konumu CMT centroid'i (hipomerkezden birkaç km farklı olabilir, popup'ta
+// belirtiliyor) — ShakeMap MMI katmanından tamamen bağımsız, ayrı bir toggle.
+function loadFocalMechLayer() {
+  if (focalMechLayer) { focalMechLayer.addTo(map); return; }
+  const p = focalMechData ? Promise.resolve(focalMechData) : fetch('data/focal_mechanisms.json').then(r => r.json()).then(d => { focalMechData = d; return d; });
+  p.then(events => {
+    focalMechLayer = L.layerGroup(events.map(ev => {
+      const icon = L.icon({ iconUrl: `data/${ev.beachball}`, iconSize: [34, 34], iconAnchor: [17, 17] });
+      const dt = new Date(ev.time);
+      const popup = `
+        <b style="color:#e5e5e5">${ev.label}</b><br>
+        <span style="color:#facc15;font-weight:600">Mw ${ev.mag.toFixed(1)}</span> (${ev.magSource})
+        · ${dt.toLocaleString('tr-TR', { timeZone: 'UTC' })} UTC<br>
+        Derinlik (centroid): ${ev.depth_km} km<br>
+        <table style="margin-top:4px;font-size:.78em;border-collapse:collapse">
+          <tr style="color:#888"><td></td><td style="padding-right:8px">strike</td><td style="padding-right:8px">dip</td><td>rake</td></tr>
+          <tr><td style="color:#888;padding-right:6px">Düzlem 1</td><td>${ev.strike1}°</td><td>${ev.dip1}°</td><td>${ev.rake1}°</td></tr>
+          <tr><td style="color:#888;padding-right:6px">Düzlem 2</td><td>${ev.strike2}°</td><td>${ev.dip2}°</td><td>${ev.rake2}°</td></tr>
+        </table>
+        <span style="color:#aaa;font-size:.72em">Bu bir <b>fay düzlemi çözümüdür</b> (kaynak mekanizması) — sarsıntı şiddeti (MMI) değildir.
+        Hangi düzlemin gerçek kırılma yüzeyi olduğu bu veriden tek başına belirlenemez.<br>
+        Kaynak: <a href="https://www.globalcmt.org" target="_blank" rel="noopener">Global CMT</a>
+        (${ev.gcmt_event_name}) · centroid konumu, hipomerkezden (${ev.lat_pde.toFixed(2)}, ${ev.lon_pde.toFixed(2)}) birkaç km farklı olabilir.</span>`;
+      return L.marker([ev.lat, ev.lon], { icon }).bindPopup(popup);
+    }));
+    if (showFocalMech) focalMechLayer.addTo(map);
+  }).catch(e => setStatus('Fay Düzlemi Çözümleri yüklenemedi: ' + e.message, true));
+}
+
 // Şehir Tabanlı İzleme — data/city_networks.json jenerik olarak okunur, her şehir
 // kendi popup'ında provenance (source_url + source_note) taşır. İstasyon Ağı'nın
 // (AFAD/KOERI) aksine bu katman Türkiye ulusal ağı DEĞİL, tek bir metropol alanının
@@ -5005,6 +5044,20 @@ function toggleLayer(type) {
     } else {
       if (afadStationsLayer)  map.removeLayer(afadStationsLayer);
       if (koeriStationsLayer) map.removeLayer(koeriStationsLayer);
+    }
+  } else if (type === 'focalmech') {
+    // Fay düzlemi çözümleri (Global CMT) — ShakeMap MMI (sarsıntı şiddeti) katmanından
+    // KASITLI olarak ayrı: biri "etki", diğeri "kaynak mekanizması" bilgisi taşır.
+    // SADECE globalcmt.org'dan doğrulanmış, gerçek çözümü olan olaylar (bkz.
+    // data/focal_mechanisms.json) — kapsam dışı olaylar için varsayımsal/sentetik
+    // beachball ÜRETİLMEZ.
+    showFocalMech = !showFocalMech;
+    document.getElementById('btnFocalMech').classList.toggle('active', showFocalMech);
+    if (showFocalMech) {
+      loadFocalMechLayer();
+      setStatus('Fay Düzlemi Çözümleri · Global CMT (globalcmt.org) · doğrulanmış moment-tensör çözümü olan olaylar');
+    } else {
+      if (focalMechLayer) map.removeLayer(focalMechLayer);
     }
   } else if (type === 'citynet') {
     showCityNet = !showCityNet;
