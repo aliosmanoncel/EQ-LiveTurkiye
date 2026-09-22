@@ -1,0 +1,14 @@
+{
+  "event": "2023-02-06 Pazarcık (Kahramanmaraş) M7.8",
+  "source": "USGS ShakeMap us6000jllz (gerçek/enstrümantal, 262 istasyon, 92 şiddet gözlemi) + Surfer color-relief regrid (yalnizca gorsellestirme cozunurlugu artirildi, veri kaynagi degismedi)",
+  "z_field": "MMI",
+  "mmi_min": 2.9,
+  "mmi_max": 9.4,
+  "bounds": {
+    "minlat": 29.216699999999996,
+    "maxlat": 44.416699999999985,
+    "minlon": 28.591700000000003,
+    "maxlon": 48.0583
+  },
+  "note": "Renk skalasi Surfer varsayilan mavi->kirmizi rainbow; dusuk deger (arka plan) seffaf yapildi, sadece hissedilir siddet alani gosterilir."
+}
