@@ -865,6 +865,7 @@
     <button class="tbtn shakebtn global-only" data-shake="chile1960" onclick="toggleShakeLayer('chile1960')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/makrosismik model) · Surfer regrid · Şili · Kayıtlara geçen en büyük deprem (Mw9.5)">1960 Şili</button>
     <span style="color:#888;font-size:.75rem;align-self:center;margin-left:6px">⚫ Fay Düzlemi Çözümleri (GCMT):</span>
     <button class="tbtn" id="btnFocalMech" onclick="toggleLayer('focalmech')" style="font-size:.7rem;padding:3px 7px" title="Global CMT (globalcmt.org) doğrulanmış moment-tensör çözümleri · sarsıntı şiddeti (MMI) DEĞİL, kaynak mekanizmasıdır · şu an yalnızca 2020 Elazığ + 2023 Pazarcık + 2023 Elbistan">Beachball</button>
+    <button class="tbtn tr-only" id="btnRecurrence" onclick="toggleLayer('recurrence')" style="font-size:.7rem;padding:3px 7px" title="Öncel &amp; Wilson (2006) tekrarlanma süresi yöntemi × GSRM v2.1 strain + yerel b-değeri · araştırma/keşif hesabı, PSHA değil · Pazarcık (kararlı) + Elbistan (yapısal applicability failure)">⏳ Tekrarlanma Süresi</button>
   </div>
 
   <!-- Seismicity renk modu — Seismicity butonunun hemen altında, aynı görsel
@@ -4513,6 +4514,8 @@ let koeriStationsLayer = null;
 let showStations       = false;
 let showFocalMech      = false;
 let focalMechLayer     = null;
+let showRecurrence     = false;
+let recurrenceLayer    = null;
 let focalMechData      = null;
 let afadStationsData   = null;
 let koeriStationsData  = null;
@@ -4813,6 +4816,51 @@ function loadFocalMechLayer() {
   }).catch(e => setStatus('Fay Düzlemi Çözümleri yüklenemedi: ' + e.message, true));
 }
 
+// Öncel & Wilson (2006) tekrarlanma süresi × GSRM v2.1 — statik, önceden
+// hesaplanmış sonuçlar (data/recurrence_analysis.json). Canlı yeniden
+// hesaplama YOK — tam yöntem/tablo: seismo-report §10. Elbistan kasıtlı
+// olarak "sayısal sonuç yok" (applicability failure) gösteriyor, bir hata
+// veya eksik veri değil — bu, yöntemin kendi sınırını gösteren bir bulgu.
+function loadRecurrenceLayer() {
+  if (recurrenceLayer) { recurrenceLayer.addTo(map); return; }
+  fetch('data/recurrence_analysis.json').then(r => r.json()).then(events => {
+    recurrenceLayer = L.layerGroup(events.map(ev => {
+      const stable = ev.status === 'stable';
+      const color = stable ? '#22c55e' : '#f5576c';
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 0 6px ${color}">⏳</div>`,
+        iconAnchor: [13, 13]
+      });
+      let body;
+      if (stable) {
+        const rows = ev.b_rows.map(r => `
+          <tr><td style="color:#888;padding-right:6px">${r.label}</td><td>${r.Hs12}y</td><td>${r.Hs15}y</td><td>${r.Hs18}y</td></tr>`).join('');
+        body = `
+          <table style="margin-top:4px;font-size:.76em;border-collapse:collapse">
+            <tr style="color:#888"><td></td><td>H_s=12km</td><td>H_s=15km</td><td>H_s=18km</td></tr>
+            ${rows}
+          </table>
+          <div style="color:#22c55e;font-weight:600;margin-top:4px;font-size:.85em">${ev.summary}</div>`;
+      } else {
+        body = `<div style="color:#f5576c;font-weight:600;margin-top:4px;font-size:.85em">⚠️ ${ev.summary}</div>`;
+      }
+      const popup = `
+        <b style="color:#e5e5e5">${ev.label} — Tekrarlanma Süresi</b><br>
+        <span style="color:#888;font-size:.78em">L=${ev.L_km}km · M_max=${ev.Mmax} (Wells&amp;Coppersmith 1994) · GSRM ε̇=${ev.strain_ns_yr} ns/yr</span>
+        ${body}
+        <div style="color:#c8d8e8;font-size:.72em;margin-top:6px;line-height:1.5">${ev.note}</div>
+        <span style="color:#aaa;font-size:.7em">Öncel &amp; Wilson (2006) Eq.(3) × GSRM v2.1 × EQ-LiveTürkiye'nin kendi kataloğundan yerel b-değeri — <b>araştırma/keşif kaydı</b>, PSHA veya resmi tehlike tahmini DEĞİLDİR. Tam yöntem/tablolar: <a href="https://github.com/aliosmanoncel/seismo-report/blob/main/eqlive-turkey-methodology.html" target="_blank" rel="noopener">seismo-report §10</a>.</span>`;
+      return L.marker([ev.lat, ev.lon], { icon }).bindPopup(popup, { maxWidth: 280 });
+    }));
+    if (showRecurrence) recurrenceLayer.addTo(map);
+  }).catch(e => {
+    setStatus('Tekrarlanma Süresi katmanı yüklenemedi: ' + e.message, true);
+    showRecurrence = false;
+    document.getElementById('btnRecurrence').classList.remove('active');
+  });
+}
+
 // Şehir Tabanlı İzleme — data/city_networks.json jenerik olarak okunur, her şehir
 // kendi popup'ında provenance (source_url + source_note) taşır. İstasyon Ağı'nın
 // (AFAD/KOERI) aksine bu katman Türkiye ulusal ağı DEĞİL, tek bir metropol alanının
@@ -5100,6 +5148,20 @@ function toggleLayer(type) {
       setStatus('Fay Düzlemi Çözümleri · Global CMT (globalcmt.org) · doğrulanmış moment-tensör çözümü olan olaylar');
     } else {
       if (focalMechLayer) map.removeLayer(focalMechLayer);
+    }
+  } else if (type === 'recurrence') {
+    // Öncel & Wilson (2006) tekrarlanma süresi yöntemi × GSRM v2.1 strain-rate
+    // + EQ-LiveTürkiye'nin kendi kataloğundan hesaplanan yerel b-değeri.
+    // ARAŞTIRMA/KEŞİF kaydı — statik, önceden hesaplanmış data/recurrence_analysis.json.
+    // Canlı yeniden hesaplama YAPILMAZ. Tam metodoloji: seismo-report §10.
+    showRecurrence = !showRecurrence;
+    document.getElementById('btnRecurrence').classList.toggle('active', showRecurrence);
+    if (!recurrenceLayer) {
+      loadRecurrenceLayer();
+    } else if (showRecurrence) {
+      recurrenceLayer.addTo(map);
+    } else {
+      map.removeLayer(recurrenceLayer);
     }
   } else if (type === 'citynet') {
     showCityNet = !showCityNet;

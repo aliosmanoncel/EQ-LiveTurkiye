@@ -1,0 +1,34 @@
+[
+  {
+    "id": "pazarcik2023",
+    "label": "2023 Pazarcık",
+    "lat": 37.55,
+    "lon": 37.45,
+    "status": "stable",
+    "L_km": 310,
+    "Mmax": 7.95,
+    "Mw": 7.8,
+    "margin": 0.15,
+    "strain_ns_yr": 32.2,
+    "b_rows": [
+      { "label": "Karışık tip (b=1.14)", "Hs12": 694, "Hs15": 555, "Hs18": 463 },
+      { "label": "MD+ml homojen (b=1.53)", "Hs12": 624, "Hs15": 499, "Hs18": 416 }
+    ],
+    "summary": "T(M≥7.8) ≈ 416–694 yıl (H_s=12–18km, b=1.14–1.53 aralığında kararlı)",
+    "note": "L=310km (uydu-tabanlı yüzey kırığı), M_max=7.95 (Wells&Coppersmith 1994) — gözlenen Mw=7.8'e 0.15 birim marj var, formül sayısal olarak kararlı."
+  },
+  {
+    "id": "elbistan2023",
+    "label": "2023 Elbistan",
+    "lat": 38.08,
+    "lon": 37.22,
+    "status": "unstable",
+    "L_km": 140,
+    "Mmax": 7.56,
+    "Mw_usgs": 7.5,
+    "Mw_gcmt": 7.7,
+    "strain_ns_yr": 16.4,
+    "summary": "Güvenilir bir tekrarlanma süresi HESAPLANAMAZ — yapısal \"applicability failure\"",
+    "note": "L=140km → M_max=7.56. USGS Mw=7.5 marj sadece 0.06 birim (T binlerce yıla şişiyor); GCMT Mw=7.7 M_max'ı AŞIYOR (T negatif, anlamsız). Bu davranış b-değerinden (1.06–1.54 arasında test edildi) VE fay-mekanizması regresyon seçiminden (4 farklı Wells&Coppersmith 1994 ilişkisiyle test edildi, hepsi Mmax=7.56–7.69 dar bandında) BAĞIMSIZ — sorun doğrudan L→Mmax ölçeklemesinin bu olayı barındıramamasından kaynaklanıyor."
+  }
+]
