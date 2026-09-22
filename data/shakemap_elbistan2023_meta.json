@@ -1,0 +1,14 @@
+{
+  "event": "2023-02-06 Elbistan (Kahramanmaraş) M7.5",
+  "source": "USGS ShakeMap us6000jlqa (gerçek/enstrümantal, 75 istasyon, 6 şiddet gözlemi) + Surfer color-relief regrid (yalnizca gorsellestirme cozunurlugu artirildi, veri kaynagi degismedi)",
+  "z_field": "MMI",
+  "mmi_min": 3.1,
+  "mmi_max": 9.1,
+  "bounds": {
+    "minlat": 32.849999999999994,
+    "maxlat": 42.8167,
+    "minlon": 30.7167,
+    "maxlon": 44.6833
+  },
+  "note": "Renk skalasi Surfer varsayilan mavi->kirmizi rainbow; dusuk deger (arka plan) seffaf yapildi, sadece hissedilir siddet alani gosterilir."
+}
