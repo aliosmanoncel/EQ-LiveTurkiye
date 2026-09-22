@@ -1,0 +1,14 @@
+{
+  "event": "1960-05-22 Büyük Şili Depremi (Valdivia) Mw9.5",
+  "source": "USGS ShakeMap official19600522191120_30 (tarihsel/makrosismik model, 21 şiddet gözlemi, enstrümantal istasyon yok — 1960'ta dijital sismograf ağı mevcut değildi) + Surfer color-relief regrid (yalnizca gorsellestirme cozunurlugu artirildi, veri kaynagi degismedi)",
+  "z_field": "MMI",
+  "mmi_min": 1.1,
+  "mmi_max": 8.9,
+  "bounds": {
+    "minlat": -50.5,
+    "maxlat": -30.0,
+    "minlon": -84.0,
+    "maxlon": -60.0
+  },
+  "note": "Renk skalasi Surfer varsayilan mavi->kirmizi rainbow; dusuk deger (arka plan) seffaf yapildi, sadece hissedilir siddet alani gosterilir."
+}

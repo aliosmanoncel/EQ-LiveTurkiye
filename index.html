@@ -860,6 +860,7 @@
     <button class="tbtn shakebtn" data-shake="pazarcik2023"  onclick="toggleShakeLayer('pazarcik2023')"  style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us6000jllz) · Kahramanmaraş çift depremi (1. şok) · Surfer regrid">2023 Pazarcık</button>
     <button class="tbtn shakebtn" data-shake="elbistan2023"  onclick="toggleShakeLayer('elbistan2023')"  style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us6000jlqa) · Kahramanmaraş çift depremi (2. şok) · Surfer regrid">2023 Elbistan</button>
     <button class="tbtn shakebtn global-only" data-shake="kanto1923" onclick="toggleShakeLayer('kanto1923')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid · Japonya">1923 Kanto</button>
+    <button class="tbtn shakebtn global-only" data-shake="chile1960" onclick="toggleShakeLayer('chile1960')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/makrosismik model) · Surfer regrid · Şili · Kayıtlara geçen en büyük deprem (Mw9.5)">1960 Şili</button>
   </div>
 
   <!-- Seismicity renk modu — Seismicity butonunun hemen altında, aynı görsel
@@ -1080,6 +1081,7 @@ const SHAKE_EVENTS = {
   yenice1953:    { label: '1953 Yenice',    file: 'yenice1953' },
   adapazari1963: { label: '1963 Adapazarı', file: 'adapazari1963' },
   kanto1923:     { label: '1923 Kanto',     file: 'kanto1923', global: true },
+  chile1960:     { label: '1960 Şili',      file: 'chile1960', global: true },
   gediz1970:     { label: '1970 Gediz',     file: '1970_gediz' },
   elazig2020:    { label: '2020 Elazığ',    file: 'elazig2020' },
   pazarcik2023:  { label: '2023 Pazarcık',  file: 'pazarcik2023' },
