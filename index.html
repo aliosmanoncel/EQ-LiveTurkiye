@@ -4779,6 +4779,15 @@ function loadFocalMechLayer() {
     focalMechLayer = L.layerGroup(events.map(ev => {
       const icon = L.icon({ iconUrl: `data/${ev.beachball}`, iconSize: [34, 34], iconAnchor: [17, 17] });
       const dt = new Date(ev.time);
+      // Her iki düzlem de dikeye yakınsa (≥60°) beachball simetrik "pervane" görünür;
+      // biri belirgin şekilde yatıksa (oblik/karışık mekanizma) şekil asimetrik/çarpık
+      // görünür — bu bir render hatası değil, geometrinin doğal sonucu. Kullanıcı
+      // geri bildirimi: Elbistan'ın (dip1=46°) çarpık görünümü kafa karıştırdı,
+      // bu yüzden eşiğin altındaki olaylara tek satırlık otomatik açıklama eklendi.
+      const minDip = Math.min(ev.dip1, ev.dip2);
+      const obliqueNote = minDip < 60
+        ? `<div style="color:#facc15;font-size:.72em;margin-top:3px">ℹ️ Şeklin simetrik değil, çarpık görünmesi normaldir: bu depremde sadece yanal (sağa-sola) değil, biraz da yukarı-aşağı eğik bir kayma olmuş.</div>`
+        : '';
       const popup = `
         <b style="color:#e5e5e5">${ev.label}</b><br>
         <span style="color:#facc15;font-weight:600">Mw ${ev.mag.toFixed(1)}</span> (${ev.magSource})
@@ -4788,12 +4797,11 @@ function loadFocalMechLayer() {
           <tr style="color:#888"><td></td><td style="padding-right:8px">strike</td><td style="padding-right:8px">dip</td><td>rake</td></tr>
           <tr><td style="color:#888;padding-right:6px">Düzlem 1</td><td>${ev.strike1}°</td><td>${ev.dip1}°</td><td>${ev.rake1}°</td></tr>
           <tr><td style="color:#888;padding-right:6px">Düzlem 2</td><td>${ev.strike2}°</td><td>${ev.dip2}°</td><td>${ev.rake2}°</td></tr>
-        </table>
-        <span style="color:#aaa;font-size:.72em">Bu bir <b>fay düzlemi çözümüdür</b> (kaynak mekanizması) — sarsıntı şiddeti (MMI) değildir.
-        Hangi düzlemin gerçek kırılma yüzeyi olduğu bu veriden tek başına belirlenemez.<br>
+        </table>${obliqueNote}
+        <span style="color:#aaa;font-size:.72em">Bu ikon depremin <b>nasıl bir fay hareketiyle</b> oluştuğunu gösterir — sarsıntının ne kadar şiddetli hissedildiğini GÖSTERMEZ (o bilgi "Tarihi Şiddet" katmanında). Desen, iki olası fay düzleminden gelir; hangisinin gerçek kırılma yüzeyi olduğu bu veriyle tek başına söylenemez.<br>
         Kaynak: <a href="https://www.globalcmt.org" target="_blank" rel="noopener">Global CMT</a>
         (${ev.gcmt_event_name}) · centroid konumu, hipomerkezden (${ev.lat_pde.toFixed(2)}, ${ev.lon_pde.toFixed(2)}) birkaç km farklı olabilir.</span>`;
-      return L.marker([ev.lat, ev.lon], { icon }).bindPopup(popup);
+      return L.marker([ev.lat, ev.lon], { icon }).bindPopup(popup, { maxWidth: 260 });
     }));
     if (showFocalMech) focalMechLayer.addTo(map);
   }).catch(e => setStatus('Fay Düzlemi Çözümleri yüklenemedi: ' + e.message, true));
