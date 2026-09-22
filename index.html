@@ -851,6 +851,7 @@
     <button class="tbtn tr-only" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
     <button class="tbtn tr-only" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
     <button class="tbtn tr-only"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
+    <button class="tbtn tr-only" id="btnStrainRate" onclick="toggleLayer('strainrate')" title="GSRM v2.1 jeodezik strain-rate modeli (Kreemer ve ark. 2014) · GPS-tabanlı, uzun-dönem gerinim oranı · CANLI ÖLÇÜM veya deprem tahmini DEĞİL · b-değeri/asperite katmanlarıyla karşılaştırma için">🌐 Strain Rate (GSRM)</button>
     <span style="color:#888;font-size:.75rem;align-self:center;margin-left:6px">🟪 Tarihi Şiddet (MMI):</span>
     <button class="tbtn shakebtn" data-shake="murefte1912"   onclick="toggleShakeLayer('murefte1912')"   style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1912 Mürefte</button>
     <button class="tbtn shakebtn" data-shake="yenice1953"    onclick="toggleShakeLayer('yenice1953')"    style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1953 Yenice</button>
@@ -4496,6 +4497,8 @@ let platesLayer = null;
 let showPlates  = false;
 let gafLayer    = null;
 let showGAF     = false;
+let strainRateLayer = null;
+let showStrainRate  = false;
 
 // İstasyon Ağı — RQ-Mc-EMSC Network Effect (seismo-report §8) keşif/diagnostic katmanı.
 // data/afad_stations.json + data/koeri_stations.json HARİCEN, bu oturumda önceden
@@ -5035,6 +5038,20 @@ function toggleLayer(type) {
       setStatus('Dünya Diri Fayları · GEM Global Active Faults Database · Styron & Pagani (2020) · CC-BY-SA 4.0');
     } else {
       if (gafLayer) map.removeLayer(gafLayer);
+    }
+  } else if (type === 'strainrate') {
+    // GSRM v2.1 jeodezik strain-rate modeli (Kreemer ve ark. 2014) — statik
+    // PNG+meta.json, scripts/build_strain_rate_layer.py ile üretilir. Bu bir
+    // MODEL/tahmin katmanıdır, canlı ölçüm veya deprem öngörüsü DEĞİLDİR —
+    // b-değeri/asperite katmanlarıyla karşılaştırma amaçlı ayrı bir referans.
+    showStrainRate = !showStrainRate;
+    document.getElementById('btnStrainRate').classList.toggle('active', showStrainRate);
+    if (!strainRateLayer) {
+      loadStrainRateLayer();
+    } else if (showStrainRate) {
+      strainRateLayer.addTo(map);
+    } else {
+      map.removeLayer(strainRateLayer);
     }
   } else if (type === 'stations') {
     // RQ-Mc-EMSC Network Effect (seismo-report §8) keşif/diagnostic katmanı.
@@ -5828,6 +5845,26 @@ async function loadShakeLayer(id) {
     setStatus(`${ev.label} şiddet haritası yüklenemedi: ` + e.message, true);
     shakeActive[id] = false;
     document.querySelector(`.shakebtn[data-shake="${id}"]`).classList.remove('active');
+  }
+}
+
+async function loadStrainRateLayer() {
+  setStatus('Strain Rate (GSRM) katmanı yükleniyor…');
+  try {
+    const metaRes = await fetch('data/strain_rate_gsrm_meta.json');
+    if (!metaRes.ok) throw new Error('meta bulunamadı');
+    const meta = await metaRes.json();
+    const b = meta.bounds;
+    strainRateLayer = L.imageOverlay('data/strain_rate_gsrm.png',
+      [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+      { opacity: 0.75, interactive: false }
+    );
+    if (showStrainRate) strainRateLayer.addTo(map);
+    setStatus(`${meta.source} · MODEL (GPS-tabanlı, canlı ölçüm değil) · ${meta.units} · log skala ${meta.color_scale.min}-${meta.color_scale.max}`);
+  } catch (e) {
+    setStatus('Strain Rate (GSRM) yüklenemedi: ' + e.message, true);
+    showStrainRate = false;
+    document.getElementById('btnStrainRate').classList.remove('active');
   }
 }
 

@@ -1,0 +1,25 @@
+{
+  "generated": "2026-09-22T11:31:45Z",
+  "source": "GSRM v2.1 (Kreemer, Blewitt & Klein, 2014) — GEM Foundation",
+  "source_url": "https://geodesy.unr.edu/GSRM/GSRM_average_strain_v2.1.txt.Z",
+  "license": "CC-BY-NC-SA 3.0 (unported) — Kreemer et al. (2014), GEM Foundation",
+  "method": "GSRM resmi ızgara değerleri (kriging YOK — model zaten düzenli grid), sqrt(0.5*(e1^2+e2^2)) etkin strain rate; eksik hücreler en-yakın-komşu (KDTree) ile dolduruldu, hafif Gauss yumuşatması (sigma=1 hücre, tekil-hücre gürültüsünü bastırmak için — ham ızgarada komşu hücreler arası büyük sıçramalar var, GPS istasyon yoğunluğu düşük alanlarda beklenen model belirsizliği) uygulandı, ardından scipy.ndimage.zoom (bilinear) ile sadece görselleştirme çözünürlüğüne büyütüldü.",
+  "z_field": "effective strain rate (sqrt(0.5*(e1^2+e2^2)))",
+  "units": "nanostrain/yr (1e-9/yr)",
+  "color_scale": {
+    "min": 3.0,
+    "max": 200.0,
+    "type": "log",
+    "colormap": "YlOrRd"
+  },
+  "source_pts": 3556,
+  "grid_w": 400,
+  "grid_h": 180,
+  "bounds": {
+    "minlat": 34.0,
+    "maxlat": 43.0,
+    "minlon": 25.0,
+    "maxlon": 45.0
+  },
+  "note": "Bu bir JEODEZİK MODEL ürünüdür (GPS verisinden türetilmiş uzun-dönem gerinim oranı) — canlı ölçüm veya deprem tahmini DEĞİLDİR. Chen & Liu (2024, SRL, doi:10.1785/0220230306) bu modeli Anadolu için sismisiteyle karşılaştırmada kullanmıştır."
+}
