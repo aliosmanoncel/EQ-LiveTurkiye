@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-22T20:11:51Z",
+  "generated": "2026-09-22T20:25:07Z",
   "source": "GSRM v2.1 (Kreemer, Blewitt & Klein, 2014) — GEM Foundation",
   "source_url": "https://geodesy.unr.edu/GSRM/GSRM_average_strain_v2.1.txt.Z",
   "license": "CC-BY-NC-SA 3.0 (unported) — Kreemer et al. (2014), GEM Foundation",
@@ -13,12 +13,12 @@
     "colormap": "YlOrRd"
   },
   "source_pts": 145086,
-  "coverage_pct": 12.0,
+  "coverage_pct": 12.3,
   "grid_w": 1440,
   "grid_h": 612,
   "bounds": {
     "minlat": -66.2,
-    "maxlat": 86.8,
+    "maxlat": 85.0511287798,
     "minlon": -180.0,
     "maxlon": 180.0
   },

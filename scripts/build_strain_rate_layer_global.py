@@ -52,7 +52,16 @@ INPUT = '../GRID_DATA/GSRM_StrainRate/GSRM_average_strain_v2.1.txt'
 OUTPUT_PNG = 'data/strain_rate_gsrm_global.png'
 OUTPUT_META = 'data/strain_rate_gsrm_global_meta.json'
 
-BOUNDS = dict(minlat=-66.2, maxlat=86.8, minlon=-180.0, maxlon=180.0)
+# NOT: Leaflet'in varsayılan CRS'i (EPSG:3857, Web Mercator) enlemi
+# ±85.0511287798°'de KIRPAR (bu değerde mercY=±pi olacak şekilde standart
+# tanım) — GSRM verisinin kendi kapsamı 86.8°'ye kadar çıkıyor ama bunu
+# BOUNDS'a olduğu gibi koymak, Leaflet'in köşe noktasını 85.05°'de
+# projekte edip görüntüyü BEKLENENDEN FARKLI bir dikey ölçekte germesine
+# yol açar (canlı testte fark edildi: içerik sistematik olarak güneye
+# kaymış görünüyordu — ilk Mercator düzeltmesi ham enlemi kullanmıştı,
+# bu ikinci düzeltme Leaflet'in gerçek kırpma sınırıyla eşleşiyor).
+LEAFLET_MAX_LAT = 85.0511287798
+BOUNDS = dict(minlat=-66.2, maxlat=LEAFLET_MAX_LAT, minlon=-180.0, maxlon=180.0)
 GRID_W, GRID_H = 1440, 612  # ~0.25 deg/piksel
 
 # En-yakın-komşu araması bu mesafeyi (derece, ~kabaca) aşarsa piksel şeffaf
