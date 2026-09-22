@@ -83,9 +83,34 @@ def main():
           f'p99={np.percentile(eff,99):.1f} max={eff.max():.1f} ns/yr')
 
     # Sabit ızgara VARSAYILMAZ — gerçek scattered-point en-yakın-komşu (KDTree).
+    #
+    # KRİTİK PROJEKSİYON DÜZELTMESİ: Leaflet L.imageOverlay, görüntüyü verilen
+    # iki köşe arasında haritanın KENDİ Web Mercator projeksiyonunda doğrusal
+    # gerer — görüntünün pikselleri düz ENLEM aralıklarıyla değil, Web Mercator
+    # Y ekseninde eşit aralıklı olmalıdır. İlk denemede grid_lats basitçe
+    # np.linspace(maxlat,minlat,...) ile düz enlemde üretilmişti — Türkiye'nin
+    # dar enlem aralığında (34-43°, ~9°) bu yaklaşım görünmez bir hataydı, ama
+    # global 153°'lik aralıkta (-66.2°..86.8°) BÜYÜK bir düşey kaymaya yol açtı
+    # (canlı testte fark edildi: Türkiye'nin gerçek strain verisi haritada
+    # Suriye'nin üzerinde görünüyordu — PNG dosyasının kendisi doğruydu,
+    # sorun sadece Leaflet'in görüntüyü gerdiği projeksiyon varsayımıydı).
+    # Çözüm: her piksel satırının GERÇEK enlemini ters-Mercator ile hesaplayıp
+    # o enlemde örnekleme yapmak — böylece Leaflet doğrusal gerince sonuç
+    # doğru enlemlere denk geliyor.
+    def lat_to_mercY(lat_deg):
+        phi = np.radians(lat_deg)
+        return np.log(np.tan(np.pi / 4 + phi / 2))
+
+    def mercY_to_lat(y):
+        return np.degrees(2 * np.arctan(np.exp(y)) - np.pi / 2)
+
+    y_north = lat_to_mercY(BOUNDS['maxlat'])
+    y_south = lat_to_mercY(BOUNDS['minlat'])
+    grid_y = np.linspace(y_north, y_south, GRID_H)  # Mercator Y'de eşit aralık
+    grid_lats = mercY_to_lat(grid_y)  # bu Y'lere karşılık gelen GERÇEK enlemler
+
     tree = cKDTree(np.column_stack([lats, lons]))
     grid_lons = np.linspace(BOUNDS['minlon'], BOUNDS['maxlon'], GRID_W)
-    grid_lats = np.linspace(BOUNDS['maxlat'], BOUNDS['minlat'], GRID_H)  # kuzey üstte
     glon, glat = np.meshgrid(grid_lons, grid_lats)
     query_pts = np.column_stack([glat.ravel(), glon.ravel()])
     dist, idx = tree.query(query_pts, k=1)
@@ -113,7 +138,11 @@ def main():
         'method': f'GSRM resmi noktaları, sabit ızgara VARSAYILMADI (Türkiye katmanından farklı — '
                   f'global çözünürlük bölgeye göre değişiyor). scipy.spatial.cKDTree ile gerçek '
                   f'en-yakın-komşu araması, MAX_DIST_DEG={MAX_DIST_DEG}° üstü mesafeler şeffaf '
-                  f'bırakıldı (var olmayan strain sinyali icat edilmedi, büyütme/yumuşatma da yok).',
+                  f'bırakıldı (var olmayan strain sinyali icat edilmedi, büyütme/yumuşatma da yok). '
+                  f'Piksel satırları düz enlemde değil, ters-Mercator ile hesaplanmış gerçek '
+                  f'enlemlerde örneklendi (Leaflet L.imageOverlay görüntüyü Web Mercator\'da '
+                  f'doğrusal gerdiği için — bkz. script içi yorum, canlı testte fark edilip '
+                  f'düzeltilen bir projeksiyon hatası).',
         'z_field': 'effective strain rate (max(|e1|,|e2|))',
         'units': 'nanostrain/yr (1e-9/yr)',
         'color_scale': {'min': VMIN, 'max': VMAX, 'type': 'log', 'colormap': 'YlOrRd'},
