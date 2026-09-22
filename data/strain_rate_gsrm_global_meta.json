@@ -1,0 +1,26 @@
+{
+  "generated": "2026-09-22T19:56:00Z",
+  "source": "GSRM v2.1 (Kreemer, Blewitt & Klein, 2014) — GEM Foundation",
+  "source_url": "https://geodesy.unr.edu/GSRM/GSRM_average_strain_v2.1.txt.Z",
+  "license": "CC-BY-NC-SA 3.0 (unported) — Kreemer et al. (2014), GEM Foundation",
+  "method": "GSRM resmi noktaları, sabit ızgara VARSAYILMADI (Türkiye katmanından farklı — global çözünürlük bölgeye göre değişiyor). scipy.spatial.cKDTree ile gerçek en-yakın-komşu araması, MAX_DIST_DEG=0.35° üstü mesafeler şeffaf bırakıldı (var olmayan strain sinyali icat edilmedi, büyütme/yumuşatma da yok).",
+  "z_field": "effective strain rate (max(|e1|,|e2|))",
+  "units": "nanostrain/yr (1e-9/yr)",
+  "color_scale": {
+    "min": 3.0,
+    "max": 500.0,
+    "type": "log",
+    "colormap": "YlOrRd"
+  },
+  "source_pts": 145086,
+  "coverage_pct": 15.4,
+  "grid_w": 1440,
+  "grid_h": 612,
+  "bounds": {
+    "minlat": -66.2,
+    "maxlat": 86.8,
+    "minlon": -180.0,
+    "maxlon": 180.0
+  },
+  "note": "Bu bir JEODEZİK MODEL ürünüdür (GPS verisinden türetilmiş uzun-dönem gerinim oranı) — canlı ölçüm veya deprem tahmini DEĞİLDİR. Yalnızca GSRM'in veri ürettiği plaka sınırı bölgeleri renklidir; boş alanlar \"sıfır strain\" değil, \"model bu bölgede tanımsız\" anlamına gelir."
+}
