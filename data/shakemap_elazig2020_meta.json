@@ -1,0 +1,14 @@
+{
+  "event": "2020-01-24 Elazığ (Sivrice-Doğanyol) M6.7",
+  "source": "USGS ShakeMap us60007ewc (gerçek/enstrümantal, 22 istasyon, 34 şiddet gözlemi) + Surfer color-relief regrid (yalnizca gorsellestirme cozunurlugu artirildi, veri kaynagi degismedi)",
+  "z_field": "MMI",
+  "mmi_min": 2.9,
+  "mmi_max": 9.3,
+  "bounds": {
+    "minlat": 35.1167,
+    "maxlat": 41.4167,
+    "minlon": 35.1,
+    "maxlon": 43.2667
+  },
+  "note": "Renk skalasi Surfer varsayilan mavi->kirmizi rainbow; dusuk deger (arka plan) seffaf yapildi, sadece hissedilir siddet alani gosterilir."
+}
