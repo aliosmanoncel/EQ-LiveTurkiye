@@ -1,1 +1,1 @@
-{"generated":"2026-09-24T00:14:15Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-09-24T05:45:06Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"729505","time":"2026-09-24T05:14:26","lat":39.572,"lon":27.77017,"dep":7.0,"mag":1.7,"mtype":"ML","mw":0.94,"place":"Altıeylül (Balıkesir)","province":"Balıkesir","district":"Altıeylül"}]}
