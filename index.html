@@ -2813,7 +2813,15 @@ async function exportPosterAGU(scale, evt) {
     c.stroke(); c.globalAlpha = 0.55; text('P', XP - 4, 146, 'bold 11px Arial', '#1e3a5f'); text('S', XS - 4, 146, 'bold 11px Arial', '#1e3a5f'); c.globalAlpha = 1; }
   // ── başlık bloğu
   const region = posterVal('posterRegion', '');
-  const title = posterVal('posterTitle', (region ? region + ': ' : '') + (lastCs ? 'Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Analizi' : 'b-Değeri, Zamansal Değişimi ve Frekans–Büyüklük Analizi'));
+  // Varsayılan başlık analize göre kurulur (2026-09-28): yöntem (tamlık basamakları / tek Mc),
+  // GK74 durumu ve verinin yıl aralığı. "Başlık" alanı doluysa o kullanılır.
+  const tEvs = (regionRect ? applyGk74Filter(regionEvents) : lastTmEvList) || [];
+  let tYrs = '';
+  if (tEvs.length) { let a = Infinity, b = -Infinity; tEvs.forEach(e => { const t = +e.time; if (t < a) a = t; if (t > b) b = t; });
+    const y0 = new Date(a).getUTCFullYear(), y1 = new Date(b).getUTCFullYear(); tYrs = y0 === y1 ? `${y0}` : `${y0}–${y1}`; }
+  const tCore = lastCs ? 'Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Oranları' : 'b-Değeri, Zamansal Değişimi ve Frekans–Büyüklük Dağılımı';
+  const tDecl = regionRect && regionDeclusterOn ? ', Artçıları Ayıklanmış Katalog' : '';
+  const title = posterVal('posterTitle', (region ? region + ': ' : '') + tCore + tDecl + (tYrs ? ` (${tYrs})` : ''));
   // Kimlik varsayılanı YOK: boşsa açıkça yer tutucu yazılır (kimse adına poster üretilmez)
   const authorIn = posterVal('posterAuthor', ''), affilIn = posterVal('posterAffil', '');
   const author = authorIn || 'Yazar Adı Soyadı', affil = affilIn || 'Unvan · Kurum / Üniversite / Bölüm';
@@ -2981,7 +2989,7 @@ async function exportPosterAGU(scale, evt) {
   if (userRes) rItems = userRes.split('\n').map(t => t.trim()).filter(Boolean);
   else {
     rItems = [];
-    if (gf) { const best = gf.curves[0]; const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**Weichert (1980):** ${V(`b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}`)}; ${V(`λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl`)}${gf.nRef !== undefined ? `; ${V(`N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl`)}` : ''} (N = ${gf.N}).`); }
+    if (gf) { const best = gf.curves[0]; const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**Weichert (1980):** ${V(`b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}`)}; ${V(`λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl`)}${gf.nRef !== undefined ? `; ${V(`N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl`)}${gf.mRefExtrap ? ' (gözlenen aralığın dışında: dışkestirim)' : ''}` : ''} (N = ${gf.N}).`); }
     if (!gf && gs) { const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**G-R (tek Mc):** ${V(`Mc = ${String(gs.mc).replace('.', ',')}`)}; ${V(`b_GR = ${gs.b.toFixed(2).replace('.', ',')}`)}; N(≥Mc) = ${gs.n.toLocaleString('tr-TR')}${gs.gof !== null ? `; GoF = %${gs.gof.toFixed(1).replace('.', ',')}` : ''}.`); }
     if (bt) { const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**b(t):** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` + (bt.fixed ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
     const qc = (document.getElementById('csDiag')?.innerText || '').split('\n').map(t => t.trim()).filter(t => /^[⚠🔴]/.test(t)).map(t => t.replace(/^[⚠️🔴\s]+/u, ''));
@@ -3027,7 +3035,7 @@ async function exportPosterAGU(scale, evt) {
   cv.toBlob(blob => {
     if (!blob) { alert('Poster oluşturulamadı (görüntü güvenlik kısıtı).'); done(); return; }
     const url = URL.createObjectURL(blob), a = document.createElement('a');
-    const slug = (region || 'bolge').toLowerCase().replace(/[^a-z0-9ğüşıöç]+/gi, '-').replace(/^-|-$/g, '');
+    const slug = (region || 'bolge').replace(/[İI]/g, 'i').toLowerCase().replace(/[ğüşıöç]/g, ch => ({ 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ı': 'i', 'ö': 'o', 'ç': 'c' })[ch]).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'bolge';
     a.href = url; a.download = `EQ-Live-${SC >= 4 ? 'Baski-7680x4320' : SC > 1 ? 'Poster' : 'Slayt'}-${slug}-${new Date().toISOString().slice(0, 10)}.png`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 5000); done();
@@ -3736,6 +3744,11 @@ function renderGutenbergRichterCS(cs) {
     // Tutarlılık denetimi (yalnızca uyarı): model N_ref, katalogda gözlenen M≥M_ref oranıyla kabaca uyuşmalı
     try {
       const nObs = items.filter(it => it.m >= mRef - 1e-9).length, Tref = csObsYears(mRef, cs.periods);
+      lastGrFit.mRefExtrap = mRef > mTopObs + 1e-9;
+      if (lastGrFit.mRefExtrap) {
+        const sug = Math.min(5, Math.floor(mTopObs * 2) / 2);
+        refNote = `ⓘ M_ref = ${mRef}, gözlenen en büyük sınıfın üst sınırının (${mTopObs}) üstünde: N${mRef} = ${nRef.toPrecision(3)}/yıl bir dışkestirimdir (extrapolation). ±σ yalnızca istatistiksel belirsizliktir; b'deki yanlılığı ve en büyük deprem belirsizliğini içermez. Veriyle desteklenen oran için M_ref ≤ ${mTopObs} (ör. ${sug.toFixed(1)}) girin.`;
+      }
       if (Tref > 0 && nObs >= 2) {
         const obs = nObs / Tref, ratio = nRef / obs;
         if (ratio < 0.2 || ratio > 5) refNote = `⚠ Model N${mRef} = ${nRef.toPrecision(3)}/yıl, katalogda gözlenen M≥${mRef} oranından (${nObs} olay / ${Tref.toFixed(1)} yıl = ${obs.toPrecision(3)}/yıl) yaklaşık ${ratio < 1 ? (1 / ratio).toFixed(0) + ' kat düşük' : ratio.toFixed(0) + ' kat yüksek'}. b yanlı olabilir: tamlık dönemlerini, analiz penceresini (ör. büyük ana şoktan önce kesmek) ve GK74 kümeden arındırmayı gözden geçirin. Mx ya da M_ref değiştirmek bunu düzeltmez.`;
