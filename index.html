@@ -1001,6 +1001,7 @@
     </div>
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">
       <label><input type="checkbox" id="posterPhoto" checked style="vertical-align:middle;"> fotoğraf</label>
+      <label title="Poster renk teması">tema <select id="posterTheme" onchange="posterSavePrefs()" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;"><option value="doga">Doğa ve Deprem (yeşil–lacivert)</option><option value="kum">Kum (AGU örneğinden esinli)</option></select></label>
       <label title="Doğa ve Deprem Bilimi Topluluğu logosu (sağ üst)"><input type="checkbox" id="posterLogo" checked style="vertical-align:middle;"> logo</label>
       <button onclick="exportPosterAGU(1, event)" style="background:none;border:1px solid #b45309;color:#fbbf24;border-radius:4px;cursor:pointer;padding:1px 8px;">🎓 Slayt 16:9 (1920×1080)</button>
       <button onclick="exportPosterAGU(2, event)" style="background:none;border:1px solid #b45309;color:#fbbf24;border-radius:4px;cursor:pointer;padding:1px 8px;">🖨 Poster (3840×2160)</button>
@@ -2533,7 +2534,7 @@ function tmSelectPoint(t, m) {
    otomatik üretilir; "Sonuçlar" isteğe bağlı olarak kullanıcıca yazılabilir.
    Hesaplamaya dokunmaz.
 ══════════════════════════════════════════ */
-const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact'];
+const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact', 'posterTheme'];
 function posterLoadPrefs() {
   try { const o = JSON.parse(localStorage.getItem('eqlivePoster') || '{}'); POSTER_KEYS.forEach(k => { const el = document.getElementById(k); if (el && o[k] !== undefined && o[k] !== '') el.value = o[k]; }); } catch (e) {}
 }
@@ -2574,15 +2575,32 @@ async function exportPosterAGU(scale, evt) {
 
   const cv = document.createElement('canvas'); cv.width = W * SC; cv.height = H * SC;
   const c = cv.getContext('2d'); c.scale(SC, SC); c.textBaseline = 'top';
-  const INK = '#1f2937', ACC = '#b45309', MUTE = '#4b5563';
+  // Renk temaları: 'doga' = Doğa ve Deprem (logo paleti: lacivert, yaprak yeşili); 'kum' = AGU örneğinden esinlenen kum tonu
+  const THEMES = {
+    doga: { bg: '#f0f4ec', acc: '#4d7c0f', soft: '#ecf5dc', deep: '#1e3a5f',
+      polys: [['#cfe0c3', [[1480, 0], [1920, 0], [1920, 1080], [1760, 1080]]], ['#a9c98f', [[1650, 0], [1920, 0], [1920, 700]]],
+              ['#1e3a5f', [[1780, 380], [1920, 250], [1920, 1080], [1850, 1080]]], ['#b7d3a0', [[0, 860], [120, 1080], [0, 1080]]]] },
+    kum: { bg: '#fbf0d9', acc: '#b45309', soft: '#fef3c7', deep: '#78350f',
+      polys: [['#f6c77a', [[1480, 0], [1920, 0], [1920, 1080], [1760, 1080]]], ['#e9a24d', [[1650, 0], [1920, 0], [1920, 700]]],
+              ['#c9803f', [[1780, 380], [1920, 250], [1920, 1080], [1850, 1080]]], ['#f3b865', [[0, 860], [120, 1080], [0, 1080]]]] } };
+  const themeKey = posterVal('posterTheme', 'doga'), TH = THEMES[themeKey] || THEMES.doga;
+  const INK = '#1f2937', ACC = TH.acc, MUTE = '#4b5563';
   const wrap = (t, w, font) => { c.font = font; const out = []; (t || '').split('\n').forEach(par => { let cur = ''; par.split(' ').filter(Boolean).forEach(wd => { const tt = cur ? cur + ' ' + wd : wd; if (c.measureText(tt).width > w && cur) { out.push(cur); cur = wd; } else cur = tt; }); out.push(cur); }); return out; };
   const text = (t, x, y, font, col, align) => { c.font = font; c.fillStyle = col; c.textAlign = align || 'left'; c.fillText(t, x, y); c.textAlign = 'left'; };
   const para = (t, x, y, w, font, lh, col, maxY, bullet) => { const lines = wrap(t, w - (bullet ? 16 : 0), font); lines.forEach((l, i) => { if (y + lh > maxY) return; if (bullet && i === 0) text('▪', x, y, font, ACC); text(l, x + (bullet ? 16 : 0), y, font, col); y += lh; }); return y; };
   // ── zemin ve dekoratif şekiller
-  c.fillStyle = '#fbf0d9'; c.fillRect(0, 0, W, H);
-  [['#f6c77a', [[1480, 0], [1920, 0], [1920, 1080], [1760, 1080]]], ['#e9a24d', [[1650, 0], [1920, 0], [1920, 700]]],
-   ['#c9803f', [[1780, 380], [1920, 250], [1920, 1080], [1850, 1080]]], ['#f3b865', [[0, 860], [120, 1080], [0, 1080]]]].forEach(([col, pts]) => {
+  c.fillStyle = TH.bg; c.fillRect(0, 0, W, H);
+  TH.polys.forEach(([col, pts]) => {
     c.fillStyle = col; c.globalAlpha = 0.55; c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.closePath(); c.fill(); c.globalAlpha = 1; });
+  if (themeKey === 'doga') {
+    // başlık şeridinde sıradağ silueti (lacivert arka, yeşil ön) ve sismogram izi — logodaki motiflerin yankısı
+    const ridge = (pts, col, a) => { c.fillStyle = col; c.globalAlpha = a; c.beginPath(); c.moveTo(pts[0][0], 170); pts.forEach(([x, y]) => c.lineTo(x, y)); c.lineTo(pts[pts.length - 1][0], 170); c.closePath(); c.fill(); c.globalAlpha = 1; };
+    ridge([[1180, 170], [1290, 112], [1350, 138], [1440, 70], [1520, 122], [1600, 58], [1700, 118], [1760, 96], [1920, 150], [1920, 170]], '#1e3a5f', 0.16);
+    ridge([[1240, 170], [1360, 132], [1430, 150], [1530, 104], [1610, 142], [1690, 116], [1800, 150], [1920, 128], [1920, 170]], '#6a9f2a', 0.22);
+    ridge([[0, 170], [0, 128], [70, 150], [150, 108], [240, 158], [300, 170]], '#6a9f2a', 0.18);
+    c.strokeStyle = '#1e3a5f'; c.globalAlpha = 0.35; c.lineWidth = 1.4; c.beginPath();
+    for (let x = 180; x <= 1740; x += 3) { const u = (x - 960) / 90, env = Math.exp(-u * u) * 9 + Math.exp(-Math.pow((x - 560) / 40, 2)) * 3, yy = 163 + env * Math.sin(x * 0.55) * (0.6 + 0.4 * Math.sin(x * 0.13)); x === 180 ? c.moveTo(x, yy) : c.lineTo(x, yy); }
+    c.stroke(); c.globalAlpha = 1; }
   // ── başlık bloğu
   const region = posterVal('posterRegion', '');
   const title = posterVal('posterTitle', (region ? region + ': ' : '') + 'Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Analizi');
@@ -2641,7 +2659,7 @@ async function exportPosterAGU(scale, evt) {
       L.line.forEach(({ wd, wW }) => { wd.forEach(pc => { c.font = font(pc); c.fillStyle = pc.col; c.textAlign = 'left'; c.fillText(pc.s, cx, y); cx += c.measureText(pc.s).width; }); cx += gap; });
       y += lh; });
     return y; };
-  const caption = (t, x, y, w, maxY) => rich(t.replace(/^(Şekil \d+\.)/, '**$1**'), x, y, w, { size: 15, lh: 19, italic: true, col: '#374151', maxY });
+  const caption = (t, x, y, w, maxY) => rich(t.replace(/^(Şekil \d+\.)/, '**$1**'), x, y, w, { size: 15, lh: 19, italic: true, col: '#374151', maxY, justify: false });
 
   const cs = lastCs, gf = lastGrFit, bt = typeof lastBts !== 'undefined' ? lastBts : null;
   const d = t => t ? new Date(t).toISOString().slice(0, 10) : '—';
@@ -2699,13 +2717,13 @@ async function exportPosterAGU(scale, evt) {
   // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
   const srcTag = (regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
   const steps = [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım 10'], ['4 · G–R', 'Weichert (1980)']];
-  { const fx0 = X1 + 16, fw = W1 - 32, ag = 18, bw = (fw - ag * (steps.length - 1)) / steps.length, bh = 50;
+  { const fx0 = X1 + 16, fw = W1 - 32, ag = 18, bw = (fw - ag * (steps.length - 1)) / steps.length, bh = 54;
     steps.forEach(([h, sub], i) => { const bx0 = fx0 + i * (bw + ag);
-      c.fillStyle = '#fef3c7'; c.strokeStyle = ACC; c.lineWidth = 1.5; c.beginPath();
+      c.fillStyle = TH.soft; c.strokeStyle = ACC; c.lineWidth = 1.5; c.beginPath();
       if (c.roundRect) c.roundRect(bx0, y, bw, bh, 7); else c.rect(bx0, y, bw, bh); c.fill(); c.stroke();
-      text(h, bx0 + bw / 2, y + 8, 'bold 15px Arial', '#78350f', 'center');
-      c.font = '12.5px Arial'; let st = sub; while (st.length > 4 && c.measureText(st).width > bw - 8) st = st.slice(0, -2);
-      text(st === sub ? sub : st + '…', bx0 + bw / 2, y + 29, '12.5px Arial', INK, 'center');
+      text(h, bx0 + bw / 2, y + 10, 'bold 14px Arial', TH.deep, 'center');
+      c.font = '11.5px Arial'; let st = sub; while (st.length > 4 && c.measureText(st).width > bw - 16) st = st.slice(0, -2);
+      text(st === sub ? sub : st + '…', bx0 + bw / 2, y + 32, '11.5px Arial', INK, 'center');
       if (i < steps.length - 1) { const ax = bx0 + bw + 3, ay = y + bh / 2; c.fillStyle = ACC; c.beginPath(); c.moveTo(ax, ay - 7); c.lineTo(ax + 12, ay); c.lineTo(ax, ay + 7); c.closePath(); c.fill(); } });
     y += bh + 12; }
   mItems.forEach(t => { y = rich(t, X1 + 16, y, W1 - 32, { size: 15, lh: 20, bullet: true, maxY: MID - 6 }) + 5; });
@@ -2716,7 +2734,7 @@ async function exportPosterAGU(scale, evt) {
   caption('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', X2 + 16, y, W2 - 32, TOP + 256);
   y = box(X2, TOP + 275, W2, MID - TOP - 275, 'b-Değerinin Zaman İçinde Değişimi');
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 104);
-  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0e7490|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0e7490|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0e7490|camgöbeği} veri Mc, {#b45309|turuncu} tamlık basamakları.', X2 + 16, y + 2, W2 - 32, { size: 15, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc, {#d97706|turuncu} tamlık basamakları.', X2 + 16, y + 2, W2 - 32, { size: 15, lh: 21, italic: true, col: '#374151', maxY: MID - 4, justify: false });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, 'Gutenberg–Richter (Weichert 1980)');
@@ -2736,8 +2754,8 @@ async function exportPosterAGU(scale, evt) {
   y = box(X3, TOP + 530, W3, MID - TOP - 530, 'Sonuçlar');
   const msg = posterVal('posterMessage', '');
   if (msg) { const ml = wrap(msg, W3 - 32 - 22, 'bold 17px Arial').slice(0, 3), mh = ml.length * 22 + 14;
-    c.fillStyle = '#fef3c7'; c.fillRect(X3 + 16, y, W3 - 32, mh); c.fillStyle = ACC; c.fillRect(X3 + 16, y, 5, mh);
-    ml.forEach((l, i) => text(l, X3 + 30, y + 7 + i * 22, 'bold 17px Arial', '#78350f')); y += mh + 8; }
+    c.fillStyle = TH.soft; c.fillRect(X3 + 16, y, W3 - 32, mh); c.fillStyle = ACC; c.fillRect(X3 + 16, y, 5, mh);
+    ml.forEach((l, i) => text(l, X3 + 30, y + 7 + i * 22, 'bold 17px Arial', TH.deep)); y += mh + 8; }
   const userRes = posterVal('posterResults', '');
   let rItems;
   if (userRes) rItems = userRes.split('\n').map(t => t.trim()).filter(Boolean);
@@ -2773,9 +2791,10 @@ async function exportPosterAGU(scale, evt) {
   const eW = (qrDrawn ? qzx - 12 : X3 + W3 - 16) - (X3 + 16);
   text('Daha Fazla Bilgi', X3 + 16, BT + 12, 'bold 21px Arial', '#111827');
   const srcShort = regionRect ? regionSourceLabel() : 'Canlı akış';
-  const eLines = [[qrDrawn ? 'Analizi canlı açmak için QR kodu tarayın →' : 'Analiz bağlantısı:', 'bold 14px Arial', ACC],
-    [`Veri: ${srcShort} · ${new Date().toLocaleDateString('tr-TR')}`, '13px Arial', INK],
-    [(location.host + location.pathname).replace(/index\.html$/, ''), '13px Arial', '#1d4ed8']];
+  const eLines = [[qrDrawn ? 'Analizi canlı açmak için QR kodu tarayın' : 'Analiz bağlantısı:', 'bold 14px Arial', ACC],
+    [`Veri: ${srcShort} — ${new Date().toLocaleDateString('tr-TR')}`, '13px Arial', INK]
+  ];
+  if (!/^(localhost|127\.0\.0\.1|\[::1\])(:|$)/.test(location.host) && location.protocol !== 'file:') eLines.push([(location.host + location.pathname).replace(/index\.html$/, ''), '13px Arial', '#1d4ed8']);
   const contact = posterVal('posterContact', ''); if (contact) eLines.push([`İletişim: ${contact}`, '13px Arial', INK]);
   eLines.forEach(([t, f, col], i) => { c.font = f; let tt = t; while (tt.length > 8 && c.measureText(tt).width > eW) tt = tt.slice(0, -2); text(tt === t ? t : tt + '…', X3 + 16, BT + 44 + i * (eLines.length > 3 ? 22 : 24), f, col); });
 
