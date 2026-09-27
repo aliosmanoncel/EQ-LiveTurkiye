@@ -2273,6 +2273,7 @@ function exportGrCSV() {
   const csCols = lastGrPoints.length && lastGrPoints[0].T !== undefined;
   if (csCols) {
     lines.push(`# Tamlık basamakları: ${csValidSteps().map(s => `${s.start}→Mc${s.mc}`).join(', ')} · T = binin tam olduğu toplam süre (yıl)`);
+    if (typeof lastCs !== 'undefined' && lastCs && lastCs.periods) lines.push(`# Tamlık dönemleri: ${lastCs.periods.map(p => `${csRange(p)} M>=${(+p.mc).toFixed(1)} (${((p.t1 - p.t0) / CS_YEAR_MS).toFixed(2)} yıl)`).join('; ')}`);
     if (lastGrFit) {
       lines.push(`# Weichert (1980): Mx = ${lastGrFit.Mx !== null ? lastGrFit.Mx + ' (girdi, Mmax kestirimi değil)' : 'girilmedi'} · m0 = ${lastGrFit.m0} · N = ${lastGrFit.N} · N${lastGrFit.mRef} = ${lastGrFit.nRef !== undefined ? lastGrFit.nRef.toPrecision(4) + ' ± ' + lastGrFit.nRefSd.toPrecision(3) : '—'} /yıl`);
       lastGrFit.curves.forEach(c => lines.push(`# eğri ${c.key}: NO = ${c.N0.toPrecision(5)} · BETA = ${c.beta.toFixed(4)} · B = ${c.b.toFixed(4)} · Mx = ${c.mx !== null ? c.mx : '—'} · λ(M≥m0) = ${c.rate0.toPrecision(5)}`));
@@ -2917,7 +2918,7 @@ async function exportPosterAGU(scale, evt) {
   const tr = evs.length ? `${d(Math.min(...evs.map(e => +e.time)))} – ${d(Math.max(...evs.map(e => +e.time)))}` : '—';
   const mItems = [
     `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}.`,
-    cs ? `**Tamlık basamakları** (alt kataloglar): ${cs.periods.map(csLabel).join(', ')}; basamaklardan geçen N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
+    cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
     '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
     cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** birikimli dağılım.'];
   // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
@@ -3281,9 +3282,14 @@ function csObsYears(m, periods) {
 // Dönem etiketi: kırpılmışsa etkin başlangıç + basamağın tanım tarihi
 // (ör. "2026-06-29→Mc0.5 (basamak 2025-01-01)") — eksen başlangıcıyla
 // basamak tanım tarihinin karıştırılmaması için (2026-09-27).
+// Dönem sınırlarını yıl olarak yaz: başlangıç 1 Ocak ise yalnızca yıl, bitiş 31 Aralık ise yalnızca yıl,
+// aksi hâlde tam tarih (ör. "1971–2008", "2024–2026-09-27"). Bitiş = bir sonraki basamaktan önceki gün.
+function csYearStart(t) { const d = new Date(t).toISOString().slice(0, 10); return d.slice(5) === '01-01' ? d.slice(0, 4) : d; }
+function csYearEnd(t)   { const d = new Date(t - 864e5).toISOString().slice(0, 10); return d.slice(5) === '12-31' ? d.slice(0, 4) : new Date(t).toISOString().slice(0, 10); }
+function csRange(p) { return `${csYearStart(p.t0)}–${csYearEnd(p.t1)}`; }
 function csLabel(p) {
   const mc = (+p.mc).toFixed(1);
-  return p.clipped ? `${new Date(p.t0).toISOString().slice(0, 10)}→Mc${mc} (basamak ${p.start})` : `${p.start}→Mc${mc}`;
+  return `${csRange(p)}: M≥${mc}` + (p.clipped ? ` (basamak ${p.start}, pencere başına kırpıldı)` : '');
 }
 
 // evList → { kept:[{e,m,mc}], steps, periods, tEnd, nExcluded }
@@ -3707,22 +3713,31 @@ function renderGutenbergRichterCS(cs) {
     <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T + plotH}" stroke="#555" stroke-width="1"/>
     <text x="${(PAD_L + plotW / 2).toFixed(1)}" y="${H - 1}" fill="#888" font-size="8" text-anchor="middle">Magnitude</text>
     <text x="10" y="${(PAD_T + plotH / 2).toFixed(1)}" fill="#888" font-size="8" text-anchor="middle" transform="rotate(-90 10 ${(PAD_T + plotH / 2).toFixed(1)})">Birikimli yıllık oran λ(≥M)</text>`;
-  const stepStr = cs.periods.map(csLabel).join(', ');
+  const stepStr = cs.periods.map(csLabel).join('; ');
   const dfy = t => new Date(t).toISOString().slice(0, 10);
   const winStr = `${dfy(cs.tStart)} – ${dfy(cs.tEnd)} (${((cs.tEnd - cs.tStart) / CS_YEAR_MS).toFixed(2)} yıl)`;
   // Büyüklüğe göre tamlık tablosu (Halchuk vd. 2004 Tablo 1'in karşılığı; basamaklardan türetilir)
   const thr = [...new Set(cs.periods.map(p => p.mc))].sort((a, b) => a - b);
+  // (1) Dönemler (alt kataloglar): her zaman aralığı, eşiği, süresi ve o dönemde analize giren olay sayısı
+  const perRows = [...cs.periods].sort((a, b) => a.t0 - b.t0).map(p => {
+    const n = cs.kept.filter(k => { const t = k.e.time.getTime(); return t >= p.t0 && t < p.t1; }).length;
+    return `<tr><td style="padding:0 6px">${csRange(p)}</td><td style="padding:0 6px">M ≥ ${(+p.mc).toFixed(1)}</td><td style="padding:0 6px;text-align:right">${((p.t1 - p.t0) / CS_YEAR_MS).toFixed(2)}</td><td style="padding:0 6px;text-align:right">${n}</td></tr>`;
+  }).join('');
+  const perTable = `<div style="color:#cbd5e1;margin-top:4px">Tamlık dönemleri (alt kataloglar)</div><table style="border-collapse:collapse;border:1px solid #2a2a3a;font-size:.95em"><tr style="color:#cbd5e1"><th style="padding:0 6px">Dönem</th><th style="padding:0 6px">Tamlık eşiği</th><th style="padding:0 6px">Süre (yıl)</th><th style="padding:0 6px">N</th></tr>${perRows}</table>`;
+  // (2) Büyüklüğe göre kesintisiz tam kayıt süresi T (Weichert 1980; Halchuk vd. 2004 Tablo 1'in karşılığı).
+  // Bir sınıf, eşiği o sınıftan küçük/eşit olan TÜM dönemlerde sayılır; bu yüzden en yüksek eşik tüm pencereyi kapsar.
   const compRows = thr.map(mc => {
     const ps = cs.periods.filter(p => p.mc <= mc + 1e-9).sort((a, b) => a.t0 - b.t0);
     let contiguous = true; for (let i = 1; i < ps.length; i++) if (ps[i].t0 - ps[i - 1].t1 > 864e5) contiguous = false;
-    return `<tr><td style="padding:0 6px">M ≥ ${mc.toFixed(1)}</td><td style="padding:0 6px">${dfy(ps[0].t0)}${contiguous ? '' : ' (kesintili)'}</td><td style="padding:0 6px;text-align:right">${csObsYears(mc, cs.periods).toFixed(2)}</td></tr>`;
+    const all = ps.length === cs.periods.length;
+    return `<tr><td style="padding:0 6px">M ≥ ${mc.toFixed(1)}</td><td style="padding:0 6px">${csYearStart(ps[0].t0)} → ${csYearEnd(ps[ps.length - 1].t1)}${contiguous ? '' : ' (kesintili)'}</td><td style="padding:0 6px;color:#9ab0c5">${all ? 'tüm dönemler' : ps.map(csRange).join(' + ')}</td><td style="padding:0 6px;text-align:right">${csObsYears(mc, cs.periods).toFixed(2)}</td></tr>`;
   }).join('');
-  const compTable = `<table style="margin-top:4px;border-collapse:collapse;border:1px solid #2a2a3a;font-size:.95em"><tr style="color:#cbd5e1"><th style="padding:0 6px">Büyüklük</th><th style="padding:0 6px">Tamlık başlangıcı</th><th style="padding:0 6px">T (yıl)</th></tr>${compRows}</table>`;
+  const compTable = perTable + `<div style="color:#cbd5e1;margin-top:4px">Büyüklüğe göre kesintisiz tam kayıt süresi (Weichert 1980; Halchuk vd. 2004 Tablo 1 biçimi)</div><table style="border-collapse:collapse;border:1px solid #2a2a3a;font-size:.95em"><tr style="color:#cbd5e1"><th style="padding:0 6px">Büyüklük</th><th style="padding:0 6px">Tam kayıt aralığı</th><th style="padding:0 6px">Kapsanan dönemler</th><th style="padding:0 6px">T (yıl)</th></tr>${compRows}</table>`;
   stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif yıllık oran λ(≥M), <span style="color:#cbd5e1">│</span> ±1 S.D. (Weichert 1980 Eş. 11–12; T eşit değilse σ² = Σn/T²) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi oran n/T (sınıf merkezinde) &nbsp;|&nbsp; <span style="color:#f5a623">━</span> Weichert en iyi tahmin${Mx !== null ? ` (Mx = ${Mx} ile kesik, Eş. 14)` : ' (kesilme yok)'}${curves.length > 1 ? ` · <span style="color:#9ca3af">─</span> üst/alt eğri (β ∓ σ, Mx ${dMxHi >= 0 ? '+' : ''}${dMxHi} / ${dMxLo >= 0 ? '+' : ''}${dMxLo}; oran Eş. 10'dan)` : ''} &nbsp;|&nbsp; ΔM=${DM}${fitStr}` +
     (mxNote ? `<div style="color:#f59e0b">${mxNote}</div>` : '') +
     curves.filter(c => c.mxReq !== undefined && Math.abs(c.mx - c.mxReq) > 1e-9).map(c => `<div style="color:#f59e0b">⚠ ${c.label.toLowerCase()}: istenen Mx ${c.mxReq.toFixed(2)} gözlenen en büyük sınıfın üst sınırından küçük; ${c.mx.toFixed(2)} kullanıldı.</div>`).join('') +
     `<div style="color:#888;margin-top:2px">Mx bir model girdisidir (Weichert 1980'de üst büyüklük sınırı); Mmax kestirimi değildir. Üst/alt eğriler görsel duyarlılık içindir (gösterim: Halchuk, Burke &amp; Adams 2004).</div>` +
-    ` <span style="color:#f59e0b">Birleşik katalog — tamlık basamakları: ${stepStr} · analiz penceresi ${winStr}</span>` + compTable + magTypeDiag(items.map(it => ({ m: it.m, t: it.e.mtype || '' })));
+    ` <span style="color:#f59e0b">Birleşik katalog — tamlık dönemleri: ${stepStr} · analiz penceresi ${winStr}</span>` + compTable + magTypeDiag(items.map(it => ({ m: it.m, t: it.e.mtype || '' })));
 }
 
 let lastCs = null;
@@ -3879,7 +3894,7 @@ function renderTimeMag(evList) {
   const mMax = Math.max(...mags).toFixed(1);
   const convStatsStr = mcConversionMode === 'none' ? '' : ` &nbsp;|&nbsp; Magnitude Conversion: <b>${convEntry.label}</b>`;
   statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>${mcIsManual ? ' (elle)' : ''}${convStatsStr}` +
-    (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">Tamlık basamakları: ${cs.periods.map(csLabel).join(', ')} · analize giren N=<b>${cs.kept.length}</b> (${cs.nExcluded} olay basamak altında, soluk)</span>` : '');
+    (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">Tamlık dönemleri: ${cs.periods.map(csLabel).join('; ')} · analize giren N=<b>${cs.kept.length}</b> (${cs.nExcluded} olay basamak altında, soluk)</span>` : '');
 
   renderBvalueTS(evList, Mc, cs);
   renderSensTable(evList, Mc, cs);
