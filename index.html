@@ -3517,6 +3517,17 @@ function csRenderDiag(cs) {
       warn.push(`⚠️ Basamak ${p.row ?? i + 1} Mc=${(+p.mc).toFixed(1)}, bu penceredeki veriden kestirilen Mc değerinin (${p.mcData.toFixed(1)}; maks. eğrilik +0.2, n=${p.nAll}) belirgin biçimde altında; eşik altı eksik tamlık nedeniyle b aşağı yanlı olabilir.`);
     }
   });
+  // Oran tersinmesi denetimi (yalnızca uyarı; hesap değişmez): bir dönemde eşiğin hemen üstündeki bant
+  // [Mc, Mc+0.3), bir üst banttan [Mc+0.3, Mc+0.6) DAHA AZ olay içeriyorsa GR ile bağdaşmaz (b>0 iken alt bant
+  // daha kalabalık olmalı) — en olası neden eşiğin veri tamlığının altında kalmasıdır.
+  let invN = 0;
+  cs.periods.forEach((p, i) => {
+    const inP = cs.kept.filter(it => it.t >= p.t0 && it.t < p.t1 + (i === nP - 1 ? 1 : 0));
+    const lo = inP.filter(it => it.m >= p.mc - 1e-9 && it.m < p.mc + 0.3 - 1e-9).length;
+    const hi = inP.filter(it => it.m >= p.mc + 0.3 - 1e-9 && it.m < p.mc + 0.6 - 1e-9).length;
+    if (hi >= 20 && lo < hi) { invN++; warn.push(`⚠️ Dönem ${csLabel(p)}: eşiğin hemen üstündeki sınıflarda (${(+p.mc).toFixed(1)}–${(+p.mc + 0.3).toFixed(1)}: ${lo} olay) olay sayısı bir üst banttan (${(+p.mc + 0.3).toFixed(1)}–${(+p.mc + 0.6).toFixed(1)}: ${hi} olay) düşük görünüyor. Küçük büyüklük sınıflarının yıllık oranı üst sınıflara göre düşük; bu dönemin Mc eşiğinin yeniden değerlendirilmesi önerilir.`); }
+  });
+  if (!invN) ok.push(`✓ Eşik üstü sınıflarda oran tersinmesi yok`);
   if (!shortN) ok.push(`✓ Her basamak ≥ ${CS_QC.minYears} yıl`);
   if (!smallN) ok.push(`✓ Basamak başına ≥ ${CS_QC.minEvents} olay`);
   if (!lowMcN && cs.periods.some(p => p.mcData !== null && p.mcData !== undefined)) ok.push(`✓ Basamak Mc'leri veri Mc'siyle uyumlu`);
@@ -3724,15 +3735,20 @@ function renderGutenbergRichterCS(cs) {
     return `<tr><td style="padding:0 6px">${csRange(p)}</td><td style="padding:0 6px">M ≥ ${(+p.mc).toFixed(1)}</td><td style="padding:0 6px;text-align:right">${((p.t1 - p.t0) / CS_YEAR_MS).toFixed(2)}</td><td style="padding:0 6px;text-align:right">${n}</td></tr>`;
   }).join('');
   const perTable = `<div style="color:#cbd5e1;margin-top:4px">Tamlık dönemleri (alt kataloglar)</div><table style="border-collapse:collapse;border:1px solid #2a2a3a;font-size:.95em"><tr style="color:#cbd5e1"><th style="padding:0 6px">Dönem</th><th style="padding:0 6px">Tamlık eşiği</th><th style="padding:0 6px">Süre (yıl)</th><th style="padding:0 6px">N</th></tr>${perRows}</table>`;
-  // (2) Büyüklüğe göre kesintisiz tam kayıt süresi T (Weichert 1980; Halchuk vd. 2004 Tablo 1'in karşılığı).
+  // (2) Büyüklük sınıfı için kullanılan gözlem süresi T (Weichert 1980; Halchuk vd. 2004 Tablo 1'in karşılığı).
   // Bir sınıf, eşiği o sınıftan küçük/eşit olan TÜM dönemlerde sayılır; bu yüzden en yüksek eşik tüm pencereyi kapsar.
-  const compRows = thr.map(mc => {
+  // Sınıflar bant olarak: eşikler arası [Mc_i, Mc_{i+1}) ve en üstte M ≥ Mc_max; büyükten küçüğe.
+  // T hesabı değişmedi (csObsYears); yalnızca gösterim: bir sınıf, eşiği o sınıftan küçük/eşit olan tüm dönemlerde sayılır.
+  const endYear = t => new Date(t - 864e5).toISOString().slice(0, 4);
+  const compRows = thr.map((mc, i) => {
     const ps = cs.periods.filter(p => p.mc <= mc + 1e-9).sort((a, b) => a.t0 - b.t0);
-    let contiguous = true; for (let i = 1; i < ps.length; i++) if (ps[i].t0 - ps[i - 1].t1 > 864e5) contiguous = false;
+    let contiguous = true; for (let j = 1; j < ps.length; j++) if (ps[j].t0 - ps[j - 1].t1 > 864e5) contiguous = false;
     const all = ps.length === cs.periods.length;
-    return `<tr><td style="padding:0 6px">M ≥ ${mc.toFixed(1)}</td><td style="padding:0 6px">${csYearStart(ps[0].t0)} → ${csYearEnd(ps[ps.length - 1].t1)}${contiguous ? '' : ' (kesintili)'}</td><td style="padding:0 6px;color:#9ab0c5">${all ? 'tüm dönemler' : ps.map(csRange).join(' + ')}</td><td style="padding:0 6px;text-align:right">${csObsYears(mc, cs.periods).toFixed(2)}</td></tr>`;
-  }).join('');
-  const compTable = perTable + `<div style="color:#cbd5e1;margin-top:4px">Büyüklüğe göre kesintisiz tam kayıt süresi (Weichert 1980; Halchuk vd. 2004 Tablo 1 biçimi)</div><table style="border-collapse:collapse;border:1px solid #2a2a3a;font-size:.95em"><tr style="color:#cbd5e1"><th style="padding:0 6px">Büyüklük</th><th style="padding:0 6px">Tam kayıt aralığı</th><th style="padding:0 6px">Kapsanan dönemler</th><th style="padding:0 6px">T (yıl)</th></tr>${compRows}</table>`;
+    const cls = i + 1 < thr.length ? `${mc.toFixed(1)} ≤ M &lt; ${thr[i + 1].toFixed(1)}` : `M ≥ ${mc.toFixed(1)}`;
+    return `<tr><td style="padding:0 6px">${cls}</td><td style="padding:0 6px">${csYearStart(ps[0].t0).slice(0, 4)}→${endYear(ps[ps.length - 1].t1)}${contiguous ? '' : ' (kesintili)'}</td><td style="padding:0 6px;color:#9ab0c5">${all ? 'tüm dönemler' : ps.map(csRange).join(' + ')}</td><td style="padding:0 6px;text-align:right">${csObsYears(mc, cs.periods).toFixed(2)}</td></tr>`;
+  }).reverse().join('');
+  const compTable = perTable + `<div style="color:#cbd5e1;margin-top:4px">Bu büyüklük sınıfı için kullanılan gözlem süresi — Weichert (1980) T</div><table style="border-collapse:collapse;border:1px solid #2a2a3a;font-size:.95em"><tr style="color:#cbd5e1"><th style="padding:0 6px">Büyüklük sınıfı</th><th style="padding:0 6px">Gözlem aralığı</th><th style="padding:0 6px">Kapsanan dönemler</th><th style="padding:0 6px">T (yıl)</th></tr>${compRows}</table>` +
+    `<div style="color:#888">Tamlık dönemleri "eşik hangi tarihten itibaren kullanılabilir?" sorusunu yanıtlar; T ise Weichert hesabında her büyüklük sınıfı için kullanılan gözlem süresidir: sınıf, eşiği o sınıftan küçük/eşit olan tüm dönemlerde sayılır (ör. en yüksek eşiğin sınıfı tüm pencereyi kapsar).</div>`;
   stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif yıllık oran λ(≥M), <span style="color:#cbd5e1">│</span> ±1 S.D. (Weichert 1980 Eş. 11–12; T eşit değilse σ² = Σn/T²) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi oran n/T (sınıf merkezinde) &nbsp;|&nbsp; <span style="color:#f5a623">━</span> Weichert en iyi tahmin${Mx !== null ? ` (Mx = ${Mx} ile kesik, Eş. 14)` : ' (kesilme yok)'}${curves.length > 1 ? ` · <span style="color:#9ca3af">─</span> üst/alt eğri (β ∓ σ, Mx ${dMxHi >= 0 ? '+' : ''}${dMxHi} / ${dMxLo >= 0 ? '+' : ''}${dMxLo}; oran Eş. 10'dan)` : ''} &nbsp;|&nbsp; ΔM=${DM}${fitStr}` +
     (mxNote ? `<div style="color:#f59e0b">${mxNote}</div>` : '') +
     curves.filter(c => c.mxReq !== undefined && Math.abs(c.mx - c.mxReq) > 1e-9).map(c => `<div style="color:#f59e0b">⚠ ${c.label.toLowerCase()}: istenen Mx ${c.mxReq.toFixed(2)} gözlenen en büyük sınıfın üst sınırından küçük; ${c.mx.toFixed(2)} kullanıldı.</div>`).join('') +
