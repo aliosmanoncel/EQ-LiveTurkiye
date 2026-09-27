@@ -1053,8 +1053,9 @@
     <span>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event)" title="Üç grafiği (Time-Mag, b-değeri, Gutenberg-Richter) + bölge/yöntem bilgisini, ekrandakiyle AYNI koyu temada tek bir PNG olarak indir — Blogger/web paylaşımı için">🖼️ PNG — Web</button>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event)" title="Aynı üç grafiği beyaz zemin/koyu metinli bir düzende PNG olarak indir — akademik rapor, Word veya PDF'e gömmek için; grafiklerin kendi renkleri değişmez, yalnızca başlık/metin rengi">📄 PNG — Rapor</button>
-      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event, 'poster')" title="Poster 16:9 (1920×1080): üç grafik yan yana, koyu tema — sunum/slayt için">🖼 Poster</button>
-      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event, 'poster')" title="Poster 16:9 (1920×1080): üç grafik yan yana, açık tema — rapor/baskı için">🖼 Poster (açık)</button>
+      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event, 'poster')" title="Hızlı özet 16:9 (1920×1080): üç grafik yan yana, koyu tema — AGU düzenindeki akademik poster DEĞİL (o: 🎓 Akademik poster)">🖼 Özet 16:9</button>
+      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event, 'poster')" title="Hızlı özet 16:9 (1920×1080): üç grafik yan yana, açık tema — AGU düzenindeki akademik poster DEĞİL (o: 🎓 Akademik poster)">🖼 Özet 16:9 (açık)</button>
+      <button class="tmFullscreenBtn" onclick="const d=document.getElementById('posterPanel'); if(d){d.open=true; d.scrollIntoView({behavior:'smooth',block:'center'});}" title="AGU sanal poster örneğinden esinlenen akademik poster / ders slaydı bölümünü aç (giriş, çalışma alanı, yöntem akışı, sonuçlar, kaynaklar, QR)" style="color:#fbbf24">🎓 Akademik poster</button>
       <button class="tmFullscreenBtn" id="tmFullscreenBtn" onclick="toggleTimeMagFullscreen(event)" title="Tam ekran aç/kapat — çok sayıda parametre/grafik olduğu için küçük pencerede görülemeyen üst kısmı (Magnitude Conversion seçici dahil) erişilebilir kılar">⛶ Tam ekran</button>
       <button class="tmClose" onclick="toggleTimeMag()">✕</button>
     </span>
@@ -3600,7 +3601,7 @@ function renderGutenbergRichterCS(cs) {
   let Mx = numIn('grMx', null);
   const dMxLo = numIn('grMxLo', -0.5), dMxHi = numIn('grMxHi', 0.2), mRef = numIn('grMref', 5.0);
   const mTopObs = +((kMax + 1) * DM).toFixed(2);
-  let mxNote = '';
+  let mxNote = '', refNote = '';
   if (Mx !== null && Mx < mTopObs - 1e-9) { mxNote = `⚠ Mx (${Mx}) gözlenen en büyük sınıfın üst sınırından (${mTopObs}) küçük — Mx uygulanmadı.`; Mx = null; }
   const classesTo = mx => {
     const kHi = mx === null ? kMax : Math.max(kMax, Math.ceil(mx / DM - 1e-9) - 1);
@@ -3717,6 +3718,14 @@ function renderGutenbergRichterCS(cs) {
       (rows.length ? `<text x="${bx + 5}" y="${(by + 10 + lines.length * lh).toFixed(1)}" fill="#94a3b8" font-size="6.8" font-family="monospace" xml:space="preserve">${'EĞRİ'.padEnd(13)} ${'NO'.padStart(9)} ${'BETA'.padStart(5)} ${'B'.padStart(6)} ${'Mx'.padStart(4)}</text>` +
         rows.map((t, i) => `<text x="${bx + 5}" y="${(by + 10 + (lines.length + 1 + i) * lh).toFixed(1)}" fill="${i === 0 ? '#f5a623' : '#cbd5e1'}" font-size="6.8" font-family="monospace" xml:space="preserve">${t}</text>`).join('') : '');
     lastGrFit.nRef = nRef; lastGrFit.nRefSd = nRefSd;
+    // Tutarlılık denetimi (yalnızca uyarı): model N_ref, katalogda gözlenen M≥M_ref oranıyla kabaca uyuşmalı
+    try {
+      const nObs = items.filter(it => it.m >= mRef - 1e-9).length, Tref = csObsYears(mRef, cs.periods);
+      if (Tref > 0 && nObs >= 2) {
+        const obs = nObs / Tref, ratio = nRef / obs;
+        if (ratio < 0.2 || ratio > 5) refNote = `⚠ Model N${mRef} = ${nRef.toPrecision(3)}/yıl, katalogda gözlenen M≥${mRef} oranından (${nObs} olay / ${Tref.toFixed(1)} yıl = ${obs.toPrecision(3)}/yıl) yaklaşık ${ratio < 1 ? (1 / ratio).toFixed(0) + ' kat düşük' : ratio.toFixed(0) + ' kat yüksek'}. b yanlı olabilir: tamlık dönemlerini, analiz penceresini (ör. büyük ana şoktan önce kesmek) ve GK74 kümeden arındırmayı gözden geçirin. Mx ya da M_ref değiştirmek bunu düzeltmez.`;
+      }
+    } catch (e) {}
   }
 
   svg.innerHTML = `${yTicks}${xTicks}${fitLine}${errBars}${cum}${non}${infoBox}
@@ -3750,7 +3759,7 @@ function renderGutenbergRichterCS(cs) {
   const compTable = perTable + `<div style="color:#cbd5e1;margin-top:4px">Bu büyüklük sınıfı için kullanılan gözlem süresi — Weichert (1980) T</div><table style="border-collapse:collapse;border:1px solid #2a2a3a;font-size:.95em"><tr style="color:#cbd5e1"><th style="padding:0 6px">Büyüklük sınıfı</th><th style="padding:0 6px">Gözlem aralığı</th><th style="padding:0 6px">Kapsanan dönemler</th><th style="padding:0 6px">T (yıl)</th></tr>${compRows}</table>` +
     `<div style="color:#888">Tamlık dönemleri "eşik hangi tarihten itibaren kullanılabilir?" sorusunu yanıtlar; T ise Weichert hesabında her büyüklük sınıfı için kullanılan gözlem süresidir: sınıf, eşiği o sınıftan küçük/eşit olan tüm dönemlerde sayılır (ör. en yüksek eşiğin sınıfı tüm pencereyi kapsar).</div>`;
   stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif yıllık oran λ(≥M), <span style="color:#cbd5e1">│</span> ±1 S.D. (Weichert 1980 Eş. 11–12; T eşit değilse σ² = Σn/T²) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi oran n/T (sınıf merkezinde) &nbsp;|&nbsp; <span style="color:#f5a623">━</span> Weichert en iyi tahmin${Mx !== null ? ` (Mx = ${Mx} ile kesik, Eş. 14)` : ' (kesilme yok)'}${curves.length > 1 ? ` · <span style="color:#9ca3af">─</span> üst/alt eğri (β ∓ σ, Mx ${dMxHi >= 0 ? '+' : ''}${dMxHi} / ${dMxLo >= 0 ? '+' : ''}${dMxLo}; oran Eş. 10'dan)` : ''} &nbsp;|&nbsp; ΔM=${DM}${fitStr}` +
-    (mxNote ? `<div style="color:#f59e0b">${mxNote}</div>` : '') +
+    (mxNote ? `<div style="color:#f59e0b">${mxNote}</div>` : '') + (refNote ? `<div style="color:#f59e0b">${refNote}</div>` : '') +
     curves.filter(c => c.mxReq !== undefined && Math.abs(c.mx - c.mxReq) > 1e-9).map(c => `<div style="color:#f59e0b">⚠ ${c.label.toLowerCase()}: istenen Mx ${c.mxReq.toFixed(2)} gözlenen en büyük sınıfın üst sınırından küçük; ${c.mx.toFixed(2)} kullanıldı.</div>`).join('') +
     `<div style="color:#888;margin-top:2px">Mx bir model girdisidir (Weichert 1980'de üst büyüklük sınırı); Mmax kestirimi değildir. Üst/alt eğriler görsel duyarlılık içindir (gösterim: Halchuk, Burke &amp; Adams 2004).</div>` +
     ` <span style="color:#f59e0b">Birleşik katalog — tamlık dönemleri: ${stepStr} · analiz penceresi ${winStr}</span>` + compTable + magTypeDiag(items.map(it => ({ m: it.m, t: it.e.mtype || '' })));
