@@ -5,7 +5,7 @@
    GitHub'daki katalog JSON'ları (son başarılı sürüm). Canlı EMSC/USGS sorguları (zamana bağlı adresler) ve
    harita karoları önbelleğe ALINMAZ: sınırsız büyür ve tarayıcı kotasını doldurur. Sürüm değişince eski
    önbellekler silinir. */
-const VERSION = 'eqlive-2026-09-27a';
+const VERSION = 'eqlive-2026-09-28a';
 const SHELL = `${VERSION}-shell`, LIBS = `${VERSION}-libs`, DATA = `${VERSION}-data`;
 const SHELL_ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 const DATA_MAX = 40;
@@ -32,7 +32,10 @@ async function trim(cacheName, max) {
 async function networkFirst(req, cacheName, opts) {
   const c = await caches.open(cacheName);
   try {
-    const res = await fetch(req);
+    // Sayfa ve aynı kökenli dosyalar: tarayıcının HTTP önbelleğini atlayıp sunucuya sor (cache: 'no-cache' =
+    // her seferinde yeniden doğrula). GitHub Pages ~10 dk önbellek süresi verdiği için, aksi hâlde yeni sürüm
+    // yayınlandıktan sonra kurulu uygulama bir süre eski sayfayı gösterebiliyordu.
+    const res = (opts && opts.revalidate) ? await fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }) : await fetch(req);
     if (res && res.ok) { c.put(req, res.clone()); if (cacheName === DATA) trim(DATA, DATA_MAX); }
     return res;
   } catch (err) {
@@ -53,9 +56,9 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
   // Sayfa (adres parametreleri ne olursa olsun): ağdan; çevrimdışıysa kayıtlı sayfa
   if (req.mode === 'navigate' && url.origin === location.origin) {
-    e.respondWith(networkFirst(req, SHELL, { ignoreSearch: true, fallback: './index.html' })); return;
+    e.respondWith(networkFirst(req, SHELL, { ignoreSearch: true, fallback: './index.html', revalidate: true })); return;
   }
-  if (url.origin === location.origin) { e.respondWith(networkFirst(req, SHELL, { ignoreSearch: true })); return; }
+  if (url.origin === location.origin) { e.respondWith(networkFirst(req, SHELL, { ignoreSearch: true, revalidate: true })); return; }
   // Sürümlü kütüphaneler (Leaflet, leaflet.heat, qrcode-generator)
   if (/^(unpkg\.com|cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net)$/.test(url.hostname)) { e.respondWith(cacheFirst(req, LIBS)); return; }
   // GitHub'daki katalog/veri dosyaları: son başarılı sürüm çevrimdışı gösterilebilsin
