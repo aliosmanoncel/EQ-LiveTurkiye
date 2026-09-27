@@ -968,6 +968,19 @@
     </select>
     <span id="tmConversionNote" style="color:#666;"></span>
   </div>
+  <div id="csPanel" style="font-size:.72rem;color:#888;margin-bottom:6px;border:1px solid #2a2a3a;border-radius:6px;padding:5px 7px;" title="Tamlığı zamanla değişen kataloglar için: her dönem kendi Mc eşiğiyle alt katalog olarak seçilir ve birleştirilir. b(t) olay başına eşikle (Aki 1965 genelleştirmesi), GR ise binlerin tam olduğu süreye bölünmüş yıllık oranlarla ve Weichert (1980) en çok olabilirlik yöntemiyle hesaplanır. Üretim b-değeri ızgarası bu seçimden ETKİLENMEZ.">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <label style="cursor:pointer;color:#cbd5e1;"><input type="checkbox" id="csEnabled" onchange="onCsChange()" style="vertical-align:middle;"> 🧩 Tamlık basamakları <span style="color:#666;">(zamana bağlı Mc · alt kataloglar)</span></label>
+      <span id="csControls" style="display:none;gap:6px;">
+        <button onclick="csAddRow()" style="background:none;border:1px solid #334;color:#cbd5e1;border-radius:4px;font-size:.95em;padding:1px 7px;cursor:pointer;">＋ Basamak</button>
+        <button onclick="csSuggest()" style="background:none;border:1px solid #334;color:#cbd5e1;border-radius:4px;font-size:.95em;padding:1px 7px;cursor:pointer;" title="Takvim yılı başına maksimum eğrilik Mc (+0.2) hesaplanır; Mc'nin ≥0.3 değiştiği yıllarda yeni basamak açılır. Sonucu gözle doğrulayın.">⚙ Otomatik öner (yıllık Mc)</button>
+        <label style="color:#9ca3af;" title="Duyarlılık testi: b(t) tüm pencere için TEK sabit Mc ile de hesaplanır (gri çizgi). Boş bırakılırsa: dönemlerin basamak Mc'si ile veri Mc'sinin (maks. eğrilik +0.2) en büyüğü — pencerede doğrulanabilen en yüksek güvenilir Mc. Değişken-Mc serisindeki bir b değişimi sabit-Mc serisinde de görülüyorsa tamlık değişimiyle açıklanamaz.">Sabit Mc karşılaştırması <input id="csFixedMc" type="number" step="0.1" min="-1" max="9" placeholder="oto" oninput="onCsChange(true)" style="width:52px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+      </span>
+    </div>
+    <div id="csRows" style="display:none;margin-top:4px;"></div>
+    <div id="csDiag" style="margin-top:4px;line-height:1.6;"></div>
+    <div id="csNote" style="color:#666;margin-top:3px;"></div>
+  </div>
   <svg id="tmSvg" viewBox="0 0 660 200" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;height:auto;max-width:660px"></svg>
   <div class="tmStats" id="tmStats">—</div>
   <div class="tmStats" id="tmSelected" style="min-height:1em;">💡 Bir noktaya tıklayın veya üzerine gelin → tarihi burada görün</div>
@@ -976,6 +989,18 @@
     <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=10 olay)</span></div>
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
+    <div id="sensPanel" style="margin-top:8px;font-size:.72rem;color:#9ab0c5;">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+        <b style="color:#cbd5e1;">🧪 Mc-eşik duyarlılık tablosu</b>
+        <span style="color:#666;">(sabit Mc × dönem · Aki MLE · ±1.96·b/√N)</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;">
+        <label>Mc düzeyleri <input id="sensMcs" value="1.0, 1.2, 1.5, 2.0, 2.2" oninput="renderSensTable()" style="width:130px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+        <label title="Artan sırada tarih sınırları (YYYY-AA-GG), virgülle. n sınır → n−1 dönem. Varsayılan sınırlar Oklahoma incelemesi içindir; bölgenize göre değiştirin.">Dönem sınırları <input id="sensBounds" value="2019-01-01, 2020-07-01, 2023-07-01, 2026-10-01" oninput="renderSensTable()" style="width:280px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+        <button onclick="sensYearly()" style="background:none;border:1px solid #334;color:#cbd5e1;border-radius:4px;font-size:.95em;padding:1px 7px;cursor:pointer;" title="Veri penceresi boyunca takvim yılı sınırları">Yıllık dilimler</button>
+      </div>
+      <div id="sensTable" style="margin-top:4px;overflow-x:auto;"></div>
+    </div>
   </div>
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
@@ -1294,7 +1319,10 @@ function parseEMSCText(text) {
 function parseGeoJSON(data) {
   return (data.features||[]).map(f=>{
     const [lon,lat,dep] = f.geometry.coordinates, p = f.properties;
-    return { lat, lon, dep:dep||0, mag:parseFloat(p.mag||0), place:p.place||p.flynn_region||'', time:new Date(p.time||Date.now()) };
+    // mtype (2026-09-27): USGS magType (ml, mb_lg, md, mw…) artık korunur —
+    // önceden atılıyordu; bu yüzden USGS verisinde mtype-tabanlı Mw dönüşümü
+    // (dispatch) çalışamıyor ve büyüklük türü karışımı görünmüyordu.
+    return { lat, lon, dep:dep||0, mag:parseFloat(p.mag||0), mtype:(p.magType||'').trim(), place:p.place||p.flynn_region||'', time:new Date(p.time||Date.now()) };
   }).filter(e=>!isNaN(e.mag)&&e.mag>0);
 }
 
@@ -1705,12 +1733,12 @@ function computeBvalue(mags, Mc) {
   return denom > 0 ? Math.LOG10E / denom : null;
 }
 
-// Aki (1965) MLE için %95 güven limiti: ±1.9·b/√n — bu projede benimsenen
-// katsayı (kaynağı doğrulanana kadar belirli bir yayına atfedilmemiştir;
-// bazı Öncel çalışmalarında 1.96 kullanılmıştır, 2026-09-13).
+// Aki (1965) MLE için %95 yaklaşık güven aralığı: ±1.96·b/√n (standart normal
+// %95 katsayısı; SE_b ≈ b/√n, Aki 1965). 2026-09-27 kullanıcı kararı: önceki
+// proje katsayısı 1.9 kaynağa bağlanamadığı için standart 1.96'ya geçildi.
 function bConfidence95(b, n) {
   if (b === null || !n) return null;
-  return 1.9 * b / Math.sqrt(n);
+  return 1.96 * b / Math.sqrt(n);
 }
 
 // Kayan pencere b-değeri zaman serisi — Öncel & Wilson (2007, GJI, İzmit) §3.1 metodolojisi:
@@ -1725,20 +1753,101 @@ function computeBvalueTimeSeries(evList, Mc) {
     const win  = sorted.slice(i, i + N_WIN);
     const mags = win.map(e => e.mw ?? e.mag);
     const b = computeBvalue(mags, Mc);
-    if (b !== null) series.push({ t: win[Math.floor(N_WIN/2)].time.getTime(), b, err: bConfidence95(b, N_WIN) });
+    if (b !== null) series.push({ t: win[Math.floor(N_WIN/2)].time.getTime(), b, err: bConfidence95(b, N_WIN), span: win[N_WIN-1].time - win[0].time });
   }
   return { series, N: sorted.length };
 }
 
-function renderBvalueTS(evList, Mc) {
+// Mc-eşik duyarlılık tablosu (2026-09-27). Her hücre BAĞIMSIZ: dönem [a,b)
+// içinde M ≥ sabit Mc olayları → Aki MLE b, kendi N'i ile ±1.96·b/√N.
+// "—" YALNIZCA sabit Mc, o dönemin geçerli Mc'sinin (basamaklar etkinse
+// dönemle örtüşen basamakların EN BÜYÜK Mc'si, değilse tek Mc) altındaysa
+// (o eşikte katalog tam değil). N<50 hücreler hesaplanır ama soluk gösterilir.
+// Tablo yorum üretmez (kanıtlandı/çürütüldü sütunu yok) — yorum kullanıcıda.
+let sensLast = null;
+function sensYearly() {
+  if (!sensLast || !sensLast.evList.length) return;
+  const ts = sensLast.evList.map(e => e.time.getTime());
+  const y0 = new Date(Math.min(...ts)).getUTCFullYear(), y1 = new Date(Math.max(...ts)).getUTCFullYear() + 1;
+  const b = []; for (let y = y0; y <= y1; y++) b.push(`${y}-01-01`);
+  document.getElementById('sensBounds').value = b.join(', ');
+  renderSensTable();
+}
+function renderSensTable(evList, Mc, cs) {
+  if (evList) sensLast = { evList, Mc, cs };
+  const el = document.getElementById('sensTable');
+  if (!el || !sensLast) return;
+  ({ evList, Mc, cs } = sensLast);
+  const mcs = document.getElementById('sensMcs').value.split(/[,;\s]+/).map(parseFloat).filter(v => !isNaN(v)).sort((a, b) => a - b);
+  const bounds = document.getElementById('sensBounds').value.split(/[,;\s]+/).filter(v => /^\d{4}-\d{2}-\d{2}$/.test(v)).map(v => Date.parse(v + 'T00:00:00Z')).sort((a, b) => a - b);
+  if (mcs.length < 1 || bounds.length < 2) { el.innerHTML = '<span style="color:#666">En az bir Mc düzeyi ve iki dönem sınırı girin.</span>'; return; }
+  const ev = evList.map(e => ({ t: e.time.getTime(), m: e.mw ?? e.mag }));
+  const tLo = Math.min(...ev.map(e => e.t)), tHi = Math.max(...ev.map(e => e.t));
+  const steps = cs ? cs.steps : null;
+  const fmtD = t => new Date(t).toISOString().slice(0, 10);
+  const periods = [];
+  for (let i = 0; i + 1 < bounds.length; i++) {
+    const a = bounds[i], b = bounds[i + 1];
+    let vmc = null;
+    if (steps) {
+      const over = steps.filter((st, k) => { const nx = k + 1 < steps.length ? steps[k + 1].t : Infinity; return st.t < b && nx > a; }).map(st => st.mc);
+      vmc = over.length ? Math.max(...over) : null;   // dönem basamak öncesine düşüyorsa geçerli Mc yok
+    } else vmc = Mc;
+    periods.push({ a, b, vmc, empty: b <= tLo || a > tHi });
+  }
+  const head = `<tr><th style="text-align:left;padding:2px 6px;color:#cbd5e1;">Sabit Mc</th>` + periods.map(p =>
+    `<th style="padding:2px 6px;color:#cbd5e1;white-space:nowrap;">${fmtD(p.a)} → ${fmtD(p.b)}<div style="font-weight:400;color:#888;">geçerli Mc: ${p.vmc !== null && p.vmc !== undefined ? (+p.vmc).toFixed(1) : '—'}</div></th>`).join('') + `</tr>`;
+  const rows = mcs.map(mc => `<tr><td style="padding:2px 6px;color:#cbd5e1;">${mc.toFixed(1)}</td>` + periods.map(p => {
+    if (p.empty) return `<td style="padding:2px 6px;color:#555;text-align:center;" title="Dönem veri penceresinin dışında">veri yok</td>`;
+    if (p.vmc === null || p.vmc === undefined || mc < p.vmc - 1e-9)
+      return `<td style="padding:2px 6px;color:#555;text-align:center;" title="Sabit Mc, bu dönemin geçerli Mc'sinin altında — katalog bu eşikte tam değil">—</td>`;
+    const mags = ev.filter(e => e.t >= p.a && e.t < p.b && e.m >= mc - 1e-9).map(e => e.m);
+    const n = mags.length, b = computeBvalue(mags, mc);
+    if (b === null) return `<td style="padding:2px 6px;color:#666;text-align:center;opacity:.55;">N=${n} (&lt;10)</td>`;
+    const err = bConfidence95(b, n), faint = n < 50;
+    return `<td style="padding:2px 6px;text-align:center;white-space:nowrap;${faint ? 'opacity:.45;' : ''}" title="${faint ? 'N<50: hesaplandı, güvenilirlik sınırlı' : ''}"><b style="color:#e2e8f0;">${b.toFixed(2)}</b> ± ${err.toFixed(2)}<div style="color:#888;">N=${n}${faint ? ' ⚠' : ''}</div></td>`;
+  }).join('') + `</tr>`).join('');
+  el.innerHTML = `<table style="border-collapse:collapse;border:1px solid #2a2a3a;">${head}${rows}</table>` +
+    `<div style="color:#666;margin-top:2px;">b: Aki (1965) MLE, b = log10(e)/(M̄ − Mc + ΔM/2); hata: %95 yaklaşık güven aralığı ±1.96·b/√N, her hücre kendi N'i ile. — : sabit Mc &lt; dönemin geçerli Mc'si${cs ? ' (dönemle örtüşen basamakların en büyüğü)' : ' (tek Mc)'}. Soluk ⚠: N&lt;50. Dönemler [başlangıç, bitiş).</div>`;
+}
+
+function renderBvalueTS(evList, Mc, cs) {
   const svgB   = document.getElementById('tmSvgB');
   const statsB = document.getElementById('tmStatsB');
-  if (Mc === null) {
+  svgB.setAttribute('viewBox', '0 0 660 350'); // Mc(t) şeridi yoksa varsayılan yükseklik
+  if (Mc === null && !cs) {
     svgB.innerHTML = `<text x="330" y="70" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: N=${evList.length} (Mc hesaplanamadı, min. 10 olay gerekir)</text>`;
     statsB.textContent = `N=${evList.length} — Mc hesaplanamadı`;
     return;
   }
-  const { series, N } = computeBvalueTimeSeries(evList, Mc);
+  const { series, N } = cs ? csBvalueTimeSeries(cs) : computeBvalueTimeSeries(evList, Mc);
+  // (b) Sabit-Mc duyarlılık serisi — yalnızca tamlık basamakları etkinken
+  // (2026-09-27). Varsayılan Mc: dönemlerin max(basamak Mc, veri Mc).
+  let fixed = null;
+  if (cs && series.length) {
+    const inp = document.getElementById('csFixedMc');
+    const user = inp && inp.value !== '' ? parseFloat(inp.value) : NaN;
+    const auto = Math.max(...cs.periods.map(p => Math.max(p.mc, p.mcData ?? p.mc)));
+    const mcF = !isNaN(user) ? user : auto;
+    const winEv = evList.filter(e => { const t = e.time.getTime(); return t >= cs.tStart && t <= cs.tEnd; });
+    const r = computeBvalueTimeSeries(winEv, mcF);
+    // Zaman çözünürlüğü: 100 olaylık pencerenin medyan süresi. Yüksek sabit Mc
+    // daha az olay → daha uzun pencere → kısa süreli b değişimleri yumuşar.
+    // Gri serinin düz kalması bu durumda değişimi ÇÜRÜTMEZ (sentetik test:
+    // 3 yıllık b=1.4 dönemi Mc=2.2 serisinde görünmedi, 2026-09-27).
+    const med = a => { const v = a.map(s => s.span).filter(Number.isFinite).sort((p, q) => p - q); return v.length ? v[Math.floor(v.length / 2)] : null; };
+    fixed = { mc: mcF, src: !isNaN(user) ? 'kullanıcı' : 'oto: en yüksek güvenilir Mc', series: r.series, N: r.N,
+              spanFixed: med(r.series), spanMain: med(series) };
+  }
+  // (c) Mc(t) şeridi: kayan pencerede veri Mc'si (maks. eğrilik +0.2, tüm
+  // olaylar, N=250 / adım 25) + basamak Mc'si (ya da tek Mc).
+  const MC_WIN = 250, MC_STEP = 25;
+  const mcAll = [...evList].sort((a, b) => a.time - b.time);
+  const mcSeries = [];
+  for (let i = 0; i + MC_WIN <= mcAll.length; i += MC_STEP) {
+    const w = mcAll.slice(i, i + MC_WIN), mc = computeMc(w);
+    if (mc !== null) mcSeries.push({ t: w[Math.floor(MC_WIN / 2)].time.getTime(), mc });
+  }
 
   if (series.length === 0) {
     svgB.innerHTML = `<text x="330" y="70" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: N=${N} (M≥Mc) — min. 100 olay gerekir (Öncel &amp; Wilson 2007)</text>`;
@@ -1755,16 +1864,22 @@ function renderBvalueTS(evList, Mc) {
   // H, okunabilirlik için 260->350'ye çıkarıldı (~%35 artış, 2026-09-17,
   // kullanıcı geri bildirimi). Yalnızca görsel -- veri/hesaplama/pencereleme
   // değişmedi (aşağıdaki bMin/bMax/computeBvalueTimeSeries mantığı aynı).
-  const W=660, H=350, PAD_L=40, PAD_B=22, PAD_T=10, PAD_R=14;
-  const plotW = W-PAD_L-PAD_R, plotH = H-PAD_T-PAD_B;
+  const W=660, H_MAIN=350, PAD_L=40, PAD_B=22, PAD_T=10, PAD_R=14;
+  const STRIP = mcSeries.length >= 2 ? 78 : 0;   // (c) Mc(t) şeridi yüksekliği
+  const H = H_MAIN + STRIP;
+  svgB.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const plotW = W-PAD_L-PAD_R, plotH = H_MAIN-PAD_T-PAD_B;
   // Eksen, nominal secili pencereye (hours) DEGIL, pencerelerin gercek zaman
   // araligina gore olceklenir -- ornegin Limit'e takilip veri nominal
   // pencerenin (or. 365 gun) yalnizca kucuk bir kismini dolduruyorsa, eksen
   // artik bos alan birakip veriyi kenara sikistirmaz (2026-09-16, kullanici
   // geri bildirimi: "1 aylik veri 1 ay, 10 yillik veri 10 yil gostermeli").
-  let t0 = series[0].t, t1 = series[series.length - 1].t;
+  const fs = fixed ? fixed.series : [];
+  let t0 = Math.min(series[0].t, ...(fs.length ? [fs[0].t] : [])),
+      t1 = Math.max(series[series.length - 1].t, ...(fs.length ? [fs[fs.length - 1].t] : []));
   if (t1 <= t0) t1 = t0 + 1;
   const bs = series.map(s => s.b);
+  const bsAll = bs.concat(fs.map(s => s.b));
   // ÖNCEKİ KARARIN GERİ ALINMASI (2026-09-13'te "eksen 0.4-1.6'yı hep
   // kapsasın, daralmasın" kilitlenmişti): veri gerçekte dar bir bantta
   // (ör. 0.7-0.9) dalgalanıyorsa, sabit 1.2 birimlik zorunlu pencere
@@ -1778,8 +1893,8 @@ function renderBvalueTS(evList, Mc) {
   // çerçeve kenarını hafifçe aşabilir, bilinen/kabul edilen bir ödün).
   // Dolgu oransal (aralığın %10'u, en az 0.05); DEFAULT_B_LO/HI (0.4/1.6)
   // artık bu hesaba hiçbir şekilde müdahale etmez (2026-09-17).
-  const dataLo = Math.min(...bs);
-  const dataHi = Math.max(...bs);
+  const dataLo = Math.min(...bsAll);
+  const dataHi = Math.max(...bsAll);
   const padding = Math.max((dataHi - dataLo) * 0.10, 0.05);
   let bMin = dataLo - padding, bMax = dataHi + padding;
   if (bMax - bMin < MIN_SPAN) {
@@ -1792,8 +1907,13 @@ function renderBvalueTS(evList, Mc) {
   const y = b => PAD_T + plotH - ((b-bMin)/(bMax-bMin)) * plotH;
 
   const pts  = series.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ');
-  // Aki (1965) %95 güven aralığı (±1.9·b/√n) — her pencere için dikey çubuk
-  const errBars = series.map(s => {
+  // Aki (1965) %95 güven aralığı (±1.96·b/√n) — her pencere için dikey çubuk
+  // (a) Yoğun serilerde (>150 pencere) üst üste binen yüzlerce dikey çubuk
+  // yerine yarı saydam %95 bandı çizilir — hata çubukları "saçılım" gibi
+  // okunmasın (2026-09-27). Değerler aynı; yalnızca gösterim değişir.
+  const BAND_MIN = 150, useBand = series.length > BAND_MIN;
+  const band = useBand ? `<polygon points="${series.map(s => `${x(s.t).toFixed(1)},${y(s.b + (s.err || 0)).toFixed(1)}`).join(' ')} ${series.slice().reverse().map(s => `${x(s.t).toFixed(1)},${y(Math.max(0, s.b - (s.err || 0))).toFixed(1)}`).join(' ')}" fill="#06b6d4" fill-opacity="0.14" stroke="none"/>` : '';
+  const errBars = useBand ? '' : series.map(s => {
     if (!s.err) return '';
     const xc = x(s.t).toFixed(1);
     return `<line x1="${xc}" y1="${y(s.b - s.err).toFixed(1)}" x2="${xc}" y2="${y(s.b + s.err).toFixed(1)}" stroke="#06b6d4" stroke-width="1" stroke-opacity="0.35"/>`;
@@ -1802,7 +1922,7 @@ function renderBvalueTS(evList, Mc) {
   // 9000+ pencere) göz önce trend çizgisini yakalasın, ham veri "arka plan
   // dokusu" gibi kalsın (2026-09-17, kullanıcı geri bildirimi). Değerler
   // aynı, yalnızca çizim ağırlığı değişti.
-  const dots = series.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="1.5" fill="#06b6d4" fill-opacity="0.5"><title>b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} (%95) · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
+  const dots = series.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="${useBand ? 1 : 1.5}" fill="#06b6d4" fill-opacity="${useBand ? 0.35 : 0.5}"><title>b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} (%95) · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
 
   // Hareketli ortalama TREND çizgisi -- YENİ bir b-değeri hesabı DEĞİLDİR,
   // mevcut N=100/step=10 serisinin (bs) üzerinde saf görsel bir özet
@@ -1819,6 +1939,44 @@ function renderBvalueTS(evList, Mc) {
   }).join(' ');
   const trendLine = `<polyline points="${trendPts}" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-opacity="0.95"/>`;
 
+  // (b) sabit-Mc serisi: aynı 21-pencere hareketli ortalama, gri kesikli
+  let fixedLine = '', fixedDots = '';
+  if (fs.length) {
+    const fb = fs.map(s => s.b);
+    const fPts = fs.map((s, i) => {
+      const lo = Math.max(0, i - TREND_HALF), hi = Math.min(fs.length - 1, i + TREND_HALF);
+      const sl = fb.slice(lo, hi + 1);
+      return `${x(s.t).toFixed(1)},${y(sl.reduce((a, c) => a + c, 0) / sl.length).toFixed(1)}`;
+    }).join(' ');
+    fixedLine = `<polyline points="${fPts}" fill="none" stroke="#d1d5db" stroke-width="1.8" stroke-dasharray="5,3" stroke-opacity="0.95"/>`;
+    fixedDots = fs.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="1" fill="#d1d5db" fill-opacity="0.35"><title>sabit Mc=${fixed.mc.toFixed(1)}: b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
+  }
+
+  // (c) Mc(t) şeridi — b(t) ile AYNI zaman ekseni
+  let strip = '';
+  if (STRIP) {
+    const sT = H_MAIN + 4, sH = STRIP - 22;
+    const stepMcs = cs ? cs.periods.map(p => p.mc) : (Mc !== null ? [Mc] : []);
+    const allMc = mcSeries.map(m => m.mc).concat(stepMcs, fixed ? [fixed.mc] : []);
+    let mLo = Math.floor(Math.min(...allMc) * 2) / 2, mHi = Math.ceil(Math.max(...allMc) * 2) / 2;
+    if (mHi - mLo < 0.5) mHi = mLo + 0.5;
+    const ym = v => sT + sH - (v - mLo) / (mHi - mLo) * sH;
+    const tx = t => PAD_L + Math.max(0, Math.min(1, (t - t0) / (t1 - t0))) * plotW;
+    let st = `<rect x="${PAD_L}" y="${sT}" width="${plotW}" height="${sH}" fill="none" stroke="#2a2a2a" stroke-width="0.6"/>`;
+    [mLo, mHi].forEach(v => { st += `<text x="${PAD_L - 6}" y="${(ym(v) + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${v.toFixed(1)}</text>`; });
+    st += `<polyline points="${mcSeries.map(m => `${tx(m.t).toFixed(1)},${ym(m.mc).toFixed(1)}`).join(' ')}" fill="none" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.8"/>`;
+    if (cs) cs.periods.forEach((p, i) => {
+      const xa = tx(p.t0), xb = tx(p.t1);
+      if (xb > xa) st += `<line x1="${xa.toFixed(1)}" y1="${ym(p.mc).toFixed(1)}" x2="${xb.toFixed(1)}" y2="${ym(p.mc).toFixed(1)}" stroke="#f59e0b" stroke-width="1.8"/>`;
+      const nx = cs.periods[i + 1];
+      if (nx) st += `<line x1="${xb.toFixed(1)}" y1="${ym(p.mc).toFixed(1)}" x2="${xb.toFixed(1)}" y2="${ym(nx.mc).toFixed(1)}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="2,2"/>`;
+    });
+    else if (Mc !== null) st += `<line x1="${PAD_L}" y1="${ym(Mc).toFixed(1)}" x2="${W - PAD_R}" y2="${ym(Mc).toFixed(1)}" stroke="#f59e0b" stroke-width="1.4" stroke-dasharray="4,3"/>`;
+    if (fixed) st += `<line x1="${PAD_L}" y1="${ym(fixed.mc).toFixed(1)}" x2="${W - PAD_R}" y2="${ym(fixed.mc).toFixed(1)}" stroke="#d1d5db" stroke-width="1" stroke-dasharray="5,3"/>`;
+    st += `<text x="${PAD_L + 4}" y="${sT + sH + 13}" fill="#888" font-size="8">Mc(t): <tspan fill="#22d3ee">━ veri (maks. eğrilik +0.2, ${MC_WIN} olay kayan pencere)</tspan>  <tspan fill="#f59e0b">━ ${cs ? 'tamlık basamakları' : 'kullanılan Mc'}</tspan>${fixed ? `  <tspan fill="#d1d5db">┄ sabit Mc=${fixed.mc.toFixed(1)}</tspan>` : ''}</text>`;
+    strip = st;
+  }
+
   let yTicks = '';
   for (let b = Math.ceil(bMin/B_STEP)*B_STEP; b <= bMax + 1e-9; b += B_STEP) {
     yTicks += `<text x="${PAD_L-6}" y="${y(b)+3}" fill="#888" font-size="8" text-anchor="end">${b.toFixed(2)}</text>`;
@@ -1831,7 +1989,7 @@ function renderBvalueTS(evList, Mc) {
     const xc = x(tk.t);
     const anchor = i === 0 ? 'start' : i === xTicksArrB.length - 1 ? 'end' : 'middle';
     xTicksB += `<line x1="${xc.toFixed(1)}" y1="${PAD_T}" x2="${xc.toFixed(1)}" y2="${PAD_T+plotH}" stroke="#2a2a2a" stroke-width="0.5"/>`;
-    xTicksB += `<text x="${xc.toFixed(1)}" y="${H-6}" fill="#888" font-size="9" text-anchor="${anchor}">${tk.label}</text>`;
+    xTicksB += `<text x="${xc.toFixed(1)}" y="${H_MAIN-6}" fill="#888" font-size="9" text-anchor="${anchor}">${tk.label}</text>`;
   });
 
   // b=1.0 karşılaştırma referansı — "küresel ortalama" değil, sadece görsel kıyas çizgisi
@@ -1848,10 +2006,14 @@ function renderBvalueTS(evList, Mc) {
     ${xTicksB}
     ${refLine1}
     <line x1="${PAD_L}" y1="${y(bAvg)}" x2="${W-PAD_R}" y2="${y(bAvg)}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+    ${band}
     ${errBars}
-    <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="0.8" stroke-opacity="0.4"/>
+    <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="${useBand ? 0.5 : 0.8}" stroke-opacity="${useBand ? 0.25 : 0.4}"/>
     ${dots}
+    ${fixedDots}
+    ${fixedLine}
     ${trendLine}
+    ${strip}
     <line x1="${PAD_L}" y1="${PAD_T+plotH}" x2="${W-PAD_R}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
     <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
   `;
@@ -1864,12 +2026,21 @@ function renderBvalueTS(evList, Mc) {
   statsB.innerHTML =
     `<div style="font-size:.85em;color:#aaa">` +
       `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; ` +
+      (useBand ? `<span style="color:#06b6d4;opacity:.6">▮</span> %95 yaklaşık güven bandı (±1.96·b/√n, pencere başına) &nbsp; ` : `<span style="color:#06b6d4">│</span> %95 güven aralığı &nbsp; `) +
+      (fixed ? `<span style="color:#d1d5db">┄</span> Sabit Mc=${fixed.mc.toFixed(1)} (${fixed.src}) hareketli ortalama &nbsp; ` : '') +
       `<span style="color:#ec4899">━</span> Hareketli ortalama (${TREND_WINDOW} pencere) &nbsp; ` +
       `<span style="color:#f59e0b">┄</span> Genel ortalama` +
     `</div>` +
     `<div style="margin-top:2px">` +
       `b ort. = <b>${bAvg.toFixed(2)}</b> &nbsp;|&nbsp; b son = <b>${bLast.b.toFixed(2)}${lastErrStr}</b> ` +
       `<span style="color:#888;font-size:.85em">(%95, n=100)</span> &nbsp;|&nbsp; ${series.length} pencere (N=${N})` +
+      (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">Tamlık basamaklı: olay başına Mc (Aki 1965 genelleştirmesi)</span>` : '') +
+      (fixed ? (fixed.series.length
+        ? ` &nbsp;|&nbsp; <span style="color:#d1d5db">Sabit Mc=${fixed.mc.toFixed(1)}: b ort. = <b>${(fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length).toFixed(2)}</b>, ${fixed.series.length} pencere (N=${fixed.N})` +
+          (fixed.spanFixed && fixed.spanMain ? ` · pencere süresi (medyan): ${(fixed.spanFixed / CS_YEAR_MS).toFixed(2)} yıl, ana seri ${(fixed.spanMain / CS_YEAR_MS).toFixed(2)} yıl` : '') + `</span>` +
+          (fixed.spanFixed && fixed.spanMain && fixed.spanFixed > 3 * fixed.spanMain
+            ? `<div style="color:#f59e0b;margin-top:2px">⚠ Sabit-Mc serisinin zaman çözünürlüğü ana serinin ${Math.round(fixed.spanFixed / fixed.spanMain)} katı kaba: pencere süresinden kısa b değişimlerini yakalayamaz. Gri çizginin düz kalması, pembe seride görülen kısa süreli bir değişimi çürütmez; yalnızca gri seride de görülen değişimler tamlıktan bağımsız sayılabilir.</div>` : '')
+        : ` &nbsp;|&nbsp; <span style="color:#d1d5db">Sabit Mc=${fixed.mc.toFixed(1)}: N=${fixed.N} &lt; 100 — karşılaştırma serisi üretilemedi</span>`) : '') +
     `</div>`;
 }
 
@@ -1883,6 +2054,7 @@ const toSuperscript = n => String(n).split('').map(c => SUPERSCRIPT_DIGITS[c] ||
 let lastGrEvList = null, lastGrMc = null, lastGrPoints = null, lastGrDM = null;
 
 function onGrBinSizeChange() {
+  if (lastCs) { renderGutenbergRichterCS(lastCs); return; }
   if (lastGrEvList) renderGutenbergRichter(lastGrEvList, lastGrMc);
 }
 
@@ -1899,6 +2071,7 @@ function setGrNormMode(mode) {
     const btn = document.getElementById('grMode' + m.charAt(0).toUpperCase() + m.slice(1));
     if (btn) btn.style.background = (m === mode) ? '#334155' : 'transparent';
   });
+  if (lastCs) { renderGutenbergRichterCS(lastCs); return; }
   if (lastGrEvList) renderGutenbergRichter(lastGrEvList, lastGrMc);
 }
 
@@ -1911,8 +2084,15 @@ function exportGrCSV() {
   const lines = [];
   lines.push(`# EQ-LiveTurkiye Gutenberg-Richter bin verisi — ${new Date().toISOString()}`);
   lines.push(`# ΔM = ${lastGrDM} · Mc (aktif) = ${lastGrMc !== null ? lastGrMc : '—'}`);
-  lines.push('magnitude,n_bin,n_cumulative');
-  lastGrPoints.forEach(p => lines.push(`${p.m},${p.nonCum},${p.cum}`));
+  const csCols = lastGrPoints.length && lastGrPoints[0].T !== undefined;
+  if (csCols) {
+    lines.push(`# Tamlık basamakları: ${csValidSteps().map(s => `${s.start}→Mc${s.mc}`).join(', ')} · T = binin tam olduğu toplam süre (yıl)`);
+    lines.push('magnitude,n_bin,n_cumulative,T_years,rate_bin_per_yr,rate_cumulative_per_yr');
+    lastGrPoints.forEach(p => lines.push(`${p.m},${p.nonCum},${p.cum},${p.T},${p.rate.toFixed(5)},${p.cumRate.toFixed(5)}`));
+  } else {
+    lines.push('magnitude,n_bin,n_cumulative');
+    lastGrPoints.forEach(p => lines.push(`${p.m},${p.nonCum},${p.cum}`));
+  }
   const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1922,6 +2102,26 @@ function exportGrCSV() {
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// Büyüklük türü tanısı (2026-09-27): 0.5 birimlik bantlarda baskın mtype ve
+// payı. Bitişik bantlarda (her biri ≥20 olay) baskın tür değişiyorsa GR'de
+// kırılma/basamak üretebilir (ör. ML → mb_Lg geçişi) — yalnızca uyarı.
+function magTypeDiag(items) {
+  const withT = items.filter(it => it.t);
+  if (!withT.length) return `<div style="color:#888;margin-top:2px">Büyüklük türü bilgisi yok (kaynak mtype vermiyor) — tür karışımı denetlenemedi.</div>`;
+  const bands = {};
+  withT.forEach(it => { const k = Math.floor(it.m * 2) / 2; const b = (bands[k] = bands[k] || { n: 0, c: {} }); b.n++; const t = it.t.toLowerCase(); b.c[t] = (b.c[t] || 0) + 1; });
+  const keys = Object.keys(bands).map(Number).sort((a, b) => a - b);
+  const rows = keys.map(k => { const b = bands[k]; const [t, n] = Object.entries(b.c).sort((a, c) => c[1] - a[1])[0]; return { k, n: b.n, t, share: n / b.n }; });
+  const tot = {}; withT.forEach(it => { const t = it.t.toLowerCase(); tot[t] = (tot[t] || 0) + 1; });
+  const totStr = Object.entries(tot).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([t, n]) => `${t} %${Math.round(100 * n / withT.length)}`).join(', ');
+  const bandStr = rows.filter(r => r.n >= 20).map(r => `${r.k.toFixed(1)}–${(r.k + 0.5).toFixed(1)}: ${r.t} %${Math.round(100 * r.share)}`).join(' · ');
+  const sw = [];
+  const big = rows.filter(r => r.n >= 20);
+  for (let i = 1; i < big.length; i++) if (big[i].t !== big[i - 1].t && big[i].k - big[i - 1].k <= 0.5) sw.push(`M≈${big[i].k.toFixed(1)}'de ${big[i - 1].t} → ${big[i].t}`);
+  return `<div style="color:#9ab0c5;margin-top:2px">Büyüklük türleri: ${totStr}${bandStr ? ` &nbsp;|&nbsp; baskın tür (0.5 bant): ${bandStr}` : ''}</div>` +
+    (sw.length ? `<div style="color:#f59e0b">⚠ Baskın büyüklük türü değişiyor (${sw.join('; ')}): farklı ölçekler birleşiyor; GR'de kırılma/basamak ve b yanlılığı üretebilir. Mw'ye dönüşüm (Magnitude Conversion) veya tek türe süzme ile karşılaştırın.</div>` : '');
 }
 
 function renderGutenbergRichter(evList, Mc) {
@@ -2088,7 +2288,7 @@ function renderGutenbergRichter(evList, Mc) {
     : modeFallback
     ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">⚠ Oran/Yoğunluk yalnızca Circle bölge modunda hesaplanır — Ham gösteriliyor</span>`
     : '';
-  stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif N(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi N &nbsp;|&nbsp; <span style="color:#f5a623">┄</span> GR fit &nbsp;|&nbsp; ΔM=${DM} · N=${mags.length} · Mmax=${mMax.toFixed(1)}${mcStr}${fitStatsStr}${modeStr}`;
+  stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif N(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi N &nbsp;|&nbsp; <span style="color:#f5a623">┄</span> GR fit &nbsp;|&nbsp; ΔM=${DM} · N=${mags.length} · Mmax=${mMax.toFixed(1)}${mcStr}${fitStatsStr}${modeStr}` + magTypeDiag(evList.filter(e => (e.mw ?? e.mag) > 0).map(e => ({ m: e.mw ?? e.mag, t: e.mtype || '' })));
 }
 
 function toggleTimeMag() {
@@ -2243,7 +2443,7 @@ async function exportTimeMagPNG(theme, evt) {
 
   const svgSpecs = [
     { id: 'tmSvg',   statsId: 'tmStats',   label: 'Zaman–Magnitude Dağılımı' },
-    { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Wilson & Öncel 2007)' },
+    { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007)' },
     { id: 'tmSvgGR', statsId: 'tmStatsGR', label: 'Gutenberg-Richter Frekans-Büyüklük Dağılımı' },
   ];
   const svgEls = svgSpecs.map(s => document.getElementById(s.id));
@@ -2377,6 +2577,389 @@ async function exportTimeMagPNG(theme, evt) {
   }, 'image/png');
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   TAMLIK BASAMAKLARI — zamana bağlı Mc ile alt kataloglar (2026-09-27)
+   Amaç: tamlığı zamanla değişen bir kataloğu (ör. Oklahoma: 2015–2019
+   M≥2.0, 2019–2025 M≥1.0, 2025– M≥0.5) TEK bir sabit Mc ile kesmek yerine,
+   her dönem için kendi eşiğiyle birleştirmek.
+   · Filtre: olay, olduğu andaki basamağın Mc'sine eşit/üstündeyse tutulur
+     (Stepp 1972 tarzı "basamaklı tamlık tablosu").
+   · b(t): her olay kendi eşiğine göre — üstel dağılımın hafızasızlığı
+     nedeniyle (M − Mc_i) fazlalıkları aynı β ile dağılır; Aki (1965)
+     tahmincisi b = log10(e) / (ortalama(M − Mc_i) + ΔM/2) olarak genelleşir.
+   · GR: her büyüklük bini, yalnızca TAM olduğu toplam süreye bölünerek
+     yıllık orana çevrilir; b, eşit olmayan gözlem süreleri için Weichert
+     (1980) en çok olabilirlik kestirimiyle hesaplanır (Kramer 1996,
+     s. 122-123: eksik kayda düz GR doğrusu çekmek b'yi yatıklaştırır).
+   Üretim katalogu / b-değeri ızgarası bu seçimden ETKİLENMEZ; yalnızca
+   Time-Mag paneli içi analizdir. URL'de 'rcs' parametresiyle paylaşılır.
+   ═══════════════════════════════════════════════════════════════════ */
+let csEnabled = false;
+let csSteps = [];            // [{start:'YYYY-MM-DD', mc:Number}]
+let lastTmEvList = null;     // otomatik öneri için panelin son olay listesi
+const CS_YEAR_MS = 365.25 * 24 * 3600 * 1000;
+
+function csValidSteps() {
+  return csSteps
+    .map(s => ({ t: Date.parse(s.start + 'T00:00:00Z'), mc: parseFloat(s.mc), start: s.start }))
+    .filter(s => !isNaN(s.t) && !isNaN(s.mc))
+    .sort((a, b) => a.t - b.t);
+}
+function csIsActive() { return csEnabled && csValidSteps().length > 0; }
+
+// Olayın zamanındaki basamak eşiği; ilk basamaktan önceki olaylar için null (dışarıda)
+function csMcAt(t, steps) {
+  let mc = null;
+  for (const s of steps) { if (t >= s.t) mc = s.mc; else break; }
+  return mc;
+}
+
+// Dönemler: [t0, t1) — t1 bir sonraki basamağın başlangıcı, son dönem için tEnd
+// Dönemler analiz penceresine [tStart, tEnd] KIRPILIR (2026-09-27 düzeltmesi):
+//   t0 = max(basamak başı, tStart), t1 = min(sonraki basamak başı, tEnd).
+// Önceden yalnızca sonda kırpılıyordu; 90 günlük bir pencerede 2015 basamağı
+// T(M≥2) ≈ 11,7 yıl sayılıyor, oranlar 7–48 kat düşük, b yukarı yanlı çıkıyordu.
+function csPeriods(steps, tStart, tEnd) {
+  return steps.map((s, i) => {
+    const rawT1 = i + 1 < steps.length ? steps[i + 1].t : tEnd;
+    return { t0: Math.max(s.t, tStart), t1: Math.min(rawT1, tEnd), mc: s.mc, start: s.start,
+             clipped: tStart - s.t > 864e5 };  // 1 günden küçük farklar uyarı üretmez (T yine kırpılır)
+  }).filter(p => p.t1 > p.t0);
+}
+
+// Bir büyüklük değerinin tam gözlendiği toplam süre (yıl)
+function csObsYears(m, periods) {
+  let T = 0;
+  periods.forEach(p => { if (p.mc <= m + 1e-9) T += (p.t1 - p.t0) / CS_YEAR_MS; });
+  return T;
+}
+
+// Dönem etiketi: kırpılmışsa etkin başlangıç + basamağın tanım tarihi
+// (ör. "2026-06-29→Mc0.5 (basamak 2025-01-01)") — eksen başlangıcıyla
+// basamak tanım tarihinin karıştırılmaması için (2026-09-27).
+function csLabel(p) {
+  const mc = (+p.mc).toFixed(1);
+  return p.clipped ? `${new Date(p.t0).toISOString().slice(0, 10)}→Mc${mc} (basamak ${p.start})` : `${p.start}→Mc${mc}`;
+}
+
+// evList → { kept:[{e,m,mc}], steps, periods, tEnd, nExcluded }
+function csBuild(evList) {
+  const steps = csValidSteps();
+  if (!steps.length || !evList.length) return null;
+  const times = evList.map(e => e.time.getTime());
+  const tMin = Math.min(...times), tMax = Math.max(...times);
+  // Bitiş: pencere sonu, ancak ŞİMDİ'den ileri olamaz (gelecek gözlenmez;
+  // ör. "Bitiş 2026-12-31" seçilince T şişmesin — 2026-09-27).
+  const tEnd = (regionRect && regionWindowEnd) ? Math.max(Math.min(+regionWindowEnd, Date.now()), tMax) : tMax;
+  // Başlangıç: öncelik sorgu/analiz penceresinin başı (regionWindowStart);
+  // ilk olayın geç gelmesi gözlemin geç başladığı anlamına gelmez. Pencere
+  // bilgisi yoksa (canlı akış, bölge seçilmemiş) en erken olay kullanılır.
+  // İSTİSNA (2026-09-27): sorgu limite takıldıysa (zamana göre, en yeniler)
+  // katalog fiilen en erken DÖNEN olayda başlar — pencere başı (ör. 1970)
+  // kullanılırsa T onlarca yıl şişer.
+  const hasWin = !!(regionRect && regionWindowStart);
+  const capTime = hasWin && regionCapped && regionOrderUsed !== 'magnitude';
+  const capMag  = hasWin && regionCapped && regionOrderUsed === 'magnitude';
+  const tStart = capTime ? tMin : hasWin ? Math.min(+regionWindowStart, tMin) : tMin;
+  const tStartSrc = capTime ? 'sorgu limite takıldı → en erken dönen olay' : hasWin ? 'analiz penceresi' : 'en erken olay';
+  const periods = csPeriods(steps, tStart, tEnd);
+  const kept = [];
+  evList.forEach(e => {
+    const m = e.mw ?? e.mag, t = e.time.getTime();
+    const mc = csMcAt(t, steps);
+    if (mc !== null && t <= tEnd && m >= mc - 1e-9) kept.push({ e, m, mc, t });
+  });
+  kept.sort((a, b) => a.t - b.t);
+  // Veri-temelli Mc denetimi (2026-09-27): her dönemin pencere içindeki TÜM
+  // olaylarından (basamak altı dahil) maksimum eğrilik Mc'si (computeMc, +0.2).
+  // Yalnızca QC uyarısı için kullanılır; basamak değerini DEĞİŞTİRMEZ.
+  periods.forEach((p, i) => {
+    const last = i === periods.length - 1;
+    const sub = evList.filter(e => { const t = e.time.getTime(); return t >= p.t0 && (t < p.t1 || (last && t <= p.t1)); });
+    p.nAll = sub.length;
+    p.mcData = sub.length >= CS_QC.minEvents ? computeMc(sub) : null;
+  });
+  return { kept, steps, periods, tStart, tStartSrc, tEnd, capTime, capMag, nExcluded: evList.length - kept.length };
+}
+
+// Aki (1965) — olay başına eşik: b = log10(e) / (ort(M − Mc_i) + ΔM/2)
+function csAkiB(items) {
+  if (items.length < 10) return null;
+  const mean = items.reduce((a, it) => a + (it.m - it.mc), 0) / items.length;
+  const d = mean + 0.05;
+  return d > 0 ? Math.LOG10E / d : null;
+}
+
+// Weichert (1980) en çok olabilirlik: bins [{m, n, T}] (T yıl, n olay)
+// β:  Σ n_i m_i / N  =  Σ T_i m_i e^{-β m_i} / Σ T_i e^{-β m_i}
+function weichertFit(bins) {
+  const B = bins.filter(b => b.T > 0);
+  const N = B.reduce((a, b) => a + b.n, 0);
+  if (N < 10 || B.length < 2) return null;
+  const lhs = B.reduce((a, b) => a + b.n * b.m, 0) / N;
+  const rhs = beta => {
+    let s0 = 0, s1 = 0;
+    B.forEach(b => { const w = b.T * Math.exp(-beta * b.m); s0 += w; s1 += w * b.m; });
+    return s1 / s0;
+  };
+  let lo = 1e-3, hi = 12;              // rhs(β) β arttıkça azalır
+  if ((rhs(lo) - lhs) * (rhs(hi) - lhs) > 0) return null;
+  for (let k = 0; k < 100; k++) {
+    const mid = (lo + hi) / 2;
+    if (rhs(mid) > lhs) lo = mid; else hi = mid;
+  }
+  const beta = (lo + hi) / 2;
+  let s0 = 0, s1 = 0, s2 = 0, e0 = 0;
+  B.forEach(b => { const ex = Math.exp(-beta * b.m), w = b.T * ex; s0 += w; s1 += w * b.m; s2 += w * b.m * b.m; e0 += ex; });
+  const varInv = N * (s2 / s0 - Math.pow(s1 / s0, 2));
+  const sigBeta = varInv > 0 ? 1 / Math.sqrt(varInv) : null;
+  const rate0 = N * e0 / s0;           // λ(M ≥ en küçük bin) /yıl
+  return { b: beta / Math.LN10, sigma: sigBeta !== null ? sigBeta / Math.LN10 : null, beta, rate0, N, mMin: Math.min(...B.map(b => b.m)) };
+}
+
+// Otomatik öneri: takvim yılı başına maksimum eğrilik Mc (+0.2, computeMc);
+// ardışık yıllarda Mc ≥0.3 değişince yeni basamak; basamak Mc'si grubun
+// EN BÜYÜK yıllık Mc'si (muhafazakâr). <50 olaylı yıllar öncekine katılır.
+function csSuggest() {
+  if (!lastTmEvList || !lastTmEvList.length) { setStatus('Önce Time-Mag panelinde veri yükleyin', true); return; }
+  const byYear = {};
+  lastTmEvList.forEach(e => { const y = e.time.getUTCFullYear(); (byYear[y] = byYear[y] || []).push(e); });
+  const years = Object.keys(byYear).map(Number).sort((a, b) => a - b);
+  const groups = [];
+  years.forEach(y => {
+    const mc = byYear[y].length >= 50 ? computeMc(byYear[y]) : null;
+    const g = groups[groups.length - 1];
+    if (!g) { groups.push({ year: y, mcs: mc !== null ? [mc] : [] }); return; }
+    const gMc = g.mcs.length ? Math.max(...g.mcs) : null;
+    if (mc !== null && gMc !== null && Math.abs(mc - gMc) >= 0.3) groups.push({ year: y, mcs: [mc] });
+    else if (mc !== null) g.mcs.push(mc);
+  });
+  csSteps = groups.filter(g => g.mcs.length).map(g => ({ start: `${g.year}-01-01`, mc: Math.max(...g.mcs).toFixed(1) }));
+  if (!csSteps.length) { setStatus('Öneri üretilemedi — yıl başına en az 50 olay gerekir', true); return; }
+  csEnabled = true;
+  document.getElementById('csEnabled').checked = true;
+  csRenderRows();
+  document.getElementById('csNote').textContent = 'Öneri: yıllık maksimum eğrilik Mc (+0.2). Zaman–büyüklük grafiğinde basamakları gözle doğrulayın; tarih ve eşikleri elle düzeltebilirsiniz.';
+  onCsChange(true);
+}
+
+function csAddRow() {
+  const last = csSteps[csSteps.length - 1];
+  csSteps.push({ start: last ? last.start : `${new Date().getUTCFullYear()}-01-01`, mc: last ? (parseFloat(last.mc) - 0.5).toFixed(1) : '2.0' });
+  csRenderRows(); onCsChange(true);
+}
+function csDelRow(i) { csSteps.splice(i, 1); csRenderRows(); onCsChange(true); }
+function csEditRow(i, field, val) { csSteps[i][field] = val; onCsChange(true); }
+
+function csRenderRows() {
+  const box = document.getElementById('csRows');
+  if (!box) return;
+  const inp = 'background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:1px 4px;';
+  box.innerHTML = csSteps.map((s, i) =>
+    `<div style="display:flex;align-items:center;gap:6px;margin:2px 0;">` +
+      `<span style="color:#f59e0b;min-width:14px;">${i + 1}.</span>` +
+      `Başlangıç <input type="date" value="${s.start}" onchange="csEditRow(${i},'start',this.value)" style="${inp}">` +
+      `Mc ≥ <input type="number" step="0.1" min="-1" max="9" value="${s.mc}" onchange="csEditRow(${i},'mc',this.value)" style="${inp}width:58px;">` +
+      `<button onclick="csDelRow(${i})" title="Basamağı sil" style="background:none;border:1px solid #334;color:#888;border-radius:4px;cursor:pointer;padding:0 6px;">✕</button>` +
+    `</div>`).join('') || '<div style="color:#666">Basamak yok — “＋ Basamak” veya “⚙ Otomatik öner”.</div>';
+}
+
+function csSyncURL() {
+  const url = new URL(location.href);
+  const steps = csValidSteps();
+  if (csEnabled && steps.length) url.searchParams.set('rcs', steps.map(s => `${s.start}_${s.mc}`).join('~'));
+  else url.searchParams.delete('rcs');
+  history.replaceState(null, '', url);
+}
+
+function onCsChange(fromEdit) {
+  if (!fromEdit) csEnabled = document.getElementById('csEnabled').checked;
+  const show = csEnabled ? '' : 'none';
+  document.getElementById('csControls').style.display = show === '' ? 'inline-flex' : 'none';
+  document.getElementById('csRows').style.display = show === '' ? 'block' : 'none';
+  if (csEnabled && !csSteps.length) csRenderRows();
+  csSyncURL();
+  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+}
+
+function restoreCsFromURL() {
+  const raw = new URLSearchParams(location.search).get('rcs');
+  if (!raw) return;
+  csSteps = raw.split('~').map(tok => { const [start, mc] = tok.split('_'); return { start, mc }; })
+               .filter(s => /^\d{4}-\d{2}-\d{2}$/.test(s.start) && !isNaN(parseFloat(s.mc)));
+  if (!csSteps.length) return;
+  csEnabled = true;
+  const cb = document.getElementById('csEnabled');
+  if (cb) cb.checked = true;
+  csRenderRows();
+  document.getElementById('csControls').style.display = 'inline-flex';
+  document.getElementById('csRows').style.display = 'block';
+}
+
+// Zaman–büyüklük grafiği için basamak çizgisi (SVG)
+function csStairSVG(cs, x, y, t0, t1, magMin, magMax, xMax) {
+  let d = '', labels = '';
+  cs.periods.forEach((p, i) => {
+    if (p.mc < magMin || p.mc > magMax) return;
+    const xa = x(Math.max(p.t0, t0)), xb = x(Math.min(p.t1, t1)), yy = y(p.mc);
+    if (xb <= xa) return;
+    d += `<line x1="${xa.toFixed(1)}" y1="${yy.toFixed(1)}" x2="${xb.toFixed(1)}" y2="${yy.toFixed(1)}" stroke="#f59e0b" stroke-width="1.6"/>`;
+    const next = cs.periods[i + 1];
+    if (next && next.mc >= magMin && next.mc <= magMax && next.t0 <= t1) {
+      d += `<line x1="${xb.toFixed(1)}" y1="${yy.toFixed(1)}" x2="${xb.toFixed(1)}" y2="${y(next.mc).toFixed(1)}" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="2,2"/>`;
+    }
+    labels += `<text x="${(xa + 3).toFixed(1)}" y="${(yy - 3).toFixed(1)}" fill="#f59e0b" font-size="8">Mc=${p.mc}</text>`;
+  });
+  return d + labels;
+}
+
+// Kalite kontrol / tanı katmanı — HESAPLAMAYI ENGELLEMEZ, yalnızca uyarır.
+// Eşikler (≥50 olay, ≥1 yıl, 2–5 basamak) geçerlilik koşulu değil, gözden
+// geçirme göstergesidir; basamakları otomatik birleştirmez/değiştirmez
+// (metodolojik karar kullanıcıda kalır — 2026-09-27).
+const CS_QC = { minEvents: 50, minYears: 1, softMaxSteps: 5, reviewSteps: 6, mcGap: 0.2 };
+function csRenderDiag(cs) {
+  const el = document.getElementById('csDiag');
+  if (!el) return;
+  if (!cs) { el.innerHTML = ''; return; }
+  const ok = [], warn = [];
+  const nP = cs.periods.length;
+  if (nP > CS_QC.reviewSteps) warn.push(`🔴 ${nP} tamlık basamağı tanımlandı. Basamak sayısının katalog ve ağ tarihçesiyle uyumlu olduğunu ayrıntılı gözden geçirin; yıllık Mc dalgalanmaları gerçek ağ değişimlerini temsil etmeyebilir.`);
+  else if (nP > CS_QC.softMaxSteps) warn.push(`⚠️ ${nP} tamlık basamağı tanımlandı (önerilen 2–${CS_QC.softMaxSteps}). Basamak sayısını gözden geçirin.`);
+  else ok.push(`✓ ${nP} basamak`);
+  let shortN = 0, smallN = 0, lowMcN = 0;
+  cs.periods.forEach((p, i) => {
+    const yrs = (p.t1 - p.t0) / CS_YEAR_MS;
+    const n = cs.kept.filter(it => it.t >= p.t0 && it.t < p.t1 + (i === nP - 1 ? 1 : 0)).length;
+    // -0.01 tolerans: 365 günlük takvim yılı = 0.9993 yıl, yanlış alarm vermesin
+    if (yrs < CS_QC.minYears - 0.01) { shortN++; warn.push(`⚠️ Basamak ${i + 1} (${csLabel(p)}): ${yrs.toFixed(2)} yıl — kısa dönem; Mc kestirimi kararsız olabilir.`); }
+    if (n < CS_QC.minEvents) { smallN++; warn.push(`⚠️ Basamak ${i + 1} (${csLabel(p)}): ${n} olay — örneklem küçük olabilir.`); }
+    // Basamak Mc'si pencere verisinden kestirilen Mc'nin (maks. eğrilik +0.2)
+    // 0.2'den FAZLA altındaysa, yani maks. eğrilik tepesinin de altındaysa
+    // (tam 0.2 fark, +0.2 düzeltmesinin kendisidir; doğru basamakta yanlış alarm vermesin):
+    // eşik altı eksik tamlık GR'yi yatıklaştırır → b aşağı yanlı (Kramer 1996).
+    if (p.mcData !== null && p.mcData !== undefined && p.mc < p.mcData - CS_QC.mcGap - 1e-9) {
+      lowMcN++;
+      warn.push(`⚠️ Basamak ${i + 1} Mc=${(+p.mc).toFixed(1)}, bu penceredeki veriden kestirilen Mc değerinin (${p.mcData.toFixed(1)}; maks. eğrilik +0.2, n=${p.nAll}) belirgin biçimde altında; eşik altı eksik tamlık nedeniyle b aşağı yanlı olabilir.`);
+    }
+  });
+  if (!shortN) ok.push(`✓ Her basamak ≥ ${CS_QC.minYears} yıl`);
+  if (!smallN) ok.push(`✓ Basamak başına ≥ ${CS_QC.minEvents} olay`);
+  if (!lowMcN && cs.periods.some(p => p.mcData !== null && p.mcData !== undefined)) ok.push(`✓ Basamak Mc'leri veri Mc'siyle uyumlu`);
+  if (cs.capMag) warn.push(`🔴 Bölge sorgusu büyüklüğe göre sıralı ve limite takıldı: katalog zamandan değil büyüklükten kesilmiş. Tamlık, gözlem süreleri (T), Weichert b ve λ bu veriyle GEÇERSİZDİR — sıralamayı "en yeni" yapın.`);
+  if (cs.capTime) warn.push(`⚠ Bölge sorgusu limite takıldı: katalog pencere başından değil en erken dönen olaydan (${new Date(cs.tStart).toISOString().slice(0, 10)}) başlıyor; gözlem süreleri buna göre hesaplandı.`);
+  const allSteps = csValidSteps();
+  const nAfter = allSteps.filter(s => s.t >= cs.tEnd).length;
+  const nBefore = allSteps.length - nP - nAfter;
+  if (nAfter > 0) warn.push(`⚠️ ${nAfter} basamak katalogun son olayından sonra başladığı için dönem oluşturmadı.`);
+  const clipped = cs.periods.filter(p => p.clipped);
+  if (clipped.length || nBefore > 0) {
+    const d0 = new Date(cs.tStart).toISOString().slice(0, 10);
+    warn.push(`⚠ Basamak başlangıcı analiz penceresinden önce; gözlem süresi analiz penceresine kırpıldı (başlangıç ${d0}, ${cs.tStartSrc})` +
+      (nBefore > 0 ? ` · ${nBefore} basamak pencereden önce sona erdiği için kullanılmadı.` : '.'));
+  }
+  el.innerHTML = ok.map(t => `<span style="color:#22c55e;margin-right:10px;">${t}</span>`).join('') +
+    warn.map(t => `<div style="color:${t.startsWith('🔴') ? '#f87171' : '#f59e0b'};">${t}</div>`).join('') +
+    (warn.length ? `<div style="color:#666;">Uyarılar hesaplamayı durdurmaz; kalite kontrol göstergesidir.</div>` : '');
+}
+
+// b(t): N=100 kayan pencere, adım 10 — olay başına eşik (csAkiB)
+function csBvalueTimeSeries(cs) {
+  const N_WIN = 100, STEP = 10, items = cs.kept;
+  if (items.length < N_WIN) return { series: [], N: items.length };
+  const series = [];
+  for (let i = 0; i + N_WIN <= items.length; i += STEP) {
+    const win = items.slice(i, i + N_WIN);
+    const b = csAkiB(win);
+    if (b !== null) series.push({ t: win[Math.floor(N_WIN / 2)].t, b, err: bConfidence95(b, N_WIN), span: win[N_WIN - 1].t - win[0].t });
+  }
+  return { series, N: items.length };
+}
+
+// GR — basamaklı tamlık: bin başına yıllık oran + Weichert (1980) fit
+function renderGutenbergRichterCS(cs) {
+  const svg = document.getElementById('tmSvgGR');
+  const stats = document.getElementById('tmStatsGR');
+  const DM = parseFloat(document.getElementById('grBinSize').value) || 0.1;
+  const items = cs.kept;
+  if (items.length < 10) {
+    svg.innerHTML = `<text x="210" y="200" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: basamaklardan geçen N=${items.length}</text>`;
+    stats.textContent = `N=${items.length}`; return;
+  }
+  // Bin: floor(m/DM) — mevcut renderGutenbergRichter ile aynı konvansiyon
+  const idx = m => Math.floor((m + 1e-9) / DM);
+  const counts = {};
+  items.forEach(it => { const k = idx(it.m); counts[k] = (counts[k] || 0) + 1; });
+  const keys = Object.keys(counts).map(Number).sort((a, b) => a - b);
+  const kMin = keys[0], kMax = keys[keys.length - 1];
+  const bins = [];
+  for (let k = kMin; k <= kMax; k++) {
+    const m = +(k * DM).toFixed(2);
+    const T = csObsYears(m, cs.periods);
+    const n = counts[k] || 0;
+    bins.push({ m, n, T, rate: T > 0 ? n / T : 0 });
+  }
+  let run = 0;
+  for (let i = bins.length - 1; i >= 0; i--) { run += bins[i].rate; bins[i].cumRate = run; }
+  let runN = 0;
+  for (let i = bins.length - 1; i >= 0; i--) { runN += bins[i].n; bins[i].cumN = runN; }
+  // Weichert: bin merkezleri (m + DM/2) ile
+  const wf = weichertFit(bins.filter(b => b.n > 0 || b.T > 0).map(b => ({ m: b.m + DM / 2, n: b.n, T: b.T })));
+
+  lastGrPoints = bins.map(b => ({ m: b.m, nonCum: b.n, cum: b.cumN, T: +b.T.toFixed(3), rate: b.rate, cumRate: b.cumRate }));
+  lastGrDM = DM;
+
+  const W = 420, H = 400, PAD_L = 42, PAD_B = 28, PAD_T = 10, PAD_R = 14;
+  const plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
+  const mMax = Math.max(...items.map(it => it.m));
+  const mAxisMax = Math.ceil(mMax) + 1;
+  const mAxisMin = Math.min(0, Math.floor(Math.min(...items.map(it => it.m))));
+  const vals = bins.flatMap(b => [b.cumRate, b.rate]).filter(v => v > 0);
+  let logTop = Math.ceil(Math.log10(Math.max(...vals)));
+  let logBot = Math.floor(Math.log10(Math.min(...vals)));
+  if (logTop <= logBot) logTop = logBot + 1;
+  const x = m => PAD_L + (m - mAxisMin) / (mAxisMax - mAxisMin) * plotW;
+  const y = v => PAD_T + plotH - ((Math.log10(Math.max(v, Math.pow(10, logBot))) - logBot) / (logTop - logBot)) * plotH;
+
+  let yTicks = '', xTicks = '';
+  for (let e = logBot; e <= logTop; e++) {
+    const yy = y(Math.pow(10, e));
+    yTicks += `<text x="${PAD_L - 6}" y="${yy + 3}" fill="#888" font-size="8" text-anchor="end">10${toSuperscript(e)}</text>` +
+              `<line x1="${PAD_L}" y1="${yy}" x2="${W - PAD_R}" y2="${yy}" stroke="#2a2a2a" stroke-width="0.5"/>`;
+  }
+  for (let m = Math.ceil(mAxisMin); m <= mAxisMax; m++) {
+    if (m === 0) continue;
+    xTicks += `<text x="${x(m).toFixed(1)}" y="${H - 8}" fill="#888" font-size="9" text-anchor="middle">${m}</text>`;
+  }
+  // Dikey Mc çizgileri kaldırıldı (2026-09-27): tamlık basamakları zaten
+  // Zaman–Magnitude panelinde basamak eğrisi olarak gösteriliyor; burada
+  // yalnızca alt yazıda metin olarak korunur.
+
+  let fitLine = '', fitStr = ' &nbsp;|&nbsp; Weichert fit: yetersiz veri';
+  if (wf) {
+    const m0 = Math.min(...bins.filter(b => b.T > 0).map(b => b.m));
+    const lam = m => wf.rate0 * Math.pow(10, -wf.b * (m - m0));
+    fitLine = `<line x1="${x(m0).toFixed(1)}" y1="${y(lam(m0)).toFixed(1)}" x2="${x(mMax).toFixed(1)}" y2="${y(lam(mMax)).toFixed(1)}" stroke="#f5a623" stroke-width="1.4" stroke-dasharray="2,2"/>` +
+              `<text x="${(x(m0 + (mMax - m0) * 0.55) + 4).toFixed(1)}" y="${(y(lam(m0 + (mMax - m0) * 0.55)) - 4).toFixed(1)}" fill="#f5a623" font-size="9" font-weight="700">b=${wf.b.toFixed(2)}</text>`;
+    fitStr = ` &nbsp;|&nbsp; Weichert (1980): <b>b=${wf.b.toFixed(2)}${wf.sigma !== null ? ' ± ' + wf.sigma.toFixed(2) : ''}</b> (1σ) · λ(M≥${m0.toFixed(1)})=<b>${wf.rate0.toFixed(1)}</b>/yıl · N=${wf.N}`;
+  }
+  const cum = bins.filter(b => b.cumRate > 0 && b.T > 0).map(b =>
+    `<circle cx="${x(b.m).toFixed(1)}" cy="${y(b.cumRate).toFixed(1)}" r="2.6" fill="#e2e8f0" stroke="#111" stroke-width="0.4"><title>λ(≥M)=${b.cumRate.toFixed(3)}/yıl @ M=${b.m} · T=${b.T.toFixed(2)} yıl</title></circle>`).join('');
+  const non = bins.filter(b => b.rate > 0).map(b =>
+    `<circle cx="${x(b.m).toFixed(1)}" cy="${y(b.rate).toFixed(1)}" r="2.6" fill="none" stroke="#22c55e" stroke-width="1.1"><title>n=${b.n}, T=${b.T.toFixed(2)} yıl → ${b.rate.toFixed(3)}/yıl @ M=${b.m}</title></circle>`).join('');
+
+  svg.innerHTML = `${yTicks}${xTicks}${fitLine}${cum}${non}
+    <line x1="${PAD_L}" y1="${PAD_T + plotH}" x2="${W - PAD_R}" y2="${PAD_T + plotH}" stroke="#555" stroke-width="1"/>
+    <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T + plotH}" stroke="#555" stroke-width="1"/>
+    <text x="${(PAD_L + plotW / 2).toFixed(1)}" y="${H - 1}" fill="#888" font-size="8" text-anchor="middle">Magnitude</text>`;
+  const stepStr = cs.periods.map(csLabel).join(', ');
+  const dfy = t => new Date(t).toISOString().slice(0, 10);
+  const winStr = `${dfy(cs.tStart)} – ${dfy(cs.tEnd)} (${((cs.tEnd - cs.tStart) / CS_YEAR_MS).toFixed(2)} yıl)`;
+  stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif yıllık oran λ(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi oran (n/T, T = binin analiz penceresi içinde tam olduğu süre) &nbsp;|&nbsp; <span style="color:#f5a623">┄</span> Weichert fit &nbsp;|&nbsp; ΔM=${DM}${fitStr} &nbsp;|&nbsp; <span style="color:#f59e0b">Birleşik katalog — tamlık basamakları: ${stepStr} · analiz penceresi ${winStr}</span>` + magTypeDiag(items.map(it => ({ m: it.m, t: it.e.mtype || '' })));
+}
+
+let lastCs = null;
+
 function renderTimeMag(evList) {
   if (!showTimeMag) return;
   const svg    = document.getElementById('tmSvg');
@@ -2461,6 +3044,11 @@ function renderTimeMag(evList) {
   const mcOverride = mcOverrideRaw !== '' ? parseFloat(mcOverrideRaw) : null;
   const mcIsManual = mcOverride != null && !isNaN(mcOverride);
   const Mc = mcIsManual ? mcOverride : computeMc(evList);
+  // Tamlık basamakları (alt kataloglar) — etkinse tek Mc yerine basamaklı eşik
+  lastTmEvList = evList;
+  const cs = csIsActive() ? csBuild(evList) : null;
+  lastCs = cs;
+  csRenderDiag(cs);
 
   const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
   const y = m => PAD_T + plotH - ((m-magMin)/(magMax-magMin)) * plotH;
@@ -2475,8 +3063,10 @@ function renderTimeMag(evList) {
     const t = e.time.getTime();
     const r = 2 + m*1.6;
     const col = m>=5 ? '#ef4444' : m>=4 ? '#f97316' : m>=2.5 ? '#eab308' : '#06b6d4';
+    const csMcE = cs ? csMcAt(t, cs.steps) : null;
+    const csOut = cs && (csMcE === null || m < csMcE - 1e-9);
     const dateStr = e.time.toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-    dots += `<circle cx="${x(t).toFixed(1)}" cy="${y(m).toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" fill-opacity="0.75" stroke="#111" stroke-width="0.5" style="cursor:pointer" onclick="tmSelectPoint(${t},${m.toFixed(2)})"><title>M${m.toFixed(1)} · ${dateStr}</title></circle>`;
+    dots += `<circle cx="${x(t).toFixed(1)}" cy="${y(m).toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" fill-opacity="${csOut ? 0.12 : 0.75}" stroke="#111" stroke-width="${csOut ? 0.2 : 0.5}" style="cursor:pointer" onclick="tmSelectPoint(${t},${m.toFixed(2)})"><title>M${m.toFixed(1)} · ${dateStr}</title></circle>`;
   });
 
   let yTicks = '';
@@ -2487,7 +3077,9 @@ function renderTimeMag(evList) {
   }
 
   let mcLine = '';
-  if (Mc !== null && Mc >= magMin && Mc <= magMax) {
+  if (cs) {
+    mcLine = csStairSVG(cs, x, y, t0, t1, magMin, magMax);
+  } else if (Mc !== null && Mc >= magMin && Mc <= magMax) {
     mcLine = `<line x1="${PAD_L}" y1="${y(Mc)}" x2="${W-PAD_R}" y2="${y(Mc)}" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3"/>` +
              `<text x="${W-PAD_R}" y="${y(Mc)-4}" fill="#06b6d4" font-size="9" text-anchor="end">Mc=${Mc}</text>`;
   }
@@ -2519,10 +3111,12 @@ function renderTimeMag(evList) {
     : `${srcName} · ${winLabel} · M≥${minMag} · N=${evList.length}${sampleNote}`;
   const mMax = Math.max(...mags).toFixed(1);
   const convStatsStr = mcConversionMode === 'none' ? '' : ` &nbsp;|&nbsp; Magnitude Conversion: <b>${convEntry.label}</b>`;
-  statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>${mcIsManual ? ' (elle)' : ''}${convStatsStr}`;
+  statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>${mcIsManual ? ' (elle)' : ''}${convStatsStr}` +
+    (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">Tamlık basamakları: ${cs.periods.map(csLabel).join(', ')} · analize giren N=<b>${cs.kept.length}</b> (${cs.nExcluded} olay basamak altında, soluk)</span>` : '');
 
-  renderBvalueTS(evList, Mc);
-  renderGutenbergRichter(evList, Mc);
+  renderBvalueTS(evList, Mc, cs);
+  renderSensTable(evList, Mc, cs);
+  if (cs) renderGutenbergRichterCS(cs); else renderGutenbergRichter(evList, Mc);
 }
 
 /* Son büyük deprem için global referans */
@@ -3677,8 +4271,12 @@ async function fetchRegionEventsLive(bounds, provider) {
       + `&minlat=${south}&maxlat=${north}&minlon=${west}&maxlon=${east}` + common;
   try {
     const res = await fetchTimeout(url, {}, 10000);
-    let evs = provider === 'usgs' ? parseGeoJSON(await res.json()) : parseEMSCText(await res.text());
-    const rawCount = evs.length; // limite takılma DURUMU, poligon filtresinden ÖNCEKİ ham bbox sonucuna göre belirlenir
+    // Limite takılma, AYRIŞTIRMADAN ÖNCEKİ ham kayıt sayısıyla belirlenir
+    // (2026-09-27): parseGeoJSON büyüklüğü boş/≤0 olan kayıtları atar; ham
+    // 20000 kayıt 19985 olaya inince limit tespiti kaçıyordu (Oklahoma).
+    let evs, rawCount;
+    if (provider === 'usgs') { const js = await res.json(); rawCount = (js.features || []).length; evs = parseGeoJSON(js); }
+    else { const tx = await res.text(); rawCount = tx.split('\n').filter(l => l.trim() && !l.startsWith('#') && l.includes('|')).length; evs = parseEMSCText(tx); }
     if (regionIsPolygon && regionRect) {
       const poly = regionRect.getLatLngs()[0];
       evs = evs.filter(e => pointInPolygon(e.lat, e.lon, poly));
@@ -3935,6 +4533,7 @@ function restoreRegionFromURL() {
   if (body && body.classList.contains('hidden')) toggleRegionCtrl();
 }
 restoreRegionFromURL();
+restoreCsFromURL();
 
 function regionDeselect() {
   if (regionRect)  { map.removeLayer(regionRect);  regionRect  = null; }
@@ -4938,13 +5537,28 @@ function openIEB() {
   const b   = usingRegion ? regionRect.getBounds() : map.getBounds();
   const zm  = Math.min(map.getZoom() + 1, 12);
   const now = new Date().toISOString().slice(0,10);
+  // Başlangıç tarihi EQ-Live'ın analiz penceresine eşitlenir -- IEB Mc ile
+  // EQ-Live Mc'si AYNI zaman penceresinde karşılaştırılsın diye (2026-09-27):
+  // (1) tamlık basamakları etkinse ilk basamağın başlangıcı, (2) değilse
+  // seçili bölgenin sorgu penceresi başlangıcı, (3) ikisi de yoksa önceki
+  // davranış (1970-01-01).
+  let iebStart = '1970-01-01', iebStartSrc = 'varsayılan (1970)';
+  const csStepsIEB = csIsActive() ? csValidSteps() : [];
+  if (csStepsIEB.length) { iebStart = csStepsIEB[0].start; iebStartSrc = 'tamlık basamağı 1'; }
+  else if (usingRegion && regionWindowStart) { iebStart = new Date(regionWindowStart).toISOString().slice(0,10); iebStartSrc = 'bölge analiz penceresi'; }
 
   // EarthScope IEB URL — seçili bölge veya mevcut görüntü alanına odaklı, 1970'ten bugüne, tüm M
   const url = 'https://www.earthscope.org/app/ieb/index.html'
     + '?format=text&nodata=404'
-    + `&starttime=1970-01-01&endtime=${now}`
+    + `&starttime=${iebStart}&endtime=${now}`
     + '&minmag=0&maxmag=10&mindepth=0&maxdepth=900'
-    + '&orderby=time-desc&src=usgs&limit=5000'
+    // limit: kullanıcı gözlemine göre IEB arayüzünün üst sınırı 25000 -- IEB
+    // belgesinden DOĞRULANMADI, teknik tercih olarak tutuluyor (EarthScope IEB; USGS/EMSC
+    // FDSN'in 20000 sınırından AYRI -- bu yalnızca IEB karşılaştırma linkidir,
+    // EQ-Live'ın kendi bölge sorgusu 20000'de kalır). 5000 iken yoğun
+    // bölgelerde (ör. Oklahoma 1970-2026) time-desc sıralamasıyla eski
+    // olaylar kesiliyordu (2026-09-27).
+    + '&orderby=time-desc&src=usgs&limit=25000'
     + `&maxlat=${b.getNorth().toFixed(2)}&minlat=${b.getSouth().toFixed(2)}`
     + `&maxlon=${b.getEast().toFixed(2)}&minlon=${b.getWest().toFixed(2)}`
     // sbl=1 = "show bounding box lines" -- olmadan IEB sadece pan/zoom yapar,
@@ -4958,7 +5572,7 @@ function openIEB() {
     'width=1100,height=700,menubar=no,toolbar=no,resizable=yes,scrollbars=yes');
 
   setStatus(usingRegion
-    ? 'EarthScope IEB açıldı · Seçili bölge sınırlarıyla · Mc değerini not alın → b-value katmanını açın'
+    ? `EarthScope IEB açıldı · Seçili bölge sınırlarıyla · Başlangıç ${iebStart} (${iebStartSrc}) · Mc değerini not alın → b-value katmanını açın`
     : 'EarthScope IEB açıldı · Mevcut harita görünümüyle · Select New Region → histogram → Mc değerini not alın → b-value katmanını açın');
 }
 
