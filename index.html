@@ -964,7 +964,7 @@
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event)" title="Aynı üç grafiği beyaz zemin/koyu metinli bir düzende PNG olarak indir — akademik rapor, Word veya PDF'e gömmek için; grafiklerin kendi renkleri değişmez, yalnızca başlık/metin rengi">📄 PNG — Rapor</button>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event, 'poster')" title="Poster 16:9 (1920×1080): üç grafik yan yana, koyu tema — sunum/slayt için">🖼 Poster</button>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event, 'poster')" title="Poster 16:9 (1920×1080): üç grafik yan yana, açık tema — rapor/baskı için">🖼 Poster (açık)</button>
-      <button class="tmFullscreenBtn" id="tmFullscreenBtn" onclick="toggleTimeMagFullscreen(event)" title="Tam ekran aç/kapat — çok sayıda parametre/grafik olduğu için küçük pencerede görülemeyen üst kısmı (Magnitude Conversion seçici dahil) erişilebilir kılar">⛶</button>
+      <button class="tmFullscreenBtn" id="tmFullscreenBtn" onclick="toggleTimeMagFullscreen(event)" title="Tam ekran aç/kapat — çok sayıda parametre/grafik olduğu için küçük pencerede görülemeyen üst kısmı (Magnitude Conversion seçici dahil) erişilebilir kılar">⛶ Tam ekran</button>
       <button class="tmClose" onclick="toggleTimeMag()">✕</button>
     </span>
   </div>
@@ -2387,6 +2387,7 @@ function toggleTimeMagFullscreen(evt) {
     else panel.removeAttribute('style');
   }
   btn.classList.toggle('active', tmFullscreen);
+  btn.textContent = tmFullscreen ? '⛶ Tam ekrandan çık' : '⛶ Tam ekran';
   btn.title = tmFullscreen ? 'Tam ekrandan çık' : 'Tam ekran aç/kapat — çok sayıda parametre/grafik olduğu için küçük pencerede görülemeyen üst kısmı (Magnitude Conversion seçici dahil) erişilebilir kılar';
 }
 
@@ -2722,10 +2723,12 @@ let csSteps = [];            // [{start:'YYYY-MM-DD', mc:Number}]
 let lastTmEvList = null;     // otomatik öneri için panelin son olay listesi
 const CS_YEAR_MS = 365.25 * 24 * 3600 * 1000;
 
+// off: true → basamak tabloda kalır ama hesaba katılmaz (satır silinmiş gibi
+// davranır; önceki basamak onun dönemini de kapsar). row: tablodaki satır no.
 function csValidSteps() {
   return csSteps
-    .map(s => ({ t: Date.parse(s.start + 'T00:00:00Z'), mc: parseFloat(s.mc), start: s.start }))
-    .filter(s => !isNaN(s.t) && !isNaN(s.mc))
+    .map((s, i) => ({ t: Date.parse(s.start + 'T00:00:00Z'), mc: parseFloat(s.mc), start: s.start, row: i + 1, off: !!s.off }))
+    .filter(s => !isNaN(s.t) && !isNaN(s.mc) && !s.off)
     .sort((a, b) => a.t - b.t);
 }
 function csIsActive() { return csEnabled && csValidSteps().length > 0; }
@@ -2745,7 +2748,7 @@ function csMcAt(t, steps) {
 function csPeriods(steps, tStart, tEnd) {
   return steps.map((s, i) => {
     const rawT1 = i + 1 < steps.length ? steps[i + 1].t : tEnd;
-    return { t0: Math.max(s.t, tStart), t1: Math.min(rawT1, tEnd), mc: s.mc, start: s.start,
+    return { t0: Math.max(s.t, tStart), t1: Math.min(rawT1, tEnd), mc: s.mc, start: s.start, row: s.row,
              clipped: tStart - s.t > 864e5 };  // 1 günden küçük farklar uyarı üretmez (T yine kırpılır)
   }).filter(p => p.t1 > p.t0);
 }
@@ -2892,6 +2895,7 @@ function csAddRow() {
   csRenderRows(); onCsChange(true);
 }
 function csDelRow(i) { csSteps.splice(i, 1); csRenderRows(); onCsChange(true); }
+function csToggleRow(i, on) { csSteps[i].off = !on; csRenderRows(); onCsChange(true); }
 function csEditRow(i, field, val) { csSteps[i][field] = val; onCsChange(true); }
 
 function csRenderRows() {
@@ -2899,18 +2903,21 @@ function csRenderRows() {
   if (!box) return;
   const inp = 'background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:1px 4px;';
   box.innerHTML = csSteps.map((s, i) =>
-    `<div style="display:flex;align-items:center;gap:6px;margin:2px 0;">` +
+    `<div style="display:flex;align-items:center;gap:6px;margin:2px 0;${s.off ? 'opacity:.45;' : ''}">` +
+      `<label title="İşaret kaldırılırsa basamak tabloda kalır ama hesaba katılmaz (önceki basamak onun dönemini de kapsar); tekrar işaretlenince geri gelir" style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;"><input type="checkbox" ${s.off ? '' : 'checked'} onchange="csToggleRow(${i}, this.checked)" style="vertical-align:middle;">hesaba kat</label>` +
       `<span style="color:#f59e0b;min-width:14px;">${i + 1}.</span>` +
       `Başlangıç <input type="date" value="${s.start}" onchange="csEditRow(${i},'start',this.value)" style="${inp}">` +
       `Mc ≥ <input type="number" step="0.1" min="-1" max="9" value="${s.mc}" onchange="csEditRow(${i},'mc',this.value)" style="${inp}width:58px;">` +
-      `<button onclick="csDelRow(${i})" title="Basamağı sil" style="background:none;border:1px solid #334;color:#888;border-radius:4px;cursor:pointer;padding:0 6px;">✕</button>` +
+      `<button onclick="csDelRow(${i})" title="Basamağı tablodan kalıcı olarak sil (yalnızca devre dışı bırakmak için soldaki “hesaba kat” işaretini kaldırın)" style="background:none;border:1px solid #334;color:#888;border-radius:4px;cursor:pointer;padding:0 6px;">✕</button>` +
     `</div>`).join('') || '<div style="color:#666">Basamak yok — “＋ Basamak” veya “⚙ Otomatik öner”.</div>';
 }
 
 function csSyncURL() {
   const url = new URL(location.href);
   const steps = csValidSteps();
-  if (csEnabled && steps.length) url.searchParams.set('rcs', steps.map(s => `${s.start}_${s.mc}`).join('~'));
+  // Hesaba katılmayan basamaklar da URL'de saklanır ('!' önekiyle)
+  const all = csSteps.filter(s => /^\d{4}-\d{2}-\d{2}$/.test(s.start) && !isNaN(parseFloat(s.mc)));
+  if (csEnabled && steps.length) url.searchParams.set('rcs', all.map(s => `${s.off ? '!' : ''}${s.start}_${s.mc}`).join('~'));
   else url.searchParams.delete('rcs');
   history.replaceState(null, '', url);
 }
@@ -2928,7 +2935,7 @@ function onCsChange(fromEdit) {
 function restoreCsFromURL() {
   const raw = new URLSearchParams(location.search).get('rcs');
   if (!raw) return;
-  csSteps = raw.split('~').map(tok => { const [start, mc] = tok.split('_'); return { start, mc }; })
+  csSteps = raw.split('~').map(tok => { const off = tok.startsWith('!'); const [start, mc] = tok.replace(/^!/, '').split('_'); return { start, mc, off }; })
                .filter(s => /^\d{4}-\d{2}-\d{2}$/.test(s.start) && !isNaN(parseFloat(s.mc)));
   if (!csSteps.length) return;
   csEnabled = true;
@@ -2975,15 +2982,15 @@ function csRenderDiag(cs) {
     const yrs = (p.t1 - p.t0) / CS_YEAR_MS;
     const n = cs.kept.filter(it => it.t >= p.t0 && it.t < p.t1 + (i === nP - 1 ? 1 : 0)).length;
     // -0.01 tolerans: 365 günlük takvim yılı = 0.9993 yıl, yanlış alarm vermesin
-    if (yrs < CS_QC.minYears - 0.01) { shortN++; warn.push(`⚠️ Basamak ${i + 1} (${csLabel(p)}): ${yrs.toFixed(2)} yıl — kısa dönem; Mc kestirimi kararsız olabilir.`); }
-    if (n < CS_QC.minEvents) { smallN++; warn.push(`⚠️ Basamak ${i + 1} (${csLabel(p)}): ${n} olay — örneklem küçük olabilir.`); }
+    if (yrs < CS_QC.minYears - 0.01) { shortN++; warn.push(`⚠️ Basamak ${p.row ?? i + 1} (${csLabel(p)}): ${yrs.toFixed(2)} yıl — kısa dönem; Mc kestirimi kararsız olabilir.`); }
+    if (n < CS_QC.minEvents) { smallN++; warn.push(`⚠️ Basamak ${p.row ?? i + 1} (${csLabel(p)}): ${n} olay — örneklem küçük olabilir.`); }
     // Basamak Mc'si pencere verisinden kestirilen Mc'nin (maks. eğrilik +0.2)
     // 0.2'den FAZLA altındaysa, yani maks. eğrilik tepesinin de altındaysa
     // (tam 0.2 fark, +0.2 düzeltmesinin kendisidir; doğru basamakta yanlış alarm vermesin):
     // eşik altı eksik tamlık GR'yi yatıklaştırır → b aşağı yanlı (Kramer 1996).
     if (p.mcData !== null && p.mcData !== undefined && p.mc < p.mcData - CS_QC.mcGap - 1e-9) {
       lowMcN++;
-      warn.push(`⚠️ Basamak ${i + 1} Mc=${(+p.mc).toFixed(1)}, bu penceredeki veriden kestirilen Mc değerinin (${p.mcData.toFixed(1)}; maks. eğrilik +0.2, n=${p.nAll}) belirgin biçimde altında; eşik altı eksik tamlık nedeniyle b aşağı yanlı olabilir.`);
+      warn.push(`⚠️ Basamak ${p.row ?? i + 1} Mc=${(+p.mc).toFixed(1)}, bu penceredeki veriden kestirilen Mc değerinin (${p.mcData.toFixed(1)}; maks. eğrilik +0.2, n=${p.nAll}) belirgin biçimde altında; eşik altı eksik tamlık nedeniyle b aşağı yanlı olabilir.`);
     }
   });
   if (!shortN) ok.push(`✓ Her basamak ≥ ${CS_QC.minYears} yıl`);
@@ -2992,6 +2999,8 @@ function csRenderDiag(cs) {
   if (cs.capMag) warn.push(`🔴 Bölge sorgusu büyüklüğe göre sıralı ve limite takıldı: katalog zamandan değil büyüklükten kesilmiş. Tamlık, gözlem süreleri (T), Weichert b ve λ bu veriyle GEÇERSİZDİR — sıralamayı "en yeni" yapın.`);
   if (cs.capChunk) warn.push(`🔴 Parçalı USGS sorgusunda bir parça yine 20.000 kayda ulaştı: o zaman aralığının sonu eksik (bkz. Parça günlüğü). Gözlem süreleri (T), Weichert b ve λ bu aralığı kapsıyorsa güvenilir DEĞİLDİR — sorguyu yenileyin.`);
   if (cs.capTime) warn.push(`⚠ Bölge sorgusu limite takıldı: katalog pencere başından değil en erken dönen olaydan (${new Date(cs.tStart).toISOString().slice(0, 10)}) başlıyor; gözlem süreleri buna göre hesaplandı.`);
+  const nOff = csSteps.filter(s => s.off).length;
+  if (nOff) warn.push(`ℹ ${nOff} basamak hesaba katılmıyor (satır ${csSteps.map((s, i) => s.off ? i + 1 : null).filter(Boolean).join(', ')}); önceki basamak o dönemleri de kapsıyor.`);
   const allSteps = csValidSteps();
   const nAfter = allSteps.filter(s => s.t >= cs.tEnd).length;
   const nBefore = allSteps.length - nP - nAfter;
