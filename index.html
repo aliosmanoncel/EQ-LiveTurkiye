@@ -1023,11 +1023,19 @@
         <select id="grBinSize" onchange="onGrBinSizeChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.85em;padding:1px 3px;">
           <option value="0.1" selected>0.1</option>
           <option value="0.2">0.2</option>
+          <option value="0.25">0.25</option>
           <option value="0.5">0.5</option>
           <option value="1">1</option>
         </select>
       </span>
       <button onclick="exportGrCSV()" style="background:none;border:1px solid #334;color:#888;border-radius:4px;font-size:.8em;padding:1px 6px;cursor:pointer;" title="Bin verisini (magnitude, bin-içi N, kümülatif N) CSV olarak indir">⬇ CSV</button>
+    </div>
+    <div id="grMxRow" style="font-size:.72rem;color:#9ab0c5;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;" title="Yalnızca tamlık basamakları (Weichert) etkinken geçerlidir. Mx: Weichert (1980) modelinde üst büyüklük sınırı olarak kullanılan bir GİRDİDİR, Mmax kestirimi değildir. Boşsa kesilme yapılmaz. Girilirse gözlenen en büyük sınıfın üstündeki boş sınıflar Mx'e kadar olabilirliğe katılır ve birikimli eğri Mx'te kesilir (Eş. 14). ΔMx alt/üst: üst/alt duyarlılık eğrilerinin Mx farkları (varsayılan −0,5 / +0,2: Halchuk, Burke &amp; Adams 2004 gösterimi). M_ref: yıllık oranı raporlanan büyüklük (Weichert Ek programındaki N5).">
+      <label>Mx <input id="grMx" type="number" step="0.1" placeholder="yok" oninput="onGrBinSizeChange()" style="width:52px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+      <label>ΔMx alt <input id="grMxLo" type="number" step="0.1" value="-0.5" oninput="onGrBinSizeChange()" style="width:46px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+      <label>üst <input id="grMxHi" type="number" step="0.1" value="0.2" oninput="onGrBinSizeChange()" style="width:46px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+      <label>M<sub>ref</sub> <input id="grMref" type="number" step="0.5" value="5.0" oninput="onGrBinSizeChange()" style="width:46px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+      <span style="color:#666">(Weichert/tamlık basamakları etkinken)</span>
     </div>
     <svg id="tmSvgGR" viewBox="0 0 420 400" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;max-width:400px;height:auto"></svg>
     <div class="tmStats" id="tmStatsGR">—</div>
@@ -2096,8 +2104,12 @@ function exportGrCSV() {
   const csCols = lastGrPoints.length && lastGrPoints[0].T !== undefined;
   if (csCols) {
     lines.push(`# Tamlık basamakları: ${csValidSteps().map(s => `${s.start}→Mc${s.mc}`).join(', ')} · T = binin tam olduğu toplam süre (yıl)`);
-    lines.push('magnitude,n_bin,n_cumulative,T_years,rate_bin_per_yr,rate_cumulative_per_yr');
-    lastGrPoints.forEach(p => lines.push(`${p.m},${p.nonCum},${p.cum},${p.T},${p.rate.toFixed(5)},${p.cumRate.toFixed(5)}`));
+    if (lastGrFit) {
+      lines.push(`# Weichert (1980): Mx = ${lastGrFit.Mx !== null ? lastGrFit.Mx + ' (girdi, Mmax kestirimi değil)' : 'girilmedi'} · m0 = ${lastGrFit.m0} · N = ${lastGrFit.N} · N${lastGrFit.mRef} = ${lastGrFit.nRef !== undefined ? lastGrFit.nRef.toPrecision(4) + ' ± ' + lastGrFit.nRefSd.toPrecision(3) : '—'} /yıl`);
+      lastGrFit.curves.forEach(c => lines.push(`# eğri ${c.key}: NO = ${c.N0.toPrecision(5)} · BETA = ${c.beta.toFixed(4)} · B = ${c.b.toFixed(4)} · Mx = ${c.mx !== null ? c.mx : '—'} · λ(M≥m0) = ${c.rate0.toPrecision(5)}`));
+    }
+    lines.push('magnitude,n_bin,n_cumulative,T_years,rate_bin_per_yr,rate_cumulative_per_yr,rate_cum_lo_1sd,rate_cum_hi_1sd');
+    lastGrPoints.forEach(p => lines.push(`${p.m},${p.nonCum},${p.cum},${p.T},${p.rate.toFixed(5)},${p.cumRate.toFixed(5)},${p.cumLo !== undefined ? p.cumLo.toFixed(5) : ''},${p.cumHi !== undefined ? p.cumHi.toFixed(5) : ''}`));
   } else {
     lines.push('magnitude,n_bin,n_cumulative');
     lastGrPoints.forEach(p => lines.push(`${p.m},${p.nonCum},${p.cum}`));
@@ -2727,6 +2739,25 @@ function weichertFit(bins) {
   return { b: beta / Math.LN10, sigma: sigBeta !== null ? sigBeta / Math.LN10 : null, beta, rate0, N, mMin: Math.min(...B.map(b => b.m)) };
 }
 
+// Sabit β için Weichert (1980) Eş. (10): N_a = N·Σe^{-βm_i} / Σ t_j e^{-βm_j}
+function weichertRateFixed(bins, beta) {
+  const B = bins.filter(b => b.T > 0);
+  const N = B.reduce((a, b) => a + b.n, 0);
+  if (!N) return null;
+  let e0 = 0, s0 = 0;
+  B.forEach(b => { const ex = Math.exp(-beta * b.m); e0 += ex; s0 += b.T * ex; });
+  return N * e0 / s0;
+}
+// Poisson ortalaması için ±1 S.D. (15,9 / 84,1 yüzdelik) sınırları — Weichert (1980)
+// Tablo 1 (N ≤ 10); N > 10 için tablo dipnotu: alt N − √N, üst N + 3/4 + √(N + 1/2).
+const W80_T1_LO = [0, 0.173, 0.708, 1.37, 2.09, 2.84, 3.62, 4.42, 5.23, 6.06, 6.89];
+const W80_T1_HI = [1.84, 3.30, 4.64, 5.92, 7.16, 8.38, 9.58, 10.8, 12.0, 13.1, 14.3];
+function poissonBounds1sd(N) {
+  if (N <= 10) return [W80_T1_LO[N], W80_T1_HI[N]];
+  return [N - Math.sqrt(N), N + 0.75 + Math.sqrt(N + 0.5)];
+}
+let lastGrFit = null;
+
 // Otomatik öneri: takvim yılı başına maksimum eğrilik Mc (+0.2, computeMc);
 // ardışık yıllarda Mc ≥0.3 değişince yeni basamak; basamak Mc'si grubun
 // EN BÜYÜK yıllık Mc'si (muhafazakâr). <50 olaylı yıllar öncekine katılır.
@@ -2914,18 +2945,68 @@ function renderGutenbergRichterCS(cs) {
   for (let i = bins.length - 1; i >= 0; i--) { run += bins[i].rate; bins[i].cumRate = run; }
   let runN = 0;
   for (let i = bins.length - 1; i >= 0; i--) { runN += bins[i].n; bins[i].cumN = runN; }
-  // Weichert: bin merkezleri (m + DM/2) ile
-  const wf = weichertFit(bins.filter(b => b.n > 0 || b.T > 0).map(b => ({ m: b.m + DM / 2, n: b.n, T: b.T })));
+  // ── Weichert (1980) + GSC tarzı gösterim (Halchuk, Burke & Adams 2004) ──
+  // Mx: kullanıcı girdisi (boşsa kesilme yok, mevcut doğrusal gösterim).
+  // Mx ≠ Mmax kestirimi: Weichert modelinde üst büyüklük sınırı olarak
+  // kullanılan bir GİRDİDİR (Weichert 1980, s. 1338, 1344). Girilirse gözlenen
+  // en büyük sınıfın üstündeki BOŞ sınıflar Mx'e kadar olabilirliğe katılır.
+  const numIn = (id, def) => { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? def : v; };
+  let Mx = numIn('grMx', null);
+  const dMxLo = numIn('grMxLo', -0.5), dMxHi = numIn('grMxHi', 0.2), mRef = numIn('grMref', 5.0);
+  const mTopObs = +((kMax + 1) * DM).toFixed(2);
+  let mxNote = '';
+  if (Mx !== null && Mx < mTopObs - 1e-9) { mxNote = `⚠ Mx (${Mx}) gözlenen en büyük sınıfın üst sınırından (${mTopObs}) küçük — Mx uygulanmadı.`; Mx = null; }
+  const classesTo = mx => {
+    const kHi = mx === null ? kMax : Math.max(kMax, Math.ceil(mx / DM - 1e-9) - 1);
+    const a = [];
+    for (let k = kMin; k <= kHi; k++) { const m = +(k * DM).toFixed(2); const T = csObsYears(m, cs.periods); if (T > 0) a.push({ m: m + DM / 2, n: counts[k] || 0, T }); }
+    return a;
+  };
+  const clsBest = classesTo(Mx);
+  const wf = weichertFit(clsBest);
+  const m0 = Math.min(...bins.filter(b => b.T > 0).map(b => b.m));   // en küçük sınıfın alt sınırı
+  // Kesik birikimli eğri (Weichert 1980, Eş. 14): λ(≥M) = λ0·[e^{-β(M-m0)} − e^{-β(Mx-m0)}]/[1 − e^{-β(Mx-m0)}]
+  const curveFn = (rate0, beta, mx) => m => mx === null ? rate0 * Math.exp(-beta * (m - m0))
+    : (m >= mx ? 0 : rate0 * (Math.exp(-beta * (m - m0)) - Math.exp(-beta * (mx - m0))) / (1 - Math.exp(-beta * (mx - m0))));
+  // Üst/alt eğriler (yalnızca Mx girildiğinde): β ∓ σβ, Mx + ΔMx; oran sabit β ile
+  // Weichert Eş. (10)'dan yeniden kestirilir — EQ-Live yaklaşımı (makale N0'ın
+  // nasıl bulunduğunu açıklamaz).
+  const curves = [];
+  if (wf) {
+    curves.push({ key: 'best', label: 'EN İYİ TAHMİN', beta: wf.beta, b: wf.b, mx: Mx, rate0: wf.rate0 });
+    if (Mx !== null && wf.sigma !== null) {
+      const sB = wf.sigma * Math.LN10;
+      [['upper', 'ÜST EĞRİ', wf.beta - sB, Mx + dMxHi], ['lower', 'ALT EĞRİ', wf.beta + sB, Mx + dMxLo]].forEach(([key, label, beta, mx]) => {
+        if (beta <= 0 || mx <= m0) return;
+        const mxEff = Math.max(mx, mTopObs);
+        const r = weichertRateFixed(classesTo(mxEff), beta);
+        if (r) curves.push({ key, label, beta, b: beta / Math.LN10, mx: mxEff, mxReq: mx, rate0: r });
+      });
+    }
+    curves.forEach(c => { c.N0 = c.rate0 * Math.exp(c.beta * m0); c.fn = curveFn(c.rate0, c.beta, c.mx); });
+  }
+  // Birikimli oranların ±1 S.D. hata sınırları (Weichert 1980, Eş. 11–12, Tablo 1):
+  // katkı veren sınıfların T'si eşitse kesin Poisson sınırları / T; değilse
+  // Poisson varyansı σ² = Σ n_i / T_i² (EQ-Live yaklaşımı).
+  for (let i = 0; i < bins.length; i++) {
+    const tail = bins.slice(i).filter(b => b.n > 0 && b.T > 0);
+    if (!tail.length) continue;
+    const Nc = tail.reduce((a, b) => a + b.n, 0);
+    const Ts = tail.map(b => b.T), eqT = Math.max(...Ts) - Math.min(...Ts) < 1e-6;
+    if (eqT) { const [lo, hi] = poissonBounds1sd(Nc); bins[i].cumLo = lo / Ts[0]; bins[i].cumHi = hi / Ts[0]; bins[i].errSrc = 'Poisson (eşit T)'; }
+    else { const sd = Math.sqrt(tail.reduce((a, b) => a + b.n / (b.T * b.T), 0)); bins[i].cumLo = Math.max(bins[i].cumRate - sd, 0); bins[i].cumHi = bins[i].cumRate + sd; bins[i].errSrc = 'σ² = Σn/T²'; }
+  }
 
-  lastGrPoints = bins.map(b => ({ m: b.m, nonCum: b.n, cum: b.cumN, T: +b.T.toFixed(3), rate: b.rate, cumRate: b.cumRate }));
+  lastGrPoints = bins.map(b => ({ m: b.m, nonCum: b.n, cum: b.cumN, T: +b.T.toFixed(3), rate: b.rate, cumRate: b.cumRate, cumLo: b.cumLo, cumHi: b.cumHi }));
   lastGrDM = DM;
+  lastGrFit = wf ? { classes: clsBest, fnBest: curves[0] ? curves[0].fn : null, Mx, m0, mRef, curves: curves.map(c => ({ key: c.key, N0: c.N0, beta: c.beta, b: c.b, mx: c.mx, rate0: c.rate0 })), sigB: wf.sigma, sigBeta: wf.sigma !== null ? wf.sigma * Math.LN10 : null, N: wf.N } : null;
 
   const W = 420, H = 400, PAD_L = 42, PAD_B = 28, PAD_T = 10, PAD_R = 14;
   const plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
   const mMax = Math.max(...items.map(it => it.m));
-  const mAxisMax = Math.ceil(mMax) + 1;
+  const mAxisMax = Math.max(Math.ceil(mMax) + 1, Mx !== null ? Math.ceil(Mx + Math.max(dMxHi, 0)) : 0);
   const mAxisMin = Math.min(0, Math.floor(Math.min(...items.map(it => it.m))));
-  const vals = bins.flatMap(b => [b.cumRate, b.rate]).filter(v => v > 0);
+  const vals = bins.flatMap(b => [b.cumRate, b.rate, b.cumHi || 0]).filter(v => v > 0);
   let logTop = Math.ceil(Math.log10(Math.max(...vals)));
   let logBot = Math.floor(Math.log10(Math.min(...vals)));
   if (logTop <= logBot) logTop = logBot + 1;
@@ -2942,31 +3023,77 @@ function renderGutenbergRichterCS(cs) {
     if (m === 0) continue;
     xTicks += `<text x="${x(m).toFixed(1)}" y="${H - 8}" fill="#888" font-size="9" text-anchor="middle">${m}</text>`;
   }
-  // Dikey Mc çizgileri kaldırıldı (2026-09-27): tamlık basamakları zaten
-  // Zaman–Magnitude panelinde basamak eğrisi olarak gösteriliyor; burada
-  // yalnızca alt yazıda metin olarak korunur.
 
+  // Eğriler: en iyi tahmin (turuncu), üst/alt (gri ince)
+  const floorV = Math.pow(10, logBot);
   let fitLine = '', fitStr = ' &nbsp;|&nbsp; Weichert fit: yetersiz veri';
+  curves.forEach(c => {
+    const mEnd = c.mx !== null ? c.mx : mMax, pts = [];
+    for (let s = 0; s <= 80; s++) { const m = m0 + (mEnd - m0) * s / 80; const v = c.fn(m); if (v < floorV) { pts.push(`${x(m).toFixed(1)},${y(floorV).toFixed(1)}`); break; } pts.push(`${x(m).toFixed(1)},${y(v).toFixed(1)}`); }
+    const best = c.key === 'best';
+    fitLine += `<polyline points="${pts.join(' ')}" fill="none" stroke="${best ? '#f5a623' : '#9ca3af'}" stroke-width="${best ? 1.6 : 0.9}" ${best && c.mx === null ? 'stroke-dasharray="2,2"' : ''}/>`;
+  });
   if (wf) {
-    const m0 = Math.min(...bins.filter(b => b.T > 0).map(b => b.m));
-    const lam = m => wf.rate0 * Math.pow(10, -wf.b * (m - m0));
-    fitLine = `<line x1="${x(m0).toFixed(1)}" y1="${y(lam(m0)).toFixed(1)}" x2="${x(mMax).toFixed(1)}" y2="${y(lam(mMax)).toFixed(1)}" stroke="#f5a623" stroke-width="1.4" stroke-dasharray="2,2"/>` +
-              `<text x="${(x(m0 + (mMax - m0) * 0.55) + 4).toFixed(1)}" y="${(y(lam(m0 + (mMax - m0) * 0.55)) - 4).toFixed(1)}" fill="#f5a623" font-size="9" font-weight="700">b=${wf.b.toFixed(2)}</text>`;
-    fitStr = ` &nbsp;|&nbsp; Weichert (1980): <b>b=${wf.b.toFixed(2)}${wf.sigma !== null ? ' ± ' + wf.sigma.toFixed(2) : ''}</b> (1σ) · λ(M≥${m0.toFixed(1)})=<b>${wf.rate0.toFixed(1)}</b>/yıl · N=${wf.N}`;
+    const mLab = m0 + (mMax - m0) * 0.55;
+    fitLine += `<text x="${(x(mLab) + 4).toFixed(1)}" y="${(y(curves[0].fn(mLab)) - 4).toFixed(1)}" fill="#f5a623" font-size="9" font-weight="700">b=${wf.b.toFixed(2)}</text>`;
+    fitStr = ` &nbsp;|&nbsp; Weichert (1980): <b>b=${wf.b.toFixed(3)}${wf.sigma !== null ? ' ± ' + wf.sigma.toFixed(3) : ''}</b> (1σ) · λ(M≥${m0.toFixed(1)})=<b>${wf.rate0.toFixed(1)}</b>/yıl · N=${wf.N}`;
   }
+  // Hata çubukları (birikimli noktalar, ±1 S.D.)
+  const errBars = bins.filter(b => b.cumRate > 0 && b.T > 0 && b.cumHi !== undefined).map(b => {
+    const xx = x(b.m).toFixed(1);
+    return `<line x1="${xx}" y1="${y(b.cumLo).toFixed(1)}" x2="${xx}" y2="${y(b.cumHi).toFixed(1)}" stroke="#cbd5e1" stroke-width="0.8"/>` +
+           `<line x1="${(x(b.m) - 2).toFixed(1)}" y1="${y(b.cumHi).toFixed(1)}" x2="${(x(b.m) + 2).toFixed(1)}" y2="${y(b.cumHi).toFixed(1)}" stroke="#cbd5e1" stroke-width="0.8"/>`;
+  }).join('');
   const cum = bins.filter(b => b.cumRate > 0 && b.T > 0).map(b =>
-    `<circle cx="${x(b.m).toFixed(1)}" cy="${y(b.cumRate).toFixed(1)}" r="2.6" fill="#e2e8f0" stroke="#111" stroke-width="0.4"><title>λ(≥M)=${b.cumRate.toFixed(3)}/yıl @ M=${b.m} · T=${b.T.toFixed(2)} yıl</title></circle>`).join('');
+    `<circle cx="${x(b.m).toFixed(1)}" cy="${y(b.cumRate).toFixed(1)}" r="2.6" fill="#e2e8f0" stroke="#111" stroke-width="0.4"><title>λ(≥M)=${b.cumRate.toFixed(4)}/yıl @ M=${b.m} · ±1 S.D.: ${b.cumLo !== undefined ? b.cumLo.toFixed(4) + '–' + b.cumHi.toFixed(4) + ' (' + b.errSrc + ')' : '—'} · T=${b.T.toFixed(2)} yıl</title></circle>`).join('');
+  // Bin-içi noktalar sınıf MERKEZİNE (Weichert 1980, s. 1344 çizim konvansiyonu)
   const non = bins.filter(b => b.rate > 0).map(b =>
-    `<circle cx="${x(b.m).toFixed(1)}" cy="${y(b.rate).toFixed(1)}" r="2.6" fill="none" stroke="#22c55e" stroke-width="1.1"><title>n=${b.n}, T=${b.T.toFixed(2)} yıl → ${b.rate.toFixed(3)}/yıl @ M=${b.m}</title></circle>`).join('');
+    `<circle cx="${x(b.m + DM / 2).toFixed(1)}" cy="${y(b.rate).toFixed(1)}" r="2.6" fill="none" stroke="#22c55e" stroke-width="1.1"><title>n=${b.n}, T=${b.T.toFixed(2)} yıl → ${b.rate.toFixed(4)}/yıl · sınıf ${b.m}–${(b.m + DM).toFixed(2)}</title></circle>`).join('');
 
-  svg.innerHTML = `${yTicks}${xTicks}${fitLine}${cum}${non}
+  // GSC tarzı bilgi kutusu (Halchuk, Burke & Adams 2004, Şekil 1–3)
+  let infoBox = '';
+  if (wf) {
+    const sB = wf.sigma !== null ? wf.sigma * Math.LN10 : null;
+    const nRef = wf.rate0 * Math.exp(-wf.beta * (mRef - m0));        // Weichert Ek, FN5 tanımı
+    const nRefSd = nRef / Math.sqrt(wf.N);                              // STDFN5
+    const f = (v, d) => (v === null || v === undefined || !isFinite(v)) ? '—' : v.toFixed(d);
+    const lines = [
+      Mx !== null ? `Mx = ${Mx.toFixed(1)} (girdi — Mmax kestirimi değil)` : 'Mx: girilmedi (kesilme yok)',
+      `BETA = ${f(wf.beta, 2)} ± ${f(sB, 2)}`,
+      `B = ${f(wf.b, 3)} ± ${f(wf.sigma, 3)}`,
+      `N${mRef} = ${nRef.toPrecision(3)} ± ${nRefSd.toPrecision(2)} /yıl`,
+      `N = ${wf.N} olay`];
+    const rows = curves.map(c => `${c.label.padEnd(13)} ${c.N0.toPrecision(4).padStart(9)} ${f(c.beta, 2).padStart(5)} ${f(c.b, 3).padStart(6)} ${c.mx !== null ? c.mx.toFixed(1).padStart(4) : '   —'}`);
+    const bw = 196, lh = 9.5, bh = 8 + lh * (lines.length + (rows.length ? rows.length + 1 : 0)) + 4;
+    const bx = W - PAD_R - bw - 2, by = PAD_T + 2;
+    infoBox = `<rect x="${bx}" y="${by}" width="${bw}" height="${bh.toFixed(1)}" fill="#0b1220" fill-opacity="0.9" stroke="#475569" stroke-width="0.6"/>` +
+      lines.map((t, i) => `<text x="${bx + 5}" y="${(by + 10 + i * lh).toFixed(1)}" fill="#e2e8f0" font-size="7.6" font-family="monospace" xml:space="preserve">${t}</text>`).join('') +
+      (rows.length ? `<text x="${bx + 5}" y="${(by + 10 + lines.length * lh).toFixed(1)}" fill="#94a3b8" font-size="6.8" font-family="monospace" xml:space="preserve">${'EĞRİ'.padEnd(13)} ${'NO'.padStart(9)} ${'BETA'.padStart(5)} ${'B'.padStart(6)} ${'Mx'.padStart(4)}</text>` +
+        rows.map((t, i) => `<text x="${bx + 5}" y="${(by + 10 + (lines.length + 1 + i) * lh).toFixed(1)}" fill="${i === 0 ? '#f5a623' : '#cbd5e1'}" font-size="6.8" font-family="monospace" xml:space="preserve">${t}</text>`).join('') : '');
+    lastGrFit.nRef = nRef; lastGrFit.nRefSd = nRefSd;
+  }
+
+  svg.innerHTML = `${yTicks}${xTicks}${fitLine}${errBars}${cum}${non}${infoBox}
     <line x1="${PAD_L}" y1="${PAD_T + plotH}" x2="${W - PAD_R}" y2="${PAD_T + plotH}" stroke="#555" stroke-width="1"/>
     <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T + plotH}" stroke="#555" stroke-width="1"/>
-    <text x="${(PAD_L + plotW / 2).toFixed(1)}" y="${H - 1}" fill="#888" font-size="8" text-anchor="middle">Magnitude</text>`;
+    <text x="${(PAD_L + plotW / 2).toFixed(1)}" y="${H - 1}" fill="#888" font-size="8" text-anchor="middle">Magnitude</text>
+    <text x="10" y="${(PAD_T + plotH / 2).toFixed(1)}" fill="#888" font-size="8" text-anchor="middle" transform="rotate(-90 10 ${(PAD_T + plotH / 2).toFixed(1)})">Birikimli yıllık oran λ(≥M)</text>`;
   const stepStr = cs.periods.map(csLabel).join(', ');
   const dfy = t => new Date(t).toISOString().slice(0, 10);
   const winStr = `${dfy(cs.tStart)} – ${dfy(cs.tEnd)} (${((cs.tEnd - cs.tStart) / CS_YEAR_MS).toFixed(2)} yıl)`;
-  stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif yıllık oran λ(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi oran (n/T, T = binin analiz penceresi içinde tam olduğu süre) &nbsp;|&nbsp; <span style="color:#f5a623">┄</span> Weichert fit &nbsp;|&nbsp; ΔM=${DM}${fitStr} &nbsp;|&nbsp; <span style="color:#f59e0b">Birleşik katalog — tamlık basamakları: ${stepStr} · analiz penceresi ${winStr}</span>` + magTypeDiag(items.map(it => ({ m: it.m, t: it.e.mtype || '' })));
+  // Büyüklüğe göre tamlık tablosu (Halchuk vd. 2004 Tablo 1'in karşılığı; basamaklardan türetilir)
+  const thr = [...new Set(cs.periods.map(p => p.mc))].sort((a, b) => a - b);
+  const compRows = thr.map(mc => {
+    const ps = cs.periods.filter(p => p.mc <= mc + 1e-9).sort((a, b) => a.t0 - b.t0);
+    let contiguous = true; for (let i = 1; i < ps.length; i++) if (ps[i].t0 - ps[i - 1].t1 > 864e5) contiguous = false;
+    return `<tr><td style="padding:0 6px">M ≥ ${mc.toFixed(1)}</td><td style="padding:0 6px">${dfy(ps[0].t0)}${contiguous ? '' : ' (kesintili)'}</td><td style="padding:0 6px;text-align:right">${csObsYears(mc, cs.periods).toFixed(2)}</td></tr>`;
+  }).join('');
+  const compTable = `<table style="margin-top:4px;border-collapse:collapse;border:1px solid #2a2a3a;font-size:.95em"><tr style="color:#cbd5e1"><th style="padding:0 6px">Büyüklük</th><th style="padding:0 6px">Tamlık başlangıcı</th><th style="padding:0 6px">T (yıl)</th></tr>${compRows}</table>`;
+  stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif yıllık oran λ(≥M), <span style="color:#cbd5e1">│</span> ±1 S.D. (Weichert 1980 Eş. 11–12; T eşit değilse σ² = Σn/T²) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi oran n/T (sınıf merkezinde) &nbsp;|&nbsp; <span style="color:#f5a623">━</span> Weichert en iyi tahmin${Mx !== null ? ` (Mx = ${Mx} ile kesik, Eş. 14)` : ' (kesilme yok)'}${curves.length > 1 ? ` · <span style="color:#9ca3af">─</span> üst/alt eğri (β ∓ σ, Mx ${dMxHi >= 0 ? '+' : ''}${dMxHi} / ${dMxLo >= 0 ? '+' : ''}${dMxLo}; oran Eş. 10'dan)` : ''} &nbsp;|&nbsp; ΔM=${DM}${fitStr}` +
+    (mxNote ? `<div style="color:#f59e0b">${mxNote}</div>` : '') +
+    curves.filter(c => c.mxReq !== undefined && Math.abs(c.mx - c.mxReq) > 1e-9).map(c => `<div style="color:#f59e0b">⚠ ${c.label.toLowerCase()}: istenen Mx ${c.mxReq.toFixed(2)} gözlenen en büyük sınıfın üst sınırından küçük; ${c.mx.toFixed(2)} kullanıldı.</div>`).join('') +
+    `<div style="color:#888;margin-top:2px">Mx bir model girdisidir (Weichert 1980'de üst büyüklük sınırı); Mmax kestirimi değildir. Üst/alt eğriler görsel duyarlılık içindir (gösterim: Halchuk, Burke &amp; Adams 2004).</div>` +
+    ` <span style="color:#f59e0b">Birleşik katalog — tamlık basamakları: ${stepStr} · analiz penceresi ${winStr}</span>` + compTable + magTypeDiag(items.map(it => ({ m: it.m, t: it.e.mtype || '' })));
 }
 
 let lastCs = null;
