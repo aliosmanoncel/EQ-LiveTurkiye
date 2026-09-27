@@ -1,1 +1,1 @@
-{"generated":"2026-09-27T18:52:57Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-09-27T21:48:14Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"729790","time":"2026-09-27T20:48:59","lat":40.7205,"lon":28.13783,"dep":6.98,"mag":2.3,"mtype":"ML","mw":1.42,"place":"Marmara Denizi - [28.80 km] Erdek (Balıkesir)","province":"Balıkesir","district":"Erdek"}]}
