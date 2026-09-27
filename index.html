@@ -2546,11 +2546,18 @@ function posterSavePrefs() {
 let _qrLib = null;
 // Koyu ekran için çizilmiş SVG'leri beyaz zemine uyarlar (poster ve açık PNG): ızgara açık gri,
 // eksen/etiket koyu gri, açık renkli yazılar koyu; veri renkleri (camgöbeği, sarı, turuncu, pembe, yeşil) korunur.
+// Poster için eksen etiketlerini büyütür: ekran SVG'leri küçültülerek yerleştirildiğinde (ör. 660 birim → 486 px)
+// 8–9 birimlik etiketler ~6 px'e iner. Yalnızca eksen etiketleri (fill #888, tspan içermeyen) k ile büyütülür.
+function svgBoostAxisText(xml, k) {
+  return xml.replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, at, body) => {
+    if (!/fill="#888"/.test(at) || /<tspan/.test(body)) return m;
+    return '<text' + at.replace(/font-size="([0-9.]+)"/, (q, f) => `font-size="${(+f * k).toFixed(1)}"`) + '>' + body + '</text>'; });
+}
 function svgToLight(xml) {
   xml = xml.replace(/<(text|tspan)\b([^>]*)>/g, (m, tag, at) => '<' + tag + at
     .replace(/fill="(#e2e8f0|#cbd5e1|#94a3b8|#888|#888888|#d1d5db|#aaa|#aaaaaa|#9ca3af|#e5e7eb|#fff|#ffffff|white)"/g, 'fill="#1f2937"')
     .replace(/fill="#22d3ee"/g, 'fill="#0891b2"').replace(/fill="#06b6d4"/g, 'fill="#0e7490"') + '>');
-  return xml.replace(/stroke="#2a2a2a"/g, 'stroke="#e5e7eb"').replace(/stroke="#(555|666|555555|666666)"/g, 'stroke="#6b7280"')
+  return xml.replace(/stroke="#2a2a2a"/g, 'stroke="#e5e7eb"').replace(/stroke="#(555|666|555555|666666)"/g, 'stroke="#4b5563"')
     .replace(/stroke="#d1d5db"/g, 'stroke="#4b5563"').replace(/fill="#d1d5db"/g, 'fill="#6b7280"')
     .replace(/stroke="#cbd5e1"/g, 'stroke="#6b7280"').replace(/stroke="#22d3ee"/g, 'stroke="#0891b2"')
     .replace(/fill="#0b1220"/g, 'fill="#ffffff"').replace(/stroke="#475569"/g, 'stroke="#9ca3af"');
@@ -2571,8 +2578,12 @@ async function exportPosterAGU(scale, evt) {
   if (btn) { btn.textContent = '⏳…'; btn.disabled = true; }
   const done = () => { if (btn) { btn.textContent = oldLabel; btn.disabled = false; } };
   const SC = scale || 1, W = 1920, H = 1080;
+  const AXK = { tmSvg: 1.7, tmSvgB: 1.5, tmSvgGR: 1.5 };
   const svgImg = (el, k) => new Promise((res, rej) => {
-    let xml = svgToLight(new XMLSerializer().serializeToString(el));
+    let xml = svgToLight(svgBoostAxisText(new XMLSerializer().serializeToString(el), AXK[el.id] || 1));
+    // G-R: büyütülen x ekseni başlığı tik etiketleriyle çakışmasın diye tuvali 12 birim uzatıp başlığı aşağı al
+    if (el.id === 'tmSvgGR') xml = xml.replace(/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/, (m, w, h) => `viewBox="0 0 ${w} ${+h + 12}"`)
+      .replace(/(<text\b[^>]*\sy=")([0-9.]+)("[^>]*>Magnitude<)/, (m, a, yv, b) => a + (+yv + 11) + b);
     if (!/ xmlns=/.test(xml)) xml = xml.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
     const vb = (el.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
     xml = xml.replace(/<svg([^>]*?)\swidth="[^"]*"/, '<svg$1').replace(/<svg([^>]*?)\sheight="[^"]*"/, '<svg$1');
@@ -2695,7 +2706,7 @@ async function exportPosterAGU(scale, evt) {
       L.line.forEach(({ wd, wW }) => { wd.forEach(pc => { c.font = font(pc); c.fillStyle = pc.col; c.textAlign = 'left'; c.fillText(pc.s, cx, y); cx += c.measureText(pc.s).width; }); cx += gap; });
       y += lh; });
     return y; };
-  const caption = (t, x, y, w, maxY) => rich(t.replace(/^(Şekil \d+\.)/, '**$1**'), x, y, w, { size: 15, lh: 19, italic: true, col: '#374151', maxY, justify: false });
+  const caption = (t, x, y, w, maxY) => rich(t.replace(/^(Şekil \d+\.)/, '**$1**'), x, y, w, { size: 16, lh: 20, italic: true, col: '#374151', maxY, justify: false });
 
   const cs = lastCs, gf = lastGrFit, bt = typeof lastBts !== 'undefined' ? lastBts : null;
   const d = t => t ? new Date(t).toISOString().slice(0, 10) : '—';
@@ -2706,7 +2717,7 @@ async function exportPosterAGU(scale, evt) {
   // ── Sütun 1: çalışma alanı haritası
   const X1 = 40, W1 = 560, X2 = 620, W2 = 680, X3 = 1320, W3 = 560, TOP = 172, MID = 905;
   // Giriş ve Amaç (AGU örneğindeki "Introduction" karşılığı); boşsa nötr, yorum içermeyen varsayılan metin
-  const GH = 124, MAPH = 188, MB = 44 + MAPH + 46, VY = GH + 12 + MB + 12;
+  const GH = 124, MAPH = 183, MB = 44 + MAPH + 46, VY = GH + 12 + MB + 12;
   let y = box(X1, TOP, W1, GH, 'Giriş ve Amaç');
   const intro = posterVal('posterIntro', `Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`);
   rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2, justify: false });
@@ -2745,7 +2756,7 @@ async function exportPosterAGU(scale, evt) {
     [['M<3', '#0891b2'], ['3–4', '#eab308'], ['4–5', '#f97316'], ['≥5', '#ef4444']].forEach(([t, cc], i) => { c.fillStyle = cc; c.beginPath(); c.arc(x + 14 + i * 58, y0 + 14, 5, 0, 2 * Math.PI); c.fill(); text(t, x + 22 + i * 58, y0 + 8, '11px Arial', '#1f2937'); });
     c.restore();
   })(X1 + 14, y, W1 - 28, MAPH);
-  caption(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString('tr-TR')} olayın dış merkezleri, büyüklüğe göre.`, X1 + 16, y + MAPH + 5, W1 - 32, TOP + GH + 12 + MB - 2);
+  caption(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString('tr-TR')} olayın dış merkezleri, büyüklüğe göre.`, X1 + 16, y + MAPH + 4, W1 - 32, TOP + GH + 12 + MB + 1);
   // Sütun 1: veri ve yöntem
   y = box(X1, TOP + VY, W1, MID - TOP - VY, 'Veri ve Yöntem');
   const ci = typeof regionChunkInfo !== 'undefined' ? regionChunkInfo : null;
@@ -2775,8 +2786,8 @@ async function exportPosterAGU(scale, evt) {
   y = figure(imgs[0], X2 + 16, y, W2 - 32, 150);
   caption('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', X2 + 16, y, W2 - 32, TOP + 256);
   y = box(X2, TOP + 275, W2, MID - TOP - 275, 'b-Değerinin Zaman İçinde Değişimi');
-  y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 104);
-  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc, {#d97706|turuncu} tamlık basamakları.', X2 + 16, y + 2, W2 - 32, { size: 15, lh: 21, italic: true, col: '#374151', maxY: MID - 4, justify: false });
+  y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112);
+  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc, {#d97706|turuncu} tamlık basamakları.', X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4, justify: false });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, 'Gutenberg–Richter (Weichert 1980)');
@@ -2840,7 +2851,7 @@ async function exportPosterAGU(scale, evt) {
   const eLines = [[qrDrawn ? 'Canlı analiz ve etkileşimli harita: QR kodu tarayın' : 'Analiz bağlantısı:', 'bold 14px Arial', ACC],
     [`Veri: ${srcShort} — ${new Date().toLocaleDateString('tr-TR')}`, '13px Arial', INK]
   ];
-  if (!/^(localhost|127\.0\.0\.1|\[::1\])(:|$)/.test(location.host) && location.protocol !== 'file:') eLines.push([(location.host + location.pathname).replace(/index\.html$/, ''), '13px Arial', '#1d4ed8']);
+  if (!/^(localhost|127\.0\.0\.1|\[::1\])(:|$)/.test(location.host) && location.protocol !== 'file:') eLines.push([(location.host + location.pathname).replace(/index\.html$/, ''), 'bold 14px Arial', '#1d4ed8']);
   const contact = posterVal('posterContact', ''); if (contact) eLines.push([`İletişim: ${contact}`, '13px Arial', INK]);
   eLines.forEach(([t, f, col], i) => { c.font = f; let tt = t; while (tt.length > 8 && c.measureText(tt).width > eW) tt = tt.slice(0, -2); text(tt === t ? t : tt + '…', X3 + 16, BT + 44 + i * (eLines.length > 3 ? 22 : 24), f, col); });
 
