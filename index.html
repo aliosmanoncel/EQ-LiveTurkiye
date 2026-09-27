@@ -204,6 +204,18 @@
     #mDock .regionCtrl-body{max-height:55vh;overflow-y:auto}
     body.mobileDock #lastCard{top:auto;bottom:118px}
 
+    /* ── UZUN BASIŞLA DAİRE BÖLGE (dokunmatik) ── */
+    #lpSheet{position:fixed;left:8px;right:8px;bottom:112px;z-index:1003;display:none;background:rgba(20,20,20,.9);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid #334;border-radius:10px;padding:9px 12px;color:#e2e8f0;font-size:.8rem;max-width:460px;margin:0 auto}
+    #lpSheet.show{display:block}
+    #lpSheet .lpTop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+    #lpSheet .lpTitle{color:#06b6d4;font-weight:700}
+    #lpSheet .lpBtns{display:flex;gap:6px}
+    #lpSheet button{background:#0b1220;color:#cbd5e1;border:1px solid #334;border-radius:6px;min-height:34px;padding:0 10px;font-size:.78rem;cursor:pointer}
+    #lpSheet input[type=range]{width:100%;height:30px;accent-color:#06b6d4}
+    #lpSheet .lpMeta{color:#9ab0c5;font-size:.72rem;display:flex;justify-content:space-between;gap:8px}
+    .lpPulse{animation:lpPulse .6s ease-out}
+    @keyframes lpPulse{0%{opacity:1}100%{opacity:.6}}
+
     /* ── NEW EQ FLASH ── */
     @keyframes flashNew{0%{opacity:1;transform:scale(1.6)}100%{opacity:.7;transform:scale(1)}}
     .new-eq{animation:flashNew .6s ease-out}
@@ -4498,6 +4510,66 @@ function makeDraggablePanel(panel, header, setWasDragged) {
   }
   const apply = () => (mq.matches ? toMobile() : toDesktop());
   apply(); if (mq.addEventListener) mq.addEventListener('change', apply); else mq.addListener(apply);
+})();
+
+/* Uzun basışla daire bölge analizi (dokunmatik ekranlar). Parmakla dikdörtgen/poligon çizmek telefonda zor;
+   haritada bir noktaya ~0,55 sn basılı tutunca o nokta merkezli bir DAİRE bölge oluşur ve bölge analizi hemen
+   başlar (mevcut boru hattı: regionRect + regionIsCircle → fetchRegionEvents; Time-Mag/poster aynen çalışır).
+   Alttaki kaydırıcıyla yarıçap 25–200 km ayarlanır: sürüklerken daire canlı büyür/küçülür, bırakınca analiz
+   yeni yarıçapla yeniden çalışır. Son yarıçap tarayıcıda hatırlanır. Fare ile çalışmaz (masaüstünde Bölge Seç /
+   Poligon Seç zaten var); sürükleme, iki parmak, işaretçi/açılır pencere üzerine basma ve çizim modları hariç. */
+(function initLongPressCircle() {
+  const HOLD_MS = 550, MOVE_TOL = 10;
+  let timer = null, sx = 0, sy = 0, pid = null, touches = 0;
+  let rKm = 50; try { const v = +localStorage.getItem('eqliveLpRadius'); if (v >= 25 && v <= 200) rKm = v; } catch (e) {}
+  const sheet = document.createElement('div'); sheet.id = 'lpSheet'; sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-label', 'Daire bölge yarıçapı');
+  sheet.innerHTML = `<div class="lpTop"><span class="lpTitle">📍 Daire bölge</span><span class="lpBtns"><button type="button" id="lpRemove">🗑 Kaldır</button><button type="button" id="lpClose">✕</button></span></div>
+    <div class="lpMeta"><span id="lpCenter"></span><span>Yarıçap: <b id="lpR"></b> km</span></div>
+    <input type="range" id="lpRange" min="25" max="200" step="5" aria-label="Yarıçap (km)">
+    <div class="lpMeta"><span id="lpStat">Analiz ediliyor…</span><span>25–200 km</span></div>`;
+  document.body.appendChild(sheet);
+  if (window.L && L.DomEvent) { L.DomEvent.disableClickPropagation(sheet); L.DomEvent.disableScrollPropagation(sheet); }
+  const rng = sheet.querySelector('#lpRange'), rLbl = sheet.querySelector('#lpR');
+  rng.value = rKm; rLbl.textContent = rKm;
+  let center = null;
+  function run() {
+    if (!center) return;
+    regionDeselect();
+    regionIsPolygon = false; regionIsCircle = true;
+    regionCircleCenter = { lat: center.lat, lon: center.lng }; regionCircleRadiusKm = rKm;
+    regionRect = L.circle(center, { radius: rKm * 1000, color: '#06b6d4', weight: 2, fillOpacity: .08, dashArray: '4' }).addTo(map);
+    fetchRegionEvents(regionRect.getBounds());
+    const bd = document.getElementById('btnRegionDecluster'); if (bd) bd.style.display = '';
+    sheet.querySelector('#lpStat').textContent = 'Analiz ediliyor…';
+  }
+  rng.addEventListener('input', () => { rKm = +rng.value; rLbl.textContent = rKm; if (regionRect && regionIsCircle && regionRect.setRadius) regionRect.setRadius(rKm * 1000); });
+  rng.addEventListener('change', () => { try { localStorage.setItem('eqliveLpRadius', String(rKm)); } catch (e) {} run(); });
+  sheet.querySelector('#lpClose').addEventListener('click', () => sheet.classList.remove('show'));
+  sheet.querySelector('#lpRemove').addEventListener('click', () => { regionDeselect(); center = null; sheet.classList.remove('show'); });
+  setInterval(() => { if (!sheet.classList.contains('show') || !center) return;
+    const n = (typeof regionEvents !== 'undefined' && regionEvents && regionIsCircle) ? regionEvents.length : null;
+    if (n !== null) sheet.querySelector('#lpStat').textContent = `N = ${n.toLocaleString('tr-TR')} olay · ayrıntı: 🔍 Bölge Analizi`; }, 800);
+  const el = map.getContainer();
+  const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } };
+  el.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse') return;
+    touches++; if (touches > 1) { cancel(); return; }
+    if (e.target.closest && e.target.closest('.leaflet-marker-icon, .leaflet-interactive, .leaflet-popup, .leaflet-control')) return;
+    if (el.style.cursor === 'crosshair') return; // Bölge Seç / Poligon / daire merkez seçimi sürüyor
+    sx = e.clientX; sy = e.clientY; pid = e.pointerId; cancel();
+    timer = setTimeout(() => {
+      timer = null;
+      const r = el.getBoundingClientRect();
+      center = map.containerPointToLatLng([sx - r.left, sy - r.top]);
+      if (navigator.vibrate) { try { navigator.vibrate(15); } catch (err) {} }
+      sheet.querySelector('#lpCenter').textContent = `${center.lat.toFixed(2)}°, ${center.lng.toFixed(2)}°`;
+      sheet.classList.add('show'); run();
+    }, HOLD_MS);
+  }, { passive: true });
+  el.addEventListener('pointermove', e => { if (timer && e.pointerId === pid && (Math.abs(e.clientX - sx) > MOVE_TOL || Math.abs(e.clientY - sy) > MOVE_TOL)) cancel(); }, { passive: true });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => el.addEventListener(t, () => { touches = Math.max(0, touches - 1); cancel(); }, { passive: true }));
+  // uzun basışın ardından tarayıcının bağlam menüsü/metin seçimi açılmasın
+  el.addEventListener('contextmenu', e => { if (e.pointerType !== 'mouse' && sheet.classList.contains('show')) e.preventDefault(); });
 })();
 
 (function initDraggablePanels() {
