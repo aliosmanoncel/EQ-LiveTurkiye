@@ -160,6 +160,30 @@
       #regionInfo{width:230px !important;font-size:.65rem !important;padding:4px 6px !important}
     }
 
+    /* ── MOBİL PANEL YIĞINI (≤600px): tüm kutular sağ üstte alt alta, KAPALI akordiyon başlıkları olarak
+       dizilir; sayfa açıldığında harita boş görünür, kullanıcı istediğini açar (bkz. initMobileDock). ── */
+    #mDock{display:none}
+    body.mobileDock #mDock{display:flex;flex-direction:column;align-items:stretch;gap:4px;position:fixed;top:8px;right:8px;z-index:1002;width:min(62vw,236px);max-height:calc(100vh - 130px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+    #mDockAll{align-self:flex-end;background:rgba(0,0,0,.88);color:#e2e8f0;border:1px solid #334;border-radius:6px;padding:5px 10px;font-size:.78rem;font-weight:700;cursor:pointer}
+    #mDock.collapsed #mDockList{display:none}
+    #mDockList{display:flex;flex-direction:column;gap:4px}
+    .mItem{background:rgba(0,0,0,.88);border:1px solid #2a2a2a;border-radius:6px}
+    .mItemHead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 11px;color:#06b6d4;font-weight:700;font-size:.78rem;cursor:pointer;user-select:none}
+    .mItemHead .mTog{color:#555;font-size:.85rem}
+    .mItemBody{padding:2px 6px 7px}
+    .mItemBody.hidden{display:none}
+    #mDock #topBar,#mDock #layerBox,#mDock .eqlist,#mDock .legend,#mDock .regionCtrl{position:static !important;transform:none !important;left:auto !important;top:auto !important;right:auto !important;bottom:auto !important;width:auto !important;max-width:none !important;min-width:0 !important;z-index:auto !important}
+    #mDock #topBar > div{flex-wrap:wrap;justify-content:center}
+    #mDock #layerBox{background:none !important;border:none !important;padding:0 !important}
+    #mDock .regionCtrl-header{width:auto !important;touch-action:auto;cursor:pointer;padding:7px 11px}
+    #mDock .regionCtrl-header .title{font-size:.78rem}
+    #mDock .regionCtrl .tbtn{width:100% !important}
+    #mDock #regionInfo{width:auto !important}
+    #mDock .eqlist-body{max-height:40vh}
+    #mDock .legend-body{max-height:45vh;overflow-y:auto}
+    #mDock .regionCtrl-body{max-height:55vh;overflow-y:auto}
+    body.mobileDock #lastCard{top:auto;bottom:118px}
+
     /* ── NEW EQ FLASH ── */
     @keyframes flashNew{0%{opacity:1;transform:scale(1.6)}100%{opacity:.7;transform:scale(1)}}
     .new-eq{animation:flashNew .6s ease-out}
@@ -180,7 +204,7 @@
 </head>
 <body>
 
-<div style="position:fixed;z-index:1001;top:8px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px">
+<div id="topBar" style="position:fixed;z-index:1001;top:8px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px">
   <!-- Zaman Penceresi — EMSC World'deki gibi her zaman üstte görünür (panel kapalıyken bile) -->
   <div style="display:flex;gap:4px;background:rgba(20,20,20,.92);padding:4px;border-radius:8px;border:1px solid #334">
     <button class="tbtn" data-h="1"    data-mag="1.0" title="Son 1 saat · M≥1.0">1s</button>
@@ -208,7 +232,7 @@
      gibi sağ üst köşeye, "Görünen Depremler" listesinin altına yerleştirildi. Detaylı
      analiz katmanları (Hazard/Risk/b-değeri/Fraktal) bilinçli olarak alttaki gizli panelde
      kalıyor. -->
-<div style="position:fixed;z-index:998;top:50px;right:10px;display:flex;flex-direction:column;gap:3px;background:rgba(20,20,20,.92);padding:5px;border-radius:8px;border:1px solid #334;width:150px">
+<div id="layerBox" style="position:fixed;z-index:998;top:50px;right:10px;display:flex;flex-direction:column;gap:3px;background:rgba(20,20,20,.92);padding:5px;border-radius:8px;border:1px solid #334;width:150px">
   <button class="tbtn"        id="btnTopo"   onclick="toggleLayer('topo')"   style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="ESRI World Hillshade + Shaded Relief topografya katmanı">🗺️ Topografya</button>
   <button class="tbtn"        id="btnAerial" onclick="toggleLayer('aerial')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Uydu Görüntüsü · Esri World Imagery © Esri, Maxar, Earthstar Geographics">🛰️ Uydu Görüntüsü</button>
   <button class="tbtn"        id="btnPlates" onclick="toggleLayer('plates')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
@@ -4319,6 +4343,7 @@ function makeDraggablePanel(panel, header, setWasDragged) {
   let startX = 0, startY = 0, startLeft = 0, startTop = 0, dragging = false, moved = false;
 
   header.addEventListener('pointerdown', (e) => {
+    if (panel.closest('#mDock')) return; // mobil yığında panel sabit; başlık yalnızca aç/kapa
     dragging = true;
     moved = false;
     startX = e.clientX;
@@ -4350,6 +4375,53 @@ function makeDraggablePanel(panel, header, setWasDragged) {
     if (moved) setWasDragged(); // hemen ardından gelecek click'i panelin toggle'ı yutsun
   });
 }
+
+/* Mobil panel yığını (≤600px). Masaüstündeki serbest konumlu kutular dar ekranda üst üste biniyordu.
+   Mobilde hepsi sağ üstte tek sütunda, KAPALI akordiyon başlıkları olarak dizilir: sayfa açıldığında
+   harita boş görünür; kullanıcı istediği kutuyu açar/kapatır (birden fazlası açık olabilir), "☰ Paneller"
+   ile yığının tamamı gizlenebilir. Kendi başlığı olan kutular (Haritada, Bölge Analizi, Araştırma Bölgesi,
+   Legend) başlıklarıyla taşınır; başlığı olmayanlar (zaman/kaynak, katmanlar) bir akordiyon öğesine sarılır.
+   Ekran genişleyince (döndürme vb.) kutular yorum düğümlerindeki eski yerlerine döner. */
+(function initMobileDock() {
+  const mq = window.matchMedia('(max-width: 600px)');
+  const items = [
+    { id: 'topBar', title: '⏱ Zaman ve kaynak' },
+    { sel: '.eqlist' },
+    { id: 'layerBox', title: '🗺️ Harita katmanları' },
+    { sel: '.regionCtrl:not(.litRegionCtrl)' },
+    { sel: '.litRegionCtrl' },
+    { sel: '.legend' }];
+  let dock = null; const homes = [];
+  function build() {
+    dock = document.createElement('div'); dock.id = 'mDock';
+    dock.innerHTML = '<button id="mDockAll" type="button" aria-expanded="true">☰ Paneller ▲</button><div id="mDockList"></div>';
+    document.body.appendChild(dock);
+    dock.querySelector('#mDockAll').addEventListener('click', e => { const c = dock.classList.toggle('collapsed'); e.currentTarget.textContent = c ? '☰ Paneller ▼' : '☰ Paneller ▲'; e.currentTarget.setAttribute('aria-expanded', String(!c)); });
+    L.DomEvent && L.DomEvent.disableClickPropagation && L.DomEvent.disableClickPropagation(dock);
+    L.DomEvent && L.DomEvent.disableScrollPropagation && L.DomEvent.disableScrollPropagation(dock);
+  }
+  function toMobile() {
+    if (!dock) build(); const list = dock.querySelector('#mDockList');
+    items.forEach(it => {
+      const el = it.id ? document.getElementById(it.id) : document.querySelector(it.sel); if (!el || el.closest('#mDock')) return;
+      const ph = document.createComment('mdock-home'); el.parentNode.insertBefore(ph, el); homes.push([el, ph]);
+      if (it.title) {
+        const w = document.createElement('div'); w.className = 'mItem';
+        w.innerHTML = `<div class="mItemHead" role="button" aria-expanded="false"><span>${it.title}</span><span class="mTog">▼</span></div><div class="mItemBody hidden"></div>`;
+        const head = w.querySelector('.mItemHead'), body = w.querySelector('.mItemBody');
+        head.addEventListener('click', () => { const h = body.classList.toggle('hidden'); w.querySelector('.mTog').textContent = h ? '▼' : '▲'; head.setAttribute('aria-expanded', String(!h)); });
+        body.appendChild(el); list.appendChild(w); el._mWrap = w;
+      } else { el.style.left = ''; el.style.top = ''; list.appendChild(el); }
+    });
+    document.body.classList.add('mobileDock');
+  }
+  function toDesktop() {
+    homes.splice(0).forEach(([el, ph]) => { ph.parentNode.insertBefore(el, ph); ph.remove(); if (el._mWrap) { el._mWrap.remove(); delete el._mWrap; } });
+    document.body.classList.remove('mobileDock');
+  }
+  const apply = () => (mq.matches ? toMobile() : toDesktop());
+  apply(); if (mq.addEventListener) mq.addEventListener('change', apply); else mq.addListener(apply);
+})();
 
 (function initDraggablePanels() {
   document.querySelectorAll('.regionCtrl').forEach(panel => {
