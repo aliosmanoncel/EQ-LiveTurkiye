@@ -2070,7 +2070,36 @@ const toSuperscript = n => String(n).split('').map(c => SUPERSCRIPT_DIGITS[c] ||
 // değerlendirip mevcut "Mc (elle)" kutusuna kendi girer, 2026-09-13.
 let lastGrEvList = null, lastGrMc = null, lastGrPoints = null, lastGrDM = null;
 
+// GR/Weichert gösterim parametrelerinin URL'de saklanması (2026-09-27):
+// grbin (sınıf genişliği), mx, dmxlo, dmxhi, mref. Parametre yoksa varsayılan
+// (grbin 0.1, mx boş, dmxlo −0.5, dmxhi +0.2, mref 5.0); yalnızca varsayılandan
+// farklı değerler yazılır. Paylaşılan bağlantı aynı hesabı ve görseli üretir.
+const GR_URL_PARAMS = [
+  ['grbin', 'grBinSize', '0.1'], ['mx', 'grMx', ''], ['dmxlo', 'grMxLo', '-0.5'],
+  ['dmxhi', 'grMxHi', '0.2'], ['mref', 'grMref', '5.0']];
+function grParamsSyncURL() {
+  const url = new URL(location.href);
+  GR_URL_PARAMS.forEach(([key, id, def]) => {
+    const el = document.getElementById(id); if (!el) return;
+    const v = String(el.value).trim();
+    if (v === '' || (def !== '' && parseFloat(v) === parseFloat(def))) url.searchParams.delete(key);
+    else url.searchParams.set(key, v);
+  });
+  history.replaceState(null, '', url);
+}
+function restoreGrParamsFromURL() {
+  const p = new URLSearchParams(location.search);
+  GR_URL_PARAMS.forEach(([key, id]) => {
+    if (!p.has(key)) return;
+    const el = document.getElementById(id), v = p.get(key);
+    if (!el || isNaN(parseFloat(v))) return;
+    if (el.tagName === 'SELECT' && ![...el.options].some(o => parseFloat(o.value) === parseFloat(v))) return;
+    el.value = el.tagName === 'SELECT' ? [...el.options].find(o => parseFloat(o.value) === parseFloat(v)).value : v;
+  });
+}
+
 function onGrBinSizeChange() {
+  grParamsSyncURL();
   if (lastCs) { renderGutenbergRichterCS(lastCs); return; }
   if (lastGrEvList) renderGutenbergRichter(lastGrEvList, lastGrMc);
 }
@@ -4781,6 +4810,7 @@ function restoreRegionFromURL() {
   const body = document.getElementById('rcBody');
   if (body && body.classList.contains('hidden')) toggleRegionCtrl();
 }
+restoreGrParamsFromURL();
 restoreRegionFromURL();
 restoreCsFromURL();
 
