@@ -2590,6 +2590,21 @@ async function exportPosterAGU(scale, evt) {
   const para = (t, x, y, w, font, lh, col, maxY, bullet) => { const lines = wrap(t, w - (bullet ? 16 : 0), font); lines.forEach((l, i) => { if (y + lh > maxY) return; if (bullet && i === 0) text('▪', x, y, font, ACC); text(l, x + (bullet ? 16 : 0), y, font, col); y += lh; }); return y; };
   // ── zemin ve dekoratif şekiller
   c.fillStyle = TH.bg; c.fillRect(0, 0, W, H);
+  if (themeKey === 'doga') {
+    // başlık şeridi: yukarıdan aşağı yumuşak geçiş (koyu adaçayı → zemin)
+    const g = c.createLinearGradient(0, 0, 0, 175); g.addColorStop(0, '#d5e2cb'); g.addColorStop(1, TH.bg); c.fillStyle = g; c.fillRect(0, 0, W, 175);
+    // topoğrafik eş yükselti eğrileri (sentetik alan, marching squares), çok düşük opaklık;
+    // kutular opak beyaz olduğundan yalnızca kenar boşluklarında ve başlıkta görünür
+    const G = 12, nx = Math.ceil(W / G) + 1, ny = Math.ceil(H / G) + 1, hills = [[300, 120, 260, 1], [1500, 60, 300, 0.9], [980, 1100, 380, 1.1], [1850, 700, 260, 0.8], [60, 900, 220, 0.7], [700, 520, 420, 0.5]];
+    const fz = (x, y) => hills.reduce((a, [hx, hy, r, h]) => a + h * Math.exp(-((x - hx) ** 2 + (y - hy) ** 2) / (r * r)), 0) + 0.06 * Math.sin(x / 140) * Math.cos(y / 110);
+    const Z = []; for (let j = 0; j < ny; j++) { Z.push([]); for (let i = 0; i < nx; i++) Z[j].push(fz(i * G, j * G)); }
+    c.strokeStyle = TH.deep; c.lineWidth = 1; c.globalAlpha = 0.11; c.beginPath();
+    for (let lv = 0.1; lv < 1.3; lv += 0.1) for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++) {
+      const a = Z[j][i], b = Z[j][i + 1], cc = Z[j + 1][i + 1], d = Z[j + 1][i], x = i * G, y = j * G, pts = [];
+      const e = (v1, v2, x1, y1, x2, y2) => { if ((v1 < lv) !== (v2 < lv)) { const t = (lv - v1) / (v2 - v1); pts.push([x1 + t * (x2 - x1), y1 + t * (y2 - y1)]); } };
+      e(a, b, x, y, x + G, y); e(b, cc, x + G, y, x + G, y + G); e(cc, d, x + G, y + G, x, y + G); e(d, a, x, y + G, x, y);
+      for (let k = 0; k + 1 < pts.length; k += 2) { c.moveTo(pts[k][0], pts[k][1]); c.lineTo(pts[k + 1][0], pts[k + 1][1]); } }
+    c.stroke(); c.globalAlpha = 1; }
   TH.polys.forEach(([col, pts]) => {
     c.fillStyle = col; c.globalAlpha = 0.55; c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.closePath(); c.fill(); c.globalAlpha = 1; });
   if (themeKey === 'doga') {
@@ -2598,9 +2613,14 @@ async function exportPosterAGU(scale, evt) {
     ridge([[1180, 170], [1290, 112], [1350, 138], [1440, 70], [1520, 122], [1600, 58], [1700, 118], [1760, 96], [1920, 150], [1920, 170]], '#1e3a5f', 0.16);
     ridge([[1240, 170], [1360, 132], [1430, 150], [1530, 104], [1610, 142], [1690, 116], [1800, 150], [1920, 128], [1920, 170]], '#6a9f2a', 0.22);
     ridge([[0, 170], [0, 128], [70, 150], [150, 108], [240, 158], [300, 170]], '#6a9f2a', 0.18);
-    c.strokeStyle = '#1e3a5f'; c.globalAlpha = 0.35; c.lineWidth = 1.4; c.beginPath();
-    for (let x = 180; x <= 1740; x += 3) { const u = (x - 960) / 90, env = Math.exp(-u * u) * 9 + Math.exp(-Math.pow((x - 560) / 40, 2)) * 3, yy = 163 + env * Math.sin(x * 0.55) * (0.6 + 0.4 * Math.sin(x * 0.13)); x === 180 ? c.moveTo(x, yy) : c.lineTo(x, yy); }
-    c.stroke(); c.globalAlpha = 1; }
+    // sentetik sismogram: gürültü → P varışı (küçük genlik) → S varışı (büyük genlik) → sönümlenen koda
+    const XP = 700, XS = 930; let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647 - 0.5;
+    c.strokeStyle = '#1e3a5f'; c.globalAlpha = 0.4; c.lineWidth = 1.3; c.beginPath();
+    for (let x = 180; x <= 1740; x += 2) { let a = 0.7 * rnd();
+      if (x >= XP) a += 4.5 * Math.exp(-(x - XP) / 70) * Math.sin((x - XP) * 0.9) ;
+      if (x >= XS) a += 10 * Math.exp(-(x - XS) / 150) * Math.sin((x - XS) * 0.45) * (0.7 + 0.6 * rnd());
+      const yy = 163 + a; x === 180 ? c.moveTo(x, yy) : c.lineTo(x, yy); }
+    c.stroke(); c.globalAlpha = 0.55; text('P', XP - 4, 146, 'bold 11px Arial', '#1e3a5f'); text('S', XS - 4, 146, 'bold 11px Arial', '#1e3a5f'); c.globalAlpha = 1; }
   // ── başlık bloğu
   const region = posterVal('posterRegion', '');
   const title = posterVal('posterTitle', (region ? region + ': ' : '') + 'Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Analizi');
@@ -2629,7 +2649,10 @@ async function exportPosterAGU(scale, evt) {
     c.drawImage(photo, cx - photo.naturalWidth * s / 2, cy - photo.naturalHeight * s / 2, photo.naturalWidth * s, photo.naturalHeight * s); c.restore();
     c.strokeStyle = ACC; c.lineWidth = 3; c.beginPath(); c.arc(cx, cy, r, 0, 2 * Math.PI); c.stroke();
   }
-  if (logo && document.getElementById('posterLogo')?.checked !== false) c.drawImage(logo, W - 40 - 132, 18, 132, 132);
+  if (logo && document.getElementById('posterLogo')?.checked !== false) {
+    const lx = W - 40 - 132, ly = 18, lr = 61;
+    c.save(); c.shadowColor = 'rgba(0,0,0,.18)'; c.shadowBlur = 8; c.shadowOffsetY = 2; c.fillStyle = '#ffffff'; c.beginPath(); c.arc(lx + 66, ly + 66, lr, 0, 2 * Math.PI); c.fill(); c.restore();
+    c.drawImage(logo, lx, ly, 132, 132); }
   // ── kutu yardımcıları
   const box = (x, y, w, h, head) => { c.fillStyle = '#ffffff'; c.fillRect(x, y, w, h); c.strokeStyle = '#111'; c.lineWidth = 1.2; c.strokeRect(x, y, w, h); text(head, x + 16, y + 12, 'bold 21px Arial', '#111827'); return y + 44; };
   const figure = (img, x, y, w, maxH) => { let fw = w, fh = fw * img.naturalHeight / img.naturalWidth; if (fh > maxH) { fh = maxH; fw = fh * img.naturalWidth / img.naturalHeight; } const fx = x + (w - fw) / 2; c.fillStyle = '#111111'; c.fillRect(fx - 4, y - 4, fw + 8, fh + 8); c.drawImage(img, fx, y, fw, fh); return y + fh + 8; };
@@ -2641,7 +2664,7 @@ async function exportPosterAGU(scale, evt) {
     const words = []; let cur = null;
     String(t).replace(/\{(#[0-9a-fA-F]{6})\|([^}]*)\}|\*\*([^*]+)\*\*|([^{*]+|[{*])/g, (m, cc, ct, bt, pt) => {
       const st = cc ? { b: true, col: cc } : bt ? { b: true, col: bcol } : { b: false, col };
-      (cc ? ct : bt !== undefined ? bt : pt).split(/(\s+)/).forEach(pc => { if (!pc) return; if (/^\s+$/.test(pc)) { cur = null; return; }
+      (cc ? ct : bt !== undefined ? bt : pt).split(/([ \t\n]+)/).forEach(pc => { if (!pc) return; if (/^[ \t\n]+$/.test(pc)) { cur = null; return; }
         if (!cur) { cur = []; words.push(cur); } cur.push({ s: pc, ...st }); }); return m; });
     const font = pc => `${it}${pc.b ? 'bold ' : ''}${size}px Arial`;
     const ww = wd => wd.reduce((a, pc) => { c.font = font(pc); return a + c.measureText(pc.s).width; }, 0);
@@ -2761,8 +2784,8 @@ async function exportPosterAGU(scale, evt) {
   if (userRes) rItems = userRes.split('\n').map(t => t.trim()).filter(Boolean);
   else {
     rItems = [];
-    if (gf) { const best = gf.curves[0]; rItems.push(`**Weichert (1980):** b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}; λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl${gf.nRef !== undefined ? `; N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl` : ''} (N = ${gf.N}).`); }
-    if (bt) rItems.push(`**b(t):** ortalama ${bt.bAvg.toFixed(2)}, son pencere ${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'} (${bt.nWin} pencere).` + (bt.fixed ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${bt.fixed.bAvg.toFixed(2)}.` : ''));
+    if (gf) { const best = gf.curves[0]; const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**Weichert (1980):** ${V(`b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}`)}; ${V(`λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl`)}${gf.nRef !== undefined ? `; ${V(`N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl`)}` : ''} (N = ${gf.N}).`); }
+    if (bt) { const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**b(t):** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` + (bt.fixed ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
     const qc = (document.getElementById('csDiag')?.innerText || '').split('\n').map(t => t.trim()).filter(t => /^[⚠🔴]/.test(t)).map(t => t.replace(/^[⚠️🔴\s]+/u, ''));
     rItems.push(qc.length ? '**Kalite kontrol:** ' + qc.slice(0, 2).join(' ') : '**Kalite kontrol:** basamaklar veri Mc\'siyle uyumlu, uyarı yok.');
   }
@@ -2791,7 +2814,7 @@ async function exportPosterAGU(scale, evt) {
   const eW = (qrDrawn ? qzx - 12 : X3 + W3 - 16) - (X3 + 16);
   text('Daha Fazla Bilgi', X3 + 16, BT + 12, 'bold 21px Arial', '#111827');
   const srcShort = regionRect ? regionSourceLabel() : 'Canlı akış';
-  const eLines = [[qrDrawn ? 'Analizi canlı açmak için QR kodu tarayın' : 'Analiz bağlantısı:', 'bold 14px Arial', ACC],
+  const eLines = [[qrDrawn ? 'Canlı analiz ve etkileşimli harita: QR kodu tarayın' : 'Analiz bağlantısı:', 'bold 14px Arial', ACC],
     [`Veri: ${srcShort} — ${new Date().toLocaleDateString('tr-TR')}`, '13px Arial', INK]
   ];
   if (!/^(localhost|127\.0\.0\.1|\[::1\])(:|$)/.test(location.host) && location.protocol !== 'file:') eLines.push([(location.host + location.pathname).replace(/index\.html$/, ''), '13px Arial', '#1d4ed8']);
