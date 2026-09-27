@@ -164,10 +164,30 @@
        dizilir; sayfa açıldığında harita boş görünür, kullanıcı istediğini açar (bkz. initMobileDock). ── */
     #mDock{display:none}
     body.mobileDock #mDock{display:flex;flex-direction:column;align-items:stretch;gap:4px;position:fixed;top:8px;right:8px;z-index:1002;width:min(62vw,236px);max-height:calc(100vh - 130px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+    #mDockTop{display:flex;justify-content:flex-end;gap:4px}
+    #mDockPin{background:rgba(20,20,20,.82);color:#64748b;border:1px solid #334;border-radius:6px;padding:5px 8px;font-size:.78rem;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+    #mDockPin.pinned{color:#fbbf24;border-color:#b45309}
+    #mDock.collapsed #mDockPin{display:none}
+    /* kapalı başlıkta durum özeti */
+    .mSum{display:none}
+    #mDock .mItemHead,#mDock .regionCtrl-header{flex-wrap:wrap;row-gap:1px}
+    #mDock .mSum{display:block;order:3;flex:1 0 100%;min-width:0;text-align:left;color:#9ab0c5;font-weight:400;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #mDock .mSum:empty{display:none}
+    #mDock .mItemHead > span:first-child,#mDock .regionCtrl-header .title{flex:0 0 auto}
     #mDockAll{align-self:flex-end;background:rgba(0,0,0,.88);color:#e2e8f0;border:1px solid #334;border-radius:6px;padding:5px 10px;font-size:.78rem;font-weight:700;cursor:pointer}
     #mDock.collapsed #mDockList{display:none}
     #mDockList{display:flex;flex-direction:column;gap:4px}
-    .mItem{background:rgba(0,0,0,.88);border:1px solid #2a2a2a;border-radius:6px}
+    .mItem{background:rgba(20,20,20,.82);border:1px solid #2a2a2a;border-radius:6px}
+    /* hafif saydam + bulanık zemin: arkadaki harita sezilir (desteklemeyen tarayıcıda düz koyu zemin kalır) */
+    body.mobileDock .mItem,body.mobileDock #mDock .eqlist,body.mobileDock #mDock .legend,body.mobileDock #mDock .regionCtrl-header,body.mobileDock #mDockAll{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+    body.mobileDock #mDock .eqlist,body.mobileDock #mDock .legend,body.mobileDock #mDock .regionCtrl-header{background:rgba(20,20,20,.82) !important}
+    /* dokunma alanları: en az ~36 px; 16 px yazı iOS'ta odaklanınca sayfanın büyümesini önler; dar satırlar alt satıra akar */
+    #mDock .tbtn{min-height:36px}
+    #mDock .regionCtrl .rowbox{flex-wrap:wrap;row-gap:6px}
+    #mDock .regionCtrl .rowbox input:not([type=checkbox]):not([type=radio]),#mDock .regionCtrl .rowbox select{font-size:16px !important;min-height:36px;flex:1 1 70px;width:auto !important;min-width:0}
+    #mDock #regionDateRangeRow > label,#mDock #regionChunkRow > label:first-child{flex:0 0 100%}
+    #mDock #regionDateRangeRow input{flex:1 1 120px}
+    #mDock #regionDateRangeRow > span{display:none}
     .mItemHead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 11px;color:#06b6d4;font-weight:700;font-size:.78rem;cursor:pointer;user-select:none}
     .mItemHead .mTog{color:#555;font-size:.85rem}
     .mItemBody{padding:2px 6px 7px}
@@ -4394,11 +4414,44 @@ function makeDraggablePanel(panel, header, setWasDragged) {
   let dock = null; const homes = [];
   function build() {
     dock = document.createElement('div'); dock.id = 'mDock';
-    dock.innerHTML = '<button id="mDockAll" type="button" aria-expanded="true">☰ Paneller ▲</button><div id="mDockList"></div>';
+    dock.innerHTML = '<div id="mDockTop"><button id="mDockPin" type="button" aria-pressed="false" title="Sabitle: haritaya dokununca açık kutular kapanmasın">📌</button><button id="mDockAll" type="button" aria-expanded="true">☰ Paneller ▲</button></div><div id="mDockList"></div>';
     document.body.appendChild(dock);
-    dock.querySelector('#mDockAll').addEventListener('click', e => { const c = dock.classList.toggle('collapsed'); e.currentTarget.textContent = c ? '☰ Paneller ▼' : '☰ Paneller ▲'; e.currentTarget.setAttribute('aria-expanded', String(!c)); });
+    const btn = dock.querySelector('#mDockAll'), pin = dock.querySelector('#mDockPin');
+    const setPin = v => { pin.classList.toggle('pinned', v); pin.setAttribute('aria-pressed', String(v)); pin.title = v ? 'Sabit: haritaya dokununca kutular açık kalır (kaldırmak için dokunun)' : 'Sabitle: haritaya dokununca açık kutular kapanmasın'; };
+    let pinSaved = null; try { pinSaved = localStorage.getItem('eqliveMobDockPin'); } catch (e) {}
+    setPin(pinSaved === '1');
+    pin.addEventListener('click', () => { const v = !pin.classList.contains('pinned'); setPin(v); try { localStorage.setItem('eqliveMobDockPin', v ? '1' : '0'); } catch (e) {} });
+    // Odak modu: kullanıcı haritaya dokunup gezinmeye başlayınca açık kutular kapanır (📌 ile sabitlenmediyse).
+    // Yalnızca kullanıcının dokunuşu dinlenir; programatik yakınlaştırmalar (ör. bölge analizinin haritayı sığdırması) kutuyu kapatmaz.
+    const mapEl = document.getElementById('map');
+    if (mapEl) mapEl.addEventListener('pointerdown', () => {
+      if (!document.body.classList.contains('mobileDock') || pin.classList.contains('pinned')) return;
+      [...dock.querySelector('#mDockList').children].forEach(x => { if (isOpen(x)) closeItem(x); });
+    }, { passive: true });
+    const setCollapsed = c => { dock.classList.toggle('collapsed', c); btn.textContent = c ? '☰ Paneller ▼' : '☰ Paneller ▲'; btn.setAttribute('aria-expanded', String(!c)); };
+    // Varsayılan: kapalı (harita tamamen boş açılır). Kullanıcının son tercihi bu tarayıcıda hatırlanır.
+    let saved = null; try { saved = localStorage.getItem('eqliveMobDock'); } catch (e) {}
+    setCollapsed(saved !== 'open');
+    btn.addEventListener('click', () => { const c = !dock.classList.contains('collapsed'); setCollapsed(c); try { localStorage.setItem('eqliveMobDock', c ? 'closed' : 'open'); } catch (e) {} });
+    // Tek açık akordiyon: bir kutu açılınca diğer açık kutular kapanır (menü dikeyde uzamaz)
+    dock.addEventListener('click', e => {
+      const head = e.target.closest('.mItemHead, .eqlist-header, .regionCtrl-header, .legend-header'); if (!head || e.target.closest('select, input')) return;
+      setTimeout(() => { const own = dock.querySelector('#mDockList').children; const cur = [...own].find(x => x.contains(head)); if (!cur || !isOpen(cur)) return;
+        [...own].forEach(x => { if (x !== cur && isOpen(x)) closeItem(x); }); }, 0);
+    });
     L.DomEvent && L.DomEvent.disableClickPropagation && L.DomEvent.disableClickPropagation(dock);
     L.DomEvent && L.DomEvent.disableScrollPropagation && L.DomEvent.disableScrollPropagation(dock);
+  }
+  // Kutu açık mı / kapat: sarılı öğeler (.mItem) ve kendi başlığı olan paneller için
+  const OWN = [['.eqlist', 'eqlBody', () => toggleEqList()], ['.litRegionCtrl', 'lrcBody', () => toggleLitRegionCtrl()],
+               ['.regionCtrl', 'rcBody', () => toggleRegionCtrl()], ['.legend', 'lgBody', () => toggleLegend()]];
+  function isOpen(x) {
+    if (x.classList.contains('mItem')) return !x.querySelector('.mItemBody').classList.contains('hidden');
+    const o = OWN.find(([sel]) => x.matches(sel)); const b = o && document.getElementById(o[1]); return !!(b && !b.classList.contains('hidden'));
+  }
+  function closeItem(x) {
+    if (x.classList.contains('mItem')) { x.querySelector('.mItemBody').classList.add('hidden'); x.querySelector('.mTog').textContent = '▼'; x.querySelector('.mItemHead').setAttribute('aria-expanded', 'false'); return; }
+    const o = OWN.find(([sel]) => x.matches(sel)); if (o && isOpen(x)) o[2]();
   }
   function toMobile() {
     if (!dock) build(); const list = dock.querySelector('#mDockList');
@@ -4407,14 +4460,38 @@ function makeDraggablePanel(panel, header, setWasDragged) {
       const ph = document.createComment('mdock-home'); el.parentNode.insertBefore(ph, el); homes.push([el, ph]);
       if (it.title) {
         const w = document.createElement('div'); w.className = 'mItem';
-        w.innerHTML = `<div class="mItemHead" role="button" aria-expanded="false"><span>${it.title}</span><span class="mTog">▼</span></div><div class="mItemBody hidden"></div>`;
+        w.innerHTML = `<div class="mItemHead" role="button" aria-expanded="false"><span>${it.title}</span><span class="mSum" data-sum="${it.id}"></span><span class="mTog">▼</span></div><div class="mItemBody hidden"></div>`;
         const head = w.querySelector('.mItemHead'), body = w.querySelector('.mItemBody');
         head.addEventListener('click', () => { const h = body.classList.toggle('hidden'); w.querySelector('.mTog').textContent = h ? '▼' : '▲'; head.setAttribute('aria-expanded', String(!h)); });
         body.appendChild(el); list.appendChild(w); el._mWrap = w;
       } else { el.style.left = ''; el.style.top = ''; list.appendChild(el); }
     });
-    document.body.classList.add('mobileDock');
+    // Bölge / Araştırma başlıklarına durum özeti alanı (yalnızca yığında görünür)
+    [['.regionCtrl:not(.litRegionCtrl) .regionCtrl-header', 'region'], ['.litRegionCtrl .regionCtrl-header', 'lit']].forEach(([sel, key]) => {
+      const h = document.querySelector(sel); if (h && !h.querySelector('.mSum')) { const sp = document.createElement('span'); sp.className = 'mSum'; sp.dataset.sum = key; h.insertBefore(sp, h.lastElementChild); } });
+    document.body.classList.add('mobileDock'); updateDockSummaries();
   }
+  // Kapalı başlıkta durum özeti: kutuyu açmadan hangi veriye bakıldığı görülür
+  function updateDockSummaries() {
+    if (!dock || !document.body.classList.contains('mobileDock')) return;
+    const put = (k, t) => { const el = document.querySelector(`#mDock .mSum[data-sum="${k}"]`); if (el && el.textContent !== t) { el.textContent = t; el.title = t; } };
+    const tb = document.querySelector('#topBar .tbtn.active[data-h]'), sc = document.querySelector('#topBar [id^="btnScope"].active');
+    put('topBar', [tb && tb.textContent.trim(), sc && sc.textContent.replace(/^\W+/u, '').trim()].filter(Boolean).join(' · '));
+    const nL = document.querySelectorAll('#layerBox .tbtn.active').length; put('layerBox', nL ? `${nL} açık` : 'kapalı');
+    try {
+      let r = 'yok';
+      if (typeof regionRect !== 'undefined' && regionRect) {
+        const shp = (typeof regionIsCircle !== 'undefined' && regionIsCircle) ? `daire ${regionCircleRadiusKm} km` : (typeof regionIsPolygon !== 'undefined' && regionIsPolygon) ? 'poligon' : 'dikdörtgen';
+        const n = (typeof regionEvents !== 'undefined' && regionEvents) ? regionEvents.length : null; r = shp + (n !== null ? ` · N=${n.toLocaleString('tr-TR')}` : ''); }
+      put('region', r);
+      let l = 'yok';
+      if (typeof litRegionLayer !== 'undefined' && litRegionLayer) {
+        if (typeof litRegionMode !== 'undefined' && litRegionMode === 'circle') l = 'daire';
+        else { const sel = document.getElementById('litRegionGroupSel'), o = sel && sel.selectedOptions[0]; l = o && o.value ? o.textContent.split(/\s[—-]\s/)[0].trim() : 'seçili'; } }
+      put('lit', l);
+    } catch (e) {}
+  }
+  setInterval(updateDockSummaries, 1200); document.addEventListener('click', () => setTimeout(updateDockSummaries, 50));
   function toDesktop() {
     homes.splice(0).forEach(([el, ph]) => { ph.parentNode.insertBefore(el, ph); ph.remove(); if (el._mWrap) { el._mWrap.remove(); delete el._mWrap; } });
     document.body.classList.remove('mobileDock');
