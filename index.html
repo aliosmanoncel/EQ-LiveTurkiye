@@ -4508,7 +4508,9 @@ function makeDraggablePanel(panel, header, setWasDragged) {
     homes.splice(0).forEach(([el, ph]) => { ph.parentNode.insertBefore(el, ph); ph.remove(); if (el._mWrap) { el._mWrap.remove(); delete el._mWrap; } });
     document.body.classList.remove('mobileDock');
   }
-  const apply = () => (mq.matches ? toMobile() : toDesktop());
+  // ?mobil=1 : masaüstünde de mobil yığını zorla (deneme / sınıfta yansıtma için); ?mobil=0 : kapat
+  const force = (location.search.match(/[?&]mobil=([01])/) || [])[1];
+  const apply = () => ((force === '1' || (force !== '0' && mq.matches)) ? toMobile() : toDesktop());
   apply(); if (mq.addEventListener) mq.addEventListener('change', apply); else mq.addListener(apply);
 })();
 
