@@ -3,6 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Ana ekrana eklenebilir uygulama (PWA): manifest + simgeler + service worker (sw.js) -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EQ-Live">
   <title>Türkiye Sismik Isı Haritası — Canlı Akış</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -165,6 +174,10 @@
     #mDock{display:none}
     body.mobileDock #mDock{display:flex;flex-direction:column;align-items:stretch;gap:4px;position:fixed;top:8px;right:8px;z-index:1002;width:min(62vw,236px);max-height:calc(100vh - 130px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
     #mDockTop{display:flex;justify-content:flex-end;gap:4px}
+    #mDockInstall{background:rgba(20,20,20,.82);color:#84cc16;border:1px solid #4d7c0f;border-radius:6px;padding:5px 8px;font-size:.74rem;font-weight:700;cursor:pointer;display:none}
+    #mDockInstall.show{display:inline-block}
+    #offlineNote{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:1004;background:#7c2d12;color:#fed7aa;border:1px solid #c2410c;border-radius:6px;padding:4px 10px;font-size:.72rem;display:none}
+    #offlineNote.show{display:block}
     #mDockPin{background:rgba(20,20,20,.82);color:#64748b;border:1px solid #334;border-radius:6px;padding:5px 8px;font-size:.78rem;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
     #mDockPin.pinned{color:#fbbf24;border-color:#b45309}
     #mDock.collapsed #mDockPin{display:none}
@@ -4474,7 +4487,7 @@ function makeDraggablePanel(panel, header, setWasDragged) {
   let dock = null; const homes = [];
   function build() {
     dock = document.createElement('div'); dock.id = 'mDock';
-    dock.innerHTML = '<div id="mDockTop"><button id="mDockPin" type="button" aria-pressed="false" title="Sabitle: haritaya dokununca açık kutular kapanmasın">📌</button><button id="mDockAll" type="button" aria-expanded="true">☰ Paneller ▲</button></div><div id="mDockList"></div>';
+    dock.innerHTML = '<div id="mDockTop"><button id="mDockInstall" type="button" title="EQ-Live\'ı telefonunuza uygulama olarak ekleyin">📲 Yükle</button><button id="mDockPin" type="button" aria-pressed="false" title="Sabitle: haritaya dokununca açık kutular kapanmasın">📌</button><button id="mDockAll" type="button" aria-expanded="true">☰ Paneller ▲</button></div><div id="mDockList"></div>';
     document.body.appendChild(dock);
     const btn = dock.querySelector('#mDockAll'), pin = dock.querySelector('#mDockPin');
     const setPin = v => { pin.classList.toggle('pinned', v); pin.setAttribute('aria-pressed', String(v)); pin.title = v ? 'Sabit: haritaya dokununca kutular açık kalır (kaldırmak için dokunun)' : 'Sabitle: haritaya dokununca açık kutular kapanmasın'; };
@@ -4651,6 +4664,29 @@ function makeDraggablePanel(panel, header, setWasDragged) {
     });
     return div; } });
   new Ctl().addTo(map);
+})();
+
+/* PWA: service worker kaydı, "Uygulama olarak yükle" düğmesi (tarayıcı destekliyorsa), çevrimdışı uyarısı.
+   Service worker yalnızca güvenli bağlamda (https veya localhost) çalışır; hata olursa site etkilenmez. */
+(function initPWA() {
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+  }
+  let deferred = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault(); deferred = e;
+    const b = document.getElementById('mDockInstall'); if (b) b.classList.add('show');
+  });
+  document.addEventListener('click', async e => {
+    if (!e.target.closest || !e.target.closest('#mDockInstall') || !deferred) return;
+    deferred.prompt(); try { await deferred.userChoice; } catch (err) {}
+    deferred = null; const b = document.getElementById('mDockInstall'); if (b) b.classList.remove('show');
+  });
+  window.addEventListener('appinstalled', () => { const b = document.getElementById('mDockInstall'); if (b) b.classList.remove('show'); });
+  const note = document.createElement('div'); note.id = 'offlineNote'; note.setAttribute('role', 'status');
+  note.textContent = '⚠ Çevrimdışı — son kaydedilen veriler gösteriliyor'; document.body.appendChild(note);
+  const upd = () => note.classList.toggle('show', !navigator.onLine);
+  window.addEventListener('online', upd); window.addEventListener('offline', upd); upd();
 })();
 
 (function initDraggablePanels() {
