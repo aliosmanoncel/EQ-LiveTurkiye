@@ -2544,6 +2544,17 @@ function posterSavePrefs() {
   try { const o = {}; POSTER_KEYS.forEach(k => { const el = document.getElementById(k); if (el) o[k] = el.value; }); localStorage.setItem('eqlivePoster', JSON.stringify(o)); } catch (e) {}
 }
 let _qrLib = null;
+// Koyu ekran için çizilmiş SVG'leri beyaz zemine uyarlar (poster ve açık PNG): ızgara açık gri,
+// eksen/etiket koyu gri, açık renkli yazılar koyu; veri renkleri (camgöbeği, sarı, turuncu, pembe, yeşil) korunur.
+function svgToLight(xml) {
+  xml = xml.replace(/<(text|tspan)\b([^>]*)>/g, (m, tag, at) => '<' + tag + at
+    .replace(/fill="(#e2e8f0|#cbd5e1|#94a3b8|#888|#888888|#d1d5db|#aaa|#aaaaaa|#9ca3af|#e5e7eb|#fff|#ffffff|white)"/g, 'fill="#1f2937"')
+    .replace(/fill="#22d3ee"/g, 'fill="#0891b2"').replace(/fill="#06b6d4"/g, 'fill="#0e7490"') + '>');
+  return xml.replace(/stroke="#2a2a2a"/g, 'stroke="#e5e7eb"').replace(/stroke="#(555|666|555555|666666)"/g, 'stroke="#6b7280"')
+    .replace(/stroke="#d1d5db"/g, 'stroke="#4b5563"').replace(/fill="#d1d5db"/g, 'fill="#6b7280"')
+    .replace(/stroke="#cbd5e1"/g, 'stroke="#6b7280"').replace(/stroke="#22d3ee"/g, 'stroke="#0891b2"')
+    .replace(/fill="#0b1220"/g, 'fill="#ffffff"').replace(/stroke="#475569"/g, 'stroke="#9ca3af"');
+}
 function posterLoadQR() {
   if (window.qrcode) return Promise.resolve(window.qrcode);
   if (_qrLib) return _qrLib;
@@ -2561,7 +2572,7 @@ async function exportPosterAGU(scale, evt) {
   const done = () => { if (btn) { btn.textContent = oldLabel; btn.disabled = false; } };
   const SC = scale || 1, W = 1920, H = 1080;
   const svgImg = (el, k) => new Promise((res, rej) => {
-    let xml = new XMLSerializer().serializeToString(el);
+    let xml = svgToLight(new XMLSerializer().serializeToString(el));
     if (!/ xmlns=/.test(xml)) xml = xml.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
     const vb = (el.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
     xml = xml.replace(/<svg([^>]*?)\swidth="[^"]*"/, '<svg$1').replace(/<svg([^>]*?)\sheight="[^"]*"/, '<svg$1');
@@ -2657,7 +2668,7 @@ async function exportPosterAGU(scale, evt) {
     c.drawImage(logo, lx, ly, 132, 132); }
   // ── kutu yardımcıları
   const box = (x, y, w, h, head) => { c.fillStyle = '#ffffff'; c.fillRect(x, y, w, h); c.strokeStyle = '#111'; c.lineWidth = 1.2; c.strokeRect(x, y, w, h); text(head, x + 16, y + 12, 'bold 21px Arial', '#111827'); return y + 44; };
-  const figure = (img, x, y, w, maxH) => { let fw = w, fh = fw * img.naturalHeight / img.naturalWidth; if (fh > maxH) { fh = maxH; fw = fh * img.naturalWidth / img.naturalHeight; } const fx = x + (w - fw) / 2; c.fillStyle = '#111111'; c.fillRect(fx - 4, y - 4, fw + 8, fh + 8); c.drawImage(img, fx, y, fw, fh); return y + fh + 8; };
+  const figure = (img, x, y, w, maxH) => { let fw = w, fh = fw * img.naturalHeight / img.naturalWidth; if (fh > maxH) { fh = maxH; fw = fh * img.naturalWidth / img.naturalHeight; } const fx = x + (w - fw) / 2; c.fillStyle = '#ffffff'; c.fillRect(fx - 4, y - 4, fw + 8, fh + 8); c.strokeStyle = '#d1d5db'; c.lineWidth = 1; c.strokeRect(fx - 4, y - 4, fw + 8, fh + 8); c.drawImage(img, fx, y, fw, fh); return y + fh + 8; };
   // Zengin, iki yana yaslı metin: **metin** kalın; {#renk|metin} kalın ve renkli.
   // o: { size, lh, col, bcol, italic, bullet, hang (asılı girinti, px), maxY, justify }
   // Son satır ve %78'den az dolu satırlar yaslanmaz (aşırı boşluk / "nehir" oluşmaması için).
@@ -2701,7 +2712,7 @@ async function exportPosterAGU(scale, evt) {
   rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2, justify: false });
   y = box(X1, TOP + GH + 12, W1, MB, 'Çalışma Alanı');
   (function drawMap(x, y0, w, h) {
-    c.fillStyle = '#0f172a'; c.fillRect(x, y0, w, h);
+    c.fillStyle = '#f8fafc'; c.fillRect(x, y0, w, h); c.strokeStyle = '#d1d5db'; c.lineWidth = 1; c.strokeRect(x, y0, w, h);
     const pts = evs.filter(e => isFinite(e.lat) && isFinite(e.lon));
     let S, N, Wl, E;
     if (regionRect) { const b = regionRect.getBounds(); S = b.getSouth(); N = b.getNorth(); Wl = b.getWest(); E = b.getEast(); }
@@ -2713,25 +2724,25 @@ async function exportPosterAGU(scale, evt) {
     const P = (lat, lon) => [ox + (lon - Wl) * k * sc, oy + (N - lat) * sc];
     c.save(); c.beginPath(); c.rect(x, y0, w, h); c.clip();
     const step = [0.1, 0.2, 0.5, 1, 2, 5, 10].find(s => spanY / s <= 6) || 10;
-    c.strokeStyle = '#334155'; c.lineWidth = 0.6; c.font = '11px Arial'; c.fillStyle = '#94a3b8';
+    c.strokeStyle = '#e2e8f0'; c.lineWidth = 0.8; c.font = '11px Arial'; c.fillStyle = '#475569';
     for (let la = Math.ceil(S / step) * step; la <= N; la += step) { const [, yy] = P(la, Wl); c.beginPath(); c.moveTo(x, yy); c.lineTo(x + w, yy); c.stroke(); if (yy > y0 + 24 && yy < y0 + h - 16) c.fillText(`${la.toFixed(step < 1 ? 1 : 0)}°`, x + 4, yy + 2); }
     const stepX = [0.1, 0.2, 0.5, 1, 2, 5, 10].find(s2 => s2 * k * sc >= 62) || 10;
     for (let lo = Math.ceil(Wl / stepX) * stepX; lo <= E; lo += stepX) { const [xx] = P(S, lo); c.beginPath(); c.moveTo(xx, y0); c.lineTo(xx, y0 + h); c.stroke(); c.fillText(`${lo.toFixed(stepX < 1 ? 1 : 0)}°`, xx + 2, y0 + h - 14); }
-    const col = m => m >= 5 ? '#ef4444' : m >= 4 ? '#f97316' : m >= 3 ? '#eab308' : '#22d3ee';
+    const col = m => m >= 5 ? '#ef4444' : m >= 4 ? '#f97316' : m >= 3 ? '#eab308' : '#0891b2';
     const stride = Math.max(1, Math.ceil(pts.length / 6000));
     const sorted = pts.filter((_, i) => i % stride === 0).sort((a, b) => (a.mw ?? a.mag) - (b.mw ?? b.mag));
     sorted.forEach(e => { const m = e.mw ?? e.mag, [px, py] = P(e.lat, e.lon); c.fillStyle = col(m); c.globalAlpha = m >= 4 ? 0.95 : 0.6; c.beginPath(); c.arc(px, py, Math.max(1.2, 0.9 + Math.max(0, m - 1) * 1.3), 0, 2 * Math.PI); c.fill(); });
-    c.globalAlpha = 1; c.strokeStyle = '#f8fafc'; c.lineWidth = 2; c.setLineDash([6, 4]); c.beginPath();
+    c.globalAlpha = 1; c.strokeStyle = '#1e3a5f'; c.lineWidth = 2; c.setLineDash([6, 4]); c.beginPath();
     if (regionIsCircle && regionCircleCenter) { for (let a = 0; a <= 360; a += 4) { const la = regionCircleCenter.lat + regionCircleRadiusKm / 111.195 * Math.cos(a * Math.PI / 180), lo = regionCircleCenter.lon + regionCircleRadiusKm / (111.195 * Math.cos(regionCircleCenter.lat * Math.PI / 180)) * Math.sin(a * Math.PI / 180); const [px, py] = P(la, lo); a ? c.lineTo(px, py) : c.moveTo(px, py); } }
     else if (regionIsPolygon && regionRect) { regionRect.getLatLngs()[0].forEach((ll, i) => { const [px, py] = P(ll.lat, ll.lng); i ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); }
     else if (regionRect) { const b = regionRect.getBounds(); [[b.getNorth(), b.getWest()], [b.getNorth(), b.getEast()], [b.getSouth(), b.getEast()], [b.getSouth(), b.getWest()]].forEach(([la, lo], i) => { const [px, py] = P(la, lo); i ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); }
     c.stroke(); c.setLineDash([]);
     // ölçek çubuğu ve kuzey oku
     const kmPerPx = 111.195 / sc; const nice = [10, 20, 50, 100, 200, 500, 1000].find(v => v / kmPerPx > w * 0.18) || 1000; const bl = nice / kmPerPx;
-    c.fillStyle = '#f8fafc'; c.fillRect(x + w - bl - 20, y0 + h - 22, bl, 4); text(`${nice} km`, x + w - 20 - bl / 2, y0 + h - 40, '12px Arial', '#f8fafc', 'center');
-    c.beginPath(); c.moveTo(x + w - 30, y0 + 14); c.lineTo(x + w - 38, y0 + 34); c.lineTo(x + w - 22, y0 + 34); c.closePath(); c.fill(); text('K', x + w - 30, y0 + 36, 'bold 12px Arial', '#f8fafc', 'center');
+    c.fillStyle = '#1f2937'; c.fillRect(x + w - bl - 20, y0 + h - 22, bl, 4); text(`${nice} km`, x + w - 20 - bl / 2, y0 + h - 40, '12px Arial', '#1f2937', 'center'); c.fillStyle = '#1f2937';
+    c.beginPath(); c.moveTo(x + w - 30, y0 + 14); c.lineTo(x + w - 38, y0 + 34); c.lineTo(x + w - 22, y0 + 34); c.closePath(); c.fill(); text('K', x + w - 30, y0 + 36, 'bold 12px Arial', '#1f2937', 'center');
     // lejant
-    [['M<3', '#22d3ee'], ['3–4', '#eab308'], ['4–5', '#f97316'], ['≥5', '#ef4444']].forEach(([t, cc], i) => { c.fillStyle = cc; c.beginPath(); c.arc(x + 14 + i * 58, y0 + 14, 5, 0, 2 * Math.PI); c.fill(); text(t, x + 22 + i * 58, y0 + 8, '11px Arial', '#e2e8f0'); });
+    [['M<3', '#0891b2'], ['3–4', '#eab308'], ['4–5', '#f97316'], ['≥5', '#ef4444']].forEach(([t, cc], i) => { c.fillStyle = cc; c.beginPath(); c.arc(x + 14 + i * 58, y0 + 14, 5, 0, 2 * Math.PI); c.fill(); text(t, x + 22 + i * 58, y0 + 8, '11px Arial', '#1f2937'); });
     c.restore();
   })(X1 + 14, y, W1 - 28, MAPH);
   caption(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString('tr-TR')} olayın dış merkezleri, büyüklüğe göre.`, X1 + 16, y + MAPH + 5, W1 - 32, TOP + GH + 12 + MB - 2);
@@ -2862,6 +2873,7 @@ async function exportTimeMagPNG(theme, evt, layout) {
   function svgToImage(svgEl) {
     return new Promise((resolve, reject) => {
       let xml = new XMLSerializer().serializeToString(svgEl);
+      if (theme === 'light') xml = svgToLight(xml);
       if (!/ xmlns=/.test(xml)) xml = xml.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
       const vb = (svgEl.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
       if (vb.length === 4 && !/ width=/.test(xml)) xml = xml.replace('<svg', `<svg width="${vb[2]}" height="${vb[3]}"`);
