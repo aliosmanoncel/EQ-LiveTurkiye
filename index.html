@@ -267,6 +267,11 @@
     <span style="color:#555">–</span>
     <input id="regionDateTo" type="date" style="width:118px" title="Bitiş tarihi. Boş bırakılırsa şimdiki zaman kullanılır." onchange="reapplyRegionQuery()">
   </div>
+  <div class="rowbox" id="regionChunkRow" title="USGS tek sorguda en fazla 20.000 olay döndürür. Bu seçenek açıkken EQ-Live önce USGS count servisiyle toplam olay sayısını öğrenir, tarih aralığını her parçada ≤18.000 olay kalacak biçimde dinamik olarak ikiye böler (her parçanın sayısı ayrıca doğrulanır), parçaları sırayla indirir ve olay kimliğine (eventid) göre tekilleştirerek birleştirir. Yalnızca USGS kaynağında geçerlidir; Limit ve Sırala bu modda kullanılmaz.">
+    <label>Parçalı</label>
+    <label style="cursor:pointer;color:#cbd5e1;font-size:.75rem;"><input type="checkbox" id="regionChunked" onchange="reapplyRegionQuery()" style="vertical-align:middle;"> USGS 20.000 sınırını aş</label>
+  </div>
+  <div id="regionChunkLog" style="display:none;font-size:.7rem;color:#9ab0c5;line-height:1.45;width:260px;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;"></div>
   <div id="regionDateRangeNote" style="display:none;font-size:.7rem;color:#666;line-height:1.4;width:210px">Yalnızca EMSC/USGS canlı sorgusunda geçerlidir — Tarihsel Katalog ve AFAD kendi tarih aralığını kullanır.</div>
   <div class="rowbox">
     <label>Mw</label>
@@ -1322,7 +1327,7 @@ function parseGeoJSON(data) {
     // mtype (2026-09-27): USGS magType (ml, mb_lg, md, mw…) artık korunur —
     // önceden atılıyordu; bu yüzden USGS verisinde mtype-tabanlı Mw dönüşümü
     // (dispatch) çalışamıyor ve büyüklük türü karışımı görünmüyordu.
-    return { lat, lon, dep:dep||0, mag:parseFloat(p.mag||0), mtype:(p.magType||'').trim(), place:p.place||p.flynn_region||'', time:new Date(p.time||Date.now()) };
+    return { id: f.id || null, lat, lon, dep:dep||0, mag:parseFloat(p.mag||0), mtype:(p.magType||'').trim(), place:p.place||p.flynn_region||'', time:new Date(p.time||Date.now()) };
   }).filter(e=>!isNaN(e.mag)&&e.mag>0);
 }
 
@@ -2658,8 +2663,9 @@ function csBuild(evList) {
   // katalog fiilen en erken DÖNEN olayda başlar — pencere başı (ör. 1970)
   // kullanılırsa T onlarca yıl şişer.
   const hasWin = !!(regionRect && regionWindowStart);
-  const capTime = hasWin && regionCapped && regionOrderUsed !== 'magnitude';
-  const capMag  = hasWin && regionCapped && regionOrderUsed === 'magnitude';
+  const capTime  = hasWin && regionCapped && regionOrderUsed === 'time';
+  const capMag   = hasWin && regionCapped && regionOrderUsed === 'magnitude';
+  const capChunk = hasWin && regionCapped && regionOrderUsed === 'chunked';
   const tStart = capTime ? tMin : hasWin ? Math.min(+regionWindowStart, tMin) : tMin;
   const tStartSrc = capTime ? 'sorgu limite takıldı → en erken dönen olay' : hasWin ? 'analiz penceresi' : 'en erken olay';
   const periods = csPeriods(steps, tStart, tEnd);
@@ -2679,7 +2685,7 @@ function csBuild(evList) {
     p.nAll = sub.length;
     p.mcData = sub.length >= CS_QC.minEvents ? computeMc(sub) : null;
   });
-  return { kept, steps, periods, tStart, tStartSrc, tEnd, capTime, capMag, nExcluded: evList.length - kept.length };
+  return { kept, steps, periods, tStart, tStartSrc, tEnd, capTime, capMag, capChunk, nExcluded: evList.length - kept.length };
 }
 
 // Aki (1965) — olay başına eşik: b = log10(e) / (ort(M − Mc_i) + ΔM/2)
@@ -2847,6 +2853,7 @@ function csRenderDiag(cs) {
   if (!smallN) ok.push(`✓ Basamak başına ≥ ${CS_QC.minEvents} olay`);
   if (!lowMcN && cs.periods.some(p => p.mcData !== null && p.mcData !== undefined)) ok.push(`✓ Basamak Mc'leri veri Mc'siyle uyumlu`);
   if (cs.capMag) warn.push(`🔴 Bölge sorgusu büyüklüğe göre sıralı ve limite takıldı: katalog zamandan değil büyüklükten kesilmiş. Tamlık, gözlem süreleri (T), Weichert b ve λ bu veriyle GEÇERSİZDİR — sıralamayı "en yeni" yapın.`);
+  if (cs.capChunk) warn.push(`🔴 Parçalı USGS sorgusunda bir parça yine 20.000 kayda ulaştı: o zaman aralığının sonu eksik (bkz. Parça günlüğü). Gözlem süreleri (T), Weichert b ve λ bu aralığı kapsıyorsa güvenilir DEĞİLDİR — sorguyu yenileyin.`);
   if (cs.capTime) warn.push(`⚠ Bölge sorgusu limite takıldı: katalog pencere başından değil en erken dönen olaydan (${new Date(cs.tStart).toISOString().slice(0, 10)}) başlıyor; gözlem süreleri buna göre hesaplandı.`);
   const allSteps = csValidSteps();
   const nAfter = allSteps.filter(s => s.t >= cs.tEnd).length;
@@ -4106,6 +4113,8 @@ async function fetchRegionEventsFromHistorical(bounds) {
    - EMSC / USGS: ikisi de FDSN uyumlu ve CORS'a tam açık, aynı canlı
      bbox+poligon sorgu mantığı fetchRegionEventsLive'da paylaşılıyor */
 async function fetchRegionEvents(bounds) {
+  // Parçalı sorgu özeti yalnızca USGS canlı + parçalı yolda yeniden doldurulur
+  if (typeof regionChunkInfo !== 'undefined') { regionChunkInfo = null; renderChunkLog(); }
   if (historicalMode) return fetchRegionEventsFromHistorical(bounds);
   if (regionSource === 'afad') return fetchRegionEventsFromAfad(bounds);
   if (regionSource === 'hk_local') return fetchRegionEventsFromHKLocal(bounds);
@@ -4238,6 +4247,97 @@ async function fetchRegionEventsFromHKHistorical(bounds) {
   }
 }
 
+/* ══════════════════════════════════════════
+   USGS PARÇALI SORGU (2026-09-27)
+   USGS FDSN tek sorguda ≤20.000 olay döndürür. Akış:
+   1) count servisiyle toplam N (aynı kutu/tarih/büyüklük/derinlik filtreleri)
+   2) aralık, her parçanın count'u ≤ CHUNK_SAFE olana dek İKİYE bölünür
+      (sabit "yıl = parça" DEĞİL; her alt aralığın sayısı ayrıca sorgulanır).
+      Parçalar yarı açık: [t0, t1] ile bir sonrakinin başı t1+1 ms → örtüşmez.
+   3) kullanıcı onayı (N > 20.000 ise)
+   4) her parça ayrı indirilir (orderby=time-asc, limit=20000); ham kayıt
+      sayısı 20.000'e ulaşırsa parça "limite takıldı" olarak işaretlenir ve
+      mevcut query-limit QC'si (regionCapped) devreye girer
+   5) eventid ile tekilleştirme; kapsam özeti #regionChunkLog'da gösterilir.
+══════════════════════════════════════════ */
+const USGS_MAX = 20000, CHUNK_SAFE = 18000;
+let regionChunkInfo = null;
+function usgsFilterQS(bounds, t0, t1, f) {
+  const iso = t => new Date(t).toISOString();
+  return `&minlatitude=${bounds.getSouth().toFixed(3)}&maxlatitude=${bounds.getNorth().toFixed(3)}`
+    + `&minlongitude=${bounds.getWest().toFixed(3)}&maxlongitude=${bounds.getEast().toFixed(3)}`
+    + `&starttime=${iso(t0)}&endtime=${iso(t1)}&minmagnitude=${f.magMin || 0}`
+    + `${f.magMax ? `&maxmagnitude=${f.magMax}` : ''}${f.depMin ? `&mindepth=${f.depMin}` : ''}${f.depMax ? `&maxdepth=${f.depMax}` : ''}`;
+}
+async function usgsCount(qs) {
+  const r = await fetchTimeout(`https://earthquake.usgs.gov/fdsnws/event/1/count?format=geojson${qs}`, {}, 30000);
+  if (!r.ok) throw new Error(`USGS count HTTP ${r.status}`);
+  const j = await r.json();
+  if (typeof j.count !== 'number') throw new Error('USGS count yanıtı beklenmedik');
+  return j.count;
+}
+async function fetchUsgsChunked(bounds, s, endT, f) {
+  const T0 = +s, T1 = +endT;
+  setStatus('USGS parçalı sorgu: toplam olay sayısı sorgulanıyor…');
+  const total = await usgsCount(usgsFilterQS(bounds, T0, T1, f));
+  let nCountCalls = 1;
+  const plan = [];
+  async function split(t0, t1, c) {
+    if (c <= CHUNK_SAFE) { plan.push({ t0, t1, count: c }); return; }
+    if (t1 - t0 < 3600e3) throw new Error(`1 saatten kısa aralıkta ${c} olay — parçalanamıyor (${new Date(t0).toISOString()})`);
+    const mid = t0 + Math.floor((t1 - t0) / 2);
+    setStatus(`USGS parçalı sorgu: aralıklar planlanıyor (${plan.length} parça hazır)…`);
+    const c1 = await usgsCount(usgsFilterQS(bounds, t0, mid, f));
+    const c2 = await usgsCount(usgsFilterQS(bounds, mid + 1, t1, f));
+    nCountCalls += 2;
+    await split(t0, mid, c1);
+    await split(mid + 1, t1, c2);
+  }
+  await split(T0, T1, total);
+  const toFetch = plan.filter(p => p.count > 0);
+  if (total > USGS_MAX && !confirm(`USGS parçalı sorgu\nN = ${total.toLocaleString('tr-TR')} olay, ${toFetch.length} parça indirilecek.\nDevam edilsin mi?`)) {
+    setStatus('Parçalı sorgu iptal edildi.'); return null;
+  }
+  const byId = new Map(); let nMerged = 0, anyCapped = false;
+  for (let i = 0; i < toFetch.length; i++) {
+    const c = toFetch[i];
+    setStatus(`USGS parçalı sorgu: parça ${i + 1}/${toFetch.length} indiriliyor (${new Date(c.t0).toISOString().slice(0, 10)} → ${new Date(c.t1).toISOString().slice(0, 10)}, ~${c.count} olay)…`);
+    const res = await fetchTimeout(`https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson${usgsFilterQS(bounds, c.t0, c.t1, f)}&orderby=time-asc&limit=${USGS_MAX}`, {}, 180000);
+    if (!res.ok) throw new Error(`Parça ${i + 1} HTTP ${res.status}`);
+    const js = await res.json();
+    c.raw = (js.features || []).length;
+    c.capped = c.raw >= USGS_MAX;
+    if (c.capped) anyCapped = true;
+    const evs = parseGeoJSON(js);
+    c.parsed = evs.length; nMerged += evs.length;
+    evs.forEach(e => { const k = e.id || `${+e.time}|${e.lat}|${e.lon}|${e.mag}`; if (!byId.has(k)) byId.set(k, e); });
+  }
+  const events = [...byId.values()].sort((a, b) => a.time - b.time);
+  const info = { t0: T0, t1: T1, total, plan, nChunks: toFetch.length, nCountCalls, nMerged, nUnique: events.length,
+                 tFirst: events.length ? +events[0].time : null, tLast: events.length ? +events[events.length - 1].time : null, anyCapped };
+  return { events, info };
+}
+function renderChunkLog() {
+  const el = document.getElementById('regionChunkLog');
+  if (!el) return;
+  const c = regionChunkInfo;
+  if (!c) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  const d = t => t ? new Date(t).toISOString().slice(0, 10) : '—';
+  const dt = t => new Date(t).toISOString().replace('T', ' ').slice(0, 19);
+  el.style.display = 'block';
+  el.innerHTML = `<b style="color:#cbd5e1">USGS parçalı sorgu</b><br>${d(c.t0)} → ${d(c.t1)}` +
+    `<br>Toplam N (count): <b>${c.total.toLocaleString('tr-TR')}</b>` +
+    `<br>Parça sayısı: <b>${c.nChunks}</b> <span style="color:#666">(${c.nCountCalls} count sorgusu)</span>` +
+    `<br>Birleştirilmiş N: ${c.nMerged.toLocaleString('tr-TR')}` +
+    `<br>Benzersiz eventID: <b>${c.nUnique.toLocaleString('tr-TR')}</b>` +
+    (c.nMerged !== c.nUnique ? ` <span style="color:#f59e0b">(${c.nMerged - c.nUnique} tekrar atıldı)</span>` : '') +
+    `<br>Gerçek katalog başlangıcı: ${d(c.tFirst)}<br>Gerçek katalog bitişi: ${d(c.tLast)}` +
+    (c.anyCapped ? `<div style="color:#f87171">🔴 Bir parça yine 20.000 kayda ulaştı — o aralık eksik olabilir (query-limit QC etkin).</div>` : '') +
+    `<details style="margin-top:3px"><summary style="cursor:pointer;color:#888">Parça günlüğü</summary>` +
+    c.plan.map((p, i) => `${i + 1}. ${dt(p.t0)} → ${dt(p.t1)} · count ${p.count}` + (p.raw !== undefined ? ` · indirilen ${p.raw}${p.capped ? ' 🔴' : ''} · ayrıştırılan ${p.parsed}` : (p.count === 0 ? ' · boş, indirilmedi' : ''))).join('<br>') +
+    `</details>`;
+}
+
 async function fetchRegionEventsLive(bounds, provider) {
   const providerLabel = provider === 'usgs' ? 'USGS' : 'EMSC';
   setStatus(`Bölgedeki küçük depremler ${providerLabel}'den getiriliyor…`);
@@ -4270,12 +4370,22 @@ async function fetchRegionEventsLive(bounds, provider) {
     : `https://www.seismicportal.eu/fdsnws/event/1/query?format=text`
       + `&minlat=${south}&maxlat=${north}&minlon=${west}&maxlon=${east}` + common;
   try {
-    const res = await fetchTimeout(url, {}, 10000);
+    let res = null, chunked = null;
+    const useChunk = provider === 'usgs' && !!document.getElementById('regionChunked')?.checked;
+    if (useChunk) {
+      chunked = await fetchUsgsChunked(bounds, s, endT, { magMin, magMax, depMin, depMax });
+      if (!chunked) return;              // kullanıcı iptal etti
+    } else {
+      res = await fetchTimeout(url, {}, 10000);
+    }
+    regionChunkInfo = chunked ? chunked.info : null;
+    renderChunkLog();
     // Limite takılma, AYRIŞTIRMADAN ÖNCEKİ ham kayıt sayısıyla belirlenir
     // (2026-09-27): parseGeoJSON büyüklüğü boş/≤0 olan kayıtları atar; ham
     // 20000 kayıt 19985 olaya inince limit tespiti kaçıyordu (Oklahoma).
     let evs, rawCount;
-    if (provider === 'usgs') { const js = await res.json(); rawCount = (js.features || []).length; evs = parseGeoJSON(js); }
+    if (chunked) { evs = chunked.events; rawCount = chunked.info.nUnique; }
+    else if (provider === 'usgs') { const js = await res.json(); rawCount = (js.features || []).length; evs = parseGeoJSON(js); }
     else { const tx = await res.text(); rawCount = tx.split('\n').filter(l => l.trim() && !l.startsWith('#') && l.includes('|')).length; evs = parseEMSCText(tx); }
     if (regionIsPolygon && regionRect) {
       const poly = regionRect.getLatLngs()[0];
@@ -4305,8 +4415,9 @@ async function fetchRegionEventsLive(bounds, provider) {
       ).addTo(regionLayer);
     });
     regionLayer.addTo(map);
-    regionCapped = rawCount >= limit; // ham bbox sonucu limite takıldıysa, poligon-sonrası sayı küçük olsa bile uyar
-    regionOrderUsed = orderby;
+    // Parçalı sorguda: herhangi bir parça 20.000'e ulaştıysa limit QC'si açık kalır.
+    regionCapped = chunked ? chunked.info.anyCapped : rawCount >= limit; // ham bbox sonucu limite takıldıysa, poligon-sonrası sayı küçük olsa bile uyar
+    regionOrderUsed = chunked ? 'chunked' : orderby;  // 'chunked': parçalı, time-asc; kesilme yeri başta değil parça içinde
     regionWindowStart = s;
     regionWindowEnd = endT;
     const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
@@ -4316,6 +4427,11 @@ async function fetchRegionEventsLive(bounds, provider) {
     setStatus(regionCapped
       ? `Bölgede ${shapeLabel} deprem (${providerLabel}, canlı) — bbox ilk ${limit} (${orderLabel}) gösteriliyor ${limitNote}${sampleNote}`
       : `Bölgede ${shapeLabel} deprem gösteriliyor (${providerLabel}, canlı)${sampleNote}`);
+    if (chunked) {
+      const ci = chunked.info, d = t => t ? new Date(t).toISOString().slice(0, 10) : '—';
+      setStatus(`Bölgede ${shapeLabel} deprem — USGS parçalı sorgu: ${ci.nChunks} parça, ${ci.nUnique} benzersiz olay, katalog ${d(ci.tFirst)} → ${d(ci.tLast)}` +
+        (ci.anyCapped ? ' — 🔴 bir parça 20.000 sınırına ulaştı' : '') + sampleNote, ci.anyCapped);
+    }
     renderRegionInfo();
     if (showTimeMag) renderTimeMag(regionEvents); // panel açıksa bölge verisiyle anında güncelle
     syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
@@ -4490,12 +4606,13 @@ function syncRegionURL(bounds, opt) {
   if (opt.magMax) url.searchParams.set('rmagmax', opt.magMax); else url.searchParams.delete('rmagmax');
   if (opt.depMin) url.searchParams.set('rdepmin', opt.depMin); else url.searchParams.delete('rdepmin');
   if (opt.depMax) url.searchParams.set('rdepmax', opt.depMax); else url.searchParams.delete('rdepmax');
+  if (document.getElementById('regionChunked')?.checked) url.searchParams.set('rchunk', '1'); else url.searchParams.delete('rchunk');
   history.replaceState(null, '', url);
 }
 
 function clearRegionURL() {
   const url = new URL(location.href);
-  ['rminlat','rmaxlat','rminlon','rmaxlon','rlimit','rorder','rsource','rmagmin','rmagmax','rdepmin','rdepmax']
+  ['rminlat','rmaxlat','rminlon','rmaxlon','rlimit','rorder','rsource','rmagmin','rmagmax','rdepmin','rdepmax','rchunk']
     .forEach(k => url.searchParams.delete(k));
   history.replaceState(null, '', url);
 }
@@ -4525,6 +4642,7 @@ function restoreRegionFromURL() {
   if (p.has('rmagmax')) document.getElementById('regionMagMax').value = p.get('rmagmax');
   if (p.has('rdepmin')) document.getElementById('regionDepMin').value = p.get('rdepmin');
   if (p.has('rdepmax')) document.getElementById('regionDepMax').value = p.get('rdepmax');
+  if (p.get('rchunk') === '1' && document.getElementById('regionChunked')) document.getElementById('regionChunked').checked = true;
   regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
   fetchRegionEvents(bounds);
   // Linkle paylaşılan bölge varsa paneli otomatik aç — aksi halde sonuçlar
