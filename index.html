@@ -1327,7 +1327,11 @@ function parseGeoJSON(data) {
     // mtype (2026-09-27): USGS magType (ml, mb_lg, md, mw…) artık korunur —
     // önceden atılıyordu; bu yüzden USGS verisinde mtype-tabanlı Mw dönüşümü
     // (dispatch) çalışamıyor ve büyüklük türü karışımı görünmüyordu.
-    return { id: f.id || null, lat, lon, dep:dep||0, mag:parseFloat(p.mag||0), mtype:(p.magType||'').trim(), place:p.place||p.flynn_region||'', time:new Date(p.time||Date.now()) };
+    // eid (2026-09-27): USGS eventid — parçalı sorguda tekilleştirme için.
+    // Bilerek 'id' DEĞİL: 'id' alanı GK74 declustering filtresinde (tarihsel
+    // katalog kimlikleri) kullanılıyor; USGS kimliği orada eşleşmez ve bölge
+    // declustering açıkken tüm USGS olaylarını düşürürdü.
+    return { eid: f.id || null, lat, lon, dep:dep||0, mag:parseFloat(p.mag||0), mtype:(p.magType||'').trim(), place:p.place||p.flynn_region||'', time:new Date(p.time||Date.now()) };
   }).filter(e=>!isNaN(e.mag)&&e.mag>0);
 }
 
@@ -4310,7 +4314,7 @@ async function fetchUsgsChunked(bounds, s, endT, f) {
     if (c.capped) anyCapped = true;
     const evs = parseGeoJSON(js);
     c.parsed = evs.length; nMerged += evs.length;
-    evs.forEach(e => { const k = e.id || `${+e.time}|${e.lat}|${e.lon}|${e.mag}`; if (!byId.has(k)) byId.set(k, e); });
+    evs.forEach(e => { const k = e.eid || `${+e.time}|${e.lat}|${e.lon}|${e.mag}`; if (!byId.has(k)) byId.set(k, e); });
   }
   const events = [...byId.values()].sort((a, b) => a.time - b.time);
   const info = { t0: T0, t1: T1, total, plan, nChunks: toFetch.length, nCountCalls, nMerged, nUnique: events.length,
