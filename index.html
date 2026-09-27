@@ -1007,6 +1007,7 @@
       <label title="Doğa ve Deprem Bilimi Topluluğu logosu (sağ üst)"><input type="checkbox" id="posterLogo" checked style="vertical-align:middle;"> logo</label>
       <button onclick="exportPosterAGU(1, event)" style="background:none;border:1px solid #b45309;color:#fbbf24;border-radius:4px;cursor:pointer;padding:1px 8px;">🎓 Slayt 16:9 (1920×1080)</button>
       <button onclick="exportPosterAGU(2, event)" style="background:none;border:1px solid #b45309;color:#fbbf24;border-radius:4px;cursor:pointer;padding:1px 8px;">🖨 Poster (3840×2160)</button>
+      <button onclick="exportPosterAGU(4, event)" title="Büyük baskı: 150 dpi'de ≈130×73 cm, 300 dpi'de ≈65×37 cm" style="background:none;border:1px solid #b45309;color:#fbbf24;border-radius:4px;cursor:pointer;padding:1px 8px;">🖨 Baskı (7680×4320)</button>
       <span style="color:#666">Grafikler ve metinler o anki analizden alınır; hesaplamayı değiştirmez.</span>
     </div>
   </details>
@@ -2548,10 +2549,11 @@ let _qrLib = null;
 // eksen/etiket koyu gri, açık renkli yazılar koyu; veri renkleri (camgöbeği, sarı, turuncu, pembe, yeşil) korunur.
 // Poster için eksen etiketlerini büyütür: ekran SVG'leri küçültülerek yerleştirildiğinde (ör. 660 birim → 486 px)
 // 8–9 birimlik etiketler ~6 px'e iner. Yalnızca eksen etiketleri (fill #888, tspan içermeyen) k ile büyütülür.
-function svgBoostAxisText(xml, k) {
+function svgBoostAxisText(xml, target) {
+  // target: SVG biriminde hedef punto; küçük etiketler bu boyuta çıkarılır (büyükler küçültülmez)
   return xml.replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, at, body) => {
     if (!/fill="#888"/.test(at) || /<tspan/.test(body)) return m;
-    return '<text' + at.replace(/font-size="([0-9.]+)"/, (q, f) => `font-size="${(+f * k).toFixed(1)}"`) + '>' + body + '</text>'; });
+    return '<text' + at.replace(/font-size="([0-9.]+)"/, (q, f) => `font-size="${Math.max(+f, target).toFixed(1)}"`) + '>' + body + '</text>'; });
 }
 function svgToLight(xml) {
   xml = xml.replace(/<(text|tspan)\b([^>]*)>/g, (m, tag, at) => '<' + tag + at
@@ -2578,12 +2580,13 @@ async function exportPosterAGU(scale, evt) {
   if (btn) { btn.textContent = '⏳…'; btn.disabled = true; }
   const done = () => { if (btn) { btn.textContent = oldLabel; btn.disabled = false; } };
   const SC = scale || 1, W = 1920, H = 1080;
-  const AXK = { tmSvg: 1.7, tmSvgB: 1.5, tmSvgGR: 1.5 };
+  // hedef punto (SVG birimi) = ~11,5 px ÷ şeklin posterdeki ölçeği (zaman–büyüklük ≈0,75; b(t) ≈0,72; G-R ≈0,73)
+  const AXK = { tmSvg: 15.3, tmSvgB: 16, tmSvgGR: 15.5 };
   const svgImg = (el, k) => new Promise((res, rej) => {
-    let xml = svgToLight(svgBoostAxisText(new XMLSerializer().serializeToString(el), AXK[el.id] || 1));
+    let xml = svgToLight(svgBoostAxisText(new XMLSerializer().serializeToString(el), AXK[el.id] || 0));
     // G-R: büyütülen x ekseni başlığı tik etiketleriyle çakışmasın diye tuvali 12 birim uzatıp başlığı aşağı al
-    if (el.id === 'tmSvgGR') xml = xml.replace(/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/, (m, w, h) => `viewBox="0 0 ${w} ${+h + 12}"`)
-      .replace(/(<text\b[^>]*\sy=")([0-9.]+)("[^>]*>Magnitude<)/, (m, a, yv, b) => a + (+yv + 11) + b);
+    if (el.id === 'tmSvgGR') xml = xml.replace(/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/, (m, w, h) => `viewBox="0 0 ${w} ${+h + 16}"`)
+      .replace(/(<text\b[^>]*\sy=")([0-9.]+)("[^>]*>Magnitude<)/, (m, a, yv, b) => a + (+yv + 15) + b);
     if (!/ xmlns=/.test(xml)) xml = xml.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
     const vb = (el.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
     xml = xml.replace(/<svg([^>]*?)\swidth="[^"]*"/, '<svg$1').replace(/<svg([^>]*?)\sheight="[^"]*"/, '<svg$1');
@@ -2679,7 +2682,7 @@ async function exportPosterAGU(scale, evt) {
     c.drawImage(logo, lx, ly, 132, 132); }
   // ── kutu yardımcıları
   const box = (x, y, w, h, head) => { c.fillStyle = '#ffffff'; c.fillRect(x, y, w, h); c.strokeStyle = '#111'; c.lineWidth = 1.2; c.strokeRect(x, y, w, h); text(head, x + 16, y + 12, 'bold 21px Arial', '#111827'); return y + 44; };
-  const figure = (img, x, y, w, maxH) => { let fw = w, fh = fw * img.naturalHeight / img.naturalWidth; if (fh > maxH) { fh = maxH; fw = fh * img.naturalWidth / img.naturalHeight; } const fx = x + (w - fw) / 2; c.fillStyle = '#ffffff'; c.fillRect(fx - 4, y - 4, fw + 8, fh + 8); c.strokeStyle = '#d1d5db'; c.lineWidth = 1; c.strokeRect(fx - 4, y - 4, fw + 8, fh + 8); c.drawImage(img, fx, y, fw, fh); return y + fh + 8; };
+  const figure = (img, x, y, w, maxH) => { let fw = w, fh = fw * img.naturalHeight / img.naturalWidth; if (fh > maxH) { fh = maxH; fw = fh * img.naturalWidth / img.naturalHeight; } const fx = x + (w - fw) / 2; c.fillStyle = '#ffffff'; c.fillRect(fx - 4, y - 4, fw + 8, fh + 8); c.strokeStyle = '#9ca3af'; c.lineWidth = 1; c.strokeRect(fx - 4, y - 4, fw + 8, fh + 8); c.drawImage(img, fx, y, fw, fh); return y + fh + 8; };
   // Zengin, iki yana yaslı metin: **metin** kalın; {#renk|metin} kalın ve renkli.
   // o: { size, lh, col, bcol, italic, bullet, hang (asılı girinti, px), maxY, justify }
   // Son satır ve %78'den az dolu satırlar yaslanmaz (aşırı boşluk / "nehir" oluşmaması için).
@@ -2720,10 +2723,10 @@ async function exportPosterAGU(scale, evt) {
   const GH = 124, MAPH = 183, MB = 44 + MAPH + 46, VY = GH + 12 + MB + 12;
   let y = box(X1, TOP, W1, GH, 'Giriş ve Amaç');
   const intro = posterVal('posterIntro', `Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`);
-  rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2, justify: false });
+  rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2 });
   y = box(X1, TOP + GH + 12, W1, MB, 'Çalışma Alanı');
   (function drawMap(x, y0, w, h) {
-    c.fillStyle = '#f8fafc'; c.fillRect(x, y0, w, h); c.strokeStyle = '#d1d5db'; c.lineWidth = 1; c.strokeRect(x, y0, w, h);
+    c.fillStyle = '#f8fafc'; c.fillRect(x, y0, w, h); c.strokeStyle = '#9ca3af'; c.lineWidth = 1; c.strokeRect(x, y0, w, h);
     const pts = evs.filter(e => isFinite(e.lat) && isFinite(e.lon));
     let S, N, Wl, E;
     if (regionRect) { const b = regionRect.getBounds(); S = b.getSouth(); N = b.getNorth(); Wl = b.getWest(); E = b.getEast(); }
@@ -2787,7 +2790,7 @@ async function exportPosterAGU(scale, evt) {
   caption('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', X2 + 16, y, W2 - 32, TOP + 256);
   y = box(X2, TOP + 275, W2, MID - TOP - 275, 'b-Değerinin Zaman İçinde Değişimi');
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112);
-  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc, {#d97706|turuncu} tamlık basamakları.', X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4, justify: false });
+  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc, {#d97706|turuncu} tamlık basamakları.', X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, 'Gutenberg–Richter (Weichert 1980)');
@@ -2859,7 +2862,7 @@ async function exportPosterAGU(scale, evt) {
     if (!blob) { alert('Poster oluşturulamadı (görüntü güvenlik kısıtı).'); done(); return; }
     const url = URL.createObjectURL(blob), a = document.createElement('a');
     const slug = (region || 'bolge').toLowerCase().replace(/[^a-z0-9ğüşıöç]+/gi, '-').replace(/^-|-$/g, '');
-    a.href = url; a.download = `EQ-Live-${SC > 1 ? 'Poster' : 'Slayt'}-${slug}-${new Date().toISOString().slice(0, 10)}.png`;
+    a.href = url; a.download = `EQ-Live-${SC >= 4 ? 'Baski-7680x4320' : SC > 1 ? 'Poster' : 'Slayt'}-${slug}-${new Date().toISOString().slice(0, 10)}.png`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 5000); done();
   }, 'image/png');
