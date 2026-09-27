@@ -157,6 +157,17 @@
        (initRegionCtrlDrag), JS'in yazdığı inline left/top zaten normal CSS
        kuralını ezer — burada sadece "sürüklenmeden önceki" varsayılan konum
        düzeltiliyor, sürükleme özelliği bozulmuyor. */
+    /* Orta genişlikler (dizüstü, tarayıcı yakınlaştırması): ortadaki zaman/kaynak çubuğu Araştırma Bölgesi'ni
+       ve Bölge Analizi'nin sağ ucunu örtüyordu. İki panel sol tarafa, yakınlaştırma düğmelerinin sağına alt alta
+       alınır; dar ekranlarda (≤1100 px) çubuğun altına iner. Sürüklenmiş panelin inline konumu bunu ezer. */
+    @media (min-width: 601px) and (max-width: 1700px) {
+      .regionCtrl{left:62px;top:10px}
+      .litRegionCtrl{left:62px;top:58px}
+    }
+    @media (min-width: 601px) and (max-width: 1100px) {
+      .regionCtrl{left:62px;top:100px}
+      .litRegionCtrl{left:62px;top:148px}
+    }
     @media (max-width: 600px) {
       .regionCtrl{left:8px;top:92px}
       .litRegionCtrl{left:8px;top:140px}
