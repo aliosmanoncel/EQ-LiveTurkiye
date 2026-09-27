@@ -989,12 +989,12 @@
   </div>
   <details id="posterPanel" style="font-size:.72rem;color:#9ab0c5;margin-bottom:6px;border:1px solid #2a2a3a;border-radius:6px;padding:4px 7px;">
     <summary style="cursor:pointer;color:#cbd5e1;">🎓 Akademik poster / ders slaydı (AGU poster örneğinden esinlenen düzen; resmî AGU şablonu değildir)</summary>
-    <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 6px;align-items:center;margin-top:4px;" oninput="posterSavePrefs()">
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 6px;align-items:center;margin-top:4px;" oninput="posterSavePrefs(); posterIdCheck()">
       <label for="posterRegion">Bölge adı</label><input id="posterRegion" placeholder="ör. Oklahoma, ABD" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterTitle">Başlık</label><input id="posterTitle" placeholder="boş: “Bölge: Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Analizi”" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterEvent">Alt satır</label><input id="posterEvent" placeholder="ör. Sismoloji ve Levha Tektoniği — Ders 2 (isteğe bağlı)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
-      <label for="posterAuthor">Yazar</label><input id="posterAuthor" placeholder="Prof. Dr. Ali Osman Öncel" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
-      <label for="posterAffil">Unvan / kurum</label><input id="posterAffil" placeholder="Jeofizik Yüksek Mühendisi &amp; Sismolog · İstanbul Üniversitesi-Cerrahpaşa" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
+      <label for="posterAuthor">Yazar</label><input id="posterAuthor" placeholder="Yazar Adı Soyadı (zorunlu)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
+      <label for="posterAffil">Unvan / kurum</label><input id="posterAffil" placeholder="Unvan · Kurum / Üniversite / Bölüm" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterResults" title="Boş bırakılırsa analizden otomatik üretilir">Sonuçlar</label><textarea id="posterResults" rows="3" placeholder="Boş: analizden otomatik (Weichert b, λ, b(t), kalite kontrol). Her satır bir madde." style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;resize:vertical;"></textarea>
       <label for="posterIntro" title="AGU örneğindeki Introduction karşılığı; 2–3 cümle">Giriş / amaç</label><textarea id="posterIntro" rows="2" placeholder="Boş: nötr varsayılan metin (tamlık değişimi → yanlılık; amaç: bölge için b, b(t) ve oranlar). **kalın** desteklenir." style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;resize:vertical;"></textarea>
       <label for="posterAck" title="AGU örneğindeki Acknowledgments karşılığı">Teşekkür</label><input id="posterAck" placeholder="Boş: veri sağlayıcıya standart teşekkür (ör. EMSC FDSN)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
@@ -1003,12 +1003,18 @@
     </div>
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">
       <label><input type="checkbox" id="posterPhoto" checked style="vertical-align:middle;"> fotoğraf</label>
+      <label title="Kendi fotoğrafınız; yalnızca bu tarayıcıda saklanır, sunucuya gönderilmez" style="cursor:pointer;border:1px solid #334;border-radius:3px;padding:0 5px;">📷 seç<input type="file" id="posterPhotoFile" accept="image/*" hidden onchange="posterStoreImg('foto', this)"></label>
       <label title="Poster renk teması">tema <select id="posterTheme" onchange="posterSavePrefs()" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;"><option value="doga">Doğa ve Deprem (yeşil–lacivert)</option><option value="kum">Kum (AGU örneğinden esinli)</option></select></label>
       <label title="Doğa ve Deprem Bilimi Topluluğu logosu (sağ üst)"><input type="checkbox" id="posterLogo" checked style="vertical-align:middle;"> logo</label>
+      <label title="Kurum/topluluk logonuz; yalnızca bu tarayıcıda saklanır" style="cursor:pointer;border:1px solid #334;border-radius:3px;padding:0 5px;">🏷 seç<input type="file" id="posterLogoFile" accept="image/*" hidden onchange="posterStoreImg('logo', this)"></label>
+      <button onclick="posterClearIdentity()" title="Bu tarayıcıda saklanan yazar, kurum, fotoğraf ve logoyu sil" style="background:none;border:1px solid #334;color:#9ab0c5;border-radius:4px;cursor:pointer;padding:1px 6px;">kimliği temizle</button>
       <button onclick="exportPosterAGU(1, event)" style="background:none;border:1px solid #b45309;color:#fbbf24;border-radius:4px;cursor:pointer;padding:1px 8px;">🎓 Slayt 16:9 (1920×1080)</button>
       <button onclick="exportPosterAGU(2, event)" style="background:none;border:1px solid #b45309;color:#fbbf24;border-radius:4px;cursor:pointer;padding:1px 8px;">🖨 Poster (3840×2160)</button>
       <button onclick="exportPosterAGU(4, event)" title="Büyük baskı: 150 dpi'de ≈130×73 cm, 300 dpi'de ≈65×37 cm" style="background:none;border:1px solid #b45309;color:#fbbf24;border-radius:4px;cursor:pointer;padding:1px 8px;">🖨 Baskı (7680×4320)</button>
       <span style="color:#666">Grafikler ve metinler o anki analizden alınır; hesaplamayı değiştirmez.</span>
+    </div>
+    <div id="posterIdNote" style="margin-top:4px;color:#fbbf24;"></div>
+    <div style="margin-top:3px;color:#666;">Kimlik kuralı: yazar, kurum, fotoğraf ve logo kullanıcıya aittir ve yalnızca bu tarayıcıda saklanır; kodda kimse adına varsayılan kimlik yoktur. Başkasının adı, fotoğrafı veya kurumsal aidiyeti, o kişinin yazarı olmadığı bir posterde kullanılmamalıdır.
     </div>
   </details>
   <div id="csPanel" style="font-size:.72rem;color:#888;margin-bottom:6px;border:1px solid #2a2a3a;border-radius:6px;padding:5px 7px;" title="Tamlığı zamanla değişen kataloglar için: her dönem kendi Mc eşiğiyle alt katalog olarak seçilir ve birleştirilir. b(t) olay başına eşikle (Aki 1965 genelleştirmesi), GR ise binlerin tam olduğu süreye bölünmüş yıllık oranlarla ve Weichert (1980) en çok olabilirlik yöntemiyle hesaplanır. Üretim b-değeri ızgarası bu seçimden ETKİLENMEZ.">
@@ -2541,6 +2547,33 @@ const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor
 function posterLoadPrefs() {
   try { const o = JSON.parse(localStorage.getItem('eqlivePoster') || '{}'); POSTER_KEYS.forEach(k => { const el = document.getElementById(k); if (el && o[k] !== undefined && o[k] !== '') el.value = o[k]; }); } catch (e) {}
 }
+// Yazar fotoğrafı / logo: kullanıcının kendi dosyası, küçültülüp yalnızca bu tarayıcıda (localStorage) saklanır
+const POSTER_IMG_KEY = 'eqlivePosterImg';
+function posterGetImgs() { try { return JSON.parse(localStorage.getItem(POSTER_IMG_KEY) || '{}'); } catch (e) { return {}; } }
+function posterStoreImg(kind, input) {
+  const f = input.files && input.files[0]; if (!f) return;
+  const im = new Image(); im.onload = () => {
+    const M = 320, s = Math.min(1, M / Math.max(im.naturalWidth, im.naturalHeight)), cv = document.createElement('canvas');
+    cv.width = Math.round(im.naturalWidth * s); cv.height = Math.round(im.naturalHeight * s); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+    const url = kind === 'logo' ? cv.toDataURL('image/png') : cv.toDataURL('image/jpeg', 0.9);
+    const o = posterGetImgs(); o[kind] = url;
+    try { localStorage.setItem(POSTER_IMG_KEY, JSON.stringify(o)); } catch (e) { alert('Görsel tarayıcıya kaydedilemedi (depolama kısıtı); bu oturumda yine de kullanılacak.'); }
+    window._posterImgMem = Object.assign(window._posterImgMem || {}, { [kind]: url }); posterIdCheck(); URL.revokeObjectURL(im.src); };
+  im.src = URL.createObjectURL(f); input.value = '';
+}
+function posterClearIdentity() {
+  try { localStorage.removeItem(POSTER_IMG_KEY); } catch (e) {}
+  window._posterImgMem = {}; ['posterAuthor', 'posterAffil', 'posterContact'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  posterSavePrefs(); posterIdCheck();
+}
+function posterIdCheck() {
+  const el = document.getElementById('posterIdNote'); if (!el) return;
+  const im = Object.assign({}, posterGetImgs(), window._posterImgMem || {}), miss = [];
+  if (!posterVal('posterAuthor', '')) miss.push('yazar adı');
+  if (!posterVal('posterAffil', '')) miss.push('unvan/kurum');
+  if (!im.foto) miss.push('fotoğraf'); if (!im.logo) miss.push('logo');
+  el.textContent = miss.length ? `⚠ Eksik kimlik bilgisi: ${miss.join(', ')}. Boş ad/kurum posterde yer tutucu olarak yazılır; fotoğraf/logo yoksa çizilmez.` : '';
+}
 function posterSavePrefs() {
   try { const o = {}; POSTER_KEYS.forEach(k => { const el = document.getElementById(k); if (el) o[k] = el.value; }); localStorage.setItem('eqlivePoster', JSON.stringify(o)); } catch (e) {}
 }
@@ -2598,7 +2631,8 @@ async function exportPosterAGU(scale, evt) {
   try { imgs = await Promise.all(['tmSvg', 'tmSvgB', 'tmSvgGR'].map(id => svgImg(document.getElementById(id), 2.5 * SC))); }
   catch (e) { alert('Görsel oluşturulamadı: ' + e.message); done(); return; }
   const loadImg = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
-  const [photo, logo, qrLib] = await Promise.all([loadImg('assets/foto-oncel.jpg'), loadImg('assets/logo-ddbt.png'), posterLoadQR()]);
+  const idImgs = Object.assign({}, posterGetImgs(), window._posterImgMem || {});
+  const [photo, logo, qrLib] = await Promise.all([idImgs.foto ? loadImg(idImgs.foto) : null, idImgs.logo ? loadImg(idImgs.logo) : null, posterLoadQR()]);
 
   const cv = document.createElement('canvas'); cv.width = W * SC; cv.height = H * SC;
   const c = cv.getContext('2d'); c.scale(SC, SC); c.textBaseline = 'top';
@@ -2651,8 +2685,9 @@ async function exportPosterAGU(scale, evt) {
   // ── başlık bloğu
   const region = posterVal('posterRegion', '');
   const title = posterVal('posterTitle', (region ? region + ': ' : '') + 'Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Analizi');
-  const author = posterVal('posterAuthor', 'Prof. Dr. Ali Osman Öncel');
-  const affil = posterVal('posterAffil', 'Jeofizik Yüksek Mühendisi & Sismolog · İstanbul Üniversitesi-Cerrahpaşa');
+  // Kimlik varsayılanı YOK: boşsa açıkça yer tutucu yazılır (kimse adına poster üretilmez)
+  const authorIn = posterVal('posterAuthor', ''), affilIn = posterVal('posterAffil', '');
+  const author = authorIn || 'Yazar Adı Soyadı', affil = affilIn || 'Unvan · Kurum / Üniversite / Bölüm';
   const eventLine = posterVal('posterEvent', '');
   let ty = 22;
   // Başlık: foto ile logo arasındaki genişliğe (≈1500 px) tek satır sığdır (40→34 px);
@@ -2667,8 +2702,8 @@ async function exportPosterAGU(scale, evt) {
   if (tLines.length === 1) ty += 12;
   tLines.forEach(l => { c.font = tFont; c.fillStyle = 'rgba(0,0,0,.18)'; c.textAlign = 'center'; c.fillText(l, W / 2 + 2, ty + 2); c.fillStyle = '#111827'; c.fillText(l, W / 2, ty); c.textAlign = 'left'; ty += tLH; });
   if (tLines.length === 1) ty += 12;
-  text(author, W / 2, ty + 2, 'bold 24px Arial', INK, 'center'); ty += 32;
-  text(affil + (eventLine ? '  ·  ' + eventLine : ''), W / 2, ty, '17px Arial', MUTE, 'center');
+  text(author, W / 2, ty + 2, (authorIn ? '' : 'italic ') + 'bold 24px Arial', authorIn ? INK : '#9ca3af', 'center'); ty += 32;
+  text(affil + (eventLine ? '  ·  ' + eventLine : ''), W / 2, ty, (affilIn ? '' : 'italic ') + '17px Arial', affilIn ? MUTE : '#9ca3af', 'center');
   if (photo && document.getElementById('posterPhoto')?.checked !== false) {
     const r = 62, cx = 40 + r, cy = 22 + r + 4;
     c.save(); c.beginPath(); c.arc(cx, cy, r, 0, 2 * Math.PI); c.closePath(); c.clip();
@@ -5260,7 +5295,7 @@ function restoreRegionFromURL() {
   const body = document.getElementById('rcBody');
   if (body && body.classList.contains('hidden')) toggleRegionCtrl();
 }
-posterLoadPrefs();
+posterLoadPrefs(); posterIdCheck();
 restoreGrParamsFromURL();
 restoreRegionFromURL();
 restoreCsFromURL();
