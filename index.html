@@ -2698,7 +2698,7 @@ async function exportPosterAGU(scale, evt) {
   const GH = 124, MAPH = 188, MB = 44 + MAPH + 46, VY = GH + 12 + MB + 12;
   let y = box(X1, TOP, W1, GH, 'Giriş ve Amaç');
   const intro = posterVal('posterIntro', `Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`);
-  rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2 });
+  rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2, justify: false });
   y = box(X1, TOP + GH + 12, W1, MB, 'Çalışma Alanı');
   (function drawMap(x, y0, w, h) {
     c.fillStyle = '#0f172a'; c.fillRect(x, y0, w, h);
@@ -2812,7 +2812,7 @@ async function exportPosterAGU(scale, evt) {
   // Teşekkür (AGU "Acknowledgments"): boşsa veri sağlayıcıya standart teşekkür
   const ackSrc = (regionRect ? regionSourceLabel() : 'canlı akış').replace(/\s*\(.*\)\s*/g, ' ').trim();
   const ack = posterVal('posterAck', `Katalog verileri ${ackSrc} FDSN web servisinden alınmıştır; veri sağlayıcılara teşekkür ederiz. Analiz: EQ-Live Türkiye.`);
-  rich('**Teşekkür:** ' + ack, X1 + 16, BT + BH - 24, X3 - X1 - 20 - 32, { size: 13, lh: 17, col: MUTE, maxY: BT + BH - 2, justify: false });
+  rich('**Teşekkür:** ' + ack, X1 + 16, BT + BH - 24, X3 - X1 - 20 - 32, { size: 12, lh: 16, italic: true, col: MUTE, maxY: BT + BH - 2 });
   // Ek Bilgi: QR (tam analiz bağlantısı; tüm ayarlar URL'dedir) + kaynak/tarih + kısa adres
   c.fillStyle = '#ffffff'; c.fillRect(X3, BT, W3, BH); c.strokeStyle = '#111'; c.lineWidth = 1.2; c.strokeRect(X3, BT, W3, BH);
   const QZ = BH - 6, qzx = X3 + W3 - 3 - QZ, qzy = BT + 3; let qrDrawn = false;
