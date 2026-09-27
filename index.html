@@ -477,7 +477,7 @@
     Sadece bu bölgeyi göster
   </label>
   <button class="tbtn" id="btnLitRegionQuery" onclick="litRegionCommitToQuery()" style="display:none;background:#3b0764;border-color:#a855f7" title="Bu araştırma bölgesinin geometrisini aktif sorgu alanına (regionRect) kopyalar ve seçili Kaynak (EMSC/USGS/AFAD) ile canlı sorgular — otomatik değildir, sadece bu butona basınca çalışır">▶ Bu bölgede sorgula</button>
-  <button class="tbtn" id="btnRegionDecluster" onclick="toggleRegionDecluster()" style="display:none" title="GK74 (Gardner-Knopoff 1974) declustering — yalnızca data/eq_historical_dc.json'da eşleşen (statik ISC+EMSC) olaylara uygulanır; EPICA/SHARE-CET ve canlı EMSC/USGS/AFAD olayları bu eşleştirmede yer almadığından her zaman ham bırakılır. Temel sorgu değişmez, sadece info kutusu/harita/Time-Mag görünümü filtrelenir.">🔻 Decluster (GK74)</button>
+  <button class="tbtn" id="btnRegionDecluster" onclick="toggleRegionDecluster()" style="display:none" title="GK74 (Gardner &amp; Knopoff 1974) declustering — seçili bölge verisi (EMSC/USGS/AFAD/Tarihsel) üzerinde tarayıcıda hesaplanır: her olayın T(M) gün / D(M) km penceresindeki daha küçük sonraki olaylar artçı sayılıp çıkarılır. Temel sorgu değişmez; info kutusu, harita, Time-Mag/G-R/Weichert ve poster filtrelenmiş küme ile çalışır. Tekrar basınca ham veriye döner.">🔻 Decluster (GK74)</button>
   </div>
 </div>
 
@@ -1486,9 +1486,8 @@ function parseGeoJSON(data) {
     // önceden atılıyordu; bu yüzden USGS verisinde mtype-tabanlı Mw dönüşümü
     // (dispatch) çalışamıyor ve büyüklük türü karışımı görünmüyordu.
     // eid (2026-09-27): USGS eventid — parçalı sorguda tekilleştirme için.
-    // Bilerek 'id' DEĞİL: 'id' alanı GK74 declustering filtresinde (tarihsel
-    // katalog kimlikleri) kullanılıyor; USGS kimliği orada eşleşmez ve bölge
-    // declustering açıkken tüm USGS olaylarını düşürürdü.
+    // ('id' yerine 'eid': GK74 2026-09-28'den beri kimlik eşleştirmesi
+    // kullanmıyor, olaylar üzerinde hesaplanıyor; alan adı geriye uyum için.)
     return { eid: f.id || null, lat, lon, dep:dep||0, mag:parseFloat(p.mag||0), mtype:(p.magType||'').trim(), place:p.place||p.flynn_region||'', time:new Date(p.time||Date.now()) };
   }).filter(e=>!isNaN(e.mag)&&e.mag>0);
 }
@@ -2876,7 +2875,7 @@ async function exportPosterAGU(scale, evt) {
 
   const cs = lastCs, gf = lastGrFit, bt = typeof lastBts !== 'undefined' ? lastBts : null;
   const d = t => t ? new Date(t).toISOString().slice(0, 10) : '—';
-  const evs = (regionRect ? regionEvents : lastTmEvList) || [];
+  const evs = (regionRect ? applyGk74Filter(regionEvents) : lastTmEvList) || [];
   const shape = regionIsCircle && regionCircleCenter ? `daire, merkez ${regionCircleCenter.lat.toFixed(2)}°, ${regionCircleCenter.lon.toFixed(2)}°, R = ${regionCircleRadiusKm} km`
     : regionRect ? (() => { const b = regionRect.getBounds(); return `${regionIsPolygon ? 'poligon' : 'dikdörtgen'} ${b.getSouth().toFixed(2)}–${b.getNorth().toFixed(2)}°K, ${b.getWest().toFixed(2)}–${b.getEast().toFixed(2)}°D`; })() : 'görünür harita alanı';
 
@@ -2929,7 +2928,7 @@ async function exportPosterAGU(scale, evt) {
   const src = (regionRect ? regionSourceLabel() : 'Canlı akış') + (ci ? ` · parçalı sorgu (${ci.nChunks} parça, ${ci.nUnique.toLocaleString('tr-TR')} benzersiz olay)` : '');
   const tr = evs.length ? `${d(Math.min(...evs.map(e => +e.time)))} – ${d(Math.max(...evs.map(e => +e.time)))}` : '—';
   const mItems = [
-    `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}.`,
+    `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')}).` : '.'),
     cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
     '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
     cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** birikimli dağılım.'];
@@ -4824,15 +4823,17 @@ let regionIsCircle = false;        // true ise regionRect bir L.Circle — fetch
 let regionCircleCenter = null;     // { lat, lon } — regionIsCircle true iken dolu
 let regionCircleRadiusKm = null;   // km — regionIsCircle true iken dolu
 
-/* GK74 (Gardner-Knopoff 1974) declustering — YALNIZCA Araştırma Bölgesi
-   panelinde, sadece data/eq_historical_dc.json'da id eşleşmesi bulunan
-   (statik ISC+EMSC) olaylara uygulanır. Algoritma JS'de YENİDEN YAZILMAZ —
-   scripts/decluster_gk74.py'nin ürettiği hazır ana-şok id kümesi bir kez
-   yüklenip Set olarak önbelleklenir. Eşleşmeyen olaylar (EPICA/SHARE-CET,
-   canlı EMSC/USGS/AFAD — bunların hiçbirinde id alanı yok) HER ZAMAN ham
-   bırakılır, sessizce çıkarılmaz (2026-09-13, kullanıcı onaylı kapsam). */
-let gk74MainshockIds = null; // Set<string> | null — henüz yüklenmediyse null
-let gk74Loading      = null; // Promise — eşzamanlı çift-tıklamada tekrar fetch'i önler
+/* GK74 (Gardner-Knopoff 1974) declustering — Araştırma Bölgesi panelindeki
+   "🔻 Decluster (GK74)" butonu. 2026-09-28: artık hazır id listesiyle
+   (data/eq_historical_dc.json) EŞLEŞTİRME YAPILMAZ; algoritma o an seçili
+   bölge kümesi (regionEvents — EMSC/USGS/AFAD/Tarihsel, hangisi olursa)
+   üzerinde tarayıcıda çalıştırılır. Böylece canlı sorgularda da etkilidir
+   ve statik dosyanın bitiş tarihinden sonraki olaylar yanlışlıkla düşmez.
+   Algoritma scripts/decluster_gk74.py ile BİREBİR aynıdır (yalnız artçı;
+   ileri zaman penceresi; işaretli olay pencere açmaz; M ≥ M_i olan olay
+   artçı sayılmaz) ve aynı veri üzerinde Python çıktısıyla doğrulanmıştır.
+   Büyüklük olarak panelin geri kalanı gibi e.mw ?? e.mag kullanılır. */
+let gk74Cache = null;          // { src, n, keep:Set<object>, removed }
 let regionDeclusterOn = false; // Araştırma Bölgesi decluster toggle durumu — varsayılan OFF/ham
 
 // Poligon çizim durumu (nokta nokta tıklama modu)
@@ -4841,29 +4842,55 @@ let polygonPoints  = [];
 let polygonPreview = null; // L.Polyline — çizilirken önizleme
 let polygonMarkers = [];   // köşe noktası işaretleri
 
-// eq_historical_dc.json (GK74 ana-şok id kümesi) bir kez indirilip Set'e
-// alınır; sonraki toggle'lar dosyayı tekrar fetch etmez.
-async function ensureGk74Loaded() {
-  if (gk74MainshockIds) return gk74MainshockIds;
-  if (gk74Loading) return gk74Loading;
-  gk74Loading = fetchTimeout('data/eq_historical_dc.json', {}, 20000)
-    .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
-    .then(json => {
-      gk74MainshockIds = new Set((json.events || []).map(e => e.id));
-      return gk74MainshockIds;
-    })
-    .catch(err => { gk74Loading = null; throw err; });
-  return gk74Loading;
+// GK74 pencereleri (Gardner & Knopoff 1974, Tablo 1'e uydurulmuş biçim;
+// scripts/decluster_gk74.py gk_window ile aynı).
+function gk74Window(m) {
+  const Td = m >= 6.5 ? Math.pow(10, 0.032 * m + 2.7389) : Math.pow(10, 0.5409 * m - 0.547);
+  const Dk = Math.pow(10, 0.1238 * m + 0.983);
+  return [Td, Dk];
 }
 
-// GK74 filtresi: decluster kapalıysa ya da katalog henüz yüklenmediyse
-// olduğu gibi (ham) döner. Açıkken de yalnızca id'si ana-şok kümesinde
-// bulunan olaylar tutulur; id'si OLMAYAN olaylar (EPICA/SHARE-CET, canlı
-// EMSC/USGS/AFAD) eşleşme aranmadan ham bırakılır (kapsam dışı, sessizce
-// çıkarılmaz — 2026-09-13 kullanıcı onaylı tasarım).
+// Ana şok kümesini hesaplar: zaman sıralı tarama; işaretlenmemiş her olay
+// kendi T(M)/D(M) penceresini İLERİYE açar, pencere içindeki ve kendisinden
+// KÜÇÜK olaylar artçı işaretlenir. Zamanı/büyüklüğü geçersiz olay pencere
+// açmaz ve çıkarılmaz (sessiz veri kaybı olmasın).
+function gk74Decluster(evList) {
+  const R = 6371, rad = Math.PI / 180;
+  const arr = evList.map(e => ({ e, t: e.time instanceof Date ? e.time.getTime() : new Date(e.time).getTime(), m: +(e.mw ?? e.mag), la: +e.lat, lo: +e.lon }))
+    .sort((x, y) => x.t - y.t);
+  const n = arr.length, cl = new Uint8Array(n);
+  for (let i = 0; i < n; i++) {
+    if (cl[i]) continue;
+    const A = arr[i];
+    if (!isFinite(A.t) || !isFinite(A.m) || !isFinite(A.la) || !isFinite(A.lo)) continue;
+    const [Td, Dk] = gk74Window(A.m), Tms = Td * 86400000;
+    const dLatMax = Dk / 111.19, c1 = Math.cos(A.la * rad);
+    for (let j = i + 1; j < n; j++) {
+      const B = arr[j];
+      if (B.t - A.t > Tms) break;
+      if (cl[j] || !(B.m < A.m)) continue;
+      if (Math.abs(B.la - A.la) > dLatMax) continue;
+      const dl = (B.la - A.la) * rad, dlo = (B.lo - A.lo) * rad;
+      const h = Math.sin(dl / 2) ** 2 + c1 * Math.cos(B.la * rad) * Math.sin(dlo / 2) ** 2;
+      if (R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)) <= Dk) cl[j] = 1;
+    }
+  }
+  const keep = new Set();
+  let removed = 0;
+  for (let i = 0; i < n; i++) { if (cl[i]) removed++; else keep.add(arr[i].e); }
+  return { keep, removed };
+}
+
+// GK74 filtresi: kapalıysa ham liste; açıkken liste üzerinde hesaplanan ana
+// şoklar (sonuç aynı dizi + uzunluk için önbelleklenir; yeni sorgu gelince
+// otomatik yeniden hesaplanır).
 function applyGk74Filter(evList) {
-  if (!regionDeclusterOn || !gk74MainshockIds) return evList;
-  return evList.filter(e => !e.id || gk74MainshockIds.has(e.id));
+  if (!regionDeclusterOn || !evList || !evList.length) return evList;
+  if (!gk74Cache || gk74Cache.src !== evList || gk74Cache.n !== evList.length) {
+    const r = gk74Decluster(evList);
+    gk74Cache = { src: evList, n: evList.length, keep: r.keep, removed: r.removed };
+  }
+  return evList.filter(e => gk74Cache.keep.has(e));
 }
 
 /* Bölgeye özel Mc/b istatistiği — mevcut computeMc()/computeBvalue()
@@ -4976,7 +5003,7 @@ function renderRegionInfo() {
   line += `<br>${regionBoundsLine()}`;
   const statsEvs = applyGk74Filter(regionEvents);
   if (regionDeclusterOn) {
-    line += `<br><span style="color:#f472b6">🔻 N=${regionEvents.length} (ham) → N=${statsEvs.length} (GK74)</span>`;
+    line += `<br><span style="color:#f472b6">🔻 GK74 (Gardner &amp; Knopoff 1974): N=${regionEvents.length} (ham) → N=${statsEvs.length} ana şok · ${regionEvents.length - statsEvs.length} artçı ayıklandı</span>`;
   }
   const circleAreaKm2 = (regionIsCircle && regionCircleRadiusKm) ? Math.PI * regionCircleRadiusKm * regionCircleRadiusKm : null;
   line += `<br>${computeRegionStatsLine(statsEvs, regionOrderUsed, regionCapped, circleAreaKm2)}`;
@@ -5570,9 +5597,7 @@ async function fetchRegionEventsFromAfad(bounds) {
 /* GK74 decluster toggle'ı sonrası harita katmanını YENİDEN SORGU YAPMADAN
    yeniden çizer — regionEvents (ham) hiç değişmez, applyGk74Filter() sadece
    bu çizim için uygulanır. Her kaynağın (Tarihsel/EMSC/USGS/AFAD) kendi
-   marker stili korunur; canlı/AFAD olaylarında id olmadığından filtre orada
-   fiilen no-op'tur (hepsi ham kalır), yalnızca Tarihsel Katalog görünümü
-   fiilen değişir — bkz. applyGk74Filter kapsam notu. */
+   marker stili korunur. GK74 artık her kaynakta tarayıcıda hesaplanır. */
 function redrawRegionMarkers() {
   if (!regionLayer) return;
   map.removeLayer(regionLayer);
@@ -5624,21 +5649,17 @@ function redrawRegionMarkers() {
 // Araştırma Bölgesi panelindeki "🔻 Decluster (GK74)" butonu — temel
 // regionEvents/fetch mantığına DOKUNMAZ, yalnızca görünüm/analiz katmanını
 // (info kutusu, harita işaretçileri, Time-Mag/Mc/b/GR) filtreler.
-async function toggleRegionDecluster() {
+function toggleRegionDecluster() {
   const btn = document.getElementById('btnRegionDecluster');
-  if (!regionDeclusterOn) {
-    if (!gk74MainshockIds) {
-      btn.disabled = true;
-      setStatus('GK74 declustered katalog yükleniyor…');
-      try { await ensureGk74Loaded(); }
-      catch (err) { setStatus(`GK74 kataloğu yüklenemedi: ${err.message}`, true); btn.disabled = false; return; }
-      btn.disabled = false;
-    }
-    regionDeclusterOn = true;
-    btn.classList.add('active');
+  regionDeclusterOn = !regionDeclusterOn;
+  btn.classList.toggle('active', regionDeclusterOn);
+  if (regionDeclusterOn) {
+    const t0 = performance.now();
+    const kept = applyGk74Filter(regionEvents);
+    const n0 = regionEvents.length, n1 = kept.length;
+    setStatus(`GK74 uygulandı: ${n0.toLocaleString('tr-TR')} → ${n1.toLocaleString('tr-TR')} ana şok (${n0 ? Math.round(100 * (n0 - n1) / n0) : 0}% artçı ayıklandı, ${Math.round(performance.now() - t0)} ms)`);
   } else {
-    regionDeclusterOn = false;
-    btn.classList.remove('active');
+    setStatus('GK74 kapalı — ham veri');
   }
   renderRegionInfo();
   redrawRegionMarkers();
@@ -5729,7 +5750,7 @@ function regionDeselect() {
   regionWindowStart = regionWindowEnd = null;
   document.getElementById('btnRegionSelect').classList.remove('active');
   document.getElementById('regionMcOverride').value = '';
-  regionDeclusterOn = false;
+  regionDeclusterOn = false; gk74Cache = null;
   const btnDecluster = document.getElementById('btnRegionDecluster');
   if (btnDecluster) { btnDecluster.style.display = 'none'; btnDecluster.classList.remove('active'); }
   setStatus('');

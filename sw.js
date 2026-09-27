@@ -5,7 +5,7 @@
    GitHub'daki katalog JSON'ları (son başarılı sürüm). Canlı EMSC/USGS sorguları (zamana bağlı adresler) ve
    harita karoları önbelleğe ALINMAZ: sınırsız büyür ve tarayıcı kotasını doldurur. Sürüm değişince eski
    önbellekler silinir. */
-const VERSION = 'eqlive-2026-09-28a';
+const VERSION = 'eqlive-2026-09-28b';
 const SHELL = `${VERSION}-shell`, LIBS = `${VERSION}-libs`, DATA = `${VERSION}-data`;
 const SHELL_ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 const DATA_MAX = 40;
