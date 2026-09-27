@@ -996,6 +996,8 @@
       <label for="posterAuthor">Yazar</label><input id="posterAuthor" placeholder="Prof. Dr. Ali Osman Öncel" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterAffil">Unvan / kurum</label><input id="posterAffil" placeholder="Jeofizik Yüksek Mühendisi &amp; Sismolog · İstanbul Üniversitesi-Cerrahpaşa" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterResults" title="Boş bırakılırsa analizden otomatik üretilir">Sonuçlar</label><textarea id="posterResults" rows="3" placeholder="Boş: analizden otomatik (Weichert b, λ, b(t), kalite kontrol). Her satır bir madde." style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;resize:vertical;"></textarea>
+      <label for="posterIntro" title="AGU örneğindeki Introduction karşılığı; 2–3 cümle">Giriş / amaç</label><textarea id="posterIntro" rows="2" placeholder="Boş: nötr varsayılan metin (tamlık değişimi → yanlılık; amaç: bölge için b, b(t) ve oranlar). **kalın** desteklenir." style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;resize:vertical;"></textarea>
+      <label for="posterAck" title="AGU örneğindeki Acknowledgments karşılığı">Teşekkür</label><input id="posterAck" placeholder="Boş: veri sağlayıcıya standart teşekkür (ör. EMSC FDSN)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterContact" title="İsteğe bağlı; yalnızca doldurulursa posterde görünür">İletişim</label><input id="posterContact" placeholder="isteğe bağlı: e-posta (boşsa posterde gösterilmez)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterMessage" title="Sonuçlar kutusunun başında vurgulu gösterilir">Ana mesaj</label><input id="posterMessage" placeholder="isteğe bağlı: tek cümlelik ana bulgu (vurgulu kutu)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
     </div>
@@ -2534,7 +2536,7 @@ function tmSelectPoint(t, m) {
    otomatik üretilir; "Sonuçlar" isteğe bağlı olarak kullanıcıca yazılabilir.
    Hesaplamaya dokunmaz.
 ══════════════════════════════════════════ */
-const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact', 'posterTheme'];
+const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact', 'posterTheme', 'posterIntro', 'posterAck'];
 function posterLoadPrefs() {
   try { const o = JSON.parse(localStorage.getItem('eqlivePoster') || '{}'); POSTER_KEYS.forEach(k => { const el = document.getElementById(k); if (el && o[k] !== undefined && o[k] !== '') el.value = o[k]; }); } catch (e) {}
 }
@@ -2692,7 +2694,12 @@ async function exportPosterAGU(scale, evt) {
 
   // ── Sütun 1: çalışma alanı haritası
   const X1 = 40, W1 = 560, X2 = 620, W2 = 680, X3 = 1320, W3 = 560, TOP = 172, MID = 905;
-  let y = box(X1, TOP, W1, 408, 'Çalışma Alanı');
+  // Giriş ve Amaç (AGU örneğindeki "Introduction" karşılığı); boşsa nötr, yorum içermeyen varsayılan metin
+  const GH = 124, MAPH = 188, MB = 44 + MAPH + 46, VY = GH + 12 + MB + 12;
+  let y = box(X1, TOP, W1, GH, 'Giriş ve Amaç');
+  const intro = posterVal('posterIntro', `Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`);
+  rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2 });
+  y = box(X1, TOP + GH + 12, W1, MB, 'Çalışma Alanı');
   (function drawMap(x, y0, w, h) {
     c.fillStyle = '#0f172a'; c.fillRect(x, y0, w, h);
     const pts = evs.filter(e => isFinite(e.lat) && isFinite(e.lon));
@@ -2707,8 +2714,9 @@ async function exportPosterAGU(scale, evt) {
     c.save(); c.beginPath(); c.rect(x, y0, w, h); c.clip();
     const step = [0.1, 0.2, 0.5, 1, 2, 5, 10].find(s => spanY / s <= 6) || 10;
     c.strokeStyle = '#334155'; c.lineWidth = 0.6; c.font = '11px Arial'; c.fillStyle = '#94a3b8';
-    for (let la = Math.ceil(S / step) * step; la <= N; la += step) { const [, yy] = P(la, Wl); c.beginPath(); c.moveTo(x, yy); c.lineTo(x + w, yy); c.stroke(); c.fillText(`${la.toFixed(step < 1 ? 1 : 0)}°`, x + 4, yy + 2); }
-    for (let lo = Math.ceil(Wl / step) * step; lo <= E; lo += step) { const [xx] = P(S, lo); c.beginPath(); c.moveTo(xx, y0); c.lineTo(xx, y0 + h); c.stroke(); c.fillText(`${lo.toFixed(step < 1 ? 1 : 0)}°`, xx + 2, y0 + h - 14); }
+    for (let la = Math.ceil(S / step) * step; la <= N; la += step) { const [, yy] = P(la, Wl); c.beginPath(); c.moveTo(x, yy); c.lineTo(x + w, yy); c.stroke(); if (yy > y0 + 24 && yy < y0 + h - 16) c.fillText(`${la.toFixed(step < 1 ? 1 : 0)}°`, x + 4, yy + 2); }
+    const stepX = [0.1, 0.2, 0.5, 1, 2, 5, 10].find(s2 => s2 * k * sc >= 62) || 10;
+    for (let lo = Math.ceil(Wl / stepX) * stepX; lo <= E; lo += stepX) { const [xx] = P(S, lo); c.beginPath(); c.moveTo(xx, y0); c.lineTo(xx, y0 + h); c.stroke(); c.fillText(`${lo.toFixed(stepX < 1 ? 1 : 0)}°`, xx + 2, y0 + h - 14); }
     const col = m => m >= 5 ? '#ef4444' : m >= 4 ? '#f97316' : m >= 3 ? '#eab308' : '#22d3ee';
     const stride = Math.max(1, Math.ceil(pts.length / 6000));
     const sorted = pts.filter((_, i) => i % stride === 0).sort((a, b) => (a.mw ?? a.mag) - (b.mw ?? b.mag));
@@ -2725,10 +2733,10 @@ async function exportPosterAGU(scale, evt) {
     // lejant
     [['M<3', '#22d3ee'], ['3–4', '#eab308'], ['4–5', '#f97316'], ['≥5', '#ef4444']].forEach(([t, cc], i) => { c.fillStyle = cc; c.beginPath(); c.arc(x + 14 + i * 58, y0 + 14, 5, 0, 2 * Math.PI); c.fill(); text(t, x + 22 + i * 58, y0 + 8, '11px Arial', '#e2e8f0'); });
     c.restore();
-  })(X1 + 14, y, W1 - 28, 300);
-  caption(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString('tr-TR')} olayın dış merkezleri, büyüklüğe göre.`, X1 + 16, y + 306, W1 - 32, TOP + 404);
+  })(X1 + 14, y, W1 - 28, MAPH);
+  caption(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString('tr-TR')} olayın dış merkezleri, büyüklüğe göre.`, X1 + 16, y + MAPH + 5, W1 - 32, TOP + GH + 12 + MB - 2);
   // Sütun 1: veri ve yöntem
-  y = box(X1, TOP + 420, W1, MID - TOP - 420, 'Veri ve Yöntem');
+  y = box(X1, TOP + VY, W1, MID - TOP - VY, 'Veri ve Yöntem');
   const ci = typeof regionChunkInfo !== 'undefined' ? regionChunkInfo : null;
   const src = (regionRect ? regionSourceLabel() : 'Canlı akış') + (ci ? ` · parçalı sorgu (${ci.nChunks} parça, ${ci.nUnique.toLocaleString('tr-TR')} benzersiz olay)` : '');
   const tr = evs.length ? `${d(Math.min(...evs.map(e => +e.time)))} – ${d(Math.max(...evs.map(e => +e.time)))}` : '—';
@@ -2800,7 +2808,11 @@ async function exportPosterAGU(scale, evt) {
   const colW = (X3 - X1 - 20 - 48) / 2;
   const half = Math.ceil(refs.length / 2), ry0 = y - 2;
   [refs.slice(0, half), refs.slice(half)].forEach((colRefs, ci2) => { let yy = ry0;
-    colRefs.forEach(r => { yy = rich(r, X1 + 16 + ci2 * (colW + 16), yy, colW, { size: 14, lh: 18, hang: 22, maxY: BT + BH - 4 }) + 5; }); });
+    colRefs.forEach(r => { yy = rich(r, X1 + 16 + ci2 * (colW + 16), yy, colW, { size: 14, lh: 18, hang: 22, maxY: BT + BH - 26 }) + 5; }); });
+  // Teşekkür (AGU "Acknowledgments"): boşsa veri sağlayıcıya standart teşekkür
+  const ackSrc = (regionRect ? regionSourceLabel() : 'canlı akış').replace(/\s*\(.*\)\s*/g, ' ').trim();
+  const ack = posterVal('posterAck', `Katalog verileri ${ackSrc} FDSN web servisinden alınmıştır; veri sağlayıcılara teşekkür ederiz. Analiz: EQ-Live Türkiye.`);
+  rich('**Teşekkür:** ' + ack, X1 + 16, BT + BH - 24, X3 - X1 - 20 - 32, { size: 13, lh: 17, col: MUTE, maxY: BT + BH - 2, justify: false });
   // Ek Bilgi: QR (tam analiz bağlantısı; tüm ayarlar URL'dedir) + kaynak/tarih + kısa adres
   c.fillStyle = '#ffffff'; c.fillRect(X3, BT, W3, BH); c.strokeStyle = '#111'; c.lineWidth = 1.2; c.strokeRect(X3, BT, W3, BH);
   const QZ = BH - 6, qzx = X3 + W3 - 3 - QZ, qzy = BT + 3; let qrDrawn = false;
