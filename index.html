@@ -2424,6 +2424,7 @@ function renderGutenbergRichter(evList, Mc) {
   // GoF R(%) = 100*(1-sum|Nobs-Nsynth|/sum(Nobs)) ile -- yeni bir R^2
   // metrigi ICAT EDILMEDI, projede zaten kullanilan tanim aynen uygulandi.
   let fitLine = '', fitStatsStr = '';
+  lastGrSimple = null;
   if (Mc !== null) {
     const bFit = computeBvalue(mags, Mc);
     const nAboveMc = mags.filter(m => m >= Mc).length;
@@ -2435,6 +2436,7 @@ function renderGutenbergRichter(evList, Mc) {
       let sumAbsDiff = 0, sumObs = 0;
       fitBins.forEach(p => { sumAbsDiff += Math.abs(p.cum - synthCum(p.m)); sumObs += p.cum; });
       const gofR = sumObs > 0 ? 100 * (1 - sumAbsDiff / sumObs) : null;
+      lastGrSimple = { mc: Mc, b: bFit, a: aFit, gof: gofR, n: nAboveMc };
       const mFitStart = Math.max(Mc, 0), mFitEnd = mMax;
       const xStart = x(mFitStart), yStart = y(synthCum(mFitStart) / normFactor);
       const xEnd   = x(mFitEnd),   yEnd   = y(synthCum(mFitEnd) / normFactor);
@@ -2811,7 +2813,7 @@ async function exportPosterAGU(scale, evt) {
     c.stroke(); c.globalAlpha = 0.55; text('P', XP - 4, 146, 'bold 11px Arial', '#1e3a5f'); text('S', XS - 4, 146, 'bold 11px Arial', '#1e3a5f'); c.globalAlpha = 1; }
   // ── başlık bloğu
   const region = posterVal('posterRegion', '');
-  const title = posterVal('posterTitle', (region ? region + ': ' : '') + 'Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Analizi');
+  const title = posterVal('posterTitle', (region ? region + ': ' : '') + (lastCs ? 'Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Analizi' : 'b-Değeri, Zamansal Değişimi ve Frekans–Büyüklük Analizi'));
   // Kimlik varsayılanı YOK: boşsa açıkça yer tutucu yazılır (kimse adına poster üretilmez)
   const authorIn = posterVal('posterAuthor', ''), affilIn = posterVal('posterAffil', '');
   const author = authorIn || 'Yazar Adı Soyadı', affil = affilIn || 'Unvan · Kurum / Üniversite / Bölüm';
@@ -2873,7 +2875,7 @@ async function exportPosterAGU(scale, evt) {
     return y; };
   const caption = (t, x, y, w, maxY) => rich(t.replace(/^(Şekil \d+\.)/, '**$1**'), x, y, w, { size: 16, lh: 20, italic: true, col: '#374151', maxY, justify: false });
 
-  const cs = lastCs, gf = lastGrFit, bt = typeof lastBts !== 'undefined' ? lastBts : null;
+  const cs = lastCs, gf = lastCs ? lastGrFit : null, gs = lastCs ? null : lastGrSimple, bt = typeof lastBts !== 'undefined' ? lastBts : null;
   const d = t => t ? new Date(t).toISOString().slice(0, 10) : '—';
   const evs = (regionRect ? applyGk74Filter(regionEvents) : lastTmEvList) || [];
   const shape = regionIsCircle && regionCircleCenter ? `daire, merkez ${regionCircleCenter.lat.toFixed(2)}°, ${regionCircleCenter.lon.toFixed(2)}°, R = ${regionCircleRadiusKm} km`
@@ -2931,10 +2933,10 @@ async function exportPosterAGU(scale, evt) {
     `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')}).` : '.'),
     cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
     '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
-    cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** birikimli dağılım.'];
+    cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** tek Mc; b_GR Aki (1965) en çok olabilirlik, a = log N(≥Mc) + b·Mc; uyum Wiemer & Wyss (2000) GoF.'];
   // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
   const srcTag = (regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
-  const steps = [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım 10'], ['4 · G–R', 'Weichert (1980)']];
+  const steps = [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım 10'], ['4 · G–R', cs ? 'Weichert (1980)' : 'tek Mc · Aki MLE']];
   { const fx0 = X1 + 16, fw = W1 - 32, ag = 18, bw = (fw - ag * (steps.length - 1)) / steps.length, bh = 54;
     steps.forEach(([h, sub], i) => { const bx0 = fx0 + i * (bw + ag);
       c.fillStyle = TH.soft; c.strokeStyle = ACC; c.lineWidth = 1.5; c.beginPath();
@@ -2949,15 +2951,15 @@ async function exportPosterAGU(scale, evt) {
   // ── Sütun 2: zaman–büyüklük ve b(t)
   y = box(X2, TOP, W2, 260, 'Zaman–Büyüklük Dağılımı');
   y = figure(imgs[0], X2 + 16, y, W2 - 32, 150);
-  caption('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', X2 + 16, y, W2 - 32, TOP + 256);
+  caption(cs ? 'Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).' : 'Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', X2 + 16, y, W2 - 32, TOP + 256);
   y = box(X2, TOP + 275, W2, MID - TOP - 275, 'b-Değerinin Zaman İçinde Değişimi');
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112);
-  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc, {#d97706|turuncu} tamlık basamakları.', X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
-  y = box(X3, TOP, W3, 515, 'Gutenberg–Richter (Weichert 1980)');
+  y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : 'Gutenberg–Richter Dağılımı');
   y = figure(imgs[2], X3 + 16, y, W3 - 32, 300);
-  y = caption(`Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
+  y = caption(!cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(gs.mc).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
   // G-R parametre tablosu (büyük punto)
   if (gf && gf.curves && gf.curves.length) {
     const cols = [['Eğri', 0], ['b', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/yıl`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
@@ -2980,9 +2982,11 @@ async function exportPosterAGU(scale, evt) {
   else {
     rItems = [];
     if (gf) { const best = gf.curves[0]; const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**Weichert (1980):** ${V(`b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}`)}; ${V(`λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl`)}${gf.nRef !== undefined ? `; ${V(`N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl`)}` : ''} (N = ${gf.N}).`); }
+    if (!gf && gs) { const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**G-R (tek Mc):** ${V(`Mc = ${String(gs.mc).replace('.', ',')}`)}; ${V(`b_GR = ${gs.b.toFixed(2).replace('.', ',')}`)}; N(≥Mc) = ${gs.n.toLocaleString('tr-TR')}${gs.gof !== null ? `; GoF = %${gs.gof.toFixed(1).replace('.', ',')}` : ''}.`); }
     if (bt) { const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**b(t):** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` + (bt.fixed ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
     const qc = (document.getElementById('csDiag')?.innerText || '').split('\n').map(t => t.trim()).filter(t => /^[⚠🔴]/.test(t)).map(t => t.replace(/^[⚠️🔴\s]+/u, ''));
-    rItems.push(qc.length ? '**Kalite kontrol:** ' + qc.slice(0, 2).join(' ') : '**Kalite kontrol:** basamaklar veri Mc\'siyle uyumlu, uyarı yok.');
+    rItems.push(!cs ? '**Kalite kontrol:** tamlık basamakları kullanılmadı; b ve oranlar tek Mc\'nin tüm dönemde geçerli olduğu varsayımına dayanır.' + (regionRect && !regionDeclusterOn ? ' Artçılar ayıklanmadı (GK74 kapalı).' : '')
+      : qc.length ? '**Kalite kontrol:** ' + qc.slice(0, 2).join(' ') : '**Kalite kontrol:** basamaklar veri Mc\'siyle uyumlu, uyarı yok.');
   }
   y += 2; rItems.forEach(t => { y = rich(t, X3 + 16, y, W3 - 32, { size: 14.5, lh: 19, bullet: true, maxY: MID - 6 }) + 5; });
 
@@ -3397,6 +3401,7 @@ function poissonBounds1sd(N) {
   return [N - Math.sqrt(N), N + 0.75 + Math.sqrt(N + 0.5)];
 }
 let lastGrFit = null;
+let lastGrSimple = null; // tek-Mc G-R (renderGutenbergRichter): {mc,b,a,gof,n} — poster metni için
 
 // Otomatik öneri: takvim yılı başına maksimum eğrilik Mc (+0.2, computeMc);
 // ardışık yıllarda Mc ≥0.3 değişince yeni basamak; basamak Mc'si grubun
