@@ -996,6 +996,7 @@
       <label for="posterAuthor">Yazar</label><input id="posterAuthor" placeholder="Prof. Dr. Ali Osman Öncel" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterAffil">Unvan / kurum</label><input id="posterAffil" placeholder="Jeofizik Yüksek Mühendisi &amp; Sismolog · İstanbul Üniversitesi-Cerrahpaşa" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterResults" title="Boş bırakılırsa analizden otomatik üretilir">Sonuçlar</label><textarea id="posterResults" rows="3" placeholder="Boş: analizden otomatik (Weichert b, λ, b(t), kalite kontrol). Her satır bir madde." style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;resize:vertical;"></textarea>
+      <label for="posterContact" title="İsteğe bağlı; yalnızca doldurulursa posterde görünür">İletişim</label><input id="posterContact" placeholder="isteğe bağlı: e-posta (boşsa posterde gösterilmez)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterMessage" title="Sonuçlar kutusunun başında vurgulu gösterilir">Ana mesaj</label><input id="posterMessage" placeholder="isteğe bağlı: tek cümlelik ana bulgu (vurgulu kutu)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
     </div>
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">
@@ -2532,7 +2533,7 @@ function tmSelectPoint(t, m) {
    otomatik üretilir; "Sonuçlar" isteğe bağlı olarak kullanıcıca yazılabilir.
    Hesaplamaya dokunmaz.
 ══════════════════════════════════════════ */
-const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage'];
+const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact'];
 function posterLoadPrefs() {
   try { const o = JSON.parse(localStorage.getItem('eqlivePoster') || '{}'); POSTER_KEYS.forEach(k => { const el = document.getElementById(k); if (el && o[k] !== undefined && o[k] !== '') el.value = o[k]; }); } catch (e) {}
 }
@@ -2614,19 +2615,33 @@ async function exportPosterAGU(scale, evt) {
   // ── kutu yardımcıları
   const box = (x, y, w, h, head) => { c.fillStyle = '#ffffff'; c.fillRect(x, y, w, h); c.strokeStyle = '#111'; c.lineWidth = 1.2; c.strokeRect(x, y, w, h); text(head, x + 16, y + 12, 'bold 21px Arial', '#111827'); return y + 44; };
   const figure = (img, x, y, w, maxH) => { let fw = w, fh = fw * img.naturalHeight / img.naturalWidth; if (fh > maxH) { fh = maxH; fw = fh * img.naturalWidth / img.naturalHeight; } const fx = x + (w - fw) / 2; c.fillStyle = '#111111'; c.fillRect(fx - 4, y - 4, fw + 8, fh + 8); c.drawImage(img, fx, y, fw, fh); return y + fh + 8; };
-  // Zengin altyazı: **metin** kalın; {#renk|metin} kalın ve renkli (grafikteki çizgiyle eşleştirme)
-  const richCaption = (t, x, y, w, maxY, size, lh) => {
-    const toks = []; t.replace(/\{(#[0-9a-fA-F]{6})\|([^}]*)\}|\*\*([^*]+)\*\*|([^{*]+)/g, (m, col, ct, bt, pt) => {
-      const seg = col ? { s: ct, b: true, col } : bt ? { s: bt, b: true, col: '#111827' } : { s: pt, b: false, col: '#374151' };
-      seg.s.split(/(\s+)/).forEach(wd => { if (wd) toks.push({ ...seg, s: wd }); }); return m; });
-    const f = tk => `italic ${tk.b ? 'bold ' : ''}${size}px Arial`;
-    let cx = x, lineStart = true;
-    toks.forEach(tk => { const isSp = /^\s+$/.test(tk.s); if (isSp) { if (!lineStart) { c.font = f(tk); cx += c.measureText(' ').width; } return; }
-      c.font = f(tk); const ww = c.measureText(tk.s).width;
-      if (cx + ww > x + w && !lineStart) { y += lh; cx = x; }
-      if (y + lh > maxY) return; c.fillStyle = tk.col; c.fillText(tk.s, cx, y); cx += ww; lineStart = false; });
-    return y + lh; };
-  const caption = (t, x, y, w, maxY) => para(t, x, y, w, 'italic 15px Arial', 19, '#374151', maxY);
+  // Zengin, iki yana yaslı metin: **metin** kalın; {#renk|metin} kalın ve renkli.
+  // o: { size, lh, col, bcol, italic, bullet, hang (asılı girinti, px), maxY, justify }
+  // Son satır ve %78'den az dolu satırlar yaslanmaz (aşırı boşluk / "nehir" oluşmaması için).
+  const rich = (t, x, y, w, o) => {
+    const size = o.size || 15, lh = o.lh || Math.round(size * 1.3), col = o.col || INK, bcol = o.bcol || '#111827', it = o.italic ? 'italic ' : '';
+    const words = []; let cur = null;
+    String(t).replace(/\{(#[0-9a-fA-F]{6})\|([^}]*)\}|\*\*([^*]+)\*\*|([^{*]+|[{*])/g, (m, cc, ct, bt, pt) => {
+      const st = cc ? { b: true, col: cc } : bt ? { b: true, col: bcol } : { b: false, col };
+      (cc ? ct : bt !== undefined ? bt : pt).split(/(\s+)/).forEach(pc => { if (!pc) return; if (/^\s+$/.test(pc)) { cur = null; return; }
+        if (!cur) { cur = []; words.push(cur); } cur.push({ s: pc, ...st }); }); return m; });
+    const font = pc => `${it}${pc.b ? 'bold ' : ''}${size}px Arial`;
+    const ww = wd => wd.reduce((a, pc) => { c.font = font(pc); return a + c.measureText(pc.s).width; }, 0);
+    c.font = `${it}${size}px Arial`; const sp = c.measureText(' ').width;
+    const bx = o.bullet ? 16 : 0, lines = []; let line = [], lw = 0;
+    words.forEach(wd => { const lim = w - bx - (lines.length ? (o.hang || 0) : 0), wW = ww(wd), add = (line.length ? sp : 0) + wW;
+      if (line.length && lw + add > lim) { lines.push({ line, lw, lim }); line = []; lw = 0; }
+      line.push({ wd, wW }); lw += (line.length > 1 ? sp : 0) + wW; });
+    if (line.length) lines.push({ line, lw, lim: w - bx - (lines.length ? (o.hang || 0) : 0), last: true });
+    lines.forEach((L, li) => { if (o.maxY && y + lh > o.maxY) return;
+      if (o.bullet && li === 0) text('▪', x, y, `${size}px Arial`, ACC);
+      const gaps = L.line.length - 1, doJ = o.justify !== false && !L.last && gaps > 0 && L.lw > 0.78 * L.lim;
+      const gap = doJ ? sp + (L.lim - L.lw) / gaps : sp;
+      let cx = x + bx + (li ? (o.hang || 0) : 0);
+      L.line.forEach(({ wd, wW }) => { wd.forEach(pc => { c.font = font(pc); c.fillStyle = pc.col; c.textAlign = 'left'; c.fillText(pc.s, cx, y); cx += c.measureText(pc.s).width; }); cx += gap; });
+      y += lh; });
+    return y; };
+  const caption = (t, x, y, w, maxY) => rich(t.replace(/^(Şekil \d+\.)/, '**$1**'), x, y, w, { size: 15, lh: 19, italic: true, col: '#374151', maxY });
 
   const cs = lastCs, gf = lastGrFit, bt = typeof lastBts !== 'undefined' ? lastBts : null;
   const d = t => t ? new Date(t).toISOString().slice(0, 10) : '—';
@@ -2677,21 +2692,23 @@ async function exportPosterAGU(scale, evt) {
   const src = (regionRect ? regionSourceLabel() : 'Canlı akış') + (ci ? ` · parçalı sorgu (${ci.nChunks} parça, ${ci.nUnique.toLocaleString('tr-TR')} benzersiz olay)` : '');
   const tr = evs.length ? `${d(Math.min(...evs.map(e => +e.time)))} – ${d(Math.max(...evs.map(e => +e.time)))}` : '—';
   const mItems = [
-    `Katalog: ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}.`,
-    cs ? `Tamlık basamakları (alt kataloglar): ${cs.periods.map(csLabel).join(', ')}; basamaklardan geçen N = ${cs.kept.length.toLocaleString('tr-TR')}.` : 'Tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
-    'b(t): Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
-    cs ? `Gutenberg–Richter: eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : 'Gutenberg–Richter: birikimli dağılım.'];
-  // QR: paylaşılan bağlantı (tüm analiz ayarları URL'dedir)
-  const QS = 150, qy = 0, qrOk = false; // QR "Ek Bilgi" kutusundadır
-  // madde metni QR'ın solunda daralarak akar
-  const bulletFlow = (t, x, y0, wFull, wNarrow, yCut, font, lh, col, maxY) => {
-    c.font = font; let yy = y0, cur = '', first = true;
-    const wAt = () => (yy + lh > yCut ? wNarrow : wFull) - 16;
-    const flush = () => { if (yy + lh > maxY) return; if (first) text('▪', x, yy, font, ACC); text(cur, x + 16, yy, font, col); yy += lh; first = false; };
-    t.split(' ').filter(Boolean).forEach(wd => { const tt = cur ? cur + ' ' + wd : wd; c.font = font; if (c.measureText(tt).width > wAt() && cur) { flush(); cur = wd; } else cur = tt; });
-    if (cur) flush(); return yy;
-  };
-  y += 2; mItems.forEach(t => { y = bulletFlow(t, X1 + 16, y, W1 - 32, qrOk ? W1 - 32 - QS - 14 : W1 - 32, qrOk ? qy - 4 : 1e9, '16px Arial', 22, INK, MID - 8) + 7; });
+    `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}.`,
+    cs ? `**Tamlık basamakları** (alt kataloglar): ${cs.periods.map(csLabel).join(', ')}; basamaklardan geçen N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
+    '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
+    cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** birikimli dağılım.'];
+  // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
+  const srcTag = (regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
+  const steps = [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım 10'], ['4 · G–R', 'Weichert (1980)']];
+  { const fx0 = X1 + 16, fw = W1 - 32, ag = 18, bw = (fw - ag * (steps.length - 1)) / steps.length, bh = 50;
+    steps.forEach(([h, sub], i) => { const bx0 = fx0 + i * (bw + ag);
+      c.fillStyle = '#fef3c7'; c.strokeStyle = ACC; c.lineWidth = 1.5; c.beginPath();
+      if (c.roundRect) c.roundRect(bx0, y, bw, bh, 7); else c.rect(bx0, y, bw, bh); c.fill(); c.stroke();
+      text(h, bx0 + bw / 2, y + 8, 'bold 15px Arial', '#78350f', 'center');
+      c.font = '12.5px Arial'; let st = sub; while (st.length > 4 && c.measureText(st).width > bw - 8) st = st.slice(0, -2);
+      text(st === sub ? sub : st + '…', bx0 + bw / 2, y + 29, '12.5px Arial', INK, 'center');
+      if (i < steps.length - 1) { const ax = bx0 + bw + 3, ay = y + bh / 2; c.fillStyle = ACC; c.beginPath(); c.moveTo(ax, ay - 7); c.lineTo(ax + 12, ay); c.lineTo(ax, ay + 7); c.closePath(); c.fill(); } });
+    y += bh + 12; }
+  mItems.forEach(t => { y = rich(t, X1 + 16, y, W1 - 32, { size: 15, lh: 20, bullet: true, maxY: MID - 6 }) + 5; });
 
   // ── Sütun 2: zaman–büyüklük ve b(t)
   y = box(X2, TOP, W2, 260, 'Zaman–Büyüklük Dağılımı');
@@ -2699,7 +2716,7 @@ async function exportPosterAGU(scale, evt) {
   caption('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', X2 + 16, y, W2 - 32, TOP + 256);
   y = box(X2, TOP + 275, W2, MID - TOP - 275, 'b-Değerinin Zaman İçinde Değişimi');
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 104);
-  richCaption('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0e7490|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0e7490|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0e7490|camgöbeği} veri Mc, {#b45309|turuncu} tamlık basamakları.', X2 + 16, y + 2, W2 - 32, MID - 4, 15, 21);
+  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0e7490|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0e7490|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0e7490|camgöbeği} veri Mc, {#b45309|turuncu} tamlık basamakları.', X2 + 16, y + 2, W2 - 32, { size: 15, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, 'Gutenberg–Richter (Weichert 1980)');
@@ -2726,12 +2743,12 @@ async function exportPosterAGU(scale, evt) {
   if (userRes) rItems = userRes.split('\n').map(t => t.trim()).filter(Boolean);
   else {
     rItems = [];
-    if (gf) { const best = gf.curves[0]; rItems.push(`Weichert (1980): b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}; λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl${gf.nRef !== undefined ? `; N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl` : ''} (N = ${gf.N}).`); }
-    if (bt) rItems.push(`b(t): ortalama ${bt.bAvg.toFixed(2)}, son pencere ${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'} (${bt.nWin} pencere).` + (bt.fixed ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${bt.fixed.bAvg.toFixed(2)}.` : ''));
+    if (gf) { const best = gf.curves[0]; rItems.push(`**Weichert (1980):** b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}; λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl${gf.nRef !== undefined ? `; N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl` : ''} (N = ${gf.N}).`); }
+    if (bt) rItems.push(`**b(t):** ortalama ${bt.bAvg.toFixed(2)}, son pencere ${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'} (${bt.nWin} pencere).` + (bt.fixed ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${bt.fixed.bAvg.toFixed(2)}.` : ''));
     const qc = (document.getElementById('csDiag')?.innerText || '').split('\n').map(t => t.trim()).filter(t => /^[⚠🔴]/.test(t)).map(t => t.replace(/^[⚠️🔴\s]+/u, ''));
-    rItems.push(qc.length ? 'Kalite kontrol: ' + qc.slice(0, 2).join(' ') : 'Kalite kontrol: basamaklar veri Mc\'siyle uyumlu, uyarı yok.');
+    rItems.push(qc.length ? '**Kalite kontrol:** ' + qc.slice(0, 2).join(' ') : '**Kalite kontrol:** basamaklar veri Mc\'siyle uyumlu, uyarı yok.');
   }
-  y += 2; rItems.forEach(t => { y = para(t, X3 + 16, y, W3 - 32, '14px Arial', 18, INK, MID - 6, true) + 4; });
+  y += 2; rItems.forEach(t => { y = rich(t, X3 + 16, y, W3 - 32, { size: 14.5, lh: 19, bullet: true, maxY: MID - 6 }) + 5; });
 
   // ── alt şerit: kaynaklar ve bilgi
   const BT = MID + 12, BH = H - BT - 22;
@@ -2740,7 +2757,9 @@ async function exportPosterAGU(scale, evt) {
     'Kijko, A. & Sellevoll, M. A. (1989). Bull. Seismol. Soc. Am. 79(3), 645–654.', 'Öncel, A. O. & Wilson, T. H. (2007). Geophys. J. Int. 169(1), 259–270.',
     'Weichert, D. H. (1980). Bull. Seismol. Soc. Am. 70(4), 1337–1346.', 'Wiemer, S. & Wyss, M. (2000). Bull. Seismol. Soc. Am. 90(4), 859–869.'];
   const colW = (X3 - X1 - 20 - 48) / 2;
-  refs.forEach((r, i) => text(r, X1 + 16 + (i % 2) * (colW + 16), y - 2 + Math.floor(i / 2) * 24, '14px Arial', INK));
+  const half = Math.ceil(refs.length / 2), ry0 = y - 2;
+  [refs.slice(0, half), refs.slice(half)].forEach((colRefs, ci2) => { let yy = ry0;
+    colRefs.forEach(r => { yy = rich(r, X1 + 16 + ci2 * (colW + 16), yy, colW, { size: 14, lh: 18, hang: 22, maxY: BT + BH - 4 }) + 5; }); });
   // Ek Bilgi: QR (tam analiz bağlantısı; tüm ayarlar URL'dedir) + kaynak/tarih + kısa adres
   c.fillStyle = '#ffffff'; c.fillRect(X3, BT, W3, BH); c.strokeStyle = '#111'; c.lineWidth = 1.2; c.strokeRect(X3, BT, W3, BH);
   const QZ = BH - 6, qzx = X3 + W3 - 3 - QZ, qzy = BT + 3; let qrDrawn = false;
@@ -2752,12 +2771,13 @@ async function exportPosterAGU(scale, evt) {
     c.save(); const ppm = QZ * SC / m; if (ppm >= 3) c.imageSmoothingEnabled = false; else { c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high'; } c.drawImage(qc, qzx, qzy, QZ, QZ); c.restore();
     qrDrawn = true; } catch (e) { qrDrawn = false; } }
   const eW = (qrDrawn ? qzx - 12 : X3 + W3 - 16) - (X3 + 16);
-  text('Ek Bilgi', X3 + 16, BT + 12, 'bold 21px Arial', '#111827');
+  text('Daha Fazla Bilgi', X3 + 16, BT + 12, 'bold 21px Arial', '#111827');
   const srcShort = regionRect ? regionSourceLabel() : 'Canlı akış';
   const eLines = [[qrDrawn ? 'Analizi canlı açmak için QR kodu tarayın →' : 'Analiz bağlantısı:', 'bold 14px Arial', ACC],
     [`Veri: ${srcShort} · ${new Date().toLocaleDateString('tr-TR')}`, '13px Arial', INK],
     [(location.host + location.pathname).replace(/index\.html$/, ''), '13px Arial', '#1d4ed8']];
-  eLines.forEach(([t, f, col], i) => { c.font = f; let tt = t; while (tt.length > 8 && c.measureText(tt).width > eW) tt = tt.slice(0, -2); text(tt === t ? t : tt + '…', X3 + 16, BT + 46 + i * 24, f, col); });
+  const contact = posterVal('posterContact', ''); if (contact) eLines.push([`İletişim: ${contact}`, '13px Arial', INK]);
+  eLines.forEach(([t, f, col], i) => { c.font = f; let tt = t; while (tt.length > 8 && c.measureText(tt).width > eW) tt = tt.slice(0, -2); text(tt === t ? t : tt + '…', X3 + 16, BT + 44 + i * (eLines.length > 3 ? 22 : 24), f, col); });
 
   cv.toBlob(blob => {
     if (!blob) { alert('Poster oluşturulamadı (görüntü güvenlik kısıtı).'); done(); return; }
