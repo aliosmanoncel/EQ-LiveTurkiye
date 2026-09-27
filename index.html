@@ -2552,14 +2552,38 @@ const POSTER_IMG_KEY = 'eqlivePosterImg';
 function posterGetImgs() { try { return JSON.parse(localStorage.getItem(POSTER_IMG_KEY) || '{}'); } catch (e) { return {}; } }
 function posterStoreImg(kind, input) {
   const f = input.files && input.files[0]; if (!f) return;
-  const im = new Image(); im.onload = () => {
+  posterStoreImgSrc(kind, URL.createObjectURL(f)); input.value = '';
+}
+function posterStoreImgSrc(kind, src) {
+  return new Promise(done => {
+  const im = new Image(); im.onerror = () => done(false); im.onload = () => {
     const M = 320, s = Math.min(1, M / Math.max(im.naturalWidth, im.naturalHeight)), cv = document.createElement('canvas');
     cv.width = Math.round(im.naturalWidth * s); cv.height = Math.round(im.naturalHeight * s); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
     const url = kind === 'logo' ? cv.toDataURL('image/png') : cv.toDataURL('image/jpeg', 0.9);
     const o = posterGetImgs(); o[kind] = url;
     try { localStorage.setItem(POSTER_IMG_KEY, JSON.stringify(o)); } catch (e) { alert('Görsel tarayıcıya kaydedilemedi (depolama kısıtı); bu oturumda yine de kullanılacak.'); }
-    window._posterImgMem = Object.assign(window._posterImgMem || {}, { [kind]: url }); posterIdCheck(); URL.revokeObjectURL(im.src); };
-  im.src = URL.createObjectURL(f); input.value = '';
+    window._posterImgMem = Object.assign(window._posterImgMem || {}, { [kind]: url }); posterIdCheck(); if (/^blob:/.test(src)) URL.revokeObjectURL(src); done(true); };
+  im.src = src; });
+}
+// Sahip ön ayarı: yalnızca proje sahibinin bildiği gizli kelimeyle (#sahip=…) bir kez etkinleşir ve o tarayıcıda
+// hatırlanır. Kodda kelimenin kendisi değil yalnızca SHA-256 özeti durur; ön ayar kimse için VARSAYILAN değildir.
+// Diğer kullanıcılar kendi ad/kurum/fotoğraf/logolarını girer (bkz. templates/poster/poster-template.md §0).
+const POSTER_OWNER_HASH = '37e3e9d80741cf60de2bfaea75833ba767c15d5f26318be61c1e0438b0496f07';
+const POSTER_OWNER_PRESET = { author: 'Prof. Dr. Ali Osman Öncel', affil: 'Jeofizik Yüksek Mühendisi & Sismolog · İstanbul Üniversitesi-Cerrahpaşa', foto: 'assets/foto-oncel.jpg', logo: 'assets/logo-ddbt.png' };
+async function posterOwnerCheck() {
+  const m = (location.hash || '').match(/(?:^#|&)sahip=([^&]+)/); if (!m) return;
+  // kelimeyi hemen adres çubuğundan sil: paylaşılan bağlantıya / QR'a / geçmişe sızmasın
+  const rest = location.hash.replace(/(^#|&)sahip=[^&]+/, '$1').replace(/^#&/, '#').replace(/^#$/, '');
+  history.replaceState(null, '', location.pathname + location.search + rest);
+  const note = t => { const el = document.getElementById('posterIdNote'); if (el) el.textContent = t; };
+  if (!(window.crypto && crypto.subtle)) { note('⚠ Sahip ön ayarı bu tarayıcıda doğrulanamadı (güvenli bağlantı gerekir).'); return; }
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('eqlive-poster-owner:' + decodeURIComponent(m[1])));
+  const hex = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  if (hex !== POSTER_OWNER_HASH) { note('⚠ Sahip bağlantısı geçersiz; kimlik yüklenmedi.'); return; }
+  const P = POSTER_OWNER_PRESET, a = document.getElementById('posterAuthor'), f = document.getElementById('posterAffil');
+  if (a) a.value = P.author; if (f) f.value = P.affil; posterSavePrefs();
+  await posterStoreImgSrc('foto', P.foto); await posterStoreImgSrc('logo', P.logo);
+  posterIdCheck(); const el = document.getElementById('posterIdNote'); if (el && !el.textContent) el.textContent = '✓ Sahip ön ayarı bu tarayıcıya yüklendi (ad, kurum, fotoğraf, logo). Kaldırmak için "kimliği temizle".';
 }
 function posterClearIdentity() {
   try { localStorage.removeItem(POSTER_IMG_KEY); } catch (e) {}
@@ -5295,7 +5319,7 @@ function restoreRegionFromURL() {
   const body = document.getElementById('rcBody');
   if (body && body.classList.contains('hidden')) toggleRegionCtrl();
 }
-posterLoadPrefs(); posterIdCheck();
+posterLoadPrefs(); posterIdCheck(); posterOwnerCheck();
 restoreGrParamsFromURL();
 restoreRegionFromURL();
 restoreCsFromURL();
