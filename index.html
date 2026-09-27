@@ -29,6 +29,17 @@
       border-top:2px solid #06b6d4;border-radius:8px 8px 0 0;padding:14px 18px;
       z-index:1001;box-shadow:0 -4px 20px rgba(0,0,0,.5);display:none}
     .tmPanel.open{display:block}
+    /* Normal mod: panel ekran yüksekliğini aşmaz, içeride kaydırılır; başlık
+       (tam ekran / kapat / PNG düğmeleri) her zaman görünür kalır (2026-09-27). */
+    .tmPanel{max-height:calc(100vh - 90px);overflow-y:auto}
+    .tmPanel .tmHead{position:sticky;top:-14px;z-index:5;background:rgba(17,17,17,.98);margin:-14px -18px 4px;padding:10px 18px 6px}
+    /* Tam ekran: poster düzeni — üç grafik yan yana (16:9 ekranlar için) */
+    .tmPanel .tmCols{display:block}
+    .tmPanel.fullscreen .tmCols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start}
+    .tmPanel.fullscreen .tmCol{max-height:calc(100vh - 80px);overflow-y:auto;padding-right:4px}
+    .tmPanel.fullscreen .tmCol > div[style*="border-top"]{border-top:none !important;margin-top:0 !important;padding-top:0 !important}
+    .tmPanel.fullscreen #tmSvg,.tmPanel.fullscreen #tmSvgB,.tmPanel.fullscreen #tmSvgGR{max-width:none !important}
+    @media (max-width: 1100px){.tmPanel.fullscreen .tmCols{grid-template-columns:1fr}.tmPanel.fullscreen .tmCol{max-height:none}}
     .tmPanel.fullscreen{left:10px;right:10px;top:10px;bottom:10px;width:auto;max-width:none;
       max-height:none;transform:none;overflow-y:auto;z-index:1002}
     .tmPanel .tmHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;cursor:move;user-select:none;touch-action:none}
@@ -951,10 +962,13 @@
     <span>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event)" title="Üç grafiği (Time-Mag, b-değeri, Gutenberg-Richter) + bölge/yöntem bilgisini, ekrandakiyle AYNI koyu temada tek bir PNG olarak indir — Blogger/web paylaşımı için">🖼️ PNG — Web</button>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event)" title="Aynı üç grafiği beyaz zemin/koyu metinli bir düzende PNG olarak indir — akademik rapor, Word veya PDF'e gömmek için; grafiklerin kendi renkleri değişmez, yalnızca başlık/metin rengi">📄 PNG — Rapor</button>
+      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event, 'poster')" title="Poster 16:9 (1920×1080): üç grafik yan yana, koyu tema — sunum/slayt için">🖼 Poster</button>
+      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event, 'poster')" title="Poster 16:9 (1920×1080): üç grafik yan yana, açık tema — rapor/baskı için">🖼 Poster (açık)</button>
       <button class="tmFullscreenBtn" id="tmFullscreenBtn" onclick="toggleTimeMagFullscreen(event)" title="Tam ekran aç/kapat — çok sayıda parametre/grafik olduğu için küçük pencerede görülemeyen üst kısmı (Magnitude Conversion seçici dahil) erişilebilir kılar">⛶</button>
       <button class="tmClose" onclick="toggleTimeMag()">✕</button>
     </span>
   </div>
+  <div class="tmCols"><div class="tmCol tmColA">
   <div class="tmMeta" id="tmMeta">—</div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.72rem;color:#888;margin-bottom:6px;" title="EQ-LiveTürkiye önerilen bir dönüşüm bağıntısı belirlemez — yayımlanmış bağıntılar alternatif analiz seçenekleri olarak sunulur, seçilen bağıntının Mc/b-değeri üzerindeki etkisini görmenizi sağlar. Üretim kataloğu/b-değeri ızgarası bu seçimden ETKİLENMEZ, yalnızca bu panel içi görüntüleme.">
     Magnitude Conversion:
@@ -989,6 +1003,7 @@
   <svg id="tmSvg" viewBox="0 0 660 200" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;height:auto;max-width:660px"></svg>
   <div class="tmStats" id="tmStats">—</div>
   <div class="tmStats" id="tmSelected" style="min-height:1em;">💡 Bir noktaya tıklayın veya üzerine gelin → tarihi burada görün</div>
+  </div><div class="tmCol tmColB">
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
     <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=10 olay)</span></div>
@@ -1008,6 +1023,7 @@
     </div>
   </div>
 
+  </div><div class="tmCol tmColC">
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
     <div class="tmTitle" style="font-size:.78rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       📉 Gutenberg-Richter Frekans-Büyüklük Dağılımı
@@ -1040,6 +1056,7 @@
     <svg id="tmSvgGR" viewBox="0 0 420 400" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;max-width:400px;height:auto"></svg>
     <div class="tmStats" id="tmStatsGR">—</div>
   </div>
+  </div></div>
 </div>
 
 <!-- STATUS -->
@@ -2483,7 +2500,7 @@ function tmSelectPoint(t, m) {
 // "aynı analizden hem Blogger'a uygun koyu tema hem de rapora doğrudan
 // eklenebilecek açık tema"). Var olan dark-tema davranışı/commit'i
 // KORUNMUŞTUR -- bu, üzerine eklenen küçük, kontrollü bir varyant.
-async function exportTimeMagPNG(theme, evt) {
+async function exportTimeMagPNG(theme, evt, layout) {
   theme = theme === 'light' ? 'light' : 'dark';
   const PALETTE = {
     dark:  { bg:'#0a0e15', title:'#e2e8f0', meta:'#9ab0c5', region:'#7ecbff', label:'#06b6d4', stats:'#aaaaaa', footer:'#556' },
@@ -2562,11 +2579,67 @@ async function exportTimeMagPNG(theme, evt) {
   const metaRawLines = htmlToLines(document.getElementById('tmMeta').innerHTML);
   const metaLines = metaRawLines.flatMap(l => wrapText(l, innerW, '12px Arial').map(w => ({ text: w, isRegion: l.startsWith('Bölge:') })));
 
+  // POSTER 16:9 (2026-09-27): 1920×1080, üç grafik yan yana. Grafikler
+  // ekrandaki SVG'lerin aynısıdır; yalnızca yerleşim değişir.
+  if (layout === 'poster') {
+    const PW = 1920, PH = 1080, PP = 32, GAP = 28;
+    const colW = Math.floor((PW - 2 * PP - 2 * GAP) / 3);
+    const cv = document.createElement('canvas'); cv.width = PW; cv.height = PH;
+    const c = cv.getContext('2d');
+    c.fillStyle = pal.bg; c.fillRect(0, 0, PW, PH); c.textBaseline = 'top';
+    let yy = PP;
+    c.fillStyle = pal.title; c.font = 'bold 30px Arial';
+    c.fillText('EQ-Live Türkiye — Deprem Analizi', PP, yy); yy += 42;
+    const metaL = metaRawLines.flatMap(l => wrapText(l, PW - 2 * PP, '15px Arial').map(w => ({ text: w, isRegion: l.startsWith('Bölge:') }))).slice(0, 3);
+    c.font = '15px Arial';
+    metaL.forEach(l => { c.fillStyle = l.isRegion ? pal.region : pal.meta; c.fillText(l.text, PP, yy); yy += 21; });
+    yy += 14;
+    const top = yy, footH = 34, bottom = PH - PP - footH;
+    // Yerleşim: solda Zaman–Magnitude (üst) + b(t) (alt), sağda Gutenberg–Richter.
+    const leftW = Math.round((PW - 2 * PP - GAP) * 0.58), rightW = PW - 2 * PP - GAP - leftW;
+    const statLines = (id, w, font) => (document.getElementById(id).innerText || '').split('\n').map(t => t.trim()).filter(Boolean).flatMap(t => wrapText(t, w, font));
+    function block(spec, img, x0, y0, colW, maxImgH, yMax) {
+      c.fillStyle = pal.label; c.font = 'bold 17px Arial';
+      wrapText(spec.label, colW, 'bold 17px Arial').slice(0, 2).forEach(t => { c.fillText(t, x0, y0); y0 += 23; });
+      y0 += 2;
+      let w = colW, h = w * img.naturalHeight / img.naturalWidth;
+      if (h > maxImgH) { h = maxImgH; w = h * img.naturalWidth / img.naturalHeight; }
+      c.drawImage(img, x0 + (colW - w) / 2, y0, w, h);
+      y0 += h + 8;
+      c.fillStyle = pal.stats; c.font = '12.5px Arial';
+      const lines = statLines(spec.statsId, colW, '12.5px Arial');
+      const maxL = Math.max(0, Math.floor((yMax - y0) / 16));
+      lines.slice(0, maxL).forEach((t, k) => { c.fillText(k === maxL - 1 && lines.length > maxL ? t.slice(0, Math.max(0, t.length - 2)) + ' …' : t, x0, y0); y0 += 16; });
+      return y0;
+    }
+    const xL = PP, xR = PP + leftW + GAP, availH = bottom - top;
+    // Sol: Zaman–Magnitude için yüksekliğin ~%34'ü, b(t) için kalanı
+    const yMid = top + Math.round(availH * 0.40);
+    block(svgSpecs[0], images[0], xL, top, leftW, Math.round(availH * 0.40) - 23 - 8 - 16 * 3, yMid - 6);
+    block(svgSpecs[1], images[1], xL, yMid + 8, leftW, Math.round((bottom - yMid) * 0.70), bottom);
+    block(svgSpecs[2], images[2], xR, top, rightW, Math.round(availH * 0.62), bottom);
+    c.fillStyle = pal.footer; c.font = '13px Arial';
+    c.fillText('EQ-Live Türkiye · aliosmanoncel.github.io/EQ-LiveTurkiye', PP, PH - PP - 30);
+    c.textAlign = 'right'; c.fillText(`Üretim: ${new Date().toLocaleString('tr-TR')}`, PW - PP, PH - PP - 30); c.textAlign = 'left';
+    // Yeniden üretim bağlantısı (tüm URL parametreleriyle), sığmazsa kısaltılır
+    c.font = '11px Arial';
+    let u = location.href; while (u.length > 20 && c.measureText(u).width > PW - 2 * PP) u = u.slice(0, -4);
+    c.fillText(u === location.href ? u : u + '…', PP, PH - PP - 12);
+    cv.toBlob(blob => {
+      const url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = `EQ-Live-Poster-${theme === 'light' ? 'acik' : 'koyu'}-${new Date().toISOString().slice(0, 10)}.png`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      if (btn) { btn.textContent = oldLabel; btn.disabled = false; }
+    }, 'image/png');
+    return;
+  }
+
   const chartBlocks = svgSpecs.map((spec, i) => {
     const img = images[i];
     const dispW = innerW;
     const dispH = Math.round(dispW * (img.naturalHeight / img.naturalWidth));
-    const statsLines = wrapText((document.getElementById(spec.statsId).textContent || '').trim(), innerW, '11px Arial');
+    const statsLines = (document.getElementById(spec.statsId).innerText || '').split('\n').map(t => t.trim()).filter(Boolean).flatMap(t => wrapText(t, innerW, '11px Arial'));
     return { img, dispW, dispH, label: spec.label, statsLines };
   });
 
