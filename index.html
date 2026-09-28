@@ -3408,6 +3408,159 @@ function poissonBounds1sd(N) {
   if (N <= 10) return [W80_T1_LO[N], W80_T1_HI[N]];
   return [N - Math.sqrt(N), N + 0.75 + Math.sqrt(N + 0.5)];
 }
+// ── Model–gözlem denetimi: üç katman (Patch 1b, 2026-09-28) ─────────────────────────────
+// Metodoloji: seismo-report/eqlive-turkey-methodology.html, "Yöntem kararı: üç katmanlı
+// model–gözlem denetimi" ve Tablo 8t. Hiyerarşi: (1) global Poisson uyum testi (ana QC)
+// → (2) log10 R(M) profili ve Δb (tanı, hüküm üretmez) → (3) seçilmiş M_ref'te R raporu
+// (gösterge; bir model doğrulama testi değildir). R = λ_model / λ_obs. Katman (1) ve (2)
+// M_ref'i KULLANMAZ. Hiçbiri b, λ ya da N_ref hesabını değiştirmez; yalnızca rapor/uyarı üretir.
+const GR_QC = { warnR: 3, redR: 10, minN: 5, alpha: 0.05, B: 999, seed: 20260928, minProfilePts: 3, poissonKnuthMax: 10 };
+
+// PRNG: mulberry32 (32-bit durum; Math.random KULLANILMAZ). Aynı tohum → aynı dizi, [0, 1).
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+// ln Γ(x), x > 0 — Lanczos yaklaşımı (g = 7, n = 9)
+const LANCZOS_C = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
+  -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+function logGamma(x) {
+  if (x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * x)) - logGamma(1 - x);
+  x -= 1;
+  let a = LANCZOS_C[0];
+  const t = x + 7.5;
+  for (let i = 1; i < 9; i++) a += LANCZOS_C[i] / (x + i);
+  return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+}
+// Poisson örnekleme: μ < 10 → Knuth çarpım yöntemi; μ ≥ 10 → PTRS, dönüştürülmüş ret
+// (Hörmann 1993, "The transformed rejection method for generating Poisson random variables").
+function poissonSample(mu, rnd) {
+  if (!(mu > 0)) return 0;
+  if (mu < GR_QC.poissonKnuthMax) {
+    const L = Math.exp(-mu); let k = 0, p = 1;
+    do { k++; p *= rnd(); } while (p > L);
+    return k - 1;
+  }
+  const slam = Math.sqrt(mu), loglam = Math.log(mu);
+  const b = 0.931 + 2.53 * slam, a = -0.059 + 0.02483 * b;
+  const invalpha = 1.1239 + 1.1328 / (b - 3.4), vr = 0.9277 - 3.6224 / (b - 2);
+  for (;;) {
+    const U = rnd() - 0.5, V = rnd(), us = 0.5 - Math.abs(U);
+    const k = Math.floor((2 * a / us + b) * U + mu + 0.43);
+    if (us >= 0.07 && V <= vr) return k;
+    if (k < 0 || (us < 0.013 && V > us)) continue;
+    if (Math.log(V) + Math.log(invalpha) - Math.log(a / (us * us) + b) <= -mu + k * loglam - logGamma(k + 1)) return k;
+  }
+}
+// χ² üst kuyruk olasılığı: Q(df/2, x/2), düzenlenmiş eksik gamma (seri / sürekli kesir)
+function chi2Sf(x, df) {
+  if (!(x > 0)) return 1;
+  const a = df / 2, z = x / 2, gln = logGamma(a);
+  if (z < a + 1) {
+    let sum = 1 / a, del = sum, ap = a;
+    for (let n = 0; n < 1000; n++) { ap += 1; del *= z / ap; sum += del; if (Math.abs(del) < Math.abs(sum) * 1e-15) break; }
+    return Math.max(0, 1 - sum * Math.exp(-z + a * Math.log(z) - gln));
+  }
+  let b = z + 1 - a, c = 1 / 1e-300, d = 1 / b, h = d;
+  for (let i = 1; i < 1000; i++) {
+    const an = -i * (i - a); b += 2;
+    d = an * d + b; if (Math.abs(d) < 1e-300) d = 1e-300;
+    c = b + an / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+    d = 1 / d; const del = d * c; h *= del; if (Math.abs(del - 1) < 1e-15) break;
+  }
+  return Math.min(1, Math.exp(-z + a * Math.log(z) - gln) * h);
+}
+// Weichert (1980) modelinin sınıf beklenenleri: μ_i = N·T_i e^{−βm_i} / Σ_j T_j e^{−βm_j}
+// (weichertFit'in kestirdiği modelin kendisi; Σμ_i = N). classes: [{m (sınıf merkezi), n, T}]
+function weichertExpected(classes, beta) {
+  const B = classes.filter(c => c.T > 0);
+  const N = B.reduce((a, c) => a + c.n, 0);
+  const w = B.map(c => c.T * Math.exp(-beta * c.m)), s = w.reduce((a, v) => a + v, 0);
+  return w.map(v => N * v / s);
+}
+// Poisson sapması D = 2 Σ [n ln(n/μ) − (n − μ)]; n = 0 için ilk terim 0
+function poissonDeviance(ns, mus) {
+  let D = 0;
+  for (let i = 0; i < ns.length; i++) { const n = ns[i], mu = mus[i]; D += (n > 0 ? n * Math.log(n / mu) : 0) - (n - mu); }
+  return 2 * D;
+}
+// Katman (1): global Poisson uyum testi. Ana QC p değeri parametrik bootstrap ile:
+// her tekrarda n* ~ Poisson(μ̂) (aynı sınıflar, aynı T), aynı Weichert uyumu yeniden kestirilir,
+// D* hesaplanır; p_boot = (1 + #{D* ≥ D}) / (B + 1). Asimptotik χ²(K − 2) karşılaştırmalıdır.
+function grGofPoisson(classes, wf, opt) {
+  const o = Object.assign({ B: GR_QC.B, seed: GR_QC.seed }, opt || {});
+  const C = classes.filter(c => c.T > 0);
+  const K = C.length, df = K - 2;
+  if (!wf || df < 1) return { ok: false, reason: 'df', K };
+  const ns = C.map(c => c.n), mus = weichertExpected(C, wf.beta);
+  const D = poissonDeviance(ns, mus);
+  const pChi2 = chi2Sf(D, df);
+  const rnd = mulberry32(o.seed);
+  let ge = 0, nFail = 0;
+  for (let r = 0; r < o.B; r++) {
+    const sim = C.map((c, i) => ({ m: c.m, T: c.T, n: poissonSample(mus[i], rnd) }));
+    const f = weichertFit(sim);
+    if (!f) { nFail++; continue; }
+    const Ds = poissonDeviance(sim.map(c => c.n), weichertExpected(sim, f.beta));
+    if (Ds >= D) ge++;
+  }
+  const Bok = o.B - nFail;
+  const pBoot = (1 + ge) / (Bok + 1);
+  return { ok: true, D, df, K, dPerDf: D / df, pChi2, pBoot, B: o.B, Bok, nFail, failFrac: nFail / o.B,
+           seed: o.seed, nMuLt1: mus.filter(m => m < 1).length, reject: pBoot < GR_QC.alpha, alpha: GR_QC.alpha,
+           rng: 'mulberry32', poisson: `Knuth (μ < ${GR_QC.poissonKnuthMax}) / PTRS, Hörmann 1993 (μ ≥ ${GR_QC.poissonKnuthMax})` };
+}
+// Katman (2): log10 R(M) profili ve Δb (tanı; hüküm üretmez). bins: sınıf alt sınırları, cumRate, cumN.
+// Aralık: en yüksek kullanılan basamak eşiğinden ΣN(≥M) ≥ 5 koşulunun ilk kaybedildiği eşiğe kadar.
+// Ağırlıklı en küçük kareler, w = (ln 10)²·ΣN (Var(log10 λ_obs) ≈ 1/((ln 10)²·ΣN)).
+// Birikimli noktalar iç içe kuyruklardır, bağımsız değildir: SE yaklaşık ve büyük olasılıkla iyimser.
+function grRProfile(bins, mStart, modelRateAt) {
+  const eps = 1e-6, pts = [];
+  const k0 = bins.findIndex(b => b.m >= mStart - eps);
+  if (k0 >= 0) for (let k = k0; k < bins.length; k++) {
+    const b = bins[k];
+    if (!(b.T > 0) || !(b.cumN >= GR_QC.minN) || !(b.cumRate > 0)) break;
+    pts.push({ m: b.m, logR: Math.log10(modelRateAt(b.m) / b.cumRate), w: Math.LN10 * Math.LN10 * b.cumN, n: b.cumN });
+  }
+  if (pts.length < GR_QC.minProfilePts) return { ok: false, reason: 'pts', points: pts, mStart };
+  const W = pts.reduce((a, p) => a + p.w, 0);
+  const xb = pts.reduce((a, p) => a + p.w * p.m, 0) / W, yb = pts.reduce((a, p) => a + p.w * p.logR, 0) / W;
+  const Sxx = pts.reduce((a, p) => a + p.w * (p.m - xb) ** 2, 0);
+  const slope = pts.reduce((a, p) => a + p.w * (p.m - xb) * (p.logR - yb), 0) / Sxx;
+  return { ok: true, points: pts, deltaB: slope, se: Math.sqrt(1 / Sxx), mFrom: pts[0].m, mTo: pts[pts.length - 1].m, n: pts.length, mStart };
+}
+// Katman (3): seçilmiş M_ref'te R = λ_model/λ_obs raporu (gösterge; test değil).
+// λ_obs = Σ n_i/T_i (bins[k].cumRate). Aralık λ_obs'un ±1 S.D. sınırlarından (bins[k].cumLo/cumHi:
+// T'ler eşitse Weichert 1980 Tablo 1 ve dipnotu, değilse σ² = Σn/T²). Renk aralığın TAMAMINA göre:
+// tamamı [1/3, 3] içinde → ok; tamamı > 10 (ya da tamamı < 1/10) → red; diğer → warn. ΣN < 5 → fewN.
+function grConsistency(bins, m0, mRef, mTopObs, DM, modelRateAt) {
+  const eps = 1e-6;
+  if (!bins || !bins.length || !isFinite(mRef)) return { level: 'na', reason: 'nobins' };
+  if (mRef > mTopObs + eps) return { level: 'extrap' };                 // dışkestirim: ⓘ notu yeterli
+  if (mRef < m0 - eps) return { level: 'na', reason: 'below', m0 };    // M_ref, en küçük sınıfın altında
+  const k = bins.findIndex(b => b.m >= mRef - eps);                     // M_ref'e eşit ya da sonraki sınıf alt sınırı
+  const mTopLower = mTopObs - DM;                                       // gözlenen en büyük sınıfın alt sınırı
+  if (k < 0 || bins[k].m > mTopLower + eps) return { level: 'na', reason: 'top' };
+  const tail = bins.slice(k);
+  if (tail.some(b => !(b.T > 0))) return { level: 'na', reason: 'T0' };
+  const mCmp = bins[k].m, shifted = Math.abs(mCmp - mRef) > eps;
+  const nObs = tail.reduce((a, b) => a + b.n, 0);
+  if (nObs < GR_QC.minN) return { level: 'fewN', nObs, mCmp, shifted };
+  const lambdaObs = bins[k].cumRate, model = modelRateAt(mCmp), R = model / lambdaObs;
+  const lambdaObsLo = bins[k].cumLo, lambdaObsHi = bins[k].cumHi;
+  const rLo = lambdaObsHi > 0 ? model / lambdaObsHi : 0;
+  const rHi = lambdaObsLo > 0 ? model / lambdaObsLo : Infinity;
+  const level = (rLo >= 1 / GR_QC.warnR && rHi <= GR_QC.warnR) ? 'ok'
+              : (rLo > GR_QC.redR || rHi < 1 / GR_QC.redR) ? 'red' : 'warn';
+  return { level, R, rLo, rHi, model, lambdaObs, lambdaObsLo, lambdaObsHi, errSrc: bins[k].errSrc, nObs, mCmp, mRef, shifted,
+           method: 'sum_n_over_T', interval: '±1 S.D.' };
+}
 let lastGrFit = null;
 let lastGrSimple = null; // tek-Mc G-R (renderGutenbergRichter): {mc,b,a,gof,n} — poster metni için
 
@@ -3624,7 +3777,8 @@ function renderGutenbergRichterCS(cs) {
   let Mx = numIn('grMx', null);
   const dMxLo = numIn('grMxLo', -0.5), dMxHi = numIn('grMxHi', 0.2), mRef = numIn('grMref', 5.0);
   const mTopObs = +((kMax + 1) * DM).toFixed(2);
-  let mxNote = '', refNote = '';
+  let mxNote = '', refNote = '', refNoteCol = '#f59e0b';
+  const qcLines = [];   // model–gözlem denetimi satırları (Patch 1b)
   if (Mx !== null && Mx < mTopObs - 1e-9) { mxNote = `⚠ Mx (${Mx}) gözlenen en büyük sınıfın üst sınırından (${mTopObs}) küçük — Mx uygulanmadı.`; Mx = null; }
   const classesTo = mx => {
     const kHi = mx === null ? kMax : Math.max(kMax, Math.ceil(mx / DM - 1e-9) - 1);
@@ -3741,17 +3895,47 @@ function renderGutenbergRichterCS(cs) {
       (rows.length ? `<text x="${bx + 5}" y="${(by + 10 + lines.length * lh).toFixed(1)}" fill="#94a3b8" font-size="6.8" font-family="monospace" xml:space="preserve">${'EĞRİ'.padEnd(13)} ${'NO'.padStart(9)} ${'BETA'.padStart(5)} ${'B'.padStart(6)} ${'Mx'.padStart(4)}</text>` +
         rows.map((t, i) => `<text x="${bx + 5}" y="${(by + 10 + (lines.length + 1 + i) * lh).toFixed(1)}" fill="${i === 0 ? '#f5a623' : '#cbd5e1'}" font-size="6.8" font-family="monospace" xml:space="preserve">${t}</text>`).join('') : '');
     lastGrFit.nRef = nRef; lastGrFit.nRefSd = nRefSd;
-    // Tutarlılık denetimi (yalnızca uyarı): model N_ref, katalogda gözlenen M≥M_ref oranıyla kabaca uyuşmalı
+    // Model–gözlem denetimi — Patch 1b (2026-09-28), metodoloji Tablo 8t: (1) global Poisson uyum testi
+    // (ana QC, p_boot) → (2) log10 R(M) profili ve Δb (tanı) → (3) M_ref'te R raporu (gösterge, test değil).
+    // Katman (1) ve (2) M_ref'i kullanmaz. Yalnızca rapor/uyarı üretir; b, λ, N_ref değişmez.
+    // Tek veri kaynağı lastGrFit.consistency: Patch 1 alanları (level, R, lambdaObs, …) + gof + profile.
     try {
-      const nObs = items.filter(it => it.m >= mRef - 1e-9).length, Tref = csObsYears(mRef, cs.periods);
       lastGrFit.mRefExtrap = mRef > mTopObs + 1e-9;
       if (lastGrFit.mRefExtrap) {
         const sug = Math.min(5, Math.floor(mTopObs * 2) / 2);
         refNote = `ⓘ M_ref = ${mRef}, gözlenen en büyük sınıfın üst sınırının (${mTopObs}) üstünde: N${mRef} = ${nRef.toPrecision(3)}/yıl bir dışkestirimdir (extrapolation). ±σ yalnızca istatistiksel belirsizliktir; b'deki yanlılığı ve en büyük deprem belirsizliğini içermez. Veriyle desteklenen oran için M_ref ≤ ${mTopObs} (ör. ${sug.toFixed(1)}) girin.`;
       }
-      if (Tref > 0 && nObs >= 2) {
-        const obs = nObs / Tref, ratio = nRef / obs;
-        if (ratio < 0.2 || ratio > 5) refNote = `⚠ Model N${mRef} = ${nRef.toPrecision(3)}/yıl, katalogda gözlenen M≥${mRef} oranından (${nObs} olay / ${Tref.toFixed(1)} yıl = ${obs.toPrecision(3)}/yıl) yaklaşık ${ratio < 1 ? (1 / ratio).toFixed(0) + ' kat düşük' : ratio.toFixed(0) + ' kat yüksek'}. b yanlı olabilir: tamlık dönemlerini, analiz penceresini (ör. büyük ana şoktan önce kesmek) ve GK74 kümeden arındırmayı gözden geçirin. Mx ya da M_ref değiştirmek bunu düzeltmez.`;
+      const modelAt = M => wf.rate0 * Math.exp(-wf.beta * (M - m0));   // N_ref (Weichert Ek, FN5) ile aynı tanım
+      const qc = grConsistency(bins, m0, mRef, mTopObs, DM, modelAt);
+      qc.gof = grGofPoisson(clsBest, wf);
+      qc.profile = grRProfile(bins, Math.max(...cs.periods.map(p => +p.mc)), modelAt);
+      lastGrFit.consistency = qc;
+      const mC = qc.mCmp !== undefined ? +qc.mCmp.toFixed(2) : mRef;
+      const at = qc.shifted ? ` Karşılaştırma M ≥ ${mC} sınıfında yapıldı (M_ref = ${mRef} bir sınıf alt sınırı değil).` : '';
+      // (1) Global Poisson uyum testi
+      const g = qc.gof;
+      if (g.ok) {
+        const pc = g.pChi2 < 1e-4 ? g.pChi2.toExponential(1) : g.pChi2.toFixed(4);
+        qcLines.push({ col: g.reject ? '#ef4444' : '#22c55e', txt: `${g.reject ? '🔴' : '✓'} (1) Uyum testi — Poisson sapması D = ${g.D.toFixed(1)}, sd = ${g.df} (K = ${g.K} sınıf), D/sd = ${g.dPerDf.toFixed(2)}; p_boot = ${g.pBoot.toFixed(3)} (B = ${g.B}, tohum ${g.seed}; PRNG ${g.rng}; Poisson: ${g.poisson})` +
+          (g.reject ? ` < α = ${g.alpha}: G-R modeli bu sınıf sayımlarıyla uyumlu değil.` : ` ≥ α = ${g.alpha}: uyumsuzluk saptanmadı (modelin doğru olduğu anlamına gelmez).`) +
+          ` Karşılaştırma: asimptotik p_χ² = ${pc}; μ < 1 olan sınıf sayısı ${g.nMuLt1}.` +
+          (g.failFrac > 0.01 ? ` ⚠ Uyum kurulamayan tekrar oranı %${(100 * g.failFrac).toFixed(1)} (> %1).` : g.nFail ? ` Uyum kurulamayan tekrar: ${g.nFail}.` : '') });
+      } else qcLines.push({ col: '#94a3b8', txt: `ⓘ (1) Uyum testi yapılamadı: sınıf sayısı K = ${g.K} (serbestlik derecesi K − 2 ≥ 1 gerekir).` });
+      // (2) Tanı: log10 R(M) profili ve Δb — hüküm üretmez
+      const pr = qc.profile;
+      qcLines.push(pr.ok
+        ? { col: '#94a3b8', txt: `(2) Tanı — log₁₀ R(M) profili, M ${pr.mFrom.toFixed(1)}–${pr.mTo.toFixed(1)} (${pr.n} eşik, ΣN ≥ ${GR_QC.minN}): Δb = ${pr.deltaB.toFixed(2)} ± ${pr.se.toFixed(2)} (Δb > 0: b̂ düşük; SE yaklaşık, noktalar bağımsız değil). Hüküm üretmez.` }
+        : { col: '#94a3b8', txt: `ⓘ (2) Tanı — log R(M) profili için yeterli eşik yok (${pr.points.length} nokta; en az ${GR_QC.minProfilePts} gerekir; başlangıç M ${pr.mStart}).` });
+      // (3) R(M_ref) raporu — aralığın tamamına dayalı gösterge
+      if (qc.level === 'ok' || qc.level === 'warn' || qc.level === 'red') {
+        const sym = { ok: '✓', warn: '⚠️', red: '🔴' }[qc.level], col = { ok: '#22c55e', warn: '#f59e0b', red: '#ef4444' }[qc.level];
+        qcLines.push({ col, txt: `${sym} (3) R(M_ref) raporu — M ≥ ${mC}: R = λ_model/λ_obs = ${qc.R.toPrecision(3)} (±1 S.D. aralığı ${qc.rLo.toPrecision(3)}–${isFinite(qc.rHi) ? qc.rHi.toPrecision(3) : '∞'}); λ_model = ${qc.model.toPrecision(3)}/yıl, λ_obs = Σn/T = ${qc.lambdaObs.toPrecision(3)}/yıl (${qc.nObs} olay).${at} Gösterge; model doğrulama testi değildir.` });
+      } else if (qc.level === 'fewN') {
+        refNote = `ⓘ (3) R(M_ref) — M ≥ ${mC}: ${qc.nObs} olay; oran için yetersiz (en az ${GR_QC.minN} gerekir), R verilmedi.${at}`; refNoteCol = '#94a3b8';
+      } else if (qc.level === 'na' && qc.reason === 'below') {
+        refNote = `ⓘ (3) R(M_ref) — M_ref = ${mRef}, en küçük sınıfın alt sınırının (${m0}) altında; R verilmedi.`; refNoteCol = '#94a3b8';
+      } else if (qc.level === 'na' && qc.reason === 'top') {
+        refNote = `ⓘ (3) R(M_ref) — M_ref = ${mRef}, gözlenen en büyük sınıfın içinde; R için M_ref ≤ ${(mTopObs - DM).toFixed(2)} girin.`; refNoteCol = '#94a3b8';
       }
     } catch (e) {}
   }
@@ -3787,7 +3971,7 @@ function renderGutenbergRichterCS(cs) {
   const compTable = perTable + `<div style="color:#cbd5e1;margin-top:4px">Bu büyüklük sınıfı için kullanılan gözlem süresi — Weichert (1980) T</div><table style="border-collapse:collapse;border:1px solid #2a2a3a;font-size:.95em"><tr style="color:#cbd5e1"><th style="padding:0 6px">Büyüklük sınıfı</th><th style="padding:0 6px">Gözlem aralığı</th><th style="padding:0 6px">Kapsanan dönemler</th><th style="padding:0 6px">T (yıl)</th></tr>${compRows}</table>` +
     `<div style="color:#888">Tamlık dönemleri "eşik hangi tarihten itibaren kullanılabilir?" sorusunu yanıtlar; T ise Weichert hesabında her büyüklük sınıfı için kullanılan gözlem süresidir: sınıf, eşiği o sınıftan küçük/eşit olan tüm dönemlerde sayılır (ör. en yüksek eşiğin sınıfı tüm pencereyi kapsar).</div>`;
   stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif yıllık oran λ(≥M), <span style="color:#cbd5e1">│</span> ±1 S.D. (Weichert 1980 Eş. 11–12; T eşit değilse σ² = Σn/T²) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi oran n/T (sınıf merkezinde) &nbsp;|&nbsp; <span style="color:#f5a623">━</span> Weichert en iyi tahmin${Mx !== null ? ` (Mx = ${Mx} ile kesik, Eş. 14)` : ' (kesilme yok)'}${curves.length > 1 ? ` · <span style="color:#9ca3af">─</span> üst/alt eğri (β ∓ σ, Mx ${dMxHi >= 0 ? '+' : ''}${dMxHi} / ${dMxLo >= 0 ? '+' : ''}${dMxLo}; oran Eş. 10'dan)` : ''} &nbsp;|&nbsp; ΔM=${DM}${fitStr}` +
-    (mxNote ? `<div style="color:#f59e0b">${mxNote}</div>` : '') + (refNote ? `<div style="color:#f59e0b">${refNote}</div>` : '') +
+    (mxNote ? `<div style="color:#f59e0b">${mxNote}</div>` : '') + qcLines.map(l => `<div style="color:${l.col}">${l.txt}</div>`).join('') + (refNote ? `<div style="color:${refNoteCol}">${refNote}</div>` : '') +
     curves.filter(c => c.mxReq !== undefined && Math.abs(c.mx - c.mxReq) > 1e-9).map(c => `<div style="color:#f59e0b">⚠ ${c.label.toLowerCase()}: istenen Mx ${c.mxReq.toFixed(2)} gözlenen en büyük sınıfın üst sınırından küçük; ${c.mx.toFixed(2)} kullanıldı.</div>`).join('') +
     `<div style="color:#888;margin-top:2px">Mx bir model girdisidir (Weichert 1980'de üst büyüklük sınırı); Mmax kestirimi değildir. Üst/alt eğriler görsel duyarlılık içindir (gösterim: Halchuk, Burke &amp; Adams 2004).</div>` +
     ` <span style="color:#f59e0b">Birleşik katalog — tamlık dönemleri: ${stepStr} · analiz penceresi ${winStr}</span>` + compTable + magTypeDiag(items.map(it => ({ m: it.m, t: it.e.mtype || '' })));
