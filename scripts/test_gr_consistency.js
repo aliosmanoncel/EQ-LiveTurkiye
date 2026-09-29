@@ -1,4 +1,4 @@
-// Birim testleri: G-R model–gözlem denetimi (Patch 1 + Patch 1b, 2026-09-28).
+// Birim testleri: G-R model–gözlem denetimi (Patch 1 + Patch 1b + Patch 2, 2026-09-28).
 // Fonksiyonlar doğrudan index.html'den okunur (weichertFit … grConsistency); kopya tutulmaz.
 // Kullanım (depo kökünde): node scripts/test_gr_consistency.js [index.html]
 // Metodoloji: seismo-report/eqlive-turkey-methodology.html — Tablo 8s, Tablo 8t, bootstrap yordamı.
@@ -9,7 +9,9 @@ const src = fs.readFileSync(process.argv[2] || path.join(__dirname, '..', 'index
 const a = src.indexOf('function weichertFit(bins)'), b = src.indexOf('let lastGrFit = null;');
 if (a < 0 || b < 0 || b < a) throw new Error('index.html içinde weichertFit … grConsistency bloğu bulunamadı');
 const ctx = {}; vm.createContext(ctx);
-vm.runInContext(src.slice(a, b) + '\n;globalThis.__x = { weichertFit, poissonBounds1sd, GR_QC, mulberry32, logGamma, poissonSample, chi2Sf, weichertExpected, poissonDeviance, grGofPoisson, grRProfile, grConsistency };', ctx);
+const csq = src.match(/^const CS_QC = \{[^\n]*\};$/m); if (!csq) throw new Error('CS_QC bulunamadı');
+vm.runInContext(csq[0].replace('const CS_QC', 'var CS_QC'), ctx);   // posterQcSummary için (index.html'den)
+vm.runInContext(src.slice(a, b) + '\n;globalThis.__x = { weichertFit, poissonBounds1sd, GR_QC, mulberry32, logGamma, poissonSample, chi2Sf, weichertExpected, poissonDeviance, grGofPoisson, grRProfile, grConsistency, fmtPboot, posterQcSummary };', ctx);
 const X = ctx.__x;
 let pass = 0, fail = 0;
 const ok = (c, msg) => { if (c) pass++; else { fail++; console.log('FAIL', msg); } };
@@ -133,5 +135,26 @@ const Tstep = m => (m < 2.0 - 1e-9 ? 3 : 15);
   r = X.grConsistency(bd, m0, 3.5, 6.0, DM, truth);
   const kd = bd.findIndex(b => b.m >= 3.5 - 1e-6), old = bd.slice(kd).reduce((a2, b3) => a2 + b3.n, 0) / bd[kd].T;
   ok(Math.abs(r.R - 1) < 0.1 && r.level === 'ok', `farklı T: R=${r.R.toFixed(3)}; eski n/T_ref oranı ${(truth(3.5) / old).toFixed(3)}`); }
+
+// ── 8. p_boot gösterimi (Patch 2): çözünürlük alt sınırı "≤ 0.001" ─────────
+ok(X.fmtPboot({ pBoot: 1 / 1000, Bok: 999 }) === '≤ 0.001', 'fmtPboot alt sınır → ≤ 0.001');
+ok(X.fmtPboot({ pBoot: 0.143, Bok: 999 }) === '= 0.143', 'fmtPboot olağan değer');
+ok(X.fmtPboot({ pBoot: 1 / 991, Bok: 990 }) === '≤ 0.001', 'fmtPboot başarısız tekrarlı alt sınır (B_ok = 990)');
+ok(X.fmtPboot({ pBoot: 2 / 1000, Bok: 999 }) === '= 0.002', 'fmtPboot bir tekrar ≥ D → = 0.002');
+
+// ── 9. Poster kalite kontrol özeti (Patch 2, seçenek A): yapılandırılmış, kısa, metin kazımadan ──
+{ const q = { gof: { ok: true, reject: true, pBoot: 1 / 1000, Bok: 999, dPerDf: 28.097 }, profile: { ok: true, deltaB: 0.5929 }, level: 'fewN', nObs: 4, mCmp: 5 };
+  const cq = { lowMc: [{ row: 1, mc: 1.8, mcData: 2.4 }, { row: 3, mc: 1.9, mcData: 2.4 }, { row: 4, mc: 0.7, mcData: 1.6 }], inv: [{}, {}, {}, {}], small: [{ row: 2, n: 33 }], short: [] };
+  const s = X.posterQcSummary(q, cq);   // cq.warn YOK: özet uyarı metinlerinden kazınmıyor
+  console.log('Poster özeti (poster verisi):', s, `[${s.length} karakter]`);
+  for (const k of ['p_boot ≤ 0.001', 'D/sd = 28.1', 'G-R uyumsuz', 'Δb = 0.59 (b̂ düşük)', 'R(M≥5): n = 4, verilmedi',
+    '3 basamak veri Mc altında (1: 1.8<2.4, 3: 1.9<2.4, 4: 0.7<1.6)', '4 dönemde oran tersinmesi', '1 basamakta <50 olay'])
+    ok(s.includes(k), 'özet içerir: ' + k);
+  ok(s.startsWith('**Kalite kontrol:**'), 'özet başlığı');
+  ok(s.length <= 250, 'özet kısa (' + s.length + ' karakter)');
+  const s2 = X.posterQcSummary({ gof: { ok: true, reject: false, pBoot: 0.143, Bok: 999, dPerDf: 1.3 }, profile: { ok: true, deltaB: -0.043 }, level: 'ok', R: 1.107, rLo: 0.876, rHi: 1.426, mCmp: 4 }, { lowMc: [], inv: [], small: [], short: [] });
+  ok(s2.includes('p_boot = 0.143') && s2.includes('uyumsuzluk saptanmadı') && s2.includes('R(M≥4) = 1.11 [0.876–1.43]') && s2.includes("basamaklar veri Mc'siyle uyumlu"), 'temiz durum özeti: ' + s2);
+  const s3 = X.posterQcSummary(null, { capMag: true, lowMc: [], inv: [], small: [], short: [] });
+  ok(s3.includes('sorgu kesilmiş') && !s3.includes('uyum testi'), 'model–gözlem yoksa yalnızca tamlık'); }
 
 console.log(`PASS ${pass} FAIL ${fail}`); process.exit(fail ? 1 : 0);

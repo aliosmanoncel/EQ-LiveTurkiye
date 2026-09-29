@@ -2873,6 +2873,7 @@ async function exportPosterAGU(scale, evt) {
       if (line.length && lw + add > lim) { lines.push({ line, lw, lim }); line = []; lw = 0; }
       line.push({ wd, wW }); lw += (line.length > 1 ? sp : 0) + wW; });
     if (line.length) lines.push({ line, lw, lim: w - bx - (lines.length ? (o.hang || 0) : 0), last: true });
+    if (o.dry) return y + lines.length * lh;   // Patch 2: yalnızca yükseklik ölçümü (çizim yok)
     lines.forEach((L, li) => { if (o.maxY && y + lh > o.maxY) return;
       if (o.bullet && li === 0) text('▪', x, y, `${size}px Arial`, ACC);
       const gaps = L.line.length - 1, doJ = o.justify !== false && !L.last && gaps > 0 && L.lw > 0.78 * L.lim;
@@ -2980,7 +2981,15 @@ async function exportPosterAGU(scale, evt) {
     c.strokeStyle = '#d1d5db'; c.lineWidth = 1; c.strokeRect(tx, y + 1, W3 - 32, ry - y - 1);
   }
   y = box(X3, TOP + 530, W3, MID - TOP - 530, 'Sonuçlar');
-  const msg = posterVal('posterMessage', '');
+  // Patch 2 — kalite kontrol uyarısı olan sonucun raporlanması (metodoloji): model–gözlem denetimi
+  // lastGrFit.consistency'den, tamlık tanıları cs.qc'den OKUNUR; hiçbir değer yeniden hesaplanmaz.
+  const qcObj = gf && gf.consistency ? gf.consistency : null, csQc = cs && cs.qc ? cs.qc : null;
+  const gofRej = !!(qcObj && qcObj.gof && qcObj.gof.ok && qcObj.gof.reject);
+  const mcFlag = !!(csQc && (csQc.lowMcN > 0 || csQc.invN > 0));
+  const qcFlag = !!cs && (mcFlag || gofRej);
+  const msg = posterVal('posterMessage', '') || (qcFlag ? (mcFlag
+    ? 'Tamlık eşikleri veri Mc\'sinin altında; b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.'
+    : `G-R modeli sınıf sayımlarıyla uyumlu değil (p_boot ${fmtPboot(qcObj.gof)}); b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.`) : '');
   if (msg) { const ml = wrap(msg, W3 - 32 - 22, 'bold 17px Arial').slice(0, 3), mh = ml.length * 22 + 14;
     c.fillStyle = TH.soft; c.fillRect(X3 + 16, y, W3 - 32, mh); c.fillStyle = ACC; c.fillRect(X3 + 16, y, 5, mh);
     ml.forEach((l, i) => text(l, X3 + 30, y + 7 + i * 22, 'bold 17px Arial', TH.deep)); y += mh + 8; }
@@ -2989,14 +2998,21 @@ async function exportPosterAGU(scale, evt) {
   if (userRes) rItems = userRes.split('\n').map(t => t.trim()).filter(Boolean);
   else {
     rItems = [];
-    if (gf) { const best = gf.curves[0]; const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**Weichert (1980):** ${V(`b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}`)}; ${V(`λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl`)}${gf.nRef !== undefined ? `; ${V(`N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl`)}${gf.mRefExtrap ? ' (gözlenen aralığın dışında: dışkestirim)' : ''}` : ''} (N = ${gf.N}).`); }
-    if (!gf && gs) { const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**G-R (tek Mc):** ${V(`Mc = ${String(gs.mc).replace('.', ',')}`)}; ${V(`b_GR = ${gs.b.toFixed(2).replace('.', ',')}`)}; N(≥Mc) = ${gs.n.toLocaleString('tr-TR')}${gs.gof !== null ? `; GoF = %${gs.gof.toFixed(1).replace('.', ',')}` : ''}.`); }
-    if (bt) { const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`; rItems.push(`**b(t):** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` + (bt.fixed ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
-    const qc = (document.getElementById('csDiag')?.innerText || '').split('\n').map(t => t.trim()).filter(t => /^[⚠🔴]/.test(t)).map(t => t.replace(/^[⚠️🔴\s]+/u, ''));
-    rItems.push(!cs ? '**Kalite kontrol:** tamlık basamakları kullanılmadı; b ve oranlar tek Mc\'nin tüm dönemde geçerli olduğu varsayımına dayanır.' + (regionRect && !regionDeclusterOn ? ' Artçılar ayıklanmadı (GK74 kapalı).' : '')
-      : qc.length ? '**Kalite kontrol:** ' + qc.slice(0, 2).join(' ') : '**Kalite kontrol:** basamaklar veri Mc\'siyle uyumlu, uyarı yok.');
+    const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`, P = t => t;   // V: vurgulu değer; P: uyarı varken vurgusuz
+    if (cs) rItems.push(posterQcSummary(qcObj, csQc));   // kalite kontrol İLK madde, kesilmeden ve kısa/yapılandırılmış (seçenek A)
+    if (gf) { const best = gf.curves[0], E = qcFlag ? P : V;   // metodoloji (i) ve (iv)
+      rItems.push(`**Weichert (1980)${qcFlag ? ' — ⚠ yanlı olabilir' : ''}:** ${E(`b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}`)}; ${E(`λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl`)}${gf.nRef !== undefined ? `; ${E(`N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl`)}${gf.mRefExtrap ? ' (gözlenen aralığın dışında: dışkestirim)' : ''}` : ''} (N = ${gf.N}).` +
+        (qcFlag && bt && bt.fixed ? ` Karşılaştırma: sabit Mc = ${bt.fixed.mc.toFixed(1)} ile b(t) ortalaması ${bt.fixed.bAvg.toFixed(2)}.` : '')); }
+    if (!gf && gs) { rItems.push(`**G-R (tek Mc):** ${V(`Mc = ${String(gs.mc).replace('.', ',')}`)}; ${V(`b_GR = ${gs.b.toFixed(2).replace('.', ',')}`)}; N(≥Mc) = ${gs.n.toLocaleString('tr-TR')}${gs.gof !== null ? `; GoF = %${gs.gof.toFixed(1).replace('.', ',')}` : ''}.`); }
+    if (bt) { rItems.push(`**b(t):** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` + (bt.fixed && !(qcFlag && gf) ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
+    if (!cs) rItems.push('**Kalite kontrol:** tamlık basamakları kullanılmadı; b ve oranlar tek Mc\'nin tüm dönemde geçerli olduğu varsayımına dayanır.' + (regionRect && !regionDeclusterOn ? ' Artçılar ayıklanmadı (GK74 kapalı).' : ''));
   }
-  y += 2; rItems.forEach(t => { y = rich(t, X3 + 16, y, W3 - 32, { size: 14.5, lh: 19, bullet: true, maxY: MID - 6 }) + 5; });
+  // Sonuçlar kutuya sığmazsa kesilmez: punto 14,5 → 10 arasında küçültülür, küçük puntoda madde aralığı daralır (poster düzeltmesi iv)
+  y += 2;
+  { const gap = sz => (sz <= 11.5 ? 2 : 5);
+    const fits = sz => { let yy = y; rItems.forEach(t => { yy = rich(t, X3 + 16, yy, W3 - 32, { size: sz, lh: Math.round(sz * 1.31), bullet: true, dry: true }) + gap(sz); }); return yy <= MID - 6; };
+    const sizes = [14.5, 13.5, 12.5, 11.5, 10.5, 10], sz = sizes.find(fits) || sizes[sizes.length - 1];
+    rItems.forEach(t => { y = rich(t, X3 + 16, y, W3 - 32, { size: sz, lh: Math.round(sz * 1.31), bullet: true, maxY: MID - 6 }) + gap(sz); }); }
 
   // ── alt şerit: kaynaklar ve bilgi
   const BT = MID + 12, BH = H - BT - 22;
@@ -3490,6 +3506,32 @@ function poissonDeviance(ns, mus) {
   for (let i = 0; i < ns.length; i++) { const n = ns[i], mu = mus[i]; D += (n > 0 ? n * Math.log(n / mu) : 0) - (n - mu); }
   return 2 * D;
 }
+// p_boot gösterimi (Patch 2): hiçbir bootstrap tekrarı gözlenen D'ye ulaşmadıysa p_boot = 1/(B_ok + 1)
+// bootstrap çözünürlüğünün alt sınırıdır ve "≤ 0.001" (B = 999) olarak yazılır; aksi hâlde "= değer".
+function fmtPboot(g) { const lo = 1 / (g.Bok + 1); return g.pBoot <= lo + 1e-12 ? `≤ ${lo.toFixed(3)}` : `= ${g.pBoot.toFixed(3)}`; }
+// Poster "Sonuçlar" kutusu için kısa, yapılandırılmış kalite kontrol özeti (Patch 2, seçenek A).
+// Girdi: lastGrFit.consistency (q) ve cs.qc (cq) — hiçbir değer yeniden hesaplanmaz, uyarı metinleri kazınmaz.
+// Tam metinler G-R panelinde ve tamlık tanı listesinde (csDiag) aynen kalır.
+function posterQcSummary(q, cq) {
+  const f1 = v => (+v).toFixed(1), mg = [], tm = [];
+  if (q && q.gof) { const g = q.gof; mg.push(g.ok ? `uyum testi p_boot ${fmtPboot(g)} (D/sd = ${g.dPerDf.toFixed(1)}): ${g.reject ? 'G-R uyumsuz' : 'uyumsuzluk saptanmadı'}` : 'uyum testi yapılamadı'); }
+  if (q && q.profile && q.profile.ok) mg.push(`Δb = ${q.profile.deltaB.toFixed(2)} (${q.profile.deltaB > 0 ? 'b̂ düşük' : 'b̂ yüksek'})`);
+  if (q && (q.level === 'ok' || q.level === 'warn' || q.level === 'red')) mg.push(`R(M≥${q.mCmp}) = ${q.R.toPrecision(3)} [${q.rLo.toPrecision(3)}–${isFinite(q.rHi) ? q.rHi.toPrecision(3) : '∞'}]`);
+  else if (q && q.level === 'fewN') mg.push(`R(M≥${q.mCmp}): n = ${q.nObs}, verilmedi`);
+  if (cq) {
+    if (cq.capMag || cq.capChunk) tm.push('sorgu kesilmiş: T, b, λ geçersiz');
+    if (cq.lowMc && cq.lowMc.length) tm.push(`${cq.lowMc.length} basamak veri Mc altında (${cq.lowMc.map(x => `${x.row}: ${f1(x.mc)}<${f1(x.mcData)}`).join(', ')})`);
+    if (cq.inv && cq.inv.length) tm.push(`${cq.inv.length} dönemde oran tersinmesi`);
+    if (cq.small && cq.small.length) tm.push(`${cq.small.length} basamakta <${CS_QC.minEvents} olay`);
+    if (cq.short && cq.short.length) tm.push(`${cq.short.length} basamak <${CS_QC.minYears} yıl`);
+    if (cq.stepFlag) tm.push(`${cq.nSteps} basamak (gözden geçirin)`);
+    if (cq.capTime) tm.push('sorgu limitli');
+    if (cq.clipped) tm.push('T pencereye kırpıldı');
+    if (cq.nAfter) tm.push(`${cq.nAfter} basamak dönem oluşturmadı`);
+  }
+  return '**Kalite kontrol:** ' + (mg.length ? mg.join('; ') + '. ' : '') +
+    (tm.length ? 'Tamlık: ' + tm.join('; ') + '.' : "Tamlık: basamaklar veri Mc'siyle uyumlu.");
+}
 // Katman (1): global Poisson uyum testi. Ana QC p değeri parametrik bootstrap ile:
 // her tekrarda n* ~ Poisson(μ̂) (aynı sınıflar, aynı T), aynı Weichert uyumu yeniden kestirilir,
 // D* hesaplanır; p_boot = (1 + #{D* ≥ D}) / (B + 1). Asimptotik χ²(K − 2) karşılaştırmalıdır.
@@ -3679,18 +3721,19 @@ function csRenderDiag(cs) {
   else if (nP > CS_QC.softMaxSteps) warn.push(`⚠️ ${nP} tamlık basamağı tanımlandı (önerilen 2–${CS_QC.softMaxSteps}). Basamak sayısını gözden geçirin.`);
   else ok.push(`✓ ${nP} basamak`);
   let shortN = 0, smallN = 0, lowMcN = 0;
+  const qShort = [], qSmall = [], qLowMc = [], qInv = [];   // Patch 2: poster özeti için yapılandırılmış olgular (metin değişmez)
   cs.periods.forEach((p, i) => {
     const yrs = (p.t1 - p.t0) / CS_YEAR_MS;
     const n = cs.kept.filter(it => it.t >= p.t0 && it.t < p.t1 + (i === nP - 1 ? 1 : 0)).length;
     // -0.01 tolerans: 365 günlük takvim yılı = 0.9993 yıl, yanlış alarm vermesin
-    if (yrs < CS_QC.minYears - 0.01) { shortN++; warn.push(`⚠️ Basamak ${p.row ?? i + 1} (${csLabel(p)}): ${yrs.toFixed(2)} yıl — kısa dönem; Mc kestirimi kararsız olabilir.`); }
-    if (n < CS_QC.minEvents) { smallN++; warn.push(`⚠️ Basamak ${p.row ?? i + 1} (${csLabel(p)}): ${n} olay — örneklem küçük olabilir.`); }
+    if (yrs < CS_QC.minYears - 0.01) { shortN++; qShort.push({ row: p.row ?? i + 1, yrs }); warn.push(`⚠️ Basamak ${p.row ?? i + 1} (${csLabel(p)}): ${yrs.toFixed(2)} yıl — kısa dönem; Mc kestirimi kararsız olabilir.`); }
+    if (n < CS_QC.minEvents) { smallN++; qSmall.push({ row: p.row ?? i + 1, n }); warn.push(`⚠️ Basamak ${p.row ?? i + 1} (${csLabel(p)}): ${n} olay — örneklem küçük olabilir.`); }
     // Basamak Mc'si pencere verisinden kestirilen Mc'nin (maks. eğrilik +0.2)
     // 0.2'den FAZLA altındaysa, yani maks. eğrilik tepesinin de altındaysa
     // (tam 0.2 fark, +0.2 düzeltmesinin kendisidir; doğru basamakta yanlış alarm vermesin):
     // eşik altı eksik tamlık GR'yi yatıklaştırır → b aşağı yanlı (Kramer 1996).
     if (p.mcData !== null && p.mcData !== undefined && p.mc < p.mcData - CS_QC.mcGap - 1e-9) {
-      lowMcN++;
+      lowMcN++; qLowMc.push({ row: p.row ?? i + 1, mc: +p.mc, mcData: p.mcData });
       warn.push(`⚠️ Basamak ${p.row ?? i + 1} Mc=${(+p.mc).toFixed(1)}, bu penceredeki veriden kestirilen Mc değerinin (${p.mcData.toFixed(1)}; maks. eğrilik +0.2, n=${p.nAll}) belirgin biçimde altında; eşik altı eksik tamlık nedeniyle b aşağı yanlı olabilir.`);
     }
   });
@@ -3702,7 +3745,7 @@ function csRenderDiag(cs) {
     const inP = cs.kept.filter(it => it.t >= p.t0 && it.t < p.t1 + (i === nP - 1 ? 1 : 0));
     const lo = inP.filter(it => it.m >= p.mc - 1e-9 && it.m < p.mc + 0.3 - 1e-9).length;
     const hi = inP.filter(it => it.m >= p.mc + 0.3 - 1e-9 && it.m < p.mc + 0.6 - 1e-9).length;
-    if (hi >= 20 && lo < hi) { invN++; warn.push(`⚠️ Dönem ${csLabel(p)}: eşiğin hemen üstündeki sınıflarda (${(+p.mc).toFixed(1)}–${(+p.mc + 0.3).toFixed(1)}: ${lo} olay) olay sayısı bir üst banttan (${(+p.mc + 0.3).toFixed(1)}–${(+p.mc + 0.6).toFixed(1)}: ${hi} olay) düşük görünüyor. Küçük büyüklük sınıflarının yıllık oranı üst sınıflara göre düşük; bu dönemin Mc eşiğinin yeniden değerlendirilmesi önerilir.`); }
+    if (hi >= 20 && lo < hi) { invN++; qInv.push({ label: csLabel(p) }); warn.push(`⚠️ Dönem ${csLabel(p)}: eşiğin hemen üstündeki sınıflarda (${(+p.mc).toFixed(1)}–${(+p.mc + 0.3).toFixed(1)}: ${lo} olay) olay sayısı bir üst banttan (${(+p.mc + 0.3).toFixed(1)}–${(+p.mc + 0.6).toFixed(1)}: ${hi} olay) düşük görünüyor. Küçük büyüklük sınıflarının yıllık oranı üst sınıflara göre düşük; bu dönemin Mc eşiğinin yeniden değerlendirilmesi önerilir.`); }
   });
   if (!invN) ok.push(`✓ Eşik üstü sınıflarda oran tersinmesi yok`);
   if (!shortN) ok.push(`✓ Her basamak ≥ ${CS_QC.minYears} yıl`);
@@ -3723,9 +3766,28 @@ function csRenderDiag(cs) {
     warn.push(`⚠ Basamak başlangıcı analiz penceresinden önce; gözlem süresi analiz penceresine kırpıldı (başlangıç ${d0}, ${cs.tStartSrc})` +
       (nBefore > 0 ? ` · ${nBefore} basamak pencereden önce sona erdiği için kullanılmadı.` : '.'));
   }
+  // Patch 2: poster tamlık tanılarını DOM'dan kazımak yerine bu nesneden okur (veri-M_c ve oran tersinmesi bayrakları dahil)
+  cs.qc = { lowMcN, invN, warn: warn.slice(), lowMc: qLowMc, inv: qInv, small: qSmall, short: qShort,
+            nSteps: nP, stepFlag: nP > CS_QC.softMaxSteps, capMag: !!cs.capMag, capChunk: !!cs.capChunk, capTime: !!cs.capTime,
+            clipped: !!(clipped.length || nBefore > 0), nAfter };
   el.innerHTML = ok.map(t => `<span style="color:#22c55e;margin-right:10px;">${t}</span>`).join('') +
     warn.map(t => `<div style="color:${t.startsWith('🔴') ? '#f87171' : '#f59e0b'};">${t}</div>`).join('') +
-    (warn.length ? `<div style="color:#666;">Uyarılar hesaplamayı durdurmaz; kalite kontrol göstergesidir.</div>` : '');
+    (warn.length ? `<div style="color:#666;">Uyarılar hesaplamayı durdurmaz; kalite kontrol göstergesidir.</div>` : '') +
+    `<div id="csDiagGR"></div>`;   // model–gözlem denetimi: G-R çiziminden sonra csRenderGrDiag doldurur
+}
+
+// Patch 2: model–gözlem denetiminin (Tablo 8t) tamlık tanı listesine aktarımı.
+// lastGrFit.consistency'den OKUNUR; hiçbir değer yeniden hesaplanmaz.
+function csRenderGrDiag() {
+  const el = document.getElementById('csDiagGR'); if (!el) return;
+  const q = lastGrFit && lastGrFit.consistency; if (!q) { el.innerHTML = ''; return; }
+  const L = [], g = q.gof, p = q.profile;
+  if (g && g.ok) L.push({ col: g.reject ? '#f87171' : '#22c55e', t: `${g.reject ? '🔴' : '✓'} Model–gözlem (1) uyum testi: D/sd = ${g.D.toFixed(1)}/${g.df} = ${g.dPerDf.toFixed(2)}, p_boot ${fmtPboot(g)} (B = ${g.B}, tohum ${g.seed})${g.reject ? ' — G-R modeli sınıf sayımlarıyla uyumlu değil.' : ' — uyumsuzluk saptanmadı.'}` });
+  if (p && p.ok) L.push({ col: '#94a3b8', t: `Model–gözlem (2) tanı: Δb = ${p.deltaB.toFixed(2)} ± ${p.se.toFixed(2)} (M ${p.mFrom.toFixed(1)}–${p.mTo.toFixed(1)}); hüküm üretmez.` });
+  if (q.level === 'ok' || q.level === 'warn' || q.level === 'red')
+    L.push({ col: { ok: '#22c55e', warn: '#f59e0b', red: '#f87171' }[q.level], t: `${{ ok: '✓', warn: '⚠️', red: '🔴' }[q.level]} Model–gözlem (3) R(M≥${q.mCmp}) = ${q.R.toPrecision(3)} [${q.rLo.toPrecision(3)}–${isFinite(q.rHi) ? q.rHi.toPrecision(3) : '∞'}] — gösterge, test değil.` });
+  else if (q.level === 'fewN') L.push({ col: '#94a3b8', t: `ⓘ Model–gözlem (3) R(M≥${q.mCmp}): ${q.nObs} olay, R verilmedi.` });
+  el.innerHTML = L.map(x => `<div style="color:${x.col};">${x.t}</div>`).join('');
 }
 
 // b(t): N=100 kayan pencere, adım 10 — olay başına eşik (csAkiB)
@@ -3749,7 +3811,7 @@ function renderGutenbergRichterCS(cs) {
   const items = cs.kept;
   if (items.length < 10) {
     svg.innerHTML = `<text x="210" y="200" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: basamaklardan geçen N=${items.length}</text>`;
-    stats.textContent = `N=${items.length}`; return;
+    stats.textContent = `N=${items.length}`; { const gd = document.getElementById('csDiagGR'); if (gd) gd.innerHTML = ''; } return;
   }
   // Bin: floor(m/DM) — mevcut renderGutenbergRichter ile aynı konvansiyon
   const idx = m => Math.floor((m + 1e-9) / DM);
@@ -3916,7 +3978,7 @@ function renderGutenbergRichterCS(cs) {
       const g = qc.gof;
       if (g.ok) {
         const pc = g.pChi2 < 1e-4 ? g.pChi2.toExponential(1) : g.pChi2.toFixed(4);
-        qcLines.push({ col: g.reject ? '#ef4444' : '#22c55e', txt: `${g.reject ? '🔴' : '✓'} (1) Uyum testi — Poisson sapması D = ${g.D.toFixed(1)}, sd = ${g.df} (K = ${g.K} sınıf), D/sd = ${g.dPerDf.toFixed(2)}; p_boot = ${g.pBoot.toFixed(3)} (B = ${g.B}, tohum ${g.seed}; PRNG ${g.rng}; Poisson: ${g.poisson})` +
+        qcLines.push({ col: g.reject ? '#ef4444' : '#22c55e', txt: `${g.reject ? '🔴' : '✓'} (1) Uyum testi — Poisson sapması D = ${g.D.toFixed(1)}, sd = ${g.df} (K = ${g.K} sınıf), D/sd = ${g.dPerDf.toFixed(2)}; p_boot ${fmtPboot(g)} (B = ${g.B}, tohum ${g.seed}; PRNG ${g.rng}; Poisson: ${g.poisson})` +
           (g.reject ? ` < α = ${g.alpha}: G-R modeli bu sınıf sayımlarıyla uyumlu değil.` : ` ≥ α = ${g.alpha}: uyumsuzluk saptanmadı (modelin doğru olduğu anlamına gelmez).`) +
           ` Karşılaştırma: asimptotik p_χ² = ${pc}; μ < 1 olan sınıf sayısı ${g.nMuLt1}.` +
           (g.failFrac > 0.01 ? ` ⚠ Uyum kurulamayan tekrar oranı %${(100 * g.failFrac).toFixed(1)} (> %1).` : g.nFail ? ` Uyum kurulamayan tekrar: ${g.nFail}.` : '') });
@@ -3975,6 +4037,7 @@ function renderGutenbergRichterCS(cs) {
     curves.filter(c => c.mxReq !== undefined && Math.abs(c.mx - c.mxReq) > 1e-9).map(c => `<div style="color:#f59e0b">⚠ ${c.label.toLowerCase()}: istenen Mx ${c.mxReq.toFixed(2)} gözlenen en büyük sınıfın üst sınırından küçük; ${c.mx.toFixed(2)} kullanıldı.</div>`).join('') +
     `<div style="color:#888;margin-top:2px">Mx bir model girdisidir (Weichert 1980'de üst büyüklük sınırı); Mmax kestirimi değildir. Üst/alt eğriler görsel duyarlılık içindir (gösterim: Halchuk, Burke &amp; Adams 2004).</div>` +
     ` <span style="color:#f59e0b">Birleşik katalog — tamlık dönemleri: ${stepStr} · analiz penceresi ${winStr}</span>` + compTable + magTypeDiag(items.map(it => ({ m: it.m, t: it.e.mtype || '' })));
+  csRenderGrDiag();   // Patch 2: tanı listesine aktarım (lastGrFit.consistency'den okur)
 }
 
 let lastCs = null;
