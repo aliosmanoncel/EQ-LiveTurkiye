@@ -24,4 +24,9 @@ ok(C.civgin2019.convert(E('ml', 3.0)) === 0.93 * 3.0 + 0.29 && C.scordilis2006.a
 ok(!cd.applicable(E('md', 3.0)), 'varsayılan combined_dispatch MD dönüştürmüyor (eski davranış korunuyor)');
 ok(cdm.applicable(E('md', 3.0)) && Math.abs(cdm.convert(E('md', 3.0)) - exp(3.0)) < 1e-12, 'combined_dispatch_md MD kolunu koeri_md_chain\'e yönlendiriyor');
 ok(/<option value="combined_dispatch_md">/.test(src), 'UI: yeni seçenek dönüşüm listesinde (varsayılan değil)');
+const eq = C.md_as_ml, cde = C.combined_dispatch_md_eqml;
+ok(eq.applicable(E('MD', 3.0)) && eq.convert(E('MD', 3.0)) === 0.93 * 3.0 + 0.29, 'MD = ML: Md 3,0 → Çıvgın ile 3,08');
+ok(!eq.applicable(E('MD', 4.0)) && !eq.applicable(E('MD', 1.6)), 'MD = ML: Md ≥ 4,0 ve Md < 1,7 dönüştürülmez');
+for (const [t, m] of [['ml', 2.0], ['mb', 4.5]]) ok(cde.convert(E(t, m)) === cd.convert(E(t, m)) && cde.applicable(E(t, m)) === cd.applicable(E(t, m)), `${t}: combined_dispatch_md_eqml ≡ combined_dispatch`);
+ok(/<option value="combined_dispatch_md_eqml">/.test(src), 'UI: MD = ML seçeneği listede');
 console.log(`\nPASS ${pass} FAIL ${fail}`); process.exit(fail ? 1 : 0);

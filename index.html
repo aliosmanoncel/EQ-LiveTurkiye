@@ -1086,6 +1086,7 @@
       <optgroup label="🔀 Dispatch / Birleşik Strateji">
         <option value="combined_dispatch">Birleşik: Scordilis(2006) mb/Ms + Çıvgın(2019) ML</option>
         <option value="combined_dispatch_highmag_exclusion">Birleşik (M≥6.0 hariç — duyarlılık testi)</option>
+        <option value="combined_dispatch_md_eqml">Birleşik + MD: MD = ML (Md &lt; 4) → Çıvgın 2019</option>
         <option value="combined_dispatch_md">Birleşik + MD: KOERI Md zinciri (Cambaz 2019 → Çıvgın 2019)</option>
       </optgroup>
     </select>
@@ -1861,6 +1862,28 @@ const MAG_CONVERSIONS = {
       return MAG_CONVERSIONS.civgin2019.applicable({ ...e, mtype: 'ml', mag: this.mdToMl(e.mag) });
     },
     convert(e) { return MAG_CONVERSIONS.civgin2019.convert({ ...e, mtype: 'ml', mag: this.mdToMl(e.mag) }); }
+  },
+  // MD = ML varsayımı (Md < 4,0) — 2026-09-29. Dayanak: EQ-Live metodoloji belgesindeki 2026-09-13 ISC/ISF2 denetimi —
+  // aynı ajansın (KOERI/ISK) eşzamanlı MD ve ML değerleri, Marmara 2005, M 2,7–4,0, 285 olay: ortalama fark +0,06
+  // (−0,3/+0,3). Bu seçenekte MD değeri ML kabul edilir ve mevcut Çıvgın & Scordilis (2019) kaydına devredilir.
+  // Cambaz vd. (2019, 2008–2011) ile çelişir (Md − ML ≈ +0,7); iki seçenek duyarlılık olarak yan yana tutulur.
+  md_as_ml: {
+    label: 'MD = ML (Md < 4,0) → Çıvgın & Scordilis (2019) ML→Mw',
+    scope: 'regional', region: 'Türkiye ve çevresi (KOERI Md)',
+    inputTypes: ['md'], outputType: 'Mw', mdMax: 4.0,
+    validRange: 'Md 1,7 – <4,0 · Türkiye/çevresi dışında uygulanmaz',
+    reference: 'Varsayım: M < 4 için MD ≈ ML (EQ-Live 2026-09-13 ISC/ISF2 denetimi: KOERI MD − ML ortalama +0,06, n = 285, Marmara 2005, M 2,7–4,0) + Çıvgın & Scordilis (2019) ML→Mw.',
+    applicable(e) { return (e.mtype || '').toLowerCase() === 'md' && e.mag < this.mdMax && MAG_CONVERSIONS.civgin2019.applicable({ ...e, mtype: 'ml' }); },
+    convert(e) { return MAG_CONVERSIONS.civgin2019.convert({ ...e, mtype: 'ml' }); }
+  },
+  combined_dispatch_md_eqml: {
+    label: 'Birleşik + MD: MD = ML (Md < 4,0) → Çıvgın & Scordilis (2019)',
+    scope: 'dispatch', region: 'Türkiye (ML ve Md kolları için)',
+    inputTypes: ['mb', 'ms', 'ml', 'md'], outputType: 'Mw',
+    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3 · ML: 1.7–6.7 · Md: 1,7 – <4,0',
+    reference: 'combined_dispatch ile AYNI mb/Ms/ML kolları + Md olayları için md_as_ml.',
+    applicable(e) { return (e.mtype || '').toLowerCase() === 'md' ? MAG_CONVERSIONS.md_as_ml.applicable(e) : MAG_CONVERSIONS.combined_dispatch.applicable(e); },
+    convert(e) { return (e.mtype || '').toLowerCase() === 'md' ? MAG_CONVERSIONS.md_as_ml.convert(e) : MAG_CONVERSIONS.combined_dispatch.convert(e); }
   },
   combined_dispatch_md: {
     label: 'Birleşik + MD: Scordilis(2006) mb/Ms + Çıvgın&Scordilis(2019) ML + KOERI Md zinciri',
