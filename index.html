@@ -1086,6 +1086,7 @@
       <optgroup label="🔀 Dispatch / Birleşik Strateji">
         <option value="combined_dispatch">Birleşik: Scordilis(2006) mb/Ms + Çıvgın(2019) ML</option>
         <option value="combined_dispatch_highmag_exclusion">Birleşik (M≥6.0 hariç — duyarlılık testi)</option>
+        <option value="combined_dispatch_md">Birleşik + MD: KOERI Md zinciri (Cambaz 2019 → Çıvgın 2019)</option>
       </optgroup>
     </select>
     <span id="tmConversionNote" style="color:#666;"></span>
@@ -1838,6 +1839,37 @@ const MAG_CONVERSIONS = {
     reference: 'combined_dispatch ile AYNI iki bağıntıyı kullanır (Scordilis 2006 + Çıvgın & Scordilis 2019); TEK fark, M≥6.0 olaylarının dönüşüm dışı bırakılmasıdır. Yeni bir ampirik bağıntı DEĞİLDİR -- amaç, yüksek-magnitüdlü kuyruğun (bir kısmı EMSC tarafından hâlâ mb/Ms olarak, moment-tensör Mw yerine raporlanır) Mc/b-değeri/GoF üzerindeki etkisini combined_dispatch ile karşılaştırarak ÖLÇMEKTİR -- "etki yoktur" varsayılmaz, duyarlılık testiyle gösterilir (2026-09-16).',
     applicable(e) { return MAG_CONVERSIONS.combined_dispatch.applicable(e) && e.mag < 6.0; },
     convert(e) { return MAG_CONVERSIONS.combined_dispatch.convert(e); }
+  },
+  // MD (süre magnitüdü) kolu — 2026-09-29. KOERI 1992–2011 arasında Md, 2012'den itibaren ML yayımladı
+  // (Cambaz vd. 2019). Zincir: KOERI'nin KENDİ Md→ML bağıntısı (Cambaz vd. 2019, 21 543 olay, 2008–2011)
+  // + EQ-Live'da zaten kullanılan Çıvgın & Scordilis (2019) ML→Mw. Mevcut civgin2019 kaydı DEĞİŞMEZ; ML
+  // aralık/coğrafya denetimi o kayda devredilir (ara ML değeri 1,7–6,7 dışında kalan Md dönüştürülmez).
+  // Kadirioğlu & Kartal (2016) Md→Mw (3,5 ≤ Md ≤ 7,4) bu veride MD olaylarının çoğunu (2,6–3,4) kapsamadığı ve
+  // Md = 3,5'te bu zincirle ~1,2 birimlik sıçrama yarattığı için birleştirilmedi.
+  // ÜST SINIR Md < 4,0 (EQ-Live kararı): Md büyük depremlerde doyuma ulaşır — ör. KOERI 1999 İzmit için Md = 6,9
+  // verdi; zincir bunu Mw ≈ 6,2'ye çevirir (gerçek Mw ≈ 7,4–7,6). Md ≥ 4,0 olaylar dönüştürülmez, ham kalır.
+  koeri_md_chain: {
+    label: 'KOERI Md zinciri: Cambaz vd. (2019) Md→ML + Çıvgın & Scordilis (2019) ML→Mw',
+    scope: 'regional', region: 'Türkiye ve çevresi (KOERI Md)',
+    inputTypes: ['md'], outputType: 'Mw',
+    validRange: 'Md ≈ 2,39 – <4,0 (ara ML ≥ 1,7; Md ≥ 4,0 doyum nedeniyle dönüştürülmez) · Türkiye/çevresi dışında uygulanmaz',
+    mdMax: 4.0,
+    reference: 'Cambaz, M. D., Turhan, F., Yılmazer, M., Kekovalı, K., Necmioğlu, Ö. & Kalafat, D. (2019). A review on Kandilli Observatory and Earthquake Research Institute (KOERI) seismic network and earthquake catalog: 2008–2018. Advances in Geosciences, 51, 15–23. doi:10.5194/adgeo-51-15-2019 (ML = 1,0313·Md − 0,7677) + Çıvgın & Scordilis (2019) ML→Mw (civgin2019 kaydı). İki regresyonun zinciridir; hatalar birikir.',
+    mdToMl(m) { return 1.0313 * m - 0.7677; },
+    applicable(e) {
+      if ((e.mtype || '').toLowerCase() !== 'md' || !isFinite(e.mag) || !(e.mag < this.mdMax)) return false;
+      return MAG_CONVERSIONS.civgin2019.applicable({ ...e, mtype: 'ml', mag: this.mdToMl(e.mag) });
+    },
+    convert(e) { return MAG_CONVERSIONS.civgin2019.convert({ ...e, mtype: 'ml', mag: this.mdToMl(e.mag) }); }
+  },
+  combined_dispatch_md: {
+    label: 'Birleşik + MD: Scordilis(2006) mb/Ms + Çıvgın&Scordilis(2019) ML + KOERI Md zinciri',
+    scope: 'dispatch', region: 'Türkiye (ML ve Md kolları için)',
+    inputTypes: ['mb', 'ms', 'ml', 'md'], outputType: 'Mw',
+    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3 · ML: 1.7–6.7 · Md: ≈2,39 – <4,0 (KOERI ağı; Md ≥ 4,0 doyum nedeniyle ham)',
+    reference: 'combined_dispatch ile AYNI mb/Ms/ML kolları (değiştirilmedi) + Md olayları için koeri_md_chain. Dispatch: her olay yalnızca kendi mtype alanına göre tek bir kola gider.',
+    applicable(e) { return (e.mtype || '').toLowerCase() === 'md' ? MAG_CONVERSIONS.koeri_md_chain.applicable(e) : MAG_CONVERSIONS.combined_dispatch.applicable(e); },
+    convert(e) { return (e.mtype || '').toLowerCase() === 'md' ? MAG_CONVERSIONS.koeri_md_chain.convert(e) : MAG_CONVERSIONS.combined_dispatch.convert(e); }
   }
   // Gelecekte eklenecek adaylar (henüz uygulanmadı, yalnızca kayıt notu):
   // Kadirioğlu & Kartal (2016, Türkiye) ve Tan (2021, Türkiye/ISC) --
