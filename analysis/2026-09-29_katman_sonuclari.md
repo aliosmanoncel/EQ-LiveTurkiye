@@ -40,9 +40,28 @@ b: Weichert (1980), tüm sınıflar; D/sd: Poisson sapması / (K − 2); "öneri
 | L1 | veri: 3.5/2.4/2.4/1.6 | 484 | 0.746 ± 0.028 | 4.49 | 0.90 / 0.70 | 2.4 → 0.97 ± 0.05 (389) | 0.97 [0.72–1.16] |
 | **L2 MD + ML<1,7 hariç** | 3.5/2.2/2.1/0.0 | 673 | 0.852 ± 0.030 | 2.77 | 0.75 / 0.23 | 2.4 → 0.97 ± 0.05 (389) | 0.97 [0.72–1.16] |
 | L2 | veri: 3.5/2.4/2.4/2.2 | 404 | 0.933 ± 0.044 | 2.71 | 0.96 / — | 2.4 → 0.97 ± 0.05 (389) | 0.97 [0.72–1.16] |
-| L3 doğrulanmış MD→Mw | — | — | **beklemede** | — | — | — | — |
+| L3 doğrulanmış MD→Mw | — | — | ayrıntı aşağıda (L3a / L3b, yalnızca duyarlılık) | — | — | — | — |
 
-L3: yayımlanmış, bölge ve katalogla uyumlu bir MD→Mw bağıntısı kaynak doğrulamasıyla seçilene kadar uygulanmaz.
+L3: EQ-Live ana yöntemi (Scordilis 2006 mb/Ms, Çıvgın & Scordilis 2019 ML→Mw) DEĞİŞTİRİLMEDİ. Aşağıdaki MD→Mw adayları
+yalnızca MD heterojenliğinin etkisini ölçen araştırma senaryolarıdır; olayların kopyalarına uygulandı, kodda yer almaz.
+Veri hattındaki `0.0376·M² + 0.646·M − 0.269` (betiklerde "Scordilis 2006" etiketli) kaynağı doğrulanamadığı için kullanılmadı.
+
+### L3 — MD→Mw duyarlılık senaryoları (aynı donmuş küme, tek değişen etken MD dönüşümü)
+
+| Senaryo | Bağıntı (kaynak) | Dönüştürülen / aralık dışı MD | Basamaklar | N | b ± σ (tüm sınıflar) | D/sd | Önerilen M_min → b ± σ (N) | b(t) @ öneri |
+|---|---|---|---|---|---|---|---|---|
+| L3a | 0.93·(1.0313·Md − 0.7677) + 0.29 (Cambaz vd. 2019 KOERI Md→ML + Çıvgın & Scordilis 2019), Md ≥ 2.4 | 566 / 5 | 3.5/2.2/2.1/0.0 | 1206 | 0.498 ± 0.012 | 19.5 | 2.3 → 1.19 ± 0.04 (739) | 1.08 [0.72–1.43] |
+| L3a | 〃 | 566 / 5 | veri: 3.5/2.7/2.4/1.6 | 458 | 0.736 ± 0.027 | 5.21 | 2.5 → 1.07 ± 0.06 (320) | 1.06 [0.73–1.35] |
+| L3b | 1.111·Md − 0.459 (Tan 2021, GOR), Md ≥ 2.8 | 413 / 158 | 3.5/2.2/2.1/0.0 | 1366 | 0.444 ± 0.011 | 25.4 | plato yok | — |
+| L3b | 〃 | 413 / 158 | veri: 3.5/2.9/2.4/1.6 | 500 | 0.678 ± 0.024 | 6.15 | 2.7 → 1.09 ± 0.06 (289) | — |
+
+L3 sonucu:
+- MD dönüşümü, tüm sınıflar b'sini 0.426'dan yalnızca 0.44–0.50'ye taşır: tüm sınıflar b'sini belirleyen baskın etken
+  tamlık altındaki düşük sınıflardır (MD hariç tutmada da 0.510).
+- Tamlık üstünde (M_min 2.3–2.7) b: MD hariç 0.97 ± 0.05; L3a 1.07–1.19; L3b 1.09 (veri basamaklarıyla). MD ölçeğine bağlı
+  belirsizlik ≈ 0.1–0.2 birim; b ≈ 1 civarı her üç yaklaşımda korunur.
+- L3b'de Md < 2.8 olan 158 MD olayı geçerlilik dışında ham kalır; mevcut basamaklarla karışım sürer (plato yok).
+- D/sd hiçbir senaryoda ≈ 1'e inmez (≥ 2.5): kalan uyumsuzluk açık konu.
 
 ## Mevcut basamaklarla M_min taraması (L0, tüm tipler)
 
