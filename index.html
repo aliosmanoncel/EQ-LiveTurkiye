@@ -1089,6 +1089,11 @@
       </optgroup>
     </select>
     <span id="tmConversionNote" style="color:#666;"></span>
+    <span id="tmTypeFilterRow" style="display:inline-flex;gap:8px;align-items:center;margin-left:6px;" title="Magnitüd tipi duyarlılık seçenekleri (2026-09-29). Olaylar katalogdan SİLİNMEZ ve DÖNÜŞTÜRÜLMEZ; işaret kaldırılınca yalnızca bu panelin analizlerinden (zaman–büyüklük, tamlık, b(t), G-R) çıkarılır. MD: süre magnitüdü (doğrulanmış bir MD→Mw bağıntısı uygulanmadığı için ham değerle kalır). ML&lt;1,7: seçili dönüşümün geçerlilik aralığı dışında kalan, dönüştürülmemiş ML olayları. Varsayılan: ikisi de dahil (mevcut yöntem).">
+      <label style="cursor:pointer"><input type="checkbox" id="tmInclMD" checked onchange="onTmTypeFilterChange()"> MD dahil</label>
+      <label style="cursor:pointer"><input type="checkbox" id="tmInclMLlow" checked onchange="onTmTypeFilterChange()"> dönüştürülmemiş ML&lt;1,7 dahil</label>
+      <span id="tmTypeFilterNote" style="color:#f59e0b;"></span>
+    </span>
   </div>
   <details id="posterPanel" style="font-size:.72rem;color:#9ab0c5;margin-bottom:6px;border:1px solid #2a2a3a;border-radius:6px;padding:4px 7px;">
     <summary style="cursor:pointer;color:#cbd5e1;">🎓 Akademik poster / ders slaydı (AGU poster örneğinden esinlenen düzen; resmî AGU şablonu değildir)</summary>
@@ -1841,6 +1846,43 @@ const MAG_CONVERSIONS = {
   // katsayılarını girebildiği genel doğrusal bağıntı) de mimari olarak bu
   // registry'ye bir sonraki adayla aynı şekilde eklenebilir, henüz yok.
 };
+
+// ── Magnitüd tipi duyarlılık seçenekleri (2026-09-29) ─────────────────────────────────────
+// MD (süre magnitüdü) ve dönüştürülmemiş ML<1,7 olayları: katalogdan silinmez, dönüştürülmez;
+// yalnızca panel analizlerinde isteğe bağlı olarak hariç tutulur. Varsayılan: dahil (mevcut yöntem).
+// convertedList: applyMagConversionForDisplay çıktısı (dönüşen olaylar kopyadır, dönüşmeyenler orijinal referans).
+function tmIsMD(e) { return /^md$/i.test(e.mtype || ''); }
+function tmIsUnconvertedMLlow(e) {
+  if (!/^ml$/i.test(e.mtype || '') || !(e.mag < 1.7 - 1e-9)) return false;
+  return e.mw === undefined || e.mw === null || Math.abs(e.mw - e.mag) < 1e-9;   // dönüşüm uygulanmamış
+}
+function tmTypeFilter(convertedList, opt) {
+  const o = Object.assign({ md: true, mlLow: true }, opt || {});
+  let nMD = 0, nMLlow = 0;
+  const list = convertedList.filter(e => {
+    if (!o.md && tmIsMD(e)) { nMD++; return false; }
+    if (!o.mlLow && tmIsUnconvertedMLlow(e)) { nMLlow++; return false; }
+    return true;
+  });
+  return { list, nMD, nMLlow, nIn: convertedList.length };
+}
+function tmTypeFilterOpts() {
+  const md = document.getElementById('tmInclMD'), ml = document.getElementById('tmInclMLlow');
+  return { md: md ? md.checked : true, mlLow: ml ? ml.checked : true };
+}
+function onTmTypeFilterChange() {
+  const o = tmTypeFilterOpts(), url = new URL(location.href);
+  if (o.md) url.searchParams.delete('xmd'); else url.searchParams.set('xmd', '1');
+  if (o.mlLow) url.searchParams.delete('xmllow'); else url.searchParams.set('xmllow', '1');
+  history.replaceState(null, '', url);
+  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+}
+function restoreTmTypeFilterFromURL() {
+  const p = new URLSearchParams(location.search);
+  if (p.get('xmd') === '1' && document.getElementById('tmInclMD')) document.getElementById('tmInclMD').checked = false;
+  if (p.get('xmllow') === '1' && document.getElementById('tmInclMLlow')) document.getElementById('tmInclMLlow').checked = false;
+}
+let lastTmTypeFilter = null;
 
 function onTmConversionChange() {
   mcConversionMode = document.getElementById('tmConversionSel').value;
@@ -2959,6 +3001,7 @@ async function exportPosterAGU(scale, evt) {
   const tr = evs.length ? `${d(Math.min(...evs.map(e => +e.time)))} – ${d(Math.max(...evs.map(e => +e.time)))}` : '—';
   const mItems = [
     `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')}).` : '.'),
+    ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitüd tipi duyarlılık senaryosu:** ${[!lastTmTypeFilter.md ? `MD (süre magnitüdü) olayları analiz dışı (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `dönüştürülmemiş ML<1,7 olayları analiz dışı (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; olaylar katalogdan silinmedi, dönüştürülmedi.`] : []),
     cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit aralığı ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} ile olay başına eşik max(Mc_i, M_min)${bt.fit.hi !== null ? ', üst sınır M_max; çift kesik Aki–Utsu en çok olabilirlik' : '; Aki (1965) en çok olabilirlik'}; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·SE.`
       : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
@@ -4326,6 +4369,10 @@ function renderTimeMag(evList) {
   // ızgarası bundan etkilenmez.
   const convResult = applyMagConversionForDisplay(evList, mcConversionMode);
   evList = convResult.list;
+  // Magnitüd tipi duyarlılık filtresi (2026-09-29): varsayılan (ikisi de dahil) iken liste aynen geçer
+  { const tf = tmTypeFilter(evList, tmTypeFilterOpts()); evList = tf.list; lastTmTypeFilter = { ...tmTypeFilterOpts(), nMD: tf.nMD, nMLlow: tf.nMLlow, nIn: tf.nIn };
+    const nt = document.getElementById('tmTypeFilterNote');
+    if (nt) nt.textContent = (tf.nMD || tf.nMLlow) ? `duyarlılık: ${[tf.nMD ? `${tf.nMD} MD` : '', tf.nMLlow ? `${tf.nMLlow} ML<1,7` : ''].filter(Boolean).join(' + ')} olay analiz dışı (katalogda duruyor)` : ''; }
   const convEntry = MAG_CONVERSIONS[mcConversionMode];
   const convNoteEl = document.getElementById('tmConversionNote');
   if (mcConversionMode === 'none') {
@@ -6255,6 +6302,7 @@ function restoreRegionFromURL() {
 }
 posterLoadPrefs(); posterIdCheck(); posterOwnerCheck();
 restoreGrParamsFromURL();
+restoreTmTypeFilterFromURL();
 restoreRegionFromURL();
 restoreCsFromURL();
 
