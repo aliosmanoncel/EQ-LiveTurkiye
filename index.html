@@ -2990,9 +2990,11 @@ async function exportPosterAGU(scale, evt) {
   const msg = posterVal('posterMessage', '') || (qcFlag ? (mcFlag
     ? 'Tamlık eşikleri veri Mc\'sinin altında; b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.'
     : `G-R modeli sınıf sayımlarıyla uyumlu değil (p_boot ${fmtPboot(qcObj.gof)}); b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.`) : '');
-  if (msg) { const ml = wrap(msg, W3 - 32 - 22, 'bold 17px Arial').slice(0, 3), mh = ml.length * 22 + 14;
-    c.fillStyle = TH.soft; c.fillRect(X3 + 16, y, W3 - 32, mh); c.fillStyle = ACC; c.fillRect(X3 + 16, y, 5, mh);
-    ml.forEach((l, i) => text(l, X3 + 30, y + 7 + i * 22, 'bold 17px Arial', TH.deep)); y += mh + 8; }
+  // Ana mesaj (Patch 2b): kesilmez — 17 → 15 → 13 px'te en çok 3 satıra sığarsa bütün olarak çizilir; sığmazsa hiç çizilmez
+  // ve kutunun sonunda not edilir. Çizim, Sonuçlar maddelerinin yerleşim planından sonra yapılır.
+  let msgL = null;
+  if (msg) for (const fs of [17, 15, 13]) { const ml = wrap(msg, W3 - 32 - 22, `bold ${fs}px Arial`);
+    if (ml.length <= 3) { const lh = Math.round(fs * 1.3); msgL = { fs, ml, lh, mh: ml.length * lh + 14 }; break; } }
   const userRes = posterVal('posterResults', '');
   let rItems;
   if (userRes) rItems = userRes.split('\n').map(t => t.trim()).filter(Boolean);
@@ -3007,12 +3009,30 @@ async function exportPosterAGU(scale, evt) {
     if (bt) { rItems.push(`**b(t):** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` + (bt.fixed && !(qcFlag && gf) ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
     if (!cs) rItems.push('**Kalite kontrol:** tamlık basamakları kullanılmadı; b ve oranlar tek Mc\'nin tüm dönemde geçerli olduğu varsayımına dayanır.' + (regionRect && !regionDeclusterOn ? ' Artçılar ayıklanmadı (GK74 kapalı).' : ''));
   }
-  // Sonuçlar kutuya sığmazsa kesilmez: punto 14,5 → 10 arasında küçültülür, küçük puntoda madde aralığı daralır (poster düzeltmesi iv)
-  y += 2;
-  { const gap = sz => (sz <= 11.5 ? 2 : 5);
-    const fits = sz => { let yy = y; rItems.forEach(t => { yy = rich(t, X3 + 16, yy, W3 - 32, { size: sz, lh: Math.round(sz * 1.31), bullet: true, dry: true }) + gap(sz); }); return yy <= MID - 6; };
-    const sizes = [14.5, 13.5, 12.5, 11.5, 10.5, 10], sz = sizes.find(fits) || sizes[sizes.length - 1];
-    rItems.forEach(t => { y = rich(t, X3 + 16, y, W3 - 32, { size: sz, lh: Math.round(sz * 1.31), bullet: true, maxY: MID - 6 }) + gap(sz); }); }
+  // Sonuçlar kutusu (poster düzeltmesi iv; Patch 2b — madde bütünlüğü): punto 14,5 → 10 arasında küçültülür, küçük puntoda
+  // madde aralığı daralır. 10 puntoda da sığmazsa HİÇBİR MADDE ORTASINDAN KESİLMEZ: sığmayan son maddeler bütün olarak
+  // çıkarılır ve kutunun son satırında sayısıyla belirtilir (posterFitItems). Kalite kontrol ilk maddedir; ona yer kalmıyorsa
+  // önce Ana mesaj çıkarılır.
+  { const gap = sz => (sz <= 11.5 ? 2 : 5), lhOf = sz => Math.round(sz * 1.31), bot = MID - 6;
+    const ro = sz => ({ size: sz, lh: lhOf(sz), bullet: true });
+    const noteTxt = (nd, mOmit) => `⚠ ${mOmit ? 'Ana mesaj' + (nd ? ' ve ' : '') : ''}${nd ? nd + ' madde' : ''} kutuya sığmadı; tam metin EQ-Live uygulamasında.`;
+    const noteO = sz => ({ size: sz, lh: lhOf(sz), italic: true, col: '#b45309' });
+    const plan = useMsg => {
+      const y0 = y + (useMsg ? msgL.mh + 8 : 0) + 2, avail = bot - y0, mOmit = !!msg && !useMsg;
+      const hs = sz => rItems.map(t => rich(t, X3 + 16, y0, W3 - 32, { ...ro(sz), dry: true }) - y0);
+      const nH = sz => rich(noteTxt(rItems.length, mOmit), X3 + 16, y0, W3 - 32, { ...noteO(sz), dry: true }) - y0;
+      for (const sz of [14.5, 13.5, 12.5, 11.5, 10.5]) { const f = posterFitItems(hs(sz), gap(sz), avail, nH(sz), mOmit);
+        if (!f.dropped) return { y0, sz, mOmit, ...f }; }
+      return { y0, sz: 10, mOmit, ...posterFitItems(hs(10), gap(10), avail, nH(10), mOmit) }; };
+    let pl = plan(!!msgL);
+    if (msgL && rItems.length && pl.keep === 0) pl = plan(false);
+    if (msgL && !pl.mOmit) { const { fs, ml, lh, mh } = msgL;
+      c.fillStyle = TH.soft; c.fillRect(X3 + 16, y, W3 - 32, mh); c.fillStyle = ACC; c.fillRect(X3 + 16, y, 5, mh);
+      ml.forEach((l, i) => text(l, X3 + 30, y + 7 + i * lh, `bold ${fs}px Arial`, TH.deep)); }
+    y = pl.y0;
+    rItems.slice(0, pl.keep).forEach(t => { y = rich(t, X3 + 16, y, W3 - 32, { ...ro(pl.sz), maxY: bot }) + gap(pl.sz); });
+    if (pl.dropped || pl.mOmit) rich(noteTxt(pl.dropped, pl.mOmit), X3 + 16, y, W3 - 32, { ...noteO(pl.sz), maxY: bot + 6 });
+    if (pl.dropped || pl.mOmit) console.warn('[poster] Sonuçlar:', noteTxt(pl.dropped, pl.mOmit)); }
 
   // ── alt şerit: kaynaklar ve bilgi
   const BT = MID + 12, BH = H - BT - 22;
@@ -3531,6 +3551,17 @@ function posterQcSummary(q, cq) {
   }
   return '**Kalite kontrol:** ' + (mg.length ? mg.join('; ') + '. ' : '') +
     (tm.length ? 'Tamlık: ' + tm.join('; ') + '.' : "Tamlık: basamaklar veri Mc'siyle uyumlu.");
+}
+// Poster "Sonuçlar" yerleşimi (Patch 2b — madde bütünlüğü). hs: madde yükseklikleri (px, aralık hariç); gp: madde aralığı;
+// avail: kullanılabilir yükseklik; noteH: "… sığmadı" notunun yüksekliği; noteAlways: not her durumda yazılacaksa (ör. Ana mesaj
+// çıkarıldıysa) yeri baştan ayrılır. Hepsi sığarsa { keep: n, dropped: 0 }; sığmazsa sıra korunarak baştan, not için yer
+// bırakan en çok madde tutulur. Tutulan hiçbir madde kesilmez: Σ(h + gp) + (not varsa noteH) ≤ avail.
+function posterFitItems(hs, gp, avail, noteH, noteAlways) {
+  const reserve = noteAlways ? noteH : 0, total = hs.reduce((a, h) => a + h + gp, 0);
+  if (total + reserve <= avail) return { keep: hs.length, dropped: 0 };
+  let used = 0, k = 0;
+  while (k < hs.length && used + hs[k] + gp + noteH <= avail) { used += hs[k] + gp; k++; }
+  return { keep: k, dropped: hs.length - k };
 }
 // Katman (1): global Poisson uyum testi. Ana QC p değeri parametrik bootstrap ile:
 // her tekrarda n* ~ Poisson(μ̂) (aynı sınıflar, aynı T), aynı Weichert uyumu yeniden kestirilir,

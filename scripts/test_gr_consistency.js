@@ -11,7 +11,7 @@ if (a < 0 || b < 0 || b < a) throw new Error('index.html içinde weichertFit …
 const ctx = {}; vm.createContext(ctx);
 const csq = src.match(/^const CS_QC = \{[^\n]*\};$/m); if (!csq) throw new Error('CS_QC bulunamadı');
 vm.runInContext(csq[0].replace('const CS_QC', 'var CS_QC'), ctx);   // posterQcSummary için (index.html'den)
-vm.runInContext(src.slice(a, b) + '\n;globalThis.__x = { weichertFit, poissonBounds1sd, GR_QC, mulberry32, logGamma, poissonSample, chi2Sf, weichertExpected, poissonDeviance, grGofPoisson, grRProfile, grConsistency, fmtPboot, posterQcSummary };', ctx);
+vm.runInContext(src.slice(a, b) + '\n;globalThis.__x = { weichertFit, poissonBounds1sd, GR_QC, mulberry32, logGamma, poissonSample, chi2Sf, weichertExpected, poissonDeviance, grGofPoisson, grRProfile, grConsistency, fmtPboot, posterQcSummary, posterFitItems };', ctx);
 const X = ctx.__x;
 let pass = 0, fail = 0;
 const ok = (c, msg) => { if (c) pass++; else { fail++; console.log('FAIL', msg); } };
@@ -156,5 +156,26 @@ ok(X.fmtPboot({ pBoot: 2 / 1000, Bok: 999 }) === '= 0.002', 'fmtPboot bir tekrar
   ok(s2.includes('p_boot = 0.143') && s2.includes('uyumsuzluk saptanmadı') && s2.includes('R(M≥4) = 1.11 [0.876–1.43]') && s2.includes("basamaklar veri Mc'siyle uyumlu"), 'temiz durum özeti: ' + s2);
   const s3 = X.posterQcSummary(null, { capMag: true, lowMc: [], inv: [], small: [], short: [] });
   ok(s3.includes('sorgu kesilmiş') && !s3.includes('uyum testi'), 'model–gözlem yoksa yalnızca tamlık'); }
+
+// ── 10. Poster Sonuçlar yerleşimi (Patch 2b — madde bütünlüğü): hiçbir madde ortasından kesilmez ──
+{ const F = X.posterFitItems;
+  const used = (hs, gp, r) => hs.slice(0, r.keep).reduce((a, h) => a + h + gp, 0);
+  let r = F([40, 30, 20], 2, 100, 13, false); ok(r.keep === 3 && r.dropped === 0, 'hepsi sığar (96 ≤ 100)');
+  r = F([40, 30, 20], 2, 95, 13, false); ok(r.keep === 2 && r.dropped === 1 && used([40, 30, 20], 2, r) + 13 <= 95, 'son madde bütün olarak çıkar, not için yer ayrılır');
+  r = F([40, 30, 20], 2, 96, 13, true); ok(r.keep === 2 && r.dropped === 1, 'noteAlways: Ana mesaj notu için yer ayrılır');
+  r = F([40, 30, 20], 2, 200, 13, true); ok(r.keep === 3 && r.dropped === 0, 'noteAlways ama hepsi + not sığar');
+  r = F([120, 10], 2, 100, 13, false); ok(r.keep === 0 && r.dropped === 2, 'ilk madde sığmazsa kesilmez, hiç tutulmaz');
+  r = F([], 2, 100, 13, false); ok(r.keep === 0 && r.dropped === 0, 'boş liste');
+  r = F([50, 10, 10], 2, 70, 13, false); ok(r.keep === 1, 'sıra korunur: sonraki küçük madde öne alınmaz');
+  // özellik testi: rastgele girdilerde tutulanlar + not her zaman sığar, keep + dropped = n
+  const rnd = X.mulberry32(20260928); let okAll = true, cnt = 0;
+  for (let it = 0; it < 2000; it++) { const n = Math.floor(rnd() * 7), hs = Array.from({ length: n }, () => 5 + Math.floor(rnd() * 80)),
+      gp = rnd() < 0.5 ? 2 : 5, avail = 20 + Math.floor(rnd() * 200), nh = 13, na = rnd() < 0.3, q = F(hs, gp, avail, nh, na);
+    const u = used(hs, gp, q) + ((q.dropped || na) ? nh : 0);
+    if (q.keep + q.dropped !== n || u > avail && q.keep > 0) okAll = false; if (q.dropped) cnt++; }
+  ok(okAll, 'özellik (2000 rastgele): tutulan maddeler + not ≤ avail, keep + dropped = n');
+  ok(cnt > 100, 'özellik testi taşma durumlarını da kapsar (' + cnt + ')');
+  const src2 = require('fs').readFileSync(require('path').join(__dirname, '..', 'index.html'), 'utf8');
+  ok(!/wrap\(msg[^\n]*\.slice\(0, 3\)/.test(src2), 'Ana mesaj artık 3 satırda sessizce kesilmiyor'); }
 
 console.log(`PASS ${pass} FAIL ${fail}`); process.exit(fail ? 1 : 0);
