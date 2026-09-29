@@ -75,7 +75,11 @@ console.log('\n2. Zaman ve büyüklük sınırları');
 console.log('\n3. Olabilirlik: sınıf kümesi');
 { const wSrc = cut('function weichertFit(bins)', '// Sabit β için');
   ok(/const B = bins\.filter\(b => b\.T > 0\);/.test(wSrc) && !/bins\.forEach/.test(wSrc), 'weichertFit: pay (Σn m) ve payda (ΣT e^{-βm}) aynı B kümesi üzerinden');
-  ok(/for \(let k = kMin; k <= kHi; k\+\+\)/.test(binBlock), 'classesTo: kMin…kMax arası BOŞ sınıflar da (n=0) katılıyor (Weichert 1980 gereği)'); }
+  // Davranış testi (kaynak metnine bağlı değil): araya boş sınıf düşen katalogda n = 0 sınıfı olabilirliğe giriyor mu?
+  setSteps([{ start: '1999-01-01', mc: 2.0 }], [D('1999-01-01'), T_END]);
+  const e0 = []; for (let i = 0; i < 12; i++) { e0.push(ev(D('2010-01-01') + i * 864e5, 2.0)); e0.push(ev(D('2011-01-01') + i * 864e5, 2.4)); }
+  const r0 = chain(e0), gaps = r0.clsBest.filter(c => c.n === 0).map(c => (c.m - 0.05).toFixed(1));
+  ok(gaps.join(',') === '2.1,2.2,2.3', 'classesTo: kMin…kMax arası BOŞ sınıflar da (n=0) katılıyor (Weichert 1980 gereği): ' + gaps.join(',')); }
 
 // ── Sentetik katalog üreteci ──
 const mulberry32 = run('mulberry32');
