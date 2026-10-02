@@ -1,1 +1,1 @@
-{"generated":"2026-10-02T06:33:18Z","source":"USGS FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"ci41341935","time":"2026-10-02T06:07:08.420","lat":32.829,"lon":-115.58533333333,"dep":12.01,"mag":1.1,"mtype":"ml","mw":0.49,"place":"3 km SW of Imperial, CA"},{"id":"us6000tyzt","time":"2026-10-02T05:38:55.084","lat":2.5781,"lon":126.4944,"dep":10.0,"mag":4.8,"mtype":"mb","mw":5.11,"place":"192 km WNW of Tobelo, Indonesia"}]}
+{"generated":"2026-10-02T13:27:10Z","source":"USGS FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
