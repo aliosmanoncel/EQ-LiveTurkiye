@@ -1,0 +1,23 @@
+{
+ "id": "kumamoto2016",
+ "title_tr": "2016 Kumamoto depremi (ana şok) — USGS ShakeMap",
+ "title_en": "2016 Kumamoto earthquake (mainshock) — USGS ShakeMap",
+ "usgs": "https://earthquake.usgs.gov/earthquakes/eventpage/us20005iis/executive",
+ "event": "us20005iis",
+ "mag": "M 7.0",
+ "place": "6 km ESE of Kumamoto, Japan",
+ "date": "2016-04-15 UTC (16 Nisan JST)",
+ "bounds": {
+  "north": 36.38333333333333,
+  "south": 29.183333333333334,
+  "east": 135.38333333333333,
+  "west": 126.75
+ },
+ "epicenter": {
+  "lon": 130.7543,
+  "lat": 32.7906
+ },
+ "source": "USGS ShakeMap KMZ (event page download, 2026-10-04)",
+ "contours": 14,
+ "kmz": "shakemap.kmz"
+}

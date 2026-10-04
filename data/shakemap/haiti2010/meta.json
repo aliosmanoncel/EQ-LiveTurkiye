@@ -1,0 +1,23 @@
+{
+ "id": "haiti2010",
+ "title_tr": "2010 Haiti depremi — USGS ShakeMap",
+ "title_en": "2010 Haiti earthquake — USGS ShakeMap",
+ "usgs": "https://earthquake.usgs.gov/earthquakes/eventpage/usp000h60h/executive",
+ "event": "usp000h60h",
+ "mag": "M 7.0",
+ "place": "10 km SE of Léogâne, Haiti",
+ "date": "2010-01-12",
+ "bounds": {
+  "north": 22.333333333333332,
+  "south": 14.549999999999999,
+  "east": -68.28333333333333,
+  "west": -76.88333333333333
+ },
+ "epicenter": {
+  "lon": -72.571,
+  "lat": 18.443
+ },
+ "source": "USGS ShakeMap KMZ (event page download, 2026-10-04)",
+ "contours": 11,
+ "kmz": "shakemap.kmz"
+}

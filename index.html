@@ -313,6 +313,8 @@
   <button class="tbtn"        id="btnStations" onclick="toggleLayer('stations')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="İstasyon Ağı · AFAD (statik, deprem.afad.gov.tr) + KOERI (gerçek Açılış tarihine göre zaman filtreli, koeri.boun.edu.tr) · RQ-Mc-EMSC Network Effect (seismo-report §8) için keşif/diagnostic katmanı — Mc hesabına veya canlı sorguya bağlı DEĞİLDİR">📡 İstasyon Ağı</button>
   <button class="tbtn"        id="btnCityNet" onclick="toggleLayer('citynet')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Şehir Tabanlı İzleme · bir metropol alanının kendi yerel sismograf ağı (Türkiye ulusal AFAD/KOERI ağının aksine) · ilk örnek: Hong Kong Observatory 8-istasyon ağı (1979/1997) · konumlar yaklaşık (bkz. popup)">🏙️ Şehir Tabanlı İzleme</button>
   <button class="tbtn active" id="btnLabels" onclick="toggleLayer('labels')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Yer adı / şehir etiketleri katmanı">🏷️ Etiketler</button>
+  <button class="tbtn"        id="btnEventLib" onclick="toggleEventLib()" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Olay Katmanları (KMZ Library) · seçili büyük depremlerin USGS ShakeMap şiddet (MMI) haritaları · data/shakemap/index.json">🗂️ Olay Katmanları</button>
+  <div id="eventLibBox" class="hidden" style="border-top:1px solid #334;margin-top:2px;padding-top:5px;font-size:.68rem;color:#ccc;max-width:190px"></div>
   <div id="stationYearCtrl" class="hidden" style="border-top:1px solid #334;margin-top:2px;padding-top:5px;font-size:.68rem;color:#aaa">
     <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span>KOERI yılı</span><span id="stationYearVal">2026</span></div>
     <input type="range" id="stationYearSlider" min="1997" max="2026" value="2026" style="width:100%" oninput="updateStationYear(this.value)">
@@ -1361,6 +1363,100 @@ function setScope(scope) {
     url.searchParams.set('zoom', map.getZoom());
     history.replaceState(null, '', url);
   });
+})();
+
+/* OLAY KATMANLARI (KMZ Library) — USGS ShakeMap (2026-10-04, "İki Deprem, İki
+   Farklı Sonuç" serisi No. 1). Kayıtlar: data/shakemap/index.json; her olay
+   data/shakemap/<id>/ altında: meta.json, overlay.png (KMZ'deki IntensityOverlay),
+   contours.geojson (KMZ'deki "MMI Contours"), legend.png, shakemap.kmz (orijinal,
+   indirilebilir). KMZ tarayıcıda ayrıştırılmaz — bir kez dönüştürülür (Leaflet
+   KMZ okumaz; 1.5–2.3 MB KML'yi her ziyarette açmak gereksiz). Değerler USGS'nin.
+   Kullanım: sağ üstteki "🗂️ Olay Katmanları" düğmesi veya ?shakemap=<id>
+   (ör. ?shakemap=haiti2010). Linkte lat/lng yoksa harita katmana sığdırılır. */
+const SHAKEMAP_BASE = 'data/shakemap/';
+const shakemapLayers = {};
+let shakemapLib = null;
+function shakemapInfoBox(m, base) {
+  let d = document.getElementById('shakemapInfo');
+  if (!d) {
+    d = L.DomUtil.create('div', 'shakemap-info', map.getContainer());
+    d.id = 'shakemapInfo';
+    d.style.cssText = 'position:absolute;left:62px;top:104px;z-index:900;background:rgba(10,14,21,.92);color:#e2e8f0;padding:8px 10px;border-radius:8px;font:12px/1.45 system-ui,sans-serif;width:260px;border:1px solid rgba(255,255,255,.15)';
+    L.DomEvent.disableClickPropagation(d); L.DomEvent.disableScrollPropagation(d);
+  }
+  d.innerHTML = '<span title="Kapat" style="float:right;cursor:pointer;opacity:.7;font-size:14px;margin-left:6px" onclick="this.parentNode.remove()">×</span>' +
+    '<strong>' + m.title_tr + '</strong><br><span style="opacity:.75">' + m.title_en + '</span>' +
+    '<img src="' + base + 'legend.png" alt="MMI ölçeği / MMI scale" style="display:block;width:100%;margin:6px 0;background:#fff;border-radius:4px">' +
+    '<span style="opacity:.75">Kaynak: USGS ShakeMap · </span><a href="' + m.usgs + '" target="_blank" rel="noopener" style="color:#7ecbff">' + m.event + '</a>' +
+    (m.kmz ? ' · <a href="' + base + m.kmz + '" download style="color:#7ecbff">KMZ indir</a>' : '');
+}
+function showShakemap(id, fit) {
+  if (!/^[a-z0-9_-]{1,40}$/.test(id)) return Promise.resolve();
+  const base = SHAKEMAP_BASE + id + '/';
+  if (shakemapLayers[id]) {
+    shakemapLayers[id].group.addTo(map);
+    shakemapInfoBox(shakemapLayers[id].meta, base);
+    if (fit) map.fitBounds(shakemapLayers[id].bounds, { padding: [20, 20] });
+    return Promise.resolve();
+  }
+  return fetch(base + 'meta.json').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(m => {
+    const b = L.latLngBounds([m.bounds.south, m.bounds.west], [m.bounds.north, m.bounds.east]);
+    const g = L.layerGroup([L.imageOverlay(base + 'overlay.png', b, { opacity: 0.55, interactive: false, zIndex: 350 })]);
+    if (m.epicenter) {
+      L.circleMarker([m.epicenter.lat, m.epicenter.lon], { radius: 7, color: '#ffffff', weight: 2, fillColor: '#e11d48', fillOpacity: 1 })
+        .bindPopup('<strong>' + m.mag + '</strong> · ' + m.place + '<br>' + m.date +
+                   '<br><a href="' + m.usgs + '" target="_blank" rel="noopener">USGS olay sayfası →</a>')
+        .addTo(g);
+    }
+    fetch(base + 'contours.geojson').then(r => r.json()).then(gj => {
+      L.geoJSON(gj, {
+        style: f => ({ color: f.properties.color, weight: 1.6, opacity: 0.9 }),
+        onEachFeature: (f, l) => l.bindTooltip('MMI ' + f.properties.mmi, { sticky: true })
+      }).addTo(g);
+    }).catch(() => {});
+    shakemapLayers[id] = { group: g, bounds: b, meta: m };
+    g.addTo(map);
+    shakemapInfoBox(m, base);
+    if (fit) map.fitBounds(b, { padding: [20, 20] });
+  }).catch(() => {});
+}
+function hideShakemap(id) {
+  const L0 = shakemapLayers[id]; if (L0) map.removeLayer(L0.group);
+  const anyOn = Object.values(shakemapLayers).some(x => map.hasLayer(x.group));
+  const d = document.getElementById('shakemapInfo'); if (d && !anyOn) d.remove();
+}
+function toggleShakemapItem(id, on) {
+  if (on) showShakemap(id, true); else hideShakemap(id);
+  const url = new URL(location.href);
+  const onIds = Object.keys(shakemapLayers).filter(k => map.hasLayer(shakemapLayers[k].group));
+  if (on && !onIds.includes(id)) onIds.push(id);
+  if (onIds.length) url.searchParams.set('shakemap', onIds.join(',')); else url.searchParams.delete('shakemap');
+  history.replaceState(null, '', url);
+}
+function renderEventLib(box) {
+  const ev = (shakemapLib && shakemapLib.events) || [];
+  box.innerHTML = '<div style="color:#9fb8d4;font-weight:700;margin-bottom:4px">' + (shakemapLib ? shakemapLib.title_tr : 'Olay Katmanları') + '</div>' +
+    ev.map(e => '<label style="display:flex;gap:6px;align-items:flex-start;margin:3px 0;cursor:pointer">' +
+      '<input type="checkbox" data-sm="' + e.id + '"' + (shakemapLayers[e.id] && map.hasLayer(shakemapLayers[e.id].group) ? ' checked' : '') + '>' +
+      '<span>' + e.label_tr + '<br><span style="opacity:.65">' + e.mag + ' · ' + e.place + '</span></span></label>').join('') +
+    '<div style="opacity:.6;margin-top:4px">Kaynak: USGS ShakeMap</div>';
+  box.querySelectorAll('input[data-sm]').forEach(cb => cb.addEventListener('change', () => toggleShakemapItem(cb.dataset.sm, cb.checked)));
+}
+function toggleEventLib() {
+  const box = document.getElementById('eventLibBox'), btn = document.getElementById('btnEventLib');
+  if (!box) return;
+  const open = box.classList.toggle('hidden') === false;
+  if (btn) btn.classList.toggle('active', open);
+  if (!open) return;
+  if (shakemapLib) { renderEventLib(box); return; }
+  box.textContent = 'Yükleniyor…';
+  fetch(SHAKEMAP_BASE + 'index.json').then(r => r.json()).then(j => { shakemapLib = j; renderEventLib(box); })
+    .catch(() => { box.textContent = 'Olay listesi yüklenemedi.'; });
+}
+(() => {
+  const p = new URLSearchParams(location.search);
+  const ids = (p.get('shakemap') || '').split(',').filter(Boolean);
+  ids.forEach((id, k) => showShakemap(id, !p.has('lat') && k === 0));
 })();
 
 const darkBase = L.tileLayer(

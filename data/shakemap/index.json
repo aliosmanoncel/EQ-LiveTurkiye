@@ -1,0 +1,21 @@
+{
+ "title_tr": "Olay Katmanları (KMZ Library)",
+ "title_en": "Event Layers (KMZ Library)",
+ "note": "USGS ShakeMap KMZ dosyaları Leaflet katmanına dönüştürülmüştür (overlay.png + contours.geojson); orijinal KMZ her klasörde shakemap.kmz olarak indirilebilir. Yeni olay eklemek: klasör + meta.json oluştur, buraya bir satır ekle.",
+ "events": [
+  {
+   "id": "haiti2010",
+   "label_tr": "Haiti 2010 — USGS ShakeMap",
+   "mag": "M 7.0",
+   "place": "10 km SE of Léogâne, Haiti",
+   "usgs": "https://earthquake.usgs.gov/earthquakes/eventpage/usp000h60h/executive"
+  },
+  {
+   "id": "kumamoto2016",
+   "label_tr": "Kumamoto 2016 — USGS ShakeMap",
+   "mag": "M 7.0",
+   "place": "6 km ESE of Kumamoto, Japan",
+   "usgs": "https://earthquake.usgs.gov/earthquakes/eventpage/us20005iis/executive"
+  }
+ ]
+}
