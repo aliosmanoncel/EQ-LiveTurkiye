@@ -1,0 +1,219 @@
+{
+ "schema": "mw_authority/1",
+ "version": "mwauth-2026-10-06",
+ "description": "Büyük depremler için otoriter Mw geçersiz kılma tablosu (Faz 2a). Seçim ölçütü (tabloya giriş): otoriter Mw ≥ 6,5 ya da katalogda doymuş/dönüştürülmemiş büyüklük. Eşleşme büyüklükle DEĞİL olay kimliğiyle yapılır: (1) kaynak olay kimliği; (2) zaman ±60 s ve uzaklık ≤ 50 km, en küçük |dt| (eşitlikte en küçük uzaklık); her kayıt en çok bir katalog olayıyla eşleşir. Yalnız status = verified kayıtlar kullanılır. Değer kuralı: USGS tercihli büyüklüğü; alternatifler ayrıca kayıtlı.",
+ "match": {
+  "dt_s": 60,
+  "dist_km": 50
+ },
+ "entries": [
+  {
+   "name": "1999 İzmit (Kocaeli)",
+   "group": "A",
+   "status": "verified",
+   "time_utc": "1999-08-17T00:01:39.130Z",
+   "lat": 40.748,
+   "lon": 29.864,
+   "mw": 7.6,
+   "mag_type": "Mwc",
+   "source": "USGS ComCat (tercihli büyüklük)",
+   "source_event_id": "usp0009d4z",
+   "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/usp0009d4z",
+   "accessed": "2026-10-06",
+   "alternatives": [
+    {
+     "mw": 7.5,
+     "mag_type": "Mww",
+     "source": "Duputel (W-fazı)"
+    }
+   ],
+   "note": "USGS tercihli büyüklük HRV/GCMT Mwc (M0 = 2,9e20 N·m)."
+  },
+  {
+   "name": "1999 Düzce",
+   "group": "A",
+   "status": "verified",
+   "time_utc": "1999-11-12T16:57:19.550Z",
+   "lat": 40.758,
+   "lon": 31.161,
+   "mw": 7.2,
+   "mag_type": "Mwc",
+   "source": "USGS ComCat (tercihli büyüklük)",
+   "source_event_id": "usp0009hev",
+   "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/usp0009hev",
+   "accessed": "2026-10-06",
+   "alternatives": [
+    {
+     "mw": 7.1,
+     "mag_type": "Mww",
+     "source": "Duputel (W-fazı)"
+    }
+   ],
+   "note": "USGS tercihli büyüklük HRV/GCMT Mwc (M0 = 6,7e19 N·m)."
+  },
+  {
+   "name": "2011 Van",
+   "group": "A",
+   "status": "verified",
+   "time_utc": "2011-10-23T10:41:23.250Z",
+   "lat": 38.721,
+   "lon": 43.508,
+   "mw": 7.1,
+   "mag_type": "Mww",
+   "source": "USGS ComCat (tercihli büyüklük)",
+   "source_event_id": "usp000j9rr",
+   "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/usp000j9rr",
+   "accessed": "2026-10-06",
+   "alternatives": [],
+   "note": "Sorgulanan usb0006bqc kimliği usp000j9rr olarak döndü."
+  },
+  {
+   "name": "2023 Pazarcık",
+   "group": "A",
+   "status": "verified",
+   "time_utc": "2023-02-06T01:17:34.342Z",
+   "lat": 37.2256,
+   "lon": 37.0143,
+   "mw": 7.8,
+   "mag_type": "Mww",
+   "source": "USGS ComCat (tercihli büyüklük)",
+   "source_event_id": "us6000jllz",
+   "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000jllz",
+   "accessed": "2026-10-06",
+   "alternatives": [
+    {
+     "mw": 7.9,
+     "mag_type": "Mwc",
+     "source": "us"
+    }
+   ],
+   "note": ""
+  },
+  {
+   "name": "2023 Elbistan",
+   "group": "A",
+   "status": "verified",
+   "time_utc": "2023-02-06T10:24:48.811Z",
+   "lat": 38.0106,
+   "lon": 37.1962,
+   "mw": 7.5,
+   "mag_type": "Mww",
+   "source": "USGS ComCat (tercihli büyüklük)",
+   "source_event_id": "us6000jlqa",
+   "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000jlqa",
+   "accessed": "2026-10-06",
+   "alternatives": [
+    {
+     "mw": 7.5,
+     "mag_type": "Mwb",
+     "source": "us"
+    }
+   ],
+   "note": ""
+  },
+  {
+   "name": "2020 Samos",
+   "group": "B",
+   "status": "verified",
+   "time_utc": "2020-10-30T11:51:27.348Z",
+   "lat": 37.8973,
+   "lon": 26.7838,
+   "mw": 7.0,
+   "mag_type": "Mww",
+   "source": "USGS ComCat (tercihli büyüklük)",
+   "source_event_id": "us7000c7y0",
+   "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000c7y0",
+   "accessed": "2026-10-06",
+   "alternatives": [
+    {
+     "mw": 6.9,
+     "mag_type": "Mwb",
+     "source": "us"
+    }
+   ],
+   "note": ""
+  },
+  {
+   "name": "2017 İran–Irak (Halabja)",
+   "group": "B",
+   "status": "verified",
+   "time_utc": "2017-11-12T18:18:17.180Z",
+   "lat": 34.9109,
+   "lon": 45.9592,
+   "mw": 7.3,
+   "mag_type": "Mww",
+   "source": "USGS ComCat (tercihli büyüklük)",
+   "source_event_id": "us2000bmcg",
+   "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/us2000bmcg",
+   "accessed": "2026-10-06",
+   "alternatives": [
+    {
+     "mw": 7.1,
+     "mag_type": "Mwb",
+     "source": "us"
+    }
+   ],
+   "note": ""
+  },
+  {
+   "name": "2006 Kythira",
+   "group": "B",
+   "status": "verified",
+   "time_utc": "2006-01-08T11:34:55.640Z",
+   "lat": 36.311,
+   "lon": 23.212,
+   "mw": 6.7,
+   "mag_type": "Mwb",
+   "source": "USGS ComCat (tercihli büyüklük)",
+   "source_event_id": "usp000e7u3",
+   "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/usp000e7u3",
+   "accessed": "2026-10-06",
+   "alternatives": [
+    {
+     "mw": 6.7,
+     "mag_type": "Mww",
+     "source": "Duputel (W-fazı)"
+    }
+   ],
+   "note": "Derinlik 66 km."
+  },
+  {
+   "name": "2018 Sarpol-e Zahab (İran–Irak)",
+   "group": "B",
+   "status": "verified",
+   "time_utc": "2018-11-25T16:37:32.830Z",
+   "lat": 34.3609,
+   "lon": 45.7443,
+   "mw": 6.3,
+   "mag_type": "Mww",
+   "source": "USGS ComCat (tercihli büyüklük)",
+   "source_event_id": "us1000hwdw",
+   "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/us1000hwdw",
+   "accessed": "2026-10-06",
+   "alternatives": [
+    {
+     "mw": 6.2,
+     "mag_type": "Mwb",
+     "source": "us"
+    }
+   ],
+   "note": "Mw < 6,5; katalogda dönüştürülmemiş mb 6,3 olduğu için tabloda."
+  },
+  {
+   "name": "2008 Onikiadalar",
+   "group": "B",
+   "status": "unverified",
+   "time_utc": "2008-07-15T03:26:35Z",
+   "lat": 35.93,
+   "lon": 27.81,
+   "mw": 6.4,
+   "mag_type": "Mw",
+   "source": "Wikipedia (USGS ComCat atfı); USGS olay kimliği bulunamadı",
+   "source_event_id": null,
+   "source_url": "https://en.wikipedia.org/wiki/2008_Dodecanese_earthquake",
+   "accessed": "2026-10-06",
+   "alternatives": [],
+   "note": "Doğrulanmadı; kullanılmaz."
+  }
+ ]
+}

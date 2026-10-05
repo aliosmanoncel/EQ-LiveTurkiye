@@ -1,0 +1,52 @@
+name: GK74 parity (Python == JS, donmus referans)
+
+# Baglamli GK74 (Faz 1) davranis sozlesmesi: index.html'deki gk74Window /
+# gk74Decluster / gk74SelectContext, scripts/gk74_context.py ve
+# scripts/fixtures/ altindaki donmus referanslarla BIREBIR ayni olmali.
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'scripts/decluster_gk74.py'
+      - 'scripts/gk74_context.py'
+      - 'scripts/validate_gk74_parity.py'
+      - 'scripts/fixtures/**'
+      - 'scripts/gk74_mwauth.py'
+      - 'scripts/mw_authority.py'
+      - 'data/mw_authority.json'
+      - '.github/workflows/gk74-parity.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'scripts/decluster_gk74.py'
+      - 'scripts/gk74_context.py'
+      - 'scripts/validate_gk74_parity.py'
+      - 'scripts/fixtures/**'
+      - 'scripts/gk74_mwauth.py'
+      - 'scripts/mw_authority.py'
+      - 'data/mw_authority.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Baglamsiz GK74 (mag, mw; UTC ve Europe/Istanbul)
+        run: |
+          python scripts/validate_gk74_parity.py
+          python scripts/validate_gk74_parity.py --mag-field mw
+          TZ=Europe/Istanbul python scripts/validate_gk74_parity.py
+      - name: Baglamli GK74 — donmus fixture'lar
+        run: python scripts/validate_gk74_parity.py --context scripts/fixtures/gk74_ctx_*_ref_*.json
+      - name: Faz 2a (otoriter Mw) — donmus fixture'lar (JS == Python)
+        run: python scripts/validate_gk74_parity.py --mwauth scripts/fixtures/gk74_mwauth_*_ref_*.json

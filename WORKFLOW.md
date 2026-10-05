@@ -43,6 +43,22 @@
 - **Durum:** ✅ TAMAMLANDI
 - **NOT:** Bu Marmara'ya özgüdür. Türkiye geneli için 1B'yi kullan, bunu değil.
 
+### 1D · Bağlamlı GK74 (Faz 1) — DONMUŞ REFERANS
+- **Sürüm:** `gk74-ctx-frozen-2026-10-06` (`index.html` ve `scripts/gk74_context.py` içinde `GK74_VERSION`; ikisi aynı olmalı)
+- **Davranış sözleşmesi:** Faz 1 davranışı fixture tabanlı donmuş referansla tanımlıdır. Yeni kural/parametre = yeni sürüm + yeni fixture + not.
+- **Kurallar:** pencere kuralları 1C ile aynı; bağlam iki kademe: dar halka R+30 km (M ≥ sorgu alt eşiği), geniş halka R+90 km (M ≥ 4), zaman başlangıç − 1100 gün; bağlam pencere açar, çıktıya girmez. Yalnız Daire modu, EMSC/USGS canlı ve Tarihsel Katalog.
+- **Referans:** `scripts/gk74_context.py` · **Fixture'lar:** `scripts/fixtures/gk74_ctx_*_ref_*.json` + kendi kendine yeten alt kataloglar `gk74_ctx_*_catalog.json` (Saimbeyli mag/mw, Adıyaman, İzmit-doğu, Van-batı; hepsinde B = G)
+- **Doğrulama:** `python scripts/validate_gk74_parity.py --context scripts/fixtures/gk74_ctx_*_ref_*.json` → BİREBİR AYNI olmalı (CI: `.github/workflows/gk74-parity.yml`)
+- **Bilinen sınır:** uzaklık episantrdan ölçülür; M ≥ 7 kırıkların uç bölgesindeki artçılar eksik ayıklanabilir (Faz 2). `eq_historical.json`'da 1999 İzmit mb 6,3, Düzce mb 6,0 olarak kayıtlı (doyma) — pencereler gerçek Mw'den küçük.
+- **Ayrıntı:** `analysis/2026-10-06_gk74_baglam_prototipi_saimbeyli.md`
+
+### 1E · Faz 2a — Otoriter Mw (DONMUŞ REFERANS; Python + JS)
+- **Sürüm:** `gk74-ctx-mwauth-2026-10-06` (`scripts/gk74_mwauth.py`); tablo `data/mw_authority.json` (mwauth-2026-10-06, 9 doğrulanmış kayıt, USGS ComCat tercihli büyüklüğü; Onikiadalar 2008 doğrulanmadı, kullanılmıyor).
+- **Kural:** Faz 1 kuralları aynen; yalnız tablodaki depremlerle (kaynak kimliği ya da ±60 s ve ≤ 50 km; her kayıt en çok bir olay) eşleşen olaylarda M_eff = otoriter Mw — pencerede ve bağlam eşiklerinde. Diğer olaylar değişmez. Tablo eşiği (Mw ≥ 6,5 ya da doymuş büyüklük) yalnız tabloya giriş ölçütüdür, çalışma anı kuralı değildir.
+- **Fixture'lar:** `scripts/fixtures/gk74_mwauth_{saimbeyli,adiyaman,izmit_dogu,van_bati}_ref_mag.json` (Faz 1 alt kataloglarını kullanır; tablo sha256'sı fixture'da). Hepsinde B = G.
+- **Doğrulama:** `python scripts/validate_gk74_parity.py --mwauth scripts/fixtures/gk74_mwauth_*_ref_*.json` → JS == Python == donmuş (4 fixture × 13 kontrol).
+- **JS (index.html):** `gk74BuildMwOverride`, `gk74SelectContext(…, mwEntries)`, `gk74Decluster(…, mwEntries)`, `GK74_MWAUTH_VERSION`; arayüzde "Büyük depremlerde otoriter Mw (Faz 2a)" kutusu, **varsayılan kapalı** (Faz 1 davranışı). Tablo `data/mw_authority.json` tarayıcıda yüklenir.
+
 ---
 
 ## AŞAMA 2 — b-Değeri Hesabı

@@ -46,6 +46,10 @@ GitHub Actions (every hour)
               └── index.html reads via raw.githubusercontent.com (no CORS)
 ```
 
+## Doğrulama — GK74 (bağlamlı, Faz 1)
+
+Bağlamlı GK74 davranışı fixture tabanlı donmuş referansla tanımlıdır (`GK74_VERSION = gk74-ctx-frozen-2026-10-06`). Kurallar ve doğrulama: `WORKFLOW.md` → 1D; komut: `python scripts/validate_gk74_parity.py --context scripts/fixtures/gk74_ctx_*_ref_*.json`.
+
 ## Author
 
 **Prof. Dr. Ali Osman Öncel**  

@@ -480,6 +480,14 @@
   </label>
   <button class="tbtn" id="btnLitRegionQuery" onclick="litRegionCommitToQuery()" style="display:none;background:#3b0764;border-color:#a855f7" title="Bu araştırma bölgesinin geometrisini aktif sorgu alanına (regionRect) kopyalar ve seçili Kaynak (EMSC/USGS/AFAD) ile canlı sorgular — otomatik değildir, sadece bu butona basınca çalışır">▶ Bu bölgede sorgula</button>
   <button class="tbtn" id="btnRegionDecluster" onclick="toggleRegionDecluster()" style="display:none" title="GK74 (Gardner &amp; Knopoff 1974) declustering — seçili bölge verisi (EMSC/USGS/AFAD/Tarihsel) üzerinde tarayıcıda hesaplanır: her olayın T(M) gün / D(M) km penceresindeki daha küçük sonraki olaylar artçı sayılıp çıkarılır. Temel sorgu değişmez; info kutusu, harita, Time-Mag/G-R/Weichert ve poster filtrelenmiş küme ile çalışır. Tekrar basınca ham veriye döner.">🔻 Decluster (GK74)</button>
+  <label id="regionDeclusterCtxRow" style="display:none;align-items:center;gap:6px;font-size:.72rem;color:#ccc;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;cursor:pointer;width:260px" title="Bağlamlı GK74 (yalnız Daire modu; EMSC/USGS canlı ve Tarihsel Katalog): daire dışındaki olaylar taramaya bağlam olarak katılır — dar halka R+30 km (M ≥ sorgu alt eşiği), geniş halka R+90 km (M ≥ 4), başlangıçtan 1100 gün önce. Bağlam olayları pencere açabilir ama sonuca girmez. Tüm katalog üzerinde uygulanan GK74 ile aynı sonucu verir; M ≥ 7 bir kırığın uç bölgesinde artçılar eksik ayıklanabilir (episantr uzaklığı).">
+    <input type="checkbox" id="regionDeclusterCtx" onchange="onRegionDeclusterCtxChange()">
+    Daire dışı ana şokları dahil et (bağlamlı GK74)
+  </label>
+  <label id="regionMwAuthRow" style="display:none;align-items:center;gap:6px;font-size:.72rem;color:#ccc;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;cursor:pointer;width:260px" title="Faz 2a (gk74-ctx-mwauth-2026-10-06): data/mw_authority.json'daki büyük depremlerle (USGS ComCat tercihli Mw; olay kimliği ya da ±60 s ve ≤ 50 km ile eşleşen) olaylarda GK74 penceresi ve bağlam eşikleri otoriter Mw ile hesaplanır. Örn. 1999 İzmit katalogda mb 6,3 → Mw 7,6; 1999 Düzce mb 6,0 → Mw 7,2; 2011 Van Ms 7,3 → Mw 7,1. Diğer olaylar değişmez. Varsayılan kapalı (Faz 1).">
+    <input type="checkbox" id="regionMwAuth" onchange="onRegionMwAuthChange()">
+    Büyük depremlerde otoriter Mw (Faz 2a)
+  </label>
   </div>
 </div>
 
@@ -3151,7 +3159,7 @@ async function exportPosterAGU(scale, evt) {
   const src = (regionRect ? regionSourceLabel() : 'Canlı akış') + (ci ? ` · parçalı sorgu (${ci.nChunks} parça, ${ci.nUnique.toLocaleString('tr-TR')} benzersiz olay)` : '');
   const tr = evs.length ? `${d(Math.min(...evs.map(e => +e.time)))} – ${d(Math.max(...evs.map(e => +e.time)))}` : '—';
   const mItems = [
-    `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')}).` : '.'),
+    `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')})` + (regionCtxReady(regionEvents) ? `; daire dışı bağlamla (dar halka R+30 km, geniş halka R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString('tr-TR')} bağlam olayı)` : '') + (mwAuthActive() ? `; büyük depremlerde otoriter Mw (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.'),
     ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitüd tipi duyarlılık senaryosu:** ${[!lastTmTypeFilter.md ? `MD (süre magnitüdü) olayları analiz dışı (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `dönüştürülmemiş ML<1,7 olayları analiz dışı (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; olaylar katalogdan silinmedi, dönüştürülmedi.`] : []),
     cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit aralığı ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} ile olay başına eşik max(Mc_i, M_min)${bt.fit.hi !== null ? ', üst sınır M_max; çift kesik Aki–Utsu en çok olabilirlik' : '; Aki (1965) en çok olabilirlik'}; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·SE.`
@@ -5576,13 +5584,28 @@ function gk74Window(m) {
 // kendi T(M)/D(M) penceresini İLERİYE açar, pencere içindeki ve kendisinden
 // KÜÇÜK olaylar artçı işaretlenir. Zamanı/büyüklüğü geçersiz olay pencere
 // açmaz ve çıkarılmaz (sessiz veri kaybı olmasın).
-function gk74Decluster(evList) {
+// BAĞLAMLI GK74 (Faz 1, 2026-10-06): ctxList ([{e, ring}]) verilirse bağlam
+// olayları taramaya katılır — pencere açar, işaretlenebilir (işaretliyse
+// pencere açmaz) — ama keep/removed'a GİRMEZ. ctxList boşsa davranış eskisiyle
+// birebir aynıdır. Referans: scripts/gk74_context.py (donmuş davranış;
+// fixture: scripts/fixtures/gk74_ctx_*_ref_*.json). Dizi sırası: hedefler,
+// sonra bağlam; kararlı zaman sıralaması. Gerekçe kaydı (rec): her olay için
+// { role:'target'|'context', ring:null|'dar'|'genis', status:'kept'|'suppressed',
+//   by: işaretleyen olay | null, byRole }.
+// Faz 2a (gk74-ctx-mwauth-2026-10-06): mwEntries (data/mw_authority.json'un
+// doğrulanmış kayıtları) verilirse, hedef + bağlam BİRLEŞİMİ üzerinde
+// gk74BuildMwOverride ile eşleşen olaylarda büyüklük = otoriter Mw. Verilmezse Faz 1.
+function gk74Decluster(evList, ctxList, mwEntries) {
   const R = 6371, rad = Math.PI / 180;
-  const arr = evList.map(e => ({ e, t: e.time instanceof Date ? e.time.getTime() : new Date(e.time).getTime(), m: +(e.mw ?? e.mag), la: +e.lat, lo: +e.lon }))
+  const ov = mwEntries ? gk74BuildMwOverride(evList.concat((ctxList || []).map(c => c.e)), mwEntries) : null;
+  const mag = e => (ov && ov.has(e)) ? +ov.get(e).mw : +(e.mw ?? e.mag);
+  const mk = (e, role, ring) => ({ e, role, ring, t: e.time instanceof Date ? e.time.getTime() : new Date(e.time).getTime(), m: mag(e), la: +e.lat, lo: +e.lon });
+  const arr = evList.map(e => mk(e, 'target', null))
+    .concat((ctxList || []).map(c => mk(c.e, 'context', c.ring)))
     .sort((x, y) => x.t - y.t);
-  const n = arr.length, cl = new Uint8Array(n);
+  const n = arr.length, by = new Int32Array(n).fill(-1);
   for (let i = 0; i < n; i++) {
-    if (cl[i]) continue;
+    if (by[i] >= 0) continue;
     const A = arr[i];
     if (!isFinite(A.t) || !isFinite(A.m) || !isFinite(A.la) || !isFinite(A.lo)) continue;
     const [Td, Dk] = gk74Window(A.m), Tms = Td * 86400000;
@@ -5590,17 +5613,82 @@ function gk74Decluster(evList) {
     for (let j = i + 1; j < n; j++) {
       const B = arr[j];
       if (B.t - A.t > Tms) break;
-      if (cl[j] || !(B.m < A.m)) continue;
+      if (by[j] >= 0 || !(B.m < A.m)) continue;
       if (Math.abs(B.la - A.la) > dLatMax) continue;
       const dl = (B.la - A.la) * rad, dlo = (B.lo - A.lo) * rad;
       const h = Math.sin(dl / 2) ** 2 + c1 * Math.cos(B.la * rad) * Math.sin(dlo / 2) ** 2;
-      if (R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)) <= Dk) cl[j] = 1;
+      if (R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)) <= Dk) by[j] = i;
     }
   }
-  const keep = new Set();
-  let removed = 0;
-  for (let i = 0; i < n; i++) { if (cl[i]) removed++; else keep.add(arr[i].e); }
-  return { keep, removed };
+  const keep = new Set(), rec = new Map(), byCtx = new Map();
+  let removed = 0, removedByCtx = 0;
+  for (let i = 0; i < n; i++) {
+    const a = arr[i], b = by[i];
+    rec.set(a.e, { role: a.role, ring: a.ring, status: b < 0 ? 'kept' : 'suppressed',
+                   by: b < 0 ? null : arr[b].e, byRole: b < 0 ? null : arr[b].role });
+    if (a.role !== 'target') continue;
+    if (b < 0) { keep.add(a.e); continue; }
+    removed++;
+    if (arr[b].role === 'context') { removedByCtx++; byCtx.set(arr[b].e, (byCtx.get(arr[b].e) || 0) + 1); }
+  }
+  return { keep, removed, removedByCtx, rec, byCtx, override: ov };
+}
+
+// Bağlamlı GK74 — iki kademeli bağlam seçimi (scripts/gk74_context.py
+// select_context ile BİREBİR aynı). d = daire merkezine uzaklık:
+//   dar halka  : R < d <= R + 30 km,      M >= mmin (hedef sorgunun alt eşiği)
+//   geniş halka: R + 30 < d <= R + 90 km, M >= max(4,0; mmin)
+//   zaman      : [tStart − 1100 gün, tEnd]
+// Gerekçe: D(M) < 30,1 km (M < 4); D(7,8) = 88,8 km. Derinlik ve üst büyüklük
+// filtreleri bağlama UYGULANMAZ (büyük ana şoklar görünmeli).
+const GK74_VERSION = 'gk74-ctx-frozen-2026-10-06';   // scripts/gk74_context.py GK74_VERSION ile aynı olmalı
+const GK74_MWAUTH_VERSION = 'gk74-ctx-mwauth-2026-10-06';   // scripts/gk74_mwauth.py GK74_MWAUTH_VERSION ile aynı olmalı
+// Faz 2a — otoriter Mw eşleşmesi (scripts/mw_authority.py build_override ile BİREBİR aynı).
+// Her kayıt (entry) için listede EN ÇOK BİR olay seçilir: kaynak olay kimliği (e.eid) eşitse
+// hemen o; yoksa |dt| <= 60 s ve uzaklık <= 50 km olanlar arasında en küçük |dt|, eşitlikte
+// en küçük uzaklık (ilk bulunan korunur). Büyüklük eşleşmede KULLANILMAZ.
+// entries: [{ ..., mw, lat, lon, source_event_id, _t (ms) }] — yalnız status === 'verified'.
+function gk74BuildMwOverride(list, entries, dtS = 60, distKm = 50) {
+  const R = 6371, rad = Math.PI / 180, out = new Map();
+  for (const ent of entries) {
+    let best = null;
+    for (const e of list) {
+      if (ent.source_event_id && e.eid === ent.source_event_id) { best = { dt: -1, d: 0, e }; break; }
+      const t = e.time instanceof Date ? e.time.getTime() : new Date(e.time).getTime();
+      if (!isFinite(t) || e.lat == null || e.lon == null) continue;
+      const dt = Math.abs(t - ent._t) / 1000;
+      if (dt > dtS) continue;
+      const dl = (+e.lat - ent.lat) * rad, dlo = (+e.lon - ent.lon) * rad;
+      const h = Math.sin(dl / 2) ** 2 + Math.cos(ent.lat * rad) * Math.cos(+e.lat * rad) * Math.sin(dlo / 2) ** 2;
+      const d = R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+      if (d > distKm) continue;
+      if (best === null || dt < best.dt || (dt === best.dt && d < best.d)) best = { dt, d, e };
+    }
+    if (best !== null) out.set(best.e, ent);
+  }
+  return out;
+}
+const GK74_CTX = { narrowKm: 30, wideKm: 90, wideMmin: 4.0, padDays: 1100 };
+function gk74SelectContext(evs, lat, lon, radiusKm, tStartMs, tEndMs, mmin, mwEntries) {
+  const R = 6371, rad = Math.PI / 180;
+  const ov = mwEntries ? gk74BuildMwOverride(evs, mwEntries) : null;   // Faz 2a: eşleşme kapsamı = aday havuzu
+  const loT = tStartMs - GK74_CTX.padDays * 86400000;
+  const mDar = (mmin === null || mmin === undefined || mmin === '' || !isFinite(+mmin)) ? -Infinity : +mmin;
+  const mGen = Math.max(GK74_CTX.wideMmin, mDar);
+  const out = [];
+  for (const e of evs) {
+    const t = e.time instanceof Date ? e.time.getTime() : new Date(e.time).getTime();
+    const m = (ov && ov.has(e)) ? +ov.get(e).mw : +(e.mw ?? e.mag), la = +e.lat, lo = +e.lon;
+    if (!isFinite(t) || !isFinite(m) || !isFinite(la) || !isFinite(lo)) continue;
+    if (t < loT || t > tEndMs) continue;
+    const dl = (la - lat) * rad, dlo = (lo - lon) * rad;
+    const h = Math.sin(dl / 2) ** 2 + Math.cos(lat * rad) * Math.cos(la * rad) * Math.sin(dlo / 2) ** 2;
+    const d = R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+    if (d <= radiusKm) continue;
+    if (d <= radiusKm + GK74_CTX.narrowKm) { if (m >= mDar) out.push({ e, ring: 'dar' }); }
+    else if (d <= radiusKm + GK74_CTX.wideKm) { if (m >= mGen) out.push({ e, ring: 'genis' }); }
+  }
+  return out;
 }
 
 // GK74 filtresi: kapalıysa ham liste; açıkken liste üzerinde hesaplanan ana
@@ -5608,11 +5696,148 @@ function gk74Decluster(evList) {
 // otomatik yeniden hesaplanır).
 function applyGk74Filter(evList) {
   if (!regionDeclusterOn || !evList || !evList.length) return evList;
-  if (!gk74Cache || gk74Cache.src !== evList || gk74Cache.n !== evList.length) {
-    const r = gk74Decluster(evList);
-    gk74Cache = { src: evList, n: evList.length, keep: r.keep, removed: r.removed };
+  const mwE = mwAuthActive() ? mwAuthTable.entries : null;
+  const ctx = regionCtxReady(evList) ? regionCtxList() : null;
+  if (!gk74Cache || gk74Cache.src !== evList || gk74Cache.n !== evList.length || gk74Cache.ctx !== ctx || gk74Cache.mwE !== mwE) {
+    const r = gk74Decluster(evList, ctx || [], mwE);
+    gk74Cache = { src: evList, n: evList.length, ctx, mwE, keep: r.keep, removed: r.removed,
+                  removedByCtx: r.removedByCtx, rec: r.rec, byCtx: r.byCtx, override: r.override };
   }
   return evList.filter(e => gk74Cache.keep.has(e));
+}
+
+/* Bağlamlı GK74 (Faz 1) — durum ve bağlam yükleme. Yalnız DAİRE modunda ve
+   EMSC/USGS canlı ya da Tarihsel Katalog kaynağında desteklenir. Bağlam,
+   üretildiği regionEvents dizisine bağlıdır (forEvents); yeni sorguda
+   kendiliğinden geçersizleşir ve gerekirse yeniden yüklenir. */
+let regionCtx = null;          // { forEvents, pool, args, lists:{faz1, faz2a}, capped, mmin, err }
+let regionCtxPending = null;
+// Faz 2a — otoriter Mw tablosu (data/mw_authority.json); varsayılan KAPALI (Faz 1 davranışı).
+let mwAuthTable = null, mwAuthPending = null;
+function mwAuthWanted() { const cb = document.getElementById('regionMwAuth'); return !!(cb && cb.checked); }
+function mwAuthActive() { return !!(regionDeclusterOn && mwAuthWanted() && mwAuthTable && !mwAuthTable.err); }
+async function loadMwAuth() {
+  if (mwAuthTable) return mwAuthTable;
+  if (mwAuthPending) return mwAuthPending;
+  mwAuthPending = (async () => {
+    try {
+      const res = await fetchTimeout('data/mw_authority.json', { cache: 'no-cache' }, 10000);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const js = await res.json();
+      mwAuthTable = { version: js.version, entries: (js.entries || []).filter(x => x.status === 'verified').map(x => ({ ...x, _t: Date.parse(x.time_utc) })) };
+    } catch (err) {
+      mwAuthTable = { err: err.message || String(err), entries: [] };
+      setStatus(`Otoriter Mw tablosu yüklenemedi (${mwAuthTable.err}) — katalog büyüklükleri kullanılıyor`, true);
+    } finally { mwAuthPending = null; }
+    gk74Cache = null; renderRegionInfo(); redrawRegionMarkers(); if (showTimeMag) renderTimeMag(regionEvents);
+    return mwAuthTable;
+  })();
+  return mwAuthPending;
+}
+function onRegionMwAuthChange() {
+  gk74Cache = null;
+  if (mwAuthWanted() && !mwAuthTable) loadMwAuth();
+  renderRegionInfo(); redrawRegionMarkers(); if (showTimeMag) renderTimeMag(regionEvents);
+}
+// Bağlam listesi otorite durumuna göre (Faz 2a'da eşleşme kapsamı = aday havuzu) önbellekli hesaplanır.
+function regionCtxList() {
+  if (!regionCtx || regionCtx.err) return null;
+  const key = mwAuthActive() ? 'faz2a' : 'faz1';
+  if (!regionCtx.lists[key]) {
+    const a = regionCtx.args;
+    regionCtx.lists[key] = gk74SelectContext(regionCtx.pool, a.lat, a.lon, a.R, a.tStart, a.tEnd, a.mmin, key === 'faz2a' ? mwAuthTable.entries : undefined);
+  }
+  return regionCtx.lists[key];
+}
+function regionCtxWanted() { const cb = document.getElementById('regionDeclusterCtx'); return !!(cb && cb.checked); }
+function regionCtxSupported() {
+  return !!(regionIsCircle && regionCircleCenter && regionCircleRadiusKm &&
+            (historicalMode || regionSource === 'emsc' || regionSource === 'usgs'));
+}
+function regionCtxReady(evList) {
+  return !!(regionDeclusterOn && regionCtxWanted() && regionCtxSupported() &&
+            regionCtx && regionCtx.forEvents === evList && !regionCtx.err);
+}
+function syncRegionCtxRow() {
+  const row = document.getElementById('regionDeclusterCtxRow');
+  const btn = document.getElementById('btnRegionDecluster');
+  if (!row) return;
+  const vis = !!(btn && btn.style.display !== 'none' && regionRect);
+  row.style.display = vis ? 'flex' : 'none';
+  const mrow = document.getElementById('regionMwAuthRow');
+  if (mrow) mrow.style.display = vis ? 'flex' : 'none';
+  const cb = document.getElementById('regionDeclusterCtx');
+  if (cb) cb.disabled = !regionCtxSupported();
+  row.style.opacity = regionCtxSupported() ? '1' : '.5';
+}
+async function ensureRegionContext() {
+  if (!regionDeclusterOn || !regionCtxWanted() || !regionCtxSupported()) return;
+  if (regionCtx && regionCtx.forEvents === regionEvents) return;
+  if (regionCtxPending) return regionCtxPending;
+  const forEvents = regionEvents;
+  const c = regionCircleCenter, R = regionCircleRadiusKm;
+  const tStart = regionWindowStart ? regionWindowStart.getTime() : Math.min(...forEvents.map(e => e.time.getTime()));
+  const tEnd   = regionWindowEnd   ? regionWindowEnd.getTime()   : Math.max(...forEvents.map(e => e.time.getTime()));
+  const mminRaw = document.getElementById('regionMagMin')?.value;
+  const mmin = mminRaw === '' || mminRaw == null ? null : +mminRaw;
+  regionCtxPending = (async () => {
+    try {
+      let pool = [], capped = false;
+      if (historicalMode) {
+        pool = events;
+      } else {
+        const provider = regionSource === 'usgs' ? 'usgs' : 'emsc';
+        setStatus(`Bağlamlı GK74: daire dışı ana şoklar ${provider.toUpperCase()}'den getiriliyor…`);
+        const fmt = d => new Date(d).toISOString().slice(0, 19);
+        const t0 = tStart - GK74_CTX.padDays * 86400000;
+        const cosL = Math.cos(c.lat * Math.PI / 180);
+        const bbox = km => { const k = km * 1.02 + 1; return { s: c.lat - k / 111.19, n: c.lat + k / 111.19, w: c.lon - k / (111.19 * cosL), e: c.lon + k / (111.19 * cosL) }; };
+        const q = async (km, mMin) => {
+          const b = bbox(km);
+          const common = `&starttime=${fmt(t0)}&endtime=${fmt(tEnd)}&minmagnitude=${mMin}&limit=20000&orderby=time`;
+          const url = provider === 'usgs'
+            ? `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minlatitude=${b.s.toFixed(3)}&maxlatitude=${b.n.toFixed(3)}&minlongitude=${b.w.toFixed(3)}&maxlongitude=${b.e.toFixed(3)}` + common
+            : `https://www.seismicportal.eu/fdsnws/event/1/query?format=text&minlat=${b.s.toFixed(3)}&maxlat=${b.n.toFixed(3)}&minlon=${b.w.toFixed(3)}&maxlon=${b.e.toFixed(3)}` + common;
+          const res = await fetchTimeout(url, {}, 20000);
+          if (res.status === 204) return { evs: [], raw: 0 };
+          if (!res.ok) throw new Error(`${provider.toUpperCase()} HTTP ${res.status}`);
+          if (provider === 'usgs') { const js = await res.json(); return { evs: parseGeoJSON(js), raw: (js.features || []).length }; }
+          const tx = await res.text();
+          return { evs: parseEMSCText(tx), raw: tx.split('\n').filter(l => l.trim() && !l.startsWith('#') && l.includes('|')).length };
+        };
+        const mDar = mmin === null ? 0 : mmin;
+        const [qd, qg] = await Promise.all([q(R + GK74_CTX.narrowKm, mDar), q(R + GK74_CTX.wideKm, Math.max(GK74_CTX.wideMmin, mDar))]);
+        capped = qd.raw >= 20000 || qg.raw >= 20000;
+        const seen = new Set();
+        for (const e of qd.evs.concat(qg.evs)) {
+          const k = e.eid || `${e.time.getTime()}|${e.lat}|${e.lon}|${e.mag}`;
+          if (seen.has(k)) continue; seen.add(k); pool.push(e);
+        }
+      }
+      regionCtx = { forEvents, pool, capped, mmin, lists: {}, args: { lat: c.lat, lon: c.lon, R, tStart, tEnd, mmin } };
+      const list = regionCtxList();
+      setStatus(`Bağlamlı GK74: ${list.length.toLocaleString('tr-TR')} bağlam olayı (dar halka ${list.filter(x => x.ring === 'dar').length}, geniş halka ${list.filter(x => x.ring === 'genis').length})` +
+                (capped ? ' — 🔴 bağlam sorgusu 20.000 sınırına ulaştı; sonuç eksik olabilir' : ''), capped);
+    } catch (err) {
+      regionCtx = { forEvents, pool: [], lists: {}, err: err.message || String(err) };
+      setStatus(`Bağlamlı GK74: bağlam alınamadı (${regionCtx.err}) — bağlamsız GK74 kullanılıyor`, true);
+    } finally {
+      regionCtxPending = null;
+    }
+    if (regionEvents === forEvents) {
+      renderRegionInfo();
+      redrawRegionMarkers();
+      if (showTimeMag) renderTimeMag(regionEvents);
+    }
+  })();
+  return regionCtxPending;
+}
+function onRegionDeclusterCtxChange() {
+  gk74Cache = null;
+  if (regionDeclusterOn && regionCtxWanted()) { ensureRegionContext(); }
+  renderRegionInfo();
+  redrawRegionMarkers();
+  if (showTimeMag) renderTimeMag(regionEvents);
 }
 
 /* Bölgeye özel Mc/b istatistiği — mevcut computeMc()/computeBvalue()
@@ -5723,9 +5948,39 @@ function renderRegionInfo() {
     line += `<br>Gösterilen: ${dfmt(new Date(Math.min(...times)))} – ${dfmt(new Date(Math.max(...times)))} (${regionEvents.length} deprem)`;
   }
   line += `<br>${regionBoundsLine()}`;
+  syncRegionCtxRow();
   const statsEvs = applyGk74Filter(regionEvents);
   if (regionDeclusterOn) {
-    line += `<br><span style="color:#f472b6">🔻 GK74 (Gardner &amp; Knopoff 1974): N=${regionEvents.length} (ham) → N=${statsEvs.length} ana şok · ${regionEvents.length - statsEvs.length} artçı ayıklandı</span>`;
+    const ctxOn = regionCtxReady(regionEvents);
+    line += `<br><span style="color:#f472b6">🔻 GK74 (Gardner &amp; Knopoff 1974)${ctxOn ? ' — bağlamlı' : ''}: N=${regionEvents.length} (ham) → N=${statsEvs.length} ana şok · ${regionEvents.length - statsEvs.length} artçı ayıklandı`;
+    if (ctxOn && gk74Cache) {
+      const top = [...gk74Cache.byCtx.entries()].sort((a, b) => b[1] - a[1])[0];
+      const cl = regionCtxList() || [];
+      const effM = e => (gk74Cache.override && gk74Cache.override.has(e)) ? +gk74Cache.override.get(e).mw : +(e.mw ?? e.mag);
+      line += ` (daire içi olaylarca ${gk74Cache.removed - gk74Cache.removedByCtx}, bağlamca ${gk74Cache.removedByCtx})` +
+        `<br>Bağlam: ${cl.length} olay — dar halka ${cl.filter(x => x.ring === 'dar').length} (R+30 km, M ≥ ${regionCtx.mmin ?? '—'}), geniş halka ${cl.filter(x => x.ring === 'genis').length} (R+90 km, M ≥ ${Math.max(4, regionCtx.mmin ?? 4)})` +
+        (top ? ` · en büyük katkı: ${top[0].time.toISOString().slice(0, 16).replace('T', ' ')} M ${effM(top[0]).toFixed(1)} → ${top[1]} olay` : '') +
+        `<br><span style="color:#fbbf24">Tüm katalog üzerinde uygulanan GK74 ile aynı sonucu verir; M ≥ 7 bir kırığın uç bölgesinde artçılar eksik ayıklanabilir.</span>` +
+        (regionCtx.capped ? `<br><span style="color:#f87171">🔴 Bağlam sorgusu 20.000 sınırına ulaştı — sonuç eksik olabilir.</span>` : '');
+    } else if (regionCtxWanted() && regionCtxSupported()) {
+      line += (regionCtx && regionCtx.forEvents === regionEvents && regionCtx.err)
+        ? `<br><span style="color:#f87171">Bağlam alınamadı (${regionCtx.err}) — bağlamsız GK74.</span>`
+        : `<br><span style="color:#9ab0c5">Bağlam yükleniyor… (şimdilik bağlamsız GK74)</span>`;
+      ensureRegionContext();
+    } else if (regionCtxWanted() && !regionCtxSupported()) {
+      line += `<br><span style="color:#9ab0c5">Bağlamlı GK74 yalnız Daire modunda ve EMSC/USGS/Tarihsel kaynakta kullanılabilir — bağlamsız GK74.</span>`;
+    }
+    if (mwAuthWanted()) {
+      if (mwAuthActive() && gk74Cache && gk74Cache.override) {
+        const ovs = [...gk74Cache.override.entries()];
+        line += `<br><span style="color:#a7f3d0">Otoriter Mw (${GK74_MWAUTH_VERSION}; tablo ${mwAuthTable.version}): ${ovs.length ? ovs.map(([e, ent]) => `${ent.name} ${(+e.mag).toFixed(1)}${e.mtype ? ' ' + e.mtype : ''} → Mw ${ent.mw}`).join('; ') : 'bu veride eşleşen deprem yok'}</span>`;
+      } else if (mwAuthTable && mwAuthTable.err) {
+        line += `<br><span style="color:#f87171">Otoriter Mw tablosu yüklenemedi — katalog büyüklükleri.</span>`;
+      } else {
+        line += `<br><span style="color:#9ab0c5">Otoriter Mw tablosu yükleniyor…</span>`; loadMwAuth();
+      }
+    }
+    line += `</span>`;
   }
   const circleAreaKm2 = (regionIsCircle && regionCircleRadiusKm) ? Math.PI * regionCircleRadiusKm * regionCircleRadiusKm : null;
   line += `<br>${computeRegionStatsLine(statsEvs, regionOrderUsed, regionCapped, circleAreaKm2)}`;
@@ -6376,6 +6631,7 @@ function toggleRegionDecluster() {
   regionDeclusterOn = !regionDeclusterOn;
   btn.classList.toggle('active', regionDeclusterOn);
   if (regionDeclusterOn) {
+    if (regionCtxWanted()) ensureRegionContext();
     const t0 = performance.now();
     const kept = applyGk74Filter(regionEvents);
     const n0 = regionEvents.length, n1 = kept.length;
@@ -6473,9 +6729,10 @@ function regionDeselect() {
   regionWindowStart = regionWindowEnd = null;
   document.getElementById('btnRegionSelect').classList.remove('active');
   document.getElementById('regionMcOverride').value = '';
-  regionDeclusterOn = false; gk74Cache = null;
+  regionDeclusterOn = false; gk74Cache = null; regionCtx = null;
   const btnDecluster = document.getElementById('btnRegionDecluster');
   if (btnDecluster) { btnDecluster.style.display = 'none'; btnDecluster.classList.remove('active'); }
+  syncRegionCtxRow();
   setStatus('');
   const info = document.getElementById('regionInfo');
   if (info) info.innerHTML = '';
@@ -6937,11 +7194,15 @@ function exportRegionCSV() {
   lines.push(`#   1900-2026 (ISC+EMSC, Tarihsel Katalog): Scordilis (2006) Mw dönüşümü`);
   lines.push(`#   1003-1899 (EPICA+SHARE-CET, Tarihsel Katalog): EPICA kendi 2021 homojenizasyonu; SHARE-CET Io→Ms→Mw iki aşamalı zincir — birbiriyle TAM tutarlı değildir, derinlik (depth_km) bu dönemde yoktur`);
   lines.push(`#   Canlı/güncel EMSC sorgusu: mtype = orijinal ölçüm tipi (ml/mb/ms vb.)`);
-  lines.push('time_utc,lat,lon,depth_km,mag,mtype,mw,place');
+  const gkRec = regionDeclusterOn ? (applyGk74Filter(regionEvents), gk74Cache && gk74Cache.rec) : null;
+  if (gkRec) lines.push(`# GK74 (${mwAuthActive() ? GK74_MWAUTH_VERSION + ', tablo ' + mwAuthTable.version : GK74_VERSION})${regionCtxReady(regionEvents) ? ' bağlamlı' : ''}: gk74_status = kept|suppressed; gk74_by_* = olayı işaretleyen pencere sahibi; gk74_by_role = target (daire içi) | context (daire dışı bağlam)`);
+  lines.push('time_utc,lat,lon,depth_km,mag,mtype,mw,place' + (gkRec ? ',gk74_status,gk74_by_time_utc,gk74_by_mag,gk74_by_role' : ''));
   regionEvents.forEach(e => {
     const dep = e.dep==null ? '' : e.dep.toFixed(1);
     const place = (e.place||'').replace(/"/g,'""');
-    lines.push(`${e.time.toISOString()},${e.lat},${e.lon},${dep},${e.mag??''},${e.mtype||''},${e.mw??e.mag??''},"${place}"`);
+    let gk = '';
+    if (gkRec) { const r = gkRec.get(e); gk = r ? `,${r.status},${r.by ? r.by.time.toISOString() : ''},${r.by ? (r.by.mw ?? r.by.mag ?? '') : ''},${r.byRole || ''}` : ',,,,'; }
+    lines.push(`${e.time.toISOString()},${e.lat},${e.lon},${dep},${e.mag??''},${e.mtype||''},${e.mw??e.mag??''},"${place}"` + gk);
   });
   const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
