@@ -46,24 +46,19 @@ OUTPUT   = 'data/eq_historical.json'
 # mag/mtype korunuyor, "mw" yalnizca gercekten dogrulanmis durumlarda
 # (native Mw, Scordilis 2006 mb/Ms) dolduruluyor. Detay ve kaynaklar:
 # seismo-report/eqlive-turkey-methodology.html §4.
+NATIVE_MW = ('mw', 'mww', 'mwb', 'mwc', 'mwr', 'mwp')
+
 def to_mw(mag, mtype, dep=None):
-    """(mw, mw_method) dondurur. mw None ise dogrulanmis bir donusum yok
-    demektir — cagiran taraf orijinal mag'i kullanmali (index.html zaten
-    her tuketim noktasinda `e.mw ?? e.mag` / `e.mw || e.mag` deseniyle
-    bunu otomatik yapiyor, ayrica degisiklik gerekmiyor)."""
+    """2026-10-11: veri hattinda OTOMATIK BUYUKLUK DONUSUMU YOKTUR.
+    'mw' alani yalnizca kaynak gercek bir moment buyuklugu bildirdiginde (NATIVE_MW
+    turleri) doldurulur; diger turlerde None'dir. Ham 'mag' ve 'mtype' her zaman korunur.
+    Donusumler (Scordilis 2006, Lolli 2014, ISC-GEM 2015, Civgin & Scordilis 2019 ...)
+    yalnizca index.html'deki Magnitude Conversion seciciyle, gecerlilik kosullariyla uygulanir.
+    Onceki surum mb'ye Scordilis (2006), ml/md/mc'ye bolge ayrimi olmadan Grunthal tipi
+    ML->Mw uyguluyordu; 'Original' secenegi bu yuzden gercekten orijinal degildi."""
     mt = (mtype or '').lower().strip()
-    if mt in ('mw','mww','mwb','mwc','mwr','mwp',''):
+    if mt in NATIVE_MW:
         return round(mag, 2), 'native'
-    if mt == 'mb' and 3.5 <= mag <= 6.2:
-        return round(0.85*mag + 1.03, 2), 'scordilis2006_mb'
-    # Scordilis (2006, J. Seismol. 10:225-236) Es. 14-15: yalnizca h < 70 km; 3,0-6,1 ve 6,2-8,2 (ozgun makaleden dogrulandi 2026-10-11)
-    if mt in ('ms','ms_20') and dep is not None and dep < 70:
-        if 3.0 <= mag <= 6.1:
-            return round(0.67*mag + 2.07, 2), 'scordilis2006_ms_lo'
-        if 6.2 <= mag <= 8.2:
-            return round(0.99*mag + 0.08, 2), 'scordilis2006_ms_hi'
-    if mt in ('ml', 'md', 'mc'):
-        return None, 'unconverted_' + mt
     return None, 'unconverted_' + (mt or 'unknown')
 
 def parse_line(line, source):

@@ -2101,7 +2101,7 @@ const MAG_CONVERSIONS = {
     label: 'Original / None', scope: 'none', region: null,
     inputTypes: null, outputType: null, validRange: null, reference: null,
     applicable(e) { return true; },
-    convert(e) { return e.mw ?? e.mag; }
+    convert(e) { return panelBaseMag(e); }
   },
   scordilis2006: {
     label: 'Scordilis (2006)', scope: 'global', region: null,
@@ -2134,12 +2134,12 @@ const MAG_CONVERSIONS = {
   iscgem2015: {
     label: 'ISC-GEM: Di Giacomo vd. (2015) EXP — mb/Ms → Mw (mb < 5 sıkışır) [duyarlılık analizi]', scope: 'global', region: null,
     inputTypes: ['mb', 'ms'], outputType: 'Mw',
-    validRange: 'mb: 3,5–6,5 · Ms: 3,0–8,5 — makalenin "M < 5 için dikkat" uyarısı BİLEREK aşılır: Eş. (2) mb → −∞ iken Mw → 4,555 asimptotuna gider (mb 3,5 → 4,75; mb 4,5 → 5,01), G–R küçük büyüklüklerde yapay olarak sıkışır',
+    validRange: 'mb: 3,5–6,5 · Ms: 3,0–8,5, yalnızca h ≤ 60 km — makalenin "M < 5 için dikkat" uyarısı BİLEREK aşılır: Eş. (2) mb → −∞ iken Mw → 4,555 asimptotuna gider (mb 3,5 → 4,75; mb 4,5 → 5,01), G–R küçük büyüklüklerde yapay olarak sıkışır',
     reference: 'Di Giacomo, D., Bondár, I., Storchak, D. A., Engdahl, E. R., Bormann, P. & Harris, J. (2015). ISC-GEM: Global Instrumental Earthquake Catalogue (1900–2009), III. Re-computed MS and mb, proxy MW, final magnitude composition and completeness assessment. Phys. Earth Planet. Inter. 239, 33–47. Eş. (1) Ms: Mw = exp(−0,222 + 0,233 Ms) + 2,863; Eş. (2) mb: Mw = exp(−4,664 + 0,859 mb) + 4,555 (s. 41–42). Makale M < 5 için dikkat önerir; burada tüm aralık uygulanır, çünkü yalnızca mb ≥ 5 dönüştürmek 4,95–5,2 arasında boşluk yaratır (2026-10-11, USGS 1 yıllık testte b(Mmin) sıçraması 1,44).',
     applicable(e) {
       const t = (e.mtype || '').toLowerCase(), m = e.mag;
       if (t === 'mb') return m >= 3.5 && m <= 6.5;
-      if (t === 'ms') return m >= 3.0 && m <= 8.5;
+      if (t === 'ms') return m >= 3.0 && m <= 8.5 && Number.isFinite(e.dep) && e.dep <= 60; // ISC-GEM Ms yalnızca sığ olaylar için yeniden hesaplandı (h − σh ≤ 60 km; Di Giacomo vd. 2015, MS yeniden hesaplama bölümü)
       return false;
     },
     convert(e) {
@@ -2332,10 +2332,21 @@ function onTmConversionChange() {
 // ile duyarlılık testi yapılıp ÖLÇÜLMESİ için bu sayaç bilgi sağlar.
 const HIGHMAG_QC_THRESHOLD = 6.0;
 
+// 2026-10-11: panelin taban büyüklüğü. Kaynağın bildirdiği ham 'mag' kullanılır; 'mw' alanına yalnızca
+// gerçek bir moment büyüklüğü türünde güvenilir. Eski veri hattı data/*.json dosyalarına mb için Scordilis,
+// ml/md/mc için bölge ayrımı olmadan Grünthal tipi ML→Mw yazıyordu; önbellekteki ya da türetilmiş eski
+// dosyalarda (eq_historical_dc.json vb.) bu değerler hâlâ bulunabilir. Böylece 'Original' her veri yolunda
+// gerçekten orijinaldir ve dönüşümler yalnızca bu seçiciden gelir.
+const NATIVE_MW_TYPES = new Set(['mw', 'mww', 'mwb', 'mwc', 'mwr', 'mwp']);
+function isNativeMw(e) { return NATIVE_MW_TYPES.has((e.mtype || '').toLowerCase().trim()); }
+function panelBaseMag(e) { return isNativeMw(e) ? (e.mw ?? e.mag) : e.mag; }
+
 function applyMagConversionForDisplay(evList, mode) {
   const conv = MAG_CONVERSIONS[mode] || MAG_CONVERSIONS.none;
+  // Taban: her olay kaynağın ham büyüklüğüyle başlar (eski, dönüştürülmüş 'mw' değerleri atılır).
+  const baseOf = e => { const b = panelBaseMag(e); return (e.mw === b) ? e : { ...e, mw: b }; };
   if (mode === 'none') {
-    return { list: evList, nApplicable: evList.length, nNotApplicable: 0,
+    return { list: evList.map(baseOf), nApplicable: evList.length, nNotApplicable: 0,
              highMag: { threshold: HIGHMAG_QC_THRESHOLD, total: 0, converted: 0 } };
   }
   let nApplicable = 0, nNotApplicable = 0, highMagTotal = 0, highMagConverted = 0;
@@ -2348,7 +2359,7 @@ function applyMagConversionForDisplay(evList, mode) {
       return { ...e, mw: conv.convert(e) };
     }
     nNotApplicable++;
-    return e;
+    return baseOf(e); // dönüşüm koşulu sağlanmadı → kaynağın ham büyüklüğü (başka bağıntıya sessizce geçilmez)
   });
   return { list, nApplicable, nNotApplicable,
            highMag: { threshold: HIGHMAG_QC_THRESHOLD, total: highMagTotal, converted: highMagConverted } };
@@ -4894,8 +4905,10 @@ function renderTimeMag(evList) {
   const convEntry = MAG_CONVERSIONS[mcConversionMode];
   const convNoteEl = document.getElementById('tmConversionNote');
   if (mcConversionMode === 'none') {
-    convNoteEl.textContent = '';
-    convNoteEl.title = '';
+    const tc = {}; evList.forEach(e => { const t = (e.mtype || '?').toLowerCase(); tc[t] = (tc[t] || 0) + 1; });
+    const nT = Object.keys(tc).length, top = Object.entries(tc).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([t, n]) => `${t} %${Math.round(100 * n / evList.length)}`).join(', ');
+    convNoteEl.textContent = nT > 1 ? `Original: kaynak büyüklükleri, homojen Mw değil (${top})` : '';
+    convNoteEl.title = nT > 1 ? 'Original seçeneği büyüklükleri tek bir ölçeğe getirmez: kaynakta bildirilen mb, ML, Md, Mw … değerleri bir arada kullanılır.' : '';
   } else {
     const scopeLabel = convEntry.scope === 'global' ? 'Global'
       : convEntry.scope === 'dispatch' ? 'Dispatch (mtype bazlı, tek bağıntı DEĞİL)'

@@ -31,19 +31,20 @@ LIMIT    = 20000
 OUTPUT   = 'data/eq_historical.json'
 
 # ── Scordilis (2006) Mw donusumu ─────────────────────────────────────
+NATIVE_MW = ('mw', 'mww', 'mwb', 'mwc', 'mwr', 'mwp')
+
 def to_mw(mag, mtype, dep=None):
+    """2026-10-11: veri hattinda OTOMATIK BUYUKLUK DONUSUMU YOKTUR.
+    'mw' alani yalnizca kaynak gercek bir moment buyuklugu bildirdiginde (NATIVE_MW
+    turleri) doldurulur; diger turlerde None'dir. Ham 'mag' ve 'mtype' her zaman korunur.
+    Donusumler (Scordilis 2006, Lolli 2014, ISC-GEM 2015, Civgin & Scordilis 2019 ...)
+    yalnizca index.html'deki Magnitude Conversion seciciyle, gecerlilik kosullariyla uygulanir.
+    Onceki surum mb'ye Scordilis (2006), ml/md/mc'ye bolge ayrimi olmadan Grunthal tipi
+    ML->Mw uyguluyordu; 'Original' secenegi bu yuzden gercekten orijinal degildi."""
     mt = (mtype or '').lower().strip()
-    if mt in ('mw','mww','mwb','mwc','mwr','mwp',''):
+    if mt in NATIVE_MW:
         return round(mag, 2)
-    if mt == 'mb' and 3.5 <= mag <= 6.2:
-        return round(0.85*mag + 1.03, 2)
-    if mt in ('ml','md','mc') and 1.0 <= mag <= 6.5:
-        return round(0.0376*mag**2 + 0.646*mag - 0.269, 2)
-    # Scordilis (2006, J. Seismol. 10:225-236) Es. 14-15: yalnizca h < 70 km; 3,0-6,1 ve 6,2-8,2 (ozgun makaleden dogrulandi 2026-10-11)
-    if mt in ('ms','ms_20') and dep is not None and dep < 70:
-        if 3.0 <= mag <= 6.1: return round(0.67*mag + 2.07, 2)
-        if 6.2 <= mag <= 8.2: return round(0.99*mag + 0.08, 2)
-    return round(mag, 2)
+    return None
 
 def parse_line(line, source):
     c = [x.strip() for x in line.split('|')]
