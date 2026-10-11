@@ -1089,6 +1089,8 @@
       <option value="none" selected>Original / None</option>
       <optgroup label="🌐 Global Relations">
         <option value="scordilis2006">Scordilis (2006) — mb/Ms → Mw</option>
+      </optgroup>
+      <optgroup label="🧪 Global — duyarlılık analizi (evrensel geçerli kabul edilmez)">
         <option value="lolli2014">Lolli, Gasperini &amp; Vannucci (2014) EXP — mb/Ms → Mw</option>
         <option value="iscgem2015">ISC-GEM, Di Giacomo vd. (2015) EXP — mb/Ms → Mw (mb &lt; 5 sıkışır)</option>
       </optgroup>
@@ -2120,6 +2122,9 @@ const MAG_CONVERSIONS = {
     convert(e) {
       const t = (e.mtype || '').toLowerCase(), m = e.mag;
       if (t === 'mb') return 0.85 * m + 1.03;
+      // ⚠ DOĞRULANMADI (2026-10-11): Di Giacomo vd. (2015, PEPI 239, s. 41) Scordilis'i 0,67 Ms + 2,07 (3,0–6,1) ve
+      // 0,99 Ms + 0,08 (6,2–8,2) olarak aktarır. 0,646 katsayısı Grünthal tipi ML bağıntısındaki (0,0376 ML² + 0,646 ML − 0,269)
+      // terimle aynıdır, aktarma hatası olabilir. Özgün makale (J. Seismol. 10:225–236) kontrol edilmeden değiştirilmeyecek.
       return m <= 6.1 ? 0.646 * m + 2.079 : 0.994 * m + 0.115; // t === 'ms'
     }
   },
@@ -2128,7 +2133,7 @@ const MAG_CONVERSIONS = {
   // GCMT Mw'den türetilmiştir; USGS/NEIC veya EMSC mb'sine uygulanması ajans farkı nedeniyle bir varsayımdır.
   // Mw tipli olaylar (mww, mwr, mwc, mwb, mwp, mw) hiçbir kolda dönüştürülmez (Di Giacomo vd. 2015 önceliği: gerçek Mw > proxy).
   iscgem2015: {
-    label: 'ISC-GEM: Di Giacomo vd. (2015) EXP — mb/Ms → Mw (mb < 5 sıkışır)', scope: 'global', region: null,
+    label: 'ISC-GEM: Di Giacomo vd. (2015) EXP — mb/Ms → Mw (mb < 5 sıkışır) [duyarlılık analizi]', scope: 'global', region: null,
     inputTypes: ['mb', 'ms'], outputType: 'Mw',
     validRange: 'mb: 3,5–6,5 · Ms: 3,0–8,5 — makalenin "M < 5 için dikkat" uyarısı BİLEREK aşılır: Eş. (2) mb → −∞ iken Mw → 4,555 asimptotuna gider (mb 3,5 → 4,75; mb 4,5 → 5,01), G–R küçük büyüklüklerde yapay olarak sıkışır',
     reference: 'Di Giacomo, D., Bondár, I., Storchak, D. A., Engdahl, E. R., Bormann, P. & Harris, J. (2015). ISC-GEM: Global Instrumental Earthquake Catalogue (1900–2009), III. Re-computed MS and mb, proxy MW, final magnitude composition and completeness assessment. Phys. Earth Planet. Inter. 239, 33–47. Eş. (1) Ms: Mw = exp(−0,222 + 0,233 Ms) + 2,863; Eş. (2) mb: Mw = exp(−4,664 + 0,859 mb) + 4,555 (s. 41–42). Makale M < 5 için dikkat önerir; burada tüm aralık uygulanır, çünkü yalnızca mb ≥ 5 dönüştürmek 4,95–5,2 arasında boşluk yaratır (2026-10-11, USGS 1 yıllık testte b(Mmin) sıçraması 1,44).',
@@ -2144,7 +2149,7 @@ const MAG_CONVERSIONS = {
     }
   },
   lolli2014: {
-    label: 'Lolli, Gasperini & Vannucci (2014) EXP (CSQ) — mb/Ms → Mw', scope: 'global', region: null,
+    label: 'Lolli, Gasperini & Vannucci (2014) EXP (CSQ) — mb/Ms → Mw [duyarlılık analizi]', scope: 'global', region: null,
     inputTypes: ['mb', 'ms'], outputType: 'Mw',
     validRange: 'mb: 3,6–7,2 (GBL veri aralığı; mb < 4,5 GCMT eksikliği nedeniyle zayıf kısıtlı) · Ms: 2,9–5,5 MED, 5,5 < Ms ≤ 8,7 GBL',
     reference: 'Lolli, B., Gasperini, P. & Vannucci, G. (2014). Empirical conversion between teleseismic magnitudes (mb and Ms) and moment magnitude (Mw) at the Global, Euro-Mediterranean and Italian scale. Geophys. J. Int. 199, 805–828. doi:10.1093/gji/ggu264. Tablo 3 EXP, CSQ regresyonu: mb GBL a = 0,741, b = 0,210, c = −0,785; Ms GBL a = −0,109, b = 0,229, c = 2,586; Ms MED a = 2,133, b = 0,063, c = −6,205. Ms ≤ 5,5 için MED katsayıları, makalenin GBL alt uç eksikliği düzeltmesi önerisidir (Bölüm 5 ve 8; 5,5\'te iki eğri farkı ≈ 0,02).',
