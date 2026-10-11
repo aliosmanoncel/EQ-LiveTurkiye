@@ -1159,6 +1159,7 @@
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
     <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=10 olay)</span></div>
+    <div style="font-size:.7rem;color:#888;text-align:right;" title="Her pencerenin b-değeri hangi zamana çizilsin? Orta: pencerenin ortanca olayı (varsayılan). Son: pencerenin en son olayı — yalnızca o ana kadarki veriyi kullanır (nedensel); ana şok öncesi (öncül) analizlerinde önerilir, çünkü orta damgada son ~50 olay hiçbir noktada 'şimdi' olarak görünmez.">b(t) zaman damgası <select id="bAnchorSel" onchange="onBAnchorChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"><option value="mid">pencere ortası</option><option value="end">pencere sonu (nedensel)</option></select></div>
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
     <div id="sensPanel" style="margin-top:8px;font-size:.72rem;color:#9ab0c5;">
@@ -2254,6 +2255,16 @@ function restoreTmTypeFilterFromURL() {
 }
 let lastTmTypeFilter = null;
 
+// b(t) zaman damgası (2026-10-11): 'mid' = ortanca olay (Öncel & Wilson 2007 gösterimi), 'end' = pencerenin son olayı (nedensel).
+// URL: ?banchor=end. Yalnızca noktaların zaman eksenindeki yerini değiştirir; b, hata ve pencereler aynıdır.
+let bTimeAnchor = (() => { try { return new URLSearchParams(location.search).get('banchor') === 'end' ? 'end' : 'mid'; } catch (e) { return 'mid'; } })();
+try { const el0 = document.getElementById('bAnchorSel'); if (el0) el0.value = bTimeAnchor; } catch (e) {}
+function bWinTime(win, getT) { return getT(win[bTimeAnchor === 'end' ? win.length - 1 : Math.floor(win.length / 2)]); }
+function onBAnchorChange() {
+  const el = document.getElementById('bAnchorSel'); bTimeAnchor = el && el.value === 'end' ? 'end' : 'mid';
+  try { const u = new URL(location.href); if (bTimeAnchor === 'end') u.searchParams.set('banchor', 'end'); else u.searchParams.delete('banchor'); history.replaceState(null, '', u); } catch (e) {}
+  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+}
 function onTmConversionChange() {
   mcConversionMode = document.getElementById('tmConversionSel').value;
   if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
@@ -2339,7 +2350,7 @@ function computeBvalueTimeSeries(evList, Mc) {
     const win  = sorted.slice(i, i + N_WIN);
     const mags = win.map(e => e.mw ?? e.mag);
     const b = computeBvalue(mags, Mc);
-    if (b !== null) series.push({ t: win[Math.floor(N_WIN/2)].time.getTime(), b, err: bConfidence95(b, N_WIN), span: win[N_WIN-1].time - win[0].time });
+    if (b !== null) series.push({ t: bWinTime(win, e => e.time.getTime()), b, err: bConfidence95(b, N_WIN), span: win[N_WIN-1].time - win[0].time });
   }
   return { series, N: sorted.length };
 }
@@ -2435,7 +2446,7 @@ function renderBvalueTS(evList, Mc, cs) {
   const mcSeries = [];
   for (let i = 0; i + MC_WIN <= mcAll.length; i += MC_STEP) {
     const w = mcAll.slice(i, i + MC_WIN), mc = computeMc(w);
-    if (mc !== null) mcSeries.push({ t: w[Math.floor(MC_WIN / 2)].time.getTime(), mc });
+    if (mc !== null) mcSeries.push({ t: bWinTime(w, e => e.time.getTime()), mc });
   }
 
   if (series.length === 0) {
@@ -2482,8 +2493,11 @@ function renderBvalueTS(evList, Mc, cs) {
   // çerçeve kenarını hafifçe aşabilir, bilinen/kabul edilen bir ödün).
   // Dolgu oransal (aralığın %10'u, en az 0.05); DEFAULT_B_LO/HI (0.4/1.6)
   // artık bu hesaba hiçbir şekilde müdahale etmez (2026-09-17).
-  const dataLo = Math.min(...bsAll);
-  const dataHi = Math.max(...bsAll);
+  // 2026-10-11: eksen artık %95 aralıklarını da kapsar (çubuklar çerçeveden taşmasın; az pencereli
+  // serilerde "aşırı büyük hata" görüntüsü taşmadan kaynaklanıyordu). Değerler değişmedi.
+  const axS = series.concat(fs);
+  const dataLo = Math.min(...axS.map(s2 => s2.b - (s2.err || 0)));
+  const dataHi = Math.max(...axS.map(s2 => s2.b + (s2.err || 0)));
   const padding = Math.max((dataHi - dataLo) * 0.10, 0.05);
   let bMin = dataLo - padding, bMax = dataHi + padding;
   if (bMax - bMin < MIN_SPAN) {
@@ -2519,7 +2533,9 @@ function renderBvalueTS(evList, Mc, cs) {
   // yoğun/heterojen serilerde genel eğilimi okumak zorlaşıyor). Öncel &
   // Wilson (2007) pencereleme/hesaplama mantığına HİÇ dokunulmaz -- ham
   // seri (pts/dots/errBars) aynen kalır, bu yalnızca ÜSTÜNE eklenir.
-  const TREND_WINDOW = 21, TREND_HALF = 10;
+  // 2026-10-11: pencere sayısı azsa 21 pencerelik ortalama serinin neredeyse tamamını kapsar ve kısa süreli
+  // değişimleri silerdi (ör. 22 pencerede her nokta 11–21 pencerenin ortalaması). k = min(21, ~n/5, tek sayı, ≥3).
+  const TREND_WINDOW = series.length >= 105 ? 21 : Math.max(3, 2 * Math.round(series.length / 10) + 1), TREND_HALF = (TREND_WINDOW - 1) / 2;
   const trendPts = series.map((s, i) => {
     const lo = Math.max(0, i - TREND_HALF), hi = Math.min(series.length - 1, i + TREND_HALF);
     const slice = bs.slice(lo, hi + 1);
@@ -2528,7 +2544,7 @@ function renderBvalueTS(evList, Mc, cs) {
   }).join(' ');
   const trendLine = `<polyline points="${trendPts}" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-opacity="0.95"/>`;
 
-  // (b) sabit-Mc serisi: aynı 21-pencere hareketli ortalama, gri kesikli
+  // (b) sabit-Mc serisi: aynı k-pencere hareketli ortalama, gri kesikli
   let fixedLine = '', fixedDots = '';
   if (fs.length) {
     const fb = fs.map(s => s.b);
@@ -2610,7 +2626,7 @@ function renderBvalueTS(evList, Mc, cs) {
   const bLast = series[series.length-1];
   const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, err: btAll.series[btAll.series.length - 1].err, nWin: btAll.series.length, N: btAll.N } : null;
   lastBts = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
-              fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS };
+              fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, trendK: TREND_WINDOW, anchor: bTimeAnchor };
   const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
   // Lejant iki seviyeye ayrıldı -- "grafik açıklaması" (renk/sembol anahtarı)
   // ile "istatistik özeti" aynı satırda karışmasın (2026-09-17, kullanıcı
@@ -3442,8 +3458,9 @@ async function exportPosterAGU(scale, evt) {
     : L('Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', 'Figure 2. Time–magnitude distribution of events; colours show magnitude classes (no completeness steps used).'), X2 + 16, y, W2 - 32, TOP + 256);
   y = box(X2, TOP + 275, W2, MID - TOP - 275, L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112);
-  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step 10 (Öncel & Wilson 2007). {#0891b2|Cyan} points/line: window b-value; {#0891b2|cyan band:} 95% confidence interval (±1.96·b/√N); {#db2777|pink:} 21-window moving average; {#6b7280|grey dashed:} fixed-Mc comparison; {#6b7280|grey dotted:} b = 1.0 reference. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
-    : '**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  const tK = (bt && bt.trendK) || 21, tEnd = bt && bt.anchor === 'end';
+  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step 10; plotted at the ' + (tEnd ? 'last event of each window (causal)' : 'median event of each window') + '. {#0891b2|Cyan:} window b-value, bars = 95% CI (±1.96·b/√N); {#db2777|pink:} ' + tK + '-window moving average (display only); {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
+    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım 10; nokta zamanı ' + (tEnd ? 'pencerenin son olayı (nedensel)' : 'pencerenin ortanca olayı') + '. {#0891b2|Camgöbeği:} pencere b-değeri, çubuklar %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} ' + tK + ' pencerelik hareketli ortalama (yalnızca görsel); {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
@@ -3451,7 +3468,7 @@ async function exportPosterAGU(scale, evt) {
   y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)})` : ''}, blue dashed Mc${gs ? ` = ${gs.mc}` : ''}.` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(gs.mc).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
   // G-R parametre tablosu (büyük punto)
   if (gf && gf.curves && gf.curves.length) {
-    const cols = [[L('Eğri', 'Curve'), 0], ['b', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/${L('yıl', 'yr')}`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
+    const cols = [[L('Eğri', 'Curve'), 0], ['b ± 1σ', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/${L('yıl', 'yr')}`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
     let ry = y + 4; c.fillStyle = '#f3f4f6'; c.fillRect(tx, ry - 3, W3 - 32, rowH);
     cols.forEach(([h, dx]) => text(h, tx + 6 + dx, ry, 'bold 16px Arial', INK)); ry += rowH;
     const nm = { best: fitT ? `${L('En iyi', 'Best')} (${fitT.replace('M ', 'M\u00a0')})` : L('En iyi tahmin', 'Best estimate'), upper: L('Üst eğri', 'Upper curve'), lower: L('Alt eğri', 'Lower curve') };
@@ -4442,11 +4459,11 @@ function csBvalueTimeSeries(cs, fit) {
     const win = items.slice(i, i + N_WIN);
     if (on) {
       const r = csAkiBRange(win, fit.hi);
-      if (r) series.push({ t: win[Math.floor(N_WIN / 2)].t, b: r.b, err: r.se !== null ? 1.96 * r.se : null, span: win[N_WIN - 1].t - win[0].t });
+      if (r) series.push({ t: bWinTime(win, it => it.t), b: r.b, err: r.se !== null ? 1.96 * r.se : null, span: win[N_WIN - 1].t - win[0].t });
       continue;
     }
     const b = csAkiB(win);
-    if (b !== null) series.push({ t: win[Math.floor(N_WIN / 2)].t, b, err: bConfidence95(b, N_WIN), span: win[N_WIN - 1].t - win[0].t });
+    if (b !== null) series.push({ t: bWinTime(win, it => it.t), b, err: bConfidence95(b, N_WIN), span: win[N_WIN - 1].t - win[0].t });
   }
   return { series, N: items.length };
 }
