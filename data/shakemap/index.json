@@ -16,6 +16,13 @@
    "mag": "M 7.0",
    "place": "6 km ESE of Kumamoto, Japan",
    "usgs": "https://earthquake.usgs.gov/earthquakes/eventpage/us20005iis/executive"
+  },
+  {
+   "id": "panama2026",
+   "label_tr": "Panama 2026 — USGS ShakeMap",
+   "mag": "M 7.7",
+   "place": "12 km WSW of Pitaloza Arriba, Panama",
+   "usgs": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000u18k/executive"
   }
  ]
 }

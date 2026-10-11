@@ -1,0 +1,23 @@
+{
+ "id": "panama2026",
+ "title_tr": "2026 Panama (Azuero) depremi — USGS ShakeMap",
+ "title_en": "2026 Panama (Azuero) earthquake — USGS ShakeMap",
+ "usgs": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000u18k/executive",
+ "event": "us6000u18k",
+ "mag": "M 7.7",
+ "place": "12 km WSW of Pitaloza Arriba, Panama",
+ "date": "2026-10-09 17:56 UTC",
+ "bounds": {
+  "north": 11.183333333333334,
+  "south": 3.9256493627933766,
+  "east": -76.69751063284107,
+  "west": -84.53333333333333
+ },
+ "epicenter": {
+  "lon": -80.769,
+  "lat": 7.5868
+ },
+ "source": "USGS ShakeMap KMZ (event page download, 2026-10-11)",
+ "contours": 11,
+ "kmz": "shakemap.kmz"
+}
