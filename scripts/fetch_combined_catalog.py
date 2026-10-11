@@ -46,7 +46,7 @@ OUTPUT   = 'data/eq_historical.json'
 # mag/mtype korunuyor, "mw" yalnizca gercekten dogrulanmis durumlarda
 # (native Mw, Scordilis 2006 mb/Ms) dolduruluyor. Detay ve kaynaklar:
 # seismo-report/eqlive-turkey-methodology.html §4.
-def to_mw(mag, mtype):
+def to_mw(mag, mtype, dep=None):
     """(mw, mw_method) dondurur. mw None ise dogrulanmis bir donusum yok
     demektir — cagiran taraf orijinal mag'i kullanmali (index.html zaten
     her tuketim noktasinda `e.mw ?? e.mag` / `e.mw || e.mag` deseniyle
@@ -56,11 +56,12 @@ def to_mw(mag, mtype):
         return round(mag, 2), 'native'
     if mt == 'mb' and 3.5 <= mag <= 6.2:
         return round(0.85*mag + 1.03, 2), 'scordilis2006_mb'
-    if mt in ('ms','ms_20'):
+    # Scordilis (2006, J. Seismol. 10:225-236) Es. 14-15: yalnizca h < 70 km; 3,0-6,1 ve 6,2-8,2 (ozgun makaleden dogrulandi 2026-10-11)
+    if mt in ('ms','ms_20') and dep is not None and dep < 70:
         if 3.0 <= mag <= 6.1:
-            return round(0.646*mag + 2.079, 2), 'scordilis2006_ms_lo'
-        if mag > 6.1:
-            return round(0.994*mag + 0.115, 2), 'scordilis2006_ms_hi'
+            return round(0.67*mag + 2.07, 2), 'scordilis2006_ms_lo'
+        if 6.2 <= mag <= 8.2:
+            return round(0.99*mag + 0.08, 2), 'scordilis2006_ms_hi'
     if mt in ('ml', 'md', 'mc'):
         return None, 'unconverted_' + mt
     return None, 'unconverted_' + (mt or 'unknown')
@@ -71,7 +72,7 @@ def parse_line(line, source):
     try:
         mag   = float(c[10])
         mtype = c[9]
-        mw, mw_method = to_mw(mag, mtype)
+        mw, mw_method = to_mw(mag, mtype, float(c[4]) if c[4] else None)
         return {
             'id'        : c[0],
             'time'      : c[1],

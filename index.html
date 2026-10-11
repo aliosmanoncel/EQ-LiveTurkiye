@@ -2106,8 +2106,8 @@ const MAG_CONVERSIONS = {
   scordilis2006: {
     label: 'Scordilis (2006)', scope: 'global', region: null,
     inputTypes: ['mb', 'ms'], outputType: 'Mw',
-    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3',
-    reference: 'Scordilis, E. M. (2006). Empirical global relations converting Ms and mb to moment magnitude. Journal of Seismology, 10(2), 225–236.',
+    validRange: 'mb: 3.5–6.2 (tüm derinlikler) · Ms: 3.0–6.1 ve 6.2–8.2, yalnızca h < 70 km',
+    reference: 'Scordilis, E. M. (2006). Empirical global relations converting Ms and mb to moment magnitude. Journal of Seismology, 10(2), 225–236. doi:10.1007/s10950-006-9012-4. Eş. (14): Mw = 0,67(±0,005) Ms + 2,07(±0,03), 3,0 ≤ Ms ≤ 6,1, σ = 0,17, n = 23 921; Eş. (15): Mw = 0,99(±0,02) Ms + 0,08(±0,13), 6,2 ≤ Ms ≤ 8,2, σ = 0,20, n = 2 382 (Ms bağıntıları h < 70 km); Eş. (22): Mw = 0,85(±0,04) mb + 1,03(±0,23), 3,5 ≤ mb ≤ 6,2, σ = 0,29, n = 39 784. En küçük kareler; veri ISC+NEIC vs. HRVD/USGS Mw. Yazar: Ms < 4,0 ve mb < 4,5 için veri zayıf, sonuç yalnızca gösterge niteliğinde.',
     // ml/md/mc tipli olaylarda bu bağıntının uygulama alanı yoktur -- makalenin
     // kendisi de genel-geçerli bir ML->Mw bağıntısı önermeyi açıkça reddeder.
     // Geçerlilik aralığı dışındaki mb/ms olayları da (2026-09-16) uygulanamaz
@@ -2116,16 +2116,15 @@ const MAG_CONVERSIONS = {
     applicable(e) {
       const t = (e.mtype || '').toLowerCase(), m = e.mag;
       if (t === 'mb') return m >= 3.5 && m <= 6.2;
-      if (t === 'ms') return m >= 3.0 && m <= 8.3;
+      if (t === 'ms') return Number.isFinite(e.dep) && e.dep < 70 && ((m >= 3.0 && m <= 6.1) || (m >= 6.2 && m <= 8.2)); // Eş. 14–15 yalnızca h < 70 km
       return false;
     },
     convert(e) {
       const t = (e.mtype || '').toLowerCase(), m = e.mag;
       if (t === 'mb') return 0.85 * m + 1.03;
-      // ⚠ DOĞRULANMADI (2026-10-11): Di Giacomo vd. (2015, PEPI 239, s. 41) Scordilis'i 0,67 Ms + 2,07 (3,0–6,1) ve
-      // 0,99 Ms + 0,08 (6,2–8,2) olarak aktarır. 0,646 katsayısı Grünthal tipi ML bağıntısındaki (0,0376 ML² + 0,646 ML − 0,269)
-      // terimle aynıdır, aktarma hatası olabilir. Özgün makale (J. Seismol. 10:225–236) kontrol edilmeden değiştirilmeyecek.
-      return m <= 6.1 ? 0.646 * m + 2.079 : 0.994 * m + 0.115; // t === 'ms'
+      // 2026-10-11: özgün makaleden doğrulandı (Eş. 14–15). Önceki 0,646/2,079 ve 0,994/0,115 katsayıları kaynakta yoktu
+      // (0,646, Grünthal tipi ML bağıntısının terimiyle aynı — aktarma hatası); üst sınır 8,3 → 8,2, h < 70 km koşulu eklendi.
+      return m <= 6.1 ? 0.67 * m + 2.07 : 0.99 * m + 0.08; // t === 'ms'
     }
   },
   // ── Global üstel (EXP) bağıntılar (2026-10-11, kullanıcı talebi: global olaylarda deneme–karşılaştırma) ──
@@ -2184,7 +2183,7 @@ const MAG_CONVERSIONS = {
     label: 'Birleşik Dispatch: Scordilis(2006) mb/Ms + Çıvgın&Scordilis(2019) ML',
     scope: 'dispatch', region: 'Türkiye (yalnızca ML kolu için)',
     inputTypes: ['mb', 'ms', 'ml'], outputType: 'Mw',
-    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3 · ML: 1.7–6.7 (KOERI ağı)',
+    validRange: 'mb: 3.5–6.2 · Ms: 3.0–6.1, 6.2–8.2 (h < 70 km) · ML: 1.7–6.7 (KOERI ağı)',
     reference: 'Bu tek bir ampirik bağıntı DEĞİLDİR -- bir dispatch stratejisidir: her olay yalnızca kendi mtype alanına göre yukarıdaki iki tekil, ayrı ayrı doğrulanmış bağıntıdan birine yönlendirilir (mb/Ms → Scordilis 2006; ML → Çıvgın & Scordilis 2019). Bu ikisi keyfi bir eşleştirme değildir: Çıvgın & Scordilis (2019, s.1262) kendi ML→Mw regresyonunu türetmeden önce, kendi mb/Ms→Mw homojenizasyon adımı için Lolli ve ark. (2014/2015) ve Zare ve ark. (2014) ile karşılaştırmalı test yapmış ve "these tests" sonrasında doğrudan şunu yazmıştır: "we decided that the conversion formulas of Scordilis (2006)... are the most appropriate for our data set" (Eş. 19-20, tam olarak bizim scordilis2006 kaydımızdaki formüller). Yani bu dispatch, makalenin kendi iç referans-çerçevesiyle birebir tutarlıdır. Kaynak detayları için ilgili tekil kayıtlara bakınız. Büyüklüğü tahmin ederek başka bir dönüşüm zinciri OLUŞTURMAZ.',
     // mtype tek bir string alan olduğundan (bkz. veri şeması) ve alt-dallar
     // birbirini dışlayan eşitlik kontrolleri kullandığından, bir olay yapısal
@@ -2202,7 +2201,7 @@ const MAG_CONVERSIONS = {
     label: 'Birleşik Dispatch (M≥6.0 hariç — duyarlılık testi)',
     scope: 'dispatch', region: 'Türkiye (yalnızca ML kolu için)',
     inputTypes: ['mb', 'ms', 'ml'], outputType: 'Mw',
-    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3 · ML: 1.7–6.7 (KOERI ağı) · M<6.0',
+    validRange: 'mb: 3.5–6.2 · Ms: 3.0–6.1, 6.2–8.2 (h < 70 km) · ML: 1.7–6.7 (KOERI ağı) · M<6.0',
     reference: 'combined_dispatch ile AYNI iki bağıntıyı kullanır (Scordilis 2006 + Çıvgın & Scordilis 2019); TEK fark, M≥6.0 olaylarının dönüşüm dışı bırakılmasıdır. Yeni bir ampirik bağıntı DEĞİLDİR -- amaç, yüksek-magnitüdlü kuyruğun (bir kısmı EMSC tarafından hâlâ mb/Ms olarak, moment-tensör Mw yerine raporlanır) Mc/b-değeri/GoF üzerindeki etkisini combined_dispatch ile karşılaştırarak ÖLÇMEKTİR -- "etki yoktur" varsayılmaz, duyarlılık testiyle gösterilir (2026-09-16).',
     applicable(e) { return MAG_CONVERSIONS.combined_dispatch.applicable(e) && e.mag < 6.0; },
     convert(e) { return MAG_CONVERSIONS.combined_dispatch.convert(e); }
@@ -2246,7 +2245,7 @@ const MAG_CONVERSIONS = {
     label: 'Birleşik + MD: MD = ML (Md < 4,0) → Çıvgın & Scordilis (2019)',
     scope: 'dispatch', region: 'Türkiye (ML ve Md kolları için)',
     inputTypes: ['mb', 'ms', 'ml', 'md'], outputType: 'Mw',
-    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3 · ML: 1.7–6.7 · Md: 1,7 – <4,0',
+    validRange: 'mb: 3.5–6.2 · Ms: 3.0–6.1, 6.2–8.2 (h < 70 km) · ML: 1.7–6.7 · Md: 1,7 – <4,0',
     reference: 'combined_dispatch ile AYNI mb/Ms/ML kolları + Md olayları için md_as_ml.',
     applicable(e) { return (e.mtype || '').toLowerCase() === 'md' ? MAG_CONVERSIONS.md_as_ml.applicable(e) : MAG_CONVERSIONS.combined_dispatch.applicable(e); },
     convert(e) { return (e.mtype || '').toLowerCase() === 'md' ? MAG_CONVERSIONS.md_as_ml.convert(e) : MAG_CONVERSIONS.combined_dispatch.convert(e); }
@@ -2255,7 +2254,7 @@ const MAG_CONVERSIONS = {
     label: 'Birleşik + MD: Scordilis(2006) mb/Ms + Çıvgın&Scordilis(2019) ML + KOERI Md zinciri',
     scope: 'dispatch', region: 'Türkiye (ML ve Md kolları için)',
     inputTypes: ['mb', 'ms', 'ml', 'md'], outputType: 'Mw',
-    validRange: 'mb: 3.5–6.2 · Ms: 3.0–8.3 · ML: 1.7–6.7 · Md: ≈2,39 – <4,0 (KOERI ağı; Md ≥ 4,0 doyum nedeniyle ham)',
+    validRange: 'mb: 3.5–6.2 · Ms: 3.0–6.1, 6.2–8.2 (h < 70 km) · ML: 1.7–6.7 · Md: ≈2,39 – <4,0 (KOERI ağı; Md ≥ 4,0 doyum nedeniyle ham)',
     reference: 'combined_dispatch ile AYNI mb/Ms/ML kolları (değiştirilmedi) + Md olayları için koeri_md_chain. Dispatch: her olay yalnızca kendi mtype alanına göre tek bir kola gider.',
     applicable(e) { return (e.mtype || '').toLowerCase() === 'md' ? MAG_CONVERSIONS.koeri_md_chain.applicable(e) : MAG_CONVERSIONS.combined_dispatch.applicable(e); },
     convert(e) { return (e.mtype || '').toLowerCase() === 'md' ? MAG_CONVERSIONS.koeri_md_chain.convert(e) : MAG_CONVERSIONS.combined_dispatch.convert(e); }

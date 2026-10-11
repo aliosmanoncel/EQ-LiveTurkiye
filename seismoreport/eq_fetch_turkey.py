@@ -49,7 +49,7 @@ def parse_args():
     return hours, minmag, output, source
 
 # ── Scordilis (2006) büyüklük homojenleştirme → Mw ──────────────────
-def to_mw(mag, mag_type):
+def to_mw(mag, mag_type, dep=None):
     mt = (mag_type or '').lower().strip()
     if mt in ('mw', 'mww', 'mwb', 'mwc', 'mwr', 'mwp', ''):
         return round(mag, 2)
@@ -59,11 +59,12 @@ def to_mw(mag, mag_type):
     if mt in ('ml', 'md', 'mc'):
         if 1.0 <= mag <= 6.5:
             return round(0.0376 * mag**2 + 0.646 * mag - 0.269, 2)
-    if mt in ('ms', 'ms_20'):
+    # Scordilis (2006, J. Seismol. 10:225-236) Es. 14-15: yalnizca h < 70 km; 3,0-6,1 ve 6,2-8,2 (ozgun makaleden dogrulandi 2026-10-11)
+    if mt in ('ms', 'ms_20') and dep is not None and dep < 70:
         if 3.0 <= mag <= 6.1:
-            return round(0.646 * mag + 2.079, 2)
-        elif mag > 6.1:
-            return round(0.994 * mag + 0.115, 2)
+            return round(0.67 * mag + 2.07, 2)
+        elif 6.2 <= mag <= 8.2:
+            return round(0.99 * mag + 0.08, 2)
     return round(mag, 2)
 
 # ── EMSC / KOERI (standart FDSN text) ────────────────────────────────
@@ -108,7 +109,7 @@ def parse_fdsn_line(line):
             'dep'  : float(c[4]) if c[4] else 0.0,
             'mag'  : mag,
             'mtype': mtype,
-            'mw'   : to_mw(mag, mtype),
+            'mw'   : to_mw(mag, mtype, float(c[4]) if c[4] else None),
             'place': c[12] if len(c) > 12 else '',
         }
     except (ValueError, IndexError):
@@ -146,7 +147,7 @@ def parse_afad_event(e):
             'dep'     : float(e.get('depth', 0)),
             'mag'     : mag,
             'mtype'   : mtype,
-            'mw'      : to_mw(mag, mtype),
+            'mw'      : to_mw(mag, mtype, float(e['depth']) if e.get('depth') not in (None, '') else None),
             'place'   : e.get('location', ''),
             'province': e.get('province', ''),
             'district': e.get('district', ''),

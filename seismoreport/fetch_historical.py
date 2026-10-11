@@ -24,7 +24,7 @@ def parse_args():
         return args[args.index(flag)+1] if flag in args else default
     return get('--starttime','1970-01-01'), float(get('--minmag','4.5')), get('--output','data/eq_historical.json')
 
-def to_mw(mag, mtype):
+def to_mw(mag, mtype, dep=None):
     mt = (mtype or '').lower().strip()
     if mt in ('mw','mww','mwb','mwc','mwr','mwp',''):
         return round(mag, 2)
@@ -32,9 +32,10 @@ def to_mw(mag, mtype):
         return round(0.85*mag + 1.03, 2)
     if mt in ('ml','md','mc') and 1.0 <= mag <= 6.5:
         return round(0.0376*mag**2 + 0.646*mag - 0.269, 2)
-    if mt in ('ms','ms_20'):
-        if 3.0 <= mag <= 6.1: return round(0.646*mag + 2.079, 2)
-        if mag > 6.1:          return round(0.994*mag + 0.115, 2)
+    # Scordilis (2006, J. Seismol. 10:225-236) Es. 14-15: yalnizca h < 70 km; 3,0-6,1 ve 6,2-8,2 (ozgun makaleden dogrulandi 2026-10-11)
+    if mt in ('ms','ms_20') and dep is not None and dep < 70:
+        if 3.0 <= mag <= 6.1: return round(0.67*mag + 2.07, 2)
+        if 6.2 <= mag <= 8.2: return round(0.99*mag + 0.08, 2)
     return round(mag, 2)
 
 def parse_line(line):
@@ -51,7 +52,7 @@ def parse_line(line):
             'dep'  : float(c[4]) if c[4] else 10.0,
             'mag'  : mag,
             'mtype': mtype,
-            'mw'   : to_mw(mag, mtype),
+            'mw'   : to_mw(mag, mtype, float(c[4]) if c[4] else None),
             'place': c[12] if len(c) > 12 else '',
         }
     except (ValueError, IndexError):
