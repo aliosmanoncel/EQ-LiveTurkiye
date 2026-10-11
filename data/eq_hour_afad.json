@@ -1,1 +1,1 @@
-{"generated":"2026-10-11T08:08:32Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-10-11T15:15:22Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"731165","time":"2026-10-11T14:35:36","lat":39.31133,"lon":25.8115,"dep":7.39,"mag":1.4,"mtype":"ML","mw":0.71,"place":"Ege Denizi - [28.79 km] Ayvacık (Çanakkale)","province":"Çanakkale","district":"Ayvacık"}]}
