@@ -2259,6 +2259,9 @@ let lastTmTypeFilter = null;
 // URL: ?banchor=end. Yalnızca noktaların zaman eksenindeki yerini değiştirir; b, hata ve pencereler aynıdır.
 let bTimeAnchor = (() => { try { return new URLSearchParams(location.search).get('banchor') === 'end' ? 'end' : 'mid'; } catch (e) { return 'mid'; } })();
 try { const el0 = document.getElementById('bAnchorSel'); if (el0) el0.value = bTimeAnchor; } catch (e) {}
+// Nedensel modda pencereler katalogun SONUNA hizalanır: son pencere her zaman en son olayı içerir
+// (ortada adım 10 yüzünden son 0–9 olay dışarıda kalabiliyordu). Ortada eski davranış (baştan hizalı).
+function bWinStart(n, N_WIN, STEP) { return bTimeAnchor === 'end' ? (n - N_WIN) % STEP : 0; }
 function bWinTime(win, getT) { return getT(win[bTimeAnchor === 'end' ? win.length - 1 : Math.floor(win.length / 2)]); }
 function onBAnchorChange() {
   const el = document.getElementById('bAnchorSel'); bTimeAnchor = el && el.value === 'end' ? 'end' : 'mid';
@@ -2346,7 +2349,7 @@ function computeBvalueTimeSeries(evList, Mc) {
     .filter(e => (e.mw ?? e.mag) >= Mc);
   if (sorted.length < N_WIN) return { series: [], N: sorted.length };
   const series = [];
-  for (let i = 0; i + N_WIN <= sorted.length; i += STEP) {
+  for (let i = bWinStart(sorted.length, N_WIN, STEP); i + N_WIN <= sorted.length; i += STEP) {
     const win  = sorted.slice(i, i + N_WIN);
     const mags = win.map(e => e.mw ?? e.mag);
     const b = computeBvalue(mags, Mc);
@@ -2537,7 +2540,7 @@ function renderBvalueTS(evList, Mc, cs) {
   // değişimleri silerdi (ör. 22 pencerede her nokta 11–21 pencerenin ortalaması). k = min(21, ~n/5, tek sayı, ≥3).
   const TREND_WINDOW = series.length >= 105 ? 21 : Math.max(3, 2 * Math.round(series.length / 10) + 1), TREND_HALF = (TREND_WINDOW - 1) / 2;
   const trendPts = series.map((s, i) => {
-    const lo = Math.max(0, i - TREND_HALF), hi = Math.min(series.length - 1, i + TREND_HALF);
+    const lo = Math.max(0, i - (bTimeAnchor === 'end' ? TREND_WINDOW - 1 : TREND_HALF)), hi = bTimeAnchor === 'end' ? i : Math.min(series.length - 1, i + TREND_HALF);
     const slice = bs.slice(lo, hi + 1);
     const avg = slice.reduce((a, b2) => a + b2, 0) / slice.length;
     return `${x(s.t).toFixed(1)},${y(avg).toFixed(1)}`;
@@ -2549,7 +2552,7 @@ function renderBvalueTS(evList, Mc, cs) {
   if (fs.length) {
     const fb = fs.map(s => s.b);
     const fPts = fs.map((s, i) => {
-      const lo = Math.max(0, i - TREND_HALF), hi = Math.min(fs.length - 1, i + TREND_HALF);
+      const lo = Math.max(0, i - (bTimeAnchor === 'end' ? TREND_WINDOW - 1 : TREND_HALF)), hi = bTimeAnchor === 'end' ? i : Math.min(fs.length - 1, i + TREND_HALF);
       const sl = fb.slice(lo, hi + 1);
       return `${x(s.t).toFixed(1)},${y(sl.reduce((a, c) => a + c, 0) / sl.length).toFixed(1)}`;
     }).join(' ');
@@ -2636,7 +2639,7 @@ function renderBvalueTS(evList, Mc, cs) {
       `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; ` +
       (useBand ? `<span style="color:#06b6d4;opacity:.6">▮</span> %95 yaklaşık güven bandı (±1.96·b/√n, pencere başına) &nbsp; ` : `<span style="color:#06b6d4">│</span> %95 güven aralığı &nbsp; `) +
       (fixed ? `<span style="color:#d1d5db">┄</span> Sabit Mc=${fixed.mc.toFixed(1)} (${fixed.src}) hareketli ortalama &nbsp; ` : '') +
-      `<span style="color:#ec4899">━</span> Hareketli ortalama (${TREND_WINDOW} pencere) &nbsp; ` +
+      `<span style="color:#ec4899">━</span> Hareketli ortalama (${TREND_WINDOW} pencere${bTimeAnchor === 'end' ? ', geriye dönük; noktalar pencere sonunda' : ''}) &nbsp; ` +
       `<span style="color:#f59e0b">┄</span> Genel ortalama` +
     `</div>` +
     `<div style="margin-top:2px">` +
@@ -3459,8 +3462,8 @@ async function exportPosterAGU(scale, evt) {
   y = box(X2, TOP + 275, W2, MID - TOP - 275, L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112);
   const tK = (bt && bt.trendK) || 21, tEnd = bt && bt.anchor === 'end';
-  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step 10; plotted at the ' + (tEnd ? 'last event of each window (causal)' : 'median event of each window') + '. {#0891b2|Cyan:} window b-value, bars = 95% CI (±1.96·b/√N); {#db2777|pink:} ' + tK + '-window moving average (display only); {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
-    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım 10; nokta zamanı ' + (tEnd ? 'pencerenin son olayı (nedensel)' : 'pencerenin ortanca olayı') + '. {#0891b2|Camgöbeği:} pencere b-değeri, çubuklar %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} ' + tK + ' pencerelik hareketli ortalama (yalnızca görsel); {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step 10; plotted at the ' + (tEnd ? 'last event of each window (causal)' : 'median event of each window') + '. {#0891b2|Cyan:} window b-value, bars = approx. 95% CI (±1.96·b/√N); {#db2777|pink:} ' + tK + '-window ' + (tEnd ? 'trailing' : 'centred') + ' moving average (display only); {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
+    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım 10; nokta zamanı ' + (tEnd ? 'pencerenin son olayı (nedensel)' : 'pencerenin ortanca olayı') + '. {#0891b2|Camgöbeği:} pencere b-değeri, çubuklar yaklaşık %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} ' + tK + ' pencerelik ' + (tEnd ? 'geriye dönük' : 'merkezî') + ' hareketli ortalama (yalnızca görsel); {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
@@ -4455,7 +4458,7 @@ function csBvalueTimeSeries(cs, fit) {
   const N_WIN = 100, STEP = 10, on = !!(fit && fit.on), items = on ? csFitItems(cs.kept, fit) : cs.kept;
   if (items.length < N_WIN) return { series: [], N: items.length };
   const series = [];
-  for (let i = 0; i + N_WIN <= items.length; i += STEP) {
+  for (let i = bWinStart(items.length, N_WIN, STEP); i + N_WIN <= items.length; i += STEP) {
     const win = items.slice(i, i + N_WIN);
     if (on) {
       const r = csAkiBRange(win, fit.hi);
