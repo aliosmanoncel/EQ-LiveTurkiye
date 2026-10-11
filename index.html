@@ -1821,13 +1821,222 @@ function renderHeat(evList) {
        seismicityColorMode === 'depth'
         ? `<br>Depth: <b style="color:${c}">${e.dep.toFixed(0)} km</b>`
         : `<br>Depth: ${e.dep.toFixed(0)} km`) +
-      `<br><span style="color:#666">${ago} ago</span>`
+      `<br><span style="color:#666">${ago} ago</span>` +
+      (mVal >= 4 ? `<br><a href="#" style="color:#7ecbff" onclick="openOmoriPanel(${e.lat},${e.lon},${e.time.getTime()},${e.mag},'${String(e.place||'').replace(/[\\'"<>]/g,'')}');return false;">📉 Artçı dizisi (Omori–Utsu)</a>` : '')
     ).addTo(markLayer);
     eqMarkerList.push({ e, marker });
   });
   if (showCircle) markLayer.addTo(map);
   labelLayer.bringToFront();
   updateEqList();
+}
+
+/* ══════════════════════════════════════════
+   ARTÇI DİZİSİ — OMORI–UTSU (2026-10-11)
+   seismo-report/scripts/jma_feed/jma_stats.py → omori_utsu() fonksiyonunun JS karşılığı.
+   Model ve parametre tanımları aynı: n(t) = K/(t+c)^p, t gün, Ogata (1983) en çok olabilirlik.
+   Düzeltmeler (jma_stats.py'ye göre):
+     1) Belirsizlik: BFGS yaklaşık ters Hessian yerine optimumda sayısal Hessian
+        (log K, log c, p) + delta yöntemi; p ve c için profil olabilirlik %95 aralığı (Δln L = 1,92).
+     2) Sınır kontrolü: c ∈ [1e-5, 2] gün, p ∈ [0,2; 3,0]; sınıra dayanan tahmin ve
+        sınıra açık aralık uyarılır.
+     3) Başlangıç kesmesi S (gün): olabilirlik [S, T] üzerinde; S = 0 iken jma_stats.py ile aynıdır.
+   K, verilen (c, p) için analitik olarak profillenir: K̂ = N / ∫_S^T (t+c)^-p dt.
+   Bu blok GK74'e ve mw_authority'ye dokunmaz; yalnız `events` listesini okur.
+══════════════════════════════════════════ */
+const OMORI_C_MIN = 1e-5, OMORI_C_MAX = 2.0, OMORI_P_MIN = 0.2, OMORI_P_MAX = 3.0;
+
+function omoriIntegral(c, p, S, T) {
+  if (Math.abs(p - 1) < 1e-8) return Math.log(T + c) - Math.log(S + c);
+  return (Math.pow(T + c, 1 - p) - Math.pow(S + c, 1 - p)) / (1 - p);
+}
+// Tam negatif log-olabilirlik, θ = (ln K, ln c, p)
+function omoriNll(lK, lc, p, t, S, T) {
+  const K = Math.exp(lK), c = Math.exp(lc);
+  let s = 0; for (let i = 0; i < t.length; i++) s += Math.log(t[i] + c);
+  return -(t.length * lK - p * s - K * omoriIntegral(c, p, S, T));
+}
+// K profillenmiş negatif log-olabilirlik (c, p) → { nll, lK }
+function omoriProfNll(lc, p, t, S, T) {
+  const c = Math.exp(lc), I = omoriIntegral(c, p, S, T);
+  if (!(I > 0) || !isFinite(I)) return { nll: Infinity, lK: NaN };
+  const lK = Math.log(t.length / I);
+  return { nll: omoriNll(lK, lc, p, t, S, T), lK };
+}
+// 1-B sınırlı minimizasyon: kaba ızgara + altın oran arama
+function omoriMin1D(f, a, b, n = 41) {
+  let bi = 0, bv = Infinity; const xs = [];
+  for (let i = 0; i < n; i++) { const x = a + (b - a) * i / (n - 1); xs.push(x); const v = f(x); if (v < bv) { bv = v; bi = i; } }
+  let lo = xs[Math.max(0, bi - 1)], hi = xs[Math.min(n - 1, bi + 1)];
+  const g = (Math.sqrt(5) - 1) / 2;
+  let x1 = hi - g * (hi - lo), x2 = lo + g * (hi - lo), f1 = f(x1), f2 = f(x2);
+  for (let k = 0; k < 60 && hi - lo > 1e-7; k++) {
+    if (f1 < f2) { hi = x2; x2 = x1; f2 = f1; x1 = hi - g * (hi - lo); f1 = f(x1); }
+    else { lo = x1; x1 = x2; f1 = f2; x2 = lo + g * (hi - lo); f2 = f(x2); }
+  }
+  const xm = (lo + hi) / 2, fm = f(xm);
+  return fm <= bv ? { x: xm, f: fm } : { x: xs[bi], f: bv };
+}
+// 2-B Nelder–Mead (ln c, p), kutu sınırlarına izdüşümlü; çok başlangıçlı
+function omoriFit(t, S, T, fix = {}) {
+  const LCMIN = Math.log(OMORI_C_MIN), LCMAX = Math.log(OMORI_C_MAX);
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  if (fix.p != null && fix.lc == null) {          // p sabit: ln c üzerinde 1-B
+    const r = omoriMin1D(lc => omoriProfNll(lc, fix.p, t, S, T).nll, LCMIN, LCMAX);
+    return { lc: r.x, p: fix.p, nll: r.f };
+  }
+  if (fix.lc != null && fix.p == null) {          // c sabit: p üzerinde 1-B
+    const r = omoriMin1D(p => omoriProfNll(fix.lc, p, t, S, T).nll, OMORI_P_MIN, OMORI_P_MAX);
+    return { lc: fix.lc, p: r.x, nll: r.f };
+  }
+  const F = v => omoriProfNll(clamp(v[0], LCMIN, LCMAX), clamp(v[1], OMORI_P_MIN, OMORI_P_MAX), t, S, T).nll;
+  let best = null;
+  for (const c0 of [1e-3, 1e-2, 0.05, 0.2]) for (const p0 of [0.7, 1.0, 1.3]) {
+    let sx = [[Math.log(c0), p0], [Math.log(c0) + 0.7, p0], [Math.log(c0), p0 + 0.15]];
+    let fx = sx.map(F);
+    for (let it = 0; it < 400; it++) {
+      const o = [0, 1, 2].sort((a, b) => fx[a] - fx[b]); sx = o.map(i => sx[i]); fx = o.map(i => fx[i]);
+      if (Math.abs(fx[2] - fx[0]) < 1e-10) break;
+      const cen = [(sx[0][0] + sx[1][0]) / 2, (sx[0][1] + sx[1][1]) / 2];
+      const xr = [cen[0] + (cen[0] - sx[2][0]), cen[1] + (cen[1] - sx[2][1])], fr = F(xr);
+      if (fr < fx[0]) { const xe = [cen[0] + 2 * (cen[0] - sx[2][0]), cen[1] + 2 * (cen[1] - sx[2][1])], fe = F(xe); if (fe < fr) { sx[2] = xe; fx[2] = fe; } else { sx[2] = xr; fx[2] = fr; } }
+      else if (fr < fx[1]) { sx[2] = xr; fx[2] = fr; }
+      else { const xc = [cen[0] + 0.5 * (sx[2][0] - cen[0]), cen[1] + 0.5 * (sx[2][1] - cen[1])], fc = F(xc);
+        if (fc < fx[2]) { sx[2] = xc; fx[2] = fc; } else { for (const j of [1, 2]) { sx[j] = [sx[0][0] + 0.5 * (sx[j][0] - sx[0][0]), sx[0][1] + 0.5 * (sx[j][1] - sx[0][1])]; fx[j] = F(sx[j]); } } }
+    }
+    const v = [clamp(sx[0][0], LCMIN, LCMAX), clamp(sx[0][1], OMORI_P_MIN, OMORI_P_MAX)], fv = F(v);
+    if (!best || fv < best.nll) best = { lc: v[0], p: v[1], nll: fv };
+  }
+  return best;
+}
+// Sayısal Hessian (merkezi farklar), θ = (ln K, ln c, p)
+function omoriHessian(th, t, S, T, h = 1e-4) {
+  const f = x => omoriNll(x[0], x[1], x[2], t, S, T), H = [[0,0,0],[0,0,0],[0,0,0]];
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+    const e = (k, d) => { const v = th.slice(); v[k] += d; return v; };
+    const pp = e(i, h); pp[j] += h; const pm = e(i, h); pm[j] -= h; const mp = e(i, -h); mp[j] += h; const mm = e(i, -h); mm[j] -= h;
+    H[i][j] = (f(pp) - f(pm) - f(mp) + f(mm)) / (4 * h * h);
+  }
+  return H;
+}
+function omoriInv3(A) {
+  const [a, b, c] = A[0], [d, e, f] = A[1], [g, h, i] = A[2];
+  const det = a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
+  if (!isFinite(det) || Math.abs(det) < 1e-300) return null;
+  return [[(e*i-f*h)/det, (c*h-b*i)/det, (b*f-c*e)/det], [(f*g-d*i)/det, (a*i-c*g)/det, (c*d-a*f)/det], [(d*h-e*g)/det, (b*g-a*h)/det, (a*e-b*d)/det]];
+}
+// Profil olabilirlik aralığı: ızgarada Δ ≤ 1,92 olan bölgenin sınırları, doğrusal aradeğerlemeyle
+function omoriProfileCI(t, S, T, which, nllBest, grid) {
+  const d = grid.map(v => (which === 'p' ? omoriFit(t, S, T, { p: v }) : omoriFit(t, S, T, { lc: v })).nll - nllBest);
+  const ok = d.map(x => x <= 1.92);
+  if (!ok.some(Boolean)) return { lo: null, hi: null, openLo: true, openHi: true };
+  const i0 = ok.indexOf(true), i1 = ok.lastIndexOf(true);
+  const interp = (ia, ib) => grid[ia] + (1.92 - d[ia]) * (grid[ib] - grid[ia]) / (d[ib] - d[ia]);
+  const lo = i0 === 0 ? grid[0] : interp(i0 - 1, i0), hi = i1 === grid.length - 1 ? grid[grid.length - 1] : interp(i1 + 1, i1);
+  return { lo, hi, openLo: i0 === 0, openHi: i1 === grid.length - 1 };
+}
+// Dönüştürülmüş zaman KS testi (Ogata 1988): τ_i = Λ(t_i)/Λ(T) ~ U(0,1)
+function omoriKS(t, S, T, K, c, p) {
+  const L = K * omoriIntegral(c, p, S, T), u = t.map(x => K * omoriIntegral(c, p, S, x) / L).sort((a, b) => a - b), n = u.length;
+  let D = 0; u.forEach((v, i) => { D = Math.max(D, (i + 1) / n - v, v - i / n); });
+  const lam = (Math.sqrt(n) + 0.12 + 0.11 / Math.sqrt(n)) * D; let q = 0;
+  for (let k = 1; k <= 100; k++) q += 2 * Math.pow(-1, k - 1) * Math.exp(-2 * k * k * lam * lam);
+  return { D, pvalue: Math.min(1, Math.max(0, q)) };
+}
+// Ana fonksiyon: t (gün, ana şoktan itibaren, t > S), S, T → sonuç nesnesi
+function omoriUtsuFit(t, S, T) {
+  t = t.filter(x => x > S && x <= T).sort((a, b) => a - b);
+  const N = t.length, warn = [];
+  if (N < 30) return { N, S, T, status: 'yetersiz', warn: [`N = ${N} < 30: Omori–Utsu uyumu yapılmadı.`] };
+  const b = omoriFit(t, S, T), lK = omoriProfNll(b.lc, b.p, t, S, T).lK;
+  const K = Math.exp(lK), c = Math.exp(b.lc), p = b.p;
+  const H = omoriHessian([lK, b.lc, p], t, S, T), C = omoriInv3(H);
+  let se = null;
+  if (C && C[0][0] > 0 && C[1][1] > 0 && C[2][2] > 0) {
+    const s = [Math.sqrt(C[0][0]), Math.sqrt(C[1][1]), Math.sqrt(C[2][2])];
+    se = { K: K * s[0], c: c * s[1], p: s[2], corr_lc_p: C[1][2] / (s[1] * s[2]) };
+  } else warn.push('Hessian pozitif tanımlı değil: standart hatalar hesaplanamadı.');
+  const pGrid = []; for (let v = OMORI_P_MIN; v <= OMORI_P_MAX + 1e-9; v += 0.01) pGrid.push(+v.toFixed(2));
+  const lcGrid = []; for (let i = 0; i <= 60; i++) lcGrid.push(Math.log(OMORI_C_MIN) + (Math.log(OMORI_C_MAX) - Math.log(OMORI_C_MIN)) * i / 60);
+  const ciP = omoriProfileCI(t, S, T, 'p', b.nll, pGrid);
+  const ciLc = omoriProfileCI(t, S, T, 'c', b.nll, lcGrid);
+  const ciC = { lo: ciLc.lo != null ? Math.exp(ciLc.lo) : null, hi: ciLc.hi != null ? Math.exp(ciLc.hi) : null, openLo: ciLc.openLo, openHi: ciLc.openHi };
+  const flags = [];
+  if (c <= OMORI_C_MIN * 1.05) flags.push('c alt sınırda (1e-5 gün): c belirlenemiyor; Hessian SE güvenilmez.');
+  if (c >= OMORI_C_MAX * 0.95) flags.push('c üst sınırda (2 gün).');
+  if (p <= OMORI_P_MIN + 1e-3 || p >= OMORI_P_MAX - 1e-3) flags.push('p arama sınırında: tahmin savunulamaz.');
+  if (ciC.openLo) flags.push('c %95 aralığı alt sınıra açık.');
+  if (ciC.openHi) flags.push('c %95 aralığı üst sınıra açık.');
+  if (ciP.openLo || ciP.openHi) flags.push('p %95 aralığı arama sınırına açık: p bu veriyle sınırlanamıyor.');
+  if (T - S < 3) warn.push(`Uyum penceresi ${(T - S).toFixed(2)} gün (< 3 gün): kısa pencerede c ve p güçlü biçimde birbirine bağlıdır.`);
+  const ks = omoriKS(t, S, T, K, c, p);
+  return { N, S, T, K, c, p, se, ciP, ciC, nll: b.nll, ks, flags, warn, status: flags.length ? 'uyarılı' : 'tamam' };
+}
+
+/* ── Panel: harita açılır penceresinden çağrılır ── */
+function omoriDefaults(M) { return { R: +Math.pow(10, 0.1238 * M + 0.983).toFixed(1), S: 0.05 }; } // R: GK74 D(M) (Gardner & Knopoff 1974)
+function omoriCollect(ms, R) {
+  const t0 = ms.time.getTime();
+  return (events || []).filter(e => e.time && e.mag > 0 && haversineKm(ms.lat, ms.lon, e.lat, e.lon) <= R &&
+    e.time.getTime() > t0 + 60000)   // ana şokun kendisini ve ±1 dk ajans farkını dışarıda bırak
+    .map(e => ({ t: (e.time.getTime() - t0) / 86400000, m: e.mag }));   // özgün büyüklük (mag); dönüşüm yok
+}
+function openOmoriPanel(lat, lon, tms, mag, place) {
+  const ms = { lat, lon, time: new Date(tms), mag, place };
+  const def = omoriDefaults(mag);
+  let el = document.getElementById('omoriPanel');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'omoriPanel';
+    el.style.cssText = 'position:fixed;z-index:3000;top:70px;right:16px;width:min(440px,calc(100vw - 32px));max-height:calc(100vh - 100px);overflow:auto;background:rgba(10,14,21,.97);border:1px solid #2a3a52;border-radius:12px;padding:14px 16px;color:#d6e2ee;font-size:.82rem;box-shadow:0 8px 30px rgba(0,0,0,.5);';
+    document.body.appendChild(el);
+  }
+  el._ms = ms;
+  el.innerHTML =
+    `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b style="font-size:.95rem;">📉 Artçı dizisi — Omori–Utsu</b>` +
+    `<button onclick="document.getElementById('omoriPanel').remove()" style="background:none;border:none;color:#9ab0c5;font-size:1.1rem;cursor:pointer;">✕</button></div>` +
+    `<div style="color:#9ab0c5;margin-bottom:8px;">Ana şok: M ${mag.toFixed(1)} · ${place || ''} · ${ms.time.toISOString().slice(0, 16).replace('T', ' ')} (listedeki zaman)</div>` +
+    `<div style="display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:center;">` +
+    `<label title="Tamlık eşiği; boş bırakılırsa MAXC + 0,2 (Woessner & Wiemer 2005)">Mc</label><input id="omMc" type="number" step="0.1" placeholder="oto (MAXC+0,2)" style="width:110px;">` +
+    `<label title="Başlangıç kesmesi (gün). Ana şok sonrası erken dönemdeki eksik kayıtların etkisini azaltır; bütünüyle telafi etmez.">S (gün)</label><input id="omS" type="number" step="0.01" min="0" value="${def.S}" style="width:110px;">` +
+    `<label title="Ana şok çevresindeki yarıçap; varsayılan GK74 D(M)">R (km)</label><input id="omR" type="number" step="1" min="1" value="${def.R}" style="width:110px;">` +
+    `</div><button onclick="runOmoriPanel()" style="margin-top:8px;background:#3b9eff;color:#0a0e15;border:none;border-radius:6px;padding:5px 12px;font-weight:700;cursor:pointer;">Hesapla</button>` +
+    `<div id="omOut" style="margin-top:10px;"></div>`;
+  runOmoriPanel();
+}
+function runOmoriPanel() {
+  const el = document.getElementById('omoriPanel'); if (!el) return; const ms = el._ms, out = document.getElementById('omOut');
+  const R = +document.getElementById('omR').value || omoriDefaults(ms.mag).R;
+  let S = Math.max(0, +document.getElementById('omS').value || 0);
+  const all = omoriCollect(ms, R), warnPre = [];
+  if (all.length < 10) { out.innerHTML = `<span style="color:#f5a623">Yüklü katalogda R ≤ ${R} km içinde ana şoktan sonra ${all.length} olay var. Daha uzun bir zaman penceresi veya kaynak seçin.</span>`; return; }
+  const mcIn = document.getElementById('omMc').value;
+  let mc = mcIn !== '' ? +mcIn : null;
+  if (mc == null) { const bins = {}; all.forEach(x => { const k = (Math.round(x.m * 10) / 10).toFixed(1); bins[k] = (bins[k] || 0) + 1; });
+    mc = +(+Object.entries(bins).sort((a, b) => b[1] - a[1])[0][0] + 0.2).toFixed(1); }
+  const listStart = (events && events.length) ? (Math.min(...events.map(e => e.time.getTime())) - ms.time.getTime()) / 86400000 : 0;
+  if (listStart > S) { warnPre.push(`Yüklü zaman penceresi ana şoktan ${listStart.toFixed(2)} gün sonra başlıyor; S bu değere çekildi. Erken artçılar için daha uzun bir pencere seçin.`); S = listStart; }
+  const tLast = Math.max(...all.map(x => x.t));
+  const gen = (window.__eqGeneratedFor === events && window.__eqGenerated) ? (window.__eqGenerated.getTime() - ms.time.getTime()) / 86400000 : null;
+  const T = (gen != null && gen >= tLast) ? gen : tLast;
+  if (T === tLast) warnPre.push('Gözlem penceresinin sonu bilinmiyor; T = son olayın zamanı alındı (p hafifçe düşük çıkabilir).');
+  const r = omoriUtsuFit(all.filter(x => x.m >= mc - 1e-9).map(x => x.t), S, T);
+  const f = (v, d = 3) => v == null || !isFinite(v) ? '—' : (+v).toFixed(d);
+  const fe = v => v == null || !isFinite(v) ? '—' : (+v).toExponential(2);
+  let h = `<div style="color:#9ab0c5;">R ≤ ${R} km · Mc = ${mc.toFixed(1)} (özgün büyüklük) · S = ${f(S, 3)} g · T = ${f(T, 2)} g · N = ${r.N}</div>`;
+  if (r.status === 'yetersiz') { h += `<div style="color:#f5a623;margin-top:6px;">${r.warn.join('<br>')}</div>`; out.innerHTML = h; return; }
+  h += `<table style="width:100%;border-collapse:collapse;margin-top:6px;">` +
+    `<tr><td>p</td><td><b>${f(r.p)}</b> ± ${f(r.se && r.se.p)} (Hessian)</td></tr>` +
+    `<tr><td></td><td>%95 profil: ${f(r.ciP.lo, 2)}${r.ciP.openLo ? '↓' : ''} – ${f(r.ciP.hi, 2)}${r.ciP.openHi ? '↑' : ''}</td></tr>` +
+    `<tr><td>c (gün)</td><td>${fe(r.c)} · %95 profil: ${fe(r.ciC.lo)}${r.ciC.openLo ? '↓' : ''} – ${fe(r.ciC.hi)}${r.ciC.openHi ? '↑' : ''}</td></tr>` +
+    `<tr><td>K</td><td>${f(r.K, 2)} ± ${f(r.se && r.se.K, 2)}</td></tr>` +
+    `<tr><td>r(ln c, p)</td><td>${f(r.se && r.se.corr_lc_p, 2)}</td></tr>` +
+    `<tr><td>Uyum (KS)</td><td>D = ${f(r.ks.D, 3)}, p = ${f(r.ks.pvalue, 2)}</td></tr></table>`;
+  const msgs = warnPre.concat(r.warn, r.flags);
+  if (msgs.length) h += `<div style="color:#f5a623;margin-top:6px;">⚠️ ${msgs.join('<br>⚠️ ')}</div>`;
+  h += `<div style="color:#6f8399;font-size:.72rem;margin-top:8px;line-height:1.45;">Yöntem: n(t) = K/(t+c)^p, Ogata (1983) en çok olabilirlik, [S, T] penceresi; seismo-report jma_stats.py ile aynı model (S = 0'da aynı sonuç). ` +
+    `%95 aralık: profil olabilirlik (Δln L = 1,92); ↑/↓ arama sınırına açık. Arama sınırları c ∈ [1e-5, 2] gün, p ∈ [0,2; 3]. Arka plan hızı modele dahil değil; önceki dizilerin artçıları sonucu etkileyebilir. ` +
+    `Hesap yüklü katalogla (kaynak ve zaman penceresi) yapılır. Tahmin veya olasılık değildir.</div>`;
+  out.innerHTML = h;
 }
 
 /* ══════════════════════════════════════════
@@ -4849,6 +5058,9 @@ async function loadData(sourceName, h) {
     if (all.length === 0) throw new Error('Seçili zaman penceresinde veri yok');
 
     events = all;
+    // Artçı paneli (Omori–Utsu) için gözlem penceresi sonu: olay zamanlarıyla aynı saat dilimi yorumu (işaretsizse yerel)
+    { const t0s = String((json.events && json.events[0] && json.events[0].time) || ''); const naive = !/(Z|[+-]\d\d:?\d\d)$/.test(t0s);
+      window.__eqGenerated = json.generated ? new Date(naive ? String(json.generated).replace(/Z$/, '') : json.generated) : null; window.__eqGeneratedFor = events; }
     // Zaman penceresine göre R otomatik seç
     const autoR = h <= 24 ? 10 : h <= 168 ? 20 : 100;
     if (autoR !== activeR) setHeatRadius(autoR, true);
