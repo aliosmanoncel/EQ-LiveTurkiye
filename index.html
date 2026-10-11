@@ -5100,12 +5100,13 @@ function pbSequences(list) {
     const t0 = ms.time.getTime(), Mms = ms.mw ?? ms.mag, Td = gk74Window(Mms)[0];
     const T = Math.min(Td, (tEndAll - t0) / 86400000);
     const Mc = computeMc(ch);
-    const rec = { ms, t0, M: Mms, Td, T, Mc, nAll: ch.length };
+    const rec = { ms, t0, M: Mms, Td, T, Mc, nAll: ch.length, all: ch.map(e => ({ t: (e.time.getTime() - t0) / 86400000, m: e.mw ?? e.mag })).filter(x => x.t > 0) };
     if (Mc === null || !(T > PB_SEQ_S)) { rec.status = 'Mc yok'; out.push(rec); return; }
     const sel = ch.map(e => ({ t: (e.time.getTime() - t0) / 86400000, m: e.mw ?? e.mag })).filter(x => x.m >= Mc - 1e-9 && x.t > PB_SEQ_S && x.t <= T);
     rec.N = sel.length;
     if (sel.length < PB_SEQ_NMIN) { rec.status = `N = ${sel.length} < ${PB_SEQ_NMIN} (M ≥ Mc)`; out.push(rec); return; }
-    const t = sel.map(x => x.t).sort((a, b) => a - b);
+    sel.sort((a, b) => a.t - b.t); rec.sel = sel;
+    const t = sel.map(x => x.t);
     const best = omoriFit(t, PB_SEQ_S, T), K = Math.exp(omoriProfNll(best.lc, best.p, t, PB_SEQ_S, T).lK);
     const grid = []; for (let v = OMORI_P_MIN; v <= OMORI_P_MAX + 1e-9; v += 0.02) grid.push(+v.toFixed(2));
     rec.p = best.p; rec.c = Math.exp(best.lc); rec.ciP = omoriProfileCI(t, PB_SEQ_S, T, 'p', best.nll, grid);
@@ -5163,12 +5164,125 @@ function renderPBSequences(list) {
   });
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = g;
   const f2 = v => v == null || !isFinite(v) ? '—' : v.toFixed(2);
-  const rows = ok.map(s => `<tr style="${s.N < PB_SEQ_NSOFT || s.flags.length ? 'opacity:.6' : ''}"><td>${new Date(s.t0).toISOString().slice(0, 10)}</td><td>${(+s.ms.lat).toFixed(2)}</td><td>${(+s.ms.lon).toFixed(2)}</td><td>${s.M.toFixed(1)}</td><td>${Number.isFinite(+s.ms.dep) ? (+s.ms.dep).toFixed(0) : '—'}</td><td>${s.N}</td><td>${s.Mc.toFixed(1)}</td><td><b>${f2(s.p)}</b> [${f2(s.ciP.lo)}–${f2(s.ciP.hi)}]</td><td><b>${f2(s.b)}</b> ± ${f2(s.bErr)}</td><td>${f2(s.ks.pvalue)}</td><td style="padding:1px 5px;color:#f59e0b">${s.flags.join('; ')}${s.notes.length ? `<span style="color:#888">${s.flags.length ? '; ' : ''}${s.notes.join('; ')}</span>` : ''}</td></tr>`).join('');
+  window.__pbOk = ok;
+  const rows = ok.map((s, i) => `<tr onclick="openPBSeqPanel(${i})" title="Bu dizinin M, b ve p zaman grafiğini aç" style="cursor:pointer;${s.N < PB_SEQ_NSOFT || s.flags.length ? 'opacity:.6' : ''}"><td>${new Date(s.t0).toISOString().slice(0, 10)}</td><td>${(+s.ms.lat).toFixed(2)}</td><td>${(+s.ms.lon).toFixed(2)}</td><td>${s.M.toFixed(1)}</td><td>${Number.isFinite(+s.ms.dep) ? (+s.ms.dep).toFixed(0) : '—'}</td><td>${s.N}</td><td>${s.Mc.toFixed(1)}</td><td><b>${f2(s.p)}</b> [${f2(s.ciP.lo)}–${f2(s.ciP.hi)}]</td><td><b>${f2(s.b)}</b> ± ${f2(s.bErr)}</td><td>${f2(s.ks.pvalue)}</td><td style="padding:1px 5px;color:#f59e0b">${s.flags.join('; ')}${s.notes.length ? `<span style="color:#888">${s.flags.length ? '; ' : ''}${s.notes.join('; ')}</span>` : ''}</td></tr>`).join('');
   const td = 'style="padding:1px 5px;"';
-  st.innerHTML = `<span style="color:#ec4899">●</span> p (%95 profil olabilirlik) &nbsp;|&nbsp; <span style="color:#06b6d4">●</span> b (±1,96·b/√N) &nbsp;|&nbsp; nokta boyutu: ana şok M &nbsp;|&nbsp; soluk: N &lt; ${PB_SEQ_NSOFT} ya da uyarı &nbsp;|&nbsp; ${ok.length} dizi analiz edildi, ${rej.length} aday ölçütü sağlamadı` +
+  st.innerHTML = `<span style="color:#ec4899">●</span> p (%95 profil olabilirlik) &nbsp;|&nbsp; <span style="color:#06b6d4">●</span> b (±1,96·b/√N) &nbsp;|&nbsp; nokta boyutu: ana şok M &nbsp;|&nbsp; tablodaki satıra tıklayın → dizinin M, b ve p zaman grafiği &nbsp;|&nbsp; soluk: N &lt; ${PB_SEQ_NSOFT} ya da uyarı &nbsp;|&nbsp; ${ok.length} dizi analiz edildi, ${rej.length} aday ölçütü sağlamadı` +
     `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:4px;font-size:.68rem;"><tr style="color:#cbd5e1">${['Tarih', 'Enlem', 'Boylam', 'M', 'h (km)', 'N', 'Mc', 'p [%95]', 'b ± %95', 'KS p', 'Uyarı'].map(h => `<th ${td}>${h}</th>`).join('')}</tr>${rows.replace(/<td>/g, `<td ${td}>`)}</table>` +
     `<div style="color:#888;margin-top:3px;">Yöntem: dizi = GK74 (Gardner &amp; Knopoff 1974) zaman–mesafe penceresinde ana şoka doğrudan bağlanan artçılar (yalnız ileri pencere; ikincil artçılar kendi penceresini açmaz). Tamlık her dizide ayrı belirlenir: Mc = maks. eğrilik + 0,2 (b(t) ile aynı); yalnız M ≥ Mc ve ana şoktan ${PB_SEQ_S} gün sonrası kullanılır (kısa süreli eksik kayıt). p: Omori–Utsu n(t) = K/(t+c)^p, Ogata (1983) en çok olabilirlik, [S, T] üzerinde; T = GK74 süresi ya da katalog sonu. b: Aki (1965). Asgari N = ${PB_SEQ_NMIN}. Sınırlama: GK74 penceresi aynı alandaki arka plan depremlerini de içerir; sabit hızlı bu katkı uzun pencerelerde bozunmayı yavaşlatır ve p'yi düşük tahmin ettirebilir (sentetik testte ≈ 0,05–0,1). Ávila-Barrientos vd. (2015) p'yi ZMAP en küçük kareleriyle ve Kagan (2002) yarıçapıyla hesaplar; burada yöntem farklıdır, değerler doğrudan karşılaştırılmamalıdır. p bir dizi parametresidir; kayan pencere (Öncel &amp; Wilson 2007) yalnız b(t) için kullanılır. Büyüklükler panelin seçili dönüşümüyle (${MAG_CONVERSIONS[mcConversionMode].label}).</div>`;
   window.lastPBSeq = { n: ok.length, rejected: rej.length, S: PB_SEQ_S, nmin: PB_SEQ_NMIN, seq: ok.map(s => ({ t0: s.t0, M: s.M, N: s.N, Mc: s.Mc, p: s.p, ciP: s.ciP, b: s.b, bErr: s.bErr, ks: s.ks.pvalue, flags: s.flags })) };
+}
+
+// ── Artçı Dizisi: M, b ve p (zaman) — dizi içi kayan pencere (2026-10-12) ──────────────────────────
+// Öncel & Wilson (2007) b(t) pencerelemesinin dizi içi uyarlaması: seçilen tek dizinin M ≥ Mc artçıları zamana göre
+// sıralanır; N = 100 olaylık pencereler 10'ar olay kaydırılır; her pencerede AYNI olaylardan b (Aki 1965) ve p
+// (Omori–Utsu, Ogata 1983 MLE) hesaplanır. c dizinin tamamından sabittir (yalnız p tahmin edilir; %95 aralık tek
+// boyutlu profil olabilirlik). Pencere sınırları komşu olayların orta noktasıdır. Güvenilmez pencerelerde değer
+// çizilmez: (1) pencere Mc'si (pencere süresindeki tüm artçılardan) > dizi Mc'si (eksik kayıt; b ve p), (2) t_son/t_ilk < 3 (p belirlenemez), (3) p aralığı
+// arama sınırına açık. Monte Carlo zarfı ve arka plan terimi μ bu sürümde YOK.
+const PBW_N = 100, PBW_STEP = 10, PBW_SPAN = 3;
+function pbWindows(rec) {
+  const ev = rec.sel || [], n = ev.length, lc = Math.log(rec.c), out = [];
+  for (let i = 0; i + PBW_N <= n; i += PBW_STEP) {
+    const w = ev.slice(i, i + PBW_N), tw = w.map(x => x.t);
+    const S = i > 0 ? (ev[i - 1].t + ev[i].t) / 2 : PB_SEQ_S, T = i + PBW_N < n ? (ev[i + PBW_N - 1].t + ev[i + PBW_N].t) / 2 : rec.T;
+    const r = { i, tFirst: tw[0], tLast: tw[PBW_N - 1], tMid: tw[Math.floor(PBW_N / 2)], span: tw[PBW_N - 1] / tw[0], why: [] };
+    // Pencere Mc'si, pencerenin zaman aralığındaki TÜM artçılardan (Mc altı dahil) hesaplanır; yalnız M ≥ Mc olaylardan
+    // hesaplansaydı kesik dağılımın tepe noktası her zaman dizi Mc'si olur ve +0,2 ile her pencere 'eksik' görünürdü.
+    r.McW = computeMc(rec.all.filter(x => x.t >= tw[0] && x.t <= tw[PBW_N - 1]).map(x => ({ mag: x.m })));
+    const incomplete = r.McW !== null && r.McW > rec.Mc + 1e-9;
+    if (incomplete) r.why.push(`pencere Mc = ${r.McW.toFixed(1)} > dizi Mc = ${rec.Mc.toFixed(1)} (eksik kayıt)`);
+    r.b = computeBvalue(w.map(x => x.m), rec.Mc); r.bErr = bConfidence95(r.b, PBW_N);
+    r.bOk = !incomplete && r.b != null;
+    const f = pp => omoriProfNll(lc, pp, tw, S, T).nll, m1 = omoriMin1D(f, OMORI_P_MIN, OMORI_P_MAX);
+    r.p = m1.x;
+    let lo = null, hi = null; const g = []; for (let v = OMORI_P_MIN; v <= OMORI_P_MAX + 1e-9; v += 0.01) g.push(v);
+    const d = g.map(v => f(v) - m1.f), okv = d.map(x => x <= 1.92), a = okv.indexOf(true), z = okv.lastIndexOf(true);
+    if (a >= 0) { lo = a === 0 ? null : g[a - 1] + (1.92 - d[a - 1]) * (g[a] - g[a - 1]) / (d[a] - d[a - 1]); hi = z === g.length - 1 ? null : g[z + 1] + (1.92 - d[z + 1]) * (g[z] - g[z + 1]) / (d[z] - d[z + 1]); }
+    r.pLo = lo; r.pHi = hi;
+    if (r.span < PBW_SPAN) r.why.push(`t_son/t_ilk = ${r.span.toFixed(1)} < ${PBW_SPAN} (p belirlenemez)`);
+    if (lo === null || hi === null) r.why.push('p %95 aralığı arama sınırına açık');
+    r.pOk = !incomplete && r.span >= PBW_SPAN && lo !== null && hi !== null;
+    r.cNote = tw[0] < 10 * rec.c;
+    out.push(r);
+  }
+  return out;
+}
+function pbSeqSvg(rec, wins) {
+  const W = 660, H = 520, PAD_L = 40, PAD_R = 14, plotW = W - PAD_L - PAD_R;
+  const S1 = { y: 10, h: 130 }, S2 = { y: 170, h: 145 }, S3 = { y: 345, h: 145 }, XT = 508;
+  const ts = rec.all.map(x => x.t).filter(t => t > 0), lmin = Math.log10(Math.max(Math.min(...ts), 1e-4)), lmax = Math.log10(Math.max(...ts, rec.T));
+  const l0 = Math.floor(lmin * 2) / 2, l1 = Math.ceil(lmax * 2) / 2, x = t => PAD_L + (Math.log10(Math.max(t, 1e-6)) - l0) / (l1 - l0) * plotW;
+  const lin = (S, lo, hi) => v => S.y + S.h - (v - lo) / (hi - lo) * S.h;
+  let g = '';
+  // x ızgarası (ondalık)
+  for (let k = Math.ceil(l0); k <= Math.floor(l1); k++) { const xc = x(Math.pow(10, k)).toFixed(1);
+    g += `<line x1="${xc}" y1="${S1.y}" x2="${xc}" y2="${S3.y + S3.h}" stroke="#2a2a2a" stroke-width="0.5"/>`;
+    g += `<text x="${xc}" y="${XT}" fill="#888" font-size="9" text-anchor="middle">${k >= 0 ? Math.pow(10, k).toLocaleString('tr-TR') : String(Math.pow(10, k)).replace('.', ',')}</text>`; }
+  g += `<text x="${PAD_L + plotW / 2}" y="${XT + 11}" fill="#888" font-size="9" text-anchor="middle">Ana şoktan geçen süre (gün, log)</text>`;
+  const frame = (S, lab) => { g += `<line x1="${PAD_L}" y1="${S.y + S.h}" x2="${W - PAD_R}" y2="${S.y + S.h}" stroke="#555" stroke-width="1"/><line x1="${PAD_L}" y1="${S.y}" x2="${PAD_L}" y2="${S.y + S.h}" stroke="#555" stroke-width="1"/>`;
+    g += `<text x="12" y="${S.y + S.h / 2}" fill="#888" font-size="9" text-anchor="middle" transform="rotate(-90 12 ${S.y + S.h / 2})">${lab}</text>`; };
+  const yticks = (S, lo, hi, step, y) => { for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) g += `<line x1="${PAD_L}" y1="${y(v).toFixed(1)}" x2="${W - PAD_R}" y2="${y(v).toFixed(1)}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${PAD_L - 6}" y="${(y(v) + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${v.toFixed(step < 1 ? 1 : 0)}</text>`; };
+  // 1) M–t
+  const ms = rec.all.map(x => x.m), mLo = Math.floor(Math.min(...ms, rec.Mc) - 0.2), mHi = Math.ceil(Math.max(...ms) + 0.2), yM = lin(S1, mLo, mHi);
+  yticks(S1, mLo, mHi, mHi - mLo > 4 ? 1 : 0.5, yM);
+  rec.all.forEach(p => { const used = p.m >= rec.Mc - 1e-9 && p.t > PB_SEQ_S && p.t <= rec.T;
+    g += `<circle cx="${x(p.t).toFixed(1)}" cy="${yM(p.m).toFixed(1)}" r="1.6" fill="${used ? '#f59e0b' : '#6b7280'}" fill-opacity="${used ? 0.7 : 0.35}"/>`; });
+  g += `<line x1="${PAD_L}" y1="${yM(rec.Mc).toFixed(1)}" x2="${W - PAD_R}" y2="${yM(rec.Mc).toFixed(1)}" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3"/><text x="${W - PAD_R - 2}" y="${(yM(rec.Mc) - 3).toFixed(1)}" fill="#06b6d4" font-size="8" text-anchor="end">dizi Mc = ${rec.Mc.toFixed(1)}</text>`;
+  g += `<line x1="${x(PB_SEQ_S).toFixed(1)}" y1="${S1.y}" x2="${x(PB_SEQ_S).toFixed(1)}" y2="${S1.y + S1.h}" stroke="#a78bfa" stroke-width="0.8" stroke-dasharray="1,2"><title>S = ${PB_SEQ_S} gün başlangıç kesmesi</title></line>`;
+  frame(S1, 'M');
+  // 2) b(t), 3) p(t)
+  const strip = (S, key, okKey, loF, hiF, col, lab, ref) => {
+    const okW = wins.filter(w => w[okKey]);
+    const vals = okW.flatMap(w => [loF(w), hiF(w)]).filter(Number.isFinite);
+    const lo = Math.floor(Math.min(0.6, ...vals) * 5) / 5, hi = Math.ceil(Math.max(1.4, ...vals) * 5) / 5, y = lin(S, lo, hi);
+    yticks(S, lo, hi, hi - lo > 1.6 ? 0.4 : 0.2, y);
+    g += `<line x1="${PAD_L}" y1="${y(ref).toFixed(1)}" x2="${W - PAD_R}" y2="${y(ref).toFixed(1)}" stroke="#666" stroke-width="1" stroke-dasharray="2,3"/>`;
+    let seg = [];
+    const flush = () => { if (seg.length > 1) g += `<polyline points="${seg.join(' ')}" fill="none" stroke="${col}" stroke-width="1.6" stroke-opacity="0.9"/>`; seg = []; };
+    wins.forEach(w => {
+      const xc = x(w.tMid).toFixed(1);
+      if (!w[okKey]) { flush(); g += `<line x1="${xc}" y1="${S.y + S.h - 5}" x2="${xc}" y2="${S.y + S.h}" stroke="#6b7280" stroke-width="1"><title>Değer çizilmedi: ${w.why.join('; ')}</title></line>`; return; }
+      g += `<line x1="${xc}" y1="${y(loF(w)).toFixed(1)}" x2="${xc}" y2="${y(hiF(w)).toFixed(1)}" stroke="${col}" stroke-width="0.8" stroke-opacity="0.45"/>`;
+      g += `<circle cx="${xc}" cy="${y(w[key]).toFixed(1)}" r="2" fill="${col}"><title>${lab} = ${w[key].toFixed(2)} [${loF(w).toFixed(2)}–${hiF(w).toFixed(2)}] · olay ${w.i + 1}–${w.i + PBW_N} · ${w.tFirst.toPrecision(3)}–${w.tLast.toPrecision(3)} gün${w.cNote && key === 'p' ? ' · ℹ t_ilk < 10c: sabit c etkili' : ''}</title></circle>`;
+      seg.push(`${xc},${y(w[key]).toFixed(1)}`);
+    });
+    flush(); frame(S, lab);
+  };
+  strip(S2, 'b', 'bOk', w => w.b - w.bErr, w => w.b + w.bErr, '#06b6d4', 'b', 1.0);
+  strip(S3, 'p', 'pOk', w => w.pLo, w => w.pHi, '#ec4899', 'p', 1.0);
+  return { W, H, g };
+}
+function openPBSeqPanel(idx) {
+  const rec = (window.__pbOk || [])[idx]; if (!rec) return;
+  const wins = pbWindows(rec), { W, H, g } = pbSeqSvg(rec, wins);
+  let el = document.getElementById('pbSeqPanel');
+  if (!el) { el = document.createElement('div'); el.id = 'pbSeqPanel';
+    el.style.cssText = 'position:fixed;z-index:3100;top:50px;left:50%;transform:translateX(-50%);width:min(720px,calc(100vw - 24px));max-height:calc(100vh - 70px);overflow:auto;background:rgba(10,14,21,.98);border:1px solid #334;border-radius:8px;padding:10px 12px;color:#ddd;font-size:.75rem;box-shadow:0 8px 30px rgba(0,0,0,.6)';
+    document.body.appendChild(el); }
+  const d = new Date(rec.t0).toISOString().slice(0, 10), nB = wins.filter(w => w.bOk).length, nP = wins.filter(w => w.pOk).length;
+  const nInc = wins.filter(w => w.why.some(t => t.includes('eksik'))).length, nSpan = wins.filter(w => w.span < PBW_SPAN).length;
+  const head = `Artçı Dizisi: M, b ve p (zaman) — M${rec.M.toFixed(1)} · ${d} · ${(+rec.ms.lat).toFixed(2)}°, ${(+rec.ms.lon).toFixed(2)}°`;
+  el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><b style="color:#e2e8f0;font-size:.82rem;">${head}</b><span>
+      <button class="tmFullscreenBtn" onclick="exportPBSeqPNG(${idx})">PNG (1600 px)</button> <button class="tmFullscreenBtn" onclick="document.getElementById('pbSeqPanel').remove()">✕</button></span></div>
+    <svg id="pbSeqSvg" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto;margin-top:6px">${g}</svg>
+    <div style="margin-top:4px;color:#cbd5e1;">${wins.length ? `${wins.length} pencere (N = ${PBW_N}, adım ${PBW_STEP}) · b gösterilen ${nB}, p gösterilen ${nP} · eksik kayıt ${nInc}, dar log-zaman ${nSpan}` : `M ≥ Mc olay sayısı ${rec.sel.length} < ${PBW_N}: pencere analizi yapılamadı (yalnız M–t gösteriliyor).`}
+      · dizi: N = ${rec.N}, Mc = ${rec.Mc.toFixed(1)}, c = ${rec.c.toExponential(1)} gün (sabit), tüm dizi p = ${rec.p.toFixed(2)}, b = ${rec.b != null ? rec.b.toFixed(2) : '—'}</div>
+    <div style="margin-top:3px;color:#888;">Yöntem: Öncel &amp; Wilson (2007) b(t) pencerelemesinin dizi içi uyarlaması — her pencerede aynı ${PBW_N} olaydan b (Aki 1965, ±1,96·b/√N) ve p (Omori–Utsu, Ogata 1983 en çok olabilirlik; c dizinin tamamından sabit; %95 tek boyutlu profil aralığı). Noktalar pencerenin ortanca olayına çizilir. Gri çentik: değer çizilmedi — pencere Mc'si dizi Mc'sini aşıyor (eksik kayıt), t_son/t_ilk &lt; ${PBW_SPAN} ya da p aralığı açık. Pencereler %90 örtüşür, bağımsız değildir; dalgalanmayı değişim kanıtı saymadan önce anlamlılık sınanmalıdır (Monte Carlo zarfı bu sürümde yok). Arka plan hızı modellenmez (μ yok): geç pencerelerde p düşük tahmin edilebilir.</div>`;
+  window.lastPBSeqWin = { idx, rec: { M: rec.M, t0: rec.t0, N: rec.N, Mc: rec.Mc, c: rec.c, p: rec.p, b: rec.b }, wins };
+}
+async function exportPBSeqPNG(idx) {
+  const svgEl = document.getElementById('pbSeqSvg'), rec = (window.__pbOk || [])[idx]; if (!svgEl || !rec) return;
+  const W = 660, H = 560, SC = 1600 / W, d = new Date(rec.t0).toISOString().slice(0, 10);
+  const inner = svgToLight(svgEl.innerHTML.replace(/fill="#f59e0b"/g, 'fill="#b45309"').replace(/stroke="#ec4899"/g, 'stroke="#be185d"').replace(/fill="#ec4899"/g, 'fill="#be185d"').replace(/stroke="#06b6d4"/g, 'stroke="#0e7490"').replace(/fill="#06b6d4"/g, 'fill="#0e7490"').replace(/fill="#6b7280"/g, 'fill="#9ca3af"'));
+  const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const xml = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * SC}" height="${H * SC}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#ffffff"/>` +
+    `<text x="10" y="16" font-size="11" font-weight="700" fill="#111827" font-family="sans-serif">${esc(`Artçı dizisi: M, b ve p — M${rec.M.toFixed(1)}, ${d}, ${(+rec.ms.lat).toFixed(2)}°K ${(+rec.ms.lon).toFixed(2)}°D`)}</text>` +
+    `<text x="10" y="29" font-size="8" fill="#374151" font-family="sans-serif">${esc(`N = ${rec.N} (M ≥ Mc = ${rec.Mc.toFixed(1)}), c = ${rec.c.toExponential(1)} gün sabit · pencere ${PBW_N} olay, adım ${PBW_STEP} · b: Aki (1965) · p: Omori–Utsu, Ogata (1983) MLE · EQ-Live`)}</text>` +
+    `<g transform="translate(0,34)" font-family="sans-serif">${inner}</g></svg>`;
+  const img = new Image(); img.onload = () => { const cv = document.createElement('canvas'); cv.width = W * SC; cv.height = H * SC; const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0);
+    cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `eqlive_artci_Mbp_M${rec.M.toFixed(1)}_${d}.png`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/png'); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
 }
 
 // ── Kümülatif Benioff gerinim ölçüsü (2026-10-11) ──────────────────────────────────────────────
