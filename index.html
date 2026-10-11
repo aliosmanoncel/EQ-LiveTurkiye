@@ -1167,6 +1167,11 @@
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
     <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
+      <div class="tmTitle" style="font-size:.78rem;">🔁 Artçı Dizisi Başına p ve b Değerleri <span style="color:#666;font-weight:400;">(Omori–Utsu, Ogata 1983 MLE · Aki 1965 b · GK74 dizileri; gösterim Ávila-Barrientos vd. 2015)</span></div>
+      <svg id="tmSvgPB" viewBox="0 0 660 300" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
+      <div class="tmStats" id="tmStatsPB">—</div>
+    </div>
+    <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
       <div class="tmTitle" style="font-size:.78rem;">⚡ Kümülatif Benioff Gerinim Ölçüsü Σ√E <span style="color:#666;font-weight:400;">(log E = 11,8 + 1,5M, erg; Gutenberg &amp; Richter 1956 — sabit eşik)</span></div>
       <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (showTimeMag) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
       <svg id="tmSvgBen" viewBox="0 0 660 210" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
@@ -4897,6 +4902,7 @@ function renderTimeMag(evList) {
   // sadece bölgeye özel kümeyi (regionEvents) kullanır — kullanıcı bir
   // bölge çizdiğinde dışındaki alanların istatistiğini görmesi anlamsız.
   const usingRegion = !!regionRect;
+  const seqRawList = usingRegion ? regionEvents : evList;   // p/b dizi paneli için kümesizleştirilmemiş liste
   if (usingRegion) evList = applyGk74Filter(regionEvents);
   const usingHistorical = historicalMode && !usingRegion;
 
@@ -5058,9 +5064,111 @@ function renderTimeMag(evList) {
     (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">Tamlık dönemleri: ${cs.periods.map(csLabel).join('; ')} · analize giren N=<b>${cs.kept.length}</b> (${cs.nExcluded} olay basamak altında, soluk)</span>` : '');
 
   renderBvalueTS(evList, Mc, cs);
+  try {
+    // Kümesizleştirme açıksa artçılar evList'ten çıkarılmıştır; diziler ham listeden, aynı dönüşüm ve tür filtresiyle kurulur
+    const seqList = (usingRegion && regionDeclusterOn)
+      ? tmTypeFilter(applyMagConversionForDisplay(seqRawList, mcConversionMode).list, tmTypeFilterOpts()).list : evList;
+    renderPBSequences(seqList);
+  } catch (e) { console.warn('[pb-seq]', e); }
   renderSensTable(evList, Mc, cs);
   if (cs) renderGutenbergRichterCS(cs); else renderGutenbergRichter(evList, Mc);
   try { renderBenioff(evList, Mc, cs); } catch (e) { console.warn('[benioff]', e); }
+}
+
+// ── Artçı dizisi başına p ve b (2026-10-12) ─────────────────────────────────────────────────────
+// Ávila-Barrientos vd. (2015, J. South Am. Earth Sci. 63:162) gösterimi: her ana şokun artçı dizisi için
+// Omori–Utsu p ve Gutenberg–Richter b, belirsizlikleriyle. p bir dizi parametresidir; ana şoku olmayan kayan
+// pencerede tanımsızdır, bu yüzden b(t)'deki N=100 kayan pencere (Öncel & Wilson 2007) p'ye UYGULANMAZ.
+// Dizi: GK74 (Gardner & Knopoff 1974) penceresinde ana şoka doğrudan bağlanan artçılar (gk74Decluster 'by').
+// Tamlık: her dizinin kendi Mc'si (computeMc, maks. eğrilik + 0,2 — b(t) ile aynı); analiz M ≥ Mc ve t > S.
+// p: omoriFit (Ogata 1983 MLE) + profil olabilirlik %95 aralığı; b: Aki (1965), ±1,96·b/√N (bConfidence95).
+// Asgari: N ≥ 30 (omoriUtsuFit ile aynı alt sınır); N < 50 soluk gösterilir (duyarlılık tablosu kuralı).
+const PB_SEQ_S = 0.05;          // gün; ana şok sonrası kısa süreli eksik kayıt için başlangıç kesmesi (Omori paneliyle aynı)
+const PB_SEQ_NMIN = 30, PB_SEQ_NSOFT = 50;
+let pbSeqCache = null;
+function pbSequences(list) {
+  // Önbellek anahtarı içerikten türetilir (panel her çizimde yeni kopyalar ürettiği için nesne kimliği kullanılamaz)
+  let h = 0; for (const e of list) { const t = e.time instanceof Date ? e.time.getTime() : 0; h = (h * 31 + (t % 1000003) + Math.round(10 * (e.mw ?? e.mag ?? 0))) % 2147483647; }
+  const key = list.length + '|' + mcConversionMode + '|' + h;
+  if (pbSeqCache && pbSeqCache.key === key) return pbSeqCache.out;
+  const r = gk74Decluster(list, [], null), kids = new Map();
+  list.forEach(e => { const q = r.rec.get(e); if (q && q.status === 'suppressed' && q.by) { if (!kids.has(q.by)) kids.set(q.by, []); kids.get(q.by).push(e); } });
+  const tEndAll = list.reduce((m, e) => { const t = e.time instanceof Date ? e.time.getTime() : NaN; return isFinite(t) && t > m ? t : m; }, -Infinity);
+  const out = [];
+  kids.forEach((ch, ms) => {
+    if (ch.length < PB_SEQ_NMIN) return;
+    const t0 = ms.time.getTime(), Mms = ms.mw ?? ms.mag, Td = gk74Window(Mms)[0];
+    const T = Math.min(Td, (tEndAll - t0) / 86400000);
+    const Mc = computeMc(ch);
+    const rec = { ms, t0, M: Mms, Td, T, Mc, nAll: ch.length };
+    if (Mc === null || !(T > PB_SEQ_S)) { rec.status = 'Mc yok'; out.push(rec); return; }
+    const sel = ch.map(e => ({ t: (e.time.getTime() - t0) / 86400000, m: e.mw ?? e.mag })).filter(x => x.m >= Mc - 1e-9 && x.t > PB_SEQ_S && x.t <= T);
+    rec.N = sel.length;
+    if (sel.length < PB_SEQ_NMIN) { rec.status = `N = ${sel.length} < ${PB_SEQ_NMIN} (M ≥ Mc)`; out.push(rec); return; }
+    const t = sel.map(x => x.t).sort((a, b) => a - b);
+    const best = omoriFit(t, PB_SEQ_S, T), K = Math.exp(omoriProfNll(best.lc, best.p, t, PB_SEQ_S, T).lK);
+    const grid = []; for (let v = OMORI_P_MIN; v <= OMORI_P_MAX + 1e-9; v += 0.02) grid.push(+v.toFixed(2));
+    rec.p = best.p; rec.c = Math.exp(best.lc); rec.ciP = omoriProfileCI(t, PB_SEQ_S, T, 'p', best.nll, grid);
+    rec.ks = omoriKS(t, PB_SEQ_S, T, K, rec.c, rec.p);
+    rec.b = computeBvalue(sel.map(x => x.m), Mc); rec.bErr = bConfidence95(rec.b, sel.length);
+    rec.flags = [];
+    rec.notes = [];
+    if (rec.c <= OMORI_C_MIN * 1.05) rec.notes.push(`c belirlenemedi (S = ${PB_SEQ_S} gün kesmesinden küçük); p etkilenmez`);
+    if (rec.ciP.openLo || rec.ciP.openHi) rec.flags.push('p aralığı sınıra açık');
+    if (rec.ks.pvalue < 0.05) rec.flags.push(`KS p = ${rec.ks.pvalue.toFixed(3)} (model uyumu zayıf)`);
+    if (T < Td - 1e-9) rec.flags.push(`dizi süresi katalog sonuyla kesik (${T.toFixed(0)}/${Td.toFixed(0)} gün)`);
+    rec.status = 'tamam'; out.push(rec);
+  });
+  out.sort((a, b) => a.t0 - b.t0);
+  pbSeqCache = { key, out };
+  return out;
+}
+function renderPBSequences(list) {
+  const svg = document.getElementById('tmSvgPB'), st = document.getElementById('tmStatsPB'); if (!svg || !st) return;
+  const W = 660, H = 300, PAD_L = 40, PAD_R = 14, PAD_T = 10, GAP = 22, PAD_B = 22, plotW = W - PAD_L - PAD_R, hP = (H - PAD_T - GAP - PAD_B) / 2;
+  if (!list || list.length < PB_SEQ_NMIN + 1) { svg.innerHTML = `<text x="330" y="60" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri</text>`; st.textContent = '—'; return; }
+  const seq = pbSequences(list), ok = seq.filter(s => s.status === 'tamam'), rej = seq.filter(s => s.status !== 'tamam');
+  if (!ok.length) {
+    svg.innerHTML = `<text x="330" y="60" fill="#666" font-size="11" text-anchor="middle">Analize uygun artçı dizisi yok (GK74 dizisi, kendi Mc'si üstünde N ≥ ${PB_SEQ_NMIN})</text>`;
+    st.innerHTML = `${seq.length} aday dizi (≥ ${PB_SEQ_NMIN} artçı) incelendi; hiçbiri ölçütü sağlamadı.` + (rej.length ? ` Örnek: M${rej[0].M.toFixed(1)} ${new Date(rej[0].t0).toISOString().slice(0, 10)} — ${rej[0].status}.` : '');
+    return;
+  }
+  const t0 = tmSharedAxis ? tmSharedAxis.t0 : Math.min(...ok.map(s => s.t0)), t1 = tmSharedAxis ? tmSharedAxis.t1 : Math.max(...ok.map(s => s.t0)) + 1;
+  const x = t => PAD_L + Math.max(0, Math.min(1, (t - t0) / (t1 - t0))) * plotW;
+  const lohi = (vals, lo0, hi0) => { const lo = Math.min(lo0, ...vals), hi = Math.max(hi0, ...vals); return [Math.floor(lo * 5) / 5, Math.ceil(hi * 5) / 5]; };
+  const [pLo, pHi] = lohi(ok.flatMap(s => [s.ciP.lo ?? s.p, s.ciP.hi ?? s.p]), 0.6, 1.4);
+  const [bLo, bHi] = lohi(ok.flatMap(s => [s.b - (s.bErr || 0), s.b + (s.bErr || 0)]), 0.6, 1.4);
+  const yP = v => PAD_T + hP - (v - pLo) / (pHi - pLo) * hP, yB = v => PAD_T + hP + GAP + hP - (v - bLo) / (bHi - bLo) * hP;
+  let g = '';
+  const strip = (y, lo, hi, lab, ref) => {
+    for (let v = lo; v <= hi + 1e-9; v += (hi - lo) > 1.2 ? 0.4 : 0.2) g += `<line x1="${PAD_L}" y1="${y(v).toFixed(1)}" x2="${W - PAD_R}" y2="${y(v).toFixed(1)}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${PAD_L - 6}" y="${(y(v) + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${v.toFixed(1)}</text>`;
+    if (ref >= lo && ref <= hi) g += `<line x1="${PAD_L}" y1="${y(ref).toFixed(1)}" x2="${W - PAD_R}" y2="${y(ref).toFixed(1)}" stroke="#666" stroke-width="1" stroke-dasharray="2,3"/>`;
+    g += `<text x="12" y="${(y((lo + hi) / 2)).toFixed(1)}" fill="#888" font-size="9" text-anchor="middle" transform="rotate(-90 12 ${(y((lo + hi) / 2)).toFixed(1)})">${lab}</text>`;
+    g += `<line x1="${PAD_L}" y1="${y(lo).toFixed(1)}" x2="${W - PAD_R}" y2="${y(lo).toFixed(1)}" stroke="#555" stroke-width="1"/><line x1="${PAD_L}" y1="${y(hi).toFixed(1)}" x2="${PAD_L}" y2="${y(lo).toFixed(1)}" stroke="#555" stroke-width="1"/>`;
+  };
+  strip(yP, pLo, pHi, 'p', 1.0); strip(yB, bLo, bHi, 'b', 1.0);
+  const ticks = timeAxisTicks(t0, t1);
+  ticks.forEach((tk, i) => { const xc = x(tk.t), anchor = i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle';
+    g += `<line x1="${xc.toFixed(1)}" y1="${PAD_T}" x2="${xc.toFixed(1)}" y2="${(PAD_T + 2 * hP + GAP).toFixed(1)}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${xc.toFixed(1)}" y="${H - 8}" fill="#888" font-size="9" text-anchor="${anchor}">${tk.label}</text>`; });
+  ok.forEach(s => {
+    const xc = x(s.t0).toFixed(1), soft = s.N < PB_SEQ_NSOFT || s.flags.length > 0, op = soft ? 0.45 : 0.95, r = Math.max(2.5, Math.min(7, 1.2 * (s.M - 3)));
+    const d = new Date(s.t0).toISOString().slice(0, 10), ttl = `M${s.M.toFixed(1)} · ${d} · N=${s.N} (M ≥ Mc=${s.Mc.toFixed(1)})`;
+    const pl = s.ciP.lo ?? pLo, ph = s.ciP.hi ?? pHi;
+    g += `<line x1="${xc}" y1="${yP(pl).toFixed(1)}" x2="${xc}" y2="${yP(ph).toFixed(1)}" stroke="#ec4899" stroke-width="1.2" stroke-opacity="${op}"/>`;
+    g += `<circle cx="${xc}" cy="${yP(s.p).toFixed(1)}" r="${r.toFixed(1)}" fill="#ec4899" fill-opacity="${op}" stroke="#111" stroke-width="0.6"><title>${ttl}\np = ${s.p.toFixed(2)} [%95 profil: ${s.ciP.lo != null ? s.ciP.lo.toFixed(2) : '—'}–${s.ciP.hi != null ? s.ciP.hi.toFixed(2) : '—'}], c = ${s.c.toExponential(1)} gün${s.flags.length ? '\n⚠ ' + s.flags.join('; ') : ''}${s.notes.length ? '\nℹ ' + s.notes.join('; ') : ''}</title></circle>`;
+    if (s.b != null) {
+      g += `<line x1="${xc}" y1="${yB(s.b - s.bErr).toFixed(1)}" x2="${xc}" y2="${yB(s.b + s.bErr).toFixed(1)}" stroke="#06b6d4" stroke-width="1.2" stroke-opacity="${op}"/>`;
+      g += `<circle cx="${xc}" cy="${yB(s.b).toFixed(1)}" r="${r.toFixed(1)}" fill="#06b6d4" fill-opacity="${op}" stroke="#111" stroke-width="0.6"><title>${ttl}\nb = ${s.b.toFixed(2)} ± ${s.bErr.toFixed(2)} (%95)</title></circle>`;
+    }
+  });
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = g;
+  const f2 = v => v == null || !isFinite(v) ? '—' : v.toFixed(2);
+  const rows = ok.map(s => `<tr style="${s.N < PB_SEQ_NSOFT || s.flags.length ? 'opacity:.6' : ''}"><td>${new Date(s.t0).toISOString().slice(0, 10)}</td><td>${(+s.ms.lat).toFixed(2)}</td><td>${(+s.ms.lon).toFixed(2)}</td><td>${s.M.toFixed(1)}</td><td>${Number.isFinite(+s.ms.dep) ? (+s.ms.dep).toFixed(0) : '—'}</td><td>${s.N}</td><td>${s.Mc.toFixed(1)}</td><td><b>${f2(s.p)}</b> [${f2(s.ciP.lo)}–${f2(s.ciP.hi)}]</td><td><b>${f2(s.b)}</b> ± ${f2(s.bErr)}</td><td>${f2(s.ks.pvalue)}</td><td style="padding:1px 5px;color:#f59e0b">${s.flags.join('; ')}${s.notes.length ? `<span style="color:#888">${s.flags.length ? '; ' : ''}${s.notes.join('; ')}</span>` : ''}</td></tr>`).join('');
+  const td = 'style="padding:1px 5px;"';
+  st.innerHTML = `<span style="color:#ec4899">●</span> p (%95 profil olabilirlik) &nbsp;|&nbsp; <span style="color:#06b6d4">●</span> b (±1,96·b/√N) &nbsp;|&nbsp; nokta boyutu: ana şok M &nbsp;|&nbsp; soluk: N &lt; ${PB_SEQ_NSOFT} ya da uyarı &nbsp;|&nbsp; ${ok.length} dizi analiz edildi, ${rej.length} aday ölçütü sağlamadı` +
+    `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:4px;font-size:.68rem;"><tr style="color:#cbd5e1">${['Tarih', 'Enlem', 'Boylam', 'M', 'h (km)', 'N', 'Mc', 'p [%95]', 'b ± %95', 'KS p', 'Uyarı'].map(h => `<th ${td}>${h}</th>`).join('')}</tr>${rows.replace(/<td>/g, `<td ${td}>`)}</table>` +
+    `<div style="color:#888;margin-top:3px;">Yöntem: dizi = GK74 (Gardner &amp; Knopoff 1974) zaman–mesafe penceresinde ana şoka doğrudan bağlanan artçılar (yalnız ileri pencere; ikincil artçılar kendi penceresini açmaz). Tamlık her dizide ayrı belirlenir: Mc = maks. eğrilik + 0,2 (b(t) ile aynı); yalnız M ≥ Mc ve ana şoktan ${PB_SEQ_S} gün sonrası kullanılır (kısa süreli eksik kayıt). p: Omori–Utsu n(t) = K/(t+c)^p, Ogata (1983) en çok olabilirlik, [S, T] üzerinde; T = GK74 süresi ya da katalog sonu. b: Aki (1965). Asgari N = ${PB_SEQ_NMIN}. Sınırlama: GK74 penceresi aynı alandaki arka plan depremlerini de içerir; sabit hızlı bu katkı uzun pencerelerde bozunmayı yavaşlatır ve p'yi düşük tahmin ettirebilir (sentetik testte ≈ 0,05–0,1). Ávila-Barrientos vd. (2015) p'yi ZMAP en küçük kareleriyle ve Kagan (2002) yarıçapıyla hesaplar; burada yöntem farklıdır, değerler doğrudan karşılaştırılmamalıdır. p bir dizi parametresidir; kayan pencere (Öncel &amp; Wilson 2007) yalnız b(t) için kullanılır. Büyüklükler panelin seçili dönüşümüyle (${MAG_CONVERSIONS[mcConversionMode].label}).</div>`;
+  window.lastPBSeq = { n: ok.length, rejected: rej.length, S: PB_SEQ_S, nmin: PB_SEQ_NMIN, seq: ok.map(s => ({ t0: s.t0, M: s.M, N: s.N, Mc: s.Mc, p: s.p, ciP: s.ciP, b: s.b, bErr: s.bErr, ks: s.ks.pvalue, flags: s.flags })) };
 }
 
 // ── Kümülatif Benioff gerinim ölçüsü (2026-10-11) ──────────────────────────────────────────────
