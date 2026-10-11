@@ -2341,9 +2341,10 @@ const NATIVE_MW_TYPES = new Set(['mw', 'mww', 'mwb', 'mwc', 'mwr', 'mwp']);
 // Scordilis (2006) Ms kolunu kullanan seçenekler (hatırlatma notu için)
 const SCORDILIS_MS_MODES = new Set(['scordilis2006', 'combined_dispatch', 'combined_dispatch_highmag_exclusion', 'combined_dispatch_md_eqml', 'combined_dispatch_md']);
 // Ms kolunun derinlik üst sınırı = kalibrasyon verisinin en büyük derinliği (2026-10-12 kuralı)
-const MS_DEPTH_LIMIT = { scordilis2006: { lim: 70, strict: true, src: 'Scordilis 2006, Eş. 14–15' },
-  iscgem2015: { lim: 60, strict: false, src: 'Di Giacomo vd. 2015 (h − σh ≤ 60 km; σh yok → h ≤ 60 km)' },
-  lolli2014: { lim: 60, strict: false, src: 'ISC Ms, IASPEI: h ≤ 60 km (Di Giacomo & Storchak 2022)' } };
+// basis: 'makale' = özgün makalede açıkça yazılı; 'çıkarım' = makalede yok, kalibrasyon verisinin üretim kuralından çıkarıldı
+const MS_DEPTH_LIMIT = { scordilis2006: { lim: 70, strict: true, basis: 'makale', src: 'Scordilis 2006, Eş. 14–15 (makalede açık)' },
+  iscgem2015: { lim: 60, strict: false, basis: 'makale', src: 'Di Giacomo vd. 2015, makalede açık: h − σh ≤ 60 km; EQ-Live\'da σh olmadığından daha katı h ≤ 60 km uygulanır' },
+  lolli2014: { lim: 60, strict: false, basis: 'çıkarım', src: 'Lolli vd. 2014 makalesi AÇIK BİR DERİNLİK SINIRI KOYMAZ (Bölüm 3 veri seçimi). Sınır, EQ-Live\'ın metodolojik tercihidir: kalibrasyon Ms verisi ISC Bulletin\'dir ve ISC, IASPEI önerisi gereği Ms\'yi yalnızca h ≤ 60 km için hesaplar (Di Giacomo & Storchak 2022, ESSD 14:393). Bu, Lolli\'nin regresyonunu aynı sınırla kurduğunu kanıtlamaz' } };
 function msDepthLimitFor(mode) { return MS_DEPTH_LIMIT[SCORDILIS_MS_MODES.has(mode) ? 'scordilis2006' : mode] || null; }
 function isNativeMw(e) { return NATIVE_MW_TYPES.has((e.mtype || '').toLowerCase().trim()); }
 function panelBaseMag(e) { return isNativeMw(e) ? (e.mw ?? e.mag) : e.mag; }
@@ -4932,9 +4933,9 @@ function renderTimeMag(evList) {
       const ms = evList.filter(e => (e.mtype || '').toLowerCase().trim() === 'ms');
       const okDep = e => Number.isFinite(e.dep) && (msLim.strict ? e.dep < msLim.lim : e.dep <= msLim.lim);
       const deep = ms.filter(e => !okDep(e)).length;
-      msNote = ` · ⚠ Ms yalnızca h ${msLim.strict ? '<' : '≤'} ${msLim.lim} km` + (ms.length ? ` (Ms olayı: ${ms.length}; derinlik koşulu nedeniyle ham kalan: ${deep})` : '');
+      msNote = ` · ⚠ Ms yalnızca h ${msLim.strict ? '<' : '≤'} ${msLim.lim} km${msLim.basis === 'çıkarım' ? ' (makalede açık değil; ISC Ms kuralına dayalı)' : ''}` + (ms.length ? ` (Ms olayı: ${ms.length}; derinlik koşulu nedeniyle ham kalan: ${deep})` : '');
     }
-    if (msLim && !SCORDILIS_MS_MODES.has(mcConversionMode)) msTitle = `\n\nMs derinlik sınırı: ${msLim.src}. Kural: bağıntı, kalibrasyon verisinin en büyük derinliğine kadar uygulanır; derinliği bilinmeyen Ms olayları dönüştürülmez.`;
+    if (msLim && !SCORDILIS_MS_MODES.has(mcConversionMode)) msTitle = `\n\nMs derinlik sınırı (${msLim.basis === 'makale' ? 'özgün makalede açık' : 'EQ-Live çıkarımı'}): ${msLim.src}. Kural: bağıntı, kalibrasyon verisinin en büyük derinliğine kadar uygulanır; derinliği bilinmeyen Ms olayları dönüştürülmez.`;
     if (SCORDILIS_MS_MODES.has(mcConversionMode)) {
       msTitle = `\n\nHatırlatma: Scordilis (2006) Ms→Mw katsayıları 11.10.2026'da özgün makaleye göre düzeltildi — Eş. (14): Mw = 0,67 Ms + 2,07 (3,0 ≤ Ms ≤ 6,1); Eş. (15): Mw = 0,99 Ms + 0,08 (6,2 ≤ Ms ≤ 8,2). İkisi de yalnızca h < 70 km için geçerlidir; derinliği bilinmeyen ya da h ≥ 70 km olan Ms olayları dönüştürülmez. Önceki 0,646/2,079 ve 0,994/0,115 katsayıları kaynakta yoktu.`;
     }
