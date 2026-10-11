@@ -1164,6 +1164,7 @@
     <div class="tmStats" id="tmStatsB">—</div>
     <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
       <div class="tmTitle" style="font-size:.78rem;">⚡ Kümülatif Benioff Gerinim Ölçüsü Σ√E <span style="color:#666;font-weight:400;">(log E = 11,8 + 1,5M, erg; Gutenberg &amp; Richter 1956 — sabit eşik)</span></div>
+      <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (showTimeMag) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
       <svg id="tmSvgBen" viewBox="0 0 660 210" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
       <div class="tmStats" id="tmStatsBen">—</div>
     </div>
@@ -4993,6 +4994,43 @@ function benioffShare(b, mLo, mHi, mMin, mMax) {
   if (Math.abs(c) < 1e-6) return (mHi - mLo) / (mMax - mMin);
   const g = m => Math.pow(10, c * m); return (g(mHi) - g(mLo)) / (g(mMax) - g(mMin));
 }
+// İki dönem testi: Benioff hız oranı (bileşik Poisson bootstrap GA), büyüklük permütasyon testi, Poisson oran testi.
+function benioffTwoPeriodTest(items, t0, ts, t1, o) {
+  const YR = 31557600000, T1 = (ts - t0) / YR, T2 = (t1 - ts) / YR;
+  const A = items.filter(e => e.t >= t0 && e.t < ts), Bv = items.filter(e => e.t >= ts && e.t <= t1);
+  const n1 = A.length, n2 = Bv.length; if (n1 < 2 || n2 < 2 || !(T1 > 0) || !(T2 > 0)) return null;
+  const sq = m => Math.pow(10, 0.75 * m);   // 10^5,9 sabit çarpanı oranlarda sadeleşir; hızlar için aşağıda geri eklenir
+  const K = Math.pow(10, 5.9), sum = a => a.reduce((s2, e) => s2 + sq(e.m), 0);
+  const s1 = sum(A), s2 = sum(Bv), r1 = K * s1 / T1, r2 = K * s2 / T2, R = r2 / r1;
+  let seed = o.seed >>> 0 || 1; const rnd = () => { seed ^= seed << 13; seed >>>= 0; seed ^= seed >>> 17; seed ^= seed << 5; seed >>>= 0; return seed / 4294967296; };
+  const pois = lam => { if (lam > 50) { let u = 0, v = 0; while (u === 0) u = rnd(); v = rnd(); return Math.max(0, Math.round(lam + Math.sqrt(lam) * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v))); }
+    const L = Math.exp(-lam); let k2 = 0, p2 = 1; do { k2++; p2 *= rnd(); } while (p2 > L); return k2 - 1; };
+  // (1) Bileşik Poisson bootstrap: olay sayısı ve büyüklük örneklemesi birlikte
+  const a1 = A.map(e => sq(e.m)), a2 = Bv.map(e => sq(e.m)), BB = 2000, rr = [];
+  for (let b = 0; b < BB; b++) { const k1 = pois(n1), k2b = pois(n2); let x1 = 0, x2 = 0;
+    for (let i = 0; i < k1; i++) x1 += a1[Math.floor(rnd() * n1)]; for (let i = 0; i < k2b; i++) x2 += a2[Math.floor(rnd() * n2)];
+    if (x1 > 0) rr.push((x2 / T2) / (x1 / T1)); }
+  rr.sort((p, q) => p - q); const qt = q => rr[Math.min(rr.length - 1, Math.max(0, Math.floor(q * rr.length)))];
+  // (2) Büyüklük permütasyonu: zamanlar (ve dolayısıyla n1, n2) sabit; ortalama √E oranı
+  const all = a1.concat(a2), N = all.length, obsM = Math.abs(Math.log((s2 / n2) / (s1 / n1)));
+  let ge = 0; const arr = all.slice();
+  for (let b = 0; b < o.B; b++) { for (let i = N - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); const t = arr[i]; arr[i] = arr[j]; arr[j] = t; }
+    let x1 = 0; for (let i = 0; i < n1; i++) x1 += arr[i]; const x2 = s1 + s2 - x1;
+    if (Math.abs(Math.log((x2 / n2) / (x1 / n1))) >= obsM - 1e-12) ge++; }
+  const pPerm = (1 + ge) / (o.B + 1);
+  // (3) Poisson oran testi: n2 | n ~ Binom(n, T2/(T1+T2)), iki yönlü kesin (olasılığı gözlenenden büyük olmayanların toplamı)
+  const n = n1 + n2, p0 = T2 / (T1 + T2), lf = x => { let s3 = 0; for (let i = 2; i <= x; i++) s3 += Math.log(i); return s3; };
+  const lfN = lf(n), pmf = kk => Math.exp(lfN - lf(kk) - lf(n - kk) + kk * Math.log(p0) + (n - kk) * Math.log(1 - p0));
+  const pObs = pmf(n2); let pPois = 0; for (let kk = 0; kk <= n; kk++) { const pk = pmf(kk); if (pk <= pObs * (1 + 1e-9)) pPois += pk; }
+  const rateRatio = (n2 / T2) / (n1 / T1), se = Math.sqrt(1 / n1 + 1 / n2);
+  // en büyük olay
+  const allE = A.concat(Bv); let big = allE[0]; allE.forEach(e => { if (e.m > big.m) big = e; });
+  const bigShare = sq(big.m) / (s1 + s2), inB = big.t >= ts;
+  const Rwo = ((s2 - (inB ? sq(big.m) : 0)) / T2) / ((s1 - (inB ? 0 : sq(big.m))) / T1);
+  return { n1, n2, T1, T2, r1, r2, R, ciR: [qt(0.025), qt(0.975)], meanRatio: (s2 / n2) / (s1 / n1), pPerm, B: o.B, seed: o.seed,
+           rateRatio, ciRate: [rateRatio * Math.exp(-1.96 * se), rateRatio * Math.exp(1.96 * se)], pPois: Math.min(1, pPois),
+           mBig: big.m, tBig: big.t, bigShare, Rwo };
+}
 function renderBenioff(evList, Mc, cs) {
   const svg = document.getElementById('tmSvgBen'), st = document.getElementById('tmStatsBen'); if (!svg || !st) return;
   const W = 660, H = 210, PAD_L = 52, PAD_R = 14, PAD_T = 12, PAD_B = 24, plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
@@ -5042,7 +5080,28 @@ function renderBenioff(evList, Mc, cs) {
     (V ? ` &nbsp;|&nbsp; <span style="color:#d1d5db">┄</span> Değişken Mc (karşılaştırma): N = ${V.length}` : '') +
     (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">┊</span> tamlık basamakları` : '') + ` &nbsp;|&nbsp; ● M ≥ ${Math.max(5, mFix + 0.5).toFixed(1)}` + warn +
     `<div style="color:#888;margin-top:3px;">Kümülatif Benioff eğrisi sismik enerji salımının betimleyici bir göstergesidir; eğimin değişmesi tek başına güvenilir bir deprem öncülünün kanıtı değildir (hızlanan moment salımı hipotezi katı istatistiksel testlerde anlamlı bulunmadı: Hardebeck, Felzer &amp; Michael 2008). Zaman damgası: olayın gerçek tarihi.</div>`;
-  window.lastBenioff = { mFix, n: F.length, total: F[F.length - 1].s, nVar: V ? V.length : null, share: warn ? benioffShare(bUse, mLoAll, mFix, mLoAll, Math.max(mObsMax, mFix + 0.1)) : null, b: bUse };
+  // ── İki dönem karşılaştırması ve anlamlılık testleri (2026-10-11) ─────────────────────────────
+  const splitIn = document.getElementById('benSplit'), splitUser = splitIn && splitIn.value ? Date.parse(splitIn.value + 'T00:00:00Z') : NaN;
+  const lastStep = cs && cs.periods.length > 1 ? cs.periods[cs.periods.length - 1].t0 : null;
+  const ts = Number.isFinite(splitUser) ? splitUser : (lastStep !== null ? lastStep : (t0 + t1) / 2);
+  const splitSrc = Number.isFinite(splitUser) ? 'kullanıcı' : (lastStep !== null ? 'son tamlık basamağı' : 'katalog ortası');
+  const benTest = benioffTwoPeriodTest(fixItems.map(e => ({ t: e.t, m: e.m })), t0, ts, t1, { B: 10000, seed: 20261011 });
+  if (benTest) {
+    const xs = x(ts); if (xs > PAD_L && xs < W - PAD_R) svg.innerHTML += `<line x1="${xs.toFixed(1)}" y1="${PAD_T}" x2="${xs.toFixed(1)}" y2="${PAD_T + plotH}" stroke="#a78bfa" stroke-width="1" stroke-dasharray="1,2"><title>Dönem ayrımı: ${new Date(ts).toISOString().slice(0, 10)} (${splitSrc})</title></line>`;
+    const f2 = v => !Number.isFinite(v) ? '—' : v.toFixed(2), fp = v => v < 0.001 ? '< 0,001' : v.toFixed(3).replace('.', ',');
+    const T = benTest, d0 = new Date(t0).toISOString().slice(0, 10), dS = new Date(ts).toISOString().slice(0, 10), d1 = new Date(t1).toISOString().slice(0, 10);
+    const row = (a, b2, c) => `<tr><td style="padding:1px 6px;color:#cbd5e1;">${a}</td><td style="padding:1px 6px;">${b2}</td><td style="padding:1px 6px;color:#9ab0c5;">${c}</td></tr>`;
+    st.innerHTML += `<div style="margin-top:5px;color:#c4b5fd;">İki dönem karşılaştırması (sabit eşik M ≥ ${mFix.toFixed(1)}; ayrım ${dS}, ${splitSrc}${splitSrc === 'kullanıcı' ? '' : ' — tarih veriden seçildiği için p değerleri keşifseldir'})</div>` +
+      `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:2px;">` +
+      row('Dönem 1', `${d0} – ${dS} (${f2(T.T1)} yıl): n = ${T.n1}, ${f2(T.n1 / T.T1)} olay/yıl, Benioff hızı ${f2(T.r1 / sc)}×10^${k}/yıl`, '') +
+      row('Dönem 2', `${dS} – ${d1} (${f2(T.T2)} yıl): n = ${T.n2}, ${f2(T.n2 / T.T2)} olay/yıl, Benioff hızı ${f2(T.r2 / sc)}×10^${k}/yıl`, '') +
+      row('Benioff hız oranı (2/1)', `<b>${f2(T.R)}</b> [%95: ${f2(T.ciR[0])}–${f2(T.ciR[1])}]`, 'bileşik Poisson bootstrap (n* ~ Poisson(n), yerine koyarak), B = 2000') +
+      row('Büyüklük permütasyon testi', `ortalama √E oranı ${f2(T.meanRatio)}; p = <b>${fp(T.pPerm)}</b>`, `zamanlar sabit, büyüklükler karıştırıldı, B = ${T.B}, tohum ${T.seed}; yalnızca büyüklük dağılımının değişimini sınar`) +
+      row('Poisson oran testi', `olay hızı oranı ${f2(T.rateRatio)} [%95: ${f2(T.ciRate[0])}–${f2(T.ciRate[1])}]; p = <b>${fp(T.pPois)}</b>`, 'koşullu kesin binom testi (iki yönlü); güven aralığı log-normal yaklaşım; yalnızca olay sıklığını sınar') +
+      row('En büyük olayın katkısı', `M${T.mBig.toFixed(1)} (${new Date(T.tBig).toISOString().slice(0, 10)}): toplam Σ√E içindeki payı %${Math.round(100 * T.bigShare)}; bu olay çıkarılınca oran ${f2(T.Rwo)}`, 'tek büyük olay oranı belirleyebilir') +
+      `</table><div style="color:#888;margin-top:2px;">Varsayımlar: olaylar bağımsızdır (artçı kümelenmesi ihlal eder${typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn ? '; GK74 açık' : ' — GK74 kapalı, kümesizleştirme önerilir'}) ve büyüklük ölçeği dönemler arasında değişmemiştir (ağ/büyüklük türü değişimi ihlal eder). Anlamlı bir sonuç bile deprem tahmini ya da öncül kanıtı değildir.</div>`;
+  }
+  window.lastBenioff = { test: benTest || null, split: ts, splitSrc, mFix, n: F.length, total: F[F.length - 1].s, nVar: V ? V.length : null, share: warn ? benioffShare(bUse, mLoAll, mFix, mLoAll, Math.max(mObsMax, mFix + 0.1)) : null, b: bUse };
 }
 
 /* Son büyük deprem için global referans */
