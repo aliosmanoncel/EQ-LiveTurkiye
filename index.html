@@ -1125,6 +1125,7 @@
       <label><input type="checkbox" id="posterPhoto" checked style="vertical-align:middle;"> fotoğraf</label>
       <label title="Kendi fotoğrafınız; yalnızca bu tarayıcıda saklanır, sunucuya gönderilmez" style="cursor:pointer;border:1px solid #334;border-radius:3px;padding:0 5px;">📷 seç<input type="file" id="posterPhotoFile" accept="image/*" hidden onchange="posterStoreImg('foto', this)"></label>
       <label title="Poster renk teması">tema <select id="posterTheme" onchange="posterSavePrefs()" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;"><option value="doga">Doğa ve Deprem (yeşil–lacivert)</option><option value="kum">Kum (AGU örneğinden esinli)</option></select></label>
+      <label title="Poster dili: başlıklar, şekil altyazıları, yöntem/sonuç metinleri ve grafik eksen etiketleri. Elle girilen alanlar (başlık, giriş, sonuçlar, ana mesaj, teşekkür) olduğu gibi kullanılır; İngilizce poster için bu alanları İngilizce doldurun veya boş bırakın (otomatik metin İngilizce üretilir).">dil <select id="posterLang" onchange="posterSavePrefs()" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;"><option value="tr">Türkçe (TR)</option><option value="en">English (EN)</option></select></label>
       <label title="Doğa ve Deprem Bilimi Topluluğu logosu (sağ üst)"><input type="checkbox" id="posterLogo" checked style="vertical-align:middle;"> logo</label>
       <label title="Kurum/topluluk logonuz; yalnızca bu tarayıcıda saklanır" style="cursor:pointer;border:1px solid #334;border-radius:3px;padding:0 5px;">🏷 seç<input type="file" id="posterLogoFile" accept="image/*" hidden onchange="posterStoreImg('logo', this)"></label>
       <button onclick="posterClearIdentity()" title="Bu tarayıcıda saklanan yazar, kurum, fotoğraf ve logoyu sil" style="background:none;border:1px solid #334;color:#9ab0c5;border-radius:4px;cursor:pointer;padding:1px 6px;">kimliği temizle</button>
@@ -3076,7 +3077,7 @@ function tmSelectPoint(t, m) {
    otomatik üretilir; "Sonuçlar" isteğe bağlı olarak kullanıcıca yazılabilir.
    Hesaplamaya dokunmaz.
 ══════════════════════════════════════════ */
-const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact', 'posterTheme', 'posterIntro', 'posterAck'];
+const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact', 'posterTheme', 'posterIntro', 'posterAck', 'posterLang'];
 function posterLoadPrefs() {
   try { const o = JSON.parse(localStorage.getItem('eqlivePoster') || '{}'); POSTER_KEYS.forEach(k => { const el = document.getElementById(k); if (el && o[k] !== undefined && o[k] !== '') el.value = o[k]; }); } catch (e) {}
 }
@@ -3145,6 +3146,21 @@ function svgBoostAxisText(xml, target) {
     if (!/fill="#888"/.test(at) || /<tspan/.test(body)) return m;
     return '<text' + at.replace(/font-size="([0-9.]+)"/, (q, f) => `font-size="${Math.max(+f, target).toFixed(1)}"`) + '>' + body + '</text>'; });
 }
+// İngilizce poster (2026-10-11): Time-Mag SVG'lerindeki Türkçe etiketleri yalnızca poster kopyasında İngilizceye çevirir;
+// ekrandaki grafikler ve hesaplama değişmez. Eşaralıklı (monospace) bilgi kutusu satırlarında sütun hizası korunur.
+const SVG_EN_MONTHS = { 'Oca': 'Jan', 'Şub': 'Feb', 'Mar': 'Mar', 'Nis': 'Apr', 'May': 'May', 'Haz': 'Jun', 'Tem': 'Jul', 'Ağu': 'Aug', 'Eyl': 'Sep', 'Eki': 'Oct', 'Kas': 'Nov', 'Ara': 'Dec' };
+function svgToEN(xml) {
+  return xml
+    .replace(/Birikimli yıllık oran λ\(≥M\)/g, 'Cumulative annual rate λ(≥M)')
+    .replace(/tüm sınıflar b=/g, 'all classes b=')
+    .replace(/veri \(maks\. eğrilik \+0\.2, (\d+) olay kayan pencere\)/g, 'data (max. curvature +0.2, $1-event moving window)')
+    .replace(/tamlık basamakları/g, 'completeness steps').replace(/kullanılan Mc/g, 'Mc used').replace(/sabit Mc=/g, 'fixed Mc=')
+    .replace(/\(girdi — Mmax kestirimi değil\)/g, '(input, not an Mmax estimate)').replace(/Mx: girilmedi \(kesilme yok\)/g, 'Mx: not set (no truncation)')
+    .replace(/ \/yıl/g, ' /yr').replace(/(N = \d+) olay/g, '$1 events').replace(/TÜM SINIFLAR/g, 'ALL CLASSES')
+    .replace(/EĞRİ {9}/g, 'CURVE        ').replace(/EN İYİ TAHMİN/g, 'BEST ESTIMATE').replace(/ÜST EĞRİ {5}/g, 'UPPER CURVE  ').replace(/ALT EĞRİ {5}/g, 'LOWER CURVE  ')
+    .replace(/Yetersiz veri:/g, 'Insufficient data:')
+    .replace(/>(Oca|Şub|Mar|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)\.?( \d{4})?</g, (m, mo, y) => '>' + SVG_EN_MONTHS[mo] + (y || '') + '<');
+}
 function svgToLight(xml) {
   xml = xml.replace(/<(text|tspan)\b([^>]*)>/g, (m, tag, at) => '<' + tag + at
     .replace(/fill="(#e2e8f0|#cbd5e1|#94a3b8|#888|#888888|#d1d5db|#aaa|#aaaaaa|#9ca3af|#e5e7eb|#fff|#ffffff|white)"/g, 'fill="#1f2937"')
@@ -3170,10 +3186,16 @@ async function exportPosterAGU(scale, evt) {
   if (btn) { btn.textContent = '⏳…'; btn.disabled = true; }
   const done = () => { if (btn) { btn.textContent = oldLabel; btn.disabled = false; } };
   const SC = scale || 1, W = 1920, H = 1080;
+  // Poster dili (2026-10-11): L(tr, en) görünür metni seçer; NF sayı biçimi; DC ondalık ayırıcı (TR virgül, EN nokta)
+  const EN = posterVal('posterLang', 'tr') === 'en', L = (tr, en) => EN ? en : tr, NF = EN ? 'en-US' : 'tr-TR';
+  const DC = v => EN ? String(v) : String(v).replace('.', ',');
+  const SRC = t => !EN ? t : t.replace('Tarihsel Katalog', 'Historical Catalogue').replace('HK Yerel Katalog', 'HK Local Catalogue').replace('HK Tarihsel Katalog', 'HK Historical Catalogue')
+    .replace('önceden çekilmiş katalog', 'pre-fetched catalogue').replace('canlı sorgu', 'live query').replace(/statik/g, 'static').replace(/^Canlı akış/, 'Live feed').replace(/^canlı akış/, 'live feed');
   // hedef punto (SVG birimi) = ~11,5 px ÷ şeklin posterdeki ölçeği (zaman–büyüklük ≈0,75; b(t) ≈0,72; G-R ≈0,73)
   const AXK = { tmSvg: 15.3, tmSvgB: 16, tmSvgGR: 15.5 };
   const svgImg = (el, k) => new Promise((res, rej) => {
     let xml = svgToLight(svgBoostAxisText(new XMLSerializer().serializeToString(el), AXK[el.id] || 0));
+    if (EN) xml = svgToEN(xml);
     // G-R: büyütülen x ekseni başlığı tik etiketleriyle çakışmasın diye tuvali 12 birim uzatıp başlığı aşağı al
     if (el.id === 'tmSvgGR') xml = xml.replace(/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/, (m, w, h) => `viewBox="0 0 ${w} ${+h + 16}"`)
       .replace(/(<text\b[^>]*\sy=")([0-9.]+)("[^>]*>Magnitude<)/, (m, a, yv, b) => a + (+yv + 15) + b);
@@ -3247,12 +3269,13 @@ async function exportPosterAGU(scale, evt) {
   let tYrs = '';
   if (tEvs.length) { let a = Infinity, b = -Infinity; tEvs.forEach(e => { const t = +e.time; if (t < a) a = t; if (t > b) b = t; });
     const y0 = new Date(a).getUTCFullYear(), y1 = new Date(b).getUTCFullYear(); tYrs = y0 === y1 ? `${y0}` : `${y0}–${y1}`; }
-  const tCore = lastCs ? 'Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Oranları' : 'b-Değeri, Zamansal Değişimi ve Frekans–Büyüklük Dağılımı';
-  const tDecl = regionRect && regionDeclusterOn ? ', Artçıları Ayıklanmış Katalog' : '';
+  const tCore = lastCs ? L('Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Oranları', 'b-Value and Earthquake Recurrence Rates with Time-Dependent Completeness')
+    : L('b-Değeri, Zamansal Değişimi ve Frekans–Büyüklük Dağılımı', 'b-Value, Its Temporal Variation and the Frequency–Magnitude Distribution');
+  const tDecl = regionRect && regionDeclusterOn ? L(', Artçıları Ayıklanmış Katalog', ', Declustered Catalogue') : '';
   const title = posterVal('posterTitle', (region ? region + ': ' : '') + tCore + tDecl + (tYrs ? ` (${tYrs})` : ''));
   // Kimlik varsayılanı YOK: boşsa açıkça yer tutucu yazılır (kimse adına poster üretilmez)
   const authorIn = posterVal('posterAuthor', ''), affilIn = posterVal('posterAffil', '');
-  const author = authorIn || 'Yazar Adı Soyadı', affil = affilIn || 'Unvan · Kurum / Üniversite / Bölüm';
+  const author = authorIn || L('Yazar Adı Soyadı', 'Author Name Surname'), affil = affilIn || L('Unvan · Kurum / Üniversite / Bölüm', 'Title · Institution / University / Department');
   const eventLine = posterVal('posterEvent', '');
   let ty = 22;
   // Başlık: foto ile logo arasındaki genişliğe (≈1500 px) tek satır sığdır (40→34 px);
@@ -3310,23 +3333,24 @@ async function exportPosterAGU(scale, evt) {
       L.line.forEach(({ wd, wW }) => { wd.forEach(pc => { c.font = font(pc); c.fillStyle = pc.col; c.textAlign = 'left'; c.fillText(pc.s, cx, y); cx += c.measureText(pc.s).width; }); cx += gap; });
       y += lh; });
     return y; };
-  const caption = (t, x, y, w, maxY) => rich(t.replace(/^(Şekil \d+\.)/, '**$1**'), x, y, w, { size: 16, lh: 20, italic: true, col: '#374151', maxY, justify: false });
+  const caption = (t, x, y, w, maxY) => rich(t.replace(/^((?:Şekil|Figure) \d+\.)/, '**$1**'), x, y, w, { size: 16, lh: 20, italic: true, col: '#374151', maxY, justify: false });
 
   const cs = lastCs, gf = lastCs ? lastGrFit : null, gs = lastCs ? null : lastGrSimple, bt = typeof lastBts !== 'undefined' ? lastBts : null;
   const fitT = gf && gf.fit ? `M ${gf.fit.lo.toFixed(1)}–${gf.fit.hi.toFixed(1)}` : null;   // fit aralığı [M_min, M_max) (2026-09-29)
   const d = t => t ? new Date(t).toISOString().slice(0, 10) : '—';
   const evs = (regionRect ? applyGk74Filter(regionEvents) : lastTmEvList) || [];
-  const shape = regionIsCircle && regionCircleCenter ? `daire, merkez ${regionCircleCenter.lat.toFixed(2)}°, ${regionCircleCenter.lon.toFixed(2)}°, R = ${regionCircleRadiusKm} km`
-    : regionRect ? (() => { const b = regionRect.getBounds(); return `${regionIsPolygon ? 'poligon' : 'dikdörtgen'} ${b.getSouth().toFixed(2)}–${b.getNorth().toFixed(2)}°K, ${b.getWest().toFixed(2)}–${b.getEast().toFixed(2)}°D`; })() : 'görünür harita alanı';
+  const shape = regionIsCircle && regionCircleCenter ? `${L('daire, merkez', 'circle, centre')} ${regionCircleCenter.lat.toFixed(2)}°, ${regionCircleCenter.lon.toFixed(2)}°, R = ${regionCircleRadiusKm} km`
+    : regionRect ? (() => { const b = regionRect.getBounds(); return `${regionIsPolygon ? L('poligon', 'polygon') : L('dikdörtgen', 'rectangle')} ${b.getSouth().toFixed(2)}–${b.getNorth().toFixed(2)}°${L('K', 'N')}, ${b.getWest().toFixed(2)}–${b.getEast().toFixed(2)}°${L('D', 'E')}`; })() : L('görünür harita alanı', 'visible map area');
 
   // ── Sütun 1: çalışma alanı haritası
   const X1 = 40, W1 = 560, X2 = 620, W2 = 680, X3 = 1320, W3 = 560, TOP = 172, MID = 905;
   // Giriş ve Amaç (AGU örneğindeki "Introduction" karşılığı); boşsa nötr, yorum içermeyen varsayılan metin
   const GH = 124, MAPH = 183, MB = 44 + MAPH + 46, VY = GH + 12 + MB + 12;
-  let y = box(X1, TOP, W1, GH, 'Giriş ve Amaç');
-  const intro = posterVal('posterIntro', `Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`);
+  let y = box(X1, TOP, W1, GH, L('Giriş ve Amaç', 'Introduction and Aim'));
+  const intro = posterVal('posterIntro', L(`Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`,
+    `When catalogue completeness changes over time, the b-value and earthquake rates computed with a single Mc can be biased. **Aim:** to estimate the b-value, its temporal variation and the annual recurrence rates for ${region || 'the study area'} using time-dependent completeness steps.`));
   rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2 });
-  y = box(X1, TOP + GH + 12, W1, MB, 'Çalışma Alanı');
+  y = box(X1, TOP + GH + 12, W1, MB, L('Çalışma Alanı', 'Study Area'));
   (function drawMap(x, y0, w, h) {
     c.fillStyle = '#f8fafc'; c.fillRect(x, y0, w, h); c.strokeStyle = '#9ca3af'; c.lineWidth = 1; c.strokeRect(x, y0, w, h);
     const pts = evs.filter(e => isFinite(e.lat) && isFinite(e.lon));
@@ -3356,18 +3380,26 @@ async function exportPosterAGU(scale, evt) {
     // ölçek çubuğu ve kuzey oku
     const kmPerPx = 111.195 / sc; const nice = [10, 20, 50, 100, 200, 500, 1000].find(v => v / kmPerPx > w * 0.18) || 1000; const bl = nice / kmPerPx;
     c.fillStyle = '#1f2937'; c.fillRect(x + w - bl - 20, y0 + h - 22, bl, 4); text(`${nice} km`, x + w - 20 - bl / 2, y0 + h - 40, '12px Arial', '#1f2937', 'center'); c.fillStyle = '#1f2937';
-    c.beginPath(); c.moveTo(x + w - 30, y0 + 14); c.lineTo(x + w - 38, y0 + 34); c.lineTo(x + w - 22, y0 + 34); c.closePath(); c.fill(); text('K', x + w - 30, y0 + 36, 'bold 12px Arial', '#1f2937', 'center');
+    c.beginPath(); c.moveTo(x + w - 30, y0 + 14); c.lineTo(x + w - 38, y0 + 34); c.lineTo(x + w - 22, y0 + 34); c.closePath(); c.fill(); text(L('K', 'N'), x + w - 30, y0 + 36, 'bold 12px Arial', '#1f2937', 'center');
     // lejant
     [['M<3', '#0891b2'], ['3–4', '#eab308'], ['4–5', '#f97316'], ['≥5', '#ef4444']].forEach(([t, cc], i) => { c.fillStyle = cc; c.beginPath(); c.arc(x + 14 + i * 58, y0 + 14, 5, 0, 2 * Math.PI); c.fill(); text(t, x + 22 + i * 58, y0 + 8, '11px Arial', '#1f2937'); });
     c.restore();
   })(X1 + 14, y, W1 - 28, MAPH);
-  caption(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString('tr-TR')} olayın dış merkezleri, büyüklüğe göre.`, X1 + 16, y + MAPH + 4, W1 - 32, TOP + GH + 12 + MB + 1);
+  caption(L(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString(NF)} olayın dış merkezleri, büyüklüğe göre.`, `Figure 1. Study area (${shape}); epicentres of ${evs.length.toLocaleString(NF)} events, by magnitude.`), X1 + 16, y + MAPH + 4, W1 - 32, TOP + GH + 12 + MB + 1);
   // Sütun 1: veri ve yöntem
-  y = box(X1, TOP + VY, W1, MID - TOP - VY, 'Veri ve Yöntem');
+  y = box(X1, TOP + VY, W1, MID - TOP - VY, L('Veri ve Yöntem', 'Data and Methods'));
   const ci = typeof regionChunkInfo !== 'undefined' ? regionChunkInfo : null;
-  const src = (regionRect ? regionSourceLabel() : 'Canlı akış') + (ci ? ` · parçalı sorgu (${ci.nChunks} parça, ${ci.nUnique.toLocaleString('tr-TR')} benzersiz olay)` : '');
+  const src = SRC(regionRect ? regionSourceLabel() : 'Canlı akış') + (ci ? L(` · parçalı sorgu (${ci.nChunks} parça, ${ci.nUnique.toLocaleString(NF)} benzersiz olay)`, ` · chunked query (${ci.nChunks} chunks, ${ci.nUnique.toLocaleString(NF)} unique events)`) : '');
+  const csLab = p => !EN ? csLabel(p) : `${csRange(p)}: M≥${(+p.mc).toFixed(1)}` + (p.clipped ? ` (step ${p.start}, clipped to window)` : '');
   const tr = evs.length ? `${d(Math.min(...evs.map(e => +e.time)))} – ${d(Math.max(...evs.map(e => +e.time)))}` : '—';
-  const mItems = [
+  const mItemsEN = () => [
+    `**Catalogue:** ${src}; ${evs.length.toLocaleString(NF)} events, ${tr}` + (regionRect && regionDeclusterOn ? `; declustered with Gardner & Knopoff (1974) (raw N = ${regionEvents.length.toLocaleString(NF)})` + (regionCtxReady(regionEvents) ? `; with out-of-circle context (inner ring R+30 km, outer ring R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString(NF)} context events)` : '') + (mwAuthActive() ? `; authoritative Mw for large earthquakes (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.'),
+    ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitude-type sensitivity scenario:** ${[!lastTmTypeFilter.md ? `MD (duration magnitude) events excluded (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `unconverted ML<1.7 events excluded (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; events were neither deleted from the catalogue nor converted.`] : []),
+    cs ? `**Completeness periods** (sub-catalogues): ${cs.periods.map(csLab).join('; ')}; N entering the analysis = ${cs.kept.length.toLocaleString(NF)}.` : '**Completeness:** single Mc (maximum curvature +0.2; Wiemer & Wyss 2000).',
+    bt && bt.fit ? `**b(t):** fit range ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} with per-event threshold max(Mc_i, M_min)${bt.fit.hi !== null ? ', upper bound M_max; doubly truncated Aki–Utsu maximum likelihood' : '; Aki (1965) maximum likelihood'}; N = 100 moving window, step 10 (Öncel & Wilson 2007); 95% interval ±1.96·SE.`
+      : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step 10 (Öncel & Wilson 2007); 95% interval ±1.96·b/√N.',
+    cs ? `**Gutenberg–Richter:** Weichert (1980) maximum likelihood with unequal observation periods${fitT ? `; fit range ${fitT} (M_min ≤ M < M_max; shared by b, D/sd, the R profile and b(t); chosen by a b(M_min) stability scan)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model input, not an Mmax estimate)` : ''}. Sub-catalogue merging principle: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** single Mc; b_GR by Aki (1965) maximum likelihood, a = log N(≥Mc) + b·Mc; goodness of fit after Wiemer & Wyss (2000).'];
+  const mItems = EN ? mItemsEN() : [
     `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')})` + (regionCtxReady(regionEvents) ? `; daire dışı bağlamla (dar halka R+30 km, geniş halka R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString('tr-TR')} bağlam olayı)` : '') + (mwAuthActive() ? `; büyük depremlerde otoriter Mw (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.'),
     ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitüd tipi duyarlılık senaryosu:** ${[!lastTmTypeFilter.md ? `MD (süre magnitüdü) olayları analiz dışı (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `dönüştürülmemiş ML<1,7 olayları analiz dışı (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; olaylar katalogdan silinmedi, dönüştürülmedi.`] : []),
     cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
@@ -3375,13 +3407,15 @@ async function exportPosterAGU(scale, evt) {
       : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
     cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${fitT ? `; fit aralığı ${fitT} (M_min ≤ M < M_max; b, D/sd, R profili ve b(t) için ortak; seçim b(M_min) kararlılık taramasıyla)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** tek Mc; b_GR Aki (1965) en çok olabilirlik, a = log N(≥Mc) + b·Mc; uyum Wiemer & Wyss (2000) GoF.'];
   // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
-  const srcTag = (regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
-  const steps = [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım 10'], ['4 · G–R', cs ? 'Weichert (1980)' : 'tek Mc · Aki MLE']];
+  const srcTag = SRC(regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
+  const steps = EN ? [['1 · Data', `${srcTag} catalogue`], ['2 · Completeness', cs ? 'Mc(t) steps' : 'single Mc'], ['3 · b(t)', 'N = 100, step 10'], ['4 · G–R', cs ? 'Weichert (1980)' : 'single Mc · Aki MLE']]
+    : [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım 10'], ['4 · G–R', cs ? 'Weichert (1980)' : 'tek Mc · Aki MLE']];
   { const fx0 = X1 + 16, fw = W1 - 32, ag = 18, bw = (fw - ag * (steps.length - 1)) / steps.length, bh = 54;
     steps.forEach(([h, sub], i) => { const bx0 = fx0 + i * (bw + ag);
       c.fillStyle = TH.soft; c.strokeStyle = ACC; c.lineWidth = 1.5; c.beginPath();
       if (c.roundRect) c.roundRect(bx0, y, bw, bh, 7); else c.rect(bx0, y, bw, bh); c.fill(); c.stroke();
-      text(h, bx0 + bw / 2, y + 10, 'bold 14px Arial', TH.deep, 'center');
+      let hs = 14; c.font = `bold ${hs}px Arial`; while (hs > 11 && c.measureText(h).width > bw - 10) { hs -= 0.5; c.font = `bold ${hs}px Arial`; }   // EN: "2 · Completeness" kutuya sığsın
+      text(h, bx0 + bw / 2, y + 10 + (14 - hs) / 2, `bold ${hs}px Arial`, TH.deep, 'center');
       c.font = '11.5px Arial'; let st = sub; while (st.length > 4 && c.measureText(st).width > bw - 16) st = st.slice(0, -2);
       text(st === sub ? sub : st + '…', bx0 + bw / 2, y + 32, '11.5px Arial', INK, 'center');
       if (i < steps.length - 1) { const ax = bx0 + bw + 3, ay = y + bh / 2; c.fillStyle = ACC; c.beginPath(); c.moveTo(ax, ay - 7); c.lineTo(ax + 12, ay); c.lineTo(ax, ay + 7); c.closePath(); c.fill(); } });
@@ -3389,32 +3423,34 @@ async function exportPosterAGU(scale, evt) {
   mItems.forEach(t => { y = rich(t, X1 + 16, y, W1 - 32, { size: 15, lh: 20, bullet: true, maxY: MID - 6 }) + 5; });
 
   // ── Sütun 2: zaman–büyüklük ve b(t)
-  y = box(X2, TOP, W2, 260, 'Zaman–Büyüklük Dağılımı');
+  y = box(X2, TOP, W2, 260, L('Zaman–Büyüklük Dağılımı', 'Time–Magnitude Distribution'));
   y = figure(imgs[0], X2 + 16, y, W2 - 32, 150);
-  caption(cs ? 'Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).' : 'Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', X2 + 16, y, W2 - 32, TOP + 256);
-  y = box(X2, TOP + 275, W2, MID - TOP - 275, 'b-Değerinin Zaman İçinde Değişimi');
+  caption(cs ? L('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', 'Figure 2. Time–magnitude distribution of events; the orange step curve is the time-dependent completeness threshold (faded points lie below it).')
+    : L('Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', 'Figure 2. Time–magnitude distribution of events; colours show magnitude classes (no completeness steps used).'), X2 + 16, y, W2 - 32, TOP + 256);
+  y = box(X2, TOP + 275, W2, MID - TOP - 275, L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112);
-  rich('**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step 10 (Öncel & Wilson 2007). {#0891b2|Cyan} points/line: window b-value; {#0891b2|cyan band:} 95% confidence interval (±1.96·b/√N); {#db2777|pink:} 21-window moving average; {#6b7280|grey dashed:} fixed-Mc comparison; {#6b7280|grey dotted:} b = 1.0 reference. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
+    : '**Şekil 3.** b(t) — N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007). {#0891b2|Camgöbeği} noktalar/çizgi: pencere b-değeri; {#0891b2|camgöbeği bant:} %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} 21 pencerelik hareketli ortalama; {#6b7280|gri kesikli:} sabit Mc karşılaştırması; {#6b7280|gri noktalı:} b = 1,0 referansı. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
-  y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : 'Gutenberg–Richter Dağılımı');
+  y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
   y = figure(imgs[2], X3 + 16, y, W3 - 32, 300);
-  y = caption(!cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(gs.mc).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
+  y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)})` : ''}, blue dashed Mc${gs ? ` = ${gs.mc}` : ''}.` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(gs.mc).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
   // G-R parametre tablosu (büyük punto)
   if (gf && gf.curves && gf.curves.length) {
-    const cols = [['Eğri', 0], ['b', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/yıl`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
+    const cols = [[L('Eğri', 'Curve'), 0], ['b', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/${L('yıl', 'yr')}`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
     let ry = y + 4; c.fillStyle = '#f3f4f6'; c.fillRect(tx, ry - 3, W3 - 32, rowH);
     cols.forEach(([h, dx]) => text(h, tx + 6 + dx, ry, 'bold 16px Arial', INK)); ry += rowH;
-    const nm = { best: fitT ? `En iyi (${fitT.replace('M ', 'M\u00a0')})` : 'En iyi tahmin', upper: 'Üst eğri', lower: 'Alt eğri' };
+    const nm = { best: fitT ? `${L('En iyi', 'Best')} (${fitT.replace('M ', 'M\u00a0')})` : L('En iyi tahmin', 'Best estimate'), upper: L('Üst eğri', 'Upper curve'), lower: L('Alt eğri', 'Lower curve') };
     const rowsP = gf.curves.slice();
     if (gf.fit && gf.all) rowsP.push({ key: 'all', b: gf.all.b, beta: gf.all.beta, rate0: gf.all.rate0, mx: null, sig: gf.all.sigma, m0: gf.all.m0 });
-    nm.all = 'Tüm sınıflar';
+    nm.all = L('Tüm sınıflar', 'All classes');
     rowsP.forEach(cv0 => { if (ry + rowH > TOP + 511) return;
       const vals = [nm[cv0.key] || cv0.key, cv0.b.toFixed(3) + (cv0.key === 'best' && gf.sigB !== null ? ' ± ' + gf.sigB.toFixed(3) : cv0.key === 'all' && cv0.sig !== null ? ' ± ' + cv0.sig.toFixed(3) : ''), cv0.beta.toFixed(3), cv0.rate0.toFixed(2) + (cv0.key === 'all' ? ` (M≥${cv0.m0.toFixed(1)})` : ''), cv0.mx !== null && cv0.mx !== undefined ? cv0.mx.toFixed(1) : '—'];
       cols.forEach(([, dx], i) => text(vals[i], tx + 6 + dx, ry, (cv0.key === 'best' ? 'bold ' : '') + (cv0.key === 'all' ? '14px' : '16px') + ' Arial', cv0.key === 'all' ? '#6b7280' : INK)); ry += rowH; });
     c.strokeStyle = '#d1d5db'; c.lineWidth = 1; c.strokeRect(tx, y + 1, W3 - 32, ry - y - 1);
   }
-  y = box(X3, TOP + 530, W3, MID - TOP - 530, 'Sonuçlar');
+  y = box(X3, TOP + 530, W3, MID - TOP - 530, L('Sonuçlar', 'Results'));
   // Patch 2 — kalite kontrol uyarısı olan sonucun raporlanması (metodoloji): model–gözlem denetimi
   // lastGrFit.consistency'den, tamlık tanıları cs.qc'den OKUNUR; hiçbir değer yeniden hesaplanmaz.
   const qcObj = gf && gf.consistency ? gf.consistency : null, csQc = cs && cs.qc ? cs.qc : null;
@@ -3422,8 +3458,8 @@ async function exportPosterAGU(scale, evt) {
   const mcFlag = !!(csQc && (csQc.lowMcN > 0 || csQc.invN > 0));
   const qcFlag = !!cs && (mcFlag || gofRej);
   const msg = posterVal('posterMessage', '') || (qcFlag ? (mcFlag
-    ? 'Tamlık eşikleri veri Mc\'sinin altında; b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.'
-    : `G-R modeli sınıf sayımlarıyla uyumlu değil (p_boot ${fmtPboot(qcObj.gof)}); b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.`) : '');
+    ? L('Tamlık eşikleri veri Mc\'sinin altında; b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.', 'Completeness thresholds lie below the data Mc; verify b and rates by re-running.')
+    : L(`G-R modeli sınıf sayımlarıyla uyumlu değil (p_boot ${fmtPboot(qcObj.gof)}); b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.`, `G-R model inconsistent with class counts (p_boot ${fmtPboot(qcObj.gof)}); verify b and rates by re-running.`)) : '');
   // Ana mesaj (Patch 2b): kesilmez — 17 → 15 → 13 px'te en çok 3 satıra sığarsa bütün olarak çizilir; sığmazsa hiç çizilmez
   // ve kutunun sonunda not edilir. Çizim, Sonuçlar maddelerinin yerleşim planından sonra yapılır.
   let msgL = null;
@@ -3435,15 +3471,19 @@ async function exportPosterAGU(scale, evt) {
   else {
     rItems = [];
     const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`, P = t => t;   // V: vurgulu değer; P: uyarı varken vurgusuz
-    if (cs) rItems.push(posterQcSummary(qcObj, csQc));   // kalite kontrol İLK madde, kesilmeden ve kısa/yapılandırılmış (seçenek A)
+    if (cs) rItems.push(posterQcSummary(qcObj, csQc, EN));   // kalite kontrol İLK madde, kesilmeden ve kısa/yapılandırılmış (seçenek A)
     if (gf) { const best = gf.curves[0], E = qcFlag ? P : V;   // metodoloji (i) ve (iv)
-      rItems.push(`**Weichert (1980)${qcFlag ? ' — ⚠ yanlı olabilir' : ''}:** ${E(`b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}`)}${fitT ? ` (${fitT}; N = ${gf.N})` : ''}; ${E(`λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/yıl`)}${gf.nRef !== undefined ? `; ${E(`N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/yıl`)}${gf.mRefExtrap ? ' (gözlenen aralığın dışında: dışkestirim)' : ''}` : ''} (N = ${gf.N}).` +
-        (gf.fit && gf.all ? ` Karşılaştırma (tüm sınıflar): b = ${gf.all.b.toFixed(3)} ± ${gf.all.sigma !== null ? gf.all.sigma.toFixed(3) : '—'}, N = ${gf.all.N}${gf.all.dPerDf !== null ? `, D/sd = ${gf.all.dPerDf.toFixed(1)}` : ''}.` : '') +
-        (qcFlag && bt && bt.fixed ? ` Karşılaştırma: sabit Mc = ${bt.fixed.mc.toFixed(1)} ile b(t) ortalaması ${bt.fixed.bAvg.toFixed(2)}.` : '')); }
-    if (!gf && gs) { rItems.push(`**G-R (tek Mc):** ${V(`Mc = ${String(gs.mc).replace('.', ',')}`)}; ${V(`b_GR = ${gs.b.toFixed(2).replace('.', ',')}`)}; N(≥Mc) = ${gs.n.toLocaleString('tr-TR')}${gs.gof !== null ? `; GoF = %${gs.gof.toFixed(1).replace('.', ',')}` : ''}.`); }
-    if (bt) { rItems.push(`**b(t)${bt.fit ? ` (${fitT || 'fit aralığı'})` : ''}:** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` +
+      const yr = L('yıl', 'yr');
+      rItems.push(`**Weichert (1980)${qcFlag ? L(' — ⚠ yanlı olabilir', ' — ⚠ may be biased') : ''}:** ${E(`b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}`)}${fitT ? ` (${fitT}; N = ${gf.N})` : ''}; ${E(`λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/${yr}`)}${gf.nRef !== undefined ? `; ${E(`N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/${yr}`)}${gf.mRefExtrap ? L(' (gözlenen aralığın dışında: dışkestirim)', ' (outside the observed range: extrapolation)') : ''}` : ''} (N = ${gf.N}).` +
+        (gf.fit && gf.all ? ` ${L('Karşılaştırma (tüm sınıflar)', 'Comparison (all classes)')}: b = ${gf.all.b.toFixed(3)} ± ${gf.all.sigma !== null ? gf.all.sigma.toFixed(3) : '—'}, N = ${gf.all.N}${gf.all.dPerDf !== null ? `, D/sd = ${gf.all.dPerDf.toFixed(1)}` : ''}.` : '') +
+        (qcFlag && bt && bt.fixed ? L(` Karşılaştırma: sabit Mc = ${bt.fixed.mc.toFixed(1)} ile b(t) ortalaması ${bt.fixed.bAvg.toFixed(2)}.`, ` Comparison: mean b(t) with fixed Mc = ${bt.fixed.mc.toFixed(1)} is ${bt.fixed.bAvg.toFixed(2)}.`) : '')); }
+    if (!gf && gs) { rItems.push(`**G-R (${L('tek Mc', 'single Mc')}):** ${V(`Mc = ${DC(gs.mc)}`)}; ${V(`b_GR = ${DC(gs.b.toFixed(2))}`)}; N(≥Mc) = ${gs.n.toLocaleString(NF)}${gs.gof !== null ? `; GoF = ${EN ? gs.gof.toFixed(1) + '%' : '%' + DC(gs.gof.toFixed(1))}` : ''}.`); }
+    if (bt) { rItems.push(EN ? `**b(t)${bt.fit ? ` (${fitT || 'fit range'})` : ''}:** mean ${V(bt.bAvg.toFixed(2))}, last window ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} windows).` +
+      (bt.fit && bt.all ? ` All classes: mean ${bt.all.bAvg.toFixed(2)}, last ${bt.all.bLast.toFixed(2)} (${bt.all.nWin} windows).` : '') + (bt.fixed && !(qcFlag && gf) ? ` With fixed Mc = ${bt.fixed.mc.toFixed(1)}, mean ${V(bt.fixed.bAvg.toFixed(2))}.` : '')
+      : `**b(t)${bt.fit ? ` (${fitT || 'fit aralığı'})` : ''}:** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` +
       (bt.fit && bt.all ? ` Tüm sınıflar: ortalama ${bt.all.bAvg.toFixed(2)}, son ${bt.all.bLast.toFixed(2)} (${bt.all.nWin} pencere).` : '') + (bt.fixed && !(qcFlag && gf) ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
-    if (!cs) rItems.push('**Kalite kontrol:** tamlık basamakları kullanılmadı; b ve oranlar tek Mc\'nin tüm dönemde geçerli olduğu varsayımına dayanır.' + (regionRect && !regionDeclusterOn ? ' Artçılar ayıklanmadı (GK74 kapalı).' : ''));
+    if (!cs) rItems.push(EN ? '**Quality control:** no completeness steps were used; b and rates assume that a single Mc is valid for the whole period.' + (regionRect && !regionDeclusterOn ? ' Aftershocks were not removed (GK74 off).' : '')
+      : '**Kalite kontrol:** tamlık basamakları kullanılmadı; b ve oranlar tek Mc\'nin tüm dönemde geçerli olduğu varsayımına dayanır.' + (regionRect && !regionDeclusterOn ? ' Artçılar ayıklanmadı (GK74 kapalı).' : ''));
   }
   // Sonuçlar kutusu (poster düzeltmesi iv; Patch 2b — madde bütünlüğü): punto 14,5 → 10 arasında küçültülür, küçük puntoda
   // madde aralığı daralır. 10 puntoda da sığmazsa HİÇBİR MADDE ORTASINDAN KESİLMEZ: sığmayan son maddeler bütün olarak
@@ -3451,7 +3491,8 @@ async function exportPosterAGU(scale, evt) {
   // önce Ana mesaj çıkarılır.
   { const gap = sz => (sz <= 11.5 ? 2 : 5), lhOf = sz => Math.round(sz * 1.31), bot = MID - 6;
     const ro = sz => ({ size: sz, lh: lhOf(sz), bullet: true });
-    const noteTxt = (nd, mOmit) => `⚠ ${mOmit ? 'Ana mesaj' + (nd ? ' ve ' : '') : ''}${nd ? nd + ' madde' : ''} kutuya sığmadı; tam metin EQ-Live uygulamasında.`;
+    const noteTxt = (nd, mOmit) => EN ? `⚠ ${mOmit ? 'Key message' + (nd ? ' and ' : '') : ''}${nd ? nd + (nd > 1 ? ' items' : ' item') : ''} did not fit in the box; full text in the EQ-Live application.`
+      : `⚠ ${mOmit ? 'Ana mesaj' + (nd ? ' ve ' : '') : ''}${nd ? nd + ' madde' : ''} kutuya sığmadı; tam metin EQ-Live uygulamasında.`;
     const noteO = sz => ({ size: sz, lh: lhOf(sz), italic: true, col: '#b45309' });
     const plan = useMsg => {
       const y0 = y + (useMsg ? msgL.mh + 8 : 0) + 2, avail = bot - y0, mOmit = !!msg && !useMsg;
@@ -3472,7 +3513,7 @@ async function exportPosterAGU(scale, evt) {
 
   // ── alt şerit: kaynaklar ve bilgi
   const BT = MID + 12, BH = H - BT - 22;
-  y = box(X1, BT, X3 - X1 - 20, BH, 'Kaynaklar');
+  y = box(X1, BT, X3 - X1 - 20, BH, L('Kaynaklar', 'References'));
   const refs = ['Aki, K. (1965). Bull. Earthq. Res. Inst. 43, 237–239.', 'Halchuk, S., Burke, K. B. S. & Adams, J. (2004). Seismol. Res. Lett. 75(3), 432–434.',
     'Kijko, A. & Sellevoll, M. A. (1989). Bull. Seismol. Soc. Am. 79(3), 645–654.', 'Öncel, A. O. & Wilson, T. H. (2007). Geophys. J. Int. 169(1), 259–270.',
     'Weichert, D. H. (1980). Bull. Seismol. Soc. Am. 70(4), 1337–1346.', 'Wiemer, S. & Wyss, M. (2000). Bull. Seismol. Soc. Am. 90(4), 859–869.'];
@@ -3481,9 +3522,9 @@ async function exportPosterAGU(scale, evt) {
   [refs.slice(0, half), refs.slice(half)].forEach((colRefs, ci2) => { let yy = ry0;
     colRefs.forEach(r => { yy = rich(r, X1 + 16 + ci2 * (colW + 16), yy, colW, { size: 14, lh: 18, hang: 22, maxY: BT + BH - 26 }) + 5; }); });
   // Teşekkür (AGU "Acknowledgments"): boşsa veri sağlayıcıya standart teşekkür
-  const ackSrc = (regionRect ? regionSourceLabel() : 'canlı akış').replace(/\s*\(.*\)\s*/g, ' ').trim();
-  const ack = posterVal('posterAck', `Katalog verileri ${ackSrc} FDSN web servisinden alınmıştır; veri sağlayıcılara teşekkür ederiz. Analiz: EQ-Live Türkiye.`);
-  rich('**Teşekkür:** ' + ack, X1 + 16, BT + BH - 24, X3 - X1 - 20 - 32, { size: 12, lh: 16, italic: true, col: MUTE, maxY: BT + BH - 2 });
+  const ackSrc = SRC(regionRect ? regionSourceLabel() : 'canlı akış').replace(/\s*\(.*\)\s*/g, ' ').trim();
+  const ack = posterVal('posterAck', L(`Katalog verileri ${ackSrc} FDSN web servisinden alınmıştır; veri sağlayıcılara teşekkür ederiz. Analiz: EQ-Live Türkiye.`, `Catalogue data were obtained from the ${ackSrc} FDSN web service; we thank the data providers. Analysis: EQ-Live Türkiye.`));
+  rich(L('**Teşekkür:** ', '**Acknowledgments:** ') + ack, X1 + 16, BT + BH - 24, X3 - X1 - 20 - 32, { size: 12, lh: 16, italic: true, col: MUTE, maxY: BT + BH - 2 });
   // Ek Bilgi: QR (tam analiz bağlantısı; tüm ayarlar URL'dedir) + kaynak/tarih + kısa adres
   c.fillStyle = '#ffffff'; c.fillRect(X3, BT, W3, BH); c.strokeStyle = '#111'; c.lineWidth = 1.2; c.strokeRect(X3, BT, W3, BH);
   const QZ = BH - 6, qzx = X3 + W3 - 3 - QZ, qzy = BT + 3; let qrDrawn = false;
@@ -3495,20 +3536,20 @@ async function exportPosterAGU(scale, evt) {
     c.save(); const ppm = QZ * SC / m; if (ppm >= 3) c.imageSmoothingEnabled = false; else { c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high'; } c.drawImage(qc, qzx, qzy, QZ, QZ); c.restore();
     qrDrawn = true; } catch (e) { qrDrawn = false; } }
   const eW = (qrDrawn ? qzx - 12 : X3 + W3 - 16) - (X3 + 16);
-  text('Daha Fazla Bilgi', X3 + 16, BT + 12, 'bold 21px Arial', '#111827');
-  const srcShort = regionRect ? regionSourceLabel() : 'Canlı akış';
-  const eLines = [[qrDrawn ? 'Canlı analiz ve etkileşimli harita: QR kodu tarayın' : 'Analiz bağlantısı:', 'bold 14px Arial', ACC],
-    [`Veri: ${srcShort} — ${new Date().toLocaleDateString('tr-TR')}`, '13px Arial', INK]
+  text(L('Daha Fazla Bilgi', 'More Information'), X3 + 16, BT + 12, 'bold 21px Arial', '#111827');
+  const srcShort = SRC(regionRect ? regionSourceLabel() : 'Canlı akış');
+  const eLines = [[qrDrawn ? L('Canlı analiz ve etkileşimli harita: QR kodu tarayın', 'Live analysis and interactive map: scan the QR code') : L('Analiz bağlantısı:', 'Analysis link:'), 'bold 14px Arial', ACC],
+    [`${L('Veri', 'Data')}: ${srcShort} — ${EN ? new Date().toISOString().slice(0, 10) : new Date().toLocaleDateString('tr-TR')}`, '13px Arial', INK]
   ];
   if (!/^(localhost|127\.0\.0\.1|\[::1\])(:|$)/.test(location.host) && location.protocol !== 'file:') eLines.push([(location.host + location.pathname).replace(/index\.html$/, ''), 'bold 14px Arial', '#1d4ed8']);
-  const contact = posterVal('posterContact', ''); if (contact) eLines.push([`İletişim: ${contact}`, '13px Arial', INK]);
+  const contact = posterVal('posterContact', ''); if (contact) eLines.push([`${L('İletişim', 'Contact')}: ${contact}`, '13px Arial', INK]);
   eLines.forEach(([t, f, col], i) => { c.font = f; let tt = t; while (tt.length > 8 && c.measureText(tt).width > eW) tt = tt.slice(0, -2); text(tt === t ? t : tt + '…', X3 + 16, BT + 44 + i * (eLines.length > 3 ? 22 : 24), f, col); });
 
   cv.toBlob(blob => {
     if (!blob) { alert('Poster oluşturulamadı (görüntü güvenlik kısıtı).'); done(); return; }
     const url = URL.createObjectURL(blob), a = document.createElement('a');
     const slug = (region || 'bolge').replace(/[İI]/g, 'i').toLowerCase().replace(/[ğüşıöç]/g, ch => ({ 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ı': 'i', 'ö': 'o', 'ç': 'c' })[ch]).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'bolge';
-    a.href = url; a.download = `EQ-Live-${SC >= 4 ? 'Baski-7680x4320' : SC > 1 ? 'Poster' : 'Slayt'}-${slug}-${new Date().toISOString().slice(0, 10)}.png`;
+    a.href = url; a.download = `EQ-Live-${SC >= 4 ? L('Baski', 'Print') + '-7680x4320' : SC > 1 ? 'Poster' : L('Slayt', 'Slide')}-${slug}-${new Date().toISOString().slice(0, 10)}${EN ? '-EN' : ''}.png`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 5000); done();
   }, 'image/png');
@@ -4061,7 +4102,8 @@ function fmtPboot(g) { const lo = 1 / (g.Bok + 1); return g.pBoot <= lo + 1e-12 
 // Poster "Sonuçlar" kutusu için kısa, yapılandırılmış kalite kontrol özeti (Patch 2, seçenek A).
 // Girdi: lastGrFit.consistency (q) ve cs.qc (cq) — hiçbir değer yeniden hesaplanmaz, uyarı metinleri kazınmaz.
 // Tam metinler G-R panelinde ve tamlık tanı listesinde (csDiag) aynen kalır.
-function posterQcSummary(q, cq) {
+function posterQcSummary(q, cq, en) {
+  if (en) return posterQcSummaryEN(q, cq);
   const f1 = v => (+v).toFixed(1), mg = [], tm = [];
   if (q && q.gof) { const g = q.gof; mg.push(g.ok ? `uyum testi p_boot ${fmtPboot(g)} (D/sd = ${g.dPerDf.toFixed(1)}): ${g.reject ? 'G-R uyumsuz' : 'uyumsuzluk saptanmadı'}` : 'uyum testi yapılamadı'); }
   if (q && q.profile && q.profile.ok) mg.push(`Δb = ${q.profile.deltaB.toFixed(2)} (${q.profile.deltaB > 0 ? 'b̂ düşük' : 'b̂ yüksek'})`);
@@ -4080,6 +4122,27 @@ function posterQcSummary(q, cq) {
   }
   return '**Kalite kontrol:** ' + (mg.length ? mg.join('; ') + '. ' : '') +
     (tm.length ? 'Tamlık: ' + tm.join('; ') + '.' : "Tamlık: basamaklar veri Mc'siyle uyumlu.");
+}
+// İngilizce poster için aynı özet (2026-10-11); alanlar ve mantık posterQcSummary ile birebir aynıdır.
+function posterQcSummaryEN(q, cq) {
+  const f1 = v => (+v).toFixed(1), mg = [], tm = [], pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  if (q && q.gof) { const g = q.gof; mg.push(g.ok ? `goodness-of-fit test p_boot ${fmtPboot(g)} (D/sd = ${g.dPerDf.toFixed(1)}): ${g.reject ? 'G-R inconsistent' : 'no inconsistency detected'}` : 'goodness-of-fit test not performed'); }
+  if (q && q.profile && q.profile.ok) mg.push(`Δb = ${q.profile.deltaB.toFixed(2)} (${q.profile.deltaB > 0 ? 'b̂ low' : 'b̂ high'})`);
+  if (q && (q.level === 'ok' || q.level === 'warn' || q.level === 'red')) mg.push(`R(M≥${q.mCmp}) = ${q.R.toPrecision(3)} [${q.rLo.toPrecision(3)}–${isFinite(q.rHi) ? q.rHi.toPrecision(3) : '∞'}]`);
+  else if (q && q.level === 'fewN') mg.push(`R(M≥${q.mCmp}): n = ${q.nObs}, not reported`);
+  if (cq) {
+    if (cq.capMag || cq.capChunk) tm.push('query truncated: T, b, λ invalid');
+    if (cq.lowMc && cq.lowMc.length) tm.push(`${pl(cq.lowMc.length, 'step')} below the data Mc (${cq.lowMc.map(x => `${x.row}: ${f1(x.mc)}<${f1(x.mcData)}`).join(', ')})`);
+    if (cq.inv && cq.inv.length) tm.push(`rate inversion in ${pl(cq.inv.length, 'period')}`);
+    if (cq.small && cq.small.length) tm.push(`<${CS_QC.minEvents} events in ${pl(cq.small.length, 'step')}`);
+    if (cq.short && cq.short.length) tm.push(`${pl(cq.short.length, 'step')} <${CS_QC.minYears} yr`);
+    if (cq.stepFlag) tm.push(`${pl(cq.nSteps, 'step')} (review)`);
+    if (cq.capTime) tm.push('query limited');
+    if (cq.clipped) tm.push('T clipped to window');
+    if (cq.nAfter) tm.push(`${pl(cq.nAfter, 'step')} formed no period`);
+  }
+  return '**Quality control:** ' + (mg.length ? mg.join('; ') + '. ' : '') +
+    (tm.length ? 'Completeness: ' + tm.join('; ') + '.' : 'Completeness: steps consistent with the data Mc.');
 }
 // Poster "Sonuçlar" yerleşimi (Patch 2b — madde bütünlüğü). hs: madde yükseklikleri (px, aralık hariç); gp: madde aralığı;
 // avail: kullanılabilir yükseklik; noteH: "… sığmadı" notunun yüksekliği; noteAlways: not her durumda yazılacaksa (ör. Ana mesaj
