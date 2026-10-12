@@ -966,6 +966,7 @@
     <button class="tbtn"        id="btnTestimony" onclick="toggleLayer('testimony')" title="EMSC Testimonies · hissedilme raporları · seismicportal.eu/testimonies-ws · yeşil=az → mor=çok tanıklık">🗣️ Tanıklıklar</button>
     <button class="tbtn"        id="btnTimeMag" onclick="toggleTimeMag()" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag (normal)</button>
     <button class="tbtn"        id="btnBtWin" onclick="toggleBtWin()" title="Zaman–Magnitude, ince adım: Time-Mag (normal) ile aynı veri, aynı Mc ve aynı Öncel &amp; Wilson (2007) b(t) hesabı (N = 100); pencereler 10 yerine 1 olay kaydırılır">📈 Time-Mag (ince)</button>
+    <button class="tbtn"        id="btnAftWin" onclick="toggleAftWin()" title="Artçı dizisi başına p (Omori–Utsu, Ogata 1983) ve b (Aki 1965) değerleri; tablodaki satıra tıklayınca TM-02 dizi analizi (M–t, b(t), p modeli; GK74 ya da M ≥ 7 için Kagan 2002)">📈 Time-Mag (artçı)</button>
     <button class="tbtn tr-only"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn tr-only"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
     <button class="tbtn tr-only"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
@@ -1169,7 +1170,7 @@
     <div class="tmStats" id="tmStatsB">—</div>
     <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
       <div class="tmTitle" style="font-size:.78rem;">⚡ Kümülatif Benioff Gerinim Ölçüsü Σ√E <span style="color:#666;font-weight:400;">(log E = 11,8 + 1,5M, erg; Gutenberg &amp; Richter 1956 — sabit eşik)</span></div>
-      <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
+      <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
       <svg id="tmSvgBen" viewBox="0 0 660 210" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
       <div class="tmStats" id="tmStatsBen">—</div>
     </div>
@@ -1242,11 +1243,22 @@
   <div class="tmTitle" style="font-size:.78rem;margin-top:8px;" title="Pencere kaydırma adımı 1 olay: aynı N = 100 pencere, aynı Mc ve aynı hesap; örnekleme 10 kat sıklaşır. Ardışık pencereler %99 örtüşür; bağımsız bilgi ve istatistiksel kesinlik ARTMAZ, değişimin zamanlaması daha ayrıntılı görünür. Eğrinin bir eşiği ilk geçtiği an fiziksel değişimin başlangıç zamanı değildir.">📊 b-Değerinin Zaman İçindeki Değişimi — ince adım <span style="color:#666;font-weight:400;">(N=100, adım=1 olay; normal adım için Time-Mag (normal))</span></div>
   <svg id="btSvg" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:900px"></svg>
   <div class="tmStats" id="btStats">—</div>
-    <details style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
-      <summary class="tmTitle" style="font-size:.78rem;cursor:pointer;" title="Aç/kapat — tablodaki satıra tıklayınca TM-02 Artçı Dizisi Analizi açılır">🔁 Artçı Dizisi Başına p ve b Değerleri <span style="color:#666;font-weight:400;">(Omori–Utsu, Ogata 1983 MLE · Aki 1965 b · GK74 dizileri; gösterim Ávila-Barrientos vd. 2015)</span></summary>
+    
+</div>
+
+<!-- Time-Mag (artçı) penceresi (2026-10-12): artçı dizisi başına p ve b (Omori–Utsu, Ogata 1983; GK74 dizileri) ve TM-02 analizi.
+     Time-Mag (normal) ile aynı veri ve dönüşüm. -->
+<div class="tmPanel" id="aftPanel" style="z-index:1004">
+  <div class="tmHead">
+    <span class="tmTitle">📈 Zaman–Magnitude — artçı dizileri <span style="color:#666;font-weight:400;">(p: Omori–Utsu, Ogata 1983 MLE · b: Aki 1965 · tablodaki satıra tıklayın → TM-02 dizi analizi)</span></span>
+    <span><button class="tmClose" onclick="toggleAftWin()">✕</button></span>
+  </div>
+  <div class="tmMeta" id="aftMeta">—</div>
+  <div style="margin-top:4px;">
+      <div class="tmTitle" style="font-size:.78rem;">🔁 Artçı Dizisi Başına p ve b Değerleri <span style="color:#666;font-weight:400;">(Omori–Utsu, Ogata 1983 MLE · Aki 1965 b · GK74 dizileri; gösterim Ávila-Barrientos vd. 2015)</span></div>
       <svg id="tmSvgPB" viewBox="0 0 660 300" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
       <div class="tmStats" id="tmStatsPB">—</div>
-    </details>
+    </div>
 </div>
 
 <!-- STATUS -->
@@ -2076,7 +2088,8 @@ function runOmoriPanel() {
    ZAMAN–MAGNİTUDE DAĞILIMI (Time–Magnitude Distribution)
 ══════════════════════════════════════════ */
 let showTimeMag = false;
-let showBtWin = false;   // Time-Mag (ince) penceresi
+let showBtWin = false, showAftWin = false;   // Time-Mag (ince) ve Time-Mag (artçı) pencereleri
+function tmAnyOpen() { return showTimeMag || showBtWin || showAftWin; }
 let lastBts = null;
 
 /* ── Magnitude Conversion Laboratory ──────────────────────────
@@ -2316,7 +2329,7 @@ function onTmTypeFilterChange() {
   if (o.md) url.searchParams.delete('xmd'); else url.searchParams.set('xmd', '1');
   if (o.mlLow) url.searchParams.delete('xmllow'); else url.searchParams.set('xmllow', '1');
   history.replaceState(null, '', url);
-  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
+  if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
 }
 function restoreTmTypeFilterFromURL() {
   const p = new URLSearchParams(location.search);
@@ -2336,11 +2349,11 @@ function bWinTime(win, getT) { return getT(win[bTimeAnchor === 'end' ? win.lengt
 function onBAnchorChange() {
   const el = document.getElementById('bAnchorSel'); bTimeAnchor = el && el.value === 'end' ? 'end' : 'mid';
   try { const u = new URL(location.href); if (bTimeAnchor === 'end') u.searchParams.set('banchor', 'end'); else u.searchParams.delete('banchor'); history.replaceState(null, '', u); } catch (e) {}
-  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
+  if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
 }
 function onTmConversionChange() {
   mcConversionMode = document.getElementById('tmConversionSel').value;
-  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
+  if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
 }
 
 // evList'in KENDİSİNİ değiştirmez. Yalnızca applicable(e)==true olan
@@ -3047,11 +3060,17 @@ function toggleBtWin() {
   document.getElementById('btPanel').classList.toggle('open', showBtWin);
   if (showBtWin) renderTimeMag([...events, ...liveEvents]);
 }
+function toggleAftWin() {
+  showAftWin = !showAftWin;
+  document.getElementById('btnAftWin').classList.toggle('active', showAftWin);
+  document.getElementById('aftPanel').classList.toggle('open', showAftWin);
+  if (showAftWin) renderTimeMag([...events, ...liveEvents]);
+}
 function toggleTimeMag() {
   showTimeMag = !showTimeMag;
   document.getElementById('btnTimeMag').classList.toggle('active', showTimeMag);
   document.getElementById('tmPanel').classList.toggle('open', showTimeMag);
-  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
+  if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
 }
 
 // Tam ekran toggle -- mevcut sürükleme (initTimeMagDrag) inline left/top/
@@ -3081,8 +3100,8 @@ function toggleTimeMagFullscreen(evt) {
 }
 
 // Time-Mag paneli sürüklenebilir — başlık çubuğundan tutulur, ekran sınırları içinde kalır
-(function initBtDrag(){
-  const panel = document.getElementById('btPanel'), head = panel && panel.querySelector('.tmHead'); if (!head) return;
+['btPanel', 'aftPanel'].forEach(function initBtDrag(id){
+  const panel = document.getElementById(id), head = panel && panel.querySelector('.tmHead'); if (!head) return;
   let dragging = false, offX = 0, offY = 0;
   head.addEventListener('pointerdown', e => {
     if (e.target.closest('.tmClose') || e.target.closest('select')) return;
@@ -3095,7 +3114,7 @@ function toggleTimeMagFullscreen(evt) {
     panel.style.top = Math.max(0, Math.min(window.innerHeight - panel.offsetHeight, e.clientY - offY)) + 'px'; });
   head.addEventListener('pointerup', () => { dragging = false; });
   head.addEventListener('pointercancel', () => { dragging = false; });
-})();
+});
 (function initTimeMagDrag(){
   const panel = document.getElementById('tmPanel');
   const head  = panel.querySelector('.tmHead');
@@ -4451,7 +4470,7 @@ function onCsChange(fromEdit) {
   document.getElementById('csRows').style.display = show === '' ? 'block' : 'none';
   if (csEnabled && !csSteps.length) csRenderRows();
   csSyncURL();
-  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
+  if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
 }
 
 function restoreCsFromURL() {
@@ -4601,7 +4620,7 @@ function onGrFitChange() {
   grParamsSyncURL();
   const fr = grFitRangeCurrent(), w = document.getElementById('grFitWarn');
   if (w) w.textContent = fr.err ? '⚠ ızgara/aralık hatası — uygulanmadı' : '';
-  if (typeof showTimeMag !== 'undefined' && (showTimeMag || showBtWin) && lastCs) { renderTimeMag([...events, ...liveEvents]); return; }
+  if (typeof showTimeMag !== 'undefined' && tmAnyOpen() && lastCs) { renderTimeMag([...events, ...liveEvents]); return; }
   if (lastCs) renderGutenbergRichterCS(lastCs);
 }
 function grFitSuggestApply() {
@@ -4930,7 +4949,7 @@ function renderGutenbergRichterCS(cs) {
 let lastCs = null;
 
 function renderTimeMag(evList) {
-  if (!showTimeMag && !showBtWin) return;   // b(t) penceresi de aynı veri hazırlığını kullanır
+  if (!tmAnyOpen()) return;   // Time-Mag (ince) ve (artçı) pencereleri de aynı veri hazırlığını kullanır
   const svg    = document.getElementById('tmSvg');
   const metaEl = document.getElementById('tmMeta');
   const statsEl= document.getElementById('tmStats');
@@ -5115,6 +5134,7 @@ function renderTimeMag(evList) {
     const src = document.getElementById('tmSvg'), dst = document.getElementById('btSvgMT');
     if (src && dst) { dst.setAttribute('viewBox', src.getAttribute('viewBox') || '0 0 660 260'); dst.innerHTML = src.innerHTML; }
   } catch (e) { console.warn('[bt-pencere]', e); }
+  { const am = document.getElementById('aftMeta'), tm = document.getElementById('tmMeta'); if (am && tm) am.textContent = tm.textContent; }
   try {
     // Kümesizleştirme açıksa artçılar evList'ten çıkarılmıştır; diziler ham listeden, aynı dönüşüm ve tür filtresiyle kurulur
     const seqList = (usingRegion && regionDeclusterOn)
@@ -6675,7 +6695,7 @@ async function loadMwAuth() {
       mwAuthTable = { err: err.message || String(err), entries: [] };
       setStatus(`Otoriter Mw tablosu yüklenemedi (${mwAuthTable.err}) — katalog büyüklükleri kullanılıyor`, true);
     } finally { mwAuthPending = null; }
-    gk74Cache = null; renderRegionInfo(); redrawRegionMarkers(); if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
+    gk74Cache = null; renderRegionInfo(); redrawRegionMarkers(); if (tmAnyOpen()) renderTimeMag(regionEvents);
     return mwAuthTable;
   })();
   return mwAuthPending;
@@ -6683,7 +6703,7 @@ async function loadMwAuth() {
 function onRegionMwAuthChange() {
   gk74Cache = null;
   if (mwAuthWanted() && !mwAuthTable) loadMwAuth();
-  renderRegionInfo(); redrawRegionMarkers(); if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
+  renderRegionInfo(); redrawRegionMarkers(); if (tmAnyOpen()) renderTimeMag(regionEvents);
 }
 // Bağlam listesi otorite durumuna göre (Faz 2a'da eşleşme kapsamı = aday havuzu) önbellekli hesaplanır.
 function regionCtxList() {
@@ -6773,7 +6793,7 @@ async function ensureRegionContext() {
     if (regionEvents === forEvents) {
       renderRegionInfo();
       redrawRegionMarkers();
-      if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
+      if (tmAnyOpen()) renderTimeMag(regionEvents);
     }
   })();
   return regionCtxPending;
@@ -6783,7 +6803,7 @@ function onRegionDeclusterCtxChange() {
   if (regionDeclusterOn && regionCtxWanted()) { ensureRegionContext(); }
   renderRegionInfo();
   redrawRegionMarkers();
-  if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
+  if (tmAnyOpen()) renderTimeMag(regionEvents);
 }
 
 /* Bölgeye özel Mc/b istatistiği — mevcut computeMc()/computeBvalue()
@@ -7108,7 +7128,7 @@ async function fetchRegionEventsFromHistorical(bounds) {
   const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
   setStatus(`Bölgede ${evs.length} deprem — Tarihsel Katalog TAMAMI, limit yok${sampleNote}`);
   renderRegionInfo();
-  if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
+  if (tmAnyOpen()) renderTimeMag(regionEvents);
 }
 
 /* Bölge Analizi kaynak yönlendirici — kendi regionSource seçimine göre
@@ -7186,7 +7206,7 @@ async function fetchRegionEventsFromHKLocal(bounds) {
     const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
     setStatus(`Bölgede ${evs.length} deprem — HK Yerel Katalog TAMAMI (ML, 1970-2011), limit yok${sampleNote}`);
     renderRegionInfo();
-    if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
+    if (tmAnyOpen()) renderTimeMag(regionEvents);
   } catch (err) {
     setStatus(`HK Yerel Katalog hatası: ${err.message}`, true);
   }
@@ -7249,7 +7269,7 @@ async function fetchRegionEventsFromHKHistorical(bounds) {
     const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
     setStatus(`Bölgede ${evs.length} deprem — HK Tarihsel Katalog TAMAMI (Mw≥5.0, 1067-2005), limit yok${sampleNote}`);
     renderRegionInfo();
-    if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
+    if (tmAnyOpen()) renderTimeMag(regionEvents);
   } catch (err) {
     setStatus(`HK Tarihsel Katalog hatası: ${err.message}`, true);
   }
@@ -7441,7 +7461,7 @@ async function fetchRegionEventsLive(bounds, provider) {
         (ci.anyCapped ? ' — 🔴 bir parça 20.000 sınırına ulaştı' : '') + sampleNote, ci.anyCapped);
     }
     renderRegionInfo();
-    if (showTimeMag || showBtWin) renderTimeMag(regionEvents); // panel açıksa bölge verisiyle anında güncelle
+    if (tmAnyOpen()) renderTimeMag(regionEvents); // panel açıksa bölge verisiyle anında güncelle
     syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
   } catch(err) {
     setStatus(`Bölge sorgusu hatası (${providerLabel}): ${err.message}`, true);
@@ -7510,7 +7530,7 @@ async function fetchRegionEventsFromAfad(bounds) {
     const clampNote = clamped ? ` · ⚠ AFAD'da 1 yıllık veri yok, ${HOURS_LABEL[afadHours]} penceresi gösteriliyor` : '';
     setStatus(`Bölgede ${shapeLabel} deprem (AFAD, önceden çekilmiş — saatlik güncellenir)${clampNote}`);
     renderRegionInfo();
-    if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
+    if (tmAnyOpen()) renderTimeMag(regionEvents);
     syncRegionURL(bounds, { limit: evs.length, orderby:'time', magMin, magMax, depMin, depMax });
   } catch(err) {
     setStatus(`AFAD statik veri hatası: ${err.message}`, true);
@@ -7587,7 +7607,7 @@ function toggleRegionDecluster() {
   }
   renderRegionInfo();
   redrawRegionMarkers();
-  if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
+  if (tmAnyOpen()) renderTimeMag(regionEvents);
 }
 
 /* URL'de bölge seçimini kalıcı kıl — paylaşılan link açıldığında aynı bölge
@@ -7683,7 +7703,7 @@ function regionDeselect() {
   const info = document.getElementById('regionInfo');
   if (info) info.innerHTML = '';
   clearRegionURL();
-  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]); // Time-Mag paneli açıksa anında global veriye dönsün
+  if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]); // Time-Mag paneli açıksa anında global veriye dönsün
 
   // Yarım kalmış bir poligon çizimi varsa onu da temizle
   polygonActive = false;
