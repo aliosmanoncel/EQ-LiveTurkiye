@@ -5100,12 +5100,13 @@ function pbSequences(list) {
     const t0 = ms.time.getTime(), Mms = ms.mw ?? ms.mag, Td = gk74Window(Mms)[0];
     const T = Math.min(Td, (tEndAll - t0) / 86400000);
     const Mc = computeMc(ch);
-    const rec = { ms, t0, M: Mms, Td, T, Mc, nAll: ch.length };
+    const rec = { ms, t0, M: Mms, Td, T, Mc, nAll: ch.length, all: ch.map(e => ({ t: (e.time.getTime() - t0) / 86400000, m: e.mw ?? e.mag })).filter(x => x.t > 0) };
     if (Mc === null || !(T > PB_SEQ_S)) { rec.status = 'Mc yok'; out.push(rec); return; }
     const sel = ch.map(e => ({ t: (e.time.getTime() - t0) / 86400000, m: e.mw ?? e.mag })).filter(x => x.m >= Mc - 1e-9 && x.t > PB_SEQ_S && x.t <= T);
     rec.N = sel.length;
     if (sel.length < PB_SEQ_NMIN) { rec.status = `N = ${sel.length} < ${PB_SEQ_NMIN} (M ≥ Mc)`; out.push(rec); return; }
-    const t = sel.map(x => x.t).sort((a, b) => a - b);
+    sel.sort((a, b) => a.t - b.t); rec.sel = sel;
+    const t = sel.map(x => x.t);
     const best = omoriFit(t, PB_SEQ_S, T), K = Math.exp(omoriProfNll(best.lc, best.p, t, PB_SEQ_S, T).lK);
     const grid = []; for (let v = OMORI_P_MIN; v <= OMORI_P_MAX + 1e-9; v += 0.02) grid.push(+v.toFixed(2));
     rec.p = best.p; rec.c = Math.exp(best.lc); rec.ciP = omoriProfileCI(t, PB_SEQ_S, T, 'p', best.nll, grid);
@@ -5125,6 +5126,7 @@ function pbSequences(list) {
 }
 function renderPBSequences(list) {
   const svg = document.getElementById('tmSvgPB'), st = document.getElementById('tmStatsPB'); if (!svg || !st) return;
+  window.__pbOk = [];   // TM-02: tablo boş kalırsa eski dizi listesi geçerli sayılmasın (açık panel "yenilendi" uyarısı verir)
   const W = 660, H = 300, PAD_L = 40, PAD_R = 14, PAD_T = 10, GAP = 22, PAD_B = 22, plotW = W - PAD_L - PAD_R, hP = (H - PAD_T - GAP - PAD_B) / 2;
   if (!list || list.length < PB_SEQ_NMIN + 1) { svg.innerHTML = `<text x="330" y="60" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri</text>`; st.textContent = '—'; return; }
   const seq = pbSequences(list), ok = seq.filter(s => s.status === 'tamam'), rej = seq.filter(s => s.status !== 'tamam');
@@ -5163,12 +5165,215 @@ function renderPBSequences(list) {
   });
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = g;
   const f2 = v => v == null || !isFinite(v) ? '—' : v.toFixed(2);
-  const rows = ok.map(s => `<tr style="${s.N < PB_SEQ_NSOFT || s.flags.length ? 'opacity:.6' : ''}"><td>${new Date(s.t0).toISOString().slice(0, 10)}</td><td>${(+s.ms.lat).toFixed(2)}</td><td>${(+s.ms.lon).toFixed(2)}</td><td>${s.M.toFixed(1)}</td><td>${Number.isFinite(+s.ms.dep) ? (+s.ms.dep).toFixed(0) : '—'}</td><td>${s.N}</td><td>${s.Mc.toFixed(1)}</td><td><b>${f2(s.p)}</b> [${f2(s.ciP.lo)}–${f2(s.ciP.hi)}]</td><td><b>${f2(s.b)}</b> ± ${f2(s.bErr)}</td><td>${f2(s.ks.pvalue)}</td><td style="padding:1px 5px;color:#f59e0b">${s.flags.join('; ')}${s.notes.length ? `<span style="color:#888">${s.flags.length ? '; ' : ''}${s.notes.join('; ')}</span>` : ''}</td></tr>`).join('');
+  window.__pbOk = ok;
+  const rows = ok.map((s, i) => `<tr onclick="openPBSeqPanel(${i})" title="Bu dizinin M, b ve p zaman grafiğini aç" style="cursor:pointer;${s.N < PB_SEQ_NSOFT || s.flags.length ? 'opacity:.6' : ''}"><td>${new Date(s.t0).toISOString().slice(0, 10)}</td><td>${(+s.ms.lat).toFixed(2)}</td><td>${(+s.ms.lon).toFixed(2)}</td><td>${s.M.toFixed(1)}</td><td>${Number.isFinite(+s.ms.dep) ? (+s.ms.dep).toFixed(0) : '—'}</td><td>${s.N}</td><td>${s.Mc.toFixed(1)}</td><td><b>${f2(s.p)}</b> [${f2(s.ciP.lo)}–${f2(s.ciP.hi)}]</td><td><b>${f2(s.b)}</b> ± ${f2(s.bErr)}</td><td>${f2(s.ks.pvalue)}</td><td style="padding:1px 5px;color:#f59e0b">${s.flags.join('; ')}${s.notes.length ? `<span style="color:#888">${s.flags.length ? '; ' : ''}${s.notes.join('; ')}</span>` : ''}</td></tr>`).join('');
   const td = 'style="padding:1px 5px;"';
-  st.innerHTML = `<span style="color:#ec4899">●</span> p (%95 profil olabilirlik) &nbsp;|&nbsp; <span style="color:#06b6d4">●</span> b (±1,96·b/√N) &nbsp;|&nbsp; nokta boyutu: ana şok M &nbsp;|&nbsp; soluk: N &lt; ${PB_SEQ_NSOFT} ya da uyarı &nbsp;|&nbsp; ${ok.length} dizi analiz edildi, ${rej.length} aday ölçütü sağlamadı` +
+  st.innerHTML = `<span style="color:#ec4899">●</span> p (%95 profil olabilirlik) &nbsp;|&nbsp; <span style="color:#06b6d4">●</span> b (±1,96·b/√N) &nbsp;|&nbsp; nokta boyutu: ana şok M &nbsp;|&nbsp; tablodaki satıra tıklayın → dizinin M, b ve p zaman grafiği &nbsp;|&nbsp; soluk: N &lt; ${PB_SEQ_NSOFT} ya da uyarı &nbsp;|&nbsp; ${ok.length} dizi analiz edildi, ${rej.length} aday ölçütü sağlamadı` +
     `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:4px;font-size:.68rem;"><tr style="color:#cbd5e1">${['Tarih', 'Enlem', 'Boylam', 'M', 'h (km)', 'N', 'Mc', 'p [%95]', 'b ± %95', 'KS p', 'Uyarı'].map(h => `<th ${td}>${h}</th>`).join('')}</tr>${rows.replace(/<td>/g, `<td ${td}>`)}</table>` +
     `<div style="color:#888;margin-top:3px;">Yöntem: dizi = GK74 (Gardner &amp; Knopoff 1974) zaman–mesafe penceresinde ana şoka doğrudan bağlanan artçılar (yalnız ileri pencere; ikincil artçılar kendi penceresini açmaz). Tamlık her dizide ayrı belirlenir: Mc = maks. eğrilik + 0,2 (b(t) ile aynı); yalnız M ≥ Mc ve ana şoktan ${PB_SEQ_S} gün sonrası kullanılır (kısa süreli eksik kayıt). p: Omori–Utsu n(t) = K/(t+c)^p, Ogata (1983) en çok olabilirlik, [S, T] üzerinde; T = GK74 süresi ya da katalog sonu. b: Aki (1965). Asgari N = ${PB_SEQ_NMIN}. Sınırlama: GK74 penceresi aynı alandaki arka plan depremlerini de içerir; sabit hızlı bu katkı uzun pencerelerde bozunmayı yavaşlatır ve p'yi düşük tahmin ettirebilir (sentetik testte ≈ 0,05–0,1). Ávila-Barrientos vd. (2015) p'yi ZMAP en küçük kareleriyle ve Kagan (2002) yarıçapıyla hesaplar; burada yöntem farklıdır, değerler doğrudan karşılaştırılmamalıdır. p bir dizi parametresidir; kayan pencere (Öncel &amp; Wilson 2007) yalnız b(t) için kullanılır. Büyüklükler panelin seçili dönüşümüyle (${MAG_CONVERSIONS[mcConversionMode].label}).</div>`;
   window.lastPBSeq = { n: ok.length, rejected: rej.length, S: PB_SEQ_S, nmin: PB_SEQ_NMIN, seq: ok.map(s => ({ t0: s.t0, M: s.M, N: s.N, Mc: s.Mc, p: s.p, ciP: s.ciP, b: s.b, bErr: s.bErr, ks: s.ks.pvalue, flags: s.flags })) };
+}
+
+// ── Artçı Dizisi: M, b ve p (zaman) — dizi içi kayan pencere (2026-10-12) ──────────────────────────
+// TM-02 (deneysel). Öncel & Wilson (2007) b(t) pencerelemesinin dizi içi uyarlaması: seçilen tek dizinin (GK74)
+// M ≥ Mc artçıları zamana göre sıralanır; N olaylık pencereler (N ∈ PBW_CHOICES, varsayılan 500) normal adımda N/10,
+// isteğe bağlı ince adımda N/100 olay kaydırılır; her pencerede b (Aki 1965, ±1,96·b/√N) hesaplanır.
+// Tamlık denetimi (pencere b'si gizlenir): (1) pencere Mc'si (pencere süresindeki TÜM artçılardan) > dizi Mc'si, ya da
+// (2) pencerenin 100 olaylık alt bloklarından birinin Mc'si > dizi Mc + 0,2. 2026-10-12 deneyi (5 senaryo × 10 tohum,
+// N = 100–1000): (1)'e 0,1 tolerans ya da yalnız (2) yanlış alarmı düşürdü ama kısa kesintileri yakalamayı azalttı;
+// önceden belirlenen ölçüt karşılanmadığı için denetim değiştirilmedi.
+// p: pencere başına p(t) YOK (gerçek dizilerde güvenilir değer üretmedi); pbModelSummary dizinin tam dönemi için tek
+// Omori–Utsu uyumu verir. Uyumun başlangıcı seçilen N'den bağımsızdır (pbModelStart).
+// Varsayılan N = 500 gerekçesi (sentetik test): pencere başına p'nin %95 aralık genişliği N = 100'de 1,3–2,4, 500'de ≈ 0,27.
+const PBW_CHOICES = [100, 200, 300, 500, 1000], PBW_SPAN = 3;
+const PBW_SUB = 100;   // tamlık denetiminin sabit çözünürlüğü (olay); N = 100'de pencerenin kendisi
+// Alt blok toleransı: 100 olaylık blokta maks. eğrilik Mc'si gürültülüdür. Sentetik kalibrasyon (2026-10-12, 3 tohum):
+// tol 0 → tam dizide pencerelerin %70–100'ü yanlışlıkla gizlendi; tol 0,2 → tam dizide 0 yanlış alarm, eksik kayıtlı
+// dizide erken pencereler yakalandı (gösterilen ilk b 0,93–1,03, gerçek 1,0).
+const PBW_SUB_TOL = 0.2;
+// Panel sürüm etiketi (TM-01 = mevcut yayındaki paneller; TM-02 = bu deneysel artçı dizisi paneli; TM-03 = gelecekte pencere başına p(t))
+const TM_VERSION = 'TM-02', TM_VERSION_DATE = '2026-10-12';
+let pbwN = 500;
+let pbwFine = false;   // isteğe bağlı ince adım (N/100): yalnız zamanlamayı ayrıntılı gösterir, bağımsız bilgi eklemez
+function pbWindows(rec, N = pbwN, fine = pbwFine) {
+  const PBW_N = N, PBW_STEP = Math.max(1, Math.round(N / (fine ? 100 : 10)));
+  const ev = rec.sel || [], n = ev.length, out = [];
+  for (let i = 0; i + PBW_N <= n; i += PBW_STEP) {
+    const w = ev.slice(i, i + PBW_N), tw = w.map(x => x.t);
+    const r = { i, tFirst: tw[0], tLast: tw[PBW_N - 1], tMid: tw[Math.floor(PBW_N / 2)], span: tw[PBW_N - 1] / tw[0], why: [] };
+    // Pencere Mc'si, pencerenin zaman aralığındaki TÜM artçılardan (Mc altı dahil) hesaplanır; yalnız M ≥ Mc olaylardan
+    // hesaplansaydı kesik dağılımın tepe noktası her zaman dizi Mc'si olur ve +0,2 ile her pencere 'eksik' görünürdü.
+    r.McW = computeMc(rec.all.filter(x => x.t >= tw[0] && x.t <= tw[PBW_N - 1]).map(x => ({ mag: x.m })));
+    // Sabit çözünürlüklü tamlık denetimi (2026-10-12): büyük pencere (ör. N = 1000) kısa bir eksik kayıt dönemini uzun
+    // tam bir dönemle karıştırıp pencere Mc'sini dizi Mc'sine indirebilir (sentetik testte ilk pencere b = 0,71–0,75,
+    // gerçek 1,0, işaretsiz). Pencere zaman sırasına göre PBW_SUB olaylık alt bloklara bölünür; her bloğun Mc'si kendi
+    // süresindeki tüm artçılardan hesaplanır; herhangi biri dizi Mc'sini aşarsa pencere eksik kayıtlı sayılır.
+    r.McSub = null;
+    for (let k = 0; k + PBW_SUB <= PBW_N; k += PBW_SUB) {
+      const m = computeMc(rec.all.filter(x => x.t >= tw[k] && x.t <= tw[k + PBW_SUB - 1]).map(x => ({ mag: x.m })));
+      if (m !== null && (r.McSub === null || m > r.McSub)) r.McSub = m;
+    }
+    const incWin = r.McW !== null && r.McW > rec.Mc + 1e-9, incSub = r.McSub !== null && r.McSub > rec.Mc + PBW_SUB_TOL + 1e-9;
+    const incomplete = incWin || incSub;
+    if (incWin) r.why.push(`pencere Mc = ${r.McW.toFixed(1)} > dizi Mc = ${rec.Mc.toFixed(1)} (eksik kayıt)`);
+    else if (incSub) r.why.push(`alt blok (${PBW_SUB} olay) Mc = ${r.McSub.toFixed(1)} ≥ dizi Mc + ${PBW_SUB_TOL} = ${(rec.Mc + PBW_SUB_TOL).toFixed(1)} (pencerenin bir kısmında eksik kayıt)`);
+    r.b = computeBvalue(w.map(x => x.m), rec.Mc); r.bErr = bConfidence95(r.b, PBW_N);
+    r.bOk = !incomplete && r.b != null;
+    r.N = PBW_N; r.step = PBW_STEP;   // 2026-10-12: pencere başına p kaldırıldı (gerçek dizilerde güvenilir değer üretmedi); p model özetine bakınız
+    out.push(r);
+  }
+  return out;
+}
+// p model özeti (2026-10-12): dizi içi p(t) iki gerçek dizide (Pazarcık 2023, Flores 2026) güvenilir pencere üretemedi;
+// yerine dizinin TAM dönemi (ilk tam pencereden sonrası) için tek Omori–Utsu uyumu ve uyum tanısı gösterilir.
+// Karar: c üst sınırda, p aralığı açık ya da KS p < 0,05 ise "uyum yetersiz" — p değeri sonuç gibi sunulmaz.
+// Uyum başlangıcı (2026-10-12, Bulgu 2): kullanıcının seçtiği N'den BAĞIMSIZ, sabit çözünürlükte (PBW_SUB = 100 olaylık
+// pencere, adım 10) b(t) ile AYNI tamlık denetimi; ilk geçen pencerenin ilk olayı. İlk pencere geçerse S = PB_SEQ_S.
+// Geçen pencere yoksa (ya da M ≥ Mc olay sayısı < 100 olduğundan denetim yapılamazsa) p tahmini yapılmaz.
+function pbModelStart(rec) {
+  const W = pbWindows(rec, PBW_SUB, false), i = W.findIndex(w => !w.why.length);   // why boş = iki tamlık ölçütünü de geçti
+  if (!W.length) return { S: null, why: `tamlık denetimi yapılamadı: M ≥ Mc olay sayısı ${(rec.sel || []).length} < ${PBW_SUB}` };
+  if (i < 0) return { S: null, why: `${PBW_SUB} olaylık ${W.length} pencerenin hiçbiri tamlık denetimini geçmedi (dizi boyunca eksik kayıt)` };
+  return { S: i === 0 ? PB_SEQ_S : W[i].tFirst, why: null, partial: i > 0 };
+}
+function pbModelSummary(rec) {
+  const st = pbModelStart(rec), S = st.S;
+  if (S === null) return { ok: false, S: null, N: 0, reasons: [`p tahmini yapılmadı — ${st.why}`], notes: [] };
+  const t = (rec.sel || []).map(x => x.t).filter(x => x >= S && x <= rec.T);
+  if (t.length < PB_SEQ_NMIN) return { ok: false, S, N: t.length, reasons: [`p tahmini yapılmadı — tam dönemde N = ${t.length} < ${PB_SEQ_NMIN}`], notes: [] };
+  const f = omoriFit(t, S, rec.T), c = Math.exp(f.lc), K = Math.exp(omoriProfNll(f.lc, f.p, t, S, rec.T).lK);
+  const grid = []; for (let v = OMORI_P_MIN; v <= OMORI_P_MAX + 1e-9; v += 0.02) grid.push(+v.toFixed(2));
+  const ci = omoriProfileCI(t, S, rec.T, 'p', f.nll, grid), ks = omoriKS(t, S, rec.T, K, c, f.p);
+  const reasons = [];
+  if (c >= OMORI_C_MAX * 0.95) reasons.push(`c üst sınırda (${OMORI_C_MAX} gün): tek Omori eğrisi bozunmayı açıklayamıyor`);
+  if (ci.openLo || ci.openHi) reasons.push('p %95 aralığı arama sınırına açık');
+  if (ks.pvalue < 0.05) reasons.push(`KS p = ${ks.pvalue.toFixed(3)} < 0,05: model uyumu reddedildi`);
+  const notes = []; if (c <= OMORI_C_MIN * 1.05) notes.push('c belirlenemedi (başlangıç kesmesinden küçük)');
+  if (c >= 0.3 * S && c < OMORI_C_MAX * 0.95) notes.push(`⚠ c (${c.toPrecision(2)} g) uyum başlangıcının (${S.toPrecision(2)} g) %30'undan büyük: p ile c güçlü bağımlı, p ağırlıkla geç dönemi temsil eder`);
+  return { ok: reasons.length === 0, S, N: t.length, p: f.p, c, K, ci, ks: ks.pvalue, reasons, notes, partial: !!st.partial };
+}
+function pbSeqSvg(rec, wins) {
+  const PBW_N = wins.length ? wins[0].N : pbwN;
+  const W = 660, H = 520, PAD_L = 40, PAD_R = 14, plotW = W - PAD_L - PAD_R;
+  const S1 = { y: 10, h: 130 }, S2 = { y: 170, h: 145 }, S3 = { y: 345, h: 145 }, XT = 508;
+  const ts = rec.all.map(x => x.t).filter(t => t > 0), lmin = Math.log10(Math.max(Math.min(...ts), 1e-4)), lmax = Math.log10(Math.max(...ts, rec.T));
+  const l0 = Math.floor(lmin * 2) / 2, l1 = Math.ceil(lmax * 2) / 2, x = t => PAD_L + (Math.log10(Math.max(t, 1e-6)) - l0) / (l1 - l0) * plotW;
+  const lin = (S, lo, hi) => v => S.y + S.h - (v - lo) / (hi - lo) * S.h;
+  const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  let g = '';
+  // x ızgarası (ondalık)
+  for (let k = Math.ceil(l0); k <= Math.floor(l1); k++) { const xc = x(Math.pow(10, k)).toFixed(1);
+    g += `<line x1="${xc}" y1="${S1.y}" x2="${xc}" y2="${S3.y + S3.h}" stroke="#2a2a2a" stroke-width="0.5"/>`;
+    g += `<text x="${xc}" y="${XT}" fill="#888" font-size="9" text-anchor="middle">${k >= 0 ? Math.pow(10, k).toLocaleString('tr-TR') : String(Math.pow(10, k)).replace('.', ',')}</text>`; }
+  g += `<text x="${PAD_L + plotW / 2}" y="${XT + 11}" fill="#888" font-size="9" text-anchor="middle">Ana şoktan geçen süre (gün, log)</text>`;
+  const frame = (S, lab) => { g += `<line x1="${PAD_L}" y1="${S.y + S.h}" x2="${W - PAD_R}" y2="${S.y + S.h}" stroke="#555" stroke-width="1"/><line x1="${PAD_L}" y1="${S.y}" x2="${PAD_L}" y2="${S.y + S.h}" stroke="#555" stroke-width="1"/>`;
+    g += `<text x="12" y="${S.y + S.h / 2}" fill="#888" font-size="9" text-anchor="middle" transform="rotate(-90 12 ${S.y + S.h / 2})">${lab}</text>`; };
+  const yticks = (S, lo, hi, step, y) => { for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) g += `<line x1="${PAD_L}" y1="${y(v).toFixed(1)}" x2="${W - PAD_R}" y2="${y(v).toFixed(1)}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${PAD_L - 6}" y="${(y(v) + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${v.toFixed(step < 1 ? 1 : 0)}</text>`; };
+  // 1) M–t
+  const ms = rec.all.map(x => x.m), mLo = Math.floor(Math.min(...ms, rec.Mc) - 0.2), mHi = Math.ceil(Math.max(...ms) + 0.2), yM = lin(S1, mLo, mHi);
+  yticks(S1, mLo, mHi, mHi - mLo > 4 ? 1 : 0.5, yM);
+  rec.all.forEach(p => { const used = p.m >= rec.Mc - 1e-9 && p.t > PB_SEQ_S && p.t <= rec.T;
+    g += `<circle cx="${x(p.t).toFixed(1)}" cy="${yM(p.m).toFixed(1)}" r="1.6" fill="${used ? '#f59e0b' : '#6b7280'}" fill-opacity="${used ? 0.7 : 0.35}"/>`; });
+  g += `<line x1="${PAD_L}" y1="${yM(rec.Mc).toFixed(1)}" x2="${W - PAD_R}" y2="${yM(rec.Mc).toFixed(1)}" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3"/><text x="${W - PAD_R - 2}" y="${(yM(rec.Mc) - 3).toFixed(1)}" fill="#06b6d4" font-size="8" text-anchor="end">dizi Mc = ${rec.Mc.toFixed(1)}</text>`;
+  g += `<line x1="${x(PB_SEQ_S).toFixed(1)}" y1="${S1.y}" x2="${x(PB_SEQ_S).toFixed(1)}" y2="${S1.y + S1.h}" stroke="#a78bfa" stroke-width="0.8" stroke-dasharray="1,2"><title>S = ${PB_SEQ_S} gün başlangıç kesmesi</title></line>`;
+  frame(S1, 'M');
+  // 2) b(t), 3) p(t)
+  const strip = (S, key, okKey, loF, hiF, col, lab, ref) => {
+    const okW = wins.filter(w => w[okKey]);
+    const vals = okW.flatMap(w => [loF(w), hiF(w)]).filter(Number.isFinite);
+    const lo = Math.floor(Math.min(0.6, ...vals) * 5) / 5, hi = Math.ceil(Math.max(1.4, ...vals) * 5) / 5, y = lin(S, lo, hi);
+    yticks(S, lo, hi, hi - lo > 1.6 ? 0.4 : 0.2, y);
+    g += `<line x1="${PAD_L}" y1="${y(ref).toFixed(1)}" x2="${W - PAD_R}" y2="${y(ref).toFixed(1)}" stroke="#666" stroke-width="1" stroke-dasharray="2,3"/>`;
+    let seg = [];
+    const flush = () => { if (seg.length > 1) g += `<polyline points="${seg.join(' ')}" fill="none" stroke="${col}" stroke-width="1.6" stroke-opacity="0.9"/>`; seg = []; };
+    if (wins.length && wins[0].step < wins[0].N / 10 - 1e-9) {
+      // İnce adım: nokta ve hata çubuğu yerine çizgi + %95 bant; gizlenen pencereler alt kenarda gri şerit
+      let run = [];
+      const flushBand = () => { if (run.length > 1) {
+          const up = run.map(w => `${x(w.tMid).toFixed(1)},${y(hiF(w)).toFixed(1)}`), dn = run.slice().reverse().map(w => `${x(w.tMid).toFixed(1)},${y(loF(w)).toFixed(1)}`);
+          g += `<polygon points="${up.concat(dn).join(' ')}" fill="${col}" fill-opacity="0.18" stroke="none"/>`;
+          g += `<polyline points="${run.map(w => `${x(w.tMid).toFixed(1)},${y(w[key]).toFixed(1)}`).join(' ')}" fill="none" stroke="${col}" stroke-width="1.6"/>`; }
+        run = []; };
+      wins.forEach(w => { if (w[okKey]) run.push(w); else { flushBand(); const xc = x(w.tMid).toFixed(1); g += `<line x1="${xc}" y1="${S.y + S.h - 4}" x2="${xc}" y2="${S.y + S.h}" stroke="#6b7280" stroke-width="0.6" stroke-opacity="0.6"/>`; } });
+      flushBand(); frame(S, lab); return;
+    }
+    wins.forEach(w => {
+      const xc = x(w.tMid).toFixed(1);
+      if (!w[okKey]) { flush(); g += `<line x1="${xc}" y1="${S.y + S.h - 5}" x2="${xc}" y2="${S.y + S.h}" stroke="#6b7280" stroke-width="1"><title>Değer çizilmedi: ${w.why.join('; ')}</title></line>`; return; }
+      g += `<line x1="${xc}" y1="${y(loF(w)).toFixed(1)}" x2="${xc}" y2="${y(hiF(w)).toFixed(1)}" stroke="${col}" stroke-width="0.8" stroke-opacity="0.45"/>`;
+      g += `<circle cx="${xc}" cy="${y(w[key]).toFixed(1)}" r="2" fill="${col}"><title>${lab} = ${w[key].toFixed(2)} [${loF(w).toFixed(2)}–${hiF(w).toFixed(2)}] · olay ${w.i + 1}–${w.i + PBW_N} · ${w.tFirst.toPrecision(3)}–${w.tLast.toPrecision(3)} gün</title></circle>`;
+      seg.push(`${xc},${y(w[key]).toFixed(1)}`);
+    });
+    flush(); frame(S, lab);
+  };
+  strip(S2, 'b', 'bOk', w => w.b - w.bErr, w => w.b + w.bErr, '#06b6d4', 'b', 1.0);
+  // Pencere kurulamadıysa ya da hiçbiri gösterilemiyorsa nedeni grafikte de yazılır (PNG'ye de geçer)
+  const bMsg = !wins.length ? `b(t) pencereleri kurulamadı: M ≥ Mc olay sayısı ${(rec.sel || []).length} < N = ${PBW_N}`
+    : !wins.some(w => w.bOk) ? `${wins.length} pencerenin hiçbiri tamlık denetimini geçmedi; b(t) gösterilmiyor` : null;
+  if (bMsg) g += `<text x="${PAD_L + plotW / 2}" y="${S2.y + S2.h * 0.3}" fill="#f59e0b" font-size="10" text-anchor="middle">${esc(bMsg)}</text>`;
+  // 3) Artçı hızı (M ≥ Mc, olay/gün; log–log) ve tam dönem Omori–Utsu model eğrisi
+  const mod = rec.model, ev = rec.sel || [], bins = [], per = 6;
+  for (let k = Math.floor(Math.log10(PB_SEQ_S) * per); k < Math.ceil(Math.log10(rec.T) * per); k++) {
+    const a1 = Math.max(Math.pow(10, k / per), PB_SEQ_S), a2 = Math.min(Math.pow(10, (k + 1) / per), rec.T); if (!(a2 > a1)) continue;
+    const n = ev.filter(x => x.t > a1 && x.t <= a2).length; if (n > 0) bins.push({ a1, a2, n, r: n / (a2 - a1) }); }
+  const lr = bins.map(q => Math.log10(q.r)), mr = [];
+  if (mod && mod.K) for (let i = 0; i <= 60; i++) { const tt = Math.pow(10, Math.log10(mod.S) + (Math.log10(rec.T) - Math.log10(mod.S)) * i / 60); mr.push([tt, Math.log10(mod.K / Math.pow(tt + mod.c, mod.p))]); }
+  const allL = lr.concat(mr.map(q => q[1])).filter(Number.isFinite);
+  const rLo = Math.floor(Math.min(...allL, 0)), rHi = Math.ceil(Math.max(...allL, 1)), yR = lin(S3, rLo, rHi);
+  for (let v = rLo; v <= rHi; v++) g += `<line x1="${PAD_L}" y1="${yR(v).toFixed(1)}" x2="${W - PAD_R}" y2="${yR(v).toFixed(1)}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${PAD_L - 6}" y="${(yR(v) + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${v >= 0 ? Math.pow(10, v).toLocaleString('tr-TR') : String(Math.pow(10, v)).replace('.', ',')}</text>`;
+  bins.forEach(q => { const xm = x(Math.sqrt(q.a1 * q.a2)).toFixed(1), inC = mod && mod.S != null && q.a1 >= mod.S - 1e-9;
+    g += `<circle cx="${xm}" cy="${yR(Math.log10(q.r)).toFixed(1)}" r="2.4" fill="${inC ? '#f59e0b' : '#6b7280'}"><title>${q.a1.toPrecision(2)}–${q.a2.toPrecision(2)} gün: ${q.n} olay, ${q.r.toPrecision(3)} olay/gün${inC ? '' : ' (eksik kayıt dönemi; uyuma girmedi)'}</title></circle>`; });
+  if (mr.length) g += `<polyline points="${mr.map(q => `${x(q[0]).toFixed(1)},${yR(q[1]).toFixed(1)}`).join(' ')}" fill="none" stroke="${mod.ok ? '#ec4899' : '#9ca3af'}" stroke-width="1.6" stroke-dasharray="${mod.ok ? '' : '5,3'}"/>`;
+  if (mod) g += `<text x="${W - PAD_R - 4}" y="${S3.y + 12}" fill="${mod.ok ? '#ec4899' : '#f59e0b'}" font-size="9" text-anchor="end">${mod.p != null ? `Omori–Utsu: p = ${mod.p.toFixed(2)} [${mod.ci.lo != null ? mod.ci.lo.toFixed(2) : '—'}–${mod.ci.hi != null ? mod.ci.hi.toFixed(2) : '—'}], c = ${mod.c.toPrecision(2)} g, KS p = ${mod.ks.toFixed(3)}` : 'Omori–Utsu uyumu yapılamadı'}</text><text x="${W - PAD_R - 4}" y="${S3.y + 24}" fill="${mod.ok ? '#9ab0c5' : '#f59e0b'}" font-size="9" text-anchor="end">${mod.ok ? 'uyum yeterli' : mod.p == null ? esc((mod.reasons[0] || '').replace(/^p tahmini yapılmadı — /, '')) : '⚠ uyum yetersiz — p yorumlanmamalı'}</text>`;
+  frame(S3, 'hız (olay/gün)');
+  return { W, H, g };
+}
+// Dizi kimliği (2026-10-12, Bulgu 5): panel açılırken dizi nesnesi saklanır; N, ince adım ve PNG denetimleri sıra
+// numarasıyla değil bu nesneyle çalışır. Tablo yeniden çizilip sıralama değişse de panel ve PNG aynı diziye bağlı kalır.
+function openPBSeqPanel(idx) {
+  const rec = idx == null ? window.__pbSeqRec : (window.__pbOk || [])[idx]; if (!rec) return;
+  window.__pbSeqRec = rec;
+  const curIdx = (window.__pbOk || []).indexOf(rec);
+  const PBW_N = pbwN, PBW_STEP = Math.max(1, Math.round(pbwN / (pbwFine ? 100 : 10)));
+  const wins = pbWindows(rec, PBW_N, pbwFine), ovl = Math.round(100 * (1 - PBW_STEP / PBW_N));
+  rec.model = pbModelSummary(rec);
+  const { W, H, g } = pbSeqSvg(rec, wins), mod = rec.model;
+  let el = document.getElementById('pbSeqPanel');
+  if (!el) { el = document.createElement('div'); el.id = 'pbSeqPanel';
+    el.style.cssText = 'position:fixed;z-index:3100;top:50px;left:50%;transform:translateX(-50%);width:min(720px,calc(100vw - 24px));max-height:calc(100vh - 70px);overflow:auto;background:rgba(10,14,21,.98);border:1px solid #334;border-radius:8px;padding:10px 12px;color:#ddd;font-size:.75rem;box-shadow:0 8px 30px rgba(0,0,0,.6)';
+    document.body.appendChild(el); }
+  const d = new Date(rec.t0).toISOString().slice(0, 10), nB = wins.filter(w => w.bOk).length;
+  const nInc = wins.filter(w => w.why.some(t => t.includes('eksik'))).length;
+  const head = `${TM_VERSION} | Artçı Dizisi Analizi 🧪 deneysel · M${rec.M.toFixed(1)} · ${d} · ${(+rec.ms.lat).toFixed(2)}°, ${(+rec.ms.lon).toFixed(2)}°`;
+  const f2 = v => v == null || !isFinite(v) ? '—' : v.toFixed(2);
+  const modTxt = mod.p == null ? `Omori–Utsu uyumu yapılamadı (${mod.reasons.join('; ')}).`
+    : `Omori–Utsu (tam dönem, t ≥ ${mod.S.toPrecision(2)} gün, N = ${mod.N}): p = <b>${f2(mod.p)}</b> [%95: ${f2(mod.ci.lo)}–${f2(mod.ci.hi)}], c = ${mod.c.toPrecision(2)} gün, KS p = ${mod.ks.toFixed(3)} — ` +
+      (mod.ok ? '<span style="color:#9ab0c5">uyum yeterli</span>' : `<span style="color:#f59e0b">⚠ uyum yetersiz: ${mod.reasons.join('; ')}. p değeri sonuç olarak yorumlanmamalıdır.</span>`) + (mod.notes.length ? ` <span style="color:#888">(${mod.notes.join('; ')})</span>` : '');
+  el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><b style="color:#e2e8f0;font-size:.82rem;">${head}</b><span style="white-space:nowrap">
+      <label style="color:#9ab0c5;">N <select onchange="pbwN=+this.value;openPBSeqPanel()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.9em;">${PBW_CHOICES.map(v => `<option value="${v}"${v === PBW_N ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+      <label style="color:#9ab0c5;" title="İnce adım (N/100): b(t) çizgi ve %95 bant olarak gösterilir. Değişimin zamanlamasını ayrıntılı görmek içindir; pencereler %99 örtüşür, bağımsız bilgi ve istatistiksel kesinlik ARTMAZ. Yorum uyarısı: eğrinin bir eşiği ilk geçtiği zaman, örtüşen pencerelerden türetilmiş bir tahmindir; fiziksel değişimin başlangıç zamanı değildir. Belirsizliği pencere büyüklüğüne, olay örneklemesine ve istatistiksel değişkenliğe bağlıdır. Küçük pencerede rastgele dalgalanma eşiği gerçek değişimden çok önce aşabilir; ince adım aynı dalgalanmayı daha sık örneklediği için bu aşımları daha görünür kılar (sentetik testte N = 100, ±0,22: 10. gündeki b değişiminde eşik, 3 tohumun 2'sinde hem kaba hem ince adımda 0,1. günde geçildi)."><input type="checkbox" ${pbwFine ? 'checked' : ''} onchange="pbwFine=this.checked;openPBSeqPanel()"> ince adım</label>
+      <button class="tmFullscreenBtn" onclick="exportPBSeqPNG()">PNG (1600 px)</button> <button class="tmFullscreenBtn" onclick="document.getElementById('pbSeqPanel').remove()">✕</button></span></div>
+    <svg id="pbSeqSvg" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto;margin-top:6px">${g}</svg>
+    <div style="margin-top:4px;color:#cbd5e1;">b(t): ${wins.length ? `${wins.length} pencere (N = ${PBW_N}, adım ${PBW_STEP}${pbwFine ? ' — ince adım' : ''}; ardışık pencereler %${ovl} örtüşür), gösterilen ${nB}, eksik kayıt nedeniyle gizlenen ${nInc}` : `M ≥ Mc olay sayısı ${rec.sel.length} < N = ${PBW_N}: b(t) pencereleri kurulamadı`} · dizi: N = ${rec.N}, Mc = ${rec.Mc.toFixed(1)}</div>
+    <div style="margin-top:3px;color:#cbd5e1;">p modeli: ${modTxt}</div>${curIdx < 0 ? `
+    <div style="margin-top:3px;color:#f59e0b;">⚠ Dizi tablosu bu panel açıldıktan sonra yenilendi; panel ve PNG, açıldığı andaki dizi verisini gösterir. Güncel sonuç için tablodan yeniden açın.</div>` : ''}
+    <div style="margin-top:3px;color:#9ab0c5;">Kayıt: ${TM_VERSION} (${TM_VERSION_DATE}) · N = ${PBW_N}, adım = ${PBW_STEP}${pbwFine ? ' (ince, N/100)' : ' (N/10)'} · dizi Mc = ${rec.Mc.toFixed(1)} · dizi tanımı: GK74 (Gardner &amp; Knopoff 1974), ana şok ${new Date(rec.t0).toISOString().replace('T', ' ').slice(0, 19)} UTC · başlangıç kesmesi S = ${PB_SEQ_S} gün · büyüklük: ${MAG_CONVERSIONS[mcConversionMode].label}</div>
+    <div style="margin-top:3px;color:#888;">Yöntem — b(t): Öncel &amp; Wilson (2007) pencerelemesinin dizi içi uyarlaması; N olaylık pencere, adım N/10 (varsayılan; Öncel &amp; Wilson ve ana b(t) paneliyle aynı oran) ya da isteğe bağlı ince adım N/100 (çizgi + %95 bant); Aki (1965), ±1,96·b/√N. Pencereler örtüşür ve tahminler bağımsız değildir; ince adım değişimin zamanlamasını ayrıntılı gösterir ama yeni bağımsız bilgi ya da daha yüksek kesinlik sağlamaz. Yorum uyarısı: eşiğin ilk geçildiği zaman örtüşen pencerelerden türetilmiş bir tahmindir, fiziksel değişimin başlangıç zamanı değildir; ince adımda rastgele eşik aşımları daha sık görülür. Değişim zamanı için istatistiksel test (ör. iki dönem b farkı, Utsu 1992) gerekir. Gri çentik = pencere gizlendi: pencere Mc'si (pencere süresindeki tüm artçılardan) dizi Mc'sini aşıyor ya da pencerenin 100 olaylık alt bloklarından birinin Mc'si dizi Mc'sini 0,2'den fazla aşıyor; alt blok denetimi N'den bağımsız olarak aynı çözünürlüktedir. Mc'nin dizi Mc'sine eşit çıkması eksiksizliği kanıtlamaz; özellikle büyük ana şoklardan hemen sonraki ilk pencereler ihtiyatla yorumlanmalıdır. <b>Tamlık denetiminin sınırlamaları:</b> alt blok tabanlı Mc kontrolü erken dönem eksik kayıtlarını sentetik testlerde %95–100 oranında yakalamıştır; dizinin ortasındaki kısa süreli tamlık kesintilerinde yakalama oranı yaklaşık %56–57'dir (2026-10-12, 10 tohum, N = 500 ve 1000). Bu nedenle bir pencerenin denetimden geçmesi, o pencerenin eksiksiz olduğunu garanti etmez. Tersine, eksiksiz sentetik katalogda da pencerelerin bir kısmı gizlenir (yanlış alarm): N = 100'de ≈ %21, N = 200'de ≈ %10, N ≥ 300'de ≤ %6 (2026-10-12, 10 tohumlu sentetik test). Küçük pencerelerde boşluk her zaman eksik kayıt anlamına gelmez. Bu oranlar sentetik senaryolardaki ölçümlerdir; gerçek kataloglarda aynı oranların geçerli olacağı garanti edilemez. Özellikle katalog kapsamının veya büyüklük belirleme yönteminin zaman içinde değiştiği dizilerde b değerleri ihtiyatla yorumlanmalıdır. Hız şeridi: M ≥ Mc artçıların log-zaman kutularındaki hızı (olay/gün; gri = eksik kayıt dönemi, uyuma girmez) ve tam dönem için tek Omori–Utsu eğrisi (Ogata 1983 en çok olabilirlik, %95 profil aralığı, Ogata 1988 KS testi). Uyumun başlangıcı seçilen N'den bağımsızdır: 100 olaylık pencerelerle (adım 10) aynı tamlık denetimi uygulanır ve ilk geçen pencerenin başı alınır; geçen pencere yoksa ya da M ≥ Mc olay sayısı 100'den azsa p tahmini yapılmaz. Başlangıçtan sonraki dönemde tamlık yeniden denetlenmez: dizi ortasındaki kısa kesintiler (b(t)'de gri çentik) uyuma girer ve p'yi etkileyebilir. Pencere başına p(t) bu sürümde YOK: Pazarcık 2023 ve Flores 2026 testlerinde güvenilir pencere üretmedi. Uyum yetersizse (c üst sınırda, aralık açık ya da KS p &lt; 0,05) eğri kesikli gri çizilir; bu genellikle ikinci ana şok, ikincil diziler ya da değişken katalog tamlığına işaret eder. Arka plan hızı modellenmez. Dizi tanımı GK74'tür; M ≳ 7 depremlerde dizi parçalanabilir.</div>`;
+  window.lastPBSeqWin = { idx: curIdx, N: PBW_N, rec: { M: rec.M, t0: rec.t0, N: rec.N, Mc: rec.Mc }, model: mod, wins };
+}
+async function exportPBSeqPNG() {
+  const svgEl = document.getElementById('pbSeqSvg'), rec = window.__pbSeqRec; if (!svgEl || !rec) return;
+  const W = 660, H = 571, SC = 1600 / W, d = new Date(rec.t0).toISOString().slice(0, 10);
+  const inner = svgToLight(svgEl.innerHTML.replace(/fill="#f59e0b"/g, 'fill="#b45309"').replace(/stroke="#ec4899"/g, 'stroke="#be185d"').replace(/fill="#ec4899"/g, 'fill="#be185d"').replace(/stroke="#06b6d4"/g, 'stroke="#0e7490"').replace(/fill="#06b6d4"/g, 'fill="#0e7490"').replace(/fill="#6b7280"/g, 'fill="#9ca3af"'));
+  const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const xml = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * SC}" height="${H * SC}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#ffffff"/>` +
+    `<text x="10" y="16" font-size="11" font-weight="700" fill="#111827" font-family="sans-serif">${esc(`${TM_VERSION} | Artçı Dizisi Analizi — M${rec.M.toFixed(1)}, ${d}, ${Math.abs(+rec.ms.lat).toFixed(2)}°${+rec.ms.lat < 0 ? 'G' : 'K'} ${Math.abs(+rec.ms.lon).toFixed(2)}°${+rec.ms.lon < 0 ? 'B' : 'D'}`)}</text>` +
+    `<text x="10" y="29" font-size="8" fill="#374151" font-family="sans-serif">${esc(`N = ${rec.N} (M ≥ Mc = ${rec.Mc.toFixed(1)}) · b(t): pencere ${pbwN} olay, adım ${Math.max(1, Math.round(pbwN / (pbwFine ? 100 : 10)))}${pbwFine ? ' (ince adım, %99 örtüşme)' : ' (N/10)'}, Aki (1965), ±1,96·b/√N`)}</text>` +
+    `<text x="10" y="40" font-size="8" fill="#374151" font-family="sans-serif">${esc(`p: tam dönem Omori–Utsu, Ogata (1983)${rec.model ? (rec.model.p == null ? ' — p tahmini yapılmadı' : !rec.model.ok ? ' — uyum yetersiz' : '') : ''} · dizi: GK74 · ${TM_VERSION} (${TM_VERSION_DATE}), EQ-Live deneysel`)}</text>` +
+    `<g transform="translate(0,45)" font-family="sans-serif">${inner}</g></svg>`;
+  const img = new Image(); img.onload = () => { const cv = document.createElement('canvas'); cv.width = W * SC; cv.height = H * SC; const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0);
+    cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${TM_VERSION}_Aftershock_Analysis_M${rec.M.toFixed(1)}_${d}_N${pbwN}${pbwFine ? '_fine' : ''}.png`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/png'); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
 }
 
 // ── Kümülatif Benioff gerinim ölçüsü (2026-10-11) ──────────────────────────────────────────────
