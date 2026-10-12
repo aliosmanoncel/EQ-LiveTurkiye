@@ -964,7 +964,8 @@
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn active" id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnTestimony" onclick="toggleLayer('testimony')" title="EMSC Testimonies · hissedilme raporları · seismicportal.eu/testimonies-ws · yeşil=az → mor=çok tanıklık">🗣️ Tanıklıklar</button>
-    <button class="tbtn"        id="btnTimeMag" onclick="toggleTimeMag()" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag</button>
+    <button class="tbtn"        id="btnTimeMag" onclick="toggleTimeMag()" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag (normal)</button>
+    <button class="tbtn"        id="btnBtWin" onclick="toggleBtWin()" title="Zaman–Magnitude, ince adım: Time-Mag (normal) ile aynı veri, aynı Mc ve aynı Öncel &amp; Wilson (2007) b(t) hesabı (N = 100); pencereler 10 yerine 1 olay kaydırılır">📈 Time-Mag (ince)</button>
     <button class="tbtn tr-only"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn tr-only"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
     <button class="tbtn tr-only"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
@@ -1167,13 +1168,8 @@
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
     <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
-      <div class="tmTitle" style="font-size:.78rem;">🔁 Artçı Dizisi Başına p ve b Değerleri <span style="color:#666;font-weight:400;">(Omori–Utsu, Ogata 1983 MLE · Aki 1965 b · GK74 dizileri; gösterim Ávila-Barrientos vd. 2015)</span></div>
-      <svg id="tmSvgPB" viewBox="0 0 660 300" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
-      <div class="tmStats" id="tmStatsPB">—</div>
-    </div>
-    <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
       <div class="tmTitle" style="font-size:.78rem;">⚡ Kümülatif Benioff Gerinim Ölçüsü Σ√E <span style="color:#666;font-weight:400;">(log E = 11,8 + 1,5M, erg; Gutenberg &amp; Richter 1956 — sabit eşik)</span></div>
-      <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (showTimeMag) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
+      <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
       <svg id="tmSvgBen" viewBox="0 0 660 210" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
       <div class="tmStats" id="tmStatsBen">—</div>
     </div>
@@ -1232,6 +1228,25 @@
     <div class="tmStats" id="tmStatsGR">—</div>
   </div>
   </div></div>
+</div>
+
+<!-- b(t) penceresi (2026-10-12): Time-Mag ile aynı veri, aynı Mc ve aynı Öncel & Wilson (2007) hesabı; adım seçilebilir
+     (1 = ince, 10 = normal). Artçı dizisi p/b bölümü ve TM-02 analizi Time-Mag'den buraya taşındı. -->
+<div class="tmPanel" id="btPanel" style="z-index:1003">
+  <div class="tmHead">
+    <span class="tmTitle">📈 Zaman–Magnitude Dağılımı — ince adım <span style="color:#666;font-weight:400;">(b(t): Öncel &amp; Wilson 2007, N=100 kayan pencere, adım=1 olay)</span></span>
+    <span><button class="tmClose" onclick="toggleBtWin()">✕</button></span>
+  </div>
+  <div class="tmMeta" id="btMeta">—</div>
+  <svg id="btSvgMT" viewBox="0 0 660 260" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:900px"></svg>
+  <div class="tmTitle" style="font-size:.78rem;margin-top:8px;" title="Pencere kaydırma adımı 1 olay: aynı N = 100 pencere, aynı Mc ve aynı hesap; örnekleme 10 kat sıklaşır. Ardışık pencereler %99 örtüşür; bağımsız bilgi ve istatistiksel kesinlik ARTMAZ, değişimin zamanlaması daha ayrıntılı görünür. Eğrinin bir eşiği ilk geçtiği an fiziksel değişimin başlangıç zamanı değildir.">📊 b-Değerinin Zaman İçindeki Değişimi — ince adım <span style="color:#666;font-weight:400;">(N=100, adım=1 olay; normal adım için Time-Mag (normal))</span></div>
+  <svg id="btSvg" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:900px"></svg>
+  <div class="tmStats" id="btStats">—</div>
+    <details style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
+      <summary class="tmTitle" style="font-size:.78rem;cursor:pointer;" title="Aç/kapat — tablodaki satıra tıklayınca TM-02 Artçı Dizisi Analizi açılır">🔁 Artçı Dizisi Başına p ve b Değerleri <span style="color:#666;font-weight:400;">(Omori–Utsu, Ogata 1983 MLE · Aki 1965 b · GK74 dizileri; gösterim Ávila-Barrientos vd. 2015)</span></summary>
+      <svg id="tmSvgPB" viewBox="0 0 660 300" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
+      <div class="tmStats" id="tmStatsPB">—</div>
+    </details>
 </div>
 
 <!-- STATUS -->
@@ -2061,6 +2076,7 @@ function runOmoriPanel() {
    ZAMAN–MAGNİTUDE DAĞILIMI (Time–Magnitude Distribution)
 ══════════════════════════════════════════ */
 let showTimeMag = false;
+let showBtWin = false;   // Time-Mag (ince) penceresi
 let lastBts = null;
 
 /* ── Magnitude Conversion Laboratory ──────────────────────────
@@ -2300,7 +2316,7 @@ function onTmTypeFilterChange() {
   if (o.md) url.searchParams.delete('xmd'); else url.searchParams.set('xmd', '1');
   if (o.mlLow) url.searchParams.delete('xmllow'); else url.searchParams.set('xmllow', '1');
   history.replaceState(null, '', url);
-  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
 }
 function restoreTmTypeFilterFromURL() {
   const p = new URLSearchParams(location.search);
@@ -2320,11 +2336,11 @@ function bWinTime(win, getT) { return getT(win[bTimeAnchor === 'end' ? win.lengt
 function onBAnchorChange() {
   const el = document.getElementById('bAnchorSel'); bTimeAnchor = el && el.value === 'end' ? 'end' : 'mid';
   try { const u = new URL(location.href); if (bTimeAnchor === 'end') u.searchParams.set('banchor', 'end'); else u.searchParams.delete('banchor'); history.replaceState(null, '', u); } catch (e) {}
-  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
 }
 function onTmConversionChange() {
   mcConversionMode = document.getElementById('tmConversionSel').value;
-  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
 }
 
 // evList'in KENDİSİNİ değiştirmez. Yalnızca applicable(e)==true olan
@@ -2416,8 +2432,8 @@ function bConfidence95(b, n) {
 
 // Kayan pencere b-değeri zaman serisi — Öncel & Wilson (2007, GJI, İzmit) §3.1 metodolojisi:
 // sabit N=100 olay pencere, adım=10 olay, Mc sabit/global (pencere başına değil)
-function computeBvalueTimeSeries(evList, Mc) {
-  const N_WIN = 100, STEP = 10;
+function computeBvalueTimeSeries(evList, Mc, step = 10) {
+  const N_WIN = 100, STEP = step;
   const sorted = [...evList].sort((a,b) => a.time - b.time)
     .filter(e => (e.mw ?? e.mag) >= Mc);
   if (sorted.length < N_WIN) return { series: [], N: sorted.length };
@@ -2485,9 +2501,12 @@ function renderSensTable(evList, Mc, cs) {
 }
 
 let tmSharedAxis = null; // { t0, t1 } — Zaman–Magnitude panelinin ekseni; b(t) ve Benioff bunu paylaşır
-function renderBvalueTS(evList, Mc, cs) {
-  const svgB   = document.getElementById('tmSvgB');
-  const statsB = document.getElementById('tmStatsB');
+// o: { svgId, statsId, step, store } — varsayılan Time-Mag (tmSvgB, adım 10, lastBts kaydı). b(t) penceresi (btPanel)
+// aynı fonksiyonu kendi öğeleri ve seçilen adımla çağırır; Time-Mag çıktısı değişmez (2026-10-12).
+function renderBvalueTS(evList, Mc, cs, o = {}) {
+  const STEPB = o.step || 10, STORE = o.store !== false;
+  const svgB   = document.getElementById(o.svgId || 'tmSvgB');
+  const statsB = document.getElementById(o.statsId || 'tmStatsB');
   svgB.setAttribute('viewBox', '0 0 660 350'); // Mc(t) şeridi yoksa varsayılan yükseklik
   if (Mc === null && !cs) {
     svgB.innerHTML = `<text x="330" y="70" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: N=${evList.length} (Mc hesaplanamadı, min. 10 olay gerekir)</text>`;
@@ -2496,8 +2515,8 @@ function renderBvalueTS(evList, Mc, cs) {
   }
   // Fit aralığı (2026-09-29): G-R ile AYNI karar (grFitRangeCurrent); karşılaştırma için eski seri de hesaplanır
   const btFit = cs ? grFitRangeCurrent() : null, btFitOn = !!(btFit && btFit.on);
-  const { series, N } = cs ? csBvalueTimeSeries(cs, btFit) : computeBvalueTimeSeries(evList, Mc);
-  const btAll = btFitOn ? csBvalueTimeSeries(cs, null) : null;
+  const { series, N } = cs ? csBvalueTimeSeries(cs, btFit, STEPB) : computeBvalueTimeSeries(evList, Mc, STEPB);
+  const btAll = btFitOn ? csBvalueTimeSeries(cs, null, STEPB) : null;
   // (b) Sabit-Mc duyarlılık serisi — yalnızca tamlık basamakları etkinken
   // (2026-09-27). Varsayılan Mc: dönemlerin max(basamak Mc, veri Mc).
   let fixed = null;
@@ -2507,7 +2526,7 @@ function renderBvalueTS(evList, Mc, cs) {
     const auto = Math.max(...cs.periods.map(p => Math.max(p.mc, p.mcData ?? p.mc)));
     const mcF = !isNaN(user) ? user : auto;
     const winEv = evList.filter(e => { const t = e.time.getTime(); return t >= cs.tStart && t <= cs.tEnd; });
-    const r = computeBvalueTimeSeries(winEv, mcF);
+    const r = computeBvalueTimeSeries(winEv, mcF, STEPB);
     // Zaman çözünürlüğü: 100 olaylık pencerenin medyan süresi. Yüksek sabit Mc
     // daha az olay → daha uzun pencere → kısa süreli b değişimleri yumuşar.
     // Gri serinin düz kalması bu durumda değişimi ÇÜRÜTMEZ (sentetik test:
@@ -2613,7 +2632,9 @@ function renderBvalueTS(evList, Mc, cs) {
   // seri (pts/dots/errBars) aynen kalır, bu yalnızca ÜSTÜNE eklenir.
   // 2026-10-11: pencere sayısı azsa 21 pencerelik ortalama serinin neredeyse tamamını kapsar ve kısa süreli
   // değişimleri silerdi (ör. 22 pencerede her nokta 11–21 pencerenin ortalaması). k = min(21, ~n/5, tek sayı, ≥3).
-  const TREND_WINDOW = series.length >= 105 ? 21 : Math.max(3, 2 * Math.round(series.length / 10) + 1), TREND_HALF = (TREND_WINDOW - 1) / 2;
+  // İnce adımda trend aynı ZAMAN ölçeğinde kalsın: pencere sayısı 10/adım katı (adım 10'da K = 1 → değişiklik yok)
+  const TREND_K = 10 / STEPB;
+  const TREND_WINDOW = series.length >= 105 * TREND_K ? 21 * TREND_K + (TREND_K % 2 === 0 ? 1 : 0) : Math.max(3, 2 * Math.round(series.length / 10) + 1), TREND_HALF = (TREND_WINDOW - 1) / 2;
   const trendPts = series.map((s, i) => {
     const lo = Math.max(0, i - (bTimeAnchor === 'end' ? TREND_WINDOW - 1 : TREND_HALF)), hi = bTimeAnchor === 'end' ? i : Math.min(series.length - 1, i + TREND_HALF);
     const slice = bs.slice(lo, hi + 1);
@@ -2692,7 +2713,7 @@ function renderBvalueTS(evList, Mc, cs) {
     ${band}
     ${errBars}
     <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="${useBand ? 0.5 : 0.8}" stroke-opacity="${useBand ? 0.25 : 0.4}"/>
-    ${dots}
+    ${STEPB === 1 ? '' : dots}
     ${fixedDots}
     ${fixedLine}
     ${trendLine}
@@ -2703,7 +2724,7 @@ function renderBvalueTS(evList, Mc, cs) {
 
   const bLast = series[series.length-1];
   const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, err: btAll.series[btAll.series.length - 1].err, nWin: btAll.series.length, N: btAll.N } : null;
-  lastBts = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
+  if (STORE) lastBts = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
               fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, trendK: TREND_WINDOW, anchor: bTimeAnchor };
   const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
   // Lejant iki seviyeye ayrıldı -- "grafik açıklaması" (renk/sembol anahtarı)
@@ -2711,7 +2732,7 @@ function renderBvalueTS(evList, Mc, cs) {
   // geri bildirimi). Sayılar/mantık aynı, yalnızca sunum iki satıra bölündü.
   statsB.innerHTML =
     `<div style="font-size:.85em;color:#aaa">` +
-      `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; ` +
+      (STEPB === 1 ? `<span style="color:#06b6d4">─</span> Ham b-değeri (ince çizgi) &nbsp; ` : `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; `) +
       (useBand ? `<span style="color:#06b6d4;opacity:.6">▮</span> %95 yaklaşık güven bandı (±1.96·b/√n, pencere başına) &nbsp; ` : `<span style="color:#06b6d4">│</span> %95 güven aralığı &nbsp; `) +
       (fixed ? `<span style="color:#d1d5db">┄</span> Sabit Mc=${fixed.mc.toFixed(1)} (${fixed.src}) hareketli ortalama &nbsp; ` : '') +
       `<span style="color:#ec4899">━</span> Hareketli ortalama (${TREND_WINDOW} pencere${bTimeAnchor === 'end' ? ', geriye dönük; noktalar pencere sonunda' : ''}) &nbsp; ` +
@@ -2719,7 +2740,7 @@ function renderBvalueTS(evList, Mc, cs) {
     `</div>` +
     `<div style="margin-top:2px">` +
       `b ort. = <b>${bAvg.toFixed(2)}</b> &nbsp;|&nbsp; b son = <b>${bLast.b.toFixed(2)}${lastErrStr}</b> ` +
-      `<span style="color:#888;font-size:.85em">(%95, n=100)</span> &nbsp;|&nbsp; ${series.length} pencere (N=${N})` +
+      `<span style="color:#888;font-size:.85em">(%95, n=100)</span> &nbsp;|&nbsp; ${series.length} pencere (N=${N}${STEPB === 1 ? ', adım 1 — ince adım: ardışık pencereler %99 örtüşür, bağımsız bilgi artmaz' : ''})` +
       (cs ? (btFitOn
         ? ` &nbsp;|&nbsp; <span style="color:#f5a623">Fit aralığı M ${btFit.lo ?? 'Mc'}–${btFit.hi ?? '∞'}: olay başına eşik max(Mc_i, M_min)${btFit.hi !== null ? ', M &lt; M_max, çift kesik Aki–Utsu (hata ±1,96·SE, Fisher)' : ' (Aki 1965 genelleştirmesi)'}</span>` +
           (allS ? ` &nbsp;|&nbsp; <span style="color:#94a3b8">karşılaştırma — tüm sınıflar: b ort. = ${allS.bAvg.toFixed(2)}, b son = ${allS.bLast.toFixed(2)}${allS.err !== null ? ' ± ' + allS.err.toFixed(2) : ''} (${allS.nWin} pencere, N=${allS.N})</span>` : '')
@@ -3019,11 +3040,18 @@ function renderGutenbergRichter(evList, Mc) {
   stats.innerHTML = `<span style="color:#e2e8f0">●</span> kümülatif N(≥M) &nbsp;|&nbsp; <span style="color:#22c55e">○</span> bin-içi N &nbsp;|&nbsp; <span style="color:#f5a623">┄</span> GR fit &nbsp;|&nbsp; ΔM=${DM} · N=${mags.length} · Mmax=${mMax.toFixed(1)}${mcStr}${fitStatsStr}${modeStr}` + magTypeDiag(evList.filter(e => (e.mw ?? e.mag) > 0).map(e => ({ m: e.mw ?? e.mag, t: e.mtype || '' })));
 }
 
+// b(t) penceresi (2026-10-12): Time-Mag'den bağımsız açılır; veri hazırlığı renderTimeMag ile ortaktır
+function toggleBtWin() {
+  showBtWin = !showBtWin;
+  document.getElementById('btnBtWin').classList.toggle('active', showBtWin);
+  document.getElementById('btPanel').classList.toggle('open', showBtWin);
+  if (showBtWin) renderTimeMag([...events, ...liveEvents]);
+}
 function toggleTimeMag() {
   showTimeMag = !showTimeMag;
   document.getElementById('btnTimeMag').classList.toggle('active', showTimeMag);
   document.getElementById('tmPanel').classList.toggle('open', showTimeMag);
-  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
 }
 
 // Tam ekran toggle -- mevcut sürükleme (initTimeMagDrag) inline left/top/
@@ -3053,6 +3081,21 @@ function toggleTimeMagFullscreen(evt) {
 }
 
 // Time-Mag paneli sürüklenebilir — başlık çubuğundan tutulur, ekran sınırları içinde kalır
+(function initBtDrag(){
+  const panel = document.getElementById('btPanel'), head = panel && panel.querySelector('.tmHead'); if (!head) return;
+  let dragging = false, offX = 0, offY = 0;
+  head.addEventListener('pointerdown', e => {
+    if (e.target.closest('.tmClose') || e.target.closest('select')) return;
+    dragging = true; const r = panel.getBoundingClientRect();
+    panel.style.left = r.left + 'px'; panel.style.top = r.top + 'px'; panel.style.bottom = 'auto'; panel.style.transform = 'none';
+    offX = e.clientX - r.left; offY = e.clientY - r.top; head.setPointerCapture(e.pointerId);
+  });
+  head.addEventListener('pointermove', e => { if (!dragging) return;
+    panel.style.left = Math.max(0, Math.min(window.innerWidth - panel.offsetWidth, e.clientX - offX)) + 'px';
+    panel.style.top = Math.max(0, Math.min(window.innerHeight - panel.offsetHeight, e.clientY - offY)) + 'px'; });
+  head.addEventListener('pointerup', () => { dragging = false; });
+  head.addEventListener('pointercancel', () => { dragging = false; });
+})();
 (function initTimeMagDrag(){
   const panel = document.getElementById('tmPanel');
   const head  = panel.querySelector('.tmHead');
@@ -4408,7 +4451,7 @@ function onCsChange(fromEdit) {
   document.getElementById('csRows').style.display = show === '' ? 'block' : 'none';
   if (csEnabled && !csSteps.length) csRenderRows();
   csSyncURL();
-  if (showTimeMag) renderTimeMag([...events, ...liveEvents]);
+  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]);
 }
 
 function restoreCsFromURL() {
@@ -4529,8 +4572,8 @@ function csRenderGrDiag() {
 // b(t): N=100 kayan pencere, adım 10 — olay başına eşik (csAkiB)
 // fit (2026-09-29): açıksa pencereler fit aralığındaki olaylardan (csFitItems) kurulur ve b
 // çift kesik tahminciyle (csAkiBRange) hesaplanır; hata ±1,96·SE (Fisher). Kapalıysa eski yol.
-function csBvalueTimeSeries(cs, fit) {
-  const N_WIN = 100, STEP = 10, on = !!(fit && fit.on), items = on ? csFitItems(cs.kept, fit) : cs.kept;
+function csBvalueTimeSeries(cs, fit, step = 10) {
+  const N_WIN = 100, STEP = step, on = !!(fit && fit.on), items = on ? csFitItems(cs.kept, fit) : cs.kept;
   if (items.length < N_WIN) return { series: [], N: items.length };
   const series = [];
   for (let i = bWinStart(items.length, N_WIN, STEP); i + N_WIN <= items.length; i += STEP) {
@@ -4558,7 +4601,7 @@ function onGrFitChange() {
   grParamsSyncURL();
   const fr = grFitRangeCurrent(), w = document.getElementById('grFitWarn');
   if (w) w.textContent = fr.err ? '⚠ ızgara/aralık hatası — uygulanmadı' : '';
-  if (typeof showTimeMag !== 'undefined' && showTimeMag && lastCs) { renderTimeMag([...events, ...liveEvents]); return; }
+  if (typeof showTimeMag !== 'undefined' && (showTimeMag || showBtWin) && lastCs) { renderTimeMag([...events, ...liveEvents]); return; }
   if (lastCs) renderGutenbergRichterCS(lastCs);
 }
 function grFitSuggestApply() {
@@ -4887,7 +4930,7 @@ function renderGutenbergRichterCS(cs) {
 let lastCs = null;
 
 function renderTimeMag(evList) {
-  if (!showTimeMag) return;
+  if (!showTimeMag && !showBtWin) return;   // b(t) penceresi de aynı veri hazırlığını kullanır
   const svg    = document.getElementById('tmSvg');
   const metaEl = document.getElementById('tmMeta');
   const statsEl= document.getElementById('tmStats');
@@ -5064,6 +5107,14 @@ function renderTimeMag(evList) {
     (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">Tamlık dönemleri: ${cs.periods.map(csLabel).join('; ')} · analize giren N=<b>${cs.kept.length}</b> (${cs.nExcluded} olay basamak altında, soluk)</span>` : '');
 
   renderBvalueTS(evList, Mc, cs);
+  if (showBtWin) try {
+    renderBvalueTS(evList, Mc, cs, { svgId: 'btSvg', statsId: 'btStats', step: 1, store: false });
+    const bm = document.getElementById('btMeta'), tm = document.getElementById('tmMeta');
+    if (bm) bm.textContent = (tm ? tm.textContent : '') + ` · Mc = ${Mc !== null ? Mc : '—'}${mcIsManual ? ' (elle)' : ''}`;
+    // M–t grafiği Time-Mag (normal) ile aynıdır: çizim kopyalanır (aynı veri, aynı ortak zaman ekseni)
+    const src = document.getElementById('tmSvg'), dst = document.getElementById('btSvgMT');
+    if (src && dst) { dst.setAttribute('viewBox', src.getAttribute('viewBox') || '0 0 660 260'); dst.innerHTML = src.innerHTML; }
+  } catch (e) { console.warn('[bt-pencere]', e); }
   try {
     // Kümesizleştirme açıksa artçılar evList'ten çıkarılmıştır; diziler ham listeden, aynı dönüşüm ve tür filtresiyle kurulur
     const seqList = (usingRegion && regionDeclusterOn)
@@ -6624,7 +6675,7 @@ async function loadMwAuth() {
       mwAuthTable = { err: err.message || String(err), entries: [] };
       setStatus(`Otoriter Mw tablosu yüklenemedi (${mwAuthTable.err}) — katalog büyüklükleri kullanılıyor`, true);
     } finally { mwAuthPending = null; }
-    gk74Cache = null; renderRegionInfo(); redrawRegionMarkers(); if (showTimeMag) renderTimeMag(regionEvents);
+    gk74Cache = null; renderRegionInfo(); redrawRegionMarkers(); if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
     return mwAuthTable;
   })();
   return mwAuthPending;
@@ -6632,7 +6683,7 @@ async function loadMwAuth() {
 function onRegionMwAuthChange() {
   gk74Cache = null;
   if (mwAuthWanted() && !mwAuthTable) loadMwAuth();
-  renderRegionInfo(); redrawRegionMarkers(); if (showTimeMag) renderTimeMag(regionEvents);
+  renderRegionInfo(); redrawRegionMarkers(); if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
 }
 // Bağlam listesi otorite durumuna göre (Faz 2a'da eşleşme kapsamı = aday havuzu) önbellekli hesaplanır.
 function regionCtxList() {
@@ -6722,7 +6773,7 @@ async function ensureRegionContext() {
     if (regionEvents === forEvents) {
       renderRegionInfo();
       redrawRegionMarkers();
-      if (showTimeMag) renderTimeMag(regionEvents);
+      if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
     }
   })();
   return regionCtxPending;
@@ -6732,7 +6783,7 @@ function onRegionDeclusterCtxChange() {
   if (regionDeclusterOn && regionCtxWanted()) { ensureRegionContext(); }
   renderRegionInfo();
   redrawRegionMarkers();
-  if (showTimeMag) renderTimeMag(regionEvents);
+  if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
 }
 
 /* Bölgeye özel Mc/b istatistiği — mevcut computeMc()/computeBvalue()
@@ -7057,7 +7108,7 @@ async function fetchRegionEventsFromHistorical(bounds) {
   const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
   setStatus(`Bölgede ${evs.length} deprem — Tarihsel Katalog TAMAMI, limit yok${sampleNote}`);
   renderRegionInfo();
-  if (showTimeMag) renderTimeMag(regionEvents);
+  if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
 }
 
 /* Bölge Analizi kaynak yönlendirici — kendi regionSource seçimine göre
@@ -7135,7 +7186,7 @@ async function fetchRegionEventsFromHKLocal(bounds) {
     const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
     setStatus(`Bölgede ${evs.length} deprem — HK Yerel Katalog TAMAMI (ML, 1970-2011), limit yok${sampleNote}`);
     renderRegionInfo();
-    if (showTimeMag) renderTimeMag(regionEvents);
+    if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
   } catch (err) {
     setStatus(`HK Yerel Katalog hatası: ${err.message}`, true);
   }
@@ -7198,7 +7249,7 @@ async function fetchRegionEventsFromHKHistorical(bounds) {
     const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
     setStatus(`Bölgede ${evs.length} deprem — HK Tarihsel Katalog TAMAMI (Mw≥5.0, 1067-2005), limit yok${sampleNote}`);
     renderRegionInfo();
-    if (showTimeMag) renderTimeMag(regionEvents);
+    if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
   } catch (err) {
     setStatus(`HK Tarihsel Katalog hatası: ${err.message}`, true);
   }
@@ -7390,7 +7441,7 @@ async function fetchRegionEventsLive(bounds, provider) {
         (ci.anyCapped ? ' — 🔴 bir parça 20.000 sınırına ulaştı' : '') + sampleNote, ci.anyCapped);
     }
     renderRegionInfo();
-    if (showTimeMag) renderTimeMag(regionEvents); // panel açıksa bölge verisiyle anında güncelle
+    if (showTimeMag || showBtWin) renderTimeMag(regionEvents); // panel açıksa bölge verisiyle anında güncelle
     syncRegionURL(bounds, { limit, orderby, magMin, magMax, depMin, depMax });
   } catch(err) {
     setStatus(`Bölge sorgusu hatası (${providerLabel}): ${err.message}`, true);
@@ -7459,7 +7510,7 @@ async function fetchRegionEventsFromAfad(bounds) {
     const clampNote = clamped ? ` · ⚠ AFAD'da 1 yıllık veri yok, ${HOURS_LABEL[afadHours]} penceresi gösteriliyor` : '';
     setStatus(`Bölgede ${shapeLabel} deprem (AFAD, önceden çekilmiş — saatlik güncellenir)${clampNote}`);
     renderRegionInfo();
-    if (showTimeMag) renderTimeMag(regionEvents);
+    if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
     syncRegionURL(bounds, { limit: evs.length, orderby:'time', magMin, magMax, depMin, depMax });
   } catch(err) {
     setStatus(`AFAD statik veri hatası: ${err.message}`, true);
@@ -7536,7 +7587,7 @@ function toggleRegionDecluster() {
   }
   renderRegionInfo();
   redrawRegionMarkers();
-  if (showTimeMag) renderTimeMag(regionEvents);
+  if (showTimeMag || showBtWin) renderTimeMag(regionEvents);
 }
 
 /* URL'de bölge seçimini kalıcı kıl — paylaşılan link açıldığında aynı bölge
@@ -7632,7 +7683,7 @@ function regionDeselect() {
   const info = document.getElementById('regionInfo');
   if (info) info.innerHTML = '';
   clearRegionURL();
-  if (showTimeMag) renderTimeMag([...events, ...liveEvents]); // Time-Mag paneli açıksa anında global veriye dönsün
+  if (showTimeMag || showBtWin) renderTimeMag([...events, ...liveEvents]); // Time-Mag paneli açıksa anında global veriye dönsün
 
   // Yarım kalmış bir poligon çizimi varsa onu da temizle
   polygonActive = false;
