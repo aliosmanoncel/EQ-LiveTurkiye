@@ -5127,6 +5127,7 @@ function pbSequences(list) {
 function renderPBSequences(list) {
   const svg = document.getElementById('tmSvgPB'), st = document.getElementById('tmStatsPB'); if (!svg || !st) return;
   window.__pbOk = [];   // TM-02: tablo boş kalırsa eski dizi listesi geçerli sayılmasın (açık panel "yenilendi" uyarısı verir)
+  window.__pbList = list;   // TM-02 Kagan (2002) seçeneği: alternatif dizi aynı listeden kurulur
   const W = 660, H = 300, PAD_L = 40, PAD_R = 14, PAD_T = 10, GAP = 22, PAD_B = 22, plotW = W - PAD_L - PAD_R, hP = (H - PAD_T - GAP - PAD_B) / 2;
   if (!list || list.length < PB_SEQ_NMIN + 1) { svg.innerHTML = `<text x="330" y="60" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri</text>`; st.textContent = '—'; return; }
   const seq = pbSequences(list), ok = seq.filter(s => s.status === 'tamam'), rej = seq.filter(s => s.status !== 'tamam');
@@ -5252,6 +5253,45 @@ function pbModelSummary(rec) {
   if (c >= 0.3 * S && c < OMORI_C_MAX * 0.95) notes.push(`⚠ c (${c.toPrecision(2)} g) uyum başlangıcının (${S.toPrecision(2)} g) %30'undan büyük: p ile c güçlü bağımlı, p ağırlıkla geç dönemi temsil eder`);
   return { ok: reasons.length === 0, S, N: t.length, p: f.p, c, K, ci, ks: ks.pvalue, reasons, notes, partial: !!st.partial };
 }
+// ── Alternatif dizi tanımı: Kagan (2002) seçim yarıçapı (deneysel seçenek, 2026-10-12) ─────────────────────
+// Kagan, Y. Y. (2002), Aftershock zone scaling, BSSA 92(2), 641–655, Eş. (6): rm = 20 × 10^((m − 6)/2) km. Kagan bu
+// yarıçapı m ≥ 7 ana şoklarda artçı zonu BOYUTUNU ölçmek için seçim penceresi olarak kullanır (episantroid merkezli,
+// DT = 1 gün, h = 0–70 km); rm bir zon sınırı değildir. Burada dizi tanımı olarak uygulanır: merkez = ana şok
+// episantrı (moment merkezi katalogda yok), h ≤ 70 km (derinliği bilinmeyen olay dahil), süre GK74 ile AYNI
+// (T = min(GK74 T(M), katalog sonu)) — böylece GK74'ten yalnız mekânsal ölçüt farklıdır. GK74'ten farklı olarak
+// başka bir ana şokun penceresine düşmüş olaylar da seçilir. Yalnız M ≥ 7. Bu, bağıntının özgün amacının
+// genişletilmesidir; doğrulanmış standart değil, sınanan bir seçenektir. GK74 (varsayılan) değişmez.
+const KAGAN_MMIN = 7, KAGAN_DMAX = 70;
+let pbSeqDef = 'gk74';   // 'gk74' | 'kagan'
+function pbSeqKaganRm(M) { return 20 * Math.pow(10, (M - 6) / 2); }
+function pbSeqKagan(base) {
+  const list = window.__pbList || [];
+  if (base._kagan && base._kagan.list === list) return base._kagan.rec;
+  const ms = base.ms, t0 = base.t0, rm = pbSeqKaganRm(base.M), la = +ms.lat, lo = +ms.lon;
+  const inR = list.filter(e => e.time instanceof Date && e.time.getTime() > t0 && (e.mw ?? e.mag) < base.M && haversineKm(la, lo, +e.lat, +e.lon) <= rm);
+  const ch = inR.filter(e => !(e.dep != null && +e.dep > KAGAN_DMAX)), nDeep = inR.length - ch.length;
+  const all = ch.map(e => ({ t: (e.time.getTime() - t0) / 86400000, m: e.mw ?? e.mag })).filter(x => x.t > 0);
+  const Mc = computeMc(ch), T = base.T;
+  const sel = Mc === null ? [] : all.filter(x => x.m >= Mc - 1e-9 && x.t > PB_SEQ_S && x.t <= T).sort((a, b) => a.t - b.t);
+  // Olay listesinin kapsadığı alan rm dairesini içeriyor mu (olayların sınır kutusuna göre yaklaşık denetim)
+  let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
+  for (const e of list) { const y = +e.lat, x = +e.lon; if (!isFinite(y) || !isFinite(x)) continue; if (y < a0) a0 = y; if (y > a1) a1 = y; if (x < b0) b0 = x; if (x > b1) b1 = x; }
+  const dLa = rm / 111.19, dLo = rm / (111.19 * Math.cos(la * Math.PI / 180));
+  const covered = la - dLa >= a0 && la + dLa <= a1 && lo - dLo >= b0 && lo + dLo <= b1;
+  // GK74 dizisiyle örtüşme (zaman + büyüklük anahtarı)
+  const key = x => x.t.toFixed(7) + '|' + x.m;
+  const gk = new Set((base.all || []).map(key)); let common = 0; all.forEach(x => { if (gk.has(key(x))) common++; });
+  const rec = { ms, t0, M: base.M, Td: base.Td, T, Mc, nAll: all.length, all, sel, N: sel.length, def: 'kagan', rm, covered, common, nGK: (base.all || []).length, nDeep };
+  rec.status = Mc === null ? 'Mc yok' : sel.length < PB_SEQ_NMIN ? `N = ${sel.length} < ${PB_SEQ_NMIN} (M ≥ Mc)` : 'tamam';
+  base._kagan = { list, rec };
+  return rec;
+}
+function pbSeqDefLabel(rec, short) {
+  if (rec.def === 'kagan') return short ? `Kagan (2002) rm = ${rec.rm.toFixed(0)} km`
+    : `Kagan (2002) seçim yarıçapı rm = 20·10^((M−6)/2) = ${rec.rm.toFixed(1)} km, ana şok episantrı merkezli, h ≤ ${KAGAN_DMAX} km, süre GK74 ile aynı (deneysel seçenek)`;
+  const D = gk74Window(rec.M)[1];
+  return short ? `GK74 (D = ${D.toFixed(0)} km)` : `GK74 (Gardner &amp; Knopoff 1974), D = ${D.toFixed(1)} km`;
+}
 function pbSeqSvg(rec, wins) {
   const PBW_N = wins.length ? wins[0].N : pbwN;
   const W = 660, H = 520, PAD_L = 40, PAD_R = 14, plotW = W - PAD_L - PAD_R;
@@ -5331,9 +5371,16 @@ function pbSeqSvg(rec, wins) {
 // Dizi kimliği (2026-10-12, Bulgu 5): panel açılırken dizi nesnesi saklanır; N, ince adım ve PNG denetimleri sıra
 // numarasıyla değil bu nesneyle çalışır. Tablo yeniden çizilip sıralama değişse de panel ve PNG aynı diziye bağlı kalır.
 function openPBSeqPanel(idx) {
-  const rec = idx == null ? window.__pbSeqRec : (window.__pbOk || [])[idx]; if (!rec) return;
-  window.__pbSeqRec = rec;
-  const curIdx = (window.__pbOk || []).indexOf(rec);
+  const base = idx == null ? window.__pbSeqRec : (window.__pbOk || [])[idx]; if (!base) return;
+  window.__pbSeqRec = base;
+  const curIdx = (window.__pbOk || []).indexOf(base);
+  const kOK = base.M >= KAGAN_MMIN - 1e-9, kRec = pbSeqDef === 'kagan' && kOK ? pbSeqKagan(base) : null;
+  const kEmpty = kRec && kRec.all.length < 10;          // Kagan dairesinde olay yoksa GK74'e dönülür ve nedeni yazılır
+  const rec = kRec && !kEmpty ? kRec : base;
+  window.__pbSeqCur = rec;
+  const defNote = pbSeqDef === 'kagan' && !kOK ? `Kagan (2002) seçeneği yalnız M ≥ ${KAGAN_MMIN} ana şoklar için tanımlıdır; GK74 gösteriliyor.`
+    : kEmpty ? 'Kagan dairesinde yeterli olay yok; GK74 gösteriliyor.'
+    : rec.def === 'kagan' ? `Kagan dizisi: ${rec.nAll} olay (GK74: ${rec.nGK}; ortak ${rec.common}${rec.nDeep ? `; rm içinde h > ${KAGAN_DMAX} km olduğu için dışlanan ${rec.nDeep}` : ''}).${rec.covered ? '' : ' ⚠ Olay listesinin kapsadığı alan rm dairesini tam içermiyor (olay sınır kutusuna göre); dizi bölge sınırında kırpılmış olabilir.'} rm bir seçim yarıçapıdır, ölçülmüş artçı zonu sınırı değildir.` : '';
   const PBW_N = pbwN, PBW_STEP = Math.max(1, Math.round(pbwN / (pbwFine ? 100 : 10)));
   const wins = pbWindows(rec, PBW_N, pbwFine), ovl = Math.round(100 * (1 - PBW_STEP / PBW_N));
   rec.model = pbModelSummary(rec);
@@ -5350,29 +5397,31 @@ function openPBSeqPanel(idx) {
     : `Omori–Utsu (tam dönem, t ≥ ${mod.S.toPrecision(2)} gün, N = ${mod.N}): p = <b>${f2(mod.p)}</b> [%95: ${f2(mod.ci.lo)}–${f2(mod.ci.hi)}], c = ${mod.c.toPrecision(2)} gün, KS p = ${mod.ks.toFixed(3)} — ` +
       (mod.ok ? '<span style="color:#9ab0c5">uyum yeterli</span>' : `<span style="color:#f59e0b">⚠ uyum yetersiz: ${mod.reasons.join('; ')}. p değeri sonuç olarak yorumlanmamalıdır.</span>`) + (mod.notes.length ? ` <span style="color:#888">(${mod.notes.join('; ')})</span>` : '');
   el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><b style="color:#e2e8f0;font-size:.82rem;">${head}</b><span style="white-space:nowrap">
+      <label style="color:#9ab0c5;" title="Dizi tanımı. GK74: Gardner &amp; Knopoff (1974) zaman–mesafe penceresi (varsayılan). Kagan (2002): seçim yarıçapı rm = 20·10^((M−6)/2) km, yalnız M ≥ ${KAGAN_MMIN}; deneysel seçenek, rm ölçülmüş artçı zonu sınırı değildir.">Dizi <select onchange="pbSeqDef=this.value;openPBSeqPanel()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.9em;"><option value="gk74"${rec.def !== 'kagan' ? ' selected' : ''}>GK74</option><option value="kagan"${rec.def === 'kagan' ? ' selected' : ''}${kOK ? '' : ' disabled'}>Kagan rm${kOK ? '' : ` (M &lt; ${KAGAN_MMIN})`}</option></select></label>
       <label style="color:#9ab0c5;">N <select onchange="pbwN=+this.value;openPBSeqPanel()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.9em;">${PBW_CHOICES.map(v => `<option value="${v}"${v === PBW_N ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
       <label style="color:#9ab0c5;" title="İnce adım (N/100): b(t) çizgi ve %95 bant olarak gösterilir. Değişimin zamanlamasını ayrıntılı görmek içindir; pencereler %99 örtüşür, bağımsız bilgi ve istatistiksel kesinlik ARTMAZ. Yorum uyarısı: eğrinin bir eşiği ilk geçtiği zaman, örtüşen pencerelerden türetilmiş bir tahmindir; fiziksel değişimin başlangıç zamanı değildir. Belirsizliği pencere büyüklüğüne, olay örneklemesine ve istatistiksel değişkenliğe bağlıdır. Küçük pencerede rastgele dalgalanma eşiği gerçek değişimden çok önce aşabilir; ince adım aynı dalgalanmayı daha sık örneklediği için bu aşımları daha görünür kılar (sentetik testte N = 100, ±0,22: 10. gündeki b değişiminde eşik, 3 tohumun 2'sinde hem kaba hem ince adımda 0,1. günde geçildi)."><input type="checkbox" ${pbwFine ? 'checked' : ''} onchange="pbwFine=this.checked;openPBSeqPanel()"> ince adım</label>
       <button class="tmFullscreenBtn" onclick="exportPBSeqPNG()">PNG (1600 px)</button> <button class="tmFullscreenBtn" onclick="document.getElementById('pbSeqPanel').remove()">✕</button></span></div>
     <svg id="pbSeqSvg" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto;margin-top:6px">${g}</svg>
     <div style="margin-top:4px;color:#cbd5e1;">b(t): ${wins.length ? `${wins.length} pencere (N = ${PBW_N}, adım ${PBW_STEP}${pbwFine ? ' — ince adım' : ''}; ardışık pencereler %${ovl} örtüşür), gösterilen ${nB}, eksik kayıt nedeniyle gizlenen ${nInc}` : `M ≥ Mc olay sayısı ${rec.sel.length} < N = ${PBW_N}: b(t) pencereleri kurulamadı`} · dizi: N = ${rec.N}, Mc = ${rec.Mc.toFixed(1)}</div>
-    <div style="margin-top:3px;color:#cbd5e1;">p modeli: ${modTxt}</div>${curIdx < 0 ? `
+    <div style="margin-top:3px;color:#cbd5e1;">p modeli: ${modTxt}</div>${defNote ? `
+    <div style="margin-top:3px;color:${rec.def === 'kagan' && rec.covered ? '#cbd5e1' : '#f59e0b'};">Dizi tanımı: ${defNote}</div>` : ''}${curIdx < 0 ? `
     <div style="margin-top:3px;color:#f59e0b;">⚠ Dizi tablosu bu panel açıldıktan sonra yenilendi; panel ve PNG, açıldığı andaki dizi verisini gösterir. Güncel sonuç için tablodan yeniden açın.</div>` : ''}
-    <div style="margin-top:3px;color:#9ab0c5;">Kayıt: ${TM_VERSION} (${TM_VERSION_DATE}) · N = ${PBW_N}, adım = ${PBW_STEP}${pbwFine ? ' (ince, N/100)' : ' (N/10)'} · dizi Mc = ${rec.Mc.toFixed(1)} · dizi tanımı: GK74 (Gardner &amp; Knopoff 1974), ana şok ${new Date(rec.t0).toISOString().replace('T', ' ').slice(0, 19)} UTC · başlangıç kesmesi S = ${PB_SEQ_S} gün · büyüklük: ${MAG_CONVERSIONS[mcConversionMode].label}</div>
-    <div style="margin-top:3px;color:#888;">Yöntem — b(t): Öncel &amp; Wilson (2007) pencerelemesinin dizi içi uyarlaması; N olaylık pencere, adım N/10 (varsayılan; Öncel &amp; Wilson ve ana b(t) paneliyle aynı oran) ya da isteğe bağlı ince adım N/100 (çizgi + %95 bant); Aki (1965), ±1,96·b/√N. Pencereler örtüşür ve tahminler bağımsız değildir; ince adım değişimin zamanlamasını ayrıntılı gösterir ama yeni bağımsız bilgi ya da daha yüksek kesinlik sağlamaz. Yorum uyarısı: eşiğin ilk geçildiği zaman örtüşen pencerelerden türetilmiş bir tahmindir, fiziksel değişimin başlangıç zamanı değildir; ince adımda rastgele eşik aşımları daha sık görülür. Değişim zamanı için istatistiksel test (ör. iki dönem b farkı, Utsu 1992) gerekir. Gri çentik = pencere gizlendi: pencere Mc'si (pencere süresindeki tüm artçılardan) dizi Mc'sini aşıyor ya da pencerenin 100 olaylık alt bloklarından birinin Mc'si dizi Mc'sini 0,2'den fazla aşıyor; alt blok denetimi N'den bağımsız olarak aynı çözünürlüktedir. Mc'nin dizi Mc'sine eşit çıkması eksiksizliği kanıtlamaz; özellikle büyük ana şoklardan hemen sonraki ilk pencereler ihtiyatla yorumlanmalıdır. <b>Tamlık denetiminin sınırlamaları:</b> alt blok tabanlı Mc kontrolü erken dönem eksik kayıtlarını sentetik testlerde %95–100 oranında yakalamıştır; dizinin ortasındaki kısa süreli tamlık kesintilerinde yakalama oranı yaklaşık %56–57'dir (2026-10-12, 10 tohum, N = 500 ve 1000). Bu nedenle bir pencerenin denetimden geçmesi, o pencerenin eksiksiz olduğunu garanti etmez. Tersine, eksiksiz sentetik katalogda da pencerelerin bir kısmı gizlenir (yanlış alarm): N = 100'de ≈ %21, N = 200'de ≈ %10, N ≥ 300'de ≤ %6 (2026-10-12, 10 tohumlu sentetik test). Küçük pencerelerde boşluk her zaman eksik kayıt anlamına gelmez. Bu oranlar sentetik senaryolardaki ölçümlerdir; gerçek kataloglarda aynı oranların geçerli olacağı garanti edilemez. Özellikle katalog kapsamının veya büyüklük belirleme yönteminin zaman içinde değiştiği dizilerde b değerleri ihtiyatla yorumlanmalıdır. Hız şeridi: M ≥ Mc artçıların log-zaman kutularındaki hızı (olay/gün; gri = eksik kayıt dönemi, uyuma girmez) ve tam dönem için tek Omori–Utsu eğrisi (Ogata 1983 en çok olabilirlik, %95 profil aralığı, Ogata 1988 KS testi). Uyumun başlangıcı seçilen N'den bağımsızdır: 100 olaylık pencerelerle (adım 10) aynı tamlık denetimi uygulanır ve ilk geçen pencerenin başı alınır; geçen pencere yoksa ya da M ≥ Mc olay sayısı 100'den azsa p tahmini yapılmaz. Başlangıçtan sonraki dönemde tamlık yeniden denetlenmez: dizi ortasındaki kısa kesintiler (b(t)'de gri çentik) uyuma girer ve p'yi etkileyebilir. Pencere başına p(t) bu sürümde YOK: Pazarcık 2023 ve Flores 2026 testlerinde güvenilir pencere üretmedi. Uyum yetersizse (c üst sınırda, aralık açık ya da KS p &lt; 0,05) eğri kesikli gri çizilir; bu genellikle ikinci ana şok, ikincil diziler ya da değişken katalog tamlığına işaret eder. Arka plan hızı modellenmez. Dizi tanımı GK74'tür; M ≳ 7 depremlerde dizi parçalanabilir.</div>`;
-  window.lastPBSeqWin = { idx: curIdx, N: PBW_N, rec: { M: rec.M, t0: rec.t0, N: rec.N, Mc: rec.Mc }, model: mod, wins };
+    <div style="margin-top:3px;color:#9ab0c5;">Kayıt: ${TM_VERSION} (${TM_VERSION_DATE}) · N = ${PBW_N}, adım = ${PBW_STEP}${pbwFine ? ' (ince, N/100)' : ' (N/10)'} · dizi Mc = ${rec.Mc.toFixed(1)} · dizi tanımı: ${pbSeqDefLabel(rec)}, ana şok ${new Date(rec.t0).toISOString().replace('T', ' ').slice(0, 19)} UTC · başlangıç kesmesi S = ${PB_SEQ_S} gün · büyüklük: ${MAG_CONVERSIONS[mcConversionMode].label}</div>
+    <div style="margin-top:3px;color:#888;">Yöntem — b(t): Öncel &amp; Wilson (2007) pencerelemesinin dizi içi uyarlaması; N olaylık pencere, adım N/10 (varsayılan; Öncel &amp; Wilson ve ana b(t) paneliyle aynı oran) ya da isteğe bağlı ince adım N/100 (çizgi + %95 bant); Aki (1965), ±1,96·b/√N. Pencereler örtüşür ve tahminler bağımsız değildir; ince adım değişimin zamanlamasını ayrıntılı gösterir ama yeni bağımsız bilgi ya da daha yüksek kesinlik sağlamaz. Yorum uyarısı: eşiğin ilk geçildiği zaman örtüşen pencerelerden türetilmiş bir tahmindir, fiziksel değişimin başlangıç zamanı değildir; ince adımda rastgele eşik aşımları daha sık görülür. Değişim zamanı için istatistiksel test (ör. iki dönem b farkı, Utsu 1992) gerekir. Gri çentik = pencere gizlendi: pencere Mc'si (pencere süresindeki tüm artçılardan) dizi Mc'sini aşıyor ya da pencerenin 100 olaylık alt bloklarından birinin Mc'si dizi Mc'sini 0,2'den fazla aşıyor; alt blok denetimi N'den bağımsız olarak aynı çözünürlüktedir. Mc'nin dizi Mc'sine eşit çıkması eksiksizliği kanıtlamaz; özellikle büyük ana şoklardan hemen sonraki ilk pencereler ihtiyatla yorumlanmalıdır. <b>Tamlık denetiminin sınırlamaları:</b> alt blok tabanlı Mc kontrolü erken dönem eksik kayıtlarını sentetik testlerde %95–100 oranında yakalamıştır; dizinin ortasındaki kısa süreli tamlık kesintilerinde yakalama oranı yaklaşık %56–57'dir (2026-10-12, 10 tohum, N = 500 ve 1000). Bu nedenle bir pencerenin denetimden geçmesi, o pencerenin eksiksiz olduğunu garanti etmez. Tersine, eksiksiz sentetik katalogda da pencerelerin bir kısmı gizlenir (yanlış alarm): N = 100'de ≈ %21, N = 200'de ≈ %10, N ≥ 300'de ≤ %6 (2026-10-12, 10 tohumlu sentetik test). Küçük pencerelerde boşluk her zaman eksik kayıt anlamına gelmez. Bu oranlar sentetik senaryolardaki ölçümlerdir; gerçek kataloglarda aynı oranların geçerli olacağı garanti edilemez. Özellikle katalog kapsamının veya büyüklük belirleme yönteminin zaman içinde değiştiği dizilerde b değerleri ihtiyatla yorumlanmalıdır. Hız şeridi: M ≥ Mc artçıların log-zaman kutularındaki hızı (olay/gün; gri = eksik kayıt dönemi, uyuma girmez) ve tam dönem için tek Omori–Utsu eğrisi (Ogata 1983 en çok olabilirlik, %95 profil aralığı, Ogata 1988 KS testi). Uyumun başlangıcı seçilen N'den bağımsızdır: 100 olaylık pencerelerle (adım 10) aynı tamlık denetimi uygulanır ve ilk geçen pencerenin başı alınır; geçen pencere yoksa ya da M ≥ Mc olay sayısı 100'den azsa p tahmini yapılmaz. Başlangıçtan sonraki dönemde tamlık yeniden denetlenmez: dizi ortasındaki kısa kesintiler (b(t)'de gri çentik) uyuma girer ve p'yi etkileyebilir. Pencere başına p(t) bu sürümde YOK: Pazarcık 2023 ve Flores 2026 testlerinde güvenilir pencere üretmedi. Uyum yetersizse (c üst sınırda, aralık açık ya da KS p &lt; 0,05) eğri kesikli gri çizilir; bu genellikle ikinci ana şok, ikincil diziler ya da değişken katalog tamlığına işaret eder. Arka plan hızı modellenmez. Dizi tanımı varsayılan olarak GK74'tür; M ≳ 7 depremlerde GK74 dizisi parçalanabilir (Pazarcık 2023, Flores 2026: D(M) artçı zonunu kırptı). M ≥ 7 için deneysel seçenek: Kagan (2002) seçim yarıçapı rm = 20·10^((M−6)/2) km (Eş. 6). Kagan rm'yi artçı zonu boyutunu ölçmek için bir seçim penceresi olarak kullanır (episantroid merkezli, 1 gün, h = 0–70 km); burada merkez ana şok episantrı, h ≤ 70 km ve süre GK74 ile aynıdır. rm ölçülmüş bir zon sınırı değildir; bu kullanım bağıntının özgün amacının genişletilmesidir ve doğrulanmış bir standart değil, sınanan bir seçenektir. Kagan seçiminde başka bir ana şokun penceresine düşmüş olaylar da diziye girer.</div>`;
+  window.lastPBSeqWin = { idx: curIdx, N: PBW_N, def: rec.def || 'gk74', rec: { M: rec.M, t0: rec.t0, N: rec.N, Mc: rec.Mc, nAll: rec.nAll, rm: rec.rm, covered: rec.covered, common: rec.common }, model: mod, wins };
 }
 async function exportPBSeqPNG() {
-  const svgEl = document.getElementById('pbSeqSvg'), rec = window.__pbSeqRec; if (!svgEl || !rec) return;
+  const svgEl = document.getElementById('pbSeqSvg'), rec = window.__pbSeqCur || window.__pbSeqRec; if (!svgEl || !rec) return;
   const W = 660, H = 571, SC = 1600 / W, d = new Date(rec.t0).toISOString().slice(0, 10);
   const inner = svgToLight(svgEl.innerHTML.replace(/fill="#f59e0b"/g, 'fill="#b45309"').replace(/stroke="#ec4899"/g, 'stroke="#be185d"').replace(/fill="#ec4899"/g, 'fill="#be185d"').replace(/stroke="#06b6d4"/g, 'stroke="#0e7490"').replace(/fill="#06b6d4"/g, 'fill="#0e7490"').replace(/fill="#6b7280"/g, 'fill="#9ca3af"'));
   const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const xml = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * SC}" height="${H * SC}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#ffffff"/>` +
     `<text x="10" y="16" font-size="11" font-weight="700" fill="#111827" font-family="sans-serif">${esc(`${TM_VERSION} | Artçı Dizisi Analizi — M${rec.M.toFixed(1)}, ${d}, ${Math.abs(+rec.ms.lat).toFixed(2)}°${+rec.ms.lat < 0 ? 'G' : 'K'} ${Math.abs(+rec.ms.lon).toFixed(2)}°${+rec.ms.lon < 0 ? 'B' : 'D'}`)}</text>` +
     `<text x="10" y="29" font-size="8" fill="#374151" font-family="sans-serif">${esc(`N = ${rec.N} (M ≥ Mc = ${rec.Mc.toFixed(1)}) · b(t): pencere ${pbwN} olay, adım ${Math.max(1, Math.round(pbwN / (pbwFine ? 100 : 10)))}${pbwFine ? ' (ince adım, %99 örtüşme)' : ' (N/10)'}, Aki (1965), ±1,96·b/√N`)}</text>` +
-    `<text x="10" y="40" font-size="8" fill="#374151" font-family="sans-serif">${esc(`p: tam dönem Omori–Utsu, Ogata (1983)${rec.model ? (rec.model.p == null ? ' — p tahmini yapılmadı' : !rec.model.ok ? ' — uyum yetersiz' : '') : ''} · dizi: GK74 · ${TM_VERSION} (${TM_VERSION_DATE}), EQ-Live deneysel`)}</text>` +
+    `<text x="10" y="40" font-size="8" fill="#374151" font-family="sans-serif">${esc(`p: tam dönem Omori–Utsu, Ogata (1983)${rec.model ? (rec.model.p == null ? ' — p tahmini yapılmadı' : !rec.model.ok ? ' — uyum yetersiz' : '') : ''} · dizi: ${pbSeqDefLabel(rec, true)} · ${TM_VERSION} (${TM_VERSION_DATE}), EQ-Live deneysel`)}</text>` +
     `<g transform="translate(0,45)" font-family="sans-serif">${inner}</g></svg>`;
   const img = new Image(); img.onload = () => { const cv = document.createElement('canvas'); cv.width = W * SC; cv.height = H * SC; const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0);
-    cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${TM_VERSION}_Aftershock_Analysis_M${rec.M.toFixed(1)}_${d}_N${pbwN}${pbwFine ? '_fine' : ''}.png`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/png'); };
+    cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${TM_VERSION}_Aftershock_Analysis_M${rec.M.toFixed(1)}_${d}_N${pbwN}${pbwFine ? '_fine' : ''}${rec.def === 'kagan' ? '_Kagan' : ''}.png`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/png'); };
   img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
 }
 
