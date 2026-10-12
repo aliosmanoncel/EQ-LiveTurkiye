@@ -964,8 +964,8 @@
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn active" id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnTestimony" onclick="toggleLayer('testimony')" title="EMSC Testimonies · hissedilme raporları · seismicportal.eu/testimonies-ws · yeşil=az → mor=çok tanıklık">🗣️ Tanıklıklar</button>
-    <button class="tbtn"        id="btnTimeMag" onclick="toggleTimeMag()" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag (normal)</button>
-    <button class="tbtn"        id="btnBtWin" onclick="toggleBtWin()" title="Zaman–Magnitude, ince adım: Time-Mag (normal) ile aynı veri, aynı Mc ve aynı Öncel &amp; Wilson (2007) b(t) hesabı (N = 100); pencereler 10 yerine 1 olay kaydırılır">📈 Time-Mag (ince)</button>
+    <button class="tbtn"        id="btnTimeMag" onclick="openTimeMagMode('normal')" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag (normal)</button>
+    <button class="tbtn"        id="btnBtWin" onclick="openTimeMagMode('ince')" title="Aynı Zaman–Magnitude penceresi, ince adım modunda: bütün araçlar ve ayarlar ortak; yalnız b(t) N = 100 pencereyle 10 yerine 1 olay kaydırılarak hesaplanır (uzun ve kısa dönem trend). Dışa aktarımlarda &quot;Adım 1 (İnce)&quot; yazar.">📈 Time-Mag (ince)</button>
     <button class="tbtn"        id="btnAftWin" onclick="toggleAftWin()" title="Artçı dizisi başına p (Omori–Utsu, Ogata 1983) ve b (Aki 1965) değerleri; tablodaki satıra tıklayınca TM-02 dizi analizi (M–t, b(t), p modeli; GK74 ya da M ≥ 7 için Kagan 2002)">📈 Time-Mag (artçı)</button>
     <button class="tbtn tr-only"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn tr-only"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
@@ -1072,7 +1072,7 @@
 <!-- Zaman–Magnitude Dağılımı (Time–Magnitude Distribution) -->
 <div class="tmPanel" id="tmPanel">
   <div class="tmHead">
-    <span class="tmTitle">📈 Zaman–Magnitude Dağılımı <span style="color:#666;font-weight:400;">(Time–Magnitude Distribution)</span></span>
+    <span class="tmTitle">📈 Zaman–Magnitude Dağılımı<span id="tmModeLbl" style="color:#a855f7;"></span> <span style="color:#666;font-weight:400;">(Time–Magnitude Distribution)</span></span>
     <span>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event)" title="Üç grafiği (Time-Mag, b-değeri, Gutenberg-Richter) + bölge/yöntem bilgisini, ekrandakiyle AYNI koyu temada tek bir PNG olarak indir — Blogger/web paylaşımı için">🖼️ PNG — Web</button>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event)" title="Aynı üç grafiği beyaz zemin/koyu metinli bir düzende PNG olarak indir — akademik rapor, Word veya PDF'e gömmek için; grafiklerin kendi renkleri değişmez, yalnızca başlık/metin rengi">📄 PNG — Rapor</button>
@@ -1164,7 +1164,7 @@
   </div><div class="tmCol tmColB">
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
-    <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=10 olay)</span></div>
+    <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=<span id="tmStepLbl">10</span> olay)</span></div>
     <div style="font-size:.7rem;color:#888;text-align:right;" title="Her pencerenin b-değeri hangi zamana çizilsin? Orta: pencerenin ortanca olayı (varsayılan). Son: pencerenin en son olayı — yalnızca o ana kadarki veriyi kullanır (nedensel); ana şok öncesi (öncül) analizlerinde önerilir, çünkü orta damgada son ~50 olay hiçbir noktada 'şimdi' olarak görünmez.">b(t) zaman damgası <select id="bAnchorSel" onchange="onBAnchorChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"><option value="mid">pencere ortası</option><option value="end">pencere sonu (nedensel)</option></select></div>
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
@@ -1231,27 +1231,6 @@
   </div></div>
 </div>
 
-<!-- b(t) penceresi (2026-10-12): Time-Mag ile aynı veri, aynı Mc ve aynı Öncel & Wilson (2007) hesabı; adım seçilebilir
-     (1 = ince, 10 = normal). Artçı dizisi p/b bölümü ve TM-02 analizi Time-Mag'den buraya taşındı. -->
-<div class="tmPanel" id="btPanel" style="z-index:1003">
-  <div class="tmHead">
-    <span class="tmTitle">📈 Zaman–Magnitude Dağılımı — ince adım <span style="color:#666;font-weight:400;">(b(t): Öncel &amp; Wilson 2007, N=100 kayan pencere, adım=1 olay)</span></span>
-    <span>
-      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event, null, true)" title="Zaman–Magnitude, ince adımlı b(t) (adım 1) ve Gutenberg–Richter: ekrandaki koyu temada PNG">🖼 PNG — Web</button>
-      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event, null, true)" title="Aynı üç grafik, beyaz zemin (rapor / Word / PDF için); b(t) adım 1">📄 PNG — Rapor</button>
-      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event, 'poster', true)" title="Özet 16:9 (1920×1080), koyu tema; b(t) adım 1">🖼 Özet 16:9</button>
-      <button class="tmFullscreenBtn" onclick="exportPosterAGU(+document.getElementById('btPosterScale').value, event, true)" title="Akademik poster (AGU düzeninden esinlenen); başlık, yazarlar, fotoğraf, dil vb. Time-Mag (normal) penceresindeki poster ayarlarından alınır; b(t) şekli ve metinleri adım 1">🎓 Akademik poster</button><select id="btPosterScale" title="Akademik poster boyutu" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.72rem;margin-right:8px;"><option value="1">1920×1080</option><option value="2" selected>3840×2160</option><option value="4">7680×4320</option></select>
-      <button class="tmClose" onclick="toggleBtWin()">✕</button>
-    </span>
-  </div>
-  <div class="tmMeta" style="color:#f59e0b;">Ayarlar Time-Mag (normal) penceresinden yönetilir.</div>
-  <div class="tmMeta" id="btMeta">—</div>
-  <svg id="btSvgMT" viewBox="0 0 660 260" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:900px"></svg>
-  <div class="tmTitle" style="font-size:.78rem;margin-top:8px;" title="Pencere kaydırma adımı 1 olay: aynı N = 100 pencere, aynı Mc ve aynı hesap; örnekleme 10 kat sıklaşır. Ardışık pencereler %99 örtüşür; bağımsız bilgi ve istatistiksel kesinlik ARTMAZ, değişimin zamanlaması daha ayrıntılı görünür. Eğrinin bir eşiği ilk geçtiği an fiziksel değişimin başlangıç zamanı değildir.">📊 b-Değerinin Zaman İçindeki Değişimi — ince adım <span style="color:#666;font-weight:400;">(N=100, adım=1 olay; normal adım için Time-Mag (normal))</span></div>
-  <svg id="btSvg" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:900px"></svg>
-  <div class="tmStats" id="btStats">—</div>
-    
-</div>
 
 <!-- Time-Mag (artçı) penceresi (2026-10-12): artçı dizisi başına p ve b (Omori–Utsu, Ogata 1983; GK74 dizileri) ve TM-02 analizi.
      Time-Mag (normal) ile aynı veri ve dönüşüm. -->
@@ -2095,8 +2074,9 @@ function runOmoriPanel() {
    ZAMAN–MAGNİTUDE DAĞILIMI (Time–Magnitude Distribution)
 ══════════════════════════════════════════ */
 let showTimeMag = false;
-let showBtWin = false, showAftWin = false;   // Time-Mag (ince) ve Time-Mag (artçı) pencereleri
-function tmAnyOpen() { return showTimeMag || showBtWin || showAftWin; }
+let showAftWin = false;   // Time-Mag (artçı) penceresi
+let tmMode = 'normal';    // Time-Mag modu: 'normal' (adım 10, Öncel & Wilson 2007) | 'ince' (adım 1); aynı pencere, ortak ayarlar
+function tmAnyOpen() { return showTimeMag || showAftWin; }
 let lastBts = null;
 let lastBtsInce = null;   // Time-Mag (ince) b(t) özeti (adım 1) — ince pencerenin dışa aktarımları için
 
@@ -2522,7 +2502,7 @@ function renderSensTable(evList, Mc, cs) {
 }
 
 let tmSharedAxis = null; // { t0, t1 } — Zaman–Magnitude panelinin ekseni; b(t) ve Benioff bunu paylaşır
-// o: { svgId, statsId, step, store } — varsayılan Time-Mag (tmSvgB, adım 10, lastBts kaydı). b(t) penceresi (btPanel)
+// o: { svgId, statsId, step, store, storeInce } — varsayılan Time-Mag normal modu (tmSvgB, adım 10, lastBts kaydı). İnce mod
 // aynı fonksiyonu kendi öğeleri ve seçilen adımla çağırır; Time-Mag çıktısı değişmez (2026-10-12).
 function renderBvalueTS(evList, Mc, cs, o = {}) {
   const STEPB = o.step || 10, STORE = o.store !== false;
@@ -3074,11 +3054,20 @@ function renderGutenbergRichter(evList, Mc) {
 }
 
 // b(t) penceresi (2026-10-12): Time-Mag'den bağımsız açılır; veri hazırlığı renderTimeMag ile ortaktır
-function toggleBtWin() {
-  showBtWin = !showBtWin;
-  document.getElementById('btnBtWin').classList.toggle('active', showBtWin);
-  document.getElementById('btPanel').classList.toggle('open', showBtWin);
-  if (showBtWin) renderTimeMag([...events, ...liveEvents]);
+// Time-Mag modları (2026-10-12): iki düğme aynı tam pencereyi açar. Kapalıysa seçilen modda açar; aynı moddaysa kapatır;
+// diğer moddaysa yalnız modu değiştirir (bölge, dönüşüm, Mc, tamlık ve poster ayarları korunur).
+function openTimeMagMode(mode) {
+  if (showTimeMag && tmMode === mode) { toggleTimeMag(); return; }
+  tmMode = mode === 'ince' ? 'ince' : 'normal';
+  tmApplyModeLabels();
+  if (!showTimeMag) toggleTimeMag(); else renderTimeMag([...events, ...liveEvents]);
+}
+function tmApplyModeLabels() {
+  const ince = tmMode === 'ince';
+  const l = document.getElementById('tmModeLbl'); if (l) l.textContent = ince ? ' — ince adım (b(t) adım 1)' : '';
+  const s = document.getElementById('tmStepLbl'); if (s) s.textContent = ince ? '1' : '10';
+  document.getElementById('btnTimeMag').classList.toggle('active', showTimeMag && !ince);
+  document.getElementById('btnBtWin').classList.toggle('active', showTimeMag && ince);
 }
 function toggleAftWin() {
   showAftWin = !showAftWin;
@@ -3088,8 +3077,8 @@ function toggleAftWin() {
 }
 function toggleTimeMag() {
   showTimeMag = !showTimeMag;
-  document.getElementById('btnTimeMag').classList.toggle('active', showTimeMag);
   document.getElementById('tmPanel').classList.toggle('open', showTimeMag);
+  tmApplyModeLabels();
   if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
 }
 
@@ -3120,7 +3109,7 @@ function toggleTimeMagFullscreen(evt) {
 }
 
 // Time-Mag paneli sürüklenebilir — başlık çubuğundan tutulur, ekran sınırları içinde kalır
-['btPanel', 'aftPanel'].forEach(function initBtDrag(id){
+['aftPanel'].forEach(function initBtDrag(id){
   const panel = document.getElementById(id), head = panel && panel.querySelector('.tmHead'); if (!head) return;
   let dragging = false, offX = 0, offY = 0;
   head.addEventListener('pointerdown', e => {
@@ -3359,10 +3348,10 @@ function posterLoadQR() {
 }
 function posterVal(id, def) { const el = document.getElementById(id); const v = el ? el.value.trim() : ''; return v || def; }
 
-// ince = true: Time-Mag (ince) penceresinden — b(t) şekli btSvg (adım 1), özet lastBtsInce, metinlerde adım 1, başlık/dosya adında "Adım 1 (İnce)"
-async function exportPosterAGU(scale, evt, ince) {
-  if (!(ince ? showBtWin : showTimeMag)) { alert(ince ? 'Önce Time-Mag (ince) penceresini açın.' : 'Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
-  const BT_ID = ince ? 'btSvg' : 'tmSvgB', BT_STEP = ince ? 1 : 10;
+// İnce mod (tmMode === 'ince'): b(t) şekli tmSvgB'de adım 1 ile çizilidir; özet lastBtsInce, metinlerde adım 1, başlık/dosya adında "Adım 1 (İnce)"
+async function exportPosterAGU(scale, evt) {
+  if (!showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
+  const ince = tmMode === 'ince', BT_ID = 'tmSvgB', BT_STEP = ince ? 1 : 10;
   posterSavePrefs();
   const btn = evt && evt.currentTarget ? evt.currentTarget : null, oldLabel = btn ? btn.textContent : null;
   if (btn) { btn.textContent = '⏳…'; btn.disabled = true; }
@@ -3374,7 +3363,7 @@ async function exportPosterAGU(scale, evt, ince) {
   const SRC = t => !EN ? t : t.replace('Tarihsel Katalog', 'Historical Catalogue').replace('HK Yerel Katalog', 'HK Local Catalogue').replace('HK Tarihsel Katalog', 'HK Historical Catalogue')
     .replace('önceden çekilmiş katalog', 'pre-fetched catalogue').replace('canlı sorgu', 'live query').replace(/statik/g, 'static').replace(/^Canlı akış/, 'Live feed').replace(/^canlı akış/, 'live feed');
   // hedef punto (SVG birimi) = ~11,5 px ÷ şeklin posterdeki ölçeği (zaman–büyüklük ≈0,75; b(t) ≈0,72; G-R ≈0,73)
-  const AXK = { tmSvg: 15.3, tmSvgB: 16, btSvg: 16, tmSvgGR: 15.5 };
+  const AXK = { tmSvg: 15.3, tmSvgB: 16, tmSvgGR: 15.5 };
   const svgImg = (el, k) => new Promise((res, rej) => {
     let xml = svgToLight(svgBoostAxisText(new XMLSerializer().serializeToString(el), AXK[el.id] || 0));
     if (EN) xml = svgToEN(xml);
@@ -3750,8 +3739,9 @@ async function exportPosterAGU(scale, evt, ince) {
   }, 'image/png');
 }
 
-// ince = true: Time-Mag (ince) penceresinden çağrılır — b(t) btSvg/btStats (adım 1), başlık ve dosya adında "Adım 1 (İnce)"
-async function exportTimeMagPNG(theme, evt, layout, ince) {
+// İnce mod (tmMode === 'ince'): b(t) tmSvgB/tmStatsB'de adım 1 ile çizilidir; başlık ve dosya adında "Adım 1 (İnce)"
+async function exportTimeMagPNG(theme, evt, layout) {
+  const ince = tmMode === 'ince';
   theme = theme === 'light' ? 'light' : 'dark';
   const PALETTE = {
     dark:  { bg:'#0a0e15', title:'#e2e8f0', meta:'#9ab0c5', region:'#7ecbff', label:'#06b6d4', stats:'#aaaaaa', footer:'#556' },
@@ -3761,12 +3751,11 @@ async function exportTimeMagPNG(theme, evt, layout, ince) {
 
   const svgSpecs = [
     { id: 'tmSvg',   statsId: 'tmStats',   label: 'Zaman–Magnitude Dağılımı' },
-    ince ? { id: 'btSvg', statsId: 'btStats', label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007) — Adım 1 (İnce)' }
-         : { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007)' },
+    { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007)' + (ince ? ' — Adım 1 (İnce)' : '') },
     { id: 'tmSvgGR', statsId: 'tmStatsGR', label: 'Gutenberg-Richter Frekans-Büyüklük Dağılımı' },
   ];
   const svgEls = svgSpecs.map(s => document.getElementById(s.id));
-  if (svgEls.some(el => !el) || !(ince ? showBtWin : showTimeMag)) { alert(ince ? 'Önce Time-Mag (ince) penceresini açın.' : 'Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
+  if (svgEls.some(el => !el) || !showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
   const INCE_T = ince ? ' — Adım 1 (İnce)' : '', INCE_F = ince ? '-Adim1-Ince' : '';
 
   function svgToImage(svgEl) {
@@ -5150,15 +5139,8 @@ function renderTimeMag(evList) {
   statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>${mcIsManual ? ' (elle)' : ''}${convStatsStr}` +
     (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">Tamlık dönemleri: ${cs.periods.map(csLabel).join('; ')} · analize giren N=<b>${cs.kept.length}</b> (${cs.nExcluded} olay basamak altında, soluk)</span>` : '');
 
-  renderBvalueTS(evList, Mc, cs);
-  if (showBtWin) try {
-    renderBvalueTS(evList, Mc, cs, { svgId: 'btSvg', statsId: 'btStats', step: 1, store: false, storeInce: true });
-    const bm = document.getElementById('btMeta'), tm = document.getElementById('tmMeta');
-    if (bm) bm.textContent = (tm ? tm.textContent : '') + ` · Mc = ${Mc !== null ? Mc : '—'}${mcIsManual ? ' (elle)' : ''}`;
-    // M–t grafiği Time-Mag (normal) ile aynıdır: çizim kopyalanır (aynı veri, aynı ortak zaman ekseni)
-    const src = document.getElementById('tmSvg'), dst = document.getElementById('btSvgMT');
-    if (src && dst) { dst.setAttribute('viewBox', src.getAttribute('viewBox') || '0 0 660 260'); dst.innerHTML = src.innerHTML; }
-  } catch (e) { console.warn('[bt-pencere]', e); }
+  if (tmMode === 'ince') renderBvalueTS(evList, Mc, cs, { step: 1, store: false, storeInce: true });   // ince mod: aynı öğeler, adım 1
+  else renderBvalueTS(evList, Mc, cs);
   { const am = document.getElementById('aftMeta'), tm = document.getElementById('tmMeta'); if (am && tm) am.textContent = tm.textContent; }
   try {
     // Kümesizleştirme açıksa artçılar evList'ten çıkarılmıştır; diziler ham listeden, aynı dönüşüm ve tür filtresiyle kurulur
