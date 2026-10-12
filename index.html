@@ -965,7 +965,7 @@
     <button class="tbtn active" id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnTestimony" onclick="toggleLayer('testimony')" title="EMSC Testimonies · hissedilme raporları · seismicportal.eu/testimonies-ws · yeşil=az → mor=çok tanıklık">🗣️ Tanıklıklar</button>
     <button class="tbtn"        id="btnTimeMag" onclick="openTimeMagMode('normal')" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag (normal)</button>
-    <button class="tbtn"        id="btnBtWin" onclick="openTimeMagMode('ince')" title="Aynı Zaman–Magnitude penceresi, ince adım modunda: bütün araçlar ve ayarlar ortak; yalnız b(t) N = 100 pencereyle 10 yerine 1 olay kaydırılarak hesaplanır (uzun ve kısa dönem trend). Dışa aktarımlarda &quot;Adım 1 (İnce)&quot; yazar.">📈 Time-Mag (ince)</button>
+    <button class="tbtn"        id="btnBtWin" onclick="openTimeMagMode('ince')" title="Aynı Zaman–Magnitude penceresi, ince adım modunda: bütün araçlar ve ayarlar ortak; yalnız b(t) N = 100 pencereyle 10 yerine 1 olay kaydırılarak hesaplanır. Dışa aktarımlarda &quot;Adım 1 (İnce)&quot; yazar.">📈 Time-Mag (ince)</button>
     <button class="tbtn"        id="btnAftWin" onclick="toggleAftWin()" title="Artçı dizisi başına p (Omori–Utsu, Ogata 1983) ve b (Aki 1965) değerleri; tablodaki satıra tıklayınca TM-02 dizi analizi (M–t, b(t), p modeli; GK74 ya da M ≥ 7 için Kagan 2002)">📈 Time-Mag (artçı)</button>
     <button class="tbtn tr-only"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn tr-only"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
@@ -2619,48 +2619,15 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     const xc = x(s.t).toFixed(1);
     return `<line x1="${xc}" y1="${y(s.b - s.err).toFixed(1)}" x2="${xc}" y2="${y(s.b + s.err).toFixed(1)}" stroke="#06b6d4" stroke-width="1" stroke-opacity="0.35"/>`;
   }).join('');
-  // Ham nokta/çizgi bilinçli olarak DAHA İNCE/SOLUK -- yoğun serilerde (ör.
-  // 9000+ pencere) göz önce trend çizgisini yakalasın, ham veri "arka plan
-  // dokusu" gibi kalsın (2026-09-17, kullanıcı geri bildirimi). Değerler
-  // aynı, yalnızca çizim ağırlığı değişti.
-  const dots = series.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="${useBand ? 1 : 1.5}" fill="#06b6d4" fill-opacity="${useBand ? 0.35 : 0.5}"><title>b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} (%95) · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
+  // 2026-10-12 (kullanıcı kararı): trend / hareketli ortalama çizgileri KALDIRILDI. 21 pencerelik ortalama hiçbir yayına
+  // dayanmıyordu (Öncel & Wilson 2007 b(t) eğrisine yumuşatma uygulamaz); akademik çıktıda fiziksel eğilim gibi
+  // okunabiliyordu. Yalnız ham pencere b değerleri ve kendi %95 aralıkları çizilir; noktalar bu yüzden daha belirgin.
+  const dots = series.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="${useBand ? 1.3 : 1.8}" fill="#06b6d4" fill-opacity="${useBand ? 0.75 : 0.9}"><title>b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} (%95) · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
 
-  // Hareketli ortalama TREND çizgisi -- YENİ bir b-değeri hesabı DEĞİLDİR,
-  // mevcut N=100/step=10 serisinin (bs) üzerinde saf görsel bir özet
-  // katmanıdır (2026-09-17, kullanıcı talebi: Ring of Fire gibi çok
-  // yoğun/heterojen serilerde genel eğilimi okumak zorlaşıyor). Öncel &
-  // Wilson (2007) pencereleme/hesaplama mantığına HİÇ dokunulmaz -- ham
-  // seri (pts/dots/errBars) aynen kalır, bu yalnızca ÜSTÜNE eklenir.
-  // 2026-10-11: pencere sayısı azsa 21 pencerelik ortalama serinin neredeyse tamamını kapsar ve kısa süreli
-  // değişimleri silerdi (ör. 22 pencerede her nokta 11–21 pencerenin ortalaması). k = min(21, ~n/5, tek sayı, ≥3).
-  // İnce adımda trend aynı ZAMAN ölçeğinde kalsın: pencere sayısı 10/adım katı (adım 10'da K = 1 → değişiklik yok)
-  const TREND_K = 10 / STEPB;
-  const TREND_WINDOW = series.length >= 105 * TREND_K ? 21 * TREND_K + (TREND_K % 2 === 0 ? 1 : 0) : Math.max(3, 2 * Math.round(series.length / 10) + 1), TREND_HALF = (TREND_WINDOW - 1) / 2;
-  const trendPts = series.map((s, i) => {
-    const lo = Math.max(0, i - (bTimeAnchor === 'end' ? TREND_WINDOW - 1 : TREND_HALF)), hi = bTimeAnchor === 'end' ? i : Math.min(series.length - 1, i + TREND_HALF);
-    const slice = bs.slice(lo, hi + 1);
-    const avg = slice.reduce((a, b2) => a + b2, 0) / slice.length;
-    return `${x(s.t).toFixed(1)},${y(avg).toFixed(1)}`;
-  }).join(' ');
-  const trendLine = `<polyline points="${trendPts}" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-opacity="0.95"/>`;
-  // İnce adım (2026-10-12): uzun dönem trend (yukarıdaki, ≈ normal pencereyle aynı olay ölçeği) + KISA dönem trend (21 pencere).
-  // 21 ince pencere 20 olaylık kayma kapsar; her b yine 100 olaydan hesaplandığı için birleşik olay aralığı ≈ 120 olaydır.
-  // Normal pencerede (adım 10) bu çizgi yoktur.
-  const SHORT_K = STEPB === 1 && TREND_WINDOW > 21 ? 21 : 0, SHORT_H = (SHORT_K - 1) / 2;
-  const shortLine = !SHORT_K ? '' : `<polyline points="${series.map((s, i) => {
-    const lo = Math.max(0, i - (bTimeAnchor === 'end' ? SHORT_K - 1 : SHORT_H)), hi = bTimeAnchor === 'end' ? i : Math.min(series.length - 1, i + SHORT_H);
-    const sl = bs.slice(lo, hi + 1); return `${x(s.t).toFixed(1)},${y(sl.reduce((a, c) => a + c, 0) / sl.length).toFixed(1)}`; }).join(' ')}" fill="none" stroke="#a855f7" stroke-width="1.5" stroke-opacity="0.95"/>`;
-
-  // (b) sabit-Mc serisi: aynı k-pencere hareketli ortalama, gri kesikli
+  // (b) sabit-Mc serisi: ham pencere değerleri (yumuşatma yok), gri kesikli
   let fixedLine = '', fixedDots = '';
   if (fs.length) {
-    const fb = fs.map(s => s.b);
-    const fPts = fs.map((s, i) => {
-      const lo = Math.max(0, i - (bTimeAnchor === 'end' ? TREND_WINDOW - 1 : TREND_HALF)), hi = bTimeAnchor === 'end' ? i : Math.min(fs.length - 1, i + TREND_HALF);
-      const sl = fb.slice(lo, hi + 1);
-      return `${x(s.t).toFixed(1)},${y(sl.reduce((a, c) => a + c, 0) / sl.length).toFixed(1)}`;
-    }).join(' ');
-    fixedLine = `<polyline points="${fPts}" fill="none" stroke="#d1d5db" stroke-width="1.8" stroke-dasharray="5,3" stroke-opacity="0.95"/>`;
+    fixedLine = `<polyline points="${fs.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ')}" fill="none" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,2" stroke-opacity="0.8"/>`;
     fixedDots = fs.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="1" fill="#d1d5db" fill-opacity="0.35"><title>sabit Mc=${fixed.mc.toFixed(1)}: b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
   }
 
@@ -2720,11 +2687,10 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     <line x1="${PAD_L}" y1="${y(bAvg)}" x2="${W-PAD_R}" y2="${y(bAvg)}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
     ${band}
     ${errBars}
-    <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="${STEPB === 1 ? 1.1 : useBand ? 0.5 : 0.8}" stroke-opacity="${STEPB === 1 ? 0.8 : useBand ? 0.25 : 0.4}"/>
+    <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="${STEPB === 1 ? 1.2 : useBand ? 0.7 : 0.9}" stroke-opacity="${STEPB === 1 ? 0.9 : 0.55}"/>
     ${STEPB === 1 ? '' : dots}
     ${fixedDots}
     ${fixedLine}
-    ${trendLine}${shortLine}
     ${strip}
     <line x1="${PAD_L}" y1="${PAD_T+plotH}" x2="${W-PAD_R}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
     <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
@@ -2733,9 +2699,9 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   const bLast = series[series.length-1];
   const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, err: btAll.series[btAll.series.length - 1].err, nWin: btAll.series.length, N: btAll.N } : null;
   const btsObj = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
-              fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, trendK: TREND_WINDOW, anchor: bTimeAnchor };
+              fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, anchor: bTimeAnchor, band: useBand };
   if (STORE) lastBts = btsObj;
-  if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB, trendShortK: SHORT_K };
+  if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB };
   const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
   // Lejant iki seviyeye ayrıldı -- "grafik açıklaması" (renk/sembol anahtarı)
   // ile "istatistik özeti" aynı satırda karışmasın (2026-09-17, kullanıcı
@@ -2744,16 +2710,13 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     `<div style="font-size:.85em;color:#aaa">` +
       (STEPB === 1 ? `<span style="color:#06b6d4">─</span> Ham b-değeri (ince çizgi) &nbsp; ` : `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; `) +
       (useBand ? `<span style="color:#06b6d4;opacity:.6">▮</span> %95 yaklaşık güven bandı (±1.96·b/√n, pencere başına) &nbsp; ` : `<span style="color:#06b6d4">│</span> %95 güven aralığı &nbsp; `) +
-      (fixed ? `<span style="color:#d1d5db">┄</span> Sabit Mc=${fixed.mc.toFixed(1)} (${fixed.src}) hareketli ortalama &nbsp; ` : '') +
-      (SHORT_K
-        ? `<span style="color:#ec4899">━</span> Uzun dönem trend (${TREND_WINDOW} pencere: ${TREND_WINDOW - 1} olay kayma, ≈ ${TREND_WINDOW + 99} olay${bTimeAnchor === 'end' ? ', geriye dönük' : ''}) &nbsp; <span style="color:#a855f7">━</span> Kısa dönem trend (${SHORT_K} pencere: ${SHORT_K - 1} olay kayma, ≈ ${SHORT_K + 99} olay) &nbsp; `
-        : `<span style="color:#ec4899">━</span> Hareketli ortalama (${TREND_WINDOW} pencere${bTimeAnchor === 'end' ? ', geriye dönük; noktalar pencere sonunda' : ''}) &nbsp; `) +
+      (fixed ? `<span style="color:#d1d5db">┄</span> Sabit Mc=${fixed.mc.toFixed(1)} (${fixed.src}) ham b(t) &nbsp; ` : '') +
       `<span style="color:#f59e0b">┄</span> Genel ortalama` +
     `</div>` +
     `<div style="margin-top:2px">` +
       `b ort. = <b>${bAvg.toFixed(2)}</b> &nbsp;|&nbsp; b son = <b>${bLast.b.toFixed(2)}${lastErrStr}</b> ` +
       `<span style="color:#888;font-size:.85em">(%95, n=100)</span> &nbsp;|&nbsp; ${series.length} pencere (N=${N}${STEPB === 1 ? ', adım 1 — ince adım' : ''})` +
-      (STEPB === 1 ? `<div style="color:#9ab0c5;margin-top:2px;">Her b değeri 100 olaydan hesaplanır; adım 1 örnekleme sıklığını 10 kat artırır, bağımsız bilgiyi aynı oranda artırmaz (ardışık pencereler 99 olayı paylaşır). %95 bant ince serinin kendi pencerelerinden hesaplanır. Kısa dönem trenddeki bir sıçrama tek başına fiziksel değişimin kanıtı değildir; örneklem belirsizliği (bant) ve pencere uzunluğuyla birlikte yorumlanmalıdır.</div>` : '') +
+      `<div style="color:#9ab0c5;margin-top:2px;">Yöntem: her b değeri 100 ardışık olaydan (M ≥ Mc) Aki (1965) en çok olabilirlikle hesaplanır; pencereler ${STEPB} olay kaydırılır (Öncel &amp; Wilson 2007${STEPB === 1 ? ' pencerelemesi, ince adım' : ''}). Ardışık pencereler ${100 - STEPB} olayı paylaşır: ham b(t) değerleri bağımsız, anlık ölçümler değildir; her biri 100 olaylık bir kayan pencere tahminidir. Ek yumuşatma (trend çizgisi) uygulanmaz.${STEPB === 1 ? ' Adım 1 örnekleme sıklığını 10 kat artırır, bağımsız bilgiyi aynı oranda artırmaz. %95 bant ince serinin kendi pencerelerinden hesaplanır.' : ''}${bTimeAnchor === 'end' ? ' Noktalar pencerenin son olayında (nedensel).' : ''}</div>` +
       (cs ? (btFitOn
         ? ` &nbsp;|&nbsp; <span style="color:#f5a623">Fit aralığı M ${btFit.lo ?? 'Mc'}–${btFit.hi ?? '∞'}: olay başına eşik max(Mc_i, M_min)${btFit.hi !== null ? ', M &lt; M_max, çift kesik Aki–Utsu (hata ±1,96·SE, Fisher)' : ' (Aki 1965 genelleştirmesi)'}</span>` +
           (allS ? ` &nbsp;|&nbsp; <span style="color:#94a3b8">karşılaştırma — tüm sınıflar: b ort. = ${allS.bAvg.toFixed(2)}, b son = ${allS.bLast.toFixed(2)}${allS.err !== null ? ' ± ' + allS.err.toFixed(2) : ''} (${allS.nWin} pencere, N=${allS.N})</span>` : '')
@@ -3609,9 +3572,9 @@ async function exportPosterAGU(scale, evt) {
     : L('Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', 'Figure 2. Time–magnitude distribution of events; colours show magnitude classes (no completeness steps used).'), X2 + 16, y, W2 - 32, TOP + 256);
   y = box(X2, TOP + 275, W2, MID - TOP - 275, L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112);
-  const tK = (bt && bt.trendK) || 21, tEnd = bt && bt.anchor === 'end';
-  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + '; plotted at the ' + (tEnd ? 'last event of each window (causal)' : 'median event of each window') + '. {#0891b2|Cyan:} window b-value' + (BT_STEP === 1 ? ' (thin line), band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); {#db2777|pink:} ' + tK + '-window ' + (tEnd ? 'trailing' : 'centred') + ' moving average (display only)' + (bt && bt.trendShortK ? '; {#9333ea|purple:} ' + bt.trendShortK + '-window short-term moving average (≈ ' + (bt.trendShortK + 99) + ' events)' : '') + '; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
-    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + '; nokta zamanı ' + (tEnd ? 'pencerenin son olayı (nedensel)' : 'pencerenin ortanca olayı') + '. {#0891b2|Camgöbeği:} pencere b-değeri' + (BT_STEP === 1 ? ' (ince çizgi), bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} ' + tK + ' pencerelik ' + (tEnd ? 'geriye dönük' : 'merkezî') + ' hareketli ortalama (yalnızca görsel)' + (bt && bt.trendShortK ? '; {#9333ea|mor:} ' + bt.trendShortK + ' pencerelik kısa dönem hareketli ortalama (≈ ' + (bt.trendShortK + 99) + ' olay)' : '') + '; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  const tEnd = bt && bt.anchor === 'end', bandF = BT_STEP === 1 || (bt && bt.band);
+  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + '; plotted at the ' + (tEnd ? 'last event of each window (causal)' : 'median event of each window') + '. {#0891b2|Cyan:} raw window b-values' + (BT_STEP === 1 ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
+    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + '; nokta zamanı ' + (tEnd ? 'pencerenin son olayı (nedensel)' : 'pencerenin ortanca olayı') + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (BT_STEP === 1 ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
