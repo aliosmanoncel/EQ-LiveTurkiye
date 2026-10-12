@@ -1236,8 +1236,15 @@
 <div class="tmPanel" id="btPanel" style="z-index:1003">
   <div class="tmHead">
     <span class="tmTitle">📈 Zaman–Magnitude Dağılımı — ince adım <span style="color:#666;font-weight:400;">(b(t): Öncel &amp; Wilson 2007, N=100 kayan pencere, adım=1 olay)</span></span>
-    <span><button class="tmClose" onclick="toggleBtWin()">✕</button></span>
+    <span>
+      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event, null, true)" title="Zaman–Magnitude, ince adımlı b(t) (adım 1) ve Gutenberg–Richter: ekrandaki koyu temada PNG">🖼 PNG — Web</button>
+      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event, null, true)" title="Aynı üç grafik, beyaz zemin (rapor / Word / PDF için); b(t) adım 1">📄 PNG — Rapor</button>
+      <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event, 'poster', true)" title="Özet 16:9 (1920×1080), koyu tema; b(t) adım 1">🖼 Özet 16:9</button>
+      <button class="tmFullscreenBtn" onclick="exportPosterAGU(+document.getElementById('btPosterScale').value, event, true)" title="Akademik poster (AGU düzeninden esinlenen); başlık, yazarlar, fotoğraf, dil vb. Time-Mag (normal) penceresindeki poster ayarlarından alınır; b(t) şekli ve metinleri adım 1">🎓 Akademik poster</button><select id="btPosterScale" title="Akademik poster boyutu" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.72rem;margin-right:8px;"><option value="1">1920×1080</option><option value="2" selected>3840×2160</option><option value="4">7680×4320</option></select>
+      <button class="tmClose" onclick="toggleBtWin()">✕</button>
+    </span>
   </div>
+  <div class="tmMeta" style="color:#f59e0b;">Ayarlar Time-Mag (normal) penceresinden yönetilir.</div>
   <div class="tmMeta" id="btMeta">—</div>
   <svg id="btSvgMT" viewBox="0 0 660 260" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:900px"></svg>
   <div class="tmTitle" style="font-size:.78rem;margin-top:8px;" title="Pencere kaydırma adımı 1 olay: aynı N = 100 pencere, aynı Mc ve aynı hesap; örnekleme 10 kat sıklaşır. Ardışık pencereler %99 örtüşür; bağımsız bilgi ve istatistiksel kesinlik ARTMAZ, değişimin zamanlaması daha ayrıntılı görünür. Eğrinin bir eşiği ilk geçtiği an fiziksel değişimin başlangıç zamanı değildir.">📊 b-Değerinin Zaman İçindeki Değişimi — ince adım <span style="color:#666;font-weight:400;">(N=100, adım=1 olay; normal adım için Time-Mag (normal))</span></div>
@@ -2091,6 +2098,7 @@ let showTimeMag = false;
 let showBtWin = false, showAftWin = false;   // Time-Mag (ince) ve Time-Mag (artçı) pencereleri
 function tmAnyOpen() { return showTimeMag || showBtWin || showAftWin; }
 let lastBts = null;
+let lastBtsInce = null;   // Time-Mag (ince) b(t) özeti (adım 1) — ince pencerenin dışa aktarımları için
 
 /* ── Magnitude Conversion Laboratory ──────────────────────────
    EQ-LiveTürkiye herhangi bir dönüşüm bağıntısını "önerilen/doğru"
@@ -2737,8 +2745,10 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
 
   const bLast = series[series.length-1];
   const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, err: btAll.series[btAll.series.length - 1].err, nWin: btAll.series.length, N: btAll.N } : null;
-  if (STORE) lastBts = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
+  const btsObj = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
               fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, trendK: TREND_WINDOW, anchor: bTimeAnchor };
+  if (STORE) lastBts = btsObj;
+  if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB };
   const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
   // Lejant iki seviyeye ayrıldı -- "grafik açıklaması" (renk/sembol anahtarı)
   // ile "istatistik özeti" aynı satırda karışmasın (2026-09-17, kullanıcı
@@ -3104,7 +3114,7 @@ function toggleTimeMagFullscreen(evt) {
   const panel = document.getElementById(id), head = panel && panel.querySelector('.tmHead'); if (!head) return;
   let dragging = false, offX = 0, offY = 0;
   head.addEventListener('pointerdown', e => {
-    if (e.target.closest('.tmClose') || e.target.closest('select')) return;
+    if (e.target.closest('.tmClose') || e.target.closest('select') || e.target.closest('button')) return;
     dragging = true; const r = panel.getBoundingClientRect();
     panel.style.left = r.left + 'px'; panel.style.top = r.top + 'px'; panel.style.bottom = 'auto'; panel.style.transform = 'none';
     offX = e.clientX - r.left; offY = e.clientY - r.top; head.setPointerCapture(e.pointerId);
@@ -3339,8 +3349,10 @@ function posterLoadQR() {
 }
 function posterVal(id, def) { const el = document.getElementById(id); const v = el ? el.value.trim() : ''; return v || def; }
 
-async function exportPosterAGU(scale, evt) {
-  if (!showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
+// ince = true: Time-Mag (ince) penceresinden — b(t) şekli btSvg (adım 1), özet lastBtsInce, metinlerde adım 1, başlık/dosya adında "Adım 1 (İnce)"
+async function exportPosterAGU(scale, evt, ince) {
+  if (!(ince ? showBtWin : showTimeMag)) { alert(ince ? 'Önce Time-Mag (ince) penceresini açın.' : 'Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
+  const BT_ID = ince ? 'btSvg' : 'tmSvgB', BT_STEP = ince ? 1 : 10;
   posterSavePrefs();
   const btn = evt && evt.currentTarget ? evt.currentTarget : null, oldLabel = btn ? btn.textContent : null;
   if (btn) { btn.textContent = '⏳…'; btn.disabled = true; }
@@ -3352,7 +3364,7 @@ async function exportPosterAGU(scale, evt) {
   const SRC = t => !EN ? t : t.replace('Tarihsel Katalog', 'Historical Catalogue').replace('HK Yerel Katalog', 'HK Local Catalogue').replace('HK Tarihsel Katalog', 'HK Historical Catalogue')
     .replace('önceden çekilmiş katalog', 'pre-fetched catalogue').replace('canlı sorgu', 'live query').replace(/statik/g, 'static').replace(/^Canlı akış/, 'Live feed').replace(/^canlı akış/, 'live feed');
   // hedef punto (SVG birimi) = ~11,5 px ÷ şeklin posterdeki ölçeği (zaman–büyüklük ≈0,75; b(t) ≈0,72; G-R ≈0,73)
-  const AXK = { tmSvg: 15.3, tmSvgB: 16, tmSvgGR: 15.5 };
+  const AXK = { tmSvg: 15.3, tmSvgB: 16, btSvg: 16, tmSvgGR: 15.5 };
   const svgImg = (el, k) => new Promise((res, rej) => {
     let xml = svgToLight(svgBoostAxisText(new XMLSerializer().serializeToString(el), AXK[el.id] || 0));
     if (EN) xml = svgToEN(xml);
@@ -3367,7 +3379,7 @@ async function exportPosterAGU(scale, evt) {
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
   });
   let imgs;
-  try { imgs = await Promise.all(['tmSvg', 'tmSvgB', 'tmSvgGR'].map(id => svgImg(document.getElementById(id), 2.5 * SC))); }
+  try { imgs = await Promise.all(['tmSvg', BT_ID, 'tmSvgGR'].map(id => svgImg(document.getElementById(id), 2.5 * SC))); }
   catch (e) { alert('Görsel oluşturulamadı: ' + e.message); done(); return; }
   const loadImg = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
   const idImgs = Object.assign({}, posterGetImgs(), window._posterImgMem || {});
@@ -3434,7 +3446,7 @@ async function exportPosterAGU(scale, evt) {
   const tCore = lastCs ? L('Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Oranları', 'b-Value and Earthquake Recurrence Rates with Time-Dependent Completeness')
     : L('b-Değeri, Zamansal Değişimi ve Frekans–Büyüklük Dağılımı', 'b-Value, Its Temporal Variation and the Frequency–Magnitude Distribution');
   const tDecl = regionRect && regionDeclusterOn ? L(', Artçıları Ayıklanmış Katalog', ', Declustered Catalogue') : '';
-  const title = posterVal('posterTitle', (region ? region + ': ' : '') + tCore + tDecl + (tYrs ? ` (${tYrs})` : ''));
+  const title = posterVal('posterTitle', (region ? region + ': ' : '') + tCore + tDecl + (tYrs ? ` (${tYrs})` : '')) + (ince ? L(' — Adım 1 (İnce)', ' — Step 1 (Fine)') : '');
   // Kimlik varsayılanı YOK: boşsa açıkça yer tutucu yazılır (kimse adına poster üretilmez)
   const authorIn = posterVal('posterAuthor', ''), affilIn = posterVal('posterAffil', '');
   const author = authorIn || L('Yazar Adı Soyadı', 'Author Name Surname'), affil = affilIn || L('Unvan · Kurum / Üniversite / Bölüm', 'Title · Institution / University / Department');
@@ -3497,7 +3509,7 @@ async function exportPosterAGU(scale, evt) {
     return y; };
   const caption = (t, x, y, w, maxY) => rich(t.replace(/^((?:Şekil|Figure) \d+\.)/, '**$1**'), x, y, w, { size: 16, lh: 20, italic: true, col: '#374151', maxY, justify: false });
 
-  const cs = lastCs, gf = lastCs ? lastGrFit : null, gs = lastCs ? null : lastGrSimple, bt = typeof lastBts !== 'undefined' ? lastBts : null;
+  const cs = lastCs, gf = lastCs ? lastGrFit : null, gs = lastCs ? null : lastGrSimple, bt = ince ? lastBtsInce : typeof lastBts !== 'undefined' ? lastBts : null;
   const fitT = gf && gf.fit ? `M ${gf.fit.lo.toFixed(1)}–${gf.fit.hi.toFixed(1)}` : null;   // fit aralığı [M_min, M_max) (2026-09-29)
   const d = t => t ? new Date(t).toISOString().slice(0, 10) : '—';
   const evs = (regionRect ? applyGk74Filter(regionEvents) : lastTmEvList) || [];
@@ -3566,19 +3578,19 @@ async function exportPosterAGU(scale, evt) {
     ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitude-type sensitivity scenario:** ${[!lastTmTypeFilter.md ? `MD (duration magnitude) events excluded (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `unconverted ML<1.7 events excluded (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; events were neither deleted from the catalogue nor converted.`] : []),
     cs ? `**Completeness periods** (sub-catalogues): ${cs.periods.map(csLab).join('; ')}; N entering the analysis = ${cs.kept.length.toLocaleString(NF)}.` : '**Completeness:** single Mc (maximum curvature +0.2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit range ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} with per-event threshold max(Mc_i, M_min)${bt.fit.hi !== null ? ', upper bound M_max; doubly truncated Aki–Utsu maximum likelihood' : '; Aki (1965) maximum likelihood'}; N = 100 moving window, step 10 (Öncel & Wilson 2007); 95% interval ±1.96·SE.`
-      : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step 10 (Öncel & Wilson 2007); 95% interval ±1.96·b/√N.',
+      : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine step; consecutive windows overlap by 99%)' : '') + ' (Öncel & Wilson 2007); 95% interval ±1.96·b/√N.',
     cs ? `**Gutenberg–Richter:** Weichert (1980) maximum likelihood with unequal observation periods${fitT ? `; fit range ${fitT} (M_min ≤ M < M_max; shared by b, D/sd, the R profile and b(t); chosen by a b(M_min) stability scan)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model input, not an Mmax estimate)` : ''}. Sub-catalogue merging principle: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** single Mc; b_GR by Aki (1965) maximum likelihood, a = log N(≥Mc) + b·Mc; goodness of fit after Wiemer & Wyss (2000).'];
   const mItems = EN ? mItemsEN() : [
     `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')})` + (regionCtxReady(regionEvents) ? `; daire dışı bağlamla (dar halka R+30 km, geniş halka R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString('tr-TR')} bağlam olayı)` : '') + (mwAuthActive() ? `; büyük depremlerde otoriter Mw (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.') + mtNote,
     ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitüd tipi duyarlılık senaryosu:** ${[!lastTmTypeFilter.md ? `MD (süre magnitüdü) olayları analiz dışı (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `dönüştürülmemiş ML<1,7 olayları analiz dışı (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; olaylar katalogdan silinmedi, dönüştürülmedi.`] : []),
     cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit aralığı ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} ile olay başına eşik max(Mc_i, M_min)${bt.fit.hi !== null ? ', üst sınır M_max; çift kesik Aki–Utsu en çok olabilirlik' : '; Aki (1965) en çok olabilirlik'}; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·SE.`
-      : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
+      : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince adım; ardışık pencereler %99 örtüşür)' : '') + ' (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
     cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${fitT ? `; fit aralığı ${fitT} (M_min ≤ M < M_max; b, D/sd, R profili ve b(t) için ortak; seçim b(M_min) kararlılık taramasıyla)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** tek Mc; b_GR Aki (1965) en çok olabilirlik, a = log N(≥Mc) + b·Mc; uyum Wiemer & Wyss (2000) GoF.'];
   // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
   const srcTag = SRC(regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
-  const steps = EN ? [['1 · Data', `${srcTag} catalogue`], ['2 · Completeness', cs ? 'Mc(t) steps' : 'single Mc'], ['3 · b(t)', 'N = 100, step 10'], ['4 · G–R', cs ? 'Weichert (1980)' : 'single Mc · Aki MLE']]
-    : [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım 10'], ['4 · G–R', cs ? 'Weichert (1980)' : 'tek Mc · Aki MLE']];
+  const steps = EN ? [['1 · Data', `${srcTag} catalogue`], ['2 · Completeness', cs ? 'Mc(t) steps' : 'single Mc'], ['3 · b(t)', 'N = 100, step ' + BT_STEP], ['4 · G–R', cs ? 'Weichert (1980)' : 'single Mc · Aki MLE']]
+    : [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım ' + BT_STEP], ['4 · G–R', cs ? 'Weichert (1980)' : 'tek Mc · Aki MLE']];
   { const fx0 = X1 + 16, fw = W1 - 32, ag = 18, bw = (fw - ag * (steps.length - 1)) / steps.length, bh = 54;
     steps.forEach(([h, sub], i) => { const bx0 = fx0 + i * (bw + ag);
       c.fillStyle = TH.soft; c.strokeStyle = ACC; c.lineWidth = 1.5; c.beginPath();
@@ -3599,8 +3611,8 @@ async function exportPosterAGU(scale, evt) {
   y = box(X2, TOP + 275, W2, MID - TOP - 275, L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112);
   const tK = (bt && bt.trendK) || 21, tEnd = bt && bt.anchor === 'end';
-  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step 10; plotted at the ' + (tEnd ? 'last event of each window (causal)' : 'median event of each window') + '. {#0891b2|Cyan:} window b-value, bars = approx. 95% CI (±1.96·b/√N); {#db2777|pink:} ' + tK + '-window ' + (tEnd ? 'trailing' : 'centred') + ' moving average (display only); {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
-    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım 10; nokta zamanı ' + (tEnd ? 'pencerenin son olayı (nedensel)' : 'pencerenin ortanca olayı') + '. {#0891b2|Camgöbeği:} pencere b-değeri, çubuklar yaklaşık %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} ' + tK + ' pencerelik ' + (tEnd ? 'geriye dönük' : 'merkezî') + ' hareketli ortalama (yalnızca görsel); {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + '; plotted at the ' + (tEnd ? 'last event of each window (causal)' : 'median event of each window') + '. {#0891b2|Cyan:} window b-value' + (BT_STEP === 1 ? ' (thin line), band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); {#db2777|pink:} ' + tK + '-window ' + (tEnd ? 'trailing' : 'centred') + ' moving average (display only); {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
+    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + '; nokta zamanı ' + (tEnd ? 'pencerenin son olayı (nedensel)' : 'pencerenin ortanca olayı') + '. {#0891b2|Camgöbeği:} pencere b-değeri' + (BT_STEP === 1 ? ' (ince çizgi), bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); {#db2777|pembe:} ' + tK + ' pencerelik ' + (tEnd ? 'geriye dönük' : 'merkezî') + ' hareketli ortalama (yalnızca görsel); {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
@@ -3722,13 +3734,14 @@ async function exportPosterAGU(scale, evt) {
     if (!blob) { alert('Poster oluşturulamadı (görüntü güvenlik kısıtı).'); done(); return; }
     const url = URL.createObjectURL(blob), a = document.createElement('a');
     const slug = (region || 'bolge').replace(/[İI]/g, 'i').toLowerCase().replace(/[ğüşıöç]/g, ch => ({ 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ı': 'i', 'ö': 'o', 'ç': 'c' })[ch]).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'bolge';
-    a.href = url; a.download = `EQ-Live-${SC >= 4 ? L('Baski', 'Print') + '-7680x4320' : SC > 1 ? 'Poster' : L('Slayt', 'Slide')}-${slug}-${new Date().toISOString().slice(0, 10)}${EN ? '-EN' : ''}.png`;
+    a.href = url; a.download = `EQ-Live-${SC >= 4 ? L('Baski', 'Print') + '-7680x4320' : SC > 1 ? 'Poster' : L('Slayt', 'Slide')}-${slug}${ince ? '-Adim1-Ince' : ''}-${new Date().toISOString().slice(0, 10)}${EN ? '-EN' : ''}.png`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 5000); done();
   }, 'image/png');
 }
 
-async function exportTimeMagPNG(theme, evt, layout) {
+// ince = true: Time-Mag (ince) penceresinden çağrılır — b(t) btSvg/btStats (adım 1), başlık ve dosya adında "Adım 1 (İnce)"
+async function exportTimeMagPNG(theme, evt, layout, ince) {
   theme = theme === 'light' ? 'light' : 'dark';
   const PALETTE = {
     dark:  { bg:'#0a0e15', title:'#e2e8f0', meta:'#9ab0c5', region:'#7ecbff', label:'#06b6d4', stats:'#aaaaaa', footer:'#556' },
@@ -3738,11 +3751,13 @@ async function exportTimeMagPNG(theme, evt, layout) {
 
   const svgSpecs = [
     { id: 'tmSvg',   statsId: 'tmStats',   label: 'Zaman–Magnitude Dağılımı' },
-    { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007)' },
+    ince ? { id: 'btSvg', statsId: 'btStats', label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007) — Adım 1 (İnce)' }
+         : { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007)' },
     { id: 'tmSvgGR', statsId: 'tmStatsGR', label: 'Gutenberg-Richter Frekans-Büyüklük Dağılımı' },
   ];
   const svgEls = svgSpecs.map(s => document.getElementById(s.id));
-  if (svgEls.some(el => !el) || !showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
+  if (svgEls.some(el => !el) || !(ince ? showBtWin : showTimeMag)) { alert(ince ? 'Önce Time-Mag (ince) penceresini açın.' : 'Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
+  const INCE_T = ince ? ' — Adım 1 (İnce)' : '', INCE_F = ince ? '-Adim1-Ince' : '';
 
   function svgToImage(svgEl) {
     return new Promise((resolve, reject) => {
@@ -3818,7 +3833,7 @@ async function exportTimeMagPNG(theme, evt, layout) {
     c.fillStyle = pal.bg; c.fillRect(0, 0, PW, PH); c.textBaseline = 'top';
     let yy = PP;
     c.fillStyle = pal.title; c.font = 'bold 30px Arial';
-    c.fillText('EQ-Live Türkiye — Deprem Analizi', PP, yy); yy += 42;
+    c.fillText('EQ-Live Türkiye — Deprem Analizi' + INCE_T, PP, yy); yy += 42;
     const metaL = metaRawLines.flatMap(l => wrapText(l, PW - 2 * PP, '15px Arial').map(w => ({ text: w, isRegion: l.startsWith('Bölge:') }))).slice(0, 3);
     c.font = '15px Arial';
     metaL.forEach(l => { c.fillStyle = l.isRegion ? pal.region : pal.meta; c.fillText(l.text, PP, yy); yy += 21; });
@@ -3856,7 +3871,7 @@ async function exportTimeMagPNG(theme, evt, layout) {
     c.fillText(u === location.href ? u : u + '…', PP, PH - PP - 12);
     cv.toBlob(blob => {
       const url = URL.createObjectURL(blob), a = document.createElement('a');
-      a.href = url; a.download = `EQ-Live-Poster-${theme === 'light' ? 'acik' : 'koyu'}-${new Date().toISOString().slice(0, 10)}.png`;
+      a.href = url; a.download = `EQ-Live-Poster-${theme === 'light' ? 'acik' : 'koyu'}${INCE_F}-${new Date().toISOString().slice(0, 10)}.png`;
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 5000);
       if (btn) { btn.textContent = oldLabel; btn.disabled = false; }
@@ -3887,7 +3902,7 @@ async function exportTimeMagPNG(theme, evt, layout) {
   let y = PAD;
   ctx.fillStyle = pal.title;
   ctx.font = 'bold 18px Arial';
-  ctx.fillText('EQ-Live Türkiye — Deprem Analizi Raporu', PAD, y);
+  ctx.fillText('EQ-Live Türkiye — Deprem Analizi Raporu' + INCE_T, PAD, y);
   y += 26;
 
   ctx.font = '12px Arial';
@@ -3922,7 +3937,7 @@ async function exportTimeMagPNG(theme, evt, layout) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `EQ-Live-Analiz-${theme === 'light' ? 'Rapor' : 'Web'}-${new Date().toISOString().slice(0,10)}.png`;
+    a.download = `EQ-Live-Analiz-${theme === 'light' ? 'Rapor' : 'Web'}${INCE_F}-${new Date().toISOString().slice(0,10)}.png`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 5000);
     if (btn) { btn.textContent = oldLabel; btn.disabled = false; }
@@ -5127,7 +5142,7 @@ function renderTimeMag(evList) {
 
   renderBvalueTS(evList, Mc, cs);
   if (showBtWin) try {
-    renderBvalueTS(evList, Mc, cs, { svgId: 'btSvg', statsId: 'btStats', step: 1, store: false });
+    renderBvalueTS(evList, Mc, cs, { svgId: 'btSvg', statsId: 'btStats', step: 1, store: false, storeInce: true });
     const bm = document.getElementById('btMeta'), tm = document.getElementById('tmMeta');
     if (bm) bm.textContent = (tm ? tm.textContent : '') + ` · Mc = ${Mc !== null ? Mc : '—'}${mcIsManual ? ' (elle)' : ''}`;
     // M–t grafiği Time-Mag (normal) ile aynıdır: çizim kopyalanır (aynı veri, aynı ortak zaman ekseni)
