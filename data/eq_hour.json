@@ -1,1 +1,1 @@
-{"generated":"2026-10-14T06:59:04Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261014_0000120","time":"2026-10-14T06:02:10.0Z","lat":36.6657,"lon":29.3503,"dep":6.9,"mag":1.1,"mtype":"ml","mw":null,"place":"WESTERN TURKEY"}]}
+{"generated":"2026-10-14T12:45:17Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261014_0000214","time":"2026-10-14T12:07:39.0Z","lat":16.92,"lon":119.92,"dep":10.0,"mag":4.3,"mtype":"m","mw":null,"place":"LUZON, PHILIPPINES"}]}
