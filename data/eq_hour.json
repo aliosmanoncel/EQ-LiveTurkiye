@@ -1,1 +1,1 @@
-{"generated":"2026-10-15T15:26:35Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261015_0000187","time":"2026-10-15T14:44:52.0Z","lat":23.904,"lon":93.418,"dep":10.0,"mag":3.2,"mtype":"m","mw":null,"place":"MYANMAR-INDIA BORDER REGION"}]}
+{"generated":"2026-10-15T19:37:30Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261015_0000262","time":"2026-10-15T19:02:02.54Z","lat":36.9957,"lon":-2.4767,"dep":4.1,"mag":1.6,"mtype":"ml","mw":null,"place":"STRAIT OF GIBRALTAR"}]}
