@@ -3375,7 +3375,7 @@ function posterLoadQR() {
 }
 function posterVal(id, def) { const el = document.getElementById(id); const v = el ? el.value.trim() : ''; return v || def; }
 
-// İnce mod (tmMode === 'ince'): b(t) şekli tmSvgB'de adım 1 ile çizilidir; özet lastBtsInce, metinlerde adım 1, başlık/dosya adında "Adım 1 (İnce)"
+// İnce mod (tmMode === 'ince'): b(t) şekli tmSvgB'de adım 1 ile çizilidir; özet lastBtsInce, metinlerde adım 1; başlıkta ek yok, dosya adında "-Adim1-Ince"
 async function exportPosterAGU(scale, evt) {
   if (!showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
   // 2026-10-17: "Her ikisi" → aynı analiz ve düzenle önce TR, sonra EN posteri üretilir (iki ayrı dosya: …png ve …-EN.png)
@@ -3486,7 +3486,7 @@ async function exportPosterAGU(scale, evt) {
   const tCore = lastCs ? L('Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Oranları', 'b-Value and Earthquake Recurrence Rates with Time-Dependent Completeness')
     : L('b-Değeri, Zamansal Değişimi ve Frekans–Büyüklük Dağılımı', 'b-Value, Its Temporal Variation and the Frequency–Magnitude Distribution');
   const tDecl = regionRect && regionDeclusterOn ? L(', Artçıları Ayıklanmış Katalog', ', Declustered Catalogue') : '';
-  const title = posterVal('posterTitle', (region ? region + ': ' : '') + tCore + tDecl + (tYrs ? ` (${tYrs})` : '')) + (ince ? L(' — Adım 1 (İnce)', ' — Step 1 (Fine)') : '');
+  const title = posterVal('posterTitle', (region ? region + ': ' : '') + tCore + tDecl + (tYrs ? ` (${tYrs})` : ''));   // 2026-10-17: başlıkta adım eki yok; adım Yöntem'de ve Şekil 3'te yazılı
   // Kimlik varsayılanı YOK: boşsa açıkça yer tutucu yazılır (kimse adına poster üretilmez)
   const authorIn = posterVal('posterAuthor', ''), affilIn = posterVal('posterAffil', '');
   const author = authorIn || L('Yazar Adı Soyadı', 'Author Name Surname'), affil = affilIn || L('Unvan · Kurum / Üniversite / Bölüm', 'Title · Institution / University / Department');
@@ -3586,14 +3586,14 @@ async function exportPosterAGU(scale, evt) {
     ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitude-type sensitivity scenario:** ${[!lastTmTypeFilter.md ? `MD (duration magnitude) events excluded (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `unconverted ML<1.7 events excluded (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; events were neither deleted from the catalogue nor converted.`] : []),
     cs ? `**Completeness periods** (sub-catalogues): ${cs.periods.map(csLab).join('; ')}; N entering the analysis = ${cs.kept.length.toLocaleString(NF)}.` : '**Completeness:** single Mc (maximum curvature +0.2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit range ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} with per-event threshold max(Mc_i, M_min)${bt.fit.hi !== null ? ', upper bound M_max; doubly truncated Aki–Utsu maximum likelihood' : '; Aki (1965) maximum likelihood'}; N = 100 moving window, step 10 (Öncel & Wilson 2007); 95% interval ±1.96·SE.`
-      : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine step; consecutive windows overlap by 99%)' : '') + ' (Öncel & Wilson 2007); 95% interval ±1.96·b/√N.',
+      : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (consecutive windows overlap by 99%)' : '') + ' (Öncel & Wilson 2007); 95% interval ±1.96·b/√N.',
     cs ? `**Gutenberg–Richter:** Weichert (1980) maximum likelihood with unequal observation periods${fitT ? `; fit range ${fitT} (M_min ≤ M < M_max; shared by b, D/sd, the R profile and b(t); chosen by a b(M_min) stability scan)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model input, not an Mmax estimate)` : ''}. Sub-catalogue merging principle: Kijko & Sellevoll (1989).${gf && gf.consistency && gf.consistency.gof && gf.consistency.gof.ok ? ` Fit test: Poisson deviance, parametric bootstrap (B = ${gf.consistency.gof.B}).` : ''}` : '**Gutenberg–Richter:** single Mc; b_GR by Aki (1965) maximum likelihood, a = log N(≥Mc) + b·Mc; goodness of fit after Wiemer & Wyss (2000).'];
   const mItems = EN ? mItemsEN() : [
     `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')})` + (regionCtxReady(regionEvents) ? `; daire dışı bağlamla (dar halka R+30 km, geniş halka R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString('tr-TR')} bağlam olayı)` : '') + (mwAuthActive() ? `; büyük depremlerde otoriter Mw (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.') + mtNote,
     ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitüd tipi duyarlılık senaryosu:** ${[!lastTmTypeFilter.md ? `MD (süre magnitüdü) olayları analiz dışı (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `dönüştürülmemiş ML<1,7 olayları analiz dışı (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; olaylar katalogdan silinmedi, dönüştürülmedi.`] : []),
     cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit aralığı ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} ile olay başına eşik max(Mc_i, M_min)${bt.fit.hi !== null ? ', üst sınır M_max; çift kesik Aki–Utsu en çok olabilirlik' : '; Aki (1965) en çok olabilirlik'}; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·SE.`
-      : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince adım; ardışık pencereler %99 örtüşür)' : '') + ' (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
+      : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ardışık pencereler %99 örtüşür)' : '') + ' (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
     cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${fitT ? `; fit aralığı ${fitT} (M_min ≤ M < M_max; b, D/sd, R profili ve b(t) için ortak; seçim b(M_min) kararlılık taramasıyla)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).${gf && gf.consistency && gf.consistency.gof && gf.consistency.gof.ok ? ` Uyum testi: Poisson sapması, parametrik bootstrap (B = ${gf.consistency.gof.B}).` : ''}` : '**Gutenberg–Richter:** tek Mc; b_GR Aki (1965) en çok olabilirlik, a = log N(≥Mc) + b·Mc; uyum Wiemer & Wyss (2000) GoF.'];
   // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
   const srcTag = SRC(regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
@@ -3686,8 +3686,8 @@ async function exportPosterAGU(scale, evt) {
   const benCap = !BEN_ON ? '' : EN
     ? ` **(b)** Cumulative Benioff strain S(t) = Σ√E, log E = 11.8 + 1.5M (Gutenberg & Richter 1956), fixed threshold M ≥ ${BB ? BB.mFix.toFixed(1) : '—'} (N = ${BB ? BB.n : '—'}). Middle strip: ${binTxt} Benioff release rate ΔS/Δt. Lower strip (log₁₀, 0 = period mean): {#3b82f6|blue} event count, {#16a34a|green} b-value (n ≥ ${BEN_DEC_NB} per interval), {#6b7280|grey} residual, {#ea580c|orange} total = observed ΔS/Δt; truncated G–R${BD ? `, b_ref = ${BD.bRef.toFixed(2)}` : ''}. b and ΔS come from the same catalogue; descriptive decomposition, not a precursor.`
     : ` **(b)** Birikimli Benioff gerinimi S(t) = Σ√E, log E = 11,8 + 1,5M (Gutenberg & Richter 1956), sabit eşik M ≥ ${BB ? DC(BB.mFix.toFixed(1)) : '—'} (N = ${BB ? BB.n : '—'}). Orta şerit: ${binTxt} Benioff salım hızı ΔS/Δt. Alt şerit (log₁₀, 0 = dönem ortalaması): {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b değeri (aralıkta n ≥ ${BEN_DEC_NB}), {#6b7280|gri} artık, {#ea580c|turuncu} toplam = gözlenen ΔS/Δt; kesilmiş G–R${BD ? `, b_ref = ${DC(BD.bRef.toFixed(2))}` : ''}. b ve ΔS aynı katalogdan; betimleyici ayrıştırmadır, öncül değildir.`;
-  const cap3 = EN ? '**Figure 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + benCap
-    : '**Şekil 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + benCap;
+  const cap3 = EN ? '**Figure 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + benCap
+    : '**Şekil 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + benCap;
   const cap3O = BEN_ON ? { size: 14, lh: 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 };
   if (BEN_ON) {
     // 2026-10-17 düzen A: Şekil 3a b(t) üstte, 3b Benioff altta; AYNI genişlik ve sol kenar → iki SVG'nin zaman eksenleri
@@ -3831,7 +3831,7 @@ async function exportPosterAGU(scale, evt) {
   }, 'image/png');
 }
 
-// İnce mod (tmMode === 'ince'): b(t) tmSvgB/tmStatsB'de adım 1 ile çizilidir; başlık ve dosya adında "Adım 1 (İnce)"
+// İnce mod (tmMode === 'ince'): b(t) tmSvgB/tmStatsB'de adım 1 ile çizilidir; başlıkta ek yok, dosya adında "-Adim1-Ince"
 async function exportTimeMagPNG(theme, evt, layout) {
   const ince = tmMode === 'ince';
   theme = theme === 'light' ? 'light' : 'dark';
@@ -3843,7 +3843,7 @@ async function exportTimeMagPNG(theme, evt, layout) {
 
   const svgSpecs = [
     { id: 'tmSvg',   statsId: 'tmStats',   label: 'Zaman–Magnitude Dağılımı' },
-    { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007)' + (ince ? ' — Adım 1 (İnce)' : '') },
+    { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007)' + (ince ? ' — adım 1' : '') },
     { id: 'tmSvgGR', statsId: 'tmStatsGR', label: 'Gutenberg-Richter Frekans-Büyüklük Dağılımı' },
   ];
   // 2026-10-17: Kümülatif Benioff paneli b(t)'nin hemen altına eklenir (aynı zaman ekseni, aynı yatay kenar boşlukları).
@@ -3854,7 +3854,7 @@ async function exportTimeMagPNG(theme, evt, layout) {
   const iTM = 0, iB = 1, iBen = benOk ? 2 : -1, iGR = benOk ? 3 : 2;
   const svgEls = svgSpecs.map(s => document.getElementById(s.id));
   if (svgEls.some(el => !el) || !showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
-  const INCE_T = ince ? ' — Adım 1 (İnce)' : '', INCE_F = ince ? '-Adim1-Ince' : '';
+  const INCE_T = '', INCE_F = ince ? '-Adim1-Ince' : '';   // 2026-10-17: başlıkta adım eki yok (adım şekil etiketinde); dosya adı ayırt edici kalır
 
   function svgToImage(svgEl) {
     return new Promise((resolve, reject) => {
