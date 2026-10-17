@@ -2722,7 +2722,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   }
 
   const bAvg = bs.reduce((a,b)=>a+b, 0) / bs.length;
-  const adNote = AD.on ? `<text x="${W - PAD_R - 4}" y="${PAD_T + 10}" fill="#f59e0b" font-size="8" text-anchor="end">Seyreltilmiş görünüm: ${series.length} pencereden ${ser.length} tanesi (gösterim adımı ${STEPD})</text>` : '';
+  const adNote = AD.on ? `<text x="${W - PAD_R - 4}" y="${PAD_T + 10}" fill="#f59e0b" font-size="8" text-anchor="end">Hesaplanan pencere: ${series.length} · Gösterilen: ${ser.length} (adım ${STEPD}) · Zaman: ${bTimeAnchor === 'end' ? 'son olay' : bTimeAnchor === 'mid' ? 'ortanca' : 'ortalama'}</text>` : '';
 
   svgB.innerHTML = `
     ${yTicks}
@@ -3006,7 +3006,8 @@ function renderGutenbergRichter(evList, Mc) {
       let sumAbsDiff = 0, sumObs = 0;
       fitBins.forEach(p => { sumAbsDiff += Math.abs(p.cum - synthCum(p.m)); sumObs += p.cum; });
       const gofR = sumObs > 0 ? 100 * (1 - sumAbsDiff / sumObs) : null;
-      lastGrSimple = { mc: Mc, b: bFit, a: aFit, gof: gofR, n: nAboveMc };
+      const bErr = bConfidence95(bFit, nAboveMc);   // 2026-10-17: b_GR belirsizliği, b(t) ile aynı tanım (Aki 1965, ±1,96·b/√N)
+      lastGrSimple = { mc: Mc, b: bFit, a: aFit, gof: gofR, n: nAboveMc, err: bErr, mMax };
       const mFitStart = Math.max(Mc, 0), mFitEnd = mMax;
       const xStart = x(mFitStart), yStart = y(synthCum(mFitStart) / normFactor);
       const xEnd   = x(mFitEnd),   yEnd   = y(synthCum(mFitEnd) / normFactor);
@@ -3020,7 +3021,7 @@ function renderGutenbergRichter(evList, Mc) {
       fitLine = `<line x1="${xStart.toFixed(1)}" y1="${yStart.toFixed(1)}" x2="${xEnd.toFixed(1)}" y2="${yEnd.toFixed(1)}" stroke="#f5a623" stroke-width="1.3" stroke-dasharray="2,2"/>` +
                 `<circle cx="${xStart.toFixed(1)}" cy="${yStart.toFixed(1)}" r="3" fill="#f5a623" stroke="#111" stroke-width="0.6"><title>Fit başlangıcı: Mc=${Mc}, N≥Mc=${nAboveMc}</title></circle>` +
                 `<text x="${(xLabel+4).toFixed(1)}" y="${(yLabel-4).toFixed(1)}" fill="#f5a623" font-size="9" font-weight="700">b=${bFit.toFixed(2)}</text>`;
-      fitStatsStr = ` &nbsp;|&nbsp; N≥Mc=<b>${nAboveMc}</b> · a=<b>${aFit.toFixed(2)}</b> · b_GR=<b>${bFit.toFixed(2)}</b> · <span title="Wiemer &amp; Wyss (2000) goodness-of-fit measure (not R²)">GoF=<b>${gofR !== null ? gofR.toFixed(1)+'%' : '—'}</b></span>`;
+      fitStatsStr = ` &nbsp;|&nbsp; N≥Mc=<b>${nAboveMc}</b> · a=<b>${aFit.toFixed(2)}</b> · b_GR=<b>${bFit.toFixed(2)}</b>${bErr !== null ? ' ± ' + bErr.toFixed(2) + ' <span style="color:#888">(%95, Aki 1965)</span>' : ''} · <span title="Aki MLE yalnızca M ≥ Mc olaylarıyla; GoF kümülatif N(≥M) ile Mc–Mmax aralığında. Mc tahmindir (maks. eğrilik +0,2): bölgeye, zaman aralığına ve yönteme bağlıdır.">uyum M ${Mc}–${mMax}</span> · <span title="Wiemer &amp; Wyss (2000) goodness-of-fit measure (not R²)">GoF=<b>${gofR !== null ? gofR.toFixed(1)+'%' : '—'}</b></span>`;
     } else {
       fitStatsStr = ` &nbsp;|&nbsp; GR fit: yetersiz veri (N≥Mc=${Mc}: ${nAboveMc} &lt; 10)`;
     }
@@ -3340,7 +3341,7 @@ function svgToEN(xml) {
     .replace(/ \/yıl/g, ' /yr').replace(/(N = \d+) olay/g, '$1 events').replace(/TÜM SINIFLAR/g, 'ALL CLASSES')
     .replace(/EĞRİ {9}/g, 'CURVE        ').replace(/EN İYİ TAHMİN/g, 'BEST ESTIMATE').replace(/ÜST EĞRİ {5}/g, 'UPPER CURVE  ').replace(/ALT EĞRİ {5}/g, 'LOWER CURVE  ')
     .replace(/Yetersiz veri:/g, 'Insufficient data:')
-    .replace(/Seyreltilmiş görünüm: (\d+) pencereden (\d+) tanesi \(gösterim adımı (\d+)\)/g, 'Thinned display: $2 of $1 windows (display step $3)')
+    .replace(/Hesaplanan pencere: (\d+) · Gösterilen: (\d+) \(adım (\d+)\) · Zaman: (son olay|ortanca|ortalama)/g, (m, a, b, c, z) => `Computed windows: ${a} · Shown: ${b} (step ${c}) · Time: ${{ 'son olay': 'last event', ortanca: 'median', ortalama: 'mean' }[z]}`)
     .replace(/>(Oca|Şub|Mar|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)\.?( \d{4})?</g, (m, mo, y) => '>' + SVG_EN_MONTHS[mo] + (y || '') + '<');
 }
 function svgToLight(xml) {
@@ -3633,7 +3634,7 @@ async function exportPosterAGU(scale, evt) {
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
   y = figure(imgs[2], X3 + 16, y, W3 - 32, 300);
-  y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)})` : ''}, blue dashed Mc${gs ? ` = ${gs.mc}` : ''}.` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(gs.mc).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
+  y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? ' ± ' + gs.err.toFixed(2) : ''}, N = ${gs.n}, fit M ≥ ${gs.mc})` : ''}, blue dashed Mc${gs ? ` = ${gs.mc}` : ''}.` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? ' ± ' + gs.err.toFixed(2).replace('.', ',') : ''}, N = ${gs.n}, uyum M ≥ ${String(gs.mc).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(gs.mc).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
   // G-R parametre tablosu (büyük punto)
   if (gf && gf.curves && gf.curves.length) {
     const cols = [[L('Eğri', 'Curve'), 0], ['b ± 1σ', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/${L('yıl', 'yr')}`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
