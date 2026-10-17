@@ -3587,14 +3587,14 @@ async function exportPosterAGU(scale, evt) {
     cs ? `**Completeness periods** (sub-catalogues): ${cs.periods.map(csLab).join('; ')}; N entering the analysis = ${cs.kept.length.toLocaleString(NF)}.` : '**Completeness:** single Mc (maximum curvature +0.2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit range ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} with per-event threshold max(Mc_i, M_min)${bt.fit.hi !== null ? ', upper bound M_max; doubly truncated Aki–Utsu maximum likelihood' : '; Aki (1965) maximum likelihood'}; N = 100 moving window, step 10 (Öncel & Wilson 2007); 95% interval ±1.96·SE.`
       : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine step; consecutive windows overlap by 99%)' : '') + ' (Öncel & Wilson 2007); 95% interval ±1.96·b/√N.',
-    cs ? `**Gutenberg–Richter:** Weichert (1980) maximum likelihood with unequal observation periods${fitT ? `; fit range ${fitT} (M_min ≤ M < M_max; shared by b, D/sd, the R profile and b(t); chosen by a b(M_min) stability scan)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model input, not an Mmax estimate)` : ''}. Sub-catalogue merging principle: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** single Mc; b_GR by Aki (1965) maximum likelihood, a = log N(≥Mc) + b·Mc; goodness of fit after Wiemer & Wyss (2000).'];
+    cs ? `**Gutenberg–Richter:** Weichert (1980) maximum likelihood with unequal observation periods${fitT ? `; fit range ${fitT} (M_min ≤ M < M_max; shared by b, D/sd, the R profile and b(t); chosen by a b(M_min) stability scan)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model input, not an Mmax estimate)` : ''}. Sub-catalogue merging principle: Kijko & Sellevoll (1989).${gf && gf.consistency && gf.consistency.gof && gf.consistency.gof.ok ? ` Fit test: Poisson deviance, parametric bootstrap (B = ${gf.consistency.gof.B}).` : ''}` : '**Gutenberg–Richter:** single Mc; b_GR by Aki (1965) maximum likelihood, a = log N(≥Mc) + b·Mc; goodness of fit after Wiemer & Wyss (2000).'];
   const mItems = EN ? mItemsEN() : [
     `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')})` + (regionCtxReady(regionEvents) ? `; daire dışı bağlamla (dar halka R+30 km, geniş halka R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString('tr-TR')} bağlam olayı)` : '') + (mwAuthActive() ? `; büyük depremlerde otoriter Mw (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.') + mtNote,
     ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitüd tipi duyarlılık senaryosu:** ${[!lastTmTypeFilter.md ? `MD (süre magnitüdü) olayları analiz dışı (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `dönüştürülmemiş ML<1,7 olayları analiz dışı (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; olaylar katalogdan silinmedi, dönüştürülmedi.`] : []),
     cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit aralığı ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} ile olay başına eşik max(Mc_i, M_min)${bt.fit.hi !== null ? ', üst sınır M_max; çift kesik Aki–Utsu en çok olabilirlik' : '; Aki (1965) en çok olabilirlik'}; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·SE.`
       : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince adım; ardışık pencereler %99 örtüşür)' : '') + ' (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
-    cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${fitT ? `; fit aralığı ${fitT} (M_min ≤ M < M_max; b, D/sd, R profili ve b(t) için ortak; seçim b(M_min) kararlılık taramasıyla)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** tek Mc; b_GR Aki (1965) en çok olabilirlik, a = log N(≥Mc) + b·Mc; uyum Wiemer & Wyss (2000) GoF.'];
+    cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${fitT ? `; fit aralığı ${fitT} (M_min ≤ M < M_max; b, D/sd, R profili ve b(t) için ortak; seçim b(M_min) kararlılık taramasıyla)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).${gf && gf.consistency && gf.consistency.gof && gf.consistency.gof.ok ? ` Uyum testi: Poisson sapması, parametrik bootstrap (B = ${gf.consistency.gof.B}).` : ''}` : '**Gutenberg–Richter:** tek Mc; b_GR Aki (1965) en çok olabilirlik, a = log N(≥Mc) + b·Mc; uyum Wiemer & Wyss (2000) GoF.'];
   // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
   const srcTag = SRC(regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
   const steps = EN ? [['1 · Data', `${srcTag} catalogue`], ['2 · Completeness', cs ? 'Mc(t) steps' : 'single Mc'], ['3 · b(t)', 'N = 100, step ' + BT_STEP], ['4 · G–R', cs ? 'Weichert (1980)' : 'single Mc · Aki MLE']]
@@ -3610,8 +3610,9 @@ async function exportPosterAGU(scale, evt) {
     let ok = false;
     for (const sz of [15, 14, 13, 12]) { METH_SZ = sz; if (room() - need(sz) >= 120) { ok = true; break; } }
     if (!ok) for (const sz of [12, 11]) { METH_SZ = sz; if (room() - need(sz) >= 90) { ok = true; break; } }
-    if (!ok) TMH = Math.max(150, TMH - Math.max(0, 90 - (room() - need(11))));
-    MAPH = Math.max(90, Math.min(183, room() - need(METH_SZ)));
+    if (!ok) TMH = Math.max(130, TMH - Math.max(0, 90 - (room() - need(11))));
+    MAPH = Math.max(75, Math.min(183, room() - need(METH_SZ)));
+    if (room() - need(METH_SZ) < 75) console.warn('[poster] Veri ve Yöntem metni kutuya tam sığmayabilir');
     MB = 44 + MAPH + 46; VY = GH + 12 + MB + 12 + TMH + 12;
   }
   y = box(X1, TOP + GH + 12, W1, MB, L('Çalışma Alanı', 'Study Area'));
@@ -3731,7 +3732,7 @@ async function exportPosterAGU(scale, evt) {
   const qcFlag = !!cs && (mcFlag || gofRej);
   const msg = posterVal('posterMessage', '') || (qcFlag ? (mcFlag
     ? L('Tamlık eşikleri veri Mc\'sinin altında; b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.', 'Completeness thresholds lie below the data Mc; verify b and rates by re-running.')
-    : L(`G-R modeli sınıf sayımlarıyla uyumlu değil (p_boot ${fmtPboot(qcObj.gof)}); b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.`, `G-R model inconsistent with class counts (p_boot ${fmtPboot(qcObj.gof)}); verify b and rates by re-running.`)) : '');
+    : L(`G-R modeli sınıf sayımlarıyla uyumlu değil (bootstrap, p_boot ${fmtPboot(qcObj.gof)}); b ve oranlar geçicidir.`, `G-R model inconsistent with class counts (bootstrap, p_boot ${fmtPboot(qcObj.gof)}); b and rates are provisional.`)) : '');
   // Ana mesaj (Patch 2b): kesilmez — 17 → 15 → 13 px'te en çok 3 satıra sığarsa bütün olarak çizilir; sığmazsa hiç çizilmez
   // ve kutunun sonunda not edilir. Çizim, Sonuçlar maddelerinin yerleşim planından sonra yapılır.
   let msgL = null;
