@@ -1165,7 +1165,7 @@
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
     <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=<span id="tmStepLbl">10</span> olay)</span></div>
-    <div style="font-size:.7rem;color:#888;text-align:right;" title="Her pencerenin b-değeri hangi zamana çizilsin? Orta: pencerenin ortanca olayı (varsayılan). Son: pencerenin en son olayı — yalnızca o ana kadarki veriyi kullanır (nedensel); ana şok öncesi (öncül) analizlerinde önerilir, çünkü orta damgada son ~50 olay hiçbir noktada 'şimdi' olarak görünmez.">b(t) zaman damgası <select id="bAnchorSel" onchange="onBAnchorChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"><option value="mid">pencere ortası</option><option value="end">pencere sonu (nedensel)</option></select></div>
+    <div style="font-size:.7rem;color:#888;text-align:right;" title="Her pencerenin b-değeri hangi zamana çizilsin? Ortalama (varsayılan): pencerenin 100 olayının aritmetik ortalama zamanı (Öncel &amp; Wilson 2007). Ortanca: pencerenin ortanca olayı. Son: pencerenin en son olayı — yalnızca o ana kadarki veriyi kullanır (nedensel); ana şok öncesi (öncül) analizlerinde önerilir, çünkü ortalama/ortanca damgada son ~50 olay hiçbir noktada 'şimdi' olarak görünmez.">b(t) zaman damgası <select id="bAnchorSel" onchange="onBAnchorChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"><option value="mean">pencere ortalama zamanı (Öncel &amp; Wilson 2007)</option><option value="mid">pencere ortancası</option><option value="end">pencere sonu (nedensel)</option></select> <label id="btRawWrap" style="display:none;cursor:pointer;margin-left:6px;" title="Seyreltilmiş görünüm etkinken, hesaplama adımındaki bütün pencerelerin b değerlerini ince çizgi olarak arkaya çizer (yalnızca denetim için). b değerleri iki görünümde de aynıdır."><input type="checkbox" id="btRawChk" onchange="onBtRawChange()" style="vertical-align:middle;"> ham b(t) çizgisi</label></div>
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
     <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
@@ -2326,18 +2326,49 @@ function restoreTmTypeFilterFromURL() {
 }
 let lastTmTypeFilter = null;
 
-// b(t) zaman damgası (2026-10-11): 'mid' = ortanca olay (Öncel & Wilson 2007 gösterimi), 'end' = pencerenin son olayı (nedensel).
-// URL: ?banchor=end. Yalnızca noktaların zaman eksenindeki yerini değiştirir; b, hata ve pencereler aynıdır.
-let bTimeAnchor = (() => { try { return new URLSearchParams(location.search).get('banchor') === 'end' ? 'end' : 'mid'; } catch (e) { return 'mid'; } })();
+// b(t) zaman damgası. 2026-10-17: varsayılan 'mean' = pencere olaylarının aritmetik ortalama zamanı (Öncel & Wilson 2007).
+// 'mid' = ortanca olay (2026-10-11 ile 2026-10-17 arasındaki varsayılan), 'end' = pencerenin son olayı (nedensel).
+// URL: ?banchor=mid | end. Yalnızca noktaların zaman eksenindeki yerini değiştirir; b, hata ve pencereler aynıdır.
+let bTimeAnchor = (() => { try { const v = new URLSearchParams(location.search).get('banchor'); return v === 'end' || v === 'mid' ? v : 'mean'; } catch (e) { return 'mean'; } })();
 try { const el0 = document.getElementById('bAnchorSel'); if (el0) el0.value = bTimeAnchor; } catch (e) {}
 // Nedensel modda pencereler katalogun SONUNA hizalanır: son pencere her zaman en son olayı içerir
 // (ortada adım 10 yüzünden son 0–9 olay dışarıda kalabiliyordu). Ortada eski davranış (baştan hizalı).
 function bWinStart(n, N_WIN, STEP) { return bTimeAnchor === 'end' ? (n - N_WIN) % STEP : 0; }
-function bWinTime(win, getT) { return getT(win[bTimeAnchor === 'end' ? win.length - 1 : Math.floor(win.length / 2)]); }
+function bWinTime(win, getT) {
+  if (bTimeAnchor === 'end') return getT(win[win.length - 1]);
+  if (bTimeAnchor === 'mid') return getT(win[Math.floor(win.length / 2)]);
+  let sum = 0; for (const e of win) sum += getT(e); return sum / win.length;   // 'mean': ms damgaları, 100·1,8e12 < 2^53
+}
+function bAnchorText(EN, short) {
+  if (short && bTimeAnchor === 'mean') return EN ? 'mean event time of each window' : 'pencerenin ortalama olay zamanı';
+  return bTimeAnchor === 'end' ? (EN ? 'last event of each window (causal)' : 'pencerenin son olayı (nedensel)')
+    : bTimeAnchor === 'mid' ? (EN ? 'median event of each window' : 'pencerenin ortanca olayı')
+    : (EN ? 'mean time of the events in each window (Öncel & Wilson 2007)' : 'pencere olaylarının ortalama zamanı (Öncel & Wilson 2007)');
+}
 function onBAnchorChange() {
-  const el = document.getElementById('bAnchorSel'); bTimeAnchor = el && el.value === 'end' ? 'end' : 'mid';
-  try { const u = new URL(location.href); if (bTimeAnchor === 'end') u.searchParams.set('banchor', 'end'); else u.searchParams.delete('banchor'); history.replaceState(null, '', u); } catch (e) {}
+  const el = document.getElementById('bAnchorSel'); bTimeAnchor = el && (el.value === 'end' || el.value === 'mid') ? el.value : 'mean';
+  try { const u = new URL(location.href); if (bTimeAnchor !== 'mean') u.searchParams.set('banchor', bTimeAnchor); else u.searchParams.delete('banchor'); history.replaceState(null, '', u); } catch (e) {}
   if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
+}
+// Ham b(t) katmanı (2026-10-17): yalnızca uyarlamalı (seyreltilmiş) görünümde anlamlıdır; varsayılan kapalı. URL: ?braw=1
+let btShowRaw = (() => { try { return new URLSearchParams(location.search).get('braw') === '1'; } catch (e) { return false; } })();
+try { const el1 = document.getElementById('btRawChk'); if (el1) el1.checked = btShowRaw; } catch (e) {}
+function onBtRawChange() {
+  const el = document.getElementById('btRawChk'); btShowRaw = !!(el && el.checked);
+  try { const u = new URL(location.href); if (btShowRaw) u.searchParams.set('braw', '1'); else u.searchParams.delete('braw'); history.replaceState(null, '', u); } catch (e) {}
+  if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
+}
+// Uyarlamalı gösterim adımı (2026-10-17). Hesaplama adımındaki pencere sayısı ADAPT_MAX'ı aşarsa çizim, adım-1 pencere
+// sayısının ~1/ADAPT_TARGET'ı kadar bir adımla seyreltilir: step_g = max(step, ⌈(N − 99)/200⌉), hesaplama adımının tam katına
+// yuvarlanır. Seyreltme, hesaplanmış pencerelerden bir alt kümeyi seçer (son pencere her zaman korunur); b değerleri, %95
+// aralıkları ve özet istatistikler değişmez, ek yumuşatma uygulanmaz. Kural alan geometrisine (dikdörtgen/poligon/daire)
+// değil yalnızca pencere sayısına bağlıdır.
+const BT_ADAPT_MAX = 500, BT_ADAPT_TARGET = 200;
+function btAdaptive(series, nEv, step) {
+  if (series.length <= BT_ADAPT_MAX) return { on: false, f: 1, step, ser: series };
+  const nWin1 = Math.max(1, nEv - 99), stepG = Math.max(step, Math.ceil(nWin1 / BT_ADAPT_TARGET));
+  const f = Math.max(1, Math.round(stepG / step)), last = series.length - 1;
+  return { on: f > 1, f, step: f * step, ser: f > 1 ? series.filter((_, i) => (last - i) % f === 0) : series };
 }
 function onTmConversionChange() {
   mcConversionMode = document.getElementById('tmConversionSel').value;
@@ -2552,6 +2583,15 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     return;
   }
 
+  // 2026-10-17: uyarlamalı gösterim adımı (btAdaptive). Çizimde `ser` / `fsD` kullanılır; istatistikler `series` üzerinden kalır.
+  const AD = btAdaptive(series, N, STEPB), ser = AD.ser, STEPD = AD.step;
+  const fsAll = fixed ? fixed.series : [], ADF = fixed ? btAdaptive(fsAll, fixed.N, STEPB) : null, fsD = ADF ? ADF.ser : [];
+  const lineOnly = STEPB === 1 && !AD.on;   // ince mod, seyreltme yok: önceki gibi yalnız ince çizgi
+  const rawOn = AD.on && btShowRaw;
+  if (!o.svgId) {
+    const wr = document.getElementById('btRawWrap'); if (wr) wr.style.display = AD.on ? '' : 'none';
+    const sl = document.getElementById('tmStepLbl'); if (sl) sl.textContent = AD.on ? `${STEPB}, gösterim ${STEPD}` : String(STEPB);
+  }
   // H önceden 140'tı (en-boy ~4.7:1, "banner" gibi basık) -- yayınlanmış
   // time-varying b-değeri figürlerinin standart, daha dengeli oranına
   // yaklaştırmak için 260'a çıkarıldı (~2.5:1). Veri/hesaplama/pencereleme
@@ -2607,14 +2647,15 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
   const y = b => PAD_T + plotH - ((b-bMin)/(bMax-bMin)) * plotH;
 
-  const pts  = series.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ');
+  const pts  = ser.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ');
+  const rawLine = rawOn ? `<polyline points="${series.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ')}" fill="none" stroke="#7dd3fc" stroke-width="0.6" stroke-opacity="0.35"/>` : '';
   // Aki (1965) %95 güven aralığı (±1.96·b/√n) — her pencere için dikey çubuk
   // (a) Yoğun serilerde (>150 pencere) üst üste binen yüzlerce dikey çubuk
   // yerine yarı saydam %95 bandı çizilir — hata çubukları "saçılım" gibi
   // okunmasın (2026-09-27). Değerler aynı; yalnızca gösterim değişir.
-  const BAND_MIN = 150, useBand = series.length > BAND_MIN;
-  const band = useBand ? `<polygon points="${series.map(s => `${x(s.t).toFixed(1)},${y(s.b + (s.err || 0)).toFixed(1)}`).join(' ')} ${series.slice().reverse().map(s => `${x(s.t).toFixed(1)},${y(Math.max(0, s.b - (s.err || 0))).toFixed(1)}`).join(' ')}" fill="#06b6d4" fill-opacity="0.14" stroke="none"/>` : '';
-  const errBars = useBand ? '' : series.map(s => {
+  const BAND_MIN = 150, useBand = ser.length > BAND_MIN;
+  const band = useBand ? `<polygon points="${ser.map(s => `${x(s.t).toFixed(1)},${y(s.b + (s.err || 0)).toFixed(1)}`).join(' ')} ${ser.slice().reverse().map(s => `${x(s.t).toFixed(1)},${y(Math.max(0, s.b - (s.err || 0))).toFixed(1)}`).join(' ')}" fill="#06b6d4" fill-opacity="0.14" stroke="none"/>` : '';
+  const errBars = useBand ? '' : ser.map(s => {
     if (!s.err) return '';
     const xc = x(s.t).toFixed(1);
     return `<line x1="${xc}" y1="${y(s.b - s.err).toFixed(1)}" x2="${xc}" y2="${y(s.b + s.err).toFixed(1)}" stroke="#06b6d4" stroke-width="1" stroke-opacity="0.35"/>`;
@@ -2622,13 +2663,15 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   // 2026-10-12 (kullanıcı kararı): trend / hareketli ortalama çizgileri KALDIRILDI. 21 pencerelik ortalama hiçbir yayına
   // dayanmıyordu (Öncel & Wilson 2007 b(t) eğrisine yumuşatma uygulamaz); akademik çıktıda fiziksel eğilim gibi
   // okunabiliyordu. Yalnız ham pencere b değerleri ve kendi %95 aralıkları çizilir; noktalar bu yüzden daha belirgin.
-  const dots = series.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="${useBand ? 1.3 : 1.8}" fill="#06b6d4" fill-opacity="${useBand ? 0.75 : 0.9}"><title>b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} (%95) · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
+  // Nokta boyutu gösterilen pencere sayısına göre ölçeklenir (2026-10-17): az pencerede belirgin, çok pencerede küçük.
+  const dotR = ser.length <= 60 ? 2.2 : ser.length <= 150 ? 1.8 : ser.length <= 300 ? 1.4 : 1.1;
+  const dots = ser.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="${dotR}" fill="#06b6d4" fill-opacity="${useBand ? 0.75 : 0.9}"><title>b=${s.b.toFixed(2)} ± ${s.err !== null && s.err !== undefined ? s.err.toFixed(2) : '—'} (%95) · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
 
   // (b) sabit-Mc serisi: ham pencere değerleri (yumuşatma yok), gri kesikli
   let fixedLine = '', fixedDots = '';
   if (fs.length) {
-    fixedLine = `<polyline points="${fs.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ')}" fill="none" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,2" stroke-opacity="0.8"/>`;
-    fixedDots = fs.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="1" fill="#d1d5db" fill-opacity="0.35"><title>sabit Mc=${fixed.mc.toFixed(1)}: b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
+    fixedLine = `<polyline points="${fsD.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ')}" fill="none" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,2" stroke-opacity="0.8"/>`;
+    fixedDots = fsD.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="1" fill="#d1d5db" fill-opacity="0.35"><title>sabit Mc=${fixed.mc.toFixed(1)}: b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
   }
 
   // (c) Mc(t) şeridi — b(t) ile AYNI zaman ekseni
@@ -2679,6 +2722,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   }
 
   const bAvg = bs.reduce((a,b)=>a+b, 0) / bs.length;
+  const adNote = AD.on ? `<text x="${W - PAD_R - 4}" y="${PAD_T + 10}" fill="#f59e0b" font-size="8" text-anchor="end">Seyreltilmiş görünüm: ${series.length} pencereden ${ser.length} tanesi (gösterim adımı ${STEPD})</text>` : '';
 
   svgB.innerHTML = `
     ${yTicks}
@@ -2687,8 +2731,10 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     <line x1="${PAD_L}" y1="${y(bAvg)}" x2="${W-PAD_R}" y2="${y(bAvg)}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
     ${band}
     ${errBars}
-    <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="${STEPB === 1 ? 1.2 : useBand ? 0.7 : 0.9}" stroke-opacity="${STEPB === 1 ? 0.9 : 0.55}"/>
-    ${STEPB === 1 ? '' : dots}
+    ${rawLine}
+    <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="${lineOnly ? 1.2 : useBand ? 0.7 : 0.9}" stroke-opacity="${lineOnly ? 0.9 : 0.55}"/>
+    ${lineOnly ? '' : dots}
+    ${adNote}
     ${fixedDots}
     ${fixedLine}
     ${strip}
@@ -2699,7 +2745,8 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   const bLast = series[series.length-1];
   const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, err: btAll.series[btAll.series.length - 1].err, nWin: btAll.series.length, N: btAll.N } : null;
   const btsObj = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
-              fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, anchor: bTimeAnchor, band: useBand };
+              fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, anchor: bTimeAnchor, band: useBand,
+              adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn };
   if (STORE) lastBts = btsObj;
   if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB };
   const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
@@ -2708,7 +2755,8 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   // geri bildirimi). Sayılar/mantık aynı, yalnızca sunum iki satıra bölündü.
   statsB.innerHTML =
     `<div style="font-size:.85em;color:#aaa">` +
-      (STEPB === 1 ? `<span style="color:#06b6d4">─</span> Ham b-değeri (ince çizgi) &nbsp; ` : `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; `) +
+      (lineOnly ? `<span style="color:#06b6d4">─</span> Ham b-değeri (ince çizgi) &nbsp; ` : AD.on ? `<span style="color:#06b6d4">●</span> Pencere b-değeri (gösterim adımı ${STEPD}) &nbsp; ` : `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; `) +
+      (rawOn ? `<span style="color:#7dd3fc;opacity:.6">─</span> Ham b(t), adım ${STEPB} (denetim katmanı) &nbsp; ` : '') +
       (useBand ? `<span style="color:#06b6d4;opacity:.6">▮</span> %95 yaklaşık güven bandı (±1.96·b/√n, pencere başına) &nbsp; ` : `<span style="color:#06b6d4">│</span> %95 güven aralığı &nbsp; `) +
       (fixed ? `<span style="color:#d1d5db">┄</span> Sabit Mc=${fixed.mc.toFixed(1)} (${fixed.src}) ham b(t) &nbsp; ` : '') +
       `<span style="color:#f59e0b">┄</span> Genel ortalama` +
@@ -2716,7 +2764,8 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     `<div style="margin-top:2px">` +
       `b ort. = <b>${bAvg.toFixed(2)}</b> &nbsp;|&nbsp; b son = <b>${bLast.b.toFixed(2)}${lastErrStr}</b> ` +
       `<span style="color:#888;font-size:.85em">(%95, n=100)</span> &nbsp;|&nbsp; ${series.length} pencere (N=${N}${STEPB === 1 ? ', adım 1 — ince adım' : ''})` +
-      `<div style="color:#9ab0c5;margin-top:2px;">Yöntem: her b değeri 100 ardışık olaydan (M ≥ Mc) Aki (1965) en çok olabilirlikle hesaplanır; pencereler ${STEPB} olay kaydırılır (Öncel &amp; Wilson 2007${STEPB === 1 ? ' pencerelemesi, ince adım' : ''}). Ardışık pencereler ${100 - STEPB} olayı paylaşır: ham b(t) değerleri bağımsız, anlık ölçümler değildir; her biri 100 olaylık bir kayan pencere tahminidir. Ek yumuşatma (trend çizgisi) uygulanmaz.${STEPB === 1 ? ' Adım 1 örnekleme sıklığını 10 kat artırır, bağımsız bilgiyi aynı oranda artırmaz. %95 bant ince serinin kendi pencerelerinden hesaplanır.' : ''}${bTimeAnchor === 'end' ? ' Noktalar pencerenin son olayında (nedensel).' : ''}</div>` +
+      `<div style="color:#9ab0c5;margin-top:2px;">Yöntem: her b değeri 100 ardışık olaydan (M ≥ Mc) Aki (1965) en çok olabilirlikle hesaplanır; pencereler ${STEPB} olay kaydırılır (Öncel &amp; Wilson 2007${STEPB === 1 ? ' pencerelemesi, ince adım' : ''}). Ardışık pencereler ${100 - STEPB} olayı paylaşır: ham b(t) değerleri bağımsız, anlık ölçümler değildir; her biri 100 olaylık bir kayan pencere tahminidir. Ek yumuşatma (trend çizgisi) uygulanmaz.${STEPB === 1 ? ' Adım 1 örnekleme sıklığını 10 kat artırır, bağımsız bilgiyi aynı oranda artırmaz. %95 bant ince serinin kendi pencerelerinden hesaplanır.' : ''}${bTimeAnchor === 'end' ? ' Noktalar pencerenin son olayında (nedensel).' : bTimeAnchor === 'mid' ? ' Noktalar pencerenin ortanca olayında.' : ' Noktalar pencere olaylarının ortalama zamanında (Öncel &amp; Wilson 2007).'}</div>` +
+      (AD.on ? `<div style="color:#f59e0b;margin-top:2px;" title="Seyreltme yalnızca gösterimi etkiler: hesaplanan ${series.length} pencereden her ${AD.f}. pencere çizilir (son pencere korunur). b değerleri, %95 aralıkları, b ort. ve b son değişmez; ek yumuşatma uygulanmaz. Bütün pencereleri görmek için 'ham b(t) çizgisi' kutusunu işaretleyin.">ℹ Yüksek veri yoğunluğu (${series.length} pencere &gt; ${BT_ADAPT_MAX}) nedeniyle seyreltilmiş görünüm etkin: gösterim adımı ${STEPD} olay, ${ser.length} pencere; nokta zamanı ${bAnchorText(false)}. b değerleri değişmedi, ek yumuşatma yok.</div>` : '') +
       (cs ? (btFitOn
         ? ` &nbsp;|&nbsp; <span style="color:#f5a623">Fit aralığı M ${btFit.lo ?? 'Mc'}–${btFit.hi ?? '∞'}: olay başına eşik max(Mc_i, M_min)${btFit.hi !== null ? ', M &lt; M_max, çift kesik Aki–Utsu (hata ±1,96·SE, Fisher)' : ' (Aki 1965 genelleştirmesi)'}</span>` +
           (allS ? ` &nbsp;|&nbsp; <span style="color:#94a3b8">karşılaştırma — tüm sınıflar: b ort. = ${allS.bAvg.toFixed(2)}, b son = ${allS.bLast.toFixed(2)}${allS.err !== null ? ' ± ' + allS.err.toFixed(2) : ''} (${allS.nWin} pencere, N=${allS.N})</span>` : '')
@@ -3291,6 +3340,7 @@ function svgToEN(xml) {
     .replace(/ \/yıl/g, ' /yr').replace(/(N = \d+) olay/g, '$1 events').replace(/TÜM SINIFLAR/g, 'ALL CLASSES')
     .replace(/EĞRİ {9}/g, 'CURVE        ').replace(/EN İYİ TAHMİN/g, 'BEST ESTIMATE').replace(/ÜST EĞRİ {5}/g, 'UPPER CURVE  ').replace(/ALT EĞRİ {5}/g, 'LOWER CURVE  ')
     .replace(/Yetersiz veri:/g, 'Insufficient data:')
+    .replace(/Seyreltilmiş görünüm: (\d+) pencereden (\d+) tanesi \(gösterim adımı (\d+)\)/g, 'Thinned display: $2 of $1 windows (display step $3)')
     .replace(/>(Oca|Şub|Mar|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)\.?( \d{4})?</g, (m, mo, y) => '>' + SVG_EN_MONTHS[mo] + (y || '') + '<');
 }
 function svgToLight(xml) {
@@ -3571,10 +3621,14 @@ async function exportPosterAGU(scale, evt) {
   caption(cs ? L('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', 'Figure 2. Time–magnitude distribution of events; the orange step curve is the time-dependent completeness threshold (faded points lie below it).')
     : L('Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', 'Figure 2. Time–magnitude distribution of events; colours show magnitude classes (no completeness steps used).'), X2 + 16, y, W2 - 32, TOP + 256);
   y = box(X2, TOP + 275, W2, MID - TOP - 275, L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
-  y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112);
-  const tEnd = bt && bt.anchor === 'end', bandF = BT_STEP === 1 || (bt && bt.band);
-  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + '; plotted at the ' + (tEnd ? 'last event of each window (causal)' : 'median event of each window') + '. {#0891b2|Cyan:} raw window b-values' + (BT_STEP === 1 ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
-    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + '; nokta zamanı ' + (tEnd ? 'pencerenin son olayı (nedensel)' : 'pencerenin ortanca olayı') + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (BT_STEP === 1 ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  const adF = !!(bt && bt.adaptive);
+  // 2026-10-17: altyazı için ayrılan alan bir satır büyütüldü (önceden son satır "Alt şerit Mc(t)" kesiliyordu); seyreltmede bir satır daha
+  y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112 - 21 - (adF ? 21 : 0));
+  const bandF = (BT_STEP === 1 && !adF) || (bt && bt.band), thinF = BT_STEP === 1 && !adF;
+  const adEN = adF ? `, display step ${bt.dispStep} (${bt.nWin} windows > ${BT_ADAPT_MAX}; values unchanged)` : '';
+  const adTR = adF ? `, gösterim adımı ${bt.dispStep} (${bt.nWin} pencere > ${BT_ADAPT_MAX}; değerler aynı)` : '';
+  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
+    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
@@ -3717,6 +3771,12 @@ async function exportTimeMagPNG(theme, evt, layout) {
     { id: 'tmSvgB',  statsId: 'tmStatsB',  label: 'b-Değerinin Zaman İçindeki Değişimi (Öncel & Wilson 2007)' + (ince ? ' — Adım 1 (İnce)' : '') },
     { id: 'tmSvgGR', statsId: 'tmStatsGR', label: 'Gutenberg-Richter Frekans-Büyüklük Dağılımı' },
   ];
+  // 2026-10-17: Kümülatif Benioff paneli b(t)'nin hemen altına eklenir (aynı zaman ekseni, aynı yatay kenar boşlukları).
+  // Panel boşsa ya da yalnızca uyarı metni içeriyorsa (Mc yok / yetersiz olay) dışa aktarmaya girmez.
+  const benEl = document.getElementById('tmSvgBen');
+  const benOk = !!(benEl && benEl.querySelector('path, polyline'));
+  if (benOk) svgSpecs.splice(2, 0, { id: 'tmSvgBen', statsId: 'tmStatsBen', label: 'Kümülatif Benioff Gerinim Ölçüsü Σ√E', short: true });
+  const iTM = 0, iB = 1, iBen = benOk ? 2 : -1, iGR = benOk ? 3 : 2;
   const svgEls = svgSpecs.map(s => document.getElementById(s.id));
   if (svgEls.some(el => !el) || !showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
   const INCE_T = ince ? ' — Adım 1 (İnce)' : '', INCE_F = ince ? '-Adim1-Ince' : '';
@@ -3818,12 +3878,29 @@ async function exportTimeMagPNG(theme, evt, layout) {
       lines.slice(0, maxL).forEach((t, k) => { c.fillText(k === maxL - 1 && lines.length > maxL ? t.slice(0, Math.max(0, t.length - 2)) + ' …' : t, x0, y0); y0 += 16; });
       return y0;
     }
-    const xL = PP, xR = PP + leftW + GAP, availH = bottom - top;
-    // Sol: Zaman–Magnitude için yüksekliğin ~%34'ü, b(t) için kalanı
-    const yMid = top + Math.round(availH * 0.40);
-    block(svgSpecs[0], images[0], xL, top, leftW, Math.round(availH * 0.40) - 23 - 8 - 16 * 3, yMid - 6);
-    block(svgSpecs[1], images[1], xL, yMid + 8, leftW, Math.round((bottom - yMid) * 0.70), bottom);
-    block(svgSpecs[2], images[2], xR, top, rightW, Math.round(availH * 0.62), bottom);
+    const xL = PP, availH = bottom - top;
+    let xR = PP + leftW + GAP, wR = rightW;
+    if (iBen < 0) {
+      // Sol: Zaman–Magnitude için yüksekliğin ~%40'ı, b(t) için kalanı
+      const yMid = top + Math.round(availH * 0.40);
+      block(svgSpecs[iTM], images[iTM], xL, top, leftW, Math.round(availH * 0.40) - 23 - 8 - 16 * 3, yMid - 6);
+      block(svgSpecs[iB], images[iB], xL, yMid + 8, leftW, Math.round((bottom - yMid) * 0.70), bottom);
+    } else {
+      // Sol: üç zaman serisi alt alta, ORTAK genişlikte çizilir — zaman eksenleri dikey olarak hizalı kalır (2026-10-17).
+      const ids = [iTM, iB, iBen], STATL = [2, 3, 2], LAB = 25, GAPV = 8;
+      const ar = ids.map(i => images[i].naturalHeight / images[i].naturalWidth);
+      const fixedH = ids.length * (LAB + GAPV + 8) + STATL.reduce((a, b) => a + b, 0) * 16;
+      const wC = Math.min(leftW, Math.floor((availH - fixedH) / ar.reduce((a, b) => a + b, 0)));
+      const xC = xL;   // sola yaslı; boşalan genişlik sağ sütuna (G-R) verilir
+      xR = xL + wC + GAP; wR = PW - PP - xR;
+      let yC = top;
+      ids.forEach((i, k) => {
+        const hImg = Math.round(wC * ar[k]), yMax = yC + LAB + 2 + hImg + 8 + STATL[k] * 16;
+        block(svgSpecs[i], images[i], xC, yC, wC, hImg, yMax);
+        yC = yMax + GAPV;
+      });
+    }
+    block(svgSpecs[iGR], images[iGR], xR, top, wR, Math.round(availH * 0.62), bottom);
     c.fillStyle = pal.footer; c.font = '13px Arial';
     c.fillText('EQ-Live Türkiye · aliosmanoncel.github.io/EQ-LiveTurkiye', PP, PH - PP - 30);
     c.textAlign = 'right'; c.fillText(`Üretim: ${new Date().toLocaleString('tr-TR')}`, PW - PP, PH - PP - 30); c.textAlign = 'left';
