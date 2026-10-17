@@ -2,6 +2,8 @@
 // Fonksiyonlar ve renderGutenbergRichterCS'in sınıflama/fit bloğu doğrudan index.html'den okunur; kopya tutulmaz.
 // "Eski yol" karşılaştırması için HEAD (git) sürümündeki aynı blok da okunur: fit kapalıyken sonuç birebir aynı olmalı.
 // Kullanım (depo kökünde): node scripts/test_fit_range.js [index.html]
+// TODO (2026-10-17): betik şu an çalışmıyor — csBvalueTimeSeries imzası (cs, fit, step) olarak değişti, cutS ise eski
+// 'function csBvalueTimeSeries(cs)' başlığını arıyor. Ayrı görev: kesme işaretlerini ve çağrıları yeni imzaya uyarlayın.
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm'), cp = require('child_process');
 const load = f => fs.readFileSync(f, 'utf8').replace(/\r\n/g, '\n');

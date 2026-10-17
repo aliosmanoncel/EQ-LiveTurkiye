@@ -25,6 +25,8 @@ let pass = 0, fail = 0;
 const ok = (c, msg) => { if (c) pass++; else { fail++; console.log('FAIL', msg); } };
 
 // Sentetik katalog: G-R b = 1 (M ≥ 1,5, ΔM = 0,1), 2000–2026; %12'si 3 günlük yoğun kümede (testere görünümü)
+// YAPAY VERİ: gerçek bir katalog değildir, fiziksel yorum için kullanılmaz. Küme (1 Haziran 2020) testere görünümünü üretmek
+// için yerleştirildi. 17 Ekim 2026 ekran görüntülerindeki 2015–2016 b = 0,7 dönemi de bu üretecin bir türevinde yapay olarak eklendi.
 function catalog(n, seed) {
   let s = seed; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
   const t0 = Date.UTC(2000, 0, 1), t1 = Date.UTC(2026, 0, 1), tc = Date.UTC(2020, 5, 1), ev = [];
