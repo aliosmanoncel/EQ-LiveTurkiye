@@ -1,1 +1,1 @@
-{"generated":"2026-10-16T22:23:51Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261016_0000282","time":"2026-10-16T21:30:29.41Z","lat":27.8299,"lon":57.1537,"dep":23.0,"mag":4.5,"mtype":"mb","mw":null,"place":"SOUTHERN IRAN"}]}
+{"generated":"2026-10-17T00:57:23Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261016_0000300","time":"2026-10-16T23:57:51.2Z","lat":38.27,"lon":20.67,"dep":5.0,"mag":4.6,"mtype":"mb","mw":null,"place":"GREECE"}]}
