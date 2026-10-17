@@ -1,0 +1,80 @@
+// Birim testleri: AMR geriye dönük testi (2026-10-17).
+// Fonksiyonlar doğrudan index.html'den okunur (AMR_* sabitleri, amrFitQ, amrGrid, amrSynthPoisson, amrSynthCluster,
+// amrPvalue, mulberry32); kopya tutulmaz. Bütün kataloglar YAPAY veridir, fiziksel yorum için kullanılmaz.
+// Denetlenen iddialar:
+//   1. q ölçütü: tam güç yasası (0 < m < 1, hızlanan) q ≪ 1 ve m'yi geri bulur; doğrusal birikim q ≈ 1; yavaşlayan
+//      birikim hızlanma sayılmaz (k < 0 koşulu).
+//   2. Izgara: t_f ve sonrası olaylar dışarıda; n < 20 hücre geçersiz; katalog başlangıcından önceki hücre geçersiz.
+//   3. Sentetik üreticiler: olay sayısı, büyüklük ve uzaklık korunur; zamanlar pencerede; küme içi zaman farkları
+//      (döngüsel sarma modülünde) korunur.
+//   4. p = (1 + #{T_sim ≤ T_obs}) / (N + 1).
+//   5. Kalibrasyon: gerçekten Poisson olan kataloglarda Poisson sıfırı altında p yaklaşık düzgün (yanlış pozitif oranı
+//      nominal düzeyi belirgin aşmaz); hızlanan sentetik katalogda p küçük.
+// Kullanım (depo kökünde): node scripts/test_amr.js [index.html]
+'use strict';
+const fs = require('fs'), path = require('path'), vm = require('vm');
+const src = fs.readFileSync(process.argv[2] || path.join(__dirname, '..', 'index.html'), 'utf8').replace(/\r\n/g, '\n');
+const fn = name => {
+  const i = src.indexOf('\nfunction ' + name + '('); if (i < 0) throw new Error('bulunamadı: ' + name);
+  const j = src.slice(i + 1).search(/\n(?=[^\s}])/); return src.slice(i + 1, i + 2 + j);
+};
+const consts = ['AMR_M_GRID', 'AMR_R_GRID', 'AMR_Y_GRID', 'AMR_NMIN'].map(c => { const m = src.match(new RegExp('^const ' + c + ' = [^\\n]*$', 'm')); if (!m) throw new Error(c); return m[0].replace(/^const /, 'var '); });
+const ctx = {}; vm.createContext(ctx);
+vm.runInContext([...new Set(consts)].join('\n') + '\n' + ['amrFitQ', 'amrGrid', 'amrSynthPoisson', 'amrSynthCluster', 'amrPvalue', 'mulberry32'].map(fn).join('\n') +
+  '\nglobalThis.__x = { amrFitQ, amrGrid, amrSynthPoisson, amrSynthCluster, amrPvalue, mulberry32, AMR_R_GRID, AMR_Y_GRID, AMR_NMIN, AMR_YR };', ctx);
+const X = ctx.__x, YR = X.AMR_YR;
+let pass = 0, fail = 0;
+const ok = (c, msg) => { if (c) pass++; else { fail++; console.log('FAIL', msg); } };
+
+// ── 1. q ölçütü ─────────────────────────────────────────────────────
+{ const tf = 2020, ts = Float64Array.from({ length: 60 }, (_, i) => 2000 + i * 19.5 / 59);
+  const pw = Float64Array.from(ts, t => 10 - 3 * Math.pow(tf - t, 0.3));
+  const r = X.amrFitQ(ts, pw, tf); ok(r && r.q < 0.05 && r.m === 0.3, `tam güç yasası: q=${r && r.q} m=${r && r.m}`);
+  const ln = Float64Array.from(ts, t => 2 + 0.5 * (t - 2000) + 0.05 * Math.sin(37 * t));
+  const l = X.amrFitQ(ts, ln, tf); ok(l && l.q > 0.9, `doğrusal: q=${l && l.q}`);
+  const dec = Float64Array.from(ts, t => 10 * (1 - Math.exp(-(t - 2000) / 3)));   // yavaşlayan birikim
+  const d = X.amrFitQ(ts, dec, tf); ok(d && (d.m === null || d.q > 0.7 || d.k < 0), `yavaşlayan birikim hızlanma sayılmamalı: q=${d && d.q}`); }
+
+// ── 2. Izgara kuralları ─────────────────────────────────────────────
+{ const tf = Date.UTC(2020, 0, 1), rnd = X.mulberry32(5);
+  const ev = Array.from({ length: 400 }, () => ({ t: tf - rnd() * 20 * YR, m: 3 + rnd(), d: rnd() * 300 }));
+  ev.push({ t: tf, m: 7, d: 0 }, { t: tf + 1e9, m: 5, d: 1 });   // ana şok anı ve sonrası dışarıda kalmalı
+  const G = X.amrGrid(ev, tf, 3, X.AMR_R_GRID, X.AMR_Y_GRID, -Infinity);
+  const c = G.cells.find(z => z.r === 300 && z.yr === 20); ok(c.n === 400, `t ≥ t_f olaylar dışarıda: n=${c.n}`);
+  ok(G.cells.filter(z => z.ok).every(z => z.n >= X.AMR_NMIN), 'geçerli hücrelerde n ≥ NMIN');
+  ok(G.cells.filter(z => !z.ok && z.n > 0).every(z => z.n < X.AMR_NMIN), 'n < NMIN hücreler geçersiz');
+  const G2 = X.amrGrid(ev, tf, 3, X.AMR_R_GRID, X.AMR_Y_GRID, tf - 7 * YR);
+  ok(G2.cells.filter(z => z.yr > 7).every(z => !z.ok), 'katalog başlangıcından önceki hücreler geçersiz');
+  ok(G.T === Math.min(...G.cells.filter(z => z.ok).map(z => z.q)), 'T = en küçük q'); }
+
+// ── 3. Sentetik üreticiler ──────────────────────────────────────────
+{ const wa = 0, wb = 10 * YR, rnd = X.mulberry32(9), ev = [], cl = [];
+  for (let c = 0; c < 30; c++) { const t0 = rnd() * wb, root = ev.length; for (let j = 0; j < 5; j++) { ev.push({ t: Math.min(wb - 1, t0 + j * 864e5), m: 3 + j * 0.1, d: c }); cl.push(root); } }
+  const P = X.amrSynthPoisson(ev, wa, wb, rnd), K = X.amrSynthCluster(ev, cl, wa, wb, rnd);
+  for (const [S, lab] of [[P, 'Poisson'], [K, 'küme']]) {
+    ok(S.length === ev.length && S.every((s, i) => s.m === ev[i].m && s.d === ev[i].d), `${lab}: sayı/büyüklük/uzaklık korunur`);
+    ok(S.every(s => s.t >= wa && s.t < wb), `${lab}: zamanlar pencerede`); }
+  const L = wb - wa, mod = v => ((v % L) + L) % L;
+  ok(ev.every((e, i) => Math.abs(mod((K[i].t - K[cl[i]].t) - (e.t - ev[cl[i]].t))) < 1e-3 || Math.abs(mod((K[i].t - K[cl[i]].t) - (e.t - ev[cl[i]].t)) - L) < 1e-3), 'küme içi zaman farkları korunur (döngüsel)'); }
+
+// ── 4. p değeri ─────────────────────────────────────────────────────
+{ const r = X.amrPvalue(0.5, [0.4, 0.6, 0.5, null, 0.9]); ok(r.n === 4 && Math.abs(r.p - 3 / 5) < 1e-12, `p formülü ${r.p}`);
+  ok(X.amrPvalue(0.1, [0.5, 0.6, 0.7]).p === 0.25, 'gözlem hepsinden küçükse p = 1/(N+1)'); }
+
+// ── 5. Kalibrasyon ve güç ───────────────────────────────────────────
+{ const tf = Date.UTC(2020, 0, 1), wa = tf - 20 * YR, R = X.AMR_R_GRID, Yg = X.AMR_Y_GRID;
+  const mk = (rnd, n, tfun) => Array.from({ length: n }, () => ({ t: tfun(rnd), m: Math.round((3 - Math.log10(1 - rnd())) * 10) / 10, d: rnd() * 300 }));
+  const pOf = (ev, rnd, nSim) => { const o = X.amrGrid(ev, tf, 3, R, Yg, -Infinity), T = [];
+    for (let k = 0; k < nSim; k++) T.push(X.amrGrid(X.amrSynthPoisson(ev, wa, tf, rnd), tf, 3, R, Yg, -Infinity).T); return X.amrPvalue(o.T, T).p; };
+  const rnd = X.mulberry32(20261017), ps = [];
+  for (let c = 0; c < 40; c++) ps.push(pOf(mk(rnd, 300, r => wa + r() * (tf - wa)), rnd, 39));
+  const fp10 = ps.filter(p => p <= 0.1).length / ps.length;
+  ok(fp10 <= 0.25, `Poisson kataloglarında p ≤ 0,10 oranı ${fp10} (nominal 0,10)`);
+  console.log(`Kalibrasyon: 40 Poisson kataloğu, p ≤ 0,10 oranı = ${fp10.toFixed(3)}, p ortalaması = ${(ps.reduce((a, b) => a + b, 0) / ps.length).toFixed(3)}`);
+  // Hızlanan katalog: olay yoğunluğu ∝ (t_f − t)^(−0,7) → ters dönüşümle örnekleme
+  const acc = mk(rnd, 300, r => tf - 20 * YR * Math.pow(r(), 1 / 0.3));
+  const pa = pOf(acc, rnd, 99); ok(pa <= 0.05, `hızlanan katalogda p küçük: ${pa}`);
+  console.log(`Güç: hızlanan sentetik katalog, p = ${pa.toFixed(3)}`); }
+
+console.log(`${fail ? '!! FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`);
+process.exit(fail ? 1 : 0);

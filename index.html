@@ -1173,6 +1173,18 @@
       <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
       <svg id="tmSvgBen" viewBox="0 0 660 210" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
       <div class="tmStats" id="tmStatsBen">—</div>
+      <div id="amrPanel" style="margin-top:8px;font-size:.72rem;color:#9ab0c5;">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+          <b style="color:#cbd5e1;">🧪 AMR geriye dönük testi</b>
+          <span style="color:#666;">(hızlanan moment salımı · sıfır hipotezine karşı · öncül göstergesi değildir)</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;">
+          <label title="Boş bırakılırsa seçimdeki en büyük olay. Tarih girilirse o gündeki (±1 gün) en büyük olay. t_f bu olayın zamanına sabitlenir; t_f tahmini yapılmaz.">Ana şok tarihi <input id="amrDate" type="date" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+          <label title="Her sıfır hipotezi için üretilen sentetik katalog sayısı. 199 → en küçük p = 0,005.">Sentetik katalog <input id="amrNsim" type="number" min="19" max="999" step="20" value="199" style="width:56px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+          <button onclick="amrRun()" style="background:none;border:1px solid #334;color:#cbd5e1;border-radius:4px;font-size:.95em;padding:1px 7px;cursor:pointer;" title="Önceden tanımlı ızgara: R = 25, 50, 100, 150, 200, 300 km × ana şoktan 2, 5, 10, 15, 20 yıl önce. Eşik: Benioff panelinin sabit eşiği. Test istatistiği ızgaradaki en küçük q'dur; aynı arama her sentetik katalogda tekrarlanır.">▶ Testi çalıştır</button>
+        </div>
+        <div id="amrOut" style="margin-top:3px;line-height:1.5;"><span style="color:#666">Test henüz çalıştırılmadı.</span></div>
+      </div>
     </div>
     <div id="sensPanel" style="margin-top:8px;font-size:.72rem;color:#9ab0c5;">
       <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
@@ -5601,7 +5613,9 @@ function benioffTwoPeriodTest(items, t0, ts, t1, o) {
 }
 function renderBenioff(evList, Mc, cs) {
   const svg = document.getElementById('tmSvgBen'), st = document.getElementById('tmStatsBen'); if (!svg || !st) return;
-  const W = 660, H = 210, PAD_L = 40, PAD_R = 14, PAD_T = 12, PAD_B = 24, plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
+  window.lastBenioffEv = evList; amrRunId++;   // veri değişti: süren AMR testi iptal, eski sonuç silinir
+  { const ao = document.getElementById('amrOut'); if (ao) ao.innerHTML = '<span style="color:#666">Test henüz çalıştırılmadı.</span>'; }
+  const W = 660, H0 = 210, STRIP = 58, H = H0 + STRIP, PAD_L = 40, PAD_R = 14, PAD_T = 12, PAD_B = 24, plotW = W - PAD_L - PAD_R, plotH = H0 - PAD_T - PAD_B;
   const mOf = e => e.mw ?? e.mag;
   let ev = evList.filter(e => Number.isFinite(mOf(e)) && e.time).map(e => ({ t: e.time.getTime(), m: mOf(e) }));
   let mFix = Mc, varItems = null, mLoAll = Mc;
@@ -5630,7 +5644,17 @@ function renderBenioff(evList, Mc, cs) {
   const benTicks = timeAxisTicks(t0, t1);
   benTicks.forEach((tk, i) => { const xc = x(tk.t); if (xc < PAD_L - 0.5 || xc > W - PAD_R + 0.5) return;
     const anchor = i === 0 ? 'start' : i === benTicks.length - 1 ? 'end' : 'middle'; // diğer panellerle aynı
-    g += `<line x1="${xc.toFixed(1)}" y1="${PAD_T}" x2="${xc.toFixed(1)}" y2="${PAD_T + plotH}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${xc.toFixed(1)}" y="${H - 8}" fill="#888" font-size="9" text-anchor="${anchor}">${tk.label}</text>`; });
+    g += `<line x1="${xc.toFixed(1)}" y1="${PAD_T}" x2="${xc.toFixed(1)}" y2="${PAD_T + plotH}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${xc.toFixed(1)}" y="${H0 - 8}" fill="#888" font-size="9" text-anchor="${anchor}">${tk.label}</text>`; });
+  // Artımlı ΔS şeridi (2026-10-17): sabit zaman aralıklarında sabit eşik olaylarının Benioff katkısı. Kümülatif eğri
+  // güçlü bir yumuşatıcıdır; şerit, eğimin hangi aralıklardaki olaylardan geldiğini gösterir. Aynı zaman ekseni.
+  { const YRm = 31557600000, span = (t1 - t0) / YRm, binY = span >= 8 ? 1 : span >= 2 ? 0.25 : 1 / 12, bw = binY * YRm;
+    const nb = Math.max(1, Math.ceil((t1 - t0) / bw)), dS = new Float64Array(nb);
+    F.forEach(p => { const i = Math.min(nb - 1, Math.floor((p.t - t0) / bw)); dS[i] += sq(p.m); });
+    const dMax = Math.max(...dS), sT = H0 + 4, sH = STRIP - 18;
+    g += `<rect x="${PAD_L}" y="${sT}" width="${plotW}" height="${sH}" fill="none" stroke="#2a2a2a" stroke-width="0.6"/>`;
+    if (dMax > 0) for (let i = 0; i < nb; i++) { if (!dS[i]) continue; const xa = x(t0 + i * bw), xb = x(Math.min(t1, t0 + (i + 1) * bw)), hh = dS[i] / dMax * sH;
+      g += `<rect x="${xa.toFixed(1)}" y="${(sT + sH - hh).toFixed(1)}" width="${Math.max(0.6, xb - xa - 0.4).toFixed(1)}" height="${hh.toFixed(1)}" fill="#f97316" fill-opacity="0.55"><title>${new Date(t0 + i * bw).toISOString().slice(0, 10)}: ΔS = ${(dS[i] / sc).toFixed(3)}×10^${k} erg^½</title></rect>`; }
+    g += `<text x="${PAD_L + 4}" y="${sT + sH + 12}" fill="#888" font-size="8">ΔS: ${binY === 1 ? 'yıllık' : binY === 0.25 ? '3 aylık' : 'aylık'} Benioff artımı (sabit eşik), en büyük çubuk = ${(dMax / sc).toFixed(2)}×10^${k} erg^½</text>`; }
   g += `<text x="9" y="${(PAD_T + plotH / 2).toFixed(1)}" fill="#888" font-size="8" text-anchor="middle" transform="rotate(-90 9 ${(PAD_T + plotH / 2).toFixed(1)})">Σ√E (×10^${k} erg^½)</text>`;
   // tamlık dönemi sınırları
   if (cs) cs.periods.slice(1).forEach(p => { const xx = x(p.t0); if (xx > PAD_L && xx < W - PAD_R) g += `<line x1="${xx.toFixed(1)}" y1="${PAD_T}" x2="${xx.toFixed(1)}" y2="${PAD_T + plotH}" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="2,3" stroke-opacity="0.8"><title>Tamlık basamağı: ${csYearStart(p.t0)}, M≥${(+p.mc).toFixed(1)}</title></line>`; });
@@ -5675,6 +5699,124 @@ function renderBenioff(evList, Mc, cs) {
       `</table><div style="color:#888;margin-top:2px;">Varsayımlar: olaylar bağımsızdır (artçı kümelenmesi ihlal eder${typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn ? '; GK74 açık' : ' — GK74 kapalı, kümesizleştirme önerilir'}) ve büyüklük ölçeği dönemler arasında değişmemiştir (ağ/büyüklük türü değişimi ihlal eder). Anlamlı bir sonuç bile deprem tahmini ya da öncül kanıtı değildir.</div>`;
   }
   window.lastBenioff = { test: benTest || null, split: ts, splitSrc, mFix, n: F.length, total: F[F.length - 1].s, nVar: V ? V.length : null, share: warn ? benioffShare(bUse, mLoAll, mFix, mLoAll, Math.max(mObsMax, mFix + 0.1)) : null, b: bUse };
+}
+
+// ── AMR geriye dönük testi (2026-10-17) ─────────────────────────────────────────────────────────
+// Soru: Ana şoktan önceki kümülatif Benioff gerinimi, aynı arama prosedürü uygulanan sentetik kataloglara göre
+// olağandışı biçimde hızlanıyor mu? Yöntem: Bufe & Varnes (1993) S(t) = K + k(t_f − t)^m, t_f = ana şok zamanına
+// SABİT (t_f tahmini yapılmaz); 0 < m < 1 ve k < 0 (hızlanma). Eğrilik q = RMS(güç yasası) / RMS(doğrusal)
+// (Bowman vd. 1998). Önceden tanımlı ızgara: yarıçap × başlangıç süresi; test istatistiği T = ızgaradaki en küçük q
+// (arama maliyeti sıfır dağılımına aynı aramayla girer). Sıfır hipotezleri: (P) Poisson — konum ve büyüklükler
+// korunur, zamanlar pencere içinde düzgün dağılır (kümelenmeyi bozduğu için anlamlılığı abartabilir);
+// (K) küme korumalı — GK74 kümeleri iç zaman farklarını koruyarak blok halinde rastgele kaydırılır.
+// p = (1 + #{T_sim ≤ T_obs}) / (N + 1). Hardebeck, Felzer & Michael (2008): AMR benzeri örüntüler kümelenmeli sentetik
+// kataloglarda da çıkar; bu yüzden sonuç bir öncül ya da tahmin olarak yorumlanmaz.
+const AMR_M_GRID = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+const AMR_R_GRID = [25, 50, 100, 150, 200, 300];   // km — önceden tanımlı, sonuç görülmeden seçilir
+const AMR_Y_GRID = [2, 5, 10, 15, 20];              // ana şoktan önceki yıl
+const AMR_NMIN = 20, AMR_YR = 31557600000;
+// items: t (yıl, artan), s (kümülatif); tf (yıl). Doğrusal ve güç yasası en küçük kareler; q, m, k döner.
+function amrFitQ(ts, ss, tf) {
+  const n = ts.length; if (n < 5) return null;
+  const lin = (X, Y) => { let sx = 0, sy = 0, sxx = 0, sxy = 0; for (let i = 0; i < n; i++) { sx += X[i]; sy += Y[i]; sxx += X[i] * X[i]; sxy += X[i] * Y[i]; }
+    const d = n * sxx - sx * sx; if (!(Math.abs(d) > 1e-300)) return null; const b = (n * sxy - sx * sy) / d, a = (sy - b * sx) / n;
+    let r = 0; for (let i = 0; i < n; i++) { const e = Y[i] - a - b * X[i]; r += e * e; } return { a, b, rms: Math.sqrt(r / n) }; };
+  const L = lin(ts, ss); if (!L || !(L.rms > 0)) return null;
+  let best = null; const X = new Float64Array(n);
+  for (const m of AMR_M_GRID) {
+    for (let i = 0; i < n; i++) X[i] = Math.pow(Math.max(tf - ts[i], 0), m);
+    const P = lin(X, ss); if (!P || !(P.b < 0)) continue;   // k < 0: t → t_f iken hızlanan birikim
+    if (!best || P.rms < best.rms) best = { m, k: P.b, K: P.a, rms: P.rms };
+  }
+  return best ? { q: best.rms / L.rms, m: best.m, k: best.k, K: best.K, n } : { q: 1, m: null, k: null, K: null, n };   // uygun güç yasası yok → doğrusaldan iyi değil
+}
+// ev: [{ t (ms), m, d (km, ana şoka uzaklık) }]; tfMs; mMin. Izgarayı hesaplar.
+function amrGrid(ev, tfMs, mMin, R = AMR_R_GRID, Y = AMR_Y_GRID, tStartMs = -Infinity) {
+  const sq = m => Math.pow(10, 0.75 * m);   // √E ∝ 10^(0,75M); sabit çarpan q'yu değiştirmez
+  const base = ev.filter(e => e.t < tfMs && e.m >= mMin - 1e-9).sort((a, b) => a.t - b.t);
+  const tf = tfMs / AMR_YR, cells = []; let best = null;
+  for (const yr of Y) {
+    const t0 = tfMs - yr * AMR_YR;
+    for (const r of R) {
+      const cell = { r, yr, n: 0, q: null, m: null, ok: false, why: '' };
+      if (t0 < tStartMs) { cell.why = 'katalog başlangıcından önce'; cells.push(cell); continue; }
+      const sel = base.filter(e => e.d <= r && e.t >= t0); cell.n = sel.length;
+      if (sel.length < AMR_NMIN) { cell.why = `n < ${AMR_NMIN}`; cells.push(cell); continue; }
+      const ts = new Float64Array(sel.length), ss = new Float64Array(sel.length); let a = 0;
+      sel.forEach((e, i) => { ts[i] = e.t / AMR_YR; ss[i] = (a += sq(e.m)); });
+      const f = amrFitQ(ts, ss, tf); if (!f) { cell.why = 'uyum yok'; cells.push(cell); continue; }
+      Object.assign(cell, { q: f.q, m: f.m, ok: true }); cells.push(cell);
+      if (!best || f.q < best.q) best = cell;
+    }
+  }
+  return { cells, best, T: best ? best.q : null };
+}
+// Sentetik katalog üreticileri. rnd: [0,1) üreteci. Pencere [wa, wb) ms.
+function amrSynthPoisson(ev, wa, wb, rnd) { return ev.map(e => ({ t: wa + rnd() * (wb - wa), m: e.m, d: e.d })); }
+// cl: her olayın küme kökü indeksi (kendisi kökse kendisi). Kök zamanı yeni rastgele zamana taşınır, üyeler aynı
+// farkla izler; pencere dışına taşan zamanlar döngüsel sarılır (olay sayısı ve küme içi aralıklar korunur).
+function amrSynthCluster(ev, cl, wa, wb, rnd) {
+  const L = wb - wa, sh = new Map(), out = new Array(ev.length);
+  for (let i = 0; i < ev.length; i++) { const r = cl[i]; if (!sh.has(r)) sh.set(r, wa + rnd() * L - ev[r].t); }
+  for (let i = 0; i < ev.length; i++) { let t = ev[i].t + sh.get(cl[i]); t = wa + ((((t - wa) % L) + L) % L); out[i] = { t, m: ev[i].m, d: ev[i].d }; }
+  return out;
+}
+function amrPvalue(Tobs, Tsim) { const v = Tsim.filter(x => x !== null); return { p: (1 + v.filter(x => x <= Tobs).length) / (v.length + 1), n: v.length }; }
+// Arayüz sürücüsü: düğmeyle çalışır (hesap ağır olabilir); parçalar halinde ilerler, ilerlemeyi yazar.
+let amrRunId = 0;
+function amrMainshock(evList, dateStr) {
+  const mOf = e => e.mw ?? e.mag;
+  let C = evList.filter(e => e.time && Number.isFinite(mOf(e)) && Number.isFinite(+e.lat) && Number.isFinite(+e.lon));
+  if (dateStr) { const d = Date.parse(dateStr + 'T00:00:00Z'); if (Number.isFinite(d)) C = C.filter(e => Math.abs(e.time.getTime() - (d + 432e5)) <= 864e5); }
+  if (!C.length) return null;
+  return C.reduce((a, b) => (mOf(b) > mOf(a) || (mOf(b) === mOf(a) && b.time < a.time)) ? b : a);
+}
+async function amrRun() {
+  const out = document.getElementById('amrOut'), B = window.lastBenioff, evList = window.lastBenioffEv;
+  if (!out) return;
+  if (!B || !evList || !evList.length) { out.innerHTML = '<span style="color:#f59e0b">Önce Benioff panelinin çizilmesi gerekiyor.</span>'; return; }
+  const id = ++amrRunId, mOf = e => e.mw ?? e.mag;
+  const nSim = Math.max(19, Math.min(999, parseInt(document.getElementById('amrNsim').value, 10) || 199));
+  const ms = amrMainshock(evList, document.getElementById('amrDate').value);
+  if (!ms) { out.innerHTML = '<span style="color:#f59e0b">Ana şok bulunamadı (konumlu olay yok ya da girilen tarihte olay yok).</span>'; return; }
+  const tf = ms.time.getTime(), la0 = +ms.lat, lo0 = +ms.lon, mMin = B.mFix;
+  const tStart = Math.min(...evList.map(e => e.time.getTime()));
+  const Rmax = Math.max(...AMR_R_GRID), Ymax = Math.max(...AMR_Y_GRID), wa = Math.max(tStart, tf - Ymax * AMR_YR);
+  const raw = evList.filter(e => e !== ms && e.time && Number.isFinite(mOf(e)) && Number.isFinite(+e.lat) && Number.isFinite(+e.lon))
+    .map(e => ({ e, t: e.time.getTime(), m: mOf(e), d: haversineKm(la0, lo0, +e.lat, +e.lon) }))
+    .filter(o => o.t >= wa && o.t < tf && o.d <= Rmax && o.m >= mMin - 1e-9).sort((a, b) => a.t - b.t);
+  const fmt = v => v === null || v === undefined ? '—' : v.toFixed(2).replace('.', ','), fp = v => v.toFixed(3).replace('.', ',');
+  const head = `Ana şok: M${mOf(ms).toFixed(1)} · ${ms.time.toISOString().slice(0, 10)} · ${la0.toFixed(2)}°, ${lo0.toFixed(2)}° · t_f bu zamana sabit · eşik M ≥ ${mMin.toFixed(1)} (Benioff paneliyle aynı) · pencere ${new Date(wa).toISOString().slice(0, 10)} – ana şok, R ≤ ${Rmax} km: n = ${raw.length}`;
+  const obs = amrGrid(raw, tf, mMin, AMR_R_GRID, AMR_Y_GRID, tStart);
+  if (obs.T === null) { out.innerHTML = `<div>${head}</div><div style="color:#f59e0b">Izgaranın hiçbir hücresinde yeterli olay yok (her hücrede n ≥ ${AMR_NMIN} gerekir). Test yapılamadı.</div>`; return; }
+  // GK74 kümeleri (küme korumalı sıfır ve kümesizleştirilmiş duyarlılık için); bağlam olmadan, pencere içi olaylarla
+  const gk = gk74Decluster(raw.map(o => o.e), [], null), idx = new Map(raw.map((o, i) => [o.e, i]));
+  const cl = raw.map((o, i) => { const r = gk.rec.get(o.e); let b = r && r.by; return b && idx.has(b) ? idx.get(b) : i; });
+  const dec = raw.filter(o => gk.keep.has(o.e)), decObs = amrGrid(dec, tf, mMin, AMR_R_GRID, AMR_Y_GRID, tStart);
+  const rnd = mulberry32(20261017), TP = [], TK = [], TD = [];
+  const prog = k => { if (id === amrRunId) out.innerHTML = `<div>${head}</div><div style="color:#9ab0c5">Sentetik kataloglar: ${k} / ${nSim} …</div>`; };
+  for (let k = 0; k < nSim; k++) {
+    TP.push(amrGrid(amrSynthPoisson(raw, wa, tf, rnd), tf, mMin, AMR_R_GRID, AMR_Y_GRID, tStart).T);
+    TK.push(amrGrid(amrSynthCluster(raw, cl, wa, tf, rnd), tf, mMin, AMR_R_GRID, AMR_Y_GRID, tStart).T);
+    if (decObs.T !== null) TD.push(amrGrid(amrSynthPoisson(dec, wa, tf, rnd), tf, mMin, AMR_R_GRID, AMR_Y_GRID, tStart).T);
+    if (k % 10 === 9) { prog(k + 1); await new Promise(r => setTimeout(r, 0)); if (id !== amrRunId) return; }
+  }
+  const pP = amrPvalue(obs.T, TP), pK = amrPvalue(obs.T, TK), pD = decObs.T !== null ? amrPvalue(decObs.T, TD) : null;
+  const col = q => q === null ? '#333' : q < 0.5 ? '#be123c' : q < 0.7 ? '#f97316' : q < 0.9 ? '#a16207' : '#334155';
+  let tab = `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:3px;"><tr><td style="padding:1px 5px;color:#888">başlangıç \\ R</td>${AMR_R_GRID.map(r => `<td style="padding:1px 5px;color:#888;text-align:center">${r} km</td>`).join('')}</tr>`;
+  AMR_Y_GRID.forEach(yr => { tab += `<tr><td style="padding:1px 5px;color:#888">${yr} yıl önce</td>` + AMR_R_GRID.map(r => { const c = obs.cells.find(z => z.r === r && z.yr === yr);
+    return c.ok ? `<td title="n = ${c.n}, m = ${String(c.m).replace('.', ',')}" style="padding:1px 5px;text-align:center;background:${col(c.q)};color:#fff;${c === obs.best ? 'outline:1px solid #fff;' : ''}">${fmt(c.q)}</td>` : `<td title="${c.why}" style="padding:1px 5px;text-align:center;color:#555">—</td>`; }).join('') + '</tr>'; });
+  tab += '</table>';
+  const nOk = obs.cells.filter(c => c.ok).length, nQ = obs.cells.filter(c => c.ok && c.q < 0.7).length;
+  const pTxt = (P, lab, note) => `<tr><td style="padding:1px 6px;color:#cbd5e1">${lab}</td><td style="padding:1px 6px">p = <b>${fp(P.p)}</b> (N = ${P.n})</td><td style="padding:1px 6px;color:#9ab0c5">${note}</td></tr>`;
+  out.innerHTML = `<div>${head}</div>` + tab +
+    `<div style="margin-top:3px">Izgara: ${nOk} geçerli hücre; q &lt; 0,70 olan hücre: ${nQ}. En küçük q = <b>${fmt(obs.T)}</b> (R = ${obs.best.r} km, ${obs.best.yr} yıl, n = ${obs.best.n}, m = ${String(obs.best.m).replace('.', ',')}). Çerçeveli hücre en küçük q; kırmızı q &lt; 0,50, turuncu 0,50–0,70, kahverengi 0,70–0,90, gri ≥ 0,90. Tek tek hücrelerdeki q &lt; 0,70 anlamlılık göstermez; anlamlılık yalnızca aşağıdaki p değerlerinden okunur.</div>` +
+    `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:3px;">` +
+    pTxt(pK, 'Küme korumalı sıfır (birincil)', 'GK74 kümeleri iç zaman farklarıyla blok halinde rastgele kaydırıldı; aynı ızgara araması her katalogda tekrarlandı') +
+    pTxt(pP, 'Poisson sıfır', 'zamanlar düzgün dağıtıldı; kümelenmeyi bozduğu için anlamlılığı abartabilir') +
+    (pD ? pTxt(pD, `GK74 kümesizleştirilmiş (n = ${dec.length})`, `en küçük q = ${fmt(decObs.T)}; Poisson sıfır, aynı ızgara`) : `<tr><td colspan="3" style="padding:1px 6px;color:#888">GK74 kümesizleştirilmiş katalogda test için yeterli olay yok.</td></tr>`) +
+    `</table><div style="color:#888;margin-top:3px">p = (1 + #{T_sim ≤ T_obs}) / (N + 1); T = ızgaradaki en küçük q (arama maliyeti dahil); tohum 20261017. Yöntem: Bufe &amp; Varnes (1993), q ölçütü Bowman vd. (1998), t_f ana şoka sabit (Jiang &amp; Wu 2005 ile aynı kurgu). <b>Bu test geriye dönüktür; t_f tahmin etmez ve alarm üretmez.</b> Küçük bir p yalnızca seçilen sıfır hipotezine göre olağandışı bir uyumu gösterir; ileriye dönük öngörü becerisinin kanıtı değildir. AMR benzeri örüntüler kümelenmeli sentetik kataloglarda da ortaya çıkar (Hardebeck, Felzer &amp; Michael 2008).</div>`;
+  window.lastAmr = { ms: { t: tf, m: mOf(ms), lat: la0, lon: lo0 }, mMin, n: raw.length, T: obs.T, best: obs.best, pK: pK.p, pP: pP.p, pD: pD ? pD.p : null, nSim, cells: obs.cells };
 }
 
 /* Son büyük deprem için global referans */
