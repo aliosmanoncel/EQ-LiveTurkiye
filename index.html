@@ -2442,7 +2442,7 @@ function applyMagConversionForDisplay(evList, mode) {
       nApplicable++;
       const t = (e.mtype || '?').toLowerCase().trim(); byType[t] = (byType[t] || 0) + 1;
       if (isHighMag) highMagConverted++;
-      return { ...e, mw: conv.convert(e) };
+      return { ...e, mw: conv.convert(e), mcv: mode };   // mcv: uygulanan bağıntı (Mc–ızgara eşlemesi için, 2026-10-18)
     }
     nNotApplicable++;
     return baseOf(e); // dönüşüm koşulu sağlanmadı → kaynağın ham büyüklüğü (başka bağıntıya sessizce geçilmez)
@@ -2452,8 +2452,32 @@ function applyMagConversionForDisplay(evList, mode) {
 }
 
 // Mc: Maximum Curvature (Wiemer & Wyss 2000) + Woessner & Wiemer (2005) +0.2 düzeltmesi
-function computeMc(evList) {
-  const mags = evList.map(e => e.mw ?? e.mag).filter(m => m > 0);
+// 2026-10-18 — Mc–ızgara düzeltmesi. Dönüştürülmüş büyüklükler kaynağın 0,1'lik ızgarasında değildir (ör. Mw = 0,93·ML + 0,29
+// → 1,964; 2,057; …). Mc'yi Mw değerlerinin 0,1'lik bin'lerinden bulmak ve Aki'de ΔM/2 = 0,05 kullanmak b'yi yanlı verir
+// (sentetik ML b = 1,00: beklenen Mw b = 1,07, eski hesap 0,90). Düzeltme: Mc kaynak ölçeğinde (dönüşüm öncesi 'mag') maksimum
+// eğrilikle bulunur, sonra Mc ve ΔM AYNI bağıntıyla dönüştürülür: Mc_Mw = f(Mc), ΔM_Mw = f(Mc + ΔM) − f(Mc) (doğrusal bağıntıda
+// s·Mc + c ve s·ΔM). Eşik çevresinde birden çok bağıntı varsa en çok olaya uygulanan seçilir (mcScale.share). Dönüşüm yoksa
+// sonuç eskisiyle birebir aynıdır.
+const MC_DM = 0.1;
+function mcSrcMag(e) { return e.mcv ? e.mag : (e.mw ?? e.mag); }
+function mcScale(evList, mcSrc) {
+  const near = evList.filter(e => Math.abs(mcSrcMag(e) - mcSrc) <= 0.25 + 1e-9), conv = near.filter(e => e.mcv && MAG_CONVERSIONS[e.mcv]);
+  if (!conv.length || conv.length < near.length / 2) return { mc: mcSrc, dm: MC_DM, mapped: false, mcSrc };
+  const cnt = new Map();
+  conv.forEach(e => { const C = MAG_CONVERSIONS[e.mcv], f = x => C.convert({ ...e, mag: x }), a = f(mcSrc), d = f(mcSrc + MC_DM) - a;
+    const k = a.toFixed(6) + '|' + d.toFixed(6), o = cnt.get(k) || { a, d, n: 0 }; o.n++; cnt.set(k, o); });
+  const best = [...cnt.values()].sort((p, q) => q.n - p.n)[0];
+  return best.d > 0 ? { mc: best.a, dm: best.d, mapped: true, mcSrc, share: best.n / conv.length } : { mc: mcSrc, dm: MC_DM, mapped: false, mcSrc };
+}
+function computeMcScale(evList) {
+  const src = computeMcSrc(evList);
+  return src === null ? null : mcScale(evList, src);
+}
+function computeMc(evList) { const r = computeMcScale(evList); return r ? r.mc : null; }
+// Gösterim: ızgara üzerindeki değer 1 ondalık, eşlenmiş (ızgara dışı) değer 2 ondalık
+function fmtM(v) { return v === null || v === undefined || !Number.isFinite(+v) ? '—' : Math.abs(v * 10 - Math.round(v * 10)) < 1e-6 ? (+v).toFixed(1) : (+v).toFixed(2); }
+function computeMcSrc(evList) {
+  const mags = evList.map(mcSrcMag).filter(m => m > 0);
   if (mags.length < 10) return null;
   const bins = {};
   mags.forEach(m => {
@@ -2471,11 +2495,12 @@ function computeMc(evList) {
 // DÜZELTME (2026-08): Öncel & Wilson (2007, GJI) Eş.4 metinde "2.303/(...)" olarak
 // basılmış, ancak bu ln(10) ile log10(e)=1/ln(10) karışıklığı (dizgi hatası) —
 // makalenin kendi raporladığı b=1.87 sonucu yalnızca 0.4343 sabitiyle tutarlı.
-function computeBvalue(mags, Mc) {
-  const sub = mags.filter(m => m >= Mc);
+// dm: büyüklük ızgara aralığı (varsayılan 0,1); dönüştürülmüş büyüklüklerde mcScale().dm (2026-10-18)
+function computeBvalue(mags, Mc, dm = 0.1) {
+  const sub = mags.filter(m => m >= Mc - 1e-9);
   if (sub.length < 10) return null;
   const mean = sub.reduce((a,b)=>a+b, 0) / sub.length;
-  const denom = mean - Mc + 0.05;
+  const denom = mean - Mc + dm / 2;
   return denom > 0 ? Math.LOG10E / denom : null;
 }
 
@@ -2489,16 +2514,16 @@ function bConfidence95(b, n) {
 
 // Kayan pencere b-değeri zaman serisi — Öncel & Wilson (2007, GJI, İzmit) §3.1 metodolojisi:
 // sabit N=100 olay pencere, adım=10 olay, Mc sabit/global (pencere başına değil)
-function computeBvalueTimeSeries(evList, Mc, step = 10) {
+function computeBvalueTimeSeries(evList, Mc, step = 10, dm = 0.1) {
   const N_WIN = 100, STEP = step;
   const sorted = [...evList].sort((a,b) => a.time - b.time)
-    .filter(e => (e.mw ?? e.mag) >= Mc);
+    .filter(e => (e.mw ?? e.mag) >= Mc - 1e-9);
   if (sorted.length < N_WIN) return { series: [], N: sorted.length };
   const series = [];
   for (let i = bWinStart(sorted.length, N_WIN, STEP); i + N_WIN <= sorted.length; i += STEP) {
     const win  = sorted.slice(i, i + N_WIN);
     const mags = win.map(e => e.mw ?? e.mag);
-    const b = computeBvalue(mags, Mc);
+    const b = computeBvalue(mags, Mc, dm);
     if (b !== null) series.push({ t: bWinTime(win, e => e.time.getTime()), b, err: bConfidence95(b, N_WIN), span: win[N_WIN-1].time - win[0].time });
   }
   return { series, N: sorted.length };
@@ -2557,6 +2582,7 @@ function renderSensTable(evList, Mc, cs) {
     `<div style="color:#666;margin-top:2px;">b: Aki (1965) MLE, b = log10(e)/(M̄ − Mc + ΔM/2); hata: %95 yaklaşık güven aralığı ±1.96·b/√N, her hücre kendi N'i ile. — : sabit Mc &lt; dönemin geçerli Mc'si${cs ? ' (dönemle örtüşen basamakların en büyüğü)' : ' (tek Mc)'}. Soluk ⚠: N&lt;50. Dönemler [başlangıç, bitiş).</div>`;
 }
 
+let tmMagDM = 0.1, tmMcScale = null;   // 2026-10-18: Time-Mag panelinin büyüklük ızgarası (dönüşümde ΔM_Mw) ve Mc eşlemesi
 let tmSharedAxis = null; // { t0, t1 } — Zaman–Magnitude panelinin ekseni; b(t) ve Benioff bunu paylaşır
 // o: { svgId, statsId, step, store, storeInce } — varsayılan Time-Mag normal modu (tmSvgB, adım 10, lastBts kaydı). İnce mod
 // aynı fonksiyonu kendi öğeleri ve seçilen adımla çağırır; Time-Mag çıktısı değişmez (2026-10-12).
@@ -2572,7 +2598,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   }
   // Fit aralığı (2026-09-29): G-R ile AYNI karar (grFitRangeCurrent); karşılaştırma için eski seri de hesaplanır
   const btFit = cs ? grFitRangeCurrent() : null, btFitOn = !!(btFit && btFit.on);
-  const { series, N } = cs ? csBvalueTimeSeries(cs, btFit, STEPB) : computeBvalueTimeSeries(evList, Mc, STEPB);
+  const { series, N } = cs ? csBvalueTimeSeries(cs, btFit, STEPB) : computeBvalueTimeSeries(evList, Mc, STEPB, tmMagDM);
   const btAll = btFitOn ? csBvalueTimeSeries(cs, null, STEPB) : null;
   // (b) Sabit-Mc duyarlılık serisi — yalnızca tamlık basamakları etkinken
   // (2026-09-27). Varsayılan Mc: dönemlerin max(basamak Mc, veri Mc).
@@ -2604,7 +2630,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
 
   if (series.length === 0) {
     svgB.innerHTML = `<text x="330" y="70" fill="#666" font-size="11" text-anchor="middle">Yetersiz veri: N=${N} (M≥Mc) — min. 100 olay gerekir (Öncel &amp; Wilson 2007)</text>`;
-    statsB.textContent = `N=${N} (M≥Mc=${Mc}) < 100 — kayan pencere b-değeri hesaplanamıyor`;
+    statsB.textContent = `N=${N} (M≥Mc=${fmtM(Mc)}) < 100 — kayan pencere b-değeri hesaplanamıyor`;
     return;
   }
 
@@ -3025,7 +3051,7 @@ function renderGutenbergRichter(evList, Mc) {
   let mcLine = '';
   if (Mc !== null && Mc >= mAxisMin && Mc <= mAxisMax) {
     mcLine = `<line x1="${x(Mc).toFixed(1)}" y1="${PAD_T}" x2="${x(Mc).toFixed(1)}" y2="${PAD_T+plotH}" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3"/>` +
-             `<text x="${x(Mc).toFixed(1)}" y="${PAD_T+10}" fill="#06b6d4" font-size="8" text-anchor="middle">Mc=${Mc}</text>`;
+             `<text x="${x(Mc).toFixed(1)}" y="${PAD_T+10}" fill="#06b6d4" font-size="8" text-anchor="middle">Mc=${fmtM(Mc)}</text>`;
   }
 
   // GR fit dogrusu: mevcut Aki MLE b hesabini (computeBvalue) DEGISTIRMEDEN
@@ -3038,8 +3064,8 @@ function renderGutenbergRichter(evList, Mc) {
   let fitLine = '', fitStatsStr = '';
   lastGrSimple = null;
   if (Mc !== null) {
-    const bFit = computeBvalue(mags, Mc);
-    const nAboveMc = mags.filter(m => m >= Mc).length;
+    const bFit = computeBvalue(mags, Mc, tmMagDM);
+    const nAboveMc = mags.filter(m => m >= Mc - 1e-9).length;
     if (bFit !== null && nAboveMc >= 10) {
       const aFit = Math.log10(nAboveMc) + bFit * Mc;
       const synthCum = m => Math.pow(10, aFit - bFit * m);
@@ -3061,11 +3087,11 @@ function renderGutenbergRichter(evList, Mc) {
       const mLabel = mFitStart + (mFitEnd - mFitStart) * 0.55;
       const xLabel = x(mLabel), yLabel = y(synthCum(mLabel) / normFactor);
       fitLine = `<line x1="${xStart.toFixed(1)}" y1="${yStart.toFixed(1)}" x2="${xEnd.toFixed(1)}" y2="${yEnd.toFixed(1)}" stroke="#f5a623" stroke-width="1.3" stroke-dasharray="2,2"/>` +
-                `<circle cx="${xStart.toFixed(1)}" cy="${yStart.toFixed(1)}" r="3" fill="#f5a623" stroke="#111" stroke-width="0.6"><title>Fit başlangıcı: Mc=${Mc}, N≥Mc=${nAboveMc}</title></circle>` +
+                `<circle cx="${xStart.toFixed(1)}" cy="${yStart.toFixed(1)}" r="3" fill="#f5a623" stroke="#111" stroke-width="0.6"><title>Fit başlangıcı: Mc=${fmtM(Mc)}, N≥Mc=${nAboveMc}</title></circle>` +
                 `<text x="${(xLabel+4).toFixed(1)}" y="${(yLabel-4).toFixed(1)}" fill="#f5a623" font-size="9" font-weight="700">b=${bFit.toFixed(2)}</text>`;
       fitStatsStr = ` &nbsp;|&nbsp; N≥Mc=<b>${nAboveMc}</b> · a=<b>${aFit.toFixed(2)}</b> · b_GR=<b>${bFit.toFixed(2)}</b>${bErr !== null ? ' ± ' + bErr.toFixed(2) + ' <span style="color:#888">(%95, Aki 1965)</span>' : ''} · <span title="Aki MLE yalnızca M ≥ Mc olaylarıyla; GoF kümülatif N(≥M) ile Mc–Mmax aralığında. Mc tahmindir (maks. eğrilik +0,2): bölgeye, zaman aralığına ve yönteme bağlıdır.">uyum M ${Mc}–${mMax}</span> · <span title="Wiemer &amp; Wyss (2000) goodness-of-fit measure (not R²)">GoF=<b>${gofR !== null ? gofR.toFixed(1)+'%' : '—'}</b></span>`;
     } else {
-      fitStatsStr = ` &nbsp;|&nbsp; GR fit: yetersiz veri (N≥Mc=${Mc}: ${nAboveMc} &lt; 10)`;
+      fitStatsStr = ` &nbsp;|&nbsp; GR fit: yetersiz veri (N≥Mc=${fmtM(Mc)}: ${nAboveMc} &lt; 10)`;
     }
   }
 
@@ -3096,7 +3122,7 @@ function renderGutenbergRichter(evList, Mc) {
     <text x="${(PAD_L+plotW/2).toFixed(1)}" y="${H-1}" fill="#888" font-size="8" text-anchor="middle">Magnitude</text>
   `;
 
-  const mcStr = Mc !== null ? ` · Mc=${Mc}` : '';
+  const mcStr = Mc !== null ? ` · Mc=${fmtM(Mc)}${tmMcScale && tmMcScale.mapped ? ` (kaynak ölçeğinde ${fmtM(tmMcScale.mcSrc)}, ΔM=${tmMagDM.toFixed(3)})` : ''}` : '';
   const modeLabel = effMode === 'rate' ? `Oran (N/T, λ) · T=${years.toFixed(1)}yıl`
                    : effMode === 'density' ? `Yoğunluk (N/(T·A)) · T=${years.toFixed(1)}yıl, A=${Math.round(areaKm2).toLocaleString('tr-TR')}km²`
                    : null;
@@ -3749,8 +3775,8 @@ async function exportPosterAGU(scale, evt) {
   const BB = window.lastBenioff, BD = window.lastBenDecomp;
   const binTxt = BD && BD.bins.length ? (w => w > 2e10 ? L('1 yıllık', '1-year') : w > 5e9 ? L('3 aylık', '3-month') : L('1 aylık', '1-month'))(BD.bins[0].t1 - BD.bins[0].t0) : '';
   const benCap = !BEN_ON ? '' : EN
-    ? ` **(b)** Cumulative Benioff strain S(t) = Σ√E, log E = 11.8 + 1.5M (Gutenberg & Richter 1956), fixed threshold M ≥ ${BB ? BB.mFix.toFixed(1) : '—'} (N = ${BB ? BB.n : '—'}). Middle strip: ${binTxt} Benioff release rate ΔS/Δt. Lower strip (log₁₀, 0 = period mean): {#3b82f6|blue} event count, {#16a34a|green} b-value (n ≥ ${BEN_DEC_NB} per interval), {#6b7280|grey} residual, {#ea580c|orange} total = observed ΔS/Δt; truncated G–R${BD ? `, b_ref = ${BD.bRef.toFixed(2)}` : ''}. b and ΔS come from the same catalogue; descriptive decomposition, not a precursor.`
-    : ` **(b)** Birikimli Benioff gerinimi S(t) = Σ√E, log E = 11,8 + 1,5M (Gutenberg & Richter 1956), sabit eşik M ≥ ${BB ? DC(BB.mFix.toFixed(1)) : '—'} (N = ${BB ? BB.n : '—'}). Orta şerit: ${binTxt} Benioff salım hızı ΔS/Δt. Alt şerit (log₁₀, 0 = dönem ortalaması): {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b değeri (aralıkta n ≥ ${BEN_DEC_NB}), {#6b7280|gri} artık, {#ea580c|turuncu} toplam = gözlenen ΔS/Δt; kesilmiş G–R${BD ? `, b_ref = ${DC(BD.bRef.toFixed(2))}` : ''}. b ve ΔS aynı katalogdan; betimleyici ayrıştırmadır, öncül değildir.`;
+    ? ` **(b)** Cumulative Benioff strain S(t) = Σ√E, log E = 11.8 + 1.5M (Gutenberg & Richter 1956), fixed threshold M ≥ ${BB ? fmtM(BB.mFix) : '—'} (N = ${BB ? BB.n : '—'}). Middle strip: ${binTxt} Benioff release rate ΔS/Δt. Lower strip (log₁₀, 0 = period mean): {#3b82f6|blue} event count, {#16a34a|green} b-value (n ≥ ${BEN_DEC_NB} per interval), {#6b7280|grey} residual, {#ea580c|orange} total = observed ΔS/Δt; truncated G–R${BD ? `, b_ref = ${BD.bRef.toFixed(2)}` : ''}. b and ΔS come from the same catalogue; descriptive decomposition, not a precursor.`
+    : ` **(b)** Birikimli Benioff gerinimi S(t) = Σ√E, log E = 11,8 + 1,5M (Gutenberg & Richter 1956), sabit eşik M ≥ ${BB ? DC(fmtM(BB.mFix)) : '—'} (N = ${BB ? BB.n : '—'}). Orta şerit: ${binTxt} Benioff salım hızı ΔS/Δt. Alt şerit (log₁₀, 0 = dönem ortalaması): {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b değeri (aralıkta n ≥ ${BEN_DEC_NB}), {#6b7280|gri} artık, {#ea580c|turuncu} toplam = gözlenen ΔS/Δt; kesilmiş G–R${BD ? `, b_ref = ${DC(BD.bRef.toFixed(2))}` : ''}. b ve ΔS aynı katalogdan; betimleyici ayrıştırmadır, öncül değildir.`;
   const cap3 = EN ? '**Figure 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + benCap
     : '**Şekil 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + benCap;
   const cap3O = BEN_ON ? { size: 14, lh: 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 };
@@ -3773,7 +3799,7 @@ async function exportPosterAGU(scale, evt) {
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
   y = figure(imgs[2], X3 + 16, y, W3 - 32, gf ? 300 : 345);   // 2026-10-18: Weichert tablosu yoksa G-R şekli büyütülür
-  y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? ' ± ' + gs.err.toFixed(2) : ''}, N = ${gs.n}, fit M ≥ ${gs.mc})` : ''}, blue dashed Mc${gs ? ` = ${gs.mc}` : ''}.` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? ' ± ' + gs.err.toFixed(2).replace('.', ',') : ''}, N = ${gs.n}, uyum M ≥ ${String(gs.mc).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(gs.mc).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
+  y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? ' ± ' + gs.err.toFixed(2) : ''}, N = ${gs.n}, fit M ≥ ${fmtM(gs.mc)})` : ''}, blue dashed Mc${gs ? ` = ${fmtM(gs.mc)}` : ''}.` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? ' ± ' + gs.err.toFixed(2).replace('.', ',') : ''}, N = ${gs.n}, uyum M ≥ ${String(fmtM(gs.mc)).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(fmtM(gs.mc)).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
   // G-R parametre tablosu (büyük punto)
   if (gf && gf.curves && gf.curves.length) {
     const cols = [[L('Eğri', 'Curve'), 0], ['b ± 1σ', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/${L('yıl', 'yr')}`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
@@ -3815,7 +3841,7 @@ async function exportPosterAGU(scale, evt) {
       rItems.push(`**Weichert (1980)${qcFlag ? L(' — ⚠ yanlı olabilir', ' — ⚠ may be biased') : ''}:** ${E(`b = ${best.b.toFixed(3)} ± ${gf.sigB !== null ? gf.sigB.toFixed(3) : '—'}`)}${fitT ? ` (${fitT}; N = ${gf.N})` : ''}; ${E(`λ(M≥${gf.m0.toFixed(1)}) = ${best.rate0.toFixed(2)}/${yr}`)}${gf.nRef !== undefined ? `; ${E(`N${gf.mRef} = ${gf.nRef.toPrecision(3)} ± ${gf.nRefSd.toPrecision(2)}/${yr}`)}${gf.mRefExtrap ? L(' (gözlenen aralığın dışında: dışkestirim)', ' (outside the observed range: extrapolation)') : ''}` : ''} (N = ${gf.N}).` +
         (gf.fit && gf.all ? ` ${L('Karşılaştırma (tüm sınıflar)', 'Comparison (all classes)')}: b = ${gf.all.b.toFixed(3)} ± ${gf.all.sigma !== null ? gf.all.sigma.toFixed(3) : '—'}, N = ${gf.all.N}${gf.all.dPerDf !== null ? `, D/sd = ${gf.all.dPerDf.toFixed(1)}` : ''}.` : '') +
         (qcFlag && bt && bt.fixed ? L(` Karşılaştırma: sabit Mc = ${bt.fixed.mc.toFixed(1)} ile b(t) ortalaması ${bt.fixed.bAvg.toFixed(2)}.`, ` Comparison: mean b(t) with fixed Mc = ${bt.fixed.mc.toFixed(1)} is ${bt.fixed.bAvg.toFixed(2)}.`) : '')); }
-    if (!gf && gs) { rItems.push(`**G-R (${L('tek Mc', 'single Mc')}):** ${V(`Mc = ${DC(gs.mc)}`)}; ${V(`b_GR = ${DC(gs.b.toFixed(2))}`)}; N(≥Mc) = ${gs.n.toLocaleString(NF)}${gs.gof !== null ? `; GoF = ${EN ? gs.gof.toFixed(1) + '%' : '%' + DC(gs.gof.toFixed(1))}` : ''}.`); }
+    if (!gf && gs) { rItems.push(`**G-R (${L('tek Mc', 'single Mc')}):** ${V(`Mc = ${DC(fmtM(gs.mc))}`)}; ${V(`b_GR = ${DC(gs.b.toFixed(2))}`)}; N(≥Mc) = ${gs.n.toLocaleString(NF)}${gs.gof !== null ? `; GoF = ${EN ? gs.gof.toFixed(1) + '%' : '%' + DC(gs.gof.toFixed(1))}` : ''}.`); }
     if (bt) { rItems.push(EN ? `**b(t)${bt.fit ? ` (${fitT || 'fit range'})` : ''}:** mean ${V(bt.bAvg.toFixed(2))}, last window ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} windows).` +
       (bt.fit && bt.all ? ` All classes: mean ${bt.all.bAvg.toFixed(2)}, last ${bt.all.bLast.toFixed(2)} (${bt.all.nWin} windows).` : '') + (bt.fixed && !(qcFlag && gf) ? ` With fixed Mc = ${bt.fixed.mc.toFixed(1)}, mean ${V(bt.fixed.bAvg.toFixed(2))}.` : '')
       : `**b(t)${bt.fit ? ` (${fitT || 'fit aralığı'})` : ''}:** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` +
@@ -5176,8 +5202,8 @@ function renderTimeMag(evList) {
   let convCmp = '';
   if (mcConversionMode !== 'none') {
     const raw = applyMagConversionForDisplay(evList, 'none').list;
-    const mb = L => { const mc = computeMc(L); if (mc == null) return null;
-      const b = computeBvalue(L.map(e => e.mw ?? e.mag), mc); return { mc, b }; };
+    const mb = L => { const sc = computeMcScale(L); if (!sc) return null;
+      const b = computeBvalue(L.map(e => e.mw ?? e.mag), sc.mc, sc.dm); return { mc: sc.mc, b }; };
     const r0 = mb(raw), r1 = mb(convResult.list), f = v => v == null ? '—' : v.toFixed(2).replace('.', ',');
     if (r0 && r1) convCmp = ` · Original → dönüşüm: Mc ${f(r0.mc)} → ${f(r1.mc)}, b ${f(r0.b)} → ${f(r1.b)}`;
   }
@@ -5216,11 +5242,15 @@ function renderTimeMag(evList) {
       msTitle = `\n\nHatırlatma: Scordilis (2006) Ms→Mw katsayıları 11.10.2026'da özgün makaleye göre düzeltildi — Eş. (14): Mw = 0,67 Ms + 2,07 (3,0 ≤ Ms ≤ 6,1); Eş. (15): Mw = 0,99 Ms + 0,08 (6,2 ≤ Ms ≤ 8,2). İkisi de yalnızca h < 70 km için geçerlidir; derinliği bilinmeyen ya da h ≥ 70 km olan Ms olayları dönüştürülmez. Önceki 0,646/2,079 ve 0,994/0,115 katsayıları kaynakta yoktu.`;
     }
     const bt = Object.entries(convResult.byType || {}).sort((x, y) => y[1] - x[1]).map(([t, n]) => `${t} ${n}`).join(', ');
-    convNoteEl.textContent = `Scope: ${scopeLabel} · Input: ${convEntry.inputTypes.join('/').toUpperCase()} → ${convEntry.outputType} · ${applyNote}${bt ? ` (${bt})` : ''}${highMagNote}${msNote}${convCmp}`;
+    // 2026-10-18: Mc–ızgara düzeltmesi yalnızca tek Mc yolunda (G-R, b(t), Benioff); basamaklı tamlık/Weichert ve Mc duyarlılık tablosunda uygulanmaz
+    const csNote = (typeof csIsActive === 'function' && csIsActive()) ? ' · ⚠ Tamlık basamakları etkin: Mc–ızgara düzeltmesi (Mc ve ΔM\'nin bağıntıyla taşınması) basamaklı Mc ve Weichert sınıflarına uygulanmaz' : '';
+    convNoteEl.textContent = `Scope: ${scopeLabel} · Input: ${convEntry.inputTypes.join('/').toUpperCase()} → ${convEntry.outputType} · ${applyNote}${bt ? ` (${bt})` : ''}${highMagNote}${msNote}${convCmp}${csNote}`;
     convNoteEl.title = `Valid range: ${convEntry.validRange}\nReference: ${convEntry.reference}${msTitle}`
       + '\n\nOriginal → dönüşüm: aynı olay kümesinde Mc (MAXC + 0,2) ve b (Aki 1965). Dönüşüm her zaman kaynağın bildirdiği ham büyüklükten yapılır; '
       + 'gerçek Mw türleri (Mww, Mwr, Mwb, Mwc, Mwp, Mw) ve türü bilinmeyen olaylar dönüştürülmez, önceden hesaplanmış eski Mw alanları kullanılmaz (çift dönüşüm yok). '
-      + 'Doğrusal bir bağıntı (Mw = s·M + c) FMD\'nin biçimini değiştirmez: tüm olaylar dönüştürüldüğünde b yaklaşık b/s olur ve b(t)\'nin zamansal deseni korunur.';
+      + 'Doğrusal bir bağıntı (Mw = s·M + c) FMD\'nin biçimini değiştirmez: tüm olaylar dönüştürüldüğünde b yaklaşık b/s olur ve b(t)\'nin zamansal deseni korunur. '
+      + 'Mc–ızgara düzeltmesi (2026-10-18): Mc kaynak ölçeğinde maksimum eğrilikle bulunur; Mc ve ΔM aynı bağıntıyla taşınır (Mc_Mw = f(Mc), ΔM_Mw = f(Mc + 0,1) − f(Mc)); '
+      + 'Aki b\'si ΔM_Mw/2 ile hesaplanır. Eşik çevresinde birden çok bağıntı varsa en çok olaya uygulanan kullanılır. Basamaklı tamlık/Weichert ve Mc duyarlılık tablosunda uygulanmaz.';
   }
 
   const srcSel  = document.getElementById('srcSel');
@@ -5266,7 +5296,11 @@ function renderTimeMag(evList) {
   const mcOverrideRaw = usingRegion ? document.getElementById('regionMcOverride').value : '';
   const mcOverride = mcOverrideRaw !== '' ? parseFloat(mcOverrideRaw) : null;
   const mcIsManual = mcOverride != null && !isNaN(mcOverride);
-  const Mc = mcIsManual ? mcOverride : computeMc(evList);
+  // 2026-10-18: dönüşüm etkinse Mc kaynak ölçeğinde bulunur, Mc ve ΔM aynı bağıntıyla Mw'ye taşınır (computeMcScale).
+  // Elle girilen Mc gösterilen ölçektedir; ΔM yine bağıntının eğiminden alınır.
+  tmMcScale = computeMcScale(evList);
+  tmMagDM = tmMcScale ? tmMcScale.dm : MC_DM;
+  const Mc = mcIsManual ? mcOverride : (tmMcScale ? tmMcScale.mc : null);
   // Tamlık basamakları (alt kataloglar) — etkinse tek Mc yerine basamaklı eşik
   lastTmEvList = evList;
   const cs = csIsActive() ? csBuild(evList) : null;
@@ -5304,7 +5338,7 @@ function renderTimeMag(evList) {
     mcLine = csStairSVG(cs, x, y, t0, t1, magMin, magMax);
   } else if (Mc !== null && Mc >= magMin && Mc <= magMax) {
     mcLine = `<line x1="${PAD_L}" y1="${y(Mc)}" x2="${W-PAD_R}" y2="${y(Mc)}" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3"/>` +
-             `<text x="${W-PAD_R}" y="${y(Mc)-4}" fill="#06b6d4" font-size="9" text-anchor="end">Mc=${Mc}</text>`;
+             `<text x="${W-PAD_R}" y="${y(Mc)-4}" fill="#06b6d4" font-size="9" text-anchor="end">Mc=${fmtM(Mc)}</text>`;
   }
 
   const xTicksArr = timeAxisTicks(t0, t1);
@@ -5774,7 +5808,7 @@ function renderBenioff(evList, Mc, cs) {
   }
   if (mFix === null || !Number.isFinite(mFix)) { svg.innerHTML = `<text x="330" y="90" fill="#666" font-size="11" text-anchor="middle">Mc yok — Benioff ölçüsü hesaplanamadı</text>`; st.textContent = '—'; return; }
   const fixItems = ev.filter(e => e.m >= mFix - 1e-9).sort((a, b) => a.t - b.t);
-  if (fixItems.length < 2) { svg.innerHTML = `<text x="330" y="90" fill="#666" font-size="11" text-anchor="middle">Sabit eşikte (M ≥ ${mFix.toFixed(1)}) yeterli olay yok (N = ${fixItems.length})</text>`; st.textContent = '—'; return; }
+  if (fixItems.length < 2) { svg.innerHTML = `<text x="330" y="90" fill="#666" font-size="11" text-anchor="middle">Sabit eşikte (M ≥ ${fmtM(mFix)}) yeterli olay yok (N = ${fixItems.length})</text>`; st.textContent = '—'; return; }
   const sq = m => Math.pow(10, 5.9 + 0.75 * m);
   const cum = arr => { let a = 0; return arr.map(e => ({ t: e.t, m: e.m, s: (a += sq(e.m)) })); };
   const F = cum(fixItems), V = varItems && varItems.length ? cum(varItems) : null;
@@ -5802,7 +5836,7 @@ function renderBenioff(evList, Mc, cs) {
       g += `<rect x="${xa.toFixed(1)}" y="${(sT + sH - hh).toFixed(1)}" width="${Math.max(0.6, xb - xa - 0.4).toFixed(1)}" height="${hh.toFixed(1)}" fill="#f97316" fill-opacity="0.55"><title>${new Date(t0 + i * bw).toISOString().slice(0, 10)}: ΔS/Δt = ${(dS[i] / sc).toFixed(3)}×10^${k} erg^½/yıl (aralık ${binY === 1 ? '1 yıl' : binY === 0.25 ? '3 ay' : '1 ay'})</title></rect>`; }
     g += `<text x="${PAD_L + 4}" y="${sT + sH + 12}" fill="#888" font-size="8">ΔS/Δt: ${binY === 1 ? '1 yıllık' : binY === 0.25 ? '3 aylık' : '1 aylık'} aralıklarda Benioff salım hızı (sabit eşik, yıla ölçekli), en büyük çubuk = ${(dMax / sc).toFixed(2)}×10^${k} erg^½/yıl</text>`;
     // ΔS/Δt ayrıştırma şeridi (2026-10-17): aynı aralıklar, aynı zaman ekseni. log10 birimi; 0 = bütün dönem ortalaması.
-    DEC = benDecompose(F.map(p => ({ t: p.t, m: p.m })), t0, t1, bw, mFix);
+    DEC = benDecompose(F.map(p => ({ t: p.t, m: p.m })), t0, t1, bw, mFix, cs ? 0.1 : tmMagDM);   // 2026-10-18: dönüşümde ΔM_Mw
     const dT = H0 + STRIP + 4, dH = STRIP2 - 30;
     g += `<rect x="${PAD_L}" y="${dT}" width="${plotW}" height="${dH}" fill="none" stroke="#2a2a2a" stroke-width="0.6"/>`;
     if (!DEC) g += `<text x="${PAD_L + plotW / 2}" y="${dT + dH / 2 + 3}" fill="#666" font-size="9" text-anchor="middle">Ayrıştırma için yeterli olay yok (sabit eşikte N ≥ ${BEN_DEC_NB} gerekir)</text>`;
@@ -5836,15 +5870,15 @@ function renderBenioff(evList, Mc, cs) {
   let warn = '';
   if (cs && V && mFix > mLoAll + 1e-9 && bUse) {
     const sh = benioffShare(bUse, mLoAll, mFix, mLoAll, Math.max(mObsMax, mFix + 0.1));
-    if (sh !== null) warn = `<div style="color:#f59e0b;margin-top:3px;">⚠ Katalog tamlığı uyarısı: değişken Mc ile birikimde, M ${mLoAll.toFixed(1)}–${mFix.toFixed(1)} aralığı (yalnızca düşük eşikli dönemlerde kayıtlı) beklenen Benioff salımında yaklaşık <b>%${Math.round(100 * sh)}</b> paya sahiptir (sürekli G–R varsayımı, b = ${bUse.toFixed(2)}, M_max = ${mObsMax.toFixed(1)}; bu bir model tahminidir). Gri eğrinin eğimindeki artışın bu kadarı yalnızca algılama değişiminden kaynaklanabilir; ana karşılaştırma sabit eşikli turuncu eğridir.</div>`;
+    if (sh !== null) warn = `<div style="color:#f59e0b;margin-top:3px;">⚠ Katalog tamlığı uyarısı: değişken Mc ile birikimde, M ${mLoAll.toFixed(1)}–${fmtM(mFix)} aralığı (yalnızca düşük eşikli dönemlerde kayıtlı) beklenen Benioff salımında yaklaşık <b>%${Math.round(100 * sh)}</b> paya sahiptir (sürekli G–R varsayımı, b = ${bUse.toFixed(2)}, M_max = ${mObsMax.toFixed(1)}; bu bir model tahminidir). Gri eğrinin eğimindeki artışın bu kadarı yalnızca algılama değişiminden kaynaklanabilir; ana karşılaştırma sabit eşikli turuncu eğridir.</div>`;
   }
   const yrs = (t1 - t0) / 31557600000;
-  st.innerHTML = `<span style="color:#f97316">━</span> Sabit eşik M ≥ ${mFix.toFixed(1)}: N = <b>${F.length}</b>, Σ√E = ${(F[F.length - 1].s / sc).toFixed(2)}×10^${k} erg^½, ortalama hız ${(F[F.length - 1].s / sc / Math.max(yrs, 1e-6)).toFixed(2)}×10^${k} erg^½/yıl` +
+  st.innerHTML = `<span style="color:#f97316">━</span> Sabit eşik M ≥ ${fmtM(mFix)}: N = <b>${F.length}</b>, Σ√E = ${(F[F.length - 1].s / sc).toFixed(2)}×10^${k} erg^½, ortalama hız ${(F[F.length - 1].s / sc / Math.max(yrs, 1e-6)).toFixed(2)}×10^${k} erg^½/yıl` +
     (V ? ` &nbsp;|&nbsp; <span style="color:#d1d5db">┄</span> Değişken Mc (karşılaştırma): N = ${V.length}` : '') +
     (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">┊</span> tamlık basamakları` : '') + ` &nbsp;|&nbsp; ● M ≥ ${Math.max(5, mFix + 0.5).toFixed(1)}` + warn +
     `<div style="color:#888;margin-top:3px;">Kümülatif Benioff eğrisi sismik enerji salımının betimleyici bir göstergesidir; eğimin değişmesi tek başına güvenilir bir deprem öncülünün kanıtı değildir (hızlanan moment salımı hipotezi katı istatistiksel testlerde anlamlı bulunmadı: Hardebeck, Felzer &amp; Michael 2008). Zaman damgası: olayın gerçek tarihi.</div>`;
   if (DEC) { const nOwn = DEC.bins.filter(b2 => b2.bOwn).length, nNon = DEC.bins.filter(b2 => b2.n).length;
-    st.innerHTML += `<div style="margin-top:4px;color:#9ab0c5;">ΔS/Δt ayrıştırması: her aralıkta log₁₀(gözlenen / dönem ortalaması) = <span style="color:#3b82f6">olay sayısı</span> log₁₀[(N/Δt)/(N_top/T)] + <span style="color:#22c55e">b değeri</span> log₁₀[g(b_i)/g(b_ref)] + <span style="color:#9ca3af">artık</span>. g(b): kesilmiş G–R (M ${DEC.mc.toFixed(2)}–${DEC.mx.toFixed(2)}) altında olay başına beklenen 10^(0,75M); b: Aki (1965), sabit eşik M ≥ ${mFix.toFixed(1)} (tamlık eşiğiyle aynı). b terimi ${nOwn}/${nNon} dolu aralıkta hesaplandı (aralık içi n ≥ ${BEN_DEC_NB}; diğerlerinde b_ref, terim 0). Artık çoğunlukla en büyük birkaç olayın örnekleme etkisidir.</div>` +
+    st.innerHTML += `<div style="margin-top:4px;color:#9ab0c5;">ΔS/Δt ayrıştırması: her aralıkta log₁₀(gözlenen / dönem ortalaması) = <span style="color:#3b82f6">olay sayısı</span> log₁₀[(N/Δt)/(N_top/T)] + <span style="color:#22c55e">b değeri</span> log₁₀[g(b_i)/g(b_ref)] + <span style="color:#9ca3af">artık</span>. g(b): kesilmiş G–R (M ${DEC.mc.toFixed(2)}–${DEC.mx.toFixed(2)}) altında olay başına beklenen 10^(0,75M); b: Aki (1965), sabit eşik M ≥ ${fmtM(mFix)} (tamlık eşiğiyle aynı). b terimi ${nOwn}/${nNon} dolu aralıkta hesaplandı (aralık içi n ≥ ${BEN_DEC_NB}; diğerlerinde b_ref, terim 0). Artık çoğunlukla en büyük birkaç olayın örnekleme etkisidir.</div>` +
       `<div style="color:#888;margin-top:2px;">b ve ΔS aynı katalogdan hesaplanır; terimler bağımsız kanıt değildir. Gözlemsel bir ayrıştırmadır; deprem tahmini ya da öncül göstergesi değildir.</div>`; }
   window.lastBenDecomp = DEC;
   // ── İki dönem karşılaştırması ve anlamlılık testleri (2026-10-11) ─────────────────────────────
@@ -5858,7 +5892,7 @@ function renderBenioff(evList, Mc, cs) {
     const f2 = v => !Number.isFinite(v) ? '—' : v.toFixed(2), fp = v => v < 0.001 ? '< 0,001' : v.toFixed(3).replace('.', ',');
     const T = benTest, d0 = new Date(t0).toISOString().slice(0, 10), dS = new Date(ts).toISOString().slice(0, 10), d1 = new Date(t1).toISOString().slice(0, 10);
     const row = (a, b2, c) => `<tr><td style="padding:1px 6px;color:#cbd5e1;">${a}</td><td style="padding:1px 6px;">${b2}</td><td style="padding:1px 6px;color:#9ab0c5;">${c}</td></tr>`;
-    st.innerHTML += `<div style="margin-top:5px;color:#c4b5fd;">İki dönem karşılaştırması (sabit eşik M ≥ ${mFix.toFixed(1)}; ayrım ${dS}, ${splitSrc}${splitSrc === 'kullanıcı' ? '' : ' — tarih veriden seçildiği için p değerleri keşifseldir'})</div>` +
+    st.innerHTML += `<div style="margin-top:5px;color:#c4b5fd;">İki dönem karşılaştırması (sabit eşik M ≥ ${fmtM(mFix)}; ayrım ${dS}, ${splitSrc}${splitSrc === 'kullanıcı' ? '' : ' — tarih veriden seçildiği için p değerleri keşifseldir'})</div>` +
       `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:2px;">` +
       row('Dönem 1', `${d0} – ${dS} (${f2(T.T1)} yıl): n = ${T.n1}, ${f2(T.n1 / T.T1)} olay/yıl, Benioff hızı ${f2(T.r1 / sc)}×10^${k}/yıl`, '') +
       row('Dönem 2', `${dS} – ${d1} (${f2(T.T2)} yıl): n = ${T.n2}, ${f2(T.n2 / T.T2)} olay/yıl, Benioff hızı ${f2(T.r2 / sc)}×10^${k}/yıl`, '') +

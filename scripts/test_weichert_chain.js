@@ -10,7 +10,7 @@ const cut = (a, b) => { const i = src.indexOf(a), j = src.indexOf(b, i); if (i <
 
 const ctx = { document: { getElementById: () => ({ value: '' }) } }; vm.createContext(ctx);
 vm.runInContext(src.match(/^const CS_QC = \{[^\n]*\};$/m)[0].replace('const CS_QC', 'var CS_QC'), ctx);
-vm.runInContext(cut('function computeMc(evList)', '// Aki (1965) MLE b-değeri'), ctx);
+vm.runInContext('var MAG_CONVERSIONS = {};\n' + cut('const MC_DM = 0.1;', '// Aki (1965) MLE b-değeri').replace('const MC_DM', 'var MC_DM'), ctx);   // 2026-10-18: computeMc → computeMcScale/mcScale
 vm.runInContext('var regionRect=null, regionWindowStart=null, regionWindowEnd=null, regionCapped=false, regionOrderUsed=null;', ctx);
 vm.runInContext(cut('let csEnabled = false;', 'let lastGrFit = null;').replace('let csEnabled', 'var csEnabled').replace('let csSteps', 'var csSteps'), ctx);
 // renderGutenbergRichterCS içindeki sınıflama bloğu (n_i, T_i, sınıf merkezleri) — birebir kaynak
