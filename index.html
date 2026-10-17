@@ -3353,6 +3353,7 @@ function svgToEN(xml) {
     .replace(/ \/yıl/g, ' /yr').replace(/(N = \d+) olay/g, '$1 events').replace(/TÜM SINIFLAR/g, 'ALL CLASSES')
     .replace(/EĞRİ {9}/g, 'CURVE        ').replace(/EN İYİ TAHMİN/g, 'BEST ESTIMATE').replace(/ÜST EĞRİ {5}/g, 'UPPER CURVE  ').replace(/ALT EĞRİ {5}/g, 'LOWER CURVE  ')
     .replace(/Yetersiz veri:/g, 'Insufficient data:')
+    .replace(/log₁₀ oran/g, 'log₁₀ ratio').replace(/Ayrıştırma için yeterli olay yok \(sabit eşikte N ≥ (\d+) gerekir\)/g, 'Not enough events for the decomposition (N ≥ $1 at the fixed threshold)')
     .replace(/Hesaplanan pencere: (\d+) · Gösterilen: (\d+) \(adım (\d+)\) · Zaman: (son olay|ortanca|ortalama)/g, (m, a, b, c, z) => `Computed windows: ${a} · Shown: ${b} (step ${c}) · Time: ${{ 'son olay': 'last event', ortanca: 'median', ortalama: 'mean' }[z]}`)
     .replace(/>(Oca|Şub|Mar|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)\.?( \d{4})?</g, (m, mo, y) => '>' + SVG_EN_MONTHS[mo] + (y || '') + '<');
 }
@@ -3389,9 +3390,14 @@ async function exportPosterAGU(scale, evt) {
   const SRC = t => !EN ? t : t.replace('Tarihsel Katalog', 'Historical Catalogue').replace('HK Yerel Katalog', 'HK Local Catalogue').replace('HK Tarihsel Katalog', 'HK Historical Catalogue')
     .replace('önceden çekilmiş katalog', 'pre-fetched catalogue').replace('canlı sorgu', 'live query').replace(/statik/g, 'static').replace(/^Canlı akış/, 'Live feed').replace(/^canlı akış/, 'live feed');
   // hedef punto (SVG birimi) = ~11,5 px ÷ şeklin posterdeki ölçeği (zaman–büyüklük ≈0,75; b(t) ≈0,72; G-R ≈0,73)
-  const AXK = { tmSvg: 15.3, tmSvgB: 16, tmSvgGR: 15.5 };
+  // 2026-10-17: Benioff (S, ΔS/Δt, ayrıştırma) b(t) ile yan yana Şekil 3b; ikisi daha küçük ölçekte çizildiği için eksen puntosu büyütülür
+  const benEl = document.getElementById('tmSvgBen'), BEN_ON = !!(benEl && benEl.querySelector('path'));
+  const AXK = { tmSvg: 15.3, tmSvgB: BEN_ON ? 19 : 16, tmSvgGR: 15.5, tmSvgBen: 19 };
   const svgImg = (el, k) => new Promise((res, rej) => {
-    let xml = svgToLight(svgBoostAxisText(new XMLSerializer().serializeToString(el), AXK[el.id] || 0));
+    let src0 = new XMLSerializer().serializeToString(el);
+    // Benioff poster kopyası: şerit alt yazıları (küçük, çok parçalı) çıkarılır; bilgileri Şekil 3b altyazısındadır
+    if (el.id === 'tmSvgBen') src0 = src0.replace(/<text\b[^>]*>(?:ΔS\/Δt:|Ayrıştırma \(log|b_ref = )[\s\S]*?<\/text>/g, '');
+    let xml = svgToLight(svgBoostAxisText(src0, AXK[el.id] || 0));
     if (EN) xml = svgToEN(xml);
     // G-R: büyütülen x ekseni başlığı tik etiketleriyle çakışmasın diye tuvali 12 birim uzatıp başlığı aşağı al
     if (el.id === 'tmSvgGR') xml = xml.replace(/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/, (m, w, h) => `viewBox="0 0 ${w} ${+h + 16}"`)
@@ -3404,7 +3410,7 @@ async function exportPosterAGU(scale, evt) {
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
   });
   let imgs;
-  try { imgs = await Promise.all(['tmSvg', BT_ID, 'tmSvgGR'].map(id => svgImg(document.getElementById(id), 2.5 * SC))); }
+  try { imgs = await Promise.all(['tmSvg', BT_ID, 'tmSvgGR'].concat(BEN_ON ? ['tmSvgBen'] : []).map(id => svgImg(document.getElementById(id), 2.5 * SC))); }
   catch (e) { alert('Görsel oluşturulamadı: ' + e.message); done(); return; }
   const loadImg = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
   const idImgs = Object.assign({}, posterGetImgs(), window._posterImgMem || {});
@@ -3633,15 +3639,30 @@ async function exportPosterAGU(scale, evt) {
   y = figure(imgs[0], X2 + 16, y, W2 - 32, 150);
   caption(cs ? L('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', 'Figure 2. Time–magnitude distribution of events; the orange step curve is the time-dependent completeness threshold (faded points lie below it).')
     : L('Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', 'Figure 2. Time–magnitude distribution of events; colours show magnitude classes (no completeness steps used).'), X2 + 16, y, W2 - 32, TOP + 256);
-  y = box(X2, TOP + 275, W2, MID - TOP - 275, L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
+  y = box(X2, TOP + 275, W2, MID - TOP - 275, BEN_ON ? L('b-Değeri ve Benioff Gerinimi', 'b-Value and Benioff Strain') : L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
   const adF = !!(bt && bt.adaptive);
+  if (BEN_ON) {
+    // 2026-10-17: b(t) (Şekil 3a) ve Benioff (Şekil 3b) aynı yükseklikte yan yana; genişlik paylaşımı en-boy oranlarından
+    const iB = imgs[1], iN = imgs[3], g2 = 14, aw = W2 - 32 - g2, rB = iB.naturalWidth / iB.naturalHeight, rN = iN.naturalWidth / iN.naturalHeight;
+    const hF = Math.min(aw / (rB + rN), MID - y - 150), wB = hF * rB, x0 = X2 + 16 + (W2 - 32 - (wB + g2 + hF * rN)) / 2;
+    figure(iB, x0, y, wB, hF); figure(iN, x0 + wB + g2, y, hF * rN, hF);
+    // alt-şekil harfleri çizim alanının sol üst köşesine (eksen etiketlerinin sağına; PAD_L = 40/660)
+    text('a', x0 + wB * 0.075, y + 3, 'bold 17px Arial', '#111827'); text('b', x0 + wB + g2 + hF * rN * 0.075, y + 3, 'bold 17px Arial', '#111827');
+    y += hF + 8;
+  } else {
   // 2026-10-17: altyazı için ayrılan alan bir satır büyütüldü (önceden son satır "Alt şerit Mc(t)" kesiliyordu); seyreltmede bir satır daha
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112 - 21 - (adF ? 21 : 0));
+  }
   const bandF = (BT_STEP === 1 && !adF) || (bt && bt.band), thinF = BT_STEP === 1 && !adF;
   const adEN = adF ? `, display step ${bt.dispStep} (${bt.nWin} windows > ${BT_ADAPT_MAX}; values unchanged)` : '';
   const adTR = adF ? `, gösterim adımı ${bt.dispStep} (${bt.nWin} pencere > ${BT_ADAPT_MAX}; değerler aynı)` : '';
-  rich(EN ? '**Figure 3.** b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.')
-    : '**Şekil 3.** b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.'), X2 + 16, y + 2, W2 - 32, { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  const BB = window.lastBenioff, BD = window.lastBenDecomp;
+  const binTxt = BD && BD.bins.length ? (w => w > 2e10 ? L('1 yıllık', '1-year') : w > 5e9 ? L('3 aylık', '3-month') : L('1 aylık', '1-month'))(BD.bins[0].t1 - BD.bins[0].t0) : '';
+  const benCap = !BEN_ON ? '' : EN
+    ? ` **(b)** Cumulative Benioff strain S(t) = Σ√E, log E = 11.8 + 1.5M (Gutenberg & Richter 1956), fixed threshold M ≥ ${BB ? BB.mFix.toFixed(1) : '—'} (N = ${BB ? BB.n : '—'}). Middle strip: ${binTxt} Benioff release rate ΔS/Δt. Lower strip (log₁₀, 0 = period mean): {#3b82f6|blue} event count, {#16a34a|green} b-value (n ≥ ${BEN_DEC_NB} per interval), {#6b7280|grey} residual, {#ea580c|orange} total = observed ΔS/Δt; truncated G–R${BD ? `, b_ref = ${BD.bRef.toFixed(2)}` : ''}. b and ΔS come from the same catalogue; descriptive decomposition, not a precursor.`
+    : ` **(b)** Birikimli Benioff gerinimi S(t) = Σ√E, log E = 11,8 + 1,5M (Gutenberg & Richter 1956), sabit eşik M ≥ ${BB ? DC(BB.mFix.toFixed(1)) : '—'} (N = ${BB ? BB.n : '—'}). Orta şerit: ${binTxt} Benioff salım hızı ΔS/Δt. Alt şerit (log₁₀, 0 = dönem ortalaması): {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b değeri (aralıkta n ≥ ${BEN_DEC_NB}), {#6b7280|gri} artık, {#ea580c|turuncu} toplam = gözlenen ΔS/Δt; kesilmiş G–R${BD ? `, b_ref = ${DC(BD.bRef.toFixed(2))}` : ''}. b ve ΔS aynı katalogdan; betimleyici ayrıştırmadır, öncül değildir.`;
+  rich(EN ? '**Figure 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + benCap
+    : '**Şekil 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + benCap, X2 + 16, y + 2, W2 - 32, BEN_ON ? { size: 14, lh: 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
