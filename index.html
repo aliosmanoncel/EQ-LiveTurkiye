@@ -5761,6 +5761,20 @@ function amrSynthCluster(ev, cl, wa, wb, rnd) {
   for (let i = 0; i < ev.length; i++) { let t = ev[i].t + sh.get(cl[i]); t = wa + ((((t - wa) % L) + L) % L); out[i] = { t, m: ev[i].m, d: ev[i].d }; }
   return out;
 }
+// Duyarlılık (2026-10-17; Guilhem vd. 2013): YALNIZCA en iyi hücrede q, (1) bütün olaylarla, (2) hücredeki en büyük olay
+// çıkarılarak, (3) o olayın GK74 kümesi (aynı küme kökü) çıkarılarak yeniden hesaplanır. Yeni hücre seçimi / optimizasyon
+// yapılmaz; p yeniden hesaplanmaz. ev: [{t, m, d}], cl: küme kökü indeksi (ev ile aynı sıra). n < AMR_NMIN ise geçersiz.
+function amrDropCheck(ev, cl, cell, tfMs, mMin) {
+  const inCell = i => ev[i].t < tfMs && ev[i].t >= tfMs - cell.yr * AMR_YR && ev[i].d <= cell.r && ev[i].m >= mMin - 1e-9;
+  const ids = ev.map((_, i) => i).filter(inCell); if (!ids.length) return null;
+  const big = ids.reduce((a, b) => (ev[b].m > ev[a].m || (ev[b].m === ev[a].m && ev[b].t < ev[a].t)) ? b : a);
+  const root = cl[big], qOf = keep => { const sub = keep.map(i => ev[i]);
+    if (sub.length < AMR_NMIN) return { n: sub.length, q: null, ok: false };
+    const g = amrGrid(sub, tfMs, mMin, [cell.r], [cell.yr]); return { n: sub.length, q: g.T, ok: g.T !== null }; };
+  const clIds = ids.filter(i => cl[i] === root);
+  return { big: ev[big], nCluster: clIds.length,
+    all: qOf(ids), noBig: qOf(ids.filter(i => i !== big)), noCluster: qOf(ids.filter(i => cl[i] !== root)) };
+}
 function amrPvalue(Tobs, Tsim) { const v = Tsim.filter(x => x !== null); return { p: (1 + v.filter(x => x <= Tobs).length) / (v.length + 1), n: v.length }; }
 // Arayüz sürücüsü: düğmeyle çalışır (hesap ağır olabilir); parçalar halinde ilerler, ilerlemeyi yazar.
 let amrRunId = 0;
@@ -5801,6 +5815,7 @@ async function amrRun() {
     if (decObs.T !== null) TD.push(amrGrid(amrSynthPoisson(dec, wa, tf, rnd), tf, mMin, AMR_R_GRID, AMR_Y_GRID, tStart).T);
     if (k % 10 === 9) { prog(k + 1); await new Promise(r => setTimeout(r, 0)); if (id !== amrRunId) return; }
   }
+  const DC = amrDropCheck(raw, cl, obs.best, tf, mMin);
   const pP = amrPvalue(obs.T, TP), pK = amrPvalue(obs.T, TK), pD = decObs.T !== null ? amrPvalue(decObs.T, TD) : null;
   const col = q => q === null ? '#333' : q < 0.5 ? '#be123c' : q < 0.7 ? '#f97316' : q < 0.9 ? '#a16207' : '#334155';
   let tab = `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:3px;"><tr><td style="padding:1px 5px;color:#888">başlangıç \\ R</td>${AMR_R_GRID.map(r => `<td style="padding:1px 5px;color:#888;text-align:center">${r} km</td>`).join('')}</tr>`;
@@ -5811,12 +5826,19 @@ async function amrRun() {
   const pTxt = (P, lab, note) => `<tr><td style="padding:1px 6px;color:#cbd5e1">${lab}</td><td style="padding:1px 6px">p = <b>${fp(P.p)}</b> (N = ${P.n})</td><td style="padding:1px 6px;color:#9ab0c5">${note}</td></tr>`;
   out.innerHTML = `<div>${head}</div>` + tab +
     `<div style="margin-top:3px">Izgara: ${nOk} geçerli hücre; q &lt; 0,70 olan hücre: ${nQ}. En küçük q = <b>${fmt(obs.T)}</b> (R = ${obs.best.r} km, ${obs.best.yr} yıl, n = ${obs.best.n}, m = ${String(obs.best.m).replace('.', ',')}). Çerçeveli hücre en küçük q; kırmızı q &lt; 0,50, turuncu 0,50–0,70, kahverengi 0,70–0,90, gri ≥ 0,90. Tek tek hücrelerdeki q &lt; 0,70 anlamlılık göstermez; anlamlılık yalnızca aşağıdaki p değerlerinden okunur.</div>` +
+    (DC ? (() => { const rw = (lab, o, note) => `<tr><td style="padding:1px 6px;color:#cbd5e1">${lab}</td><td style="padding:1px 6px">${o.ok ? 'q = <b>' + fmt(o.q) + '</b>' : '<span style="color:#888">geçersiz</span>'}</td><td style="padding:1px 6px;color:#9ab0c5">n = ${o.n}${o.ok ? '' : ` &lt; ${AMR_NMIN}, karşılaştırma yapılmadı`}${note ? ' · ' + note : ''}</td></tr>`;
+      return `<div style="margin-top:4px;color:#c4b5fd">Tek olay / küme duyarlılığı (yalnızca en iyi hücre: R = ${obs.best.r} km, ${obs.best.yr} yıl; Guilhem vd. 2013)</div>` +
+        `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:2px;">` +
+        rw('Bütün olaylar', DC.all, '') +
+        rw(`En büyük olay çıkarılmış (M${DC.big.m.toFixed(1)}, ${new Date(DC.big.t).toISOString().slice(0, 10)})`, DC.noBig, '') +
+        rw('En büyük olayın GK74 kümesi çıkarılmış', DC.noCluster, `kümede ${DC.nCluster} olay`) +
+        `</table><div style="color:#888;margin-top:2px">q'nun belirgin yükselmesi, güç yasası uyumunun bu olaya/kümeye dayandığını gösterir; tek başına AMR'nin geçersizliğini kanıtlamaz. Bu satırlar için p yeniden hesaplanmadı (aynı çıkarma her sentetik katalogda yapılmadığı için karşılaştırılamaz).</div>`; })() : '') +
     `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:3px;">` +
     pTxt(pK, 'Küme korumalı sıfır (birincil)', 'GK74 kümeleri iç zaman farklarıyla blok halinde rastgele kaydırıldı; aynı ızgara araması her katalogda tekrarlandı') +
     pTxt(pP, 'Poisson sıfır', 'zamanlar düzgün dağıtıldı; kümelenmeyi bozduğu için anlamlılığı abartabilir') +
     (pD ? pTxt(pD, `GK74 kümesizleştirilmiş (n = ${dec.length})`, `en küçük q = ${fmt(decObs.T)}; Poisson sıfır, aynı ızgara`) : `<tr><td colspan="3" style="padding:1px 6px;color:#888">GK74 kümesizleştirilmiş katalogda test için yeterli olay yok.</td></tr>`) +
     `</table><div style="color:#f59e0b;margin-top:3px">⚠ Deneysel: bu p değerlerinin kalibrasyonu henüz doğrulanmadı. Hızlanma içermeyen yapay Poisson kataloglarında (100 katalog) p ≤ 0,05 oranı 0,08–0,09 bulundu (nominal 0,05); kümelenmiş kataloglarda doğrulama sürüyor. p değerlerini kesin istatistiksel kanıt olarak değil, yön gösterici olarak okuyun.</div><div style="color:#888;margin-top:3px">p = (1 + #{T_sim ≤ T_obs}) / (N + 1); T = ızgaradaki en küçük q (arama maliyeti dahil); tohum 20261017. Yöntem: Bufe &amp; Varnes (1993), q ölçütü Bowman vd. (1998), t_f ana şoka sabit (Jiang &amp; Wu 2005 ile aynı kurgu). <b>Bu test geriye dönüktür; t_f tahmin etmez ve alarm üretmez.</b> Küçük bir p yalnızca seçilen sıfır hipotezine göre olağandışı bir uyumu gösterir; ileriye dönük öngörü becerisinin kanıtı değildir. AMR benzeri örüntüler kümelenmeli sentetik kataloglarda da ortaya çıkar (Hardebeck, Felzer &amp; Michael 2008).</div>`;
-  window.lastAmr = { ms: { t: tf, m: mOf(ms), lat: la0, lon: lo0 }, mMin, n: raw.length, T: obs.T, best: obs.best, pK: pK.p, pP: pP.p, pD: pD ? pD.p : null, nSim, cells: obs.cells };
+  window.lastAmr = { ms: { t: tf, m: mOf(ms), lat: la0, lon: lo0 }, mMin, n: raw.length, T: obs.T, best: obs.best, pK: pK.p, pP: pP.p, pD: pD ? pD.p : null, nSim, cells: obs.cells, drop: DC };
 }
 
 /* Son büyük deprem için global referans */

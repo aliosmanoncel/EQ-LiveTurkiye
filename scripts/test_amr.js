@@ -20,8 +20,8 @@ const fn = name => {
 };
 const consts = ['AMR_M_GRID', 'AMR_R_GRID', 'AMR_Y_GRID', 'AMR_NMIN'].map(c => { const m = src.match(new RegExp('^const ' + c + ' = [^\\n]*$', 'm')); if (!m) throw new Error(c); return m[0].replace(/^const /, 'var '); });
 const ctx = {}; vm.createContext(ctx);
-vm.runInContext([...new Set(consts)].join('\n') + '\n' + ['amrFitQ', 'amrGrid', 'amrSynthPoisson', 'amrSynthCluster', 'amrPvalue', 'mulberry32'].map(fn).join('\n') +
-  '\nglobalThis.__x = { amrFitQ, amrGrid, amrSynthPoisson, amrSynthCluster, amrPvalue, mulberry32, AMR_R_GRID, AMR_Y_GRID, AMR_NMIN, AMR_YR };', ctx);
+vm.runInContext([...new Set(consts)].join('\n') + '\n' + ['amrFitQ', 'amrGrid', 'amrSynthPoisson', 'amrSynthCluster', 'amrDropCheck', 'amrPvalue', 'mulberry32'].map(fn).join('\n') +
+  '\nglobalThis.__x = { amrFitQ, amrGrid, amrSynthPoisson, amrSynthCluster, amrDropCheck, amrPvalue, mulberry32, AMR_R_GRID, AMR_Y_GRID, AMR_NMIN, AMR_YR };', ctx);
 const X = ctx.__x, YR = X.AMR_YR;
 let pass = 0, fail = 0;
 const ok = (c, msg) => { if (c) pass++; else { fail++; console.log('FAIL', msg); } };
@@ -83,6 +83,21 @@ const ok = (c, msg) => { if (c) pass++; else { fail++; console.log('FAIL', msg);
   const acc = mk(rnd, 300, r => tf - 20 * YR * Math.pow(r(), 1 / 0.3));
   const pa = pOf(acc, rnd, 99); ok(pa <= 0.05, `hızlanan katalogda p küçük: ${pa}`);
   console.log(`Güç: hızlanan sentetik katalog, p = ${pa.toFixed(3)}`); }
+
+// ── 6. Tek olay / küme duyarlılığı (amrDropCheck; Guilhem vd. 2013) ──
+{ const tf = Date.UTC(2020, 0, 1), rnd = X.mulberry32(31), ev = [], cl = [];
+  for (let i = 0; i < 150; i++) { ev.push({ t: tf - 10 * YR + rnd() * 10 * YR, m: 3 + Math.round(rnd() * 8) / 10, d: rnd() * 90 }); cl.push(i); }
+  const big = ev.length; ev.push({ t: tf - 0.4 * YR, m: 6.5, d: 10 }); cl.push(big);   // geç gelen büyük olay
+  for (let j = 0; j < 60; j++) { ev.push({ t: tf - 0.4 * YR + rnd() * 0.3 * YR, m: 3 + Math.round(rnd() * 15) / 10, d: 12 }); cl.push(big); }   // artçıları
+  const cell = { r: 100, yr: 10 }, D = X.amrDropCheck(ev, cl, cell, tf, 3);
+  ok(D && D.big.m === 6.5 && D.nCluster === 61, `en büyük olay ve kümesi bulunur: M${D && D.big.m}, küme ${D && D.nCluster}`);
+  ok(D.all.ok && D.noBig.ok && D.noCluster.ok, 'üç karşılaştırma geçerli (n ≥ NMIN)');
+  ok(D.all.n === 211 && D.noBig.n === 210 && D.noCluster.n === 150, `n değerleri ${D.all.n}/${D.noBig.n}/${D.noCluster.n}`);
+  ok(D.all.q < 0.7 && D.noCluster.q > D.all.q + 0.2, `geç küme q'yu düşürür; çıkarınca yükselir: ${D.all.q.toFixed(2)} → ${D.noCluster.q.toFixed(2)}`);
+  const G = X.amrGrid(ev, tf, 3, [100], [10]); ok(Math.abs(G.T - D.all.q) < 1e-12, 'bütün olaylar q = ızgara hücresinin q değeri');
+  // NMIN koşulu: küme çıkarılınca n < NMIN → geçersiz
+  const ev2 = ev.slice(big), cl2 = cl.slice(big).map(c => c - big), D2 = X.amrDropCheck(ev2, cl2, cell, tf, 3);
+  ok(D2.all.ok && !D2.noCluster.ok && D2.noCluster.q === null, `n < NMIN olunca geçersiz: n=${D2.noCluster.n}`); }
 
 console.log(`${fail ? '!! FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`);
 process.exit(fail ? 1 : 0);
