@@ -33,7 +33,15 @@ const ok = (c, msg) => { if (c) pass++; else { fail++; console.log('FAIL', msg);
   const ln = Float64Array.from(ts, t => 2 + 0.5 * (t - 2000) + 0.05 * Math.sin(37 * t));
   const l = X.amrFitQ(ts, ln, tf); ok(l && l.q > 0.9, `doğrusal: q=${l && l.q}`);
   const dec = Float64Array.from(ts, t => 10 * (1 - Math.exp(-(t - 2000) / 3)));   // yavaşlayan birikim
-  const d = X.amrFitQ(ts, dec, tf); ok(d && (d.m === null || d.q > 0.7 || d.k < 0), `yavaşlayan birikim hızlanma sayılmamalı: q=${d && d.q}`); }
+  const d = X.amrFitQ(ts, dec, tf); ok(d && d.q > 0.9, `yavaşlayan birikim hızlanma sayılmamalı: q=${d && d.q}`);
+  // İşaret koşulu: S = K + k(t_f − t)^m, 0 < m < 1. k < 0 → dS/dt = −k·m·(t_f − t)^(m−1) > 0 ve t → t_f iken artar (hızlanma);
+  // k > 0 azalan S verir ve reddedilmelidir. Seçilen her uyumda k < 0 olmalı ve uyumun eğimi pozitif, artan olmalı.
+  const neg = Float64Array.from(ts, t => 10 + 3 * Math.pow(tf - t, 0.3));   // k = +3: azalan S
+  const nr = X.amrFitQ(ts, neg, tf); ok(nr && nr.q >= 0.99, `k > 0 (azalan S) reddedilmeli: q=${nr && nr.q} m=${nr && nr.m}`);
+  ok(r.k < 0, `seçilen uyumda k < 0: ${r.k}`);
+  const rate = t => -r.k * r.m * Math.pow(tf - t, r.m - 1);
+  ok(rate(2000) > 0 && rate(2019) > rate(2010) && rate(2010) > rate(2000), 'uyumun eğimi pozitif ve t_f\'ye yaklaştıkça artar');
+  ok(Math.abs((r.K + r.k * Math.pow(0, r.m)) - 10) < 0.05, `t = t_f'de S = K sonlu: K=${r.K}`); }
 
 // ── 2. Izgara kuralları ─────────────────────────────────────────────
 { const tf = Date.UTC(2020, 0, 1), rnd = X.mulberry32(5);
