@@ -1131,7 +1131,7 @@
       <label><input type="checkbox" id="posterPhoto" checked style="vertical-align:middle;"> fotoğraf</label>
       <label title="Kendi fotoğrafınız; yalnızca bu tarayıcıda saklanır, sunucuya gönderilmez" style="cursor:pointer;border:1px solid #334;border-radius:3px;padding:0 5px;">📷 seç<input type="file" id="posterPhotoFile" accept="image/*" hidden onchange="posterStoreImg('foto', this)"></label>
       <label title="Poster renk teması">tema <select id="posterTheme" onchange="posterSavePrefs()" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;"><option value="doga">Doğa ve Deprem (yeşil–lacivert)</option><option value="kum">Kum (AGU örneğinden esinli)</option><option value="sade">Sade (açık gri–lacivert, desensiz; renk körlüğüne duyarlı)</option></select></label>
-      <label title="Poster dili: başlıklar, şekil altyazıları, yöntem/sonuç metinleri ve grafik eksen etiketleri. Elle girilen alanlar (başlık, giriş, sonuçlar, ana mesaj, teşekkür) olduğu gibi kullanılır; İngilizce poster için bu alanları İngilizce doldurun veya boş bırakın (otomatik metin İngilizce üretilir).">dil <select id="posterLang" onchange="posterSavePrefs()" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;"><option value="tr">Türkçe (TR)</option><option value="en">English (EN)</option></select></label>
+      <label title="Poster dili: başlıklar, şekil altyazıları, yöntem/sonuç metinleri ve grafik eksen etiketleri. Elle girilen alanlar (başlık, giriş, sonuçlar, ana mesaj, teşekkür) olduğu gibi kullanılır; İngilizce poster için bu alanları İngilizce doldurun veya boş bırakın (otomatik metin İngilizce üretilir).">dil <select id="posterLang" onchange="posterSavePrefs()" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;"><option value="tr">Türkçe (TR)</option><option value="en">English (EN)</option><option value="both">Her ikisi (TR + EN)</option></select></label>
       <label title="Sonuçlar kutusunun sonuna standart bir yorum sınırı maddesi ekler: b(t) değişimlerinin pencere boyu, Mc ve katalog heterojenliğine duyarlı olduğu ve tek başına büyük deprem öncülü sayılmaması gerektiği. Özellikle ana şok öncesi dönem analizlerinde önerilir."><input type="checkbox" id="posterCaveat" onchange="posterSavePrefs()" style="vertical-align:middle;"> yorum sınırı</label>
       <label title="Doğa ve Deprem Bilimi Topluluğu logosu (sağ üst)"><input type="checkbox" id="posterLogo" checked style="vertical-align:middle;"> logo</label>
       <label title="Kurum/topluluk logonuz; yalnızca bu tarayıcıda saklanır" style="cursor:pointer;border:1px solid #334;border-radius:3px;padding:0 5px;">🏷 seç<input type="file" id="posterLogoFile" accept="image/*" hidden onchange="posterStoreImg('logo', this)"></label>
@@ -3378,6 +3378,15 @@ function posterVal(id, def) { const el = document.getElementById(id); const v = 
 // İnce mod (tmMode === 'ince'): b(t) şekli tmSvgB'de adım 1 ile çizilidir; özet lastBtsInce, metinlerde adım 1, başlık/dosya adında "Adım 1 (İnce)"
 async function exportPosterAGU(scale, evt) {
   if (!showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
+  // 2026-10-17: "Her ikisi" → aynı analiz ve düzenle önce TR, sonra EN posteri üretilir (iki ayrı dosya: …png ve …-EN.png)
+  const langEl = document.getElementById('posterLang');
+  if (langEl && langEl.value === 'both') {
+    const btn0 = evt && evt.currentTarget ? evt.currentTarget : null, lab0 = btn0 ? btn0.textContent : null;
+    if (btn0) { btn0.textContent = '⏳…'; btn0.disabled = true; }
+    try { langEl.value = 'tr'; await exportPosterAGU(scale, null); langEl.value = 'en'; await exportPosterAGU(scale, null); }
+    finally { langEl.value = 'both'; posterSavePrefs(); if (btn0) { btn0.textContent = lab0; btn0.disabled = false; } }
+    return;
+  }
   const ince = tmMode === 'ince', BT_ID = 'tmSvgB', BT_STEP = ince ? 1 : 10;
   posterSavePrefs();
   const btn = evt && evt.currentTarget ? evt.currentTarget : null, oldLabel = btn ? btn.textContent : null;
@@ -3550,11 +3559,61 @@ async function exportPosterAGU(scale, evt) {
   // ── Sütun 1: çalışma alanı haritası
   const X1 = 40, W1 = 560, X2 = 620, W2 = 680, X3 = 1320, W3 = 560, TOP = 172, MID = 905;
   // Giriş ve Amaç (AGU örneğindeki "Introduction" karşılığı); boşsa nötr, yorum içermeyen varsayılan metin
-  const GH = 124, MAPH = 183, MB = 44 + MAPH + 46, VY = GH + 12 + MB + 12;
-  let y = box(X1, TOP, W1, GH, L('Giriş ve Amaç', 'Introduction and Aim'));
+  // 2026-10-17 düzen A (Benioff varken): Zaman–Büyüklük 1. sütuna taşınır; Giriş ve harita kompakt, harita yüksekliği
+  // Veri ve Yöntem metnine göre ayarlanır; 2. sütun tamamen b(t) (üstte) + Benioff (altta, aynı genişlik → zaman eksenleri hizalı).
+  let GH = BEN_ON ? 104 : 124, MAPH = 183, MB = 44 + MAPH + 46, VY = GH + 12 + MB + 12, METH_SZ = 15;
+  let TMH = BEN_ON ? 196 : 0;
   const intro = posterVal('posterIntro', L(`Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`,
     `When catalogue completeness changes over time, the b-value and earthquake rates computed with a single Mc can be biased. **Aim:** to estimate the b-value, its temporal variation and the annual recurrence rates for ${region || 'the study area'} using time-dependent completeness steps.`));
+  // düzen A: Giriş kutusu metne göre (96–124 px); Benioff yoksa eski sabit 124 px
+  if (BEN_ON) GH = Math.max(96, Math.min(124, 44 + rich(intro, X1 + 16, 0, W1 - 32, { size: 14, lh: 18, dry: true }) + 4));
+  let y = box(X1, TOP, W1, GH, L('Giriş ve Amaç', 'Introduction and Aim'));
   rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2 });
+  // Sütun 1: veri ve yöntem
+  const ci = typeof regionChunkInfo !== 'undefined' ? regionChunkInfo : null;
+  const src = SRC(regionRect ? regionSourceLabel() : 'Canlı akış') + (ci ? L(` · parçalı sorgu (${ci.nChunks} parça, ${ci.nUnique.toLocaleString(NF)} benzersiz olay)`, ` · chunked query (${ci.nChunks} chunks, ${ci.nUnique.toLocaleString(NF)} unique events)`) : '');
+  // Büyüklük türü dağılımı (2026-10-11): magTypeDiag ile aynı sayım (e.mtype); poster için kısa özet + baskın tür değişimi uyarısı
+  const mtShort = (() => { const w = evs.filter(e => e.mtype); if (!w.length) return L(' Büyüklük türü bilgisi yok.', ' No magnitude-type information.');
+    const tot = {}; w.forEach(e => { const t = e.mtype.toLowerCase(); tot[t] = (tot[t] || 0) + 1; });
+    const top = Object.entries(tot).sort((a, b) => b[1] - a[1]), str = top.slice(0, 4).map(([t, n]) => EN ? `${t} ${Math.round(100 * n / w.length)}%` : `${t} %${Math.round(100 * n / w.length)}`).join(', ') + (top.length > 4 ? (EN ? ', other' : ', diğer') : '');
+    return L(` Büyüklük türleri: ${str}${top.length > 1 ? ' (karışık ölçek; Mw\'ye dönüştürülmediyse b yanlı olabilir)' : ''}.`, ` Magnitude types: ${str}${top.length > 1 ? ' (mixed scales; b may be biased unless converted to Mw)' : ''}.`); })();
+  const mtConv = typeof mcConversionMode !== 'undefined' && mcConversionMode && mcConversionMode !== 'none';
+  const mtNote = mtConv ? L(' Büyüklükler Magnitude Conversion ile dönüştürüldü.', ' Magnitudes converted with the Magnitude Conversion module.') : mtShort;
+  const csLab = p => !EN ? csLabel(p) : `${csRange(p)}: M≥${(+p.mc).toFixed(1)}` + (p.clipped ? ` (step ${p.start}, clipped to window)` : '');
+  const tr = evs.length ? `${d(Math.min(...evs.map(e => +e.time)))} – ${d(Math.max(...evs.map(e => +e.time)))}` : '—';
+  const mItemsEN = () => [
+    `**Catalogue:** ${src}; ${evs.length.toLocaleString(NF)} events, ${tr}` + (regionRect && regionDeclusterOn ? `; declustered with Gardner & Knopoff (1974) (raw N = ${regionEvents.length.toLocaleString(NF)})` + (regionCtxReady(regionEvents) ? `; with out-of-circle context (inner ring R+30 km, outer ring R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString(NF)} context events)` : '') + (mwAuthActive() ? `; authoritative Mw for large earthquakes (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.') + mtNote,
+    ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitude-type sensitivity scenario:** ${[!lastTmTypeFilter.md ? `MD (duration magnitude) events excluded (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `unconverted ML<1.7 events excluded (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; events were neither deleted from the catalogue nor converted.`] : []),
+    cs ? `**Completeness periods** (sub-catalogues): ${cs.periods.map(csLab).join('; ')}; N entering the analysis = ${cs.kept.length.toLocaleString(NF)}.` : '**Completeness:** single Mc (maximum curvature +0.2; Wiemer & Wyss 2000).',
+    bt && bt.fit ? `**b(t):** fit range ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} with per-event threshold max(Mc_i, M_min)${bt.fit.hi !== null ? ', upper bound M_max; doubly truncated Aki–Utsu maximum likelihood' : '; Aki (1965) maximum likelihood'}; N = 100 moving window, step 10 (Öncel & Wilson 2007); 95% interval ±1.96·SE.`
+      : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine step; consecutive windows overlap by 99%)' : '') + ' (Öncel & Wilson 2007); 95% interval ±1.96·b/√N.',
+    cs ? `**Gutenberg–Richter:** Weichert (1980) maximum likelihood with unequal observation periods${fitT ? `; fit range ${fitT} (M_min ≤ M < M_max; shared by b, D/sd, the R profile and b(t); chosen by a b(M_min) stability scan)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model input, not an Mmax estimate)` : ''}. Sub-catalogue merging principle: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** single Mc; b_GR by Aki (1965) maximum likelihood, a = log N(≥Mc) + b·Mc; goodness of fit after Wiemer & Wyss (2000).'];
+  const mItems = EN ? mItemsEN() : [
+    `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')})` + (regionCtxReady(regionEvents) ? `; daire dışı bağlamla (dar halka R+30 km, geniş halka R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString('tr-TR')} bağlam olayı)` : '') + (mwAuthActive() ? `; büyük depremlerde otoriter Mw (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.') + mtNote,
+    ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitüd tipi duyarlılık senaryosu:** ${[!lastTmTypeFilter.md ? `MD (süre magnitüdü) olayları analiz dışı (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `dönüştürülmemiş ML<1,7 olayları analiz dışı (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; olaylar katalogdan silinmedi, dönüştürülmedi.`] : []),
+    cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
+    bt && bt.fit ? `**b(t):** fit aralığı ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} ile olay başına eşik max(Mc_i, M_min)${bt.fit.hi !== null ? ', üst sınır M_max; çift kesik Aki–Utsu en çok olabilirlik' : '; Aki (1965) en çok olabilirlik'}; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·SE.`
+      : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince adım; ardışık pencereler %99 örtüşür)' : '') + ' (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
+    cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${fitT ? `; fit aralığı ${fitT} (M_min ≤ M < M_max; b, D/sd, R profili ve b(t) için ortak; seçim b(M_min) kararlılık taramasıyla)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** tek Mc; b_GR Aki (1965) en çok olabilirlik, a = log N(≥Mc) + b·Mc; uyum Wiemer & Wyss (2000) GoF.'];
+  // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
+  const srcTag = SRC(regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
+  const steps = EN ? [['1 · Data', `${srcTag} catalogue`], ['2 · Completeness', cs ? 'Mc(t) steps' : 'single Mc'], ['3 · b(t)', 'N = 100, step ' + BT_STEP], ['4 · G–R', cs ? 'Weichert (1980)' : 'single Mc · Aki MLE']]
+    : [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım ' + BT_STEP], ['4 · G–R', cs ? 'Weichert (1980)' : 'tek Mc · Aki MLE']];
+  const tmCapT = cs ? L('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', 'Figure 2. Time–magnitude distribution of events; the orange step curve is the time-dependent completeness threshold (faded points lie below it).')
+    : L('Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', 'Figure 2. Time–magnitude distribution of events; colours show magnitude classes (no completeness steps used).');
+  if (BEN_ON) {
+    const mH = sz => mItems.reduce((a, t) => a + (rich(t, X1 + 16, 0, W1 - 32, { size: sz, lh: Math.round(sz * 1.33), bullet: true, dry: true }) + 5), 0);
+    const need = sz => 44 + 54 + 12 + mH(sz) + 8;
+    // Öncelik: metin hiç kesilmesin. Önce punto (15 → 12) harita ≥ 120 px kalacak şekilde; olmazsa harita 90 px'e,
+    // punto 11'e ve son çare olarak Şekil 2 kutusu 150 px'e iner.
+    const room = () => MID - TOP - (GH + 12 + 44 + 46 + 12 + TMH + 12);
+    let ok = false;
+    for (const sz of [15, 14, 13, 12]) { METH_SZ = sz; if (room() - need(sz) >= 120) { ok = true; break; } }
+    if (!ok) for (const sz of [12, 11]) { METH_SZ = sz; if (room() - need(sz) >= 90) { ok = true; break; } }
+    if (!ok) TMH = Math.max(150, TMH - Math.max(0, 90 - (room() - need(11))));
+    MAPH = Math.max(90, Math.min(183, room() - need(METH_SZ)));
+    MB = 44 + MAPH + 46; VY = GH + 12 + MB + 12 + TMH + 12;
+  }
   y = box(X1, TOP + GH + 12, W1, MB, L('Çalışma Alanı', 'Study Area'));
   (function drawMap(x, y0, w, h) {
     c.fillStyle = '#f8fafc'; c.fillRect(x, y0, w, h); c.strokeStyle = '#9ca3af'; c.lineWidth = 1; c.strokeRect(x, y0, w, h);
@@ -3591,37 +3650,13 @@ async function exportPosterAGU(scale, evt) {
     c.restore();
   })(X1 + 14, y, W1 - 28, MAPH);
   caption(L(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString(NF)} olayın dış merkezleri, büyüklüğe göre.`, `Figure 1. Study area (${shape}); epicentres of ${evs.length.toLocaleString(NF)} events, by magnitude.`), X1 + 16, y + MAPH + 4, W1 - 32, TOP + GH + 12 + MB + 1);
-  // Sütun 1: veri ve yöntem
+  if (BEN_ON) {   // Şekil 2, 1. sütunda (harita ile Veri ve Yöntem arasında)
+    const tmY = TOP + GH + 12 + MB + 12;
+    y = box(X1, tmY, W1, TMH, L('Zaman–Büyüklük Dağılımı', 'Time–Magnitude Distribution'));
+    y = figure(imgs[0], X1 + 16, y, W1 - 32, TMH - 44 - 50);
+    caption(tmCapT, X1 + 16, y, W1 - 32, tmY + TMH - 2);
+  }
   y = box(X1, TOP + VY, W1, MID - TOP - VY, L('Veri ve Yöntem', 'Data and Methods'));
-  const ci = typeof regionChunkInfo !== 'undefined' ? regionChunkInfo : null;
-  const src = SRC(regionRect ? regionSourceLabel() : 'Canlı akış') + (ci ? L(` · parçalı sorgu (${ci.nChunks} parça, ${ci.nUnique.toLocaleString(NF)} benzersiz olay)`, ` · chunked query (${ci.nChunks} chunks, ${ci.nUnique.toLocaleString(NF)} unique events)`) : '');
-  // Büyüklük türü dağılımı (2026-10-11): magTypeDiag ile aynı sayım (e.mtype); poster için kısa özet + baskın tür değişimi uyarısı
-  const mtShort = (() => { const w = evs.filter(e => e.mtype); if (!w.length) return L(' Büyüklük türü bilgisi yok.', ' No magnitude-type information.');
-    const tot = {}; w.forEach(e => { const t = e.mtype.toLowerCase(); tot[t] = (tot[t] || 0) + 1; });
-    const top = Object.entries(tot).sort((a, b) => b[1] - a[1]), str = top.slice(0, 4).map(([t, n]) => EN ? `${t} ${Math.round(100 * n / w.length)}%` : `${t} %${Math.round(100 * n / w.length)}`).join(', ') + (top.length > 4 ? (EN ? ', other' : ', diğer') : '');
-    return L(` Büyüklük türleri: ${str}${top.length > 1 ? ' (karışık ölçek; Mw\'ye dönüştürülmediyse b yanlı olabilir)' : ''}.`, ` Magnitude types: ${str}${top.length > 1 ? ' (mixed scales; b may be biased unless converted to Mw)' : ''}.`); })();
-  const mtConv = typeof mcConversionMode !== 'undefined' && mcConversionMode && mcConversionMode !== 'none';
-  const mtNote = mtConv ? L(' Büyüklükler Magnitude Conversion ile dönüştürüldü.', ' Magnitudes converted with the Magnitude Conversion module.') : mtShort;
-  const csLab = p => !EN ? csLabel(p) : `${csRange(p)}: M≥${(+p.mc).toFixed(1)}` + (p.clipped ? ` (step ${p.start}, clipped to window)` : '');
-  const tr = evs.length ? `${d(Math.min(...evs.map(e => +e.time)))} – ${d(Math.max(...evs.map(e => +e.time)))}` : '—';
-  const mItemsEN = () => [
-    `**Catalogue:** ${src}; ${evs.length.toLocaleString(NF)} events, ${tr}` + (regionRect && regionDeclusterOn ? `; declustered with Gardner & Knopoff (1974) (raw N = ${regionEvents.length.toLocaleString(NF)})` + (regionCtxReady(regionEvents) ? `; with out-of-circle context (inner ring R+30 km, outer ring R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString(NF)} context events)` : '') + (mwAuthActive() ? `; authoritative Mw for large earthquakes (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.') + mtNote,
-    ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitude-type sensitivity scenario:** ${[!lastTmTypeFilter.md ? `MD (duration magnitude) events excluded (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `unconverted ML<1.7 events excluded (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; events were neither deleted from the catalogue nor converted.`] : []),
-    cs ? `**Completeness periods** (sub-catalogues): ${cs.periods.map(csLab).join('; ')}; N entering the analysis = ${cs.kept.length.toLocaleString(NF)}.` : '**Completeness:** single Mc (maximum curvature +0.2; Wiemer & Wyss 2000).',
-    bt && bt.fit ? `**b(t):** fit range ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} with per-event threshold max(Mc_i, M_min)${bt.fit.hi !== null ? ', upper bound M_max; doubly truncated Aki–Utsu maximum likelihood' : '; Aki (1965) maximum likelihood'}; N = 100 moving window, step 10 (Öncel & Wilson 2007); 95% interval ±1.96·SE.`
-      : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine step; consecutive windows overlap by 99%)' : '') + ' (Öncel & Wilson 2007); 95% interval ±1.96·b/√N.',
-    cs ? `**Gutenberg–Richter:** Weichert (1980) maximum likelihood with unequal observation periods${fitT ? `; fit range ${fitT} (M_min ≤ M < M_max; shared by b, D/sd, the R profile and b(t); chosen by a b(M_min) stability scan)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model input, not an Mmax estimate)` : ''}. Sub-catalogue merging principle: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** single Mc; b_GR by Aki (1965) maximum likelihood, a = log N(≥Mc) + b·Mc; goodness of fit after Wiemer & Wyss (2000).'];
-  const mItems = EN ? mItemsEN() : [
-    `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')})` + (regionCtxReady(regionEvents) ? `; daire dışı bağlamla (dar halka R+30 km, geniş halka R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString('tr-TR')} bağlam olayı)` : '') + (mwAuthActive() ? `; büyük depremlerde otoriter Mw (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.') + mtNote,
-    ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitüd tipi duyarlılık senaryosu:** ${[!lastTmTypeFilter.md ? `MD (süre magnitüdü) olayları analiz dışı (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `dönüştürülmemiş ML<1,7 olayları analiz dışı (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; olaylar katalogdan silinmedi, dönüştürülmedi.`] : []),
-    cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
-    bt && bt.fit ? `**b(t):** fit aralığı ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} ile olay başına eşik max(Mc_i, M_min)${bt.fit.hi !== null ? ', üst sınır M_max; çift kesik Aki–Utsu en çok olabilirlik' : '; Aki (1965) en çok olabilirlik'}; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·SE.`
-      : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince adım; ardışık pencereler %99 örtüşür)' : '') + ' (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
-    cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${fitT ? `; fit aralığı ${fitT} (M_min ≤ M < M_max; b, D/sd, R profili ve b(t) için ortak; seçim b(M_min) kararlılık taramasıyla)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).` : '**Gutenberg–Richter:** tek Mc; b_GR Aki (1965) en çok olabilirlik, a = log N(≥Mc) + b·Mc; uyum Wiemer & Wyss (2000) GoF.'];
-  // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
-  const srcTag = SRC(regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
-  const steps = EN ? [['1 · Data', `${srcTag} catalogue`], ['2 · Completeness', cs ? 'Mc(t) steps' : 'single Mc'], ['3 · b(t)', 'N = 100, step ' + BT_STEP], ['4 · G–R', cs ? 'Weichert (1980)' : 'single Mc · Aki MLE']]
-    : [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım ' + BT_STEP], ['4 · G–R', cs ? 'Weichert (1980)' : 'tek Mc · Aki MLE']];
   { const fx0 = X1 + 16, fw = W1 - 32, ag = 18, bw = (fw - ag * (steps.length - 1)) / steps.length, bh = 54;
     steps.forEach(([h, sub], i) => { const bx0 = fx0 + i * (bw + ag);
       c.fillStyle = TH.soft; c.strokeStyle = ACC; c.lineWidth = 1.5; c.beginPath();
@@ -3632,27 +3667,16 @@ async function exportPosterAGU(scale, evt) {
       text(st === sub ? sub : st + '…', bx0 + bw / 2, y + 32, '11.5px Arial', INK, 'center');
       if (i < steps.length - 1) { const ax = bx0 + bw + 3, ay = y + bh / 2; c.fillStyle = ACC; c.beginPath(); c.moveTo(ax, ay - 7); c.lineTo(ax + 12, ay); c.lineTo(ax, ay + 7); c.closePath(); c.fill(); } });
     y += bh + 12; }
-  mItems.forEach(t => { y = rich(t, X1 + 16, y, W1 - 32, { size: 15, lh: 20, bullet: true, maxY: MID - 6 }) + 5; });
+  mItems.forEach(t => { y = rich(t, X1 + 16, y, W1 - 32, { size: METH_SZ, lh: METH_SZ === 15 ? 20 : Math.round(METH_SZ * 1.33), bullet: true, maxY: MID - 6 }) + 5; });
 
   // ── Sütun 2: zaman–büyüklük ve b(t)
-  y = box(X2, TOP, W2, 260, L('Zaman–Büyüklük Dağılımı', 'Time–Magnitude Distribution'));
-  y = figure(imgs[0], X2 + 16, y, W2 - 32, 150);
-  caption(cs ? L('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', 'Figure 2. Time–magnitude distribution of events; the orange step curve is the time-dependent completeness threshold (faded points lie below it).')
-    : L('Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', 'Figure 2. Time–magnitude distribution of events; colours show magnitude classes (no completeness steps used).'), X2 + 16, y, W2 - 32, TOP + 256);
-  y = box(X2, TOP + 275, W2, MID - TOP - 275, BEN_ON ? L('b-Değeri ve Benioff Gerinimi', 'b-Value and Benioff Strain') : L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
-  const adF = !!(bt && bt.adaptive);
-  if (BEN_ON) {
-    // 2026-10-17: b(t) (Şekil 3a) ve Benioff (Şekil 3b) aynı yükseklikte yan yana; genişlik paylaşımı en-boy oranlarından
-    const iB = imgs[1], iN = imgs[3], g2 = 14, aw = W2 - 32 - g2, rB = iB.naturalWidth / iB.naturalHeight, rN = iN.naturalWidth / iN.naturalHeight;
-    const hF = Math.min(aw / (rB + rN), MID - y - 150), wB = hF * rB, x0 = X2 + 16 + (W2 - 32 - (wB + g2 + hF * rN)) / 2;
-    figure(iB, x0, y, wB, hF); figure(iN, x0 + wB + g2, y, hF * rN, hF);
-    // alt-şekil harfleri çizim alanının sol üst köşesine (eksen etiketlerinin sağına; PAD_L = 40/660)
-    text('a', x0 + wB * 0.075, y + 3, 'bold 17px Arial', '#111827'); text('b', x0 + wB + g2 + hF * rN * 0.075, y + 3, 'bold 17px Arial', '#111827');
-    y += hF + 8;
-  } else {
-  // 2026-10-17: altyazı için ayrılan alan bir satır büyütüldü (önceden son satır "Alt şerit Mc(t)" kesiliyordu); seyreltmede bir satır daha
-  y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112 - 21 - (adF ? 21 : 0));
+  if (!BEN_ON) {
+    y = box(X2, TOP, W2, 260, L('Zaman–Büyüklük Dağılımı', 'Time–Magnitude Distribution'));
+    y = figure(imgs[0], X2 + 16, y, W2 - 32, 150);
+    caption(tmCapT, X2 + 16, y, W2 - 32, TOP + 256);
   }
+  y = box(X2, BEN_ON ? TOP : TOP + 275, W2, BEN_ON ? MID - TOP : MID - TOP - 275, BEN_ON ? L('b-Değeri ve Benioff Gerinimi', 'b-Value and Benioff Strain') : L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
+  const adF = !!(bt && bt.adaptive);
   const bandF = (BT_STEP === 1 && !adF) || (bt && bt.band), thinF = BT_STEP === 1 && !adF;
   const adEN = adF ? `, display step ${bt.dispStep} (${bt.nWin} windows > ${BT_ADAPT_MAX}; values unchanged)` : '';
   const adTR = adF ? `, gösterim adımı ${bt.dispStep} (${bt.nWin} pencere > ${BT_ADAPT_MAX}; değerler aynı)` : '';
@@ -3661,8 +3685,24 @@ async function exportPosterAGU(scale, evt) {
   const benCap = !BEN_ON ? '' : EN
     ? ` **(b)** Cumulative Benioff strain S(t) = Σ√E, log E = 11.8 + 1.5M (Gutenberg & Richter 1956), fixed threshold M ≥ ${BB ? BB.mFix.toFixed(1) : '—'} (N = ${BB ? BB.n : '—'}). Middle strip: ${binTxt} Benioff release rate ΔS/Δt. Lower strip (log₁₀, 0 = period mean): {#3b82f6|blue} event count, {#16a34a|green} b-value (n ≥ ${BEN_DEC_NB} per interval), {#6b7280|grey} residual, {#ea580c|orange} total = observed ΔS/Δt; truncated G–R${BD ? `, b_ref = ${BD.bRef.toFixed(2)}` : ''}. b and ΔS come from the same catalogue; descriptive decomposition, not a precursor.`
     : ` **(b)** Birikimli Benioff gerinimi S(t) = Σ√E, log E = 11,8 + 1,5M (Gutenberg & Richter 1956), sabit eşik M ≥ ${BB ? DC(BB.mFix.toFixed(1)) : '—'} (N = ${BB ? BB.n : '—'}). Orta şerit: ${binTxt} Benioff salım hızı ΔS/Δt. Alt şerit (log₁₀, 0 = dönem ortalaması): {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b değeri (aralıkta n ≥ ${BEN_DEC_NB}), {#6b7280|gri} artık, {#ea580c|turuncu} toplam = gözlenen ΔS/Δt; kesilmiş G–R${BD ? `, b_ref = ${DC(BD.bRef.toFixed(2))}` : ''}. b ve ΔS aynı katalogdan; betimleyici ayrıştırmadır, öncül değildir.`;
-  rich(EN ? '**Figure 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + benCap
-    : '**Şekil 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + benCap, X2 + 16, y + 2, W2 - 32, BEN_ON ? { size: 14, lh: 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 });
+  const cap3 = EN ? '**Figure 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (fine)' : '') + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + benCap
+    : '**Şekil 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ince)' : '') + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + benCap;
+  const cap3O = BEN_ON ? { size: 14, lh: 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 };
+  if (BEN_ON) {
+    // 2026-10-17 düzen A: Şekil 3a b(t) üstte, 3b Benioff altta; AYNI genişlik ve sol kenar → iki SVG'nin zaman eksenleri
+    // (W = 660, PAD_L = 40, PAD_R = 14) dikey olarak hizalıdır. Genişlik, altyazıya kalan yükseklikten hesaplanır.
+    const capH = rich(cap3, X2 + 16, 0, W2 - 32, { ...cap3O, dry: true }), g2 = 10;
+    const iB = imgs[1], iN = imgs[3], rB = iB.naturalHeight / iB.naturalWidth, rN = iN.naturalHeight / iN.naturalWidth;
+    const wF = Math.min(W2 - 32, (MID - 8 - y - capH - g2 - 18) / (rB + rN)), x0 = X2 + 16 + (W2 - 32 - wF) / 2;
+    figure(iB, x0, y, wF, wF * rB + 0.5); text('a', x0 + wF * 0.075, y + 3, 'bold 17px Arial', '#111827');
+    y += wF * rB + 8 + g2;
+    figure(iN, x0, y, wF, wF * rN + 0.5); text('b', x0 + wF * 0.075, y + 3, 'bold 17px Arial', '#111827');
+    y += wF * rN + 8;
+  } else {
+  // 2026-10-17: altyazı için ayrılan alan bir satır büyütüldü (önceden son satır "Alt şerit Mc(t)" kesiliyordu); seyreltmede bir satır daha
+  y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112 - 21 - (adF ? 21 : 0));
+  }
+  rich(cap3, X2 + 16, y + 2, W2 - 32, cap3O);
 
   // ── Sütun 3: G-R ve sonuçlar
   y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
