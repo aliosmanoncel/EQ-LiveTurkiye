@@ -1175,7 +1175,7 @@
       <div class="tmStats" id="tmStatsBen">—</div>
       <div id="amrPanel" style="margin-top:8px;font-size:.72rem;color:#9ab0c5;">
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-          <b style="color:#cbd5e1;">🧪 AMR geriye dönük testi</b>
+          <b style="color:#cbd5e1;">🧪 AMR geriye dönük testi</b> <span style="color:#f59e0b;border:1px solid #f59e0b;border-radius:3px;padding:0 4px;font-size:.9em;">DENEYSEL</span>
           <span style="color:#666;">(hızlanan moment salımı · sıfır hipotezine karşı · öncül göstergesi değildir)</span>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;">
@@ -5815,7 +5815,7 @@ async function amrRun() {
     pTxt(pK, 'Küme korumalı sıfır (birincil)', 'GK74 kümeleri iç zaman farklarıyla blok halinde rastgele kaydırıldı; aynı ızgara araması her katalogda tekrarlandı') +
     pTxt(pP, 'Poisson sıfır', 'zamanlar düzgün dağıtıldı; kümelenmeyi bozduğu için anlamlılığı abartabilir') +
     (pD ? pTxt(pD, `GK74 kümesizleştirilmiş (n = ${dec.length})`, `en küçük q = ${fmt(decObs.T)}; Poisson sıfır, aynı ızgara`) : `<tr><td colspan="3" style="padding:1px 6px;color:#888">GK74 kümesizleştirilmiş katalogda test için yeterli olay yok.</td></tr>`) +
-    `</table><div style="color:#888;margin-top:3px">p = (1 + #{T_sim ≤ T_obs}) / (N + 1); T = ızgaradaki en küçük q (arama maliyeti dahil); tohum 20261017. Yöntem: Bufe &amp; Varnes (1993), q ölçütü Bowman vd. (1998), t_f ana şoka sabit (Jiang &amp; Wu 2005 ile aynı kurgu). <b>Bu test geriye dönüktür; t_f tahmin etmez ve alarm üretmez.</b> Küçük bir p yalnızca seçilen sıfır hipotezine göre olağandışı bir uyumu gösterir; ileriye dönük öngörü becerisinin kanıtı değildir. AMR benzeri örüntüler kümelenmeli sentetik kataloglarda da ortaya çıkar (Hardebeck, Felzer &amp; Michael 2008).</div>`;
+    `</table><div style="color:#f59e0b;margin-top:3px">⚠ Deneysel: bu p değerlerinin kalibrasyonu henüz doğrulanmadı. Hızlanma içermeyen yapay Poisson kataloglarında (100 katalog) p ≤ 0,05 oranı 0,08–0,09 bulundu (nominal 0,05); kümelenmiş kataloglarda doğrulama sürüyor. p değerlerini kesin istatistiksel kanıt olarak değil, yön gösterici olarak okuyun.</div><div style="color:#888;margin-top:3px">p = (1 + #{T_sim ≤ T_obs}) / (N + 1); T = ızgaradaki en küçük q (arama maliyeti dahil); tohum 20261017. Yöntem: Bufe &amp; Varnes (1993), q ölçütü Bowman vd. (1998), t_f ana şoka sabit (Jiang &amp; Wu 2005 ile aynı kurgu). <b>Bu test geriye dönüktür; t_f tahmin etmez ve alarm üretmez.</b> Küçük bir p yalnızca seçilen sıfır hipotezine göre olağandışı bir uyumu gösterir; ileriye dönük öngörü becerisinin kanıtı değildir. AMR benzeri örüntüler kümelenmeli sentetik kataloglarda da ortaya çıkar (Hardebeck, Felzer &amp; Michael 2008).</div>`;
   window.lastAmr = { ms: { t: tf, m: mOf(ms), lat: la0, lon: lo0 }, mMin, n: raw.length, T: obs.T, best: obs.best, pK: pK.p, pP: pP.p, pD: pD ? pD.p : null, nSim, cells: obs.cells };
 }
 
