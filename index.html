@@ -2747,6 +2747,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   bMin = Math.max(0, bMin); // b fiziksel olarak negatif olamaz
 
   const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
+  { const se = document.getElementById('tmSvgB'); if (se) se.dataset.tax = JSON.stringify({ t0, t1, xa: PAD_L, xb: PAD_L + plotW, ya: PAD_T, yb: PAD_T + plotH }); }   // poster: ana şok çizgisi için
   const y = b => PAD_T + plotH - ((b-bMin)/(bMax-bMin)) * plotH;
 
   const pts  = ser.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ');
@@ -3550,6 +3551,14 @@ function posterLoadQR() {
 function posterVal(id, def) { const el = document.getElementById(id); const v = el ? el.value.trim() : ''; return v || def; }
 
 // İnce mod (tmMode === 'ince'): b(t) şekli tmSvgB'de adım 1 ile çizilidir; özet lastBtsInce, metinlerde adım 1; başlıkta ek yok, dosya adında "-Adim1-Ince"
+// 2026-10-18: posterin ana şoku — AMR testindeki ana şok; yoksa çalışma kümesindeki en büyük olay (M ≥ 6 ise).
+function posterMainshock() {
+  const ev = (regionRect ? (typeof applyGk74Filter === 'function' ? applyGk74Filter(regionEvents) : regionEvents) : lastTmEvList) || [];
+  const am = window.lastAmr && window.lastAmr.ms;
+  if (am) { const e = ev.find(q => q.time && Math.abs(+q.time - am.t) < 120000); return { t: am.t, m: am.m, lat: am.lat, lon: am.lon, place: e && e.place || '', amr: true }; }
+  const big = ev.reduce((a, e) => (e.time && (!a || (e.mw ?? e.mag) > (a.mw ?? a.mag))) ? e : a, null);
+  return big && (big.mw ?? big.mag) >= 6 ? { t: +big.time, m: big.mw ?? big.mag, lat: big.lat, lon: big.lon, place: big.place || '', amr: false } : null;
+}
 async function exportPosterAGU(scale, evt) {
   if (!showTimeMag) { alert('Önce Time-Mag panelini açın (📈 Time-Mag).'); return; }
   // 2026-10-17: "Her ikisi" → aynı analiz ve düzenle önce TR, sonra EN posteri üretilir (iki ayrı dosya: …png ve …-EN.png)
@@ -3596,6 +3605,10 @@ async function exportPosterAGU(scale, evt) {
     // b(t) poster kopyası (2026-10-18): sınıf lejantı çıkarılır (altyazıda var; panel harfiyle çakışıyordu), sınıf bantları ve şerit belirginleştirilir
     if (el.id === BT_ID) src0 = src0.replace(/<text class="btLeg"[\s\S]*?<\/text>/g, '').replace(/opacity="0\.13" class="btBand"/g, 'opacity="0.24" class="btBand"')
       .replace(/<rect class="btRib" x="([0-9.]+)" y="([0-9.]+)"([^>]*?) height="9"/g, (m, xa, yv, mid) => `<rect class="btRib" x="${xa}" y="${(+yv - 5).toFixed(1)}"${mid} height="14"`);
+    { const MSL = posterMainshock(), ax = el.dataset && el.dataset.tax ? JSON.parse(el.dataset.tax) : null;
+      if (MSL && ax && (el.id === BT_ID || el.id === 'tmSvgBen') && MSL.t > ax.t0 && MSL.t <= ax.t1 + 1) {
+        const xm = (ax.xa + (MSL.t - ax.t0) / (ax.t1 - ax.t0) * (ax.xb - ax.xa)).toFixed(1);
+        src0 = src0.replace(/<\/svg>\s*$/, `<line x1="${xm}" y1="${ax.ya}" x2="${xm}" y2="${ax.yb}" stroke="#dc2626" stroke-width="1.4" stroke-dasharray="5,3"/><text x="${(+xm - 3).toFixed(1)}" y="${ax.ya + 9}" fill="#dc2626" font-size="9" font-weight="bold" text-anchor="end">M${MSL.m.toFixed(1)}</text></svg>`); } }
     if (el.id === 'tmSvgBen') src0 = src0.replace(/<text\b[^>]*>(?:ΔS\/Δt:|Ayrıştırma \(log|b_ref = )[\s\S]*?<\/text>/g, '');
     let xml = svgToLight(svgBoostAxisText(src0, AXK[el.id] || 0));
     if (EN) xml = svgToEN(xml);
@@ -3686,8 +3699,8 @@ async function exportPosterAGU(scale, evt) {
     : L('b-Değeri, Zamansal Değişimi ve Frekans–Büyüklük Dağılımı', 'b-Value, Its Temporal Variation and the Frequency–Magnitude Distribution');
   const tDecl = regionRect && regionDeclusterOn ? L(', Artçıları Ayıklanmış Katalog', ', Declustered Catalogue') : '';
   // 2026-10-18: AMR ana şoku varsa varsayılan başlık o depremin öncesini anlatır (ör. "… before the M7.7 Panama Earthquake (9 October 2026)")
-  const AMS = AMR_ON && window.lastAmr && window.lastAmr.ms ? window.lastAmr.ms : null;
-  const amsPlace = AMS ? (() => { const e = tEvs.find(q => q.time && Math.abs(+q.time - AMS.t) < 120000); const pl = e && e.place ? String(e.place) : ''; return pl ? pl.split(',').pop().trim() : ''; })() : '';
+  const MSX = posterMainshock(), AMS = MSX;   // AMR ana şoku ya da kümedeki en büyük olay (M ≥ 6)
+  const amsPlace = AMS && AMS.place ? String(AMS.place).split(',').pop().trim() : '';
   const amsDate = AMS ? new Date(AMS.t).toLocaleDateString(EN ? 'en-GB' : 'tr-TR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : '';
   const tEvent = AMS ? L(`M${String(AMS.m.toFixed(1)).replace('.', ',')} ${amsPlace ? amsPlace + ' ' : ''}Depremi (${amsDate}) Öncesi Sismisite ve b-Değeri Değişimi`, `Seismicity and b-Value Variation before the M${AMS.m.toFixed(1)} ${amsPlace ? amsPlace + ' ' : ''}Earthquake (${amsDate})`) : '';
   const title = posterVal('posterTitle', tEvent || ((region ? region + ': ' : '') + tCore + tDecl + (tYrs ? ` (${tYrs})` : '')));   // 2026-10-17: başlıkta adım eki yok; adım Yöntem'de ve Şekil 3'te yazılı
@@ -3771,8 +3784,8 @@ async function exportPosterAGU(scale, evt) {
   const G = h => h > 0 ? h + 12 : 0;
   let GH = !INC.intro ? 0 : STACK_ON ? 104 : 124, MAPH = INC.map ? 183 : 0, MB = INC.map ? 44 + MAPH + 46 : 0, VY = G(GH) + G(MB), METH_SZ = 15;
   let TMH = STACK_ON && INC.tm ? 250 : 0;   // 2026-10-18: Şekil 2 büyütüldü (660×200 SVG, sütun genişliğinde ≈ 160 px yükseklik)
-  const introEvt = AMS ? L(`Büyük depremlerden önce b-değerinde düşüş ve hızlanan moment salımı (AMR) bildirilmiştir; bu gözlemlerin istatistiksel olarak sınanması gerekir (Hardebeck vd. 2008). **Amaç:** M${String(AMS.m.toFixed(1)).replace('.', ',')} ${amsPlace ? amsPlace + ' ' : ''}depreminden (${amsDate}) önceki sismisitede b-değerinin zamansal değişimini, Benioff gerinim birikimini ve AMR'yi önceden tanımlanmış bir protokolle, geriye dönük olarak betimlemek.`,
-    `Decreases in b-value and accelerating moment release (AMR) have been reported before large earthquakes, but such observations require statistical testing (Hardebeck et al. 2008). **Aim:** to describe, retrospectively and with a predefined protocol, the temporal variation of the b-value, cumulative Benioff strain and AMR in the seismicity preceding the M${AMS.m.toFixed(1)} ${amsPlace ? amsPlace + ' ' : ''}earthquake (${amsDate}).`) : '';
+  const introEvt = AMS ? L(`**Soru:** M${String(AMS.m.toFixed(1)).replace('.', ',')} ${amsPlace ? amsPlace + ' ' : ''}depreminden (${amsDate}) önceki sismisitede b-değeri, Benioff gerinimi${AMR_ON ? ' ve moment salımı' : ''} istatistiksel olarak anlamlı bir değişim ya da hızlanma gösteriyor mu? Düşük b yüksek gerilimle ilişkilendirilir, ancak bu ilişki evrensel değildir; öncü örüntüler katalog tamlığı, kümelenme ve rastlantısal değişkenlikten de doğabilir (Hardebeck vd. 2008). **Amaç:** göstergeleri belirsizlikleriyle ve önceden tanımlanmış bir protokolle, geriye dönük olarak sınamak.`,
+    `**Question:** Do the b-value, Benioff strain${AMR_ON ? ' and moment release' : ''} show a statistically significant change or acceleration before the M${AMS.m.toFixed(1)} ${amsPlace ? amsPlace + ' ' : ''}earthquake (${amsDate})? Low b-values are often linked to high differential stress, but the link is not universal, and apparent precursory patterns can arise from catalogue incompleteness, clustering or chance (Hardebeck et al. 2008). **Aim:** to test these indicators retrospectively, with uncertainties and a predefined protocol.`) : '';
   const intro = introEvt && !document.getElementById('posterIntro')?.value.trim() ? introEvt : posterVal('posterIntro', L(`Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`,
     `When catalogue completeness changes over time, the b-value and earthquake rates computed with a single Mc can be biased. **Aim:** to estimate the b-value, its temporal variation and the annual recurrence rates for ${region || 'the study area'} using time-dependent completeness steps.`));
   // düzen A: Giriş kutusu metne göre (96–124 px); Benioff yoksa eski sabit 124 px
@@ -3980,9 +3993,9 @@ async function exportPosterAGU(scale, evt) {
   // 2026-10-18: kısa altyazı (varsayılan): poster görsele dayanır; ayrıntılar metodoloji belgesindedir
   const SHORTCAP = document.getElementById('posterShortCap')?.checked !== false;
   const sA = INC.bt ? (NPAN > 1 ? '**(a)** ' : '') + L(`b-değeri, 100 olaylık kayan pencere (Aki 1965), %95 güven bandı; arka plan b sınıfı: {#dc2626|< 0,7}, {#ca8a04|0,7–1,4}, {#16a34a|> 1,4} (betimleyici, tehlike düzeyi değil).`, `b-value in 100-event moving windows (Aki 1965) with 95% CI; background b class: {#dc2626|< 0.7}, {#ca8a04|0.7–1.4}, {#16a34a|> 1.4} (descriptive, not a hazard level).`) : '';
-  const sB = BEN_ON ? ` ${PL('ben') ? `**(${PL('ben')})** ` : ''}` + L(`Birikimli Benioff gerinimi S = Σ√E (M ≥ ${BB ? DC(fmtM(BB.mFix)) : '—'}); alt şerit: salım hızının ortalamaya oranı (çizgi üstü hızlı, altı yavaş).`, `Cumulative Benioff strain S = Σ√E (M ≥ ${BB ? fmtM(BB.mFix) : '—'}); lower strip: release rate relative to the mean (above = faster, below = slower).`) : '';
+  const sB = BEN_ON ? ` ${PL('ben') ? `**(${PL('ben')})** ` : ''}` + L(`Birikimli Benioff gerinimi S = Σ√E (M ≥ ${BB ? DC(fmtM(BB.mFix)) : '—'}); alt şerit: aralık başına Benioff salımının tüm dönem ortalamasına oranı, log ölçek (çizgi üstü hızlı, altı yavaş; {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b-değeri katkısı).`, `Cumulative Benioff strain S = Σ√E (M ≥ ${BB ? fmtM(BB.mFix) : '—'}); lower strip: Benioff release per interval divided by the whole-period mean, log scale (above = faster, below = slower; {#3b82f6|blue} event-count, {#16a34a|green} b-value contribution).`) : '';
   const sC = AMR_ON ? ` ${PL('amr') ? `**(${PL('amr')})** ` : ''}` + L(`AMR, en iyi hücre R = ${AP.r} km, ${AP.yr} yıl: {#ea580c|Σ√E}, {#2563eb|güç yasası}, gri doğrusal; q = ${DC(AP.q.toFixed(2))}, p = ${DC(AP.pK.toFixed(3))} (${amrSupport(AP.pK).tr.toLowerCase()}).`, `AMR, best cell R = ${AP.r} km, ${AP.yr} yr: {#ea580c|Σ√E}, {#2563eb|power law}, grey linear; q = ${AP.q.toFixed(2)}, p = ${AP.pK.toFixed(3)} (${amrSupport(AP.pK).en.toLowerCase()}).`) : '';
-  const cap3 = SHORTCAP ? L('**Şekil 3.** ', '**Figure 3.** ') + sA + sB + sC + L(' {#dc2626|Kırmızı}: ana şok. Geriye dönük; öncül değildir.', ' {#dc2626|Red}: mainshock. Retrospective; not a precursor.').replace(AMR_ON ? /$^/ : / \{#dc2626\|(Kırmızı|Red)\}: (ana şok|mainshock)\./, '') : cap3Full;
+  const cap3 = SHORTCAP ? L('**Şekil 3.** ', '**Figure 3.** ') + sA + sB + sC + L(' {#dc2626|Kırmızı kesikli}: ana şok. Geriye dönük; öncül değildir.', ' {#dc2626|Red dashed}: mainshock. Retrospective; not a precursor.').replace(AMR_ON || MSX ? /$^/ : / \{#dc2626\|(Kırmızı kesikli|Red dashed)\}: (ana şok|mainshock)\./, '') : cap3Full;
   const cap3O = STACK_ON ? { size: BEN_ON && AMR_ON ? 13 : 14, lh: BEN_ON && AMR_ON ? 17 : 18, italic: true, col: '#374151', maxY: MID2 - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID2 - 4 };
   if (STACK_ON) {
     // 2026-10-17 düzen A: Şekil 3a b(t) üstte, 3b Benioff ve/veya 3c AMR altta; AYNI genişlik ve sol kenar → SVG'lerin zaman
@@ -4009,11 +4022,11 @@ async function exportPosterAGU(scale, evt) {
   // ── Sütun 3: G-R ve sonuçlar
   // 2026-10-18: G–R ve Sonuçlar seçilebilir. İkisi de varsa G–R kutusu 515 px (+ QR yoksa ek alanın yarısı); biri yoksa
   // diğeri sütunun tamamını alır. G–R şekli genişlikle sınırlıdır (≈ 528 px); kalan alan tablo ve altyazıya kalır.
-  const GRH = !INC.gr ? 0 : !INC.res ? MID3 - TOP : 515 + Math.round((MID3 - MID) / 2);
+  const GRH = !INC.gr ? 0 : !INC.res ? MID3 - TOP : INC.qr ? 515 + Math.round((MID3 - MID) / 2) : 545;   // QR yoksa kazanılan alan Sonuçlar'a verilir
   if (!INC.gr && !INC.res) PW.push(L('3. sütun boş: Gutenberg–Richter veya Sonuçlar\'dan birini seçin.', 'Column 3 is empty: select Gutenberg–Richter or Results.'));
   if (INC.gr) {
   y = box(X3, TOP, W3, GRH, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
-  { const grMax = (gf ? 300 : 375) + Math.max(0, GRH - 515 - (gf ? 40 : 0)), im = imgs[2];   // 2026-10-18: G–R şekli kutuyu doldurur
+  { const grMax = Math.max(260, (gf ? 300 : 360) + (GRH - 515 - (gf ? 40 : 0))), im = imgs[2];   // 2026-10-18: G–R şekli kutuyu doldurur
     if (!gf && !INC.res) { const fh = Math.min(grMax, (W3 - 32) * im.naturalHeight / im.naturalWidth), spare = (TOP + GRH - 8 - y) - (fh + 90);
       if (spare > 40) y += Math.round(spare / 2);
       if (spare > 250) PW.push(L('Yerleşim önerisi: 3. sütunda geniş boşluk var; Sonuçlar kutusu eklenebilir.', 'Layout hint: column 3 has a large gap; consider adding the Results box.')); }   // Sonuçlar yoksa şekil + altyazı dikey ortalanır
@@ -4023,7 +4036,7 @@ async function exportPosterAGU(scale, evt) {
     ? L(` Dikey eksen: yıllık oran N/T; T = ${DC(GN.years.toFixed(1))} yıl (gözlem süresi ${gnD(GN.t0)} – ${gnD(GN.t1)}).`, ` Vertical axis: annual rate N/T; T = ${GN.years.toFixed(1)} yr (observation period ${gnD(GN.t0)} – ${gnD(GN.t1)}).`)
     : L(` Dikey eksen: N/(T·A) (10⁶ km² ve yıl başına); T = ${DC(GN.years.toFixed(1))} yıl, A = ${Math.round(GN.area).toLocaleString(NF)} km².`, ` Vertical axis: N/(T·A) per 10⁶ km² per year; T = ${GN.years.toFixed(1)} yr, A = ${Math.round(GN.area).toLocaleString(NF)} km².`);
   if (!cs && GN && GN.mode === 'raw' && regionIsCircle) PW.push(L('G–R ham sayılarla çizildi; yayın için G–R panelinde "Oran" (N/T) seçmeyi düşünün.', 'G–R plotted as raw counts; consider selecting "Rate" (N/T) in the G–R panel for publication.'));
-  y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? ' ± ' + gs.err.toFixed(2) : ''}, N = ${gs.n}, fit M ≥ ${fmtM(gs.mc)})` : ''}, blue dashed Mc${gs ? ` = ${fmtM(gs.mc)}` : ''}.${grNormTxt}` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? ' ± ' + gs.err.toFixed(2).replace('.', ',') : ''}, N = ${gs.n}, uyum M ≥ ${String(fmtM(gs.mc)).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(fmtM(gs.mc)).replace('.', ',')}` : ''}.${grNormTxt}` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + GRH - 4);
+  y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? ' ± ' + gs.err.toFixed(2) : ''}, N = ${gs.n}, fit M ≥ ${fmtM(gs.mc)})` : ''}, blue dashed Mc${gs ? ` = ${fmtM(gs.mc)}` : ''} (maximum curvature + 0.2; Wiemer & Wyss 2000).${grNormTxt}` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? ' ± ' + gs.err.toFixed(2).replace('.', ',') : ''}, N = ${gs.n}, uyum M ≥ ${String(fmtM(gs.mc)).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(fmtM(gs.mc)).replace('.', ',')}` : ''} (maksimum eğrilik + 0,2; Wiemer & Wyss 2000).${grNormTxt}` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + GRH - 4);
   // G-R parametre tablosu (büyük punto)
   if (gf && gf.curves && gf.curves.length) {
     const cols = [[L('Eğri', 'Curve'), 0], ['b ± 1σ', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/${L('yıl', 'yr')}`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
@@ -4047,7 +4060,15 @@ async function exportPosterAGU(scale, evt) {
   const gofRej = !!(qcObj && qcObj.gof && qcObj.gof.ok && qcObj.gof.reject);
   const mcFlag = !!(csQc && (csQc.lowMcN > 0 || csQc.invN > 0));
   const qcFlag = !!cs && (mcFlag || gofRej);
-  const msg = posterVal('posterMessage', '') || (qcFlag ? (mcFlag
+  const PRE = (() => { if (!MSX || !bt || !bt.ser) return null; const pre = bt.ser.filter(q => q.t < MSX.t && Number.isFinite(q.b)); if (pre.length < 3) return null;
+    const f = pre[0], l = pre[pre.length - 1], mn = pre.reduce((a2, q) => q.b < a2.b ? q : a2, pre[0]);
+    const sig = Number.isFinite(l.err) && Number.isFinite(f.err) ? Math.abs(l.b - f.b) > Math.sqrt(l.err ** 2 + f.err ** 2) : null; return { pre, f, l, mn, sig }; })();
+  const autoMsg = MSX && !qcFlag ? (() => { const parts = [];
+    if (AMR_ON) parts.push(AP.pK <= 0.05 ? L(`AMR kümelenmiş rastgele kataloglardan ayırt edilebiliyor (p = ${DC(AP.pK.toFixed(2))})`, `AMR distinguishable from clustered random catalogues (p = ${AP.pK.toFixed(2)})`) : L(`istatistiksel olarak saptanabilir AMR yok (p = ${DC(AP.pK.toFixed(2))})`, `no statistically detectable AMR (p = ${AP.pK.toFixed(2)})`));
+    if (PRE && PRE.sig !== null) parts.push(PRE.sig ? L('b-değeri değişimi %95 belirsizliği aşıyor', 'b-value change exceeds the 95% uncertainty') : L('%95 belirsizliği aşan b-değeri değişimi yok', 'no b-value change beyond the 95% uncertainty'));
+    if (!parts.length) return '';
+    return L(`M${DC(MSX.m.toFixed(1))} öncesinde ${parts.join('; ')}.`, `Before the M${MSX.m.toFixed(1)} mainshock: ${parts.join('; ')}.`); })() : '';
+  const msg = posterVal('posterMessage', '') || autoMsg || (qcFlag ? (mcFlag
     ? L('Tamlık eşikleri veri Mc\'sinin altında; b ve oranlar yeniden çalıştırmayla doğrulanmalıdır.', 'Completeness thresholds lie below the data Mc; verify b and rates by re-running.')
     : L(`G-R modeli sınıf sayımlarıyla uyumlu değil (bootstrap, p_boot ${fmtPboot(qcObj.gof)}); b ve oranlar geçicidir.`, `G-R model inconsistent with class counts (bootstrap, p_boot ${fmtPboot(qcObj.gof)}); b and rates are provisional.`)) : '');
   // Ana mesaj (Patch 2b): kesilmez — 17 → 15 → 13 px'te en çok 3 satıra sığarsa bütün olarak çizilir; sığmazsa hiç çizilmez
@@ -4068,20 +4089,18 @@ async function exportPosterAGU(scale, evt) {
         (gf.fit && gf.all ? ` ${L('Karşılaştırma (tüm sınıflar)', 'Comparison (all classes)')}: b = ${gf.all.b.toFixed(3)} ± ${gf.all.sigma !== null ? gf.all.sigma.toFixed(3) : '—'}, N = ${gf.all.N}${gf.all.dPerDf !== null ? `, D/sd = ${gf.all.dPerDf.toFixed(1)}` : ''}.` : '') +
         (qcFlag && bt && bt.fixed ? L(` Karşılaştırma: sabit Mc = ${bt.fixed.mc.toFixed(1)} ile b(t) ortalaması ${bt.fixed.bAvg.toFixed(2)}.`, ` Comparison: mean b(t) with fixed Mc = ${bt.fixed.mc.toFixed(1)} is ${bt.fixed.bAvg.toFixed(2)}.`) : '')); }
     if (!gf && gs) { rItems.push(`**G-R (${L('tek Mc', 'single Mc')}):** ${V(`Mc = ${DC(fmtM(gs.mc))}`)}; ${V(`b_GR = ${DC(gs.b.toFixed(2))}`)}; N(≥Mc) = ${gs.n.toLocaleString(NF)}${gs.gof !== null ? `; GoF = ${EN ? gs.gof.toFixed(1) + '%' : '%' + DC(gs.gof.toFixed(1))}` : ''}.`); }
-    if (bt) { rItems.push(EN ? `**b(t)${bt.fit ? ` (${fitT || 'fit range'})` : ''}:** mean ${V(bt.bAvg.toFixed(2))}, last window ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} windows).` +
+    if (bt && !PRE) { rItems.push(EN ? `**b(t)${bt.fit ? ` (${fitT || 'fit range'})` : ''}:** mean ${V(bt.bAvg.toFixed(2))}, last window ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} windows).` +
       (bt.fit && bt.all ? ` All classes: mean ${bt.all.bAvg.toFixed(2)}, last ${bt.all.bLast.toFixed(2)} (${bt.all.nWin} windows).` : '') + (bt.fixed && !(qcFlag && gf) ? ` With fixed Mc = ${bt.fixed.mc.toFixed(1)}, mean ${V(bt.fixed.bAvg.toFixed(2))}.` : '')
       : `**b(t)${bt.fit ? ` (${fitT || 'fit aralığı'})` : ''}:** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` +
       (bt.fit && bt.all ? ` Tüm sınıflar: ortalama ${bt.all.bAvg.toFixed(2)}, son ${bt.all.bLast.toFixed(2)} (${bt.all.nWin} pencere).` : '') + (bt.fixed && !(qcFlag && gf) ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
     // 2026-10-18: AMR posterdeyse sonuçlara yalnızca testin kendi çıktısı eklenir (yorum yok)
-    if (AMS && bt && bt.ser && bt.ser.length) {   // b(t)'nin ana şok öncesi seyri (betimleyici)
-      const pre = bt.ser.filter(q => q.t < AMS.t && Number.isFinite(q.b));
-      if (pre.length >= 3) { const f = pre[0], l = pre[pre.length - 1], mn = pre.reduce((a2, q) => q.b < a2.b ? q : a2, pre[0]);
-        const yy = t => new Date(t).getUTCFullYear(), dd = t => new Date(t).toISOString().slice(0, 7), pm = q => `${DC(q.b.toFixed(2))}${Number.isFinite(q.err) ? ' ± ' + DC(q.err.toFixed(2)) : ''}`;
-        const sig = Number.isFinite(l.err) && Number.isFinite(f.err) ? (Math.abs(l.b - f.b) > Math.sqrt(l.err ** 2 + f.err ** 2) ? L('fark %95 aralıklarının birleşiminden büyük', 'difference exceeds the combined 95% CIs') : L('fark %95 belirsizlik içinde', 'difference within the 95% uncertainty')) : '';
-        rItems.push(L(`**Ana şok öncesi b(t):** ${yy(f.t)}'te ${pm(f)}; en düşük ${pm(mn)} (${dd(mn.t)}); ana şoktan önceki son pencerede ${pm(l)} (${pre.length} pencere${sig ? '; ilk–son ' + sig : ''}). Betimleyicidir; öncül değildir.`,
-          `**b(t) before the mainshock:** ${pm(f)} in ${yy(f.t)}; minimum ${pm(mn)} (${dd(mn.t)}); ${pm(l)} in the last window before the mainshock (${pre.length} windows${sig ? '; first vs last: ' + sig : ''}). Descriptive; not a precursor.`)); } }
-    if (AMR_ON) rItems.push(EN ? `**AMR (experimental, retrospective):** best cell R = ${AP.r} km, ${AP.yr} yr; q = ${AP.q.toFixed(2)}, cluster-preserving null p = ${AP.pK.toFixed(3)} — ${amrSupport(AP.pK).en.toLowerCase()} (protocol ${AMR_PROTO}${amrInclTxt ? `; registry: ${amrInclTxt}` : ''}). Not a precursor.`
-      : `**AMR (deneysel, geriye dönük):** en iyi hücre R = ${AP.r} km, ${AP.yr} yıl; q = ${DC(AP.q.toFixed(2))}, küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} — ${amrSupport(AP.pK).tr.toLowerCase()} (protokol ${AMR_PROTO}${amrInclTxt ? `; sicil: ${amrInclTxt}` : ''}). Öncül değildir.`);
+    if (PRE) { const { pre, f, l, mn, sig } = PRE;   // b(t)'nin ana şok öncesi seyri (betimleyici)
+      const yy = t => new Date(t).getUTCFullYear(), dd = t => new Date(t).toISOString().slice(0, 7), pm = q => `${DC(q.b.toFixed(2))}${Number.isFinite(q.err) ? ' ± ' + DC(q.err.toFixed(2)) : ''}`;
+      const sg = sig === null ? '' : sig ? L('fark %95 aralıklarının birleşiminden büyük', 'difference exceeds the combined 95% CIs') : L('fark %95 belirsizlik içinde', 'difference within the 95% uncertainty');
+      rItems.push(L(`**Ana şok öncesi b(t):** ${yy(f.t)}'te ${pm(f)}; en düşük ${pm(mn)} (${dd(mn.t)}); ana şoktan önceki son pencerede ${pm(l)} (${pre.length} pencere${sg ? '; ilk–son ' + sg : ''}).`,
+        `**b(t) before the mainshock:** ${pm(f)} in ${yy(f.t)}; minimum ${pm(mn)} (${dd(mn.t)}); ${pm(l)} in the last window before the mainshock (${pre.length} windows${sg ? '; first vs last: ' + sg : ''}).`)); }
+    if (AMR_ON) rItems.push(EN ? `**AMR (retrospective):** best cell R = ${AP.r} km, ${AP.yr} yr; q = ${AP.q.toFixed(2)}, cluster-preserving null p = ${AP.pK.toFixed(3)} — ${amrSupport(AP.pK).en.toLowerCase()} (protocol ${AMR_PROTO}).`
+      : `**AMR (geriye dönük):** en iyi hücre R = ${AP.r} km, ${AP.yr} yıl; q = ${DC(AP.q.toFixed(2))}, küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} — ${amrSupport(AP.pK).tr.toLowerCase()} (protokol ${AMR_PROTO}).`);
     if (document.getElementById('posterCaveat')?.checked) rItems.push(EN
       ? '**Interpretation limit:** b(t) variations are sensitive to window length, Mc and catalogue heterogeneity (magnitude types, network changes); on their own they are not a reliable precursor of a large earthquake.'
       : '**Yorum sınırı:** b(t) değişimleri pencere boyuna, Mc\'ye ve katalog heterojenliğine (büyüklük türleri, ağ değişimleri) duyarlıdır; tek başına büyük bir depremin güvenilir öncülü olarak yorumlanmamalıdır.');
@@ -6074,6 +6093,7 @@ function renderBenioff(evList, Mc, cs) {
   window.lastBenAxis = { t0, t1 };   // 2026-10-18: AMR şekli aynı zaman eksenini kullanır
   const sMax = Math.max(F[F.length - 1].s, V ? V[V.length - 1].s : 0), k = Math.floor(Math.log10(sMax)), sc = Math.pow(10, k);
   const x = t => PAD_L + (t1 > t0 ? (t - t0) / (t1 - t0) : 0) * plotW, y = v => PAD_T + plotH - v / sMax * plotH;
+  svg.dataset.tax = JSON.stringify({ t0, t1, xa: PAD_L, xb: PAD_L + plotW, ya: PAD_T, yb: H0 + STRIP + STRIP2 - 30 });   // poster: ana şok çizgisi için
   const stepPath = A => { let d = `M${x(t0).toFixed(1)},${y(0).toFixed(1)}`, prev = 0; A.forEach(p => { d += ` L${x(p.t).toFixed(1)},${y(prev).toFixed(1)} L${x(p.t).toFixed(1)},${y(p.s).toFixed(1)}`; prev = p.s; }); return d + ` L${x(t1).toFixed(1)},${y(prev).toFixed(1)}`; };
   let g = '';
   for (let i = 0; i <= 4; i++) { const v = sMax * i / 4, yy = y(v).toFixed(1);
