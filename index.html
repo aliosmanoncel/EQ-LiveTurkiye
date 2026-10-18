@@ -1141,16 +1141,20 @@
       <button onclick="exportPosterAGU(4, event)" title="Büyük baskı: 150 dpi'de ≈130×73 cm, 300 dpi'de ≈65×37 cm" style="background:none;border:1px solid #b45309;color:#fbbf24;border-radius:4px;cursor:pointer;padding:1px 8px;">🖨 Baskı (7680×4320)</button>
       <span style="color:#666">Grafikler ve metinler o anki analizden alınır; hesaplamayı değiştirmez.</span>
     </div>
-    <div id="posterComp" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:5px;" title="Poster bileşenleri (2026-10-18, yalnızca sunum katmanı; hesaplamayı değiştirmez). b(t) (Şekil 3a), G-R, Veri ve Yöntem ve Sonuçlar her zaman posterdedir. Bir bileşen çıkarıldığında boşalan alan kalan metin ve şekillere verilir; şekil numaraları sırayla yeniden verilir. Metin okunabilirlik sınırının altına küçülmez: sığmayan içerik kesilmez, aşağıdaki notta bildirilir.">
+    <div id="posterComp" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:5px;" title="Poster bileşenleri (2026-10-18, yalnızca sunum katmanı; hesaplamayı değiştirmez). b(t) (Şekil 3a), G-R, Veri ve Yöntem ve Sonuçlar her zaman posterdedir. Bir bileşen çıkarıldığında boşalan alan kalan metin ve şekillere verilir (Kaynaklar ve QR kutusu çıkarılırsa alt şerit kalkar, sütunlar uzar); şekil numaraları sırayla yeniden verilir. Metin okunabilirlik sınırının altına küçülmez: sığmayan içerik kesilmez, aşağıdaki notta bildirilir.">
       <span style="color:#cbd5e1;">Bileşenler:</span>
       <select id="posterPreset" onchange="posterApplyPreset()" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;">
-        <option value="akademik">Akademik (tümü)</option><option value="standart">Standart (Şekil 2 yok)</option><option value="sade">Sade sunum (harita, b(t), G-R)</option><option value="ozel">Özel</option></select>
+        <option value="akademik">Akademik (tümü)</option><option value="standart">Standart (Şekil 2 yok)</option><option value="sade">Sade sunum (harita, b(t), G-R, sonuçlar)</option><option value="ozel">Özel</option></select>
       <label style="cursor:pointer"><input type="checkbox" id="pcIntro" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Giriş ve Amaç</label>
       <label style="cursor:pointer"><input type="checkbox" id="pcMap" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Çalışma alanı haritası</label>
+      <label style="cursor:pointer"><input type="checkbox" id="pcMeth" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Veri ve Yöntem</label>
       <label style="cursor:pointer"><input type="checkbox" id="pcTM" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Zaman–büyüklük</label>
       <label style="cursor:pointer" title="Yalnızca Benioff paneli çizilmişse kullanılır"><input type="checkbox" id="pcBen" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Benioff (3b)</label>
       <label style="cursor:pointer" title="Yalnızca AMR testi çalıştırılıp şekli çizilmişse kullanılır (deneysel; varsayılan kapalı)"><input type="checkbox" id="pcAmr" onchange="posterCompChanged()" style="vertical-align:middle;"> AMR (3c)</label>
+      <label style="cursor:pointer"><input type="checkbox" id="pcGR" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Gutenberg–Richter</label>
+      <label style="cursor:pointer"><input type="checkbox" id="pcRes" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Sonuçlar</label>
       <label style="cursor:pointer"><input type="checkbox" id="pcRefs" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Kaynaklar</label>
+      <label style="cursor:pointer" title="Sağ alttaki QR kodu, veri kaynağı ve bağlantı kutusu"><input type="checkbox" id="pcQr" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Daha Fazla Bilgi (QR)</label>
     </div>
     <div id="posterFitNote" style="margin-top:3px;color:#f59e0b;"></div>
     <div id="posterIdNote" style="margin-top:4px;color:#fbbf24;"></div>
@@ -1218,6 +1222,7 @@
     <div class="tmTitle" style="font-size:.78rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       📉 Gutenberg-Richter Frekans-Büyüklük Dağılımı
       <span style="color:#666;font-weight:400;">(aynı olay kümesi · Mc çizgisi yalnızca aktif eşiği gösterir, otomatik seçmez)</span>
+      <label class="pcFig" title="Akademik posterde Gutenberg–Richter kutusu yer alsın mı? Poster panelindeki “Bileşenler” ile aynı ayardır." style="font-size:.68rem;font-weight:400;color:#fbbf24;cursor:pointer;white-space:nowrap;"><input type="checkbox" data-pc="pcGR" onchange="posterFigToggle(this)" style="vertical-align:middle;"> 🎓 posterde</label>
       <span style="font-weight:400;color:#888;font-size:.85em;display:inline-flex;align-items:center;gap:3px;" title="Bölüm 5.2 spesifikasyonu: (a) Ham = ham kümülatif N(≥M); (b) Oran = N/T yıllık oran (λ); (c) Yoğunluk = N/(T·A) /10⁶km²/yıl — Pappin ve ark. (2015) ile aynı formül. (b)/(c) yalnızca Circle bölge modunda hesaplanabilir (alan kesin bilinir); değilse otomatik Ham'a döner.">
         <span style="display:inline-flex;border:1px solid #334;border-radius:4px;overflow:hidden;">
           <button id="grModeRaw" onclick="setGrNormMode('raw')" style="background:#334155;color:#e2e8f0;border:none;font-size:.85em;padding:1px 6px;cursor:pointer;" title="Ham kümülatif N(≥M) — normalize edilmemiş, varsayılan">Ham</button>
@@ -3368,9 +3373,10 @@ function tmSelectPoint(t, m) {
 ══════════════════════════════════════════ */
 const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact', 'posterTheme', 'posterIntro', 'posterAck', 'posterLang', 'posterPreset'];
 // Poster bileşenleri (2026-10-18): seçilebilir şekil ve metin blokları; hazır düzenler yalnızca bu kutuları işaretler
-const POSTER_COMP = ['pcIntro', 'pcMap', 'pcTM', 'pcBen', 'pcAmr', 'pcRefs'];
-const POSTER_PRESETS = { akademik: { pcIntro: 1, pcMap: 1, pcTM: 1, pcBen: 1, pcAmr: 0, pcRefs: 1 },
-  standart: { pcIntro: 1, pcMap: 1, pcTM: 0, pcBen: 1, pcAmr: 0, pcRefs: 1 }, sade: { pcIntro: 0, pcMap: 1, pcTM: 0, pcBen: 0, pcAmr: 0, pcRefs: 0 } };
+const POSTER_COMP = ['pcIntro', 'pcMap', 'pcMeth', 'pcTM', 'pcBen', 'pcAmr', 'pcGR', 'pcRes', 'pcRefs', 'pcQr'];
+const POSTER_PRESETS = { akademik: { pcIntro: 1, pcMap: 1, pcMeth: 1, pcTM: 1, pcBen: 1, pcAmr: 0, pcGR: 1, pcRes: 1, pcRefs: 1, pcQr: 1 },
+  standart: { pcIntro: 1, pcMap: 1, pcMeth: 1, pcTM: 0, pcBen: 1, pcAmr: 0, pcGR: 1, pcRes: 1, pcRefs: 1, pcQr: 1 },
+  sade: { pcIntro: 0, pcMap: 1, pcMeth: 0, pcTM: 0, pcBen: 0, pcAmr: 0, pcGR: 1, pcRes: 1, pcRefs: 0, pcQr: 1 } };
 // Şekil başlıklarının yanındaki “🎓 posterde” kutuları poster panelindeki bileşen kutularının aynasıdır (2026-10-18)
 function posterSyncFigToggles() {
   document.querySelectorAll('input[data-pc]').forEach(cb => { const src = document.getElementById(cb.dataset.pc); if (src) cb.checked = src.checked; });
@@ -3697,6 +3703,8 @@ async function exportPosterAGU(scale, evt) {
 
   // ── Sütun 1: çalışma alanı haritası
   const X1 = 40, W1 = 560, X2 = 620, W2 = 680, X3 = 1320, W3 = 560, TOP = 172, MID = 905;
+  // 2026-10-18: sütun alt sınırları. Kaynaklar kutusu yoksa 1. ve 2. sütun, QR kutusu yoksa 3. sütun sayfa altına uzar.
+  const MID1 = INC.refs ? MID : H - 22, MID2 = MID1, MID3 = INC.qr ? MID : H - 22;
   // Giriş ve Amaç (AGU örneğindeki "Introduction" karşılığı); boşsa nötr, yorum içermeyen varsayılan metin
   // 2026-10-17 düzen A (Benioff varken): Zaman–Büyüklük 1. sütuna taşınır; Giriş ve harita kompakt, harita yüksekliği
   // Veri ve Yöntem metnine göre ayarlanır; 2. sütun tamamen b(t) (üstte) + Benioff (altta, aynı genişlik → zaman eksenleri hizalı).
@@ -3745,25 +3753,31 @@ async function exportPosterAGU(scale, evt) {
     : L('Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', 'Figure 2. Time–magnitude distribution of events; colours show magnitude classes (no completeness steps used).');
   if (STACK_ON) {
     const mH = sz => mItems.reduce((a, t) => a + (rich(t, X1 + 16, 0, W1 - 32, { size: sz, lh: Math.round(sz * 1.33), bullet: true, dry: true }) + 5), 0);
-    const need = sz => 44 + 54 + 12 + mH(sz) + 8;
+    const need = sz => INC.meth ? 44 + 54 + 12 + mH(sz) + 8 : 0;
     // Öncelik: metin hiç kesilmesin. Önce punto (15 → 12) harita ≥ 120 px kalacak şekilde; olmazsa harita 90 px'e,
     // punto 11'e ve son çare olarak Şekil 2 kutusu 150 px'e iner.
     // harita çıkarıldıysa (INC.map = false) haritaya ayrılan sabit pay (44 + 46 + 12) ve en küçük yükseklik 0 olur
     const mapFix = INC.map ? 44 + 46 + 12 : 0, mapMin = INC.map ? 120 : 0, mapMin2 = INC.map ? 90 : 0, mapMin3 = INC.map ? 75 : 0;
-    const room = () => MID - TOP - (G(GH) + mapFix + G(TMH));
+    const room = () => MID1 - TOP - (G(GH) + mapFix + G(TMH));
     let ok = false;
     for (const sz of [15, 14, 13, 12]) { METH_SZ = sz; if (room() - need(sz) >= mapMin) { ok = true; break; } }
     if (!ok) for (const sz of [12, 11]) { METH_SZ = sz; if (room() - need(sz) >= mapMin2) { ok = true; break; } }
     if (!ok && TMH) TMH = Math.max(130, TMH - Math.max(0, mapMin2 - (room() - need(11))));
     // Şekil 2 yoksa harita boşalan alanı alabilir (en çok 300 px)
-    MAPH = INC.map ? Math.max(75, Math.min(INC.tm ? 183 : 300, room() - need(METH_SZ))) : 0;
+    const grow = MID1 - MID + (INC.meth ? 0 : 220);   // Kaynaklar ya da Veri ve Yöntem çıkarıldıysa harita daha büyük olabilir
+    MAPH = INC.map ? Math.max(75, Math.min((INC.tm ? 183 : 300) + grow, room() - need(METH_SZ))) : 0;
     // harita yoksa Şekil 2 boşalan alanı alır (en çok 260 px: şekil sütun genişliğini doldurur)
     if (!INC.map && TMH) TMH += Math.max(0, Math.min(room() - need(METH_SZ), 260 - TMH));
     if (room() - need(METH_SZ) < mapMin3) { console.warn('[poster] Veri ve Yöntem metni kutuya tam sığmayabilir');
       PW.push(L('Veri ve Yöntem metni kutuya tam sığmayabilir; Giriş veya Zaman–büyüklük bileşenini çıkarmayı düşünün.', 'Data and Methods text may not fit; consider removing the Introduction or Time–magnitude component.')); }
     if (METH_SZ <= 12) PW.push(L(`Veri ve Yöntem metni ${METH_SZ} px'e küçültüldü (okunabilirlik alt sınırına yakın).`, `Data and Methods text reduced to ${METH_SZ} px (near the readability limit).`));
     MB = INC.map ? 44 + MAPH + 46 : 0; VY = G(GH) + G(MB) + G(TMH);
+  } else if (INC.map) {   // düzen B: harita, Veri ve Yöntem yoksa ya da sütun uzadıysa büyür
+    const free = MID1 - TOP - G(GH) - 44 - 46 - 12;
+    MAPH = INC.meth ? Math.min(183 + (MID1 - MID), Math.max(183, free - 330)) : free;   // Veri ve Yöntem yoksa harita sütunun altına kadar uzar
+    MB = 44 + MAPH + 46; VY = G(GH) + G(MB);
   }
+  if (!INC.intro && !INC.map && !INC.meth && !(STACK_ON && INC.tm)) PW.push(L('1. sütun boş: Giriş, harita veya Veri ve Yöntem\'den birini seçin.', 'Column 1 is empty: select the introduction, map or data and methods.'));
   if (INC.map) {
   y = box(X1, TOP + G(GH), W1, MB, L('Çalışma Alanı', 'Study Area'));
   (function drawMap(x, y0, w, h) {
@@ -3808,7 +3822,8 @@ async function exportPosterAGU(scale, evt) {
     y = figure(imgs[0], X1 + 16, y, W1 - 32, TMH - 44 - 50);
     caption(tmCapT, X1 + 16, y, W1 - 32, tmY + TMH - 2);
   }
-  y = box(X1, TOP + VY, W1, MID - TOP - VY, L('Veri ve Yöntem', 'Data and Methods'));
+  if (INC.meth) {
+  y = box(X1, TOP + VY, W1, MID1 - TOP - VY, L('Veri ve Yöntem', 'Data and Methods'));
   { const fx0 = X1 + 16, fw = W1 - 32, ag = 18, bw = (fw - ag * (steps.length - 1)) / steps.length, bh = 54;
     steps.forEach(([h, sub], i) => { const bx0 = fx0 + i * (bw + ag);
       c.fillStyle = TH.soft; c.strokeStyle = ACC; c.lineWidth = 1.5; c.beginPath();
@@ -3819,7 +3834,8 @@ async function exportPosterAGU(scale, evt) {
       text(st === sub ? sub : st + '…', bx0 + bw / 2, y + 32, '11.5px Arial', INK, 'center');
       if (i < steps.length - 1) { const ax = bx0 + bw + 3, ay = y + bh / 2; c.fillStyle = ACC; c.beginPath(); c.moveTo(ax, ay - 7); c.lineTo(ax + 12, ay); c.lineTo(ax, ay + 7); c.closePath(); c.fill(); } });
     y += bh + 12; }
-  mItems.forEach(t => { y = rich(t, X1 + 16, y, W1 - 32, { size: METH_SZ, lh: METH_SZ === 15 ? 20 : Math.round(METH_SZ * 1.33), bullet: true, maxY: MID - 6 }) + 5; });
+  mItems.forEach(t => { y = rich(t, X1 + 16, y, W1 - 32, { size: METH_SZ, lh: METH_SZ === 15 ? 20 : Math.round(METH_SZ * 1.33), bullet: true, maxY: MID1 - 6 }) + 5; });
+  }
 
   // ── Sütun 2: zaman–büyüklük ve b(t)
   const TM2 = !STACK_ON && INC.tm;   // düzen B: Şekil 2, 2. sütunun üstünde
@@ -3828,7 +3844,7 @@ async function exportPosterAGU(scale, evt) {
     y = figure(imgs[0], X2 + 16, y, W2 - 32, 150);
     caption(tmCapT, X2 + 16, y, W2 - 32, TOP + 256);
   }
-  y = box(X2, TM2 ? TOP + 275 : TOP, W2, TM2 ? MID - TOP - 275 : MID - TOP, STACK_ON ? (BEN_ON && AMR_ON ? L('b-Değeri, Benioff Gerinimi ve AMR', 'b-Value, Benioff Strain and AMR') : BEN_ON ? L('b-Değeri ve Benioff Gerinimi', 'b-Value and Benioff Strain') : L('b-Değeri ve AMR', 'b-Value and AMR')) : L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
+  y = box(X2, TM2 ? TOP + 275 : TOP, W2, TM2 ? MID2 - TOP - 275 : MID2 - TOP, STACK_ON ? (BEN_ON && AMR_ON ? L('b-Değeri, Benioff Gerinimi ve AMR', 'b-Value, Benioff Strain and AMR') : BEN_ON ? L('b-Değeri ve Benioff Gerinimi', 'b-Value and Benioff Strain') : L('b-Değeri ve AMR', 'b-Value and AMR')) : L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
   const adF = !!(bt && bt.adaptive);
   const bandF = (BT_STEP === 1 && !adF) || (bt && bt.band), thinF = BT_STEP === 1 && !adF;
   const adEN = adF ? `, display step ${bt.dispStep} (${bt.nWin} windows > ${BT_ADAPT_MAX}; values unchanged)` : '';
@@ -3844,27 +3860,40 @@ async function exportPosterAGU(scale, evt) {
     : ` **(${amrL}) Deneysel:** en iyi ızgara hücresi için hızlanan moment salımı (AMR) (R = ${AP.r} km, M${DC(AP.mMain.toFixed(1))} ana şoktan ${AP.yr} yıl önce, t_f sabit; n = ${AP.n}, M ≥ ${DC(fmtM(AP.mMin))}). {#ea580c|Turuncu}${BEN_ON ? " (b'deki gibi)" : ''}: t_f'de 1'e normalize birikimli Σ√E; {#2563eb|mavi} güç yasası S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? DC(AP.fit.m) : '—'}, Bufe & Varnes 1993); {#6b7280|gri kesikli} doğrusal. q = rms(güç yasası)/rms(doğrusal) = ${DC(AP.q.toFixed(2))}; küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} (${AP.nSim} sentetik katalog): ${amrSupport(AP.pK).tr.toLowerCase()} (önceden tanımlı: p ≤ 0,01 güçlü, ≤ 0,05 sınırlı, aksi halde yetersiz). {#dc2626|Kırmızı} çizgi: ana şok (t_f sabit, kestirilmez). Zaman ekseni (a) ile aynıdır. Geriye dönük testtir; öncül ya da tahmin değildir.`;
   const cap3 = EN ? '**Figure 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + (bt && bt.cls ? ' Background and bottom strip: b-value class ({#dc2626|low} < 0.7, {#ca8a04|typical} 0.7–1.4, {#16a34a|high} > 1.4); a window is coloured only if its whole 95% CI lies in one class; gaps in the strip are windows whose CI crosses a boundary (uncertain). Class colours are not a hazard or alarm level; this is a descriptive classification, not the FTLS of Gulia et al. (2019, 2024).' : '') + benCap + amrCap
     : '**Şekil 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + (bt && bt.cls ? ' Arka plan ve alt şerit: b-değeri sınıfı ({#dc2626|düşük} < 0,7, {#ca8a04|tipik} 0,7–1,4, {#16a34a|yüksek} > 1,4); pencere yalnızca %95 aralığının tamamı bir sınıftaysa renklenir; şeritteki boşluklar aralığın bir sınırı kestiği (belirsiz) pencerelerdir. Sınıf renkleri tehlike ya da alarm seviyesi değildir; betimleyici sınıflamadır, Gulia vd. (2019, 2024) FTLS yöntemi değildir.' : '') + benCap + amrCap;
-  const cap3O = STACK_ON ? { size: BEN_ON && AMR_ON ? 13 : 14, lh: BEN_ON && AMR_ON ? 17 : 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 };
+  const cap3O = STACK_ON ? { size: BEN_ON && AMR_ON ? 13 : 14, lh: BEN_ON && AMR_ON ? 17 : 18, italic: true, col: '#374151', maxY: MID2 - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID2 - 4 };
   if (STACK_ON) {
     // 2026-10-17 düzen A: Şekil 3a b(t) üstte, 3b Benioff ve/veya 3c AMR altta; AYNI genişlik ve sol kenar → SVG'lerin zaman
     // eksenleri (W = 660, PAD_L = 40, PAD_R = 14) dikey olarak hizalıdır. Genişlik, altyazıya kalan yükseklikten hesaplanır.
     const capH = rich(cap3, X2 + 16, 0, W2 - 32, { ...cap3O, dry: true }), g2 = 10;
     const stack = [imgs[1]].concat(BEN_ON ? [imgs[IMG_IDS.indexOf('tmSvgBen')]] : [], AMR_ON ? [imgs[IMG_IDS.indexOf('tmSvgAmr')]] : []);
     const rs = stack.map(im => im.naturalHeight / im.naturalWidth), rSum = rs.reduce((a, v) => a + v, 0);
-    const wF = Math.min(W2 - 32, (MID - 8 - y - capH - g2 * (stack.length - 1) - 18 - 8 * (stack.length - 2)) / rSum), x0 = X2 + 16 + (W2 - 32 - wF) / 2;
+    const wF = Math.min(W2 - 32, (MID2 - 8 - y - capH - g2 * (stack.length - 1) - 18 - 8 * (stack.length - 2)) / rSum), x0 = X2 + 16 + (W2 - 32 - wF) / 2;
     if (wF < 0.6 * (W2 - 32)) PW.push(L('Şekil 3 panelleri küçüldü; Benioff veya AMR\'den birini çıkarmayı düşünün.', 'Figure 3 panels became small; consider removing Benioff or AMR.'));
+    { const used = wF * rSum + 8 * stack.length + g2 * (stack.length - 1) + capH, spare = (MID2 - 8 - y) - used; if (spare > 40) y += Math.round(spare / 2); }   // genişlik sınırında dikey ortala
     stack.forEach((im, i) => { figure(im, x0, y, wF, wF * rs[i] + 0.5); text('abc'[i], x0 + wF * 0.075, y + 3, 'bold 17px Arial', '#111827');
       y += wF * rs[i] + 8 + (i < stack.length - 1 ? g2 : 0); });
   } else {
   // 2026-10-17: altyazı için ayrılan alan bir satır büyütüldü (önceden son satır "Alt şerit Mc(t)" kesiliyordu); seyreltmede bir satır daha
-  y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112 - 21 - (adF ? 21 : 0));
+  { // 2026-10-18: şekil genişlikle sınırlı kaldığında (sütun uzadığında) şekil + altyazı kutu içinde dikey ortalanır
+    const im = imgs[1], capH = rich(cap3, X2 + 16, 0, W2 - 32, { ...cap3O, dry: true }) + 2, maxH = MID2 - y - 112 - 21 - (adF ? 21 : 0);
+    const fh = Math.min(maxH, (W2 - 32) * im.naturalHeight / im.naturalWidth), spare = (MID2 - 8 - y) - (fh + capH);
+    if (spare > 40) y += Math.round(spare / 2);
+    y = figure(im, X2 + 16, y, W2 - 32, maxH); }
   }
   rich(cap3, X2 + 16, y + 2, W2 - 32, cap3O);
 
   // ── Sütun 3: G-R ve sonuçlar
-  y = box(X3, TOP, W3, 515, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
-  y = figure(imgs[2], X3 + 16, y, W3 - 32, gf ? 300 : 345);   // 2026-10-18: Weichert tablosu yoksa G-R şekli büyütülür
-  y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? ' ± ' + gs.err.toFixed(2) : ''}, N = ${gs.n}, fit M ≥ ${fmtM(gs.mc)})` : ''}, blue dashed Mc${gs ? ` = ${fmtM(gs.mc)}` : ''}.` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? ' ± ' + gs.err.toFixed(2).replace('.', ',') : ''}, N = ${gs.n}, uyum M ≥ ${String(fmtM(gs.mc)).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(fmtM(gs.mc)).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + 511);
+  // 2026-10-18: G–R ve Sonuçlar seçilebilir. İkisi de varsa G–R kutusu 515 px (+ QR yoksa ek alanın yarısı); biri yoksa
+  // diğeri sütunun tamamını alır. G–R şekli genişlikle sınırlıdır (≈ 528 px); kalan alan tablo ve altyazıya kalır.
+  const GRH = !INC.gr ? 0 : !INC.res ? MID3 - TOP : 515 + Math.round((MID3 - MID) / 2);
+  if (!INC.gr && !INC.res) PW.push(L('3. sütun boş: Gutenberg–Richter veya Sonuçlar\'dan birini seçin.', 'Column 3 is empty: select Gutenberg–Richter or Results.'));
+  if (INC.gr) {
+  y = box(X3, TOP, W3, GRH, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
+  { const grMax = (gf ? 300 : 345) + Math.max(0, GRH - 515 - (gf ? 40 : 80)), im = imgs[2];
+    if (!gf && !INC.res) { const fh = Math.min(grMax, (W3 - 32) * im.naturalHeight / im.naturalWidth), spare = (TOP + GRH - 8 - y) - (fh + 90);
+      if (spare > 40) y += Math.round(spare / 2); }   // Sonuçlar yoksa şekil + altyazı dikey ortalanır
+    y = figure(im, X3 + 16, y, W3 - 32, grMax); }   // Weichert tablosu yoksa G-R şekli büyütülür
+  y = caption(EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? ' ± ' + gs.err.toFixed(2) : ''}, N = ${gs.n}, fit M ≥ ${fmtM(gs.mc)})` : ''}, blue dashed Mc${gs ? ` = ${fmtM(gs.mc)}` : ''}.` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? ' ± ' + gs.err.toFixed(2).replace('.', ',') : ''}, N = ${gs.n}, uyum M ≥ ${String(fmtM(gs.mc)).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(fmtM(gs.mc)).replace('.', ',')}` : ''}.` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, X3 + 16, y, W3 - 32, TOP + GRH - 4);
   // G-R parametre tablosu (büyük punto)
   if (gf && gf.curves && gf.curves.length) {
     const cols = [[L('Eğri', 'Curve'), 0], ['b ± 1σ', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/${L('yıl', 'yr')}`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
@@ -3874,12 +3903,14 @@ async function exportPosterAGU(scale, evt) {
     const rowsP = gf.curves.slice();
     if (gf.fit && gf.all) rowsP.push({ key: 'all', b: gf.all.b, beta: gf.all.beta, rate0: gf.all.rate0, mx: null, sig: gf.all.sigma, m0: gf.all.m0 });
     nm.all = L('Tüm sınıflar', 'All classes');
-    rowsP.forEach(cv0 => { if (ry + rowH > TOP + 511) return;
+    rowsP.forEach(cv0 => { if (ry + rowH > TOP + GRH - 4) return;
       const vals = [nm[cv0.key] || cv0.key, cv0.b.toFixed(3) + (cv0.key === 'best' && gf.sigB !== null ? ' ± ' + gf.sigB.toFixed(3) : cv0.key === 'all' && cv0.sig !== null ? ' ± ' + cv0.sig.toFixed(3) : ''), cv0.beta.toFixed(3), cv0.rate0.toFixed(2) + (cv0.key === 'all' ? ` (M≥${cv0.m0.toFixed(1)})` : ''), cv0.mx !== null && cv0.mx !== undefined ? cv0.mx.toFixed(1) : '—'];
       cols.forEach(([, dx], i) => text(vals[i], tx + 6 + dx, ry, (cv0.key === 'best' ? 'bold ' : '') + (cv0.key === 'all' ? '14px' : '16px') + ' Arial', cv0.key === 'all' ? '#6b7280' : INK)); ry += rowH; });
     c.strokeStyle = '#d1d5db'; c.lineWidth = 1; c.strokeRect(tx, y + 1, W3 - 32, ry - y - 1);
   }
-  y = box(X3, TOP + 530, W3, MID - TOP - 530, L('Sonuçlar', 'Results'));
+  }
+  const RY0 = INC.gr ? TOP + GRH + 15 : TOP;
+  if (INC.res) y = box(X3, RY0, W3, MID3 - RY0, L('Sonuçlar', 'Results'));
   // Patch 2 — kalite kontrol uyarısı olan sonucun raporlanması (metodoloji): model–gözlem denetimi
   // lastGrFit.consistency'den, tamlık tanıları cs.qc'den OKUNUR; hiçbir değer yeniden hesaplanmaz.
   const qcObj = gf && gf.consistency ? gf.consistency : null, csQc = cs && cs.qc ? cs.qc : null;
@@ -3924,7 +3955,7 @@ async function exportPosterAGU(scale, evt) {
   // madde aralığı daralır. 10 puntoda da sığmazsa HİÇBİR MADDE ORTASINDAN KESİLMEZ: sığmayan son maddeler bütün olarak
   // çıkarılır ve kutunun son satırında sayısıyla belirtilir (posterFitItems). Kalite kontrol ilk maddedir; ona yer kalmıyorsa
   // önce Ana mesaj çıkarılır.
-  { const gap = sz => (sz <= 11.5 ? 2 : 5), lhOf = sz => Math.round(sz * 1.31), bot = MID - 6;
+  if (INC.res) { const gap = sz => (sz <= 11.5 ? 2 : 5), lhOf = sz => Math.round(sz * 1.31), bot = MID3 - 6;
     const ro = sz => ({ size: sz, lh: lhOf(sz), bullet: true });
     const noteTxt = (nd, mOmit) => EN ? `⚠ ${mOmit ? 'Key message' + (nd ? ' and ' : '') : ''}${nd ? nd + (nd > 1 ? ' items' : ' item') : ''} did not fit in the box; full text in the EQ-Live application.`
       : `⚠ ${mOmit ? 'Ana mesaj' + (nd ? ' ve ' : '') : ''}${nd ? nd + ' madde' : ''} kutuya sığmadı; tam metin EQ-Live uygulamasında.`;
@@ -3949,20 +3980,23 @@ async function exportPosterAGU(scale, evt) {
 
   // ── alt şerit: kaynaklar ve bilgi
   const BT = MID + 12, BH = H - BT - 22;
-  y = box(X1, BT, X3 - X1 - 20, BH, INC.refs ? L('Kaynaklar', 'References') : L('Teşekkür', 'Acknowledgments'));
+  // 2026-10-18: alt şerit. Kaynaklar yoksa kutu çizilmez (1.–2. sütun uzar); QR yoksa Kaynaklar tam genişliğe yayılır.
+  const RW = X3 - X1 - 20;   // 3. sütun QR yoksa sayfa altına uzadığından Kaynaklar kutusu 1.–2. sütun genişliğinde kalır
+  if (INC.refs) y = box(X1, BT, RW, BH, L('Kaynaklar', 'References'));
   const refs = ['Aki, K. (1965). Bull. Earthq. Res. Inst. 43, 237–239.', 'Halchuk, S., Burke, K. B. S. & Adams, J. (2004). Seismol. Res. Lett. 75(3), 432–434.',
     'Kijko, A. & Sellevoll, M. A. (1989). Bull. Seismol. Soc. Am. 79(3), 645–654.', 'Öncel, A. O. & Wilson, T. H. (2007). Geophys. J. Int. 169(1), 259–270.',
     'Weichert, D. H. (1980). Bull. Seismol. Soc. Am. 70(4), 1337–1346.', 'Wiemer, S. & Wyss, M. (2000). Bull. Seismol. Soc. Am. 90(4), 859–869.'];
-  const colW = (X3 - X1 - 20 - 48) / 2;
+  const colW = (RW - 48) / 2;
   const half = Math.ceil(refs.length / 2), ry0 = y - 2;
   if (INC.refs) [refs.slice(0, half), refs.slice(half)].forEach((colRefs, ci2) => { let yy = ry0;
     colRefs.forEach(r => { yy = rich(r, X1 + 16 + ci2 * (colW + 16), yy, colW, { size: 14, lh: 18, hang: 22, maxY: BT + BH - 26 }) + 5; }); });
   // Teşekkür (AGU "Acknowledgments"): boşsa veri sağlayıcıya standart teşekkür
   const ackSrc = SRC(regionRect ? regionSourceLabel() : 'canlı akış').replace(/\s*\(.*\)\s*/g, ' ').trim();
   const ack = posterVal('posterAck', L(`Katalog verileri ${ackSrc} FDSN web servisinden alınmıştır; veri sağlayıcılara teşekkür ederiz. Analiz: EQ-Live Türkiye.`, `Catalogue data were obtained from the ${ackSrc} FDSN web service; we thank the data providers. Analysis: EQ-Live Türkiye.`));
-  if (INC.refs) rich(L('**Teşekkür:** ', '**Acknowledgments:** ') + ack, X1 + 16, BT + BH - 24, X3 - X1 - 20 - 32, { size: 12, lh: 16, italic: true, col: MUTE, maxY: BT + BH - 2 });
-  else rich(ack, X1 + 16, ry0, X3 - X1 - 20 - 32, { size: 15, lh: 20, italic: true, col: MUTE, maxY: BT + BH - 4 });   // kaynaklar çıkarıldı: kutu yalnızca teşekkür
+  if (INC.refs) rich(L('**Teşekkür:** ', '**Acknowledgments:** ') + ack, X1 + 16, BT + BH - 24, RW - 32, { size: 12, lh: 16, italic: true, col: MUTE, maxY: BT + BH - 2 });
+  else rich(L('**Teşekkür:** ', '**Acknowledgments:** ') + ack, X1, H - 19, X3 - 20 - X1, { size: 11, lh: 14, italic: true, col: MUTE, maxY: H - 2 });   // kaynaklar çıkarıldı: teşekkür sayfa altında tek satır
   // Ek Bilgi: QR (tam analiz bağlantısı; tüm ayarlar URL'dedir) + kaynak/tarih + kısa adres
+  if (INC.qr) {
   c.fillStyle = '#ffffff'; c.fillRect(X3, BT, W3, BH); c.strokeStyle = '#111'; c.lineWidth = 1.2; c.strokeRect(X3, BT, W3, BH);
   const QZ = BH - 6, qzx = X3 + W3 - 3 - QZ, qzy = BT + 3; let qrDrawn = false;
   if (qrLib) { try { const q = qrLib(0, 'L'); q.addData(location.href); q.make(); const n = q.getModuleCount(), m = n + 8;
@@ -3981,6 +4015,7 @@ async function exportPosterAGU(scale, evt) {
   if (!/^(localhost|127\.0\.0\.1|\[::1\])(:|$)/.test(location.host) && location.protocol !== 'file:') eLines.push([(location.host + location.pathname).replace(/index\.html$/, ''), 'bold 14px Arial', '#1d4ed8']);
   const contact = posterVal('posterContact', ''); if (contact) eLines.push([`${L('İletişim', 'Contact')}: ${contact}`, '13px Arial', INK]);
   eLines.forEach(([t, f, col], i) => { c.font = f; let tt = t; while (tt.length > 8 && c.measureText(tt).width > eW) tt = tt.slice(0, -2); text(tt === t ? t : tt + '…', X3 + 16, BT + 44 + i * (eLines.length > 3 ? 22 : 24), f, col); });
+  }
 
   { const fn = document.getElementById('posterFitNote');
     if (fn) fn.textContent = PW.length ? `${EN ? 'EN poster' : 'Poster'}: ${PW.join(' · ')}` : ''; }
