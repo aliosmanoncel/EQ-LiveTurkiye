@@ -2037,6 +2037,23 @@ function omoriUtsuFit(t, S, T) {
 
 /* ── Panel: harita açılır penceresinden çağrılır ── */
 function omoriDefaults(M) { return { R: +Math.pow(10, 0.1238 * M + 0.983).toFixed(1), S: 0.05 }; } // R: GK74 D(M) (Gardner & Knopoff 1974)
+// Wells & Coppersmith (1994) Tablo 2A, tüm faylanma türleri: log L = a + b·M (σ: log L'nin standart sapması).
+// Yalnız bilgi amaçlı; Omori–Utsu hesabına girmez. Geçerlik aralığı dışında değer verilmez.
+const WC94 = { RLD: { a: -2.44, b: 0.59, s: 0.16, lo: 4.8, hi: 8.1 }, SRL: { a: -3.22, b: 0.69, s: 0.22, lo: 5.2, hi: 8.1 } };
+function wc94Length(M, k) { const c = WC94[k]; if (!(M >= c.lo - 1e-9 && M <= c.hi + 1e-9)) return null;
+  const L = Math.pow(10, c.a + c.b * M), f = Math.pow(10, c.s); return { L, lo: L / f, hi: L * f }; }
+function wc94Note(M, R) {
+  const d = wc94Length(M, 'RLD'), s = wc94Length(M, 'SRL');
+  if (!d) return `<div style="color:#888;margin-top:6px;font-size:.92em;">Wells &amp; Coppersmith (1994) beklenen kırılma uzunluğu: M ${M.toFixed(1)} bağıntının geçerlik aralığı (M 4,8–8,1) dışında.</div>`;
+  const f0 = v => v >= 10 ? v.toFixed(0) : v.toFixed(1);
+  const cmp = R >= d.L ? 'R ≥ L: tek yönlü kırılma da daire içinde kalır'
+    : R >= d.L / 2 ? 'L/2 ≤ R < L: iki yönlü (episantr ortada) kırılmayı kapsar; tek yönlü kırılmanın ucu dışarıda kalabilir'
+    : 'R < L/2: beklenen kırılmanın bir kısmı daire dışında kalabilir';
+  return `<div style="color:#9ab0c5;margin-top:6px;font-size:.92em;line-height:1.45;" title="Wells &amp; Coppersmith (1994) Tablo 2A, tüm faylanma türleri: log RLD = −2,44 + 0,59·M (σ = 0,16; M 4,8–8,1); log SRL = −3,22 + 0,69·M (σ = 0,22; M 5,2–8,1). Doğrultu atımlı alt küme: log RLD = −2,57 + 0,62·M. Bağıntılar Mw içindir; burada listedeki büyüklük kullanılır. Bilgi amaçlıdır; Omori–Utsu hesabına girmez.">` +
+    `Beklenen kırılma uzunluğu (Wells &amp; Coppersmith 1994, tüm faylanma türleri): yeraltı L ≈ ${f0(d.L)} km (±1σ: ${f0(d.lo)}–${f0(d.hi)})` +
+    (s ? `; yüzey ≈ ${f0(s.L)} km (${f0(s.lo)}–${f0(s.hi)})` : '') +
+    `. R = ${R} km ile karşılaştırma (episantr merkezli daire): ${cmp}. Bilgi amaçlıdır; hesaba girmez. Bağıntı Mw içindir, listedeki büyüklük Mw olmayabilir.</div>`;
+}
 function omoriCollect(ms, R) {
   const t0 = ms.time.getTime();
   return (events || []).filter(e => e.time && e.mag > 0 && haversineKm(ms.lat, ms.lon, e.lat, e.lon) <= R &&
@@ -2062,6 +2079,7 @@ function openOmoriPanel(lat, lon, tms, mag, place) {
     `<label title="Başlangıç kesmesi (gün). Ana şok sonrası erken dönemdeki eksik kayıtların etkisini azaltır; bütünüyle telafi etmez.">S (gün)</label><input id="omS" type="number" step="0.01" min="0" value="${def.S}" style="width:110px;">` +
     `<label title="Ana şok çevresindeki yarıçap; varsayılan GK74 D(M)">R (km)</label><input id="omR" type="number" step="1" min="1" value="${def.R}" style="width:110px;">` +
     `</div><button onclick="runOmoriPanel()" style="margin-top:8px;background:#3b9eff;color:#0a0e15;border:none;border-radius:6px;padding:5px 12px;font-weight:700;cursor:pointer;">Hesapla</button>` +
+    `<div id="omWC">${wc94Note(mag, def.R)}</div>` +
     `<div id="omOut" style="margin-top:10px;"></div>`;
   runOmoriPanel();
 }
@@ -2069,6 +2087,7 @@ function runOmoriPanel() {
   const el = document.getElementById('omoriPanel'); if (!el) return; const ms = el._ms, out = document.getElementById('omOut');
   const R = +document.getElementById('omR').value || omoriDefaults(ms.mag).R;
   let S = Math.max(0, +document.getElementById('omS').value || 0);
+  const wc = document.getElementById('omWC'); if (wc) wc.innerHTML = wc94Note(ms.mag, R);
   const all = omoriCollect(ms, R), warnPre = [];
   if (all.length < 10) { out.innerHTML = `<span style="color:#f5a623">Yüklü katalogda R ≤ ${R} km içinde ana şoktan sonra ${all.length} olay var. Daha uzun bir zaman penceresi veya kaynak seçin.</span>`; return; }
   const mcIn = document.getElementById('omMc').value;
