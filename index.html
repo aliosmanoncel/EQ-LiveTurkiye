@@ -1197,7 +1197,7 @@
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;">
           <label title="Boş bırakılırsa seçimdeki en büyük olay. Tarih girilirse o gündeki (±1 gün) en büyük olay. t_f bu olayın zamanına sabitlenir; t_f tahmini yapılmaz.">Ana şok tarihi <input id="amrDate" type="date" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
-          <label title="AMR için alt büyüklük eşiği. Boş: Benioff panelinin sabit eşiği (veri Mc). Doldurulursa yalnız AMR testi bu eşikle yapılır (b(t), G–R ve Benioff değişmez); Benioff eşiğinin altına inemez. Ör. Jiang &amp; Wu (2005) yeniden üretimi için 5,8.">AMR eşiği M ≥ <input id="amrMmin" type="number" step="0.1" min="0" placeholder="oto" style="width:52px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+          <label title="Benioff ve AMR için ortak alt büyüklük eşiği. Boş: veri Mc. Doldurulursa Benioff birikimi ve AMR testi bu eşikle yapılır; b(t) ve G–R veri Mc'siyle kalır. Veri Mc'sinin altına inemez. Ör. Jiang &amp; Wu (2005) yeniden üretimi için 5,8.">Benioff/AMR eşiği M ≥ <input id="amrMmin" type="number" step="0.1" min="0" placeholder="oto" onchange="if (window._benArgs) { try { renderBenioff(...window._benArgs); } catch (e) {} } const ao = document.getElementById('amrOut'); if (ao &amp;&amp; window.lastAmr) ao.innerHTML = '&lt;span style=&quot;color:#f59e0b&quot;&gt;Eşik değişti; testi yeniden çalıştırın.&lt;/span&gt;';" style="width:52px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
           <label title="Önceden tanımlı protokol: AMR-P1 R ≤ 300 km; AMR-P2 R ≤ 500 km (Bowman vd. 1998 ölçeklemesi büyük depremler için daha geniş kritik bölge öngörür). Bölge yarıçapı en az ızgaranın en büyük R'si kadar olmalıdır.">Protokol <select id="amrProto" onchange="amrSetProto(this.value)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;"><option value="AMR-P2">P2 (R ≤ 500 km)</option><option value="AMR-P1">P1 (R ≤ 300 km)</option><option value="AMR-JW05">JW05 yeniden üretim (R ≤ 1500 km, ≤ 30 yıl; sicile girmez)</option></select></label>
           <label title="Her sıfır hipotezi için üretilen sentetik katalog sayısı. 199 → en küçük p = 0,005.">Sentetik katalog <input id="amrNsim" type="number" min="19" max="999" step="20" value="199" style="width:56px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
           <label title="Vaka sicilinin dahil etme ölçütü (ör. Dünya geneli M ≥ 7,0, USGS ComCat). Doldurulursa poster altyazısında ve sonuç maddesinde görünür; boşsa yazılmaz. Tarayıcıda hatırlanır.">Sicil ölçütü <input id="amrIncl" type="text" autocomplete="off" maxlength="160" placeholder="ör. Dünya M ≥ 7,0, USGS" oninput="amrInclSet(this.value)" style="width:150px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
@@ -6100,6 +6100,7 @@ function benioffTwoPeriodTest(items, t0, ts, t1, o) {
            mBig: big.m, tBig: big.t, bigShare, Rwo };
 }
 function renderBenioff(evList, Mc, cs) {
+  window._benArgs = [evList, Mc, cs];
   const svg = document.getElementById('tmSvgBen'), st = document.getElementById('tmStatsBen'); if (!svg || !st) return;
   window.lastBenioffEv = evList; amrRunId++;   // veri değişti: süren AMR testi iptal, eski sonuç silinir
   window.lastAmrPlot = null; { const sa = document.getElementById('tmSvgAmr'); if (sa) { sa.style.display = 'none'; sa.innerHTML = ''; } }
@@ -6116,6 +6117,8 @@ function renderBenioff(evList, Mc, cs) {
     varItems = cs.kept.map(it => ({ t: it.t, m: it.m })).sort((a, b) => a.t - b.t);
     mLoAll = Math.min(...cs.periods.map(p => +p.mc));
   }
+  // 2026-10-18: Benioff/AMR eşiği — doluysa Benioff birikimi (ve ona bağlı AMR testi) bu eşikle; b(t) ve G–R veri Mc'siyle kalır
+  { const ub = parseFloat((document.getElementById('amrMmin') || {}).value); if (Number.isFinite(ub) && Number.isFinite(mFix) && ub > mFix) mFix = ub; }
   if (mFix === null || !Number.isFinite(mFix)) { svg.innerHTML = `<text x="330" y="90" fill="#666" font-size="11" text-anchor="middle">Mc yok — Benioff ölçüsü hesaplanamadı</text>`; st.textContent = '—'; return; }
   const fixItems = ev.filter(e => e.m >= mFix - 1e-9).sort((a, b) => a.t - b.t);
   if (fixItems.length < 2) { svg.innerHTML = `<text x="330" y="90" fill="#666" font-size="11" text-anchor="middle">Sabit eşikte (M ≥ ${fmtM(mFix)}) yeterli olay yok (N = ${fixItems.length})</text>`; st.textContent = '—'; return; }
@@ -6367,15 +6370,14 @@ async function amrRun() {
   const ms = amrMainshock(evList, document.getElementById('amrDate').value);
   if (!ms) { out.innerHTML = '<span style="color:#f59e0b">Ana şok bulunamadı (konumlu olay yok ya da girilen tarihte olay yok).</span>'; return; }
   // 2026-10-18: isteğe bağlı AMR eşiği (ör. literatür yeniden üretimi için Mw ≥ 5,8); Benioff eşiğinin altına inemez
-  const mUser = parseFloat((document.getElementById('amrMmin') || {}).value);
-  const tf = ms.time.getTime(), la0 = +ms.lat, lo0 = +ms.lon, mMin = Number.isFinite(mUser) ? Math.max(mUser, B.mFix) : B.mFix;
+  const tf = ms.time.getTime(), la0 = +ms.lat, lo0 = +ms.lon, mMin = B.mFix;   // Benioff/AMR eşiği Benioff panelinde uygulanır
   const tStart = Math.min(...evList.map(e => e.time.getTime()));
   const Rmax = Math.max(...AMR_R_GRID), Ymax = Math.max(...AMR_Y_GRID), wa = Math.max(tStart, tf - Ymax * AMR_YR);
   const raw = evList.filter(e => e !== ms && e.time && Number.isFinite(mOf(e)) && Number.isFinite(+e.lat) && Number.isFinite(+e.lon))
     .map(e => ({ e, t: e.time.getTime(), m: mOf(e), d: haversineKm(la0, lo0, +e.lat, +e.lon) }))
     .filter(o => o.t >= wa && o.t < tf && o.d <= Rmax && o.m >= mMin - 1e-9).sort((a, b) => a.t - b.t);
   const fmt = v => v === null || v === undefined ? '—' : v.toFixed(2).replace('.', ','), fp = v => v.toFixed(3).replace('.', ',');
-  const head = `Ana şok: M${mOf(ms).toFixed(1)} · ${ms.time.toISOString().slice(0, 10)} · ${la0.toFixed(2)}°, ${lo0.toFixed(2)}° · t_f bu zamana sabit · eşik M ≥ ${mMin.toFixed(1)} (${mMin > B.mFix + 1e-9 ? 'AMR eşiği; Benioff paneli M ≥ ' + B.mFix.toFixed(1) : 'Benioff paneliyle aynı'}) · pencere ${new Date(wa).toISOString().slice(0, 10)} – ana şok, R ≤ ${Rmax} km: n = ${raw.length}`;
+  const head = `Ana şok: M${mOf(ms).toFixed(1)} · ${ms.time.toISOString().slice(0, 10)} · ${la0.toFixed(2)}°, ${lo0.toFixed(2)}° · t_f bu zamana sabit · eşik M ≥ ${mMin.toFixed(1)} (Benioff paneliyle aynı) · pencere ${new Date(wa).toISOString().slice(0, 10)} – ana şok, R ≤ ${Rmax} km: n = ${raw.length}`;
   const obs = amrGrid(raw, tf, mMin, AMR_R_GRID, AMR_Y_GRID, tStart);
   if (obs.T === null) { out.innerHTML = `<div>${head}</div><div style="color:#f59e0b">Izgaranın hiçbir hücresinde yeterli olay yok (her hücrede n ≥ ${AMR_NMIN} gerekir). Test yapılamadı.</div>`; return; }
   // GK74 kümeleri (küme korumalı sıfır ve kümesizleştirilmiş duyarlılık için); bağlam olmadan, pencere içi olaylarla
