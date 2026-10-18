@@ -1176,7 +1176,7 @@
   </div><div class="tmCol tmColB">
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
-    <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=<span id="tmStepLbl">10</span> olay)</span></div>
+    <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=<span id="tmStepLbl">10</span> olay)</span> <label title="Herkesin bildiği trafik ışığı renkleriyle b-değeri SINIFI (tehlike ya da alarm seviyesi DEĞİLDİR). Eşikler: düşük b &lt; 0,7 (kırmızı), tipik 0,7–1,4 (sarı), yüksek b &gt; 1,4 (yeşil) — uygulamanın b-değeri haritasıyla aynı. Bir pencere yalnızca %95 güven aralığının TAMAMI bir sınıfın içindeyse renklendirilir; aralık iki sınıfı kesiyorsa renksiz kalır (belirsiz). Hesabı değiştirmez. URL: ?bclass=1" style="font-size:.68rem;font-weight:400;color:#cbd5e1;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" id="btClassChk" onchange="onBtClassChange()" style="vertical-align:middle;"> 🚦 b sınıfı</label></div>
     <div style="font-size:.7rem;color:#888;text-align:right;" title="Her pencerenin b-değeri hangi zamana çizilsin? Ortalama (varsayılan): pencerenin 100 olayının aritmetik ortalama zamanı (Öncel &amp; Wilson 2007). Ortanca: pencerenin ortanca olayı. Son: pencerenin en son olayı — yalnızca o ana kadarki veriyi kullanır (nedensel); ana şok öncesi (öncül) analizlerinde önerilir, çünkü ortalama/ortanca damgada son ~50 olay hiçbir noktada 'şimdi' olarak görünmez.">b(t) zaman damgası <select id="bAnchorSel" onchange="onBAnchorChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"><option value="mean">pencere ortalama zamanı (Öncel &amp; Wilson 2007)</option><option value="mid">pencere ortancası</option><option value="end">pencere sonu (nedensel)</option></select> <label id="btRawWrap" style="display:none;cursor:pointer;margin-left:6px;" title="Seyreltilmiş görünüm etkinken, hesaplama adımındaki bütün pencerelerin b değerlerini ince çizgi olarak arkaya çizer (yalnızca denetim için). b değerleri iki görünümde de aynıdır."><input type="checkbox" id="btRawChk" onchange="onBtRawChange()" style="vertical-align:middle;"> ham b(t) çizgisi</label></div>
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
@@ -2375,6 +2375,25 @@ function onBAnchorChange() {
   try { const u = new URL(location.href); if (bTimeAnchor !== 'mean') u.searchParams.set('banchor', bTimeAnchor); else u.searchParams.delete('banchor'); history.replaceState(null, '', u); } catch (e) {}
   if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
 }
+// 2026-10-18 — b(t) sınıf renkleri (trafik ışığı; yalnızca gösterim, varsayılan kapalı). Üç sınıf, eşikler uygulamanın b-değeri
+// haritasıyla aynı (0,7 ve 1,4). Bir pencere yalnızca %95 aralığının tamamı bir sınıftaysa renklenir; aksi halde renksiz (belirsiz).
+// Renkler b-değeri SINIFIDIR; deprem tehlikesi ya da alarm seviyesi değildir.
+const BT_CLASS = { lo: 0.7, hi: 1.4, col: { low: '#dc2626', mid: '#eab308', high: '#16a34a' } };
+function btClassOf(b, err) {
+  if (!Number.isFinite(b) || !Number.isFinite(err)) return null;
+  const lo = b - err, hi = b + err;
+  if (hi < BT_CLASS.lo) return 'low';
+  if (lo >= BT_CLASS.lo && hi <= BT_CLASS.hi) return 'mid';
+  if (lo > BT_CLASS.hi) return 'high';
+  return null;   // aralık sınıf sınırını kesiyor → belirsiz, renksiz
+}
+let btClassOn = (() => { try { return new URLSearchParams(location.search).get('bclass') === '1'; } catch (e) { return false; } })();
+try { const elc = document.getElementById('btClassChk'); if (elc) elc.checked = btClassOn; } catch (e) {}
+function onBtClassChange() {
+  btClassOn = !!document.getElementById('btClassChk')?.checked;
+  try { const u = new URL(location.href); if (btClassOn) u.searchParams.set('bclass', '1'); else u.searchParams.delete('bclass'); history.replaceState(null, '', u); } catch (e) {}
+  if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
+}
 // Ham b(t) katmanı (2026-10-17): yalnızca uyarlamalı (seyreltilmiş) görünümde anlamlıdır; varsayılan kapalı. URL: ?braw=1
 let btShowRaw = (() => { try { return new URLSearchParams(location.search).get('braw') === '1'; } catch (e) { return false; } })();
 try { const el1 = document.getElementById('btRawChk'); if (el1) el1.checked = btShowRaw; } catch (e) {}
@@ -2777,7 +2796,21 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   const bAvg = bs.reduce((a,b)=>a+b, 0) / bs.length;
   const adNote = AD.on ? `<text x="${W - PAD_R - 4}" y="${PAD_T + 10}" fill="#f59e0b" font-size="8" text-anchor="end">Hesaplanan pencere: ${series.length} · Gösterilen: ${ser.length} (adım ${STEPD}) · Zaman: ${bTimeAnchor === 'end' ? 'son olay' : bTimeAnchor === 'mid' ? 'ortanca' : 'ortalama'}</text>` : '';
 
+  // 2026-10-18: b sınıfı renkleri — arka plan bantları ve grafik tabanında sınıf şeridi (yalnızca %95 aralığı tamamen bir sınıfta olan pencereler)
+  let clsBands = '', clsRibbon = '', clsLegend = '', clsCount = null;
+  if (btClassOn) {
+    const yc = v => y(Math.max(bMin, Math.min(bMax, v))), C = BT_CLASS.col;
+    [[bMin, BT_CLASS.lo, C.low], [BT_CLASS.lo, BT_CLASS.hi, C.mid], [BT_CLASS.hi, bMax, C.high]].forEach(([a, b2, c]) => { if (b2 <= bMin || a >= bMax) return;
+      clsBands += `<rect x="${PAD_L}" y="${yc(b2).toFixed(1)}" width="${plotW}" height="${Math.max(0, yc(a) - yc(b2)).toFixed(1)}" fill="${c}" opacity="0.07"/>`; });
+    clsCount = { low: 0, mid: 0, high: 0, none: 0 };
+    const RB = 7, yR = PAD_T + plotH - RB;
+    ser.forEach((s2, i) => { const k = btClassOf(s2.b, s2.err); clsCount[k || 'none']++; if (!k) return;
+      const xa = i ? (x(ser[i - 1].t) + x(s2.t)) / 2 : x(s2.t), xb = i < ser.length - 1 ? (x(s2.t) + x(ser[i + 1].t)) / 2 : x(s2.t);
+      clsRibbon += `<rect x="${xa.toFixed(1)}" y="${yR}" width="${Math.max(0.8, xb - xa).toFixed(1)}" height="${RB}" fill="${C[k]}"/>`; });
+    clsLegend = `<text x="${PAD_L + 30}" y="${PAD_T + 20}" font-size="8"><tspan fill="${C.low}">■ düşük b &lt; 0,7</tspan><tspan fill="${C.mid}" dx="6">■ tipik 0,7–1,4</tspan><tspan fill="${C.high}" dx="6">■ yüksek b &gt; 1,4</tspan><tspan fill="#888" dx="6">· şerit: %95 aralığı tamamen sınıf içinde · alarm değildir</tspan></text>`;
+  }
   svgB.innerHTML = `
+    ${clsBands}
     ${yTicks}
     ${xTicksB}
     ${refLine1}
@@ -2791,6 +2824,8 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     ${fixedDots}
     ${fixedLine}
     ${strip}
+    ${clsRibbon}
+    ${clsLegend}
     <line x1="${PAD_L}" y1="${PAD_T+plotH}" x2="${W-PAD_R}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
     <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
   `;
@@ -2799,7 +2834,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, err: btAll.series[btAll.series.length - 1].err, nWin: btAll.series.length, N: btAll.N } : null;
   const btsObj = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
               fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, anchor: bTimeAnchor, band: useBand,
-              adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn };
+              adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn, cls: clsCount };
   if (STORE) lastBts = btsObj;
   if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB };
   const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
@@ -3437,6 +3472,9 @@ function svgToEN(xml) {
     .replace(/EĞRİ {9}/g, 'CURVE        ').replace(/EN İYİ TAHMİN/g, 'BEST ESTIMATE').replace(/ÜST EĞRİ {5}/g, 'UPPER CURVE  ').replace(/ALT EĞRİ {5}/g, 'LOWER CURVE  ')
     .replace(/Yetersiz veri:/g, 'Insufficient data:')
     .replace(/(\d+) yıl · n = /g, '$1 yr · n = ').replace(/p \(küme korumalı\)/g, 'p (cluster-preserving)').replace(/Σ√E \(göreli, t_f = 1\)/g, 'Σ√E (relative, t_f = 1)')
+    .replace(/■ düşük b &lt; 0,7/g, '■ low b &lt; 0.7').replace(/■ tipik 0,7–1,4/g, '■ typical 0.7–1.4').replace(/■ yüksek b &gt; 1,4/g, '■ high b &gt; 1.4')
+    .replace(/· şerit: %95 aralığı tamamen sınıf içinde · alarm değildir/g, '· strip: whole 95% CI within class · not an alarm')
+    .replace(/(Güçlü|Sınırlı|Yetersiz) istatistiksel destek/g, (m, k) => ({ Güçlü: 'Strong', Sınırlı: 'Limited', Yetersiz: 'Insufficient' })[k] + ' statistical support')
     .replace(/┅ güç yasası/g, '┅ power law').replace(/╌ doğrusal/g, '╌ linear').replace(/gölgeli: pencere dışı/g, 'shaded: outside window')
     .replace(/log₁₀ oran/g, 'log₁₀ ratio').replace(/Ayrıştırma için yeterli olay yok \(sabit eşikte N ≥ (\d+) gerekir\)/g, 'Not enough events for the decomposition (N ≥ $1 at the fixed threshold)')
     .replace(/Hesaplanan pencere: (\d+) · Gösterilen: (\d+) \(adım (\d+)\) · Zaman: (son olay|ortanca|ortalama)/g, (m, a, b, c, z) => `Computed windows: ${a} · Shown: ${b} (step ${c}) · Time: ${{ 'son olay': 'last event', ortanca: 'median', ortalama: 'mean' }[z]}`)
@@ -3797,10 +3835,10 @@ async function exportPosterAGU(scale, evt) {
     : ` **(b)** Birikimli Benioff gerinimi S(t) = Σ√E, log E = 11,8 + 1,5M (Gutenberg & Richter 1956), sabit eşik M ≥ ${BB ? DC(fmtM(BB.mFix)) : '—'} (N = ${BB ? BB.n : '—'}). Orta şerit: ${binTxt} Benioff salım hızı ΔS/Δt. Alt şerit (log₁₀, 0 = dönem ortalaması): {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b değeri (aralıkta n ≥ ${BEN_DEC_NB}), {#6b7280|gri} artık, {#ea580c|turuncu} toplam = gözlenen ΔS/Δt; kesilmiş G–R${BD ? `, b_ref = ${DC(BD.bRef.toFixed(2))}` : ''}. b ve ΔS aynı katalogdan; betimleyici ayrıştırmadır, öncül değildir.`;
   const AP = window.lastAmrPlot, amrL = BEN_ON ? 'c' : 'b';
   const amrCap = !AMR_ON ? '' : EN
-    ? ` **(${amrL}) Experimental:** accelerating moment release (AMR) for the best grid cell (R = ${AP.r} km, ${AP.yr} yr before the M${AP.mMain.toFixed(1)} mainshock, t_f fixed; n = ${AP.n}, M ≥ ${fmtM(AP.mMin)}). {#ea580c|Orange}${BEN_ON ? ' (as in b)' : ''}: cumulative Σ√E normalised to 1 at t_f; {#1e40af|dark blue} power law S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? AP.fit.m : '—'}, Bufe & Varnes 1993); {#6b7280|grey dashed} linear. q = rms(power law)/rms(linear) = ${AP.q.toFixed(2)}; cluster-preserving null p = ${AP.pK.toFixed(3)} (${AP.nSim} synthetic catalogues). {#dc2626|Red} line: mainshock (t_f fixed, not estimated). Same time axis as (a). Retrospective test; not a precursor or forecast.`
-    : ` **(${amrL}) Deneysel:** en iyi ızgara hücresi için hızlanan moment salımı (AMR) (R = ${AP.r} km, M${DC(AP.mMain.toFixed(1))} ana şoktan ${AP.yr} yıl önce, t_f sabit; n = ${AP.n}, M ≥ ${DC(fmtM(AP.mMin))}). {#ea580c|Turuncu}${BEN_ON ? " (b'deki gibi)" : ''}: t_f'de 1'e normalize birikimli Σ√E; {#1e40af|koyu mavi} güç yasası S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? DC(AP.fit.m) : '—'}, Bufe & Varnes 1993); {#6b7280|gri kesikli} doğrusal. q = rms(güç yasası)/rms(doğrusal) = ${DC(AP.q.toFixed(2))}; küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} (${AP.nSim} sentetik katalog). {#dc2626|Kırmızı} çizgi: ana şok (t_f sabit, kestirilmez). Zaman ekseni (a) ile aynıdır. Geriye dönük testtir; öncül ya da tahmin değildir.`;
-  const cap3 = EN ? '**Figure 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + benCap + amrCap
-    : '**Şekil 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + benCap + amrCap;
+    ? ` **(${amrL}) Experimental:** accelerating moment release (AMR) for the best grid cell (R = ${AP.r} km, ${AP.yr} yr before the M${AP.mMain.toFixed(1)} mainshock, t_f fixed; n = ${AP.n}, M ≥ ${fmtM(AP.mMin)}). {#ea580c|Orange}${BEN_ON ? ' (as in b)' : ''}: cumulative Σ√E normalised to 1 at t_f; {#2563eb|blue} power law S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? AP.fit.m : '—'}, Bufe & Varnes 1993); {#6b7280|grey dashed} linear. q = rms(power law)/rms(linear) = ${AP.q.toFixed(2)}; cluster-preserving null p = ${AP.pK.toFixed(3)} (${AP.nSim} synthetic catalogues): ${amrSupport(AP.pK).en.toLowerCase()} (predefined: p ≤ 0.01 strong, ≤ 0.05 limited, otherwise insufficient). {#dc2626|Red} line: mainshock (t_f fixed, not estimated). Same time axis as (a). Retrospective test; not a precursor or forecast.`
+    : ` **(${amrL}) Deneysel:** en iyi ızgara hücresi için hızlanan moment salımı (AMR) (R = ${AP.r} km, M${DC(AP.mMain.toFixed(1))} ana şoktan ${AP.yr} yıl önce, t_f sabit; n = ${AP.n}, M ≥ ${DC(fmtM(AP.mMin))}). {#ea580c|Turuncu}${BEN_ON ? " (b'deki gibi)" : ''}: t_f'de 1'e normalize birikimli Σ√E; {#2563eb|mavi} güç yasası S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? DC(AP.fit.m) : '—'}, Bufe & Varnes 1993); {#6b7280|gri kesikli} doğrusal. q = rms(güç yasası)/rms(doğrusal) = ${DC(AP.q.toFixed(2))}; küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} (${AP.nSim} sentetik katalog): ${amrSupport(AP.pK).tr.toLowerCase()} (önceden tanımlı: p ≤ 0,01 güçlü, ≤ 0,05 sınırlı, aksi halde yetersiz). {#dc2626|Kırmızı} çizgi: ana şok (t_f sabit, kestirilmez). Zaman ekseni (a) ile aynıdır. Geriye dönük testtir; öncül ya da tahmin değildir.`;
+  const cap3 = EN ? '**Figure 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + (bt && bt.cls ? ' Background and bottom strip: b-value class ({#dc2626|low} < 0.7, {#ca8a04|typical} 0.7–1.4, {#16a34a|high} > 1.4); a window is coloured only if its whole 95% CI lies in one class. Class colours are not a hazard or alarm level.' : '') + benCap + amrCap
+    : '**Şekil 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + (bt && bt.cls ? ' Arka plan ve alt şerit: b-değeri sınıfı ({#dc2626|düşük} < 0,7, {#ca8a04|tipik} 0,7–1,4, {#16a34a|yüksek} > 1,4); pencere yalnızca %95 aralığının tamamı bir sınıftaysa renklenir. Sınıf renkleri tehlike ya da alarm seviyesi değildir.' : '') + benCap + amrCap;
   const cap3O = STACK_ON ? { size: BEN_ON && AMR_ON ? 13 : 14, lh: BEN_ON && AMR_ON ? 17 : 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 };
   if (STACK_ON) {
     // 2026-10-17 düzen A: Şekil 3a b(t) üstte, 3b Benioff ve/veya 3c AMR altta; AYNI genişlik ve sol kenar → SVG'lerin zaman
@@ -3869,8 +3907,8 @@ async function exportPosterAGU(scale, evt) {
       : `**b(t)${bt.fit ? ` (${fitT || 'fit aralığı'})` : ''}:** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` +
       (bt.fit && bt.all ? ` Tüm sınıflar: ortalama ${bt.all.bAvg.toFixed(2)}, son ${bt.all.bLast.toFixed(2)} (${bt.all.nWin} pencere).` : '') + (bt.fixed && !(qcFlag && gf) ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
     // 2026-10-18: AMR posterdeyse sonuçlara yalnızca testin kendi çıktısı eklenir (yorum yok)
-    if (AMR_ON) rItems.push(EN ? `**AMR (experimental, retrospective):** best cell R = ${AP.r} km, ${AP.yr} yr; q = ${AP.q.toFixed(2)}, cluster-preserving null p = ${AP.pK.toFixed(3)}. Not a precursor.`
-      : `**AMR (deneysel, geriye dönük):** en iyi hücre R = ${AP.r} km, ${AP.yr} yıl; q = ${DC(AP.q.toFixed(2))}, küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))}. Öncül değildir.`);
+    if (AMR_ON) rItems.push(EN ? `**AMR (experimental, retrospective):** best cell R = ${AP.r} km, ${AP.yr} yr; q = ${AP.q.toFixed(2)}, cluster-preserving null p = ${AP.pK.toFixed(3)} — ${amrSupport(AP.pK).en.toLowerCase()}. Not a precursor.`
+      : `**AMR (deneysel, geriye dönük):** en iyi hücre R = ${AP.r} km, ${AP.yr} yıl; q = ${DC(AP.q.toFixed(2))}, küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} — ${amrSupport(AP.pK).tr.toLowerCase()}. Öncül değildir.`);
     if (document.getElementById('posterCaveat')?.checked) rItems.push(EN
       ? '**Interpretation limit:** b(t) variations are sensitive to window length, Mc and catalogue heterogeneity (magnitude types, network changes); on their own they are not a reliable precursor of a large earthquake.'
       : '**Yorum sınırı:** b(t) değişimleri pencere boyuna, Mc\'ye ve katalog heterojenliğine (büyüklük türleri, ağ değişimleri) duyarlıdır; tek başına büyük bir depremin güvenilir öncülü olarak yorumlanmamalıdır.');
@@ -6090,15 +6128,16 @@ async function amrRun() {
   }
   const DC = amrDropCheck(raw, cl, obs.best, tf, mMin);
   const pP = amrPvalue(obs.T, TP), pK = amrPvalue(obs.T, TK), pD = decObs.T !== null ? amrPvalue(decObs.T, TD) : null;
-  const col = q => q === null ? '#333' : q < 0.5 ? '#be123c' : q < 0.7 ? '#f97316' : q < 0.9 ? '#a16207' : '#334155';
+  const col = q => q === null ? '#333' : q < 0.5 ? '#1e3a8a' : q < 0.7 ? '#1d4ed8' : q < 0.9 ? '#3b5b8c' : '#334155';   // 2026-10-18: nötr mavi skala (kırmızı alarm çağrışımı kaldırıldı)
   let tab = `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:3px;"><tr><td style="padding:1px 5px;color:#888">başlangıç \\ R</td>${AMR_R_GRID.map(r => `<td style="padding:1px 5px;color:#888;text-align:center">${r} km</td>`).join('')}</tr>`;
   AMR_Y_GRID.forEach(yr => { tab += `<tr><td style="padding:1px 5px;color:#888">${yr} yıl önce</td>` + AMR_R_GRID.map(r => { const c = obs.cells.find(z => z.r === r && z.yr === yr);
     return c.ok ? `<td title="n = ${c.n}, m = ${String(c.m).replace('.', ',')}" style="padding:1px 5px;text-align:center;background:${col(c.q)};color:#fff;${c === obs.best ? 'outline:1px solid #fff;' : ''}">${fmt(c.q)}</td>` : `<td title="${c.why}" style="padding:1px 5px;text-align:center;color:#555">—</td>`; }).join('') + '</tr>'; });
   tab += '</table>';
   const nOk = obs.cells.filter(c => c.ok).length, nQ = obs.cells.filter(c => c.ok && c.q < 0.7).length;
   const pTxt = (P, lab, note) => `<tr><td style="padding:1px 6px;color:#cbd5e1">${lab}</td><td style="padding:1px 6px">p = <b>${fp(P.p)}</b> (N = ${P.n})</td><td style="padding:1px 6px;color:#9ab0c5">${note}</td></tr>`;
-  out.innerHTML = `<div>${head}</div>` + tab +
-    `<div style="margin-top:3px">Izgara: ${nOk} geçerli hücre; q &lt; 0,70 olan hücre: ${nQ}. En küçük q = <b>${fmt(obs.T)}</b> (R = ${obs.best.r} km, ${obs.best.yr} yıl, n = ${obs.best.n}, m = ${String(obs.best.m).replace('.', ',')}). Çerçeveli hücre en küçük q; kırmızı q &lt; 0,50, turuncu 0,50–0,70, kahverengi 0,70–0,90, gri ≥ 0,90. Tek tek hücrelerdeki q &lt; 0,70 anlamlılık göstermez; anlamlılık yalnızca aşağıdaki p değerlerinden okunur.</div>` +
+  const SUPo = amrSupport(pK.p);
+  out.innerHTML = `<div>${head}</div>` + (SUPo ? `<div style="margin:3px 0;padding:3px 7px;border:1px solid #475569;border-radius:4px;background:#1e293b;color:#e2e8f0;display:inline-block;" title="Önceden tanımlı ölçüt (küme korumalı sıfır, birincil test): p ≤ 0,01 güçlü; 0,01 &lt; p ≤ 0,05 sınırlı; p &gt; 0,05 yetersiz. ${nSim} sentetik katalogla en küçük p = ${(1 / (nSim + 1)).toFixed(3).replace('.', ',')}. Nötr renk bilinçlidir: düzey yalnızca güç yasası uyumunun rastgele kataloglardan ayırt edilebilirliğini anlatır; deprem olasılığı ya da alarm değildir."><b>${SUPo.tr}</b> · küme korumalı sıfır p = ${fp(pK.p)} · alarm ya da tahmin değildir</div>` : '') + tab +
+    `<div style="margin-top:3px">Izgara: ${nOk} geçerli hücre; q &lt; 0,70 olan hücre: ${nQ}. En küçük q = <b>${fmt(obs.T)}</b> (R = ${obs.best.r} km, ${obs.best.yr} yıl, n = ${obs.best.n}, m = ${String(obs.best.m).replace('.', ',')}). Çerçeveli hücre en küçük q; koyu mavi q &lt; 0,50, mavi 0,50–0,70, açık mavi 0,70–0,90, gri ≥ 0,90 (nötr renkler: q düşüklüğü alarm değildir). Tek tek hücrelerdeki q &lt; 0,70 anlamlılık göstermez; anlamlılık yalnızca aşağıdaki p değerlerinden okunur.</div>` +
     (DC ? (() => { const rw = (lab, o, note) => `<tr><td style="padding:1px 6px;color:#cbd5e1">${lab}</td><td style="padding:1px 6px">${o.ok ? 'q = <b>' + fmt(o.q) + '</b>' : '<span style="color:#888">geçersiz</span>'}</td><td style="padding:1px 6px;color:#9ab0c5">n = ${o.n}${o.ok ? '' : ` &lt; ${AMR_NMIN}, karşılaştırma yapılmadı`}${note ? ' · ' + note : ''}</td></tr>`;
       return `<div style="margin-top:4px;color:#c4b5fd">Tek olay / küme duyarlılığı (yalnızca en iyi hücre: R = ${obs.best.r} km, ${obs.best.yr} yıl; Guilhem vd. 2013)</div>` +
         `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:2px;">` +
@@ -6119,6 +6158,15 @@ async function amrRun() {
 // aynı uyumlar (amrFitQ: güç yasası S = K + k(t_f − t)^m ve doğrusal S = a + b·t; en küçük kareler, Bufe & Varnes 1993;
 // Bowman vd. 1998). Zaman ekseni b(t) ve Benioff panelleriyle aynıdır (W = 660, PAD_L = 40, PAD_R = 14); şekiller alt alta
 // hizalanır. Hesap değişmez: q, m ve p testten (amrRun) alınır.
+// 2026-10-18 — AMR istatistiksel destek düzeyi (nötr renk; trafik ışığı KULLANILMAZ). Önceden tanımlı ölçüt: küme korumalı
+// sıfır hipotezine göre p (birincil test). p ≤ 0,01 güçlü, 0,01 < p ≤ 0,05 sınırlı, p > 0,05 yetersiz. Destek düzeyi yalnızca
+// güç yasası uyumunun rastgele kataloglardan ayırt edilebilirliğini anlatır; deprem olasılığı ya da alarm değildir.
+function amrSupport(p) {
+  if (!Number.isFinite(p)) return null;
+  return p <= 0.01 ? { k: 'strong', tr: 'Güçlü istatistiksel destek', en: 'Strong statistical support' }
+    : p <= 0.05 ? { k: 'limited', tr: 'Sınırlı istatistiksel destek', en: 'Limited statistical support' }
+    : { k: 'insufficient', tr: 'Yetersiz istatistiksel destek', en: 'Insufficient statistical support' };
+}
 function amrPlotData(raw, best, tfMs, mMin, info) {
   if (!best) return null;
   const t0w = tfMs - best.yr * AMR_YR, sel = raw.filter(o => o.d <= best.r && o.t >= t0w && o.t < tfMs && o.m >= mMin - 1e-9).sort((a, b) => a.t - b.t);
@@ -6155,14 +6203,16 @@ function renderAmrFig() {
     const vl = P.lin.a + P.lin.b * ty; dl += `${i ? ' L' : 'M'}${x(t).toFixed(1)},${y(vl).toFixed(1)}`;
     if (P.fit && P.fit.m !== null) { const vw = P.fit.K + P.fit.k * Math.pow(Math.max(tfY - ty, 0), P.fit.m); dw += `${i ? ' L' : 'M'}${x(t).toFixed(1)},${y(vw).toFixed(1)}`; } }
   g += `<path d="${dl}" fill="none" stroke="#9ca3af" stroke-width="1.1" stroke-dasharray="5,3"/>`;
-  if (dw) g += `<path d="${dw}" fill="none" stroke="#1e40af" stroke-width="1.6" stroke-dasharray="4,2"/>`;
+  if (dw) g += `<path d="${dw}" fill="none" stroke="#3b82f6" stroke-width="1.6" stroke-dasharray="4,2"/>`;
   // ana şok (t_f) ve pencere başlangıcı
   const xf = x(P.tf).toFixed(1), xw = x(P.t0w).toFixed(1);
   g += `<line x1="${xf}" y1="${PAD_T}" x2="${xf}" y2="${PAD_T + plotH}" stroke="#dc2626" stroke-width="1.2"/><text x="${xf}" y="${PAD_T - 3}" fill="#dc2626" font-size="9" text-anchor="end">t_f: M${P.mMain.toFixed(1)}</text>`;
   g += `<line x1="${xw}" y1="${PAD_T}" x2="${xw}" y2="${PAD_T + plotH}" stroke="#64748b" stroke-width="0.8" stroke-dasharray="3,3"/>`;
+  const SUP = amrSupport(P.pK);
+  if (SUP) g += `<text x="${W - PAD_R - 4}" y="${PAD_T + 32}" fill="#cbd5e1" font-size="9" font-weight="700" text-anchor="end">${SUP.tr} (p ${P.pK <= 0.01 ? '≤ 0,01' : P.pK <= 0.05 ? '≤ 0,05' : '&gt; 0,05'})</text>`;
   const fq = v => v.toFixed(2).replace('.', ','), lbl = `R = ${P.r} km · ${P.yr} yıl · n = ${P.n} · m = ${P.fit && P.fit.m !== null ? String(P.fit.m).replace('.', ',') : '—'} · q = ${fq(P.q)} · p (küme korumalı) = ${P.pK.toFixed(3).replace('.', ',')}`;
   g += `<text x="${PAD_L + 30}" y="${PAD_T + 10}" fill="#cbd5e1" font-size="9">${lbl}</text>`;
-  g += `<text x="${PAD_L + 30}" y="${PAD_T + 21}" font-size="8"><tspan fill="#f97316">━ Σ√E (göreli, t_f = 1)</tspan><tspan fill="#1e40af" dx="8">┅ güç yasası</tspan><tspan fill="#9ca3af" dx="8">╌ doğrusal</tspan><tspan fill="#64748b" dx="8">gölgeli: pencere dışı</tspan></text>`;
+  g += `<text x="${PAD_L + 30}" y="${PAD_T + 21}" font-size="8"><tspan fill="#f97316">━ Σ√E (göreli, t_f = 1)</tspan><tspan fill="#3b82f6" dx="8">┅ güç yasası</tspan><tspan fill="#9ca3af" dx="8">╌ doğrusal</tspan><tspan fill="#64748b" dx="8">gölgeli: pencere dışı</tspan></text>`;
   g += `<line x1="${PAD_L}" y1="${PAD_T + plotH}" x2="${W - PAD_R}" y2="${PAD_T + plotH}" stroke="#555"/><line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T + plotH}" stroke="#555"/>`;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = g; svg.style.display = 'block';
 }
