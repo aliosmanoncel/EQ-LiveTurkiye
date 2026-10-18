@@ -2889,7 +2889,8 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, err: btAll.series[btAll.series.length - 1].err, nWin: btAll.series.length, N: btAll.N } : null;
   const btsObj = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
               fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, anchor: bTimeAnchor, band: useBand,
-              adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn, cls: clsCount, ser: series.map(q => ({ t: q.t, b: q.b, err: q.err, t0: q.t0 ?? (q.t - (q.span || 0)), t1: q.t1 ?? (q.t + (q.span || 0)) })), msWin };
+              adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn, cls: clsCount, ser: series.map(q => { const t0 = q.t0 ?? (q.t - (q.span || 0)), t1 = q.t1 ?? (q.t + (q.span || 0));
+                return { t: q.t, b: q.b, err: q.err, t0, t1, inc: !cs && Number.isFinite(Mc) && mcSeries.some(m => m.t >= t0 && m.t <= t1 && m.mc > Mc + 0.1 + 1e-9) }; }), msWin };   // inc: pencere süresinde veri Mc(t) > kullanılan Mc + 0,1 (eksik kayıt kuşkusu)
   if (STORE) lastBts = btsObj;
   if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB };
   const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
@@ -3813,7 +3814,7 @@ async function exportPosterAGU(scale, evt) {
   const intro = introEvt && !document.getElementById('posterIntro')?.value.trim() ? introEvt : posterVal('posterIntro', L(`Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`,
     `When catalogue completeness changes over time, the b-value and earthquake rates computed with a single Mc can be biased. **Aim:** to estimate the b-value, its temporal variation and the annual recurrence rates for ${region || 'the study area'} using time-dependent completeness steps.`));
   // düzen A: Giriş kutusu metne göre (96–124 px); Benioff yoksa eski sabit 124 px
-  if (STACK_ON && INC.intro) GH = Math.max(96, Math.min(170, 44 + rich(intro, X1 + 16, 0, W1 - 32, { size: 14, lh: 18, dry: true }) + 4));
+  if (INC.intro) GH = Math.max(96, Math.min(170, 44 + rich(intro, X1 + 16, 0, W1 - 32, { size: 14, lh: 18, dry: true }) + 4));
   let y = TOP;
   if (INC.intro) { y = box(X1, TOP, W1, GH, L('Giriş ve Amaç', 'Introduction and Aim'));
     rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2 }); }
@@ -4085,12 +4086,12 @@ async function exportPosterAGU(scale, evt) {
   const gofRej = !!(qcObj && qcObj.gof && qcObj.gof.ok && qcObj.gof.reject);
   const mcFlag = !!(csQc && (csQc.lowMcN > 0 || csQc.invN > 0));
   const qcFlag = !!cs && (mcFlag || gofRej);
-  const PRE = (() => { if (!MSX || !bt || !bt.ser) return null; const pre = bt.ser.filter(q => (q.t1 ?? q.t) < MSX.t && Number.isFinite(q.b)); if (pre.length < 3) return null;   // yalnız son olayı ana şoktan önce olan pencereler
+  const PRE = (() => { if (!MSX || !bt || !bt.ser) return null; const pre0 = bt.ser.filter(q => (q.t1 ?? q.t) < MSX.t && Number.isFinite(q.b)), pre = pre0.filter(q => !q.inc), nInc = pre0.length - pre.length; if (pre.length < 3) return null;   // yalnız son olayı ana şoktan önce olan ve tamlık denetimini geçen pencereler
     const f = pre[0], l = pre[pre.length - 1], mn = pre.reduce((a2, q) => q.b < a2.b ? q : a2, pre[0]);
-    const sig = Number.isFinite(l.err) && Number.isFinite(f.err) ? Math.abs(l.b - f.b) > Math.sqrt(l.err ** 2 + f.err ** 2) : null; return { pre, f, l, mn, sig }; })();
+    const sig = Number.isFinite(l.err) && Number.isFinite(f.err) ? Math.abs(l.b - f.b) > Math.sqrt(l.err ** 2 + f.err ** 2) : null; return { pre, f, l, mn, sig, up: l.b > f.b, nInc }; })();
   const autoMsg = MSX && !qcFlag ? (() => { const parts = [];
     if (AMR_ON) parts.push(AP.pK <= 0.05 ? L(`AMR kümelenmiş rastgele kataloglardan ayırt edilebiliyor (p = ${DC(AP.pK.toFixed(2))})`, `AMR distinguishable from clustered random catalogues (p = ${AP.pK.toFixed(2)})`) : L(`istatistiksel olarak saptanabilir AMR yok (p = ${DC(AP.pK.toFixed(2))})`, `no statistically detectable AMR (p = ${AP.pK.toFixed(2)})`));
-    if (PRE && PRE.sig !== null) parts.push(PRE.sig ? L('b-değeri değişimi %95 belirsizliği aşıyor', 'b-value change exceeds the 95% uncertainty') : L('%95 belirsizliği aşan b-değeri değişimi yok', 'no b-value change beyond the 95% uncertainty'));
+    if (PRE && PRE.sig !== null) parts.push(PRE.sig ? (PRE.up ? L('b-değeri %95 belirsizliği aşacak biçimde arttı (azalma yok)', 'b-value increased beyond the 95% uncertainty (no decrease)') : L('b-değeri %95 belirsizliği aşacak biçimde azaldı', 'b-value decreased beyond the 95% uncertainty')) : L('%95 belirsizliği aşan b-değeri değişimi yok', 'no b-value change beyond the 95% uncertainty'));
     if (!parts.length) return '';
     return L(`M${DC(MSX.m.toFixed(1))} öncesinde ${parts.join('; ')}.`, `Before the M${MSX.m.toFixed(1)} mainshock: ${parts.join('; ')}.`); })() : '';
   const msg = posterVal('posterMessage', '') || autoMsg || (qcFlag ? (mcFlag
@@ -4122,11 +4123,11 @@ async function exportPosterAGU(scale, evt) {
       : `**b(t)${bt.fit ? ` (${fitT || 'fit aralığı'})` : ''}:** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` +
       (bt.fit && bt.all ? ` Tüm sınıflar: ortalama ${bt.all.bAvg.toFixed(2)}, son ${bt.all.bLast.toFixed(2)} (${bt.all.nWin} pencere).` : '') + (bt.fixed && !(qcFlag && gf) ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
     // 2026-10-18: AMR posterdeyse sonuçlara yalnızca testin kendi çıktısı eklenir (yorum yok)
-    if (PRE) { const { pre, f, l, mn, sig } = PRE;   // b(t)'nin ana şok öncesi seyri (betimleyici)
+    if (PRE) { const { pre, f, l, mn, sig, up, nInc } = PRE;   // b(t)'nin ana şok öncesi seyri (betimleyici)
       const yy = t => new Date(t).getUTCFullYear(), dd = t => new Date(t).toISOString().slice(0, 7), pm = q => `${DC(q.b.toFixed(2))}${Number.isFinite(q.err) ? ' ± ' + DC(q.err.toFixed(2)) : ''}`;
-      const sg = sig === null ? '' : sig ? L('fark %95 aralıklarının birleşiminden büyük', 'difference exceeds the combined 95% CIs') : L('fark %95 belirsizlik içinde', 'difference within the 95% uncertainty');
-      rItems.push(L(`**Ana şok öncesi b(t):** ${yy(f.t)}'te ${pm(f)}; en düşük ${pm(mn)} (${dd(mn.t)}); ana şoktan önceki son pencerede ${pm(l)} (${pre.length} pencere${sg ? '; ilk–son ' + sg : ''})${bt.msWin ? `; M${DC(bt.msWin.m.toFixed(1))} ya da sonrasını içeren ${bt.msWin.n} pencere (gri/mor bant, ${new Date(bt.msWin.tA).toISOString().slice(0, 7)} sonrası) hariç` : ''}.`,
-        `**b(t) before the mainshock:** ${pm(f)} in ${yy(f.t)}; minimum ${pm(mn)} (${dd(mn.t)}); ${pm(l)} in the last window before the mainshock (${pre.length} windows${sg ? '; first vs last: ' + sg : ''})${bt.msWin ? `; the ${bt.msWin.n} windows containing the M${bt.msWin.m.toFixed(1)} or later events (grey/violet bands, plotted from ${new Date(bt.msWin.tA).toISOString().slice(0, 7)}) excluded` : ''}.`)); }
+      const sg = sig === null ? '' : sig ? (up ? L('artış %95 aralıklarının birleşiminden büyük', 'increase exceeds the combined 95% CIs') : L('azalma %95 aralıklarının birleşiminden büyük', 'decrease exceeds the combined 95% CIs')) : L('fark %95 belirsizlik içinde', 'difference within the 95% uncertainty');
+      rItems.push(L(`**Ana şok öncesi b(t):** ${yy(f.t)}'te ${pm(f)}; en düşük ${pm(mn)} (${dd(mn.t)}); ana şoktan önceki son pencerede ${pm(l)} (${pre.length} pencere${sg ? '; ilk–son ' + sg : ''}${nInc ? `; veri Mc(t)'si kullanılan Mc'nin üstünde olan ${nInc} pencere hariç` : ''})${bt.msWin ? `; M${DC(bt.msWin.m.toFixed(1))} ya da sonrasını içeren ${bt.msWin.n} pencere (gri/mor bant, ${new Date(bt.msWin.tA).toISOString().slice(0, 7)} sonrası) hariç` : ''}.`,
+        `**b(t) before the mainshock:** ${pm(f)} in ${yy(f.t)}; minimum ${pm(mn)} (${dd(mn.t)}); ${pm(l)} in the last window before the mainshock (${pre.length} windows${sg ? '; first vs last: ' + sg : ''}${nInc ? `; ${nInc} early windows with data Mc(t) above the Mc used excluded` : ''})${bt.msWin ? `; the ${bt.msWin.n} windows containing the M${bt.msWin.m.toFixed(1)} or later events (grey/violet bands, plotted from ${new Date(bt.msWin.tA).toISOString().slice(0, 7)}) excluded` : ''}.`)); }
     if (MSX && bt && bt.ser) { const po = bt.ser.filter(q => (q.t0 ?? q.t) >= MSX.t - 1000 && Number.isFinite(q.b));   // ana şok sonrası (artçı dönemi) pencereler
       if (po.length >= 3) { const p0 = po[0], p1 = po[po.length - 1], dd = t => new Date(t).toISOString().slice(0, 7), pm = q => `${DC(q.b.toFixed(2))}${Number.isFinite(q.err) ? ' ± ' + DC(q.err.toFixed(2)) : ''}`;
         const lp = PRE ? PRE.l : null, cmp = lp && Number.isFinite(lp.err) && Number.isFinite(p0.err) ? (Math.abs(p0.b - lp.b) > Math.sqrt(p0.err ** 2 + lp.err ** 2) ? L('fark %95 aralıklarının birleşiminden büyük', 'difference exceeds the combined 95% CIs') : L('fark %95 belirsizlik içinde', 'difference within the 95% uncertainty')) : '';
