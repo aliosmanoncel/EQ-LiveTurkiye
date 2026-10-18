@@ -1118,7 +1118,7 @@
     <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 6px;align-items:center;margin-top:4px;" oninput="posterSavePrefs(); posterIdCheck()">
       <label for="posterRegion">Bölge adı</label><input id="posterRegion" placeholder="ör. Oklahoma, ABD" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterTitle">Başlık</label><input id="posterTitle" placeholder="boş: “Bölge: Zamana Bağlı Tamlık ile b-Değeri ve Deprem Tekrarlanma Analizi”" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
-      <label for="posterEvent">Alt satır</label><input id="posterEvent" placeholder="ör. Sismoloji ve Levha Tektoniği — Ders 2 (isteğe bağlı)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
+      <label for="posterEvent">Alt satır</label><input id="posterEvent" placeholder="alt başlık, ör. A retrospective, protocol-based test of b-value, Benioff strain and AMR (isteğe bağlı)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterAuthor">Yazar</label><input id="posterAuthor" placeholder="Yazar Adı Soyadı (zorunlu)" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterAffil">Unvan / kurum</label><input id="posterAffil" placeholder="Unvan · Kurum / Üniversite / Bölüm" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;">
       <label for="posterResults" title="Boş bırakılırsa analizden otomatik üretilir">Sonuçlar</label><textarea id="posterResults" rows="3" placeholder="Boş: analizden otomatik (Weichert b, λ, b(t), kalite kontrol). Her satır bir madde." style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:1px 4px;resize:vertical;"></textarea>
@@ -3733,16 +3733,20 @@ async function exportPosterAGU(scale, evt) {
   // sığmazsa kelime sayısı dengeli iki satıra böl (tek kelimelik yetim satır oluşmaz).
   const TW = 1500; let tSize = 40, tLines = [title];
   for (; tSize >= 34; tSize -= 1) { c.font = `bold ${tSize}px Arial`; if (c.measureText(title).width <= TW) break; }
-  if (tSize < 34) { tSize = 38; c.font = `bold ${tSize}px Arial`; const wd = title.split(' '); let best = null;
-    for (let i = 1; i < wd.length; i++) { const a = wd.slice(0, i).join(' '), b = wd.slice(i).join(' '), wa = c.measureText(a).width, wb = c.measureText(b).width;
-      if (Math.max(wa, wb) > TW) continue; const sc0 = Math.abs(wa - wb); if (!best || sc0 < best[0]) best = [sc0, a, b]; }
+  if (tSize < 34) { let best = null;   // iki dengeli satır; sığmazsa punto 38 → 28 px'e iner (başlık kesilmez)
+    for (tSize = eventLine ? 34 : 38; tSize >= 28 && !best; tSize -= 1) { c.font = `bold ${tSize}px Arial`; const wd = title.split(' ');
+      for (let i = 1; i < wd.length; i++) { const a = wd.slice(0, i).join(' '), b = wd.slice(i).join(' '), wa = c.measureText(a).width, wb = c.measureText(b).width;
+        if (Math.max(wa, wb) > TW) continue; const sc0 = Math.abs(wa - wb); if (!best || sc0 < best[0]) best = [sc0, a, b]; } }
+    if (best) tSize += 1; else { tSize = 28; c.font = `bold ${tSize}px Arial`; PW.push(L('Başlık iki satıra sığmadı ve kesildi; daha kısa bir başlık yazın.', 'Title did not fit on two lines and was truncated; use a shorter title.')); }
     tLines = best ? [best[1], best[2]] : wrap(title, TW, c.font).slice(0, 2); }
-  const tFont = `bold ${tSize}px Arial`, tLH = Math.round(tSize * 1.2);
-  if (tLines.length === 1) ty += 12;
+  // 2026-10-18: alt satır (posterEvent) başlığın hemen altında italik alt başlık olarak yazılır; iki satırlık başlıkta yer açmak için başlık 34 px'e iner
+  const tFont = `bold ${tSize}px Arial`, tLH = Math.round(tSize * (eventLine && tLines.length > 1 ? 1.12 : 1.2));
+  if (tLines.length === 1) ty += eventLine ? 4 : 12;
   tLines.forEach(l => { c.font = tFont; c.fillStyle = 'rgba(0,0,0,.18)'; c.textAlign = 'center'; c.fillText(l, W / 2 + 2, ty + 2); c.fillStyle = '#111827'; c.fillText(l, W / 2, ty); c.textAlign = 'left'; ty += tLH; });
-  if (tLines.length === 1) ty += 12;
-  text(author, W / 2, ty + 2, (authorIn ? '' : 'italic ') + 'bold 24px Arial', authorIn ? INK : '#9ca3af', 'center'); ty += 32;
-  text(affil + (eventLine ? '  ·  ' + eventLine : ''), W / 2, ty, (affilIn ? '' : 'italic ') + '17px Arial', affilIn ? MUTE : '#9ca3af', 'center');
+  if (eventLine) { text(eventLine, W / 2, ty - 2, 'italic 21px Arial', TH.deep, 'center'); ty += tLines.length > 1 ? 25 : 28; }
+  else if (tLines.length === 1) ty += 12;
+  text(author, W / 2, ty + 2, (authorIn ? '' : 'italic ') + `bold ${eventLine && tLines.length > 1 ? 22 : 24}px Arial`, authorIn ? INK : '#9ca3af', 'center'); ty += eventLine && tLines.length > 1 ? 27 : 32;
+  text(affil, W / 2, ty, (affilIn ? '' : 'italic ') + '17px Arial', affilIn ? MUTE : '#9ca3af', 'center');
   if (photo && document.getElementById('posterPhoto')?.checked !== false) {
     const r = 62, cx = 40 + r, cy = 22 + r + 4;
     c.save(); c.beginPath(); c.arc(cx, cy, r, 0, 2 * Math.PI); c.closePath(); c.clip();
