@@ -2575,7 +2575,7 @@ function computeBvalueTimeSeries(evList, Mc, step = 10, dm = 0.1) {
     const win  = sorted.slice(i, i + N_WIN);
     const mags = win.map(e => e.mw ?? e.mag);
     const b = computeBvalue(mags, Mc, dm);
-    if (b !== null) series.push({ t: bWinTime(win, e => e.time.getTime()), b, err: bConfidence95(b, N_WIN), span: win[N_WIN-1].time - win[0].time });
+    if (b !== null) series.push({ t: bWinTime(win, e => e.time.getTime()), b, err: bConfidence95(b, N_WIN), span: win[N_WIN-1].time - win[0].time, t0: win[0].time.getTime(), t1: win[N_WIN-1].time.getTime() });
   }
   return { series, N: sorted.length };
 }
@@ -2844,6 +2844,16 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
       clsRibbon += `<rect class="btRib" x="${xa.toFixed(1)}" y="${yR}" width="${Math.max(0.8, xb - xa).toFixed(1)}" height="${RB}" fill="${k ? C[k] : 'transparent'}">${tt}</rect>`; });
     clsLegend = `<text class="btLeg" x="${PAD_L + 30}" y="${PAD_T + 20}" font-size="8"><tspan fill="${C.low}">■ düşük b &lt; 0,7</tspan><tspan fill="${C.mid}" dx="6">■ tipik 0,7–1,4</tspan><tspan fill="${C.high}" dx="6">■ yüksek b &gt; 1,4</tspan></text><text class="btLeg" x="${PAD_L + 30}" y="${PAD_T + 30}" font-size="8" fill="#888">şerit: %95 aralığı tamamen sınıf içinde; boşluk = aralık sınırı kesiyor (belirsiz) · alarm değildir · FTLS değildir</text>`;
   }
+  // 2026-10-18: ana şoku (AMR ana şoku ya da en büyük M ≥ 6 olay) İÇEREN ya da ondan sonraki olayları içeren pencereler gri bantla
+  // işaretlenir. Pencere zamanı olayların ortalaması olduğundan bu pencereler ana şok çizgisinin SOLUNDA çizilir; ana şok öncesi
+  // yorum yalnız bandın solundaki (son olayı ana şoktan önce olan) pencerelerle yapılmalıdır.
+  let msShade = '', msWin = null;
+  { const MSb = typeof posterMainshock === 'function' ? posterMainshock() : null;
+    if (MSb) { const wEnd = q => q.t1 ?? (q.t + (q.span || 0)), cont = series.filter(q => wEnd(q) >= MSb.t - 1000);
+      if (cont.length) { const tA = Math.min(...cont.map(q => q.t)), first = cont.reduce((a2, q) => q.t < a2.t ? q : a2, cont[0]);
+        msWin = { n: cont.length, tA, t0: first.t0 ?? null, m: MSb.m, tMS: MSb.t };
+        const xa = x(tA), xb = W - PAD_R;
+        if (xb - xa > 0.5) msShade = `<rect x="${xa.toFixed(1)}" y="${PAD_T}" width="${(xb - xa).toFixed(1)}" height="${plotH}" fill="#6b7280" fill-opacity="0.22"><title>${cont.length} pencere M${MSb.m.toFixed(1)} ana şokunu ya da sonrasını içeriyor; ilk böyle pencere ${first.t0 ? new Date(first.t0).toISOString().slice(0, 10) : '?'} tarihinde başlıyor</title></rect><text x="${(xa - 2).toFixed(1)}" y="${PAD_T + plotH - 14}" fill="#4b5563" font-size="8" text-anchor="end">M${MSb.m.toFixed(1)} dahil pencereler →</text>`; } } }
   svgB.innerHTML = `
     ${clsBands}
     ${yTicks}
@@ -2851,6 +2861,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     ${refLine1}
     <line x1="${PAD_L}" y1="${y(bAvg)}" x2="${W-PAD_R}" y2="${y(bAvg)}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
     ${band}
+    ${msShade}
     ${errBars}
     ${rawLine}
     <polyline points="${pts}" fill="none" stroke="#0891b2" stroke-width="${lineOnly ? 1.4 : useBand ? 1.0 : 1.1}" stroke-opacity="${lineOnly ? 0.95 : 0.8}"/>
@@ -2870,7 +2881,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, err: btAll.series[btAll.series.length - 1].err, nWin: btAll.series.length, N: btAll.N } : null;
   const btsObj = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
               fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, anchor: bTimeAnchor, band: useBand,
-              adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn, cls: clsCount, ser: series.map(q => ({ t: q.t, b: q.b, err: q.err })) };
+              adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn, cls: clsCount, ser: series.map(q => ({ t: q.t, b: q.b, err: q.err, t1: q.t1 ?? (q.t + (q.span || 0)) })), msWin };
   if (STORE) lastBts = btsObj;
   if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB };
   const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
@@ -3528,7 +3539,7 @@ function svgToEN(xml) {
     .replace(/şerit: %95 aralığı tamamen sınıf içinde; boşluk = aralık sınırı kesiyor \(belirsiz\) · alarm değildir · FTLS değildir/g, 'strip: whole 95% CI within class; gap = CI crosses a boundary (uncertain) · not an alarm · not FTLS')
     .replace(/(Güçlü|Sınırlı|Yetersiz) istatistiksel destek/g, (m, k) => ({ Güçlü: 'Strong', Sınırlı: 'Limited', Yetersiz: 'Insufficient' })[k] + ' statistical support')
     .replace(/┅ güç yasası/g, '┅ power law').replace(/╌ doğrusal/g, '╌ linear').replace(/gölgeli: pencere dışı/g, 'shaded: outside window')
-    .replace(/log₁₀ oran/g, 'log₁₀ ratio').replace(/>hız\/ort\.</g, '>rate/mean<').replace(/Ayrıştırma için yeterli olay yok \(sabit eşikte N ≥ (\d+) gerekir\)/g, 'Not enough events for the decomposition (N ≥ $1 at the fixed threshold)')
+    .replace(/log₁₀ oran/g, 'log₁₀ ratio').replace(/(M[0-9.]+) dahil pencereler →/g, 'windows incl. $1 →').replace(/>hız\/ort\.</g, '>rate/mean<').replace(/Ayrıştırma için yeterli olay yok \(sabit eşikte N ≥ (\d+) gerekir\)/g, 'Not enough events for the decomposition (N ≥ $1 at the fixed threshold)')
     .replace(/Hesaplanan pencere: (\d+) · Gösterilen: (\d+) \(adım (\d+)\) · Zaman: (son olay|ortanca|ortalama)/g, (m, a, b, c, z) => `Computed windows: ${a} · Shown: ${b} (step ${c}) · Time: ${{ 'son olay': 'last event', ortanca: 'median', ortalama: 'mean' }[z]}`)
     .replace(/>(Oca|Şub|Mar|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)\.?( \d{4})?</g, (m, mo, y) => '>' + SVG_EN_MONTHS[mo] + (y || '') + '<');
 }
@@ -3992,7 +4003,7 @@ async function exportPosterAGU(scale, evt) {
     : '**Şekil 3.** ' + (!INC.bt ? '' : (NPAN > 1 ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + (bt && bt.cls ? ' Arka plan ve alt şerit: b-değeri sınıfı ({#dc2626|düşük} < 0,7, {#ca8a04|tipik} 0,7–1,4, {#16a34a|yüksek} > 1,4); pencere yalnızca %95 aralığının tamamı bir sınıftaysa renklenir; şeritteki boşluklar aralığın bir sınırı kestiği (belirsiz) pencerelerdir. Sınıf renkleri tehlike ya da alarm seviyesi değildir; betimleyici sınıflamadır, Gulia vd. (2019, 2024) FTLS yöntemi değildir.' : '')) + benCap + amrCap;
   // 2026-10-18: kısa altyazı (varsayılan): poster görsele dayanır; ayrıntılar metodoloji belgesindedir
   const SHORTCAP = document.getElementById('posterShortCap')?.checked !== false;
-  const sA = INC.bt ? (NPAN > 1 ? '**(a)** ' : '') + L(`b-değeri, 100 olaylık kayan pencere (Aki 1965), %95 güven bandı; arka plan b sınıfı: {#dc2626|< 0,7}, {#ca8a04|0,7–1,4}, {#16a34a|> 1,4} (betimleyici, tehlike düzeyi değil).`, `b-value in 100-event moving windows (Aki 1965) with 95% CI; background b class: {#dc2626|< 0.7}, {#ca8a04|0.7–1.4}, {#16a34a|> 1.4} (descriptive, not a hazard level).`) : '';
+  const sA = INC.bt ? (NPAN > 1 ? '**(a)** ' : '') + L(`b-değeri, 100 olaylık kayan pencere (Aki 1965), %95 güven bandı; arka plan b sınıfı: {#dc2626|< 0,7}, {#ca8a04|0,7–1,4}, {#16a34a|> 1,4} (betimleyici, tehlike düzeyi değil)${bt && bt.msWin ? '; gri bant: ana şoku ya da sonraki olayları içeren pencereler (ortalama zamanda çizildikleri için ana şok çizgisinin solundan başlar)' : ''}.`, `b-value in 100-event moving windows (Aki 1965) with 95% CI; background b class: {#dc2626|< 0.7}, {#ca8a04|0.7–1.4}, {#16a34a|> 1.4} (descriptive, not a hazard level)${bt && bt.msWin ? '; grey band: windows containing the mainshock or later events (plotted at their mean time, so the band starts left of the red line)' : ''}.`) : '';
   const sB = BEN_ON ? ` ${PL('ben') ? `**(${PL('ben')})** ` : ''}` + L(`Birikimli Benioff gerinimi S = Σ√E (M ≥ ${BB ? DC(fmtM(BB.mFix)) : '—'}); alt şerit: aralık başına Benioff salımının tüm dönem ortalamasına oranı, log ölçek (çizgi üstü hızlı, altı yavaş; {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b-değeri katkısı).`, `Cumulative Benioff strain S = Σ√E (M ≥ ${BB ? fmtM(BB.mFix) : '—'}); lower strip: Benioff release per interval divided by the whole-period mean, log scale (above = faster, below = slower; {#3b82f6|blue} event-count, {#16a34a|green} b-value contribution).`) : '';
   const sC = AMR_ON ? ` ${PL('amr') ? `**(${PL('amr')})** ` : ''}` + L(`AMR, en iyi hücre R = ${AP.r} km, ${AP.yr} yıl: {#ea580c|Σ√E}, {#2563eb|güç yasası}, gri doğrusal; q = ${DC(AP.q.toFixed(2))}, p = ${DC(AP.pK.toFixed(3))} (${amrSupport(AP.pK).tr.toLowerCase()}).`, `AMR, best cell R = ${AP.r} km, ${AP.yr} yr: {#ea580c|Σ√E}, {#2563eb|power law}, grey linear; q = ${AP.q.toFixed(2)}, p = ${AP.pK.toFixed(3)} (${amrSupport(AP.pK).en.toLowerCase()}).`) : '';
   const cap3 = SHORTCAP ? L('**Şekil 3.** ', '**Figure 3.** ') + sA + sB + sC + L(` {#dc2626|Kırmızı kesikli}: ana şok; sağındaki değerler artçıları içerir${AMR_ON ? ', AMR penceresi ana şoktan önce biter' : ''}. Geriye dönük; öncül değildir.`, ` {#dc2626|Red dashed}: mainshock; values to its right include aftershocks${AMR_ON ? '; the AMR window ends before the mainshock' : ''}. Retrospective; not a precursor.`).replace(AMR_ON || MSX ? /$^/ : / \{#dc2626\|(Kırmızı kesikli|Red dashed)\}: (ana şok|mainshock)[^.]*\./, '') : cap3Full;
@@ -4060,7 +4071,7 @@ async function exportPosterAGU(scale, evt) {
   const gofRej = !!(qcObj && qcObj.gof && qcObj.gof.ok && qcObj.gof.reject);
   const mcFlag = !!(csQc && (csQc.lowMcN > 0 || csQc.invN > 0));
   const qcFlag = !!cs && (mcFlag || gofRej);
-  const PRE = (() => { if (!MSX || !bt || !bt.ser) return null; const pre = bt.ser.filter(q => q.t < MSX.t && Number.isFinite(q.b)); if (pre.length < 3) return null;
+  const PRE = (() => { if (!MSX || !bt || !bt.ser) return null; const pre = bt.ser.filter(q => (q.t1 ?? q.t) < MSX.t && Number.isFinite(q.b)); if (pre.length < 3) return null;   // yalnız son olayı ana şoktan önce olan pencereler
     const f = pre[0], l = pre[pre.length - 1], mn = pre.reduce((a2, q) => q.b < a2.b ? q : a2, pre[0]);
     const sig = Number.isFinite(l.err) && Number.isFinite(f.err) ? Math.abs(l.b - f.b) > Math.sqrt(l.err ** 2 + f.err ** 2) : null; return { pre, f, l, mn, sig }; })();
   const autoMsg = MSX && !qcFlag ? (() => { const parts = [];
@@ -4100,8 +4111,8 @@ async function exportPosterAGU(scale, evt) {
     if (PRE) { const { pre, f, l, mn, sig } = PRE;   // b(t)'nin ana şok öncesi seyri (betimleyici)
       const yy = t => new Date(t).getUTCFullYear(), dd = t => new Date(t).toISOString().slice(0, 7), pm = q => `${DC(q.b.toFixed(2))}${Number.isFinite(q.err) ? ' ± ' + DC(q.err.toFixed(2)) : ''}`;
       const sg = sig === null ? '' : sig ? L('fark %95 aralıklarının birleşiminden büyük', 'difference exceeds the combined 95% CIs') : L('fark %95 belirsizlik içinde', 'difference within the 95% uncertainty');
-      rItems.push(L(`**Ana şok öncesi b(t):** ${yy(f.t)}'te ${pm(f)}; en düşük ${pm(mn)} (${dd(mn.t)}); ana şoktan önceki son pencerede ${pm(l)} (${pre.length} pencere${sg ? '; ilk–son ' + sg : ''}).`,
-        `**b(t) before the mainshock:** ${pm(f)} in ${yy(f.t)}; minimum ${pm(mn)} (${dd(mn.t)}); ${pm(l)} in the last window before the mainshock (${pre.length} windows${sg ? '; first vs last: ' + sg : ''}).`)); }
+      rItems.push(L(`**Ana şok öncesi b(t):** ${yy(f.t)}'te ${pm(f)}; en düşük ${pm(mn)} (${dd(mn.t)}); ana şoktan önceki son pencerede ${pm(l)} (${pre.length} pencere${sg ? '; ilk–son ' + sg : ''})${bt.msWin ? `; M${DC(bt.msWin.m.toFixed(1))} ya da sonrasını içeren ${bt.msWin.n} pencere (gri bant, ${new Date(bt.msWin.tA).toISOString().slice(0, 7)} sonrası) hariç` : ''}.`,
+        `**b(t) before the mainshock:** ${pm(f)} in ${yy(f.t)}; minimum ${pm(mn)} (${dd(mn.t)}); ${pm(l)} in the last window before the mainshock (${pre.length} windows${sg ? '; first vs last: ' + sg : ''})${bt.msWin ? `; the ${bt.msWin.n} windows containing the M${bt.msWin.m.toFixed(1)} or later events (grey band, plotted from ${new Date(bt.msWin.tA).toISOString().slice(0, 7)}) excluded` : ''}.`)); }
     if (AMR_ON) rItems.push(EN ? `**AMR (retrospective):** best cell R = ${AP.r} km, ${AP.yr} yr; q = ${AP.q.toFixed(2)}, cluster-preserving null p = ${AP.pK.toFixed(3)} — ${amrSupport(AP.pK).en.toLowerCase()} (protocol ${AMR_PROTO}).`
       : `**AMR (geriye dönük):** en iyi hücre R = ${AP.r} km, ${AP.yr} yıl; q = ${DC(AP.q.toFixed(2))}, küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} — ${amrSupport(AP.pK).tr.toLowerCase()} (protokol ${AMR_PROTO}).`);
     if (document.getElementById('posterCaveat')?.checked) rItems.push(EN
