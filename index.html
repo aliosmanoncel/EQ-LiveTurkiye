@@ -6463,6 +6463,8 @@ async function amrRun() {
     pTxt(pP, 'Poisson sıfır', 'zamanlar düzgün dağıtıldı; kümelenmeyi bozduğu için anlamlılığı abartabilir') +
     (pD ? pTxt(pD, `GK74 kümesizleştirilmiş (n = ${dec.length})`, `en küçük q = ${fmt(decObs.T)}; Poisson sıfır, aynı ızgara`) : `<tr><td colspan="3" style="padding:1px 6px;color:#888">GK74 kümesizleştirilmiş katalogda test için yeterli olay yok.</td></tr>`) +
     `</table><div style="color:#f59e0b;margin-top:3px">⚠ Deneysel: p değerleri yön gösterici niteliktedir; kesin istatistiksel kanıt olarak okunmamalıdır. Yazılım denetimi: hızlanma içermeyen yapay Poisson kataloglarında (100 katalog) p ≤ 0,05 oranı 0,08–0,09 bulundu (nominal 0,05). Yöntemin kendi sınırlılıkları için literatüre bakınız (Hardebeck vd. 2008; Guilhem vd. 2013).</div><div style="color:#888;margin-top:3px">p = (1 + #{T_sim ≤ T_obs}) / (N + 1); T = ızgaradaki en küçük q (arama maliyeti dahil); tohum 20261017. Yöntem: Bufe &amp; Varnes (1993), q ölçütü Bowman vd. (1998), t_f ana şoka sabit (Jiang &amp; Wu 2005 ile aynı kurgu). <b>Bu test geriye dönüktür; t_f tahmin etmez ve alarm üretmez.</b> Küçük bir p yalnızca seçilen sıfır hipotezine göre olağandışı bir uyumu gösterir; ileriye dönük öngörü becerisinin kanıtı değildir. AMR benzeri örüntüler kümelenmeli sentetik kataloglarda da ortaya çıkar (Hardebeck, Felzer &amp; Michael 2008).</div>`;
+  try { const u = new URL(location.href); u.searchParams.set('amrp', AMR_PROTO); u.searchParams.set('amrn', String(nSim)); u.searchParams.set('amrd', ms.time.toISOString().slice(0, 10));
+    const um = (document.getElementById('amrMmin') || {}).value; if (um) u.searchParams.set('amrm', um); else u.searchParams.delete('amrm'); history.replaceState(null, '', u); } catch (e) {}   // AMR ayarları bağlantıda
   window.lastAmr = { proto: AMR_PROTO, grid: AMR_R_GRID.slice(), ygrid: AMR_Y_GRID.slice(), cover, ms: { t: tf, m: mOf(ms), lat: la0, lon: lo0 }, mMin, n: raw.length, T: obs.T, best: obs.best, pK: pK.p, pP: pP.p, pD: pD ? pD.p : null, nSim, cells: obs.cells, drop: DC };
   window.lastAmrPlot = amrPlotData(raw, obs.best, tf, mMin, { mMain: mOf(ms), pK: pK.p, nSim });
   renderAmrFig();
@@ -8531,12 +8533,16 @@ function syncRegionURL(bounds, opt) {
   if (opt.depMin) url.searchParams.set('rdepmin', opt.depMin); else url.searchParams.delete('rdepmin');
   if (opt.depMax) url.searchParams.set('rdepmax', opt.depMax); else url.searchParams.delete('rdepmax');
   if (document.getElementById('regionChunked')?.checked) url.searchParams.set('rchunk', '1'); else url.searchParams.delete('rchunk');
+  // 2026-10-18: tarih aralığı da bağlantıda (tekrarlanabilirlik; yoksa link varsayılan zaman penceresiyle açılırdı)
+  const df = document.getElementById('regionDateFrom')?.value, dt = document.getElementById('regionDateTo')?.value;
+  if (df) url.searchParams.set('rfrom', df); else url.searchParams.delete('rfrom');
+  if (dt) url.searchParams.set('rto', dt); else url.searchParams.delete('rto');
   history.replaceState(null, '', url);
 }
 
 function clearRegionURL() {
   const url = new URL(location.href);
-  ['rminlat','rmaxlat','rminlon','rmaxlon','rlimit','rorder','rsource','rmagmin','rmagmax','rdepmin','rdepmax','rchunk']
+  ['rminlat','rmaxlat','rminlon','rmaxlon','rlimit','rorder','rsource','rmagmin','rmagmax','rdepmin','rdepmax','rchunk','rfrom','rto']
     .forEach(k => url.searchParams.delete(k));
   history.replaceState(null, '', url);
 }
@@ -8567,6 +8573,9 @@ function restoreRegionFromURL() {
   if (p.has('rdepmin')) document.getElementById('regionDepMin').value = p.get('rdepmin');
   if (p.has('rdepmax')) document.getElementById('regionDepMax').value = p.get('rdepmax');
   if (p.get('rchunk') === '1' && document.getElementById('regionChunked')) document.getElementById('regionChunked').checked = true;
+  const dfI = document.getElementById('regionDateFrom'), dtI = document.getElementById('regionDateTo');
+  if (dfI && /^\d{4}-\d{2}-\d{2}$/.test(p.get('rfrom') || '')) dfI.value = p.get('rfrom');
+  if (dtI && /^\d{4}-\d{2}-\d{2}$/.test(p.get('rto') || '')) dtI.value = p.get('rto');
   regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
   fetchRegionEvents(bounds);
   // Linkle paylaşılan bölge varsa paneli otomatik aç — aksi halde sonuçlar
@@ -8578,6 +8587,10 @@ posterLoadPrefs(); posterIdCheck(); posterOwnerCheck();
 restoreGrParamsFromURL();
 restoreTmTypeFilterFromURL();
 restoreRegionFromURL();
+(function restoreAmrFromURL() { const p = new URLSearchParams(location.search);   // 2026-10-18: AMR ayarlarını bağlantıdan geri kur (test kendiliğinden çalışmaz)
+  if (p.has('amrp') && typeof amrSetProto === 'function') { amrSetProto(p.get('amrp')); const e = document.getElementById('amrProto'); if (e) e.value = AMR_PROTO; }
+  const set = (id, k, re) => { const e = document.getElementById(id), v = p.get(k); if (e && v && re.test(v)) e.value = v; };
+  set('amrMmin', 'amrm', /^\d+(\.\d+)?$/); set('amrNsim', 'amrn', /^\d{2,3}$/); set('amrDate', 'amrd', /^\d{4}-\d{2}-\d{2}$/); })();
 restoreCsFromURL();
 
 function regionDeselect() {
