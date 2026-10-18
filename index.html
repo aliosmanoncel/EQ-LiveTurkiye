@@ -974,7 +974,7 @@
     <button class="tbtn tr-only"        id="btnAmbraseys" onclick="toggleLayer('ambraseys')" title="Marmara Tarihsel · Ambraseys 2002 · Table 1 — Ms ≥ 6.8, 32–1999; kaynak büyüklüğü Ms olarak korunmuştur">Marmara Tarihsel · Ambraseys 2002</button>
     <button class="tbtn"                id="btnHistHK" onclick="toggleLayer('histhk')"  title="Hong Kong Tarihsel · GEO Publication No. 1/2012 (Geotechnical Engineering Office) Regional Earthquake Catalogue · Mw≥5.0 · 500km yarıçap (HKO, Tsim Sha Tsui) · 1067-2005 · EAGP verisi, bağımsız doğrulanmadı">🇭🇰 HK Tarihsel</button>
     <button class="tbtn tr-only"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
-    <button class="tbtn tr-only"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Asperite triyajı · Kırmızı=stres odağı">b-Adaptif</button>
+    <button class="tbtn tr-only"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Düşük b sınıflaması · Kırmızı = düşük b (b-değeri sınıfı; tehlike ya da tahmin değildir)">b-Adaptif</button>
     <button class="tbtn tr-only active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
     <button class="tbtn tr-only active" id="btnZoneM"  onclick="toggleBAdaptZone('MID')"  style="font-size:.7rem;padding:3px 7px;color:#ffaa00;border-color:#ffaa00" title="R=50km · Orta sismisite">🟠R50</button>
     <button class="tbtn tr-only"        id="btnZoneL"  onclick="toggleBAdaptZone('LOW')"  style="font-size:.7rem;padding:3px 7px;color:#aaa;border-color:#555"       title="R=100km · Düşük sismisite · Geniş alan · Dikkatli yorumla">🟡R100</button>
@@ -1023,7 +1023,7 @@
   <!-- Layer toggles — satir 2: b-analiz + Forecast (Türkiye/Marmara-özel) -->
   <div class="tr-only" style="display:flex;gap:4px;flex-wrap:nowrap;margin-top:4px">
     <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
-    <button class="tbtn"        id="btnTL"     onclick="toggleLayer('tl')"     title="Öncel&Wyss(2000,2001) T_L Anomalisi · Asperite Yoğunluğu · 10^(b·M−a_ann) · Minima = kilitli asperite · Triple-Target: 6.8/7.4/7.8">🔴 Asperite (T_L)</button>
+    <button class="tbtn"        id="btnTL"     onclick="toggleLayer('tl')"     title="Öncel&Wyss(2000,2001) T_L Anomalisi · 10^(b·M−a_ann) · T_L minimumları literatürde kilitli asperite ile ilişkilendirilir (hipotez, kanıt değil) · Triple-Target: 6.8/7.4/7.8 · tahmin değildir">🔴 Asperite (T_L)</button>
     <select id="selTL" onchange="setTLTarget(+this.value)" style="background:#1a2a3a;color:#7ecfff;border:1px solid #7ecfff33;border-radius:4px;font-size:11px;padding:2px 4px;cursor:pointer">
       <option value="6.8">Mw 6.8</option>
       <option value="7.4" selected>Mw 7.4</option>
@@ -2380,11 +2380,12 @@ function onBAnchorChange() {
 // Renkler b-değeri SINIFIDIR; deprem tehlikesi ya da alarm seviyesi değildir.
 const BT_CLASS = { lo: 0.7, hi: 1.4, col: { low: '#dc2626', mid: '#eab308', high: '#16a34a' } };
 function btClassOf(b, err) {
-  if (!Number.isFinite(b) || !Number.isFinite(err)) return null;
-  const lo = b - err, hi = b + err;
-  if (hi < BT_CLASS.lo) return 'low';
-  if (lo >= BT_CLASS.lo && hi <= BT_CLASS.hi) return 'mid';
-  if (lo > BT_CLASS.hi) return 'high';
+  if (!Number.isFinite(b) || !Number.isFinite(err) || err < 0) return null;   // eksik/geçersiz aralık → sınıflanmaz
+  // Sınır kuralı: b = 0,7 ve b = 1,4 tipik sınıfa aittir (lo ≥ 0,7 ve hi ≤ 1,4); arka plan bantları aynı sınırlarla çizilir.
+  const lo = b - err, hi = b + err, E = 1e-9;   // E: kayan nokta yuvarlaması (ör. 1,3 + 0,1 = 1,4000000000000001) sınıfı değiştirmesin
+  if (hi < BT_CLASS.lo - E) return 'low';
+  if (lo >= BT_CLASS.lo - E && hi <= BT_CLASS.hi + E) return 'mid';
+  if (lo > BT_CLASS.hi + E) return 'high';
   return null;   // aralık sınıf sınırını kesiyor → belirsiz, renksiz
 }
 let btClassOn = (() => { try { return new URLSearchParams(location.search).get('bclass') === '1'; } catch (e) { return false; } })();
@@ -2804,10 +2805,14 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
       clsBands += `<rect x="${PAD_L}" y="${yc(b2).toFixed(1)}" width="${plotW}" height="${Math.max(0, yc(a) - yc(b2)).toFixed(1)}" fill="${c}" opacity="0.07"/>`; });
     clsCount = { low: 0, mid: 0, high: 0, none: 0 };
     const RB = 7, yR = PAD_T + plotH - RB;
-    ser.forEach((s2, i) => { const k = btClassOf(s2.b, s2.err); clsCount[k || 'none']++; if (!k) return;
+    const f2 = v => v.toFixed(2).replace('.', ','), NM = { low: 'düşük b', mid: 'tipik b', high: 'yüksek b' };
+    ser.forEach((s2, i) => { const k = btClassOf(s2.b, s2.err); clsCount[k || 'none']++;
       const xa = i ? (x(ser[i - 1].t) + x(s2.t)) / 2 : x(s2.t), xb = i < ser.length - 1 ? (x(s2.t) + x(ser[i + 1].t)) / 2 : x(s2.t);
-      clsRibbon += `<rect x="${xa.toFixed(1)}" y="${yR}" width="${Math.max(0.8, xb - xa).toFixed(1)}" height="${RB}" fill="${C[k]}"/>`; });
-    clsLegend = `<text x="${PAD_L + 30}" y="${PAD_T + 20}" font-size="8"><tspan fill="${C.low}">■ düşük b &lt; 0,7</tspan><tspan fill="${C.mid}" dx="6">■ tipik 0,7–1,4</tspan><tspan fill="${C.high}" dx="6">■ yüksek b &gt; 1,4</tspan><tspan fill="#888" dx="6">· şerit: %95 aralığı tamamen sınıf içinde · alarm değildir</tspan></text>`;
+      const lo = s2.b - (s2.err || 0), hi = s2.b + (s2.err || 0);
+      const why = !Number.isFinite(s2.err) ? 'güven aralığı yok' : k ? `%95 aralığı tamamen ${NM[k]} sınıfında` : `%95 aralığı ${lo < BT_CLASS.lo && hi >= BT_CLASS.lo ? '0,7' : '1,4'} sınırını kesiyor — sınıflanmadı (belirsiz)`;
+      const tt = `<title>${new Date(s2.t).toISOString().slice(0, 10)} · b = ${f2(s2.b)} · %95: ${f2(lo)}–${f2(hi)} · ${why}</title>`;
+      clsRibbon += `<rect x="${xa.toFixed(1)}" y="${yR}" width="${Math.max(0.8, xb - xa).toFixed(1)}" height="${RB}" fill="${k ? C[k] : 'transparent'}">${tt}</rect>`; });
+    clsLegend = `<text x="${PAD_L + 30}" y="${PAD_T + 20}" font-size="8"><tspan fill="${C.low}">■ düşük b &lt; 0,7</tspan><tspan fill="${C.mid}" dx="6">■ tipik 0,7–1,4</tspan><tspan fill="${C.high}" dx="6">■ yüksek b &gt; 1,4</tspan><tspan fill="#888" dx="6">· şerit: %95 aralığı tamamen sınıf içinde; boşluk = aralık sınırı kesiyor (belirsiz) · alarm değildir</tspan></text>`;
   }
   svgB.innerHTML = `
     ${clsBands}
@@ -3473,7 +3478,7 @@ function svgToEN(xml) {
     .replace(/Yetersiz veri:/g, 'Insufficient data:')
     .replace(/(\d+) yıl · n = /g, '$1 yr · n = ').replace(/p \(küme korumalı\)/g, 'p (cluster-preserving)').replace(/Σ√E \(göreli, t_f = 1\)/g, 'Σ√E (relative, t_f = 1)')
     .replace(/■ düşük b &lt; 0,7/g, '■ low b &lt; 0.7').replace(/■ tipik 0,7–1,4/g, '■ typical 0.7–1.4').replace(/■ yüksek b &gt; 1,4/g, '■ high b &gt; 1.4')
-    .replace(/· şerit: %95 aralığı tamamen sınıf içinde · alarm değildir/g, '· strip: whole 95% CI within class · not an alarm')
+    .replace(/· şerit: %95 aralığı tamamen sınıf içinde; boşluk = aralık sınırı kesiyor \(belirsiz\) · alarm değildir/g, '· strip: whole 95% CI within class; gap = CI crosses a boundary (uncertain) · not an alarm')
     .replace(/(Güçlü|Sınırlı|Yetersiz) istatistiksel destek/g, (m, k) => ({ Güçlü: 'Strong', Sınırlı: 'Limited', Yetersiz: 'Insufficient' })[k] + ' statistical support')
     .replace(/┅ güç yasası/g, '┅ power law').replace(/╌ doğrusal/g, '╌ linear').replace(/gölgeli: pencere dışı/g, 'shaded: outside window')
     .replace(/log₁₀ oran/g, 'log₁₀ ratio').replace(/Ayrıştırma için yeterli olay yok \(sabit eşikte N ≥ (\d+) gerekir\)/g, 'Not enough events for the decomposition (N ≥ $1 at the fixed threshold)')
@@ -3837,8 +3842,8 @@ async function exportPosterAGU(scale, evt) {
   const amrCap = !AMR_ON ? '' : EN
     ? ` **(${amrL}) Experimental:** accelerating moment release (AMR) for the best grid cell (R = ${AP.r} km, ${AP.yr} yr before the M${AP.mMain.toFixed(1)} mainshock, t_f fixed; n = ${AP.n}, M ≥ ${fmtM(AP.mMin)}). {#ea580c|Orange}${BEN_ON ? ' (as in b)' : ''}: cumulative Σ√E normalised to 1 at t_f; {#2563eb|blue} power law S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? AP.fit.m : '—'}, Bufe & Varnes 1993); {#6b7280|grey dashed} linear. q = rms(power law)/rms(linear) = ${AP.q.toFixed(2)}; cluster-preserving null p = ${AP.pK.toFixed(3)} (${AP.nSim} synthetic catalogues): ${amrSupport(AP.pK).en.toLowerCase()} (predefined: p ≤ 0.01 strong, ≤ 0.05 limited, otherwise insufficient). {#dc2626|Red} line: mainshock (t_f fixed, not estimated). Same time axis as (a). Retrospective test; not a precursor or forecast.`
     : ` **(${amrL}) Deneysel:** en iyi ızgara hücresi için hızlanan moment salımı (AMR) (R = ${AP.r} km, M${DC(AP.mMain.toFixed(1))} ana şoktan ${AP.yr} yıl önce, t_f sabit; n = ${AP.n}, M ≥ ${DC(fmtM(AP.mMin))}). {#ea580c|Turuncu}${BEN_ON ? " (b'deki gibi)" : ''}: t_f'de 1'e normalize birikimli Σ√E; {#2563eb|mavi} güç yasası S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? DC(AP.fit.m) : '—'}, Bufe & Varnes 1993); {#6b7280|gri kesikli} doğrusal. q = rms(güç yasası)/rms(doğrusal) = ${DC(AP.q.toFixed(2))}; küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} (${AP.nSim} sentetik katalog): ${amrSupport(AP.pK).tr.toLowerCase()} (önceden tanımlı: p ≤ 0,01 güçlü, ≤ 0,05 sınırlı, aksi halde yetersiz). {#dc2626|Kırmızı} çizgi: ana şok (t_f sabit, kestirilmez). Zaman ekseni (a) ile aynıdır. Geriye dönük testtir; öncül ya da tahmin değildir.`;
-  const cap3 = EN ? '**Figure 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + (bt && bt.cls ? ' Background and bottom strip: b-value class ({#dc2626|low} < 0.7, {#ca8a04|typical} 0.7–1.4, {#16a34a|high} > 1.4); a window is coloured only if its whole 95% CI lies in one class. Class colours are not a hazard or alarm level.' : '') + benCap + amrCap
-    : '**Şekil 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + (bt && bt.cls ? ' Arka plan ve alt şerit: b-değeri sınıfı ({#dc2626|düşük} < 0,7, {#ca8a04|tipik} 0,7–1,4, {#16a34a|yüksek} > 1,4); pencere yalnızca %95 aralığının tamamı bir sınıftaysa renklenir. Sınıf renkleri tehlike ya da alarm seviyesi değildir.' : '') + benCap + amrCap;
+  const cap3 = EN ? '**Figure 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + (bt && bt.cls ? ' Background and bottom strip: b-value class ({#dc2626|low} < 0.7, {#ca8a04|typical} 0.7–1.4, {#16a34a|high} > 1.4); a window is coloured only if its whole 95% CI lies in one class; gaps in the strip are windows whose CI crosses a boundary (uncertain). Class colours are not a hazard or alarm level.' : '') + benCap + amrCap
+    : '**Şekil 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + (bt && bt.cls ? ' Arka plan ve alt şerit: b-değeri sınıfı ({#dc2626|düşük} < 0,7, {#ca8a04|tipik} 0,7–1,4, {#16a34a|yüksek} > 1,4); pencere yalnızca %95 aralığının tamamı bir sınıftaysa renklenir; şeritteki boşluklar aralığın bir sınırı kestiği (belirsiz) pencerelerdir. Sınıf renkleri tehlike ya da alarm seviyesi değildir.' : '') + benCap + amrCap;
   const cap3O = STACK_ON ? { size: BEN_ON && AMR_ON ? 13 : 14, lh: BEN_ON && AMR_ON ? 17 : 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 };
   if (STACK_ON) {
     // 2026-10-17 düzen A: Şekil 3a b(t) üstte, 3b Benioff ve/veya 3c AMR altta; AYNI genişlik ve sol kenar → SVG'lerin zaman
@@ -6136,7 +6141,8 @@ async function amrRun() {
   const nOk = obs.cells.filter(c => c.ok).length, nQ = obs.cells.filter(c => c.ok && c.q < 0.7).length;
   const pTxt = (P, lab, note) => `<tr><td style="padding:1px 6px;color:#cbd5e1">${lab}</td><td style="padding:1px 6px">p = <b>${fp(P.p)}</b> (N = ${P.n})</td><td style="padding:1px 6px;color:#9ab0c5">${note}</td></tr>`;
   const SUPo = amrSupport(pK.p);
-  out.innerHTML = `<div>${head}</div>` + (SUPo ? `<div style="margin:3px 0;padding:3px 7px;border:1px solid #475569;border-radius:4px;background:#1e293b;color:#e2e8f0;display:inline-block;" title="Önceden tanımlı ölçüt (küme korumalı sıfır, birincil test): p ≤ 0,01 güçlü; 0,01 &lt; p ≤ 0,05 sınırlı; p &gt; 0,05 yetersiz. ${nSim} sentetik katalogla en küçük p = ${(1 / (nSim + 1)).toFixed(3).replace('.', ',')}. Nötr renk bilinçlidir: düzey yalnızca güç yasası uyumunun rastgele kataloglardan ayırt edilebilirliğini anlatır; deprem olasılığı ya da alarm değildir."><b>${SUPo.tr}</b> · küme korumalı sıfır p = ${fp(pK.p)} · alarm ya da tahmin değildir</div>` : '') + tab +
+  out.innerHTML = `<div>${head}</div>` + (SUPo ? `<div style="margin:3px 0;padding:3px 7px;border:1px solid #475569;border-radius:4px;background:#1e293b;color:#e2e8f0;display:inline-block;" title="Önceden tanımlı ölçüt (küme korumalı sıfır, birincil test): p ≤ 0,01 güçlü; 0,01 &lt; p ≤ 0,05 sınırlı; p &gt; 0,05 yetersiz. ${nSim} sentetik katalogla en küçük p = ${(1 / (nSim + 1)).toFixed(3).replace('.', ',')}. Nötr renk bilinçlidir: düzey yalnızca güç yasası uyumunun rastgele kataloglardan ayırt edilebilirliğini anlatır; deprem olasılığı ya da alarm değildir."><b>${SUPo.tr}</b> · küme korumalı sıfır p = ${fp(pK.p)} · yalnızca sıfır hipotezine karşı destek; modelin tahmin başarısını ya da deprem olasılığını göstermez</div>` : '') +
+    (nSim < 99 ? `<div style="color:#f59e0b;margin:2px 0;">İstatistiksel çözünürlük sınırlı: ${nSim} sentetik katalogla en küçük p = ${(1 / (nSim + 1)).toFixed(3).replace('.', ',')}; “güçlü” düzeyi (p ≤ 0,01) en az 99 katalog gerektirir. Güçlü destek görülmemesi modelin başarısızlığı anlamına gelmez.</div>` : '') + tab +
     `<div style="margin-top:3px">Izgara: ${nOk} geçerli hücre; q &lt; 0,70 olan hücre: ${nQ}. En küçük q = <b>${fmt(obs.T)}</b> (R = ${obs.best.r} km, ${obs.best.yr} yıl, n = ${obs.best.n}, m = ${String(obs.best.m).replace('.', ',')}). Çerçeveli hücre en küçük q; koyu mavi q &lt; 0,50, mavi 0,50–0,70, açık mavi 0,70–0,90, gri ≥ 0,90 (nötr renkler: q düşüklüğü alarm değildir). Tek tek hücrelerdeki q &lt; 0,70 anlamlılık göstermez; anlamlılık yalnızca aşağıdaki p değerlerinden okunur.</div>` +
     (DC ? (() => { const rw = (lab, o, note) => `<tr><td style="padding:1px 6px;color:#cbd5e1">${lab}</td><td style="padding:1px 6px">${o.ok ? 'q = <b>' + fmt(o.q) + '</b>' : '<span style="color:#888">geçersiz</span>'}</td><td style="padding:1px 6px;color:#9ab0c5">n = ${o.n}${o.ok ? '' : ` &lt; ${AMR_NMIN}, karşılaştırma yapılmadı`}${note ? ' · ' + note : ''}</td></tr>`;
       return `<div style="margin-top:4px;color:#c4b5fd">Tek olay / küme duyarlılığı (yalnızca en iyi hücre: R = ${obs.best.r} km, ${obs.best.yr} yıl; Guilhem vd. 2013)</div>` +
@@ -9913,7 +9919,7 @@ function toggleBAdaptZone(zone) {
 
 // ── b-Adaptif Katmanı (Öncel 2026) ────────────────────────────────────────
 function bAdaptColor(b) {
-  // Kırmızı (stres odağı b<0.7) → turuncu → sarı → yeşil (sakin b>1.4)
+  // Kırmızı (düşük b, b<0.7) → turuncu → sarı → yeşil (yüksek b, b>1.4) — b-değeri sınıfı; tehlike ya da tahmin değildir (2026-10-18)
   const t = Math.max(0, Math.min(1, (b - 0.5) / 1.0));
   const r = Math.round(255 * (1 - t));
   const g = Math.round(255 * t);
@@ -9927,10 +9933,11 @@ function bAdaptRadius(zone) {
 }
 
 function bAdaptTriage(b, zone) {
-  // Otomatik asperite etiketleme (Chang vd. 2025 + Öncel & Wyss 2001)
-  if (zone === 'HIGH' && b < 0.7)  return '🔴 Sismik Risk Odak Noktası';
-  if (zone === 'HIGH' && b < 0.85) return '🟠 Yüksek Stres Segmenti';
-  if (b < 0.75)                    return '🟡 Gerilim Birikimi';
+  // Düşük b sınıflaması (Chang vd. 2025 + Öncel & Wyss 2001). 2026-10-18 dil denetimi: etiketler gözlenen b sınıfını
+  // tanımlar; "risk odağı / stres / gerilim birikimi" gibi tehlike ya da tahmin ima eden ifadeler kaldırıldı (eşikler aynı).
+  if (zone === 'HIGH' && b < 0.7)  return '🔴 Düşük b odağı (b < 0,7)';
+  if (zone === 'HIGH' && b < 0.85) return '🟠 Düşük b segmenti (b < 0,85)';
+  if (b < 0.75)                    return '🟡 Görece düşük b (b < 0,75)';
   return null;
 }
 
@@ -9958,7 +9965,8 @@ function renderBAdaptLayer() {
       <b>R =</b> ${p.r} km · <b>N =</b> ${p.n}<br>
       <b>Yoğunluk:</b> ${p.dens} olay/50km<br>
       <b>Konum:</b> ${p.lat.toFixed(2)}°N ${p.lon.toFixed(2)}°E<br>
-      <small style="color:#aaa">Aki (1965) MLE + Utsu (1966) · Gaussian σ=0.5×R</small>
+      <small style="color:#aaa">Aki (1965) MLE + Utsu (1966) · Gaussian σ=0.5×R</small><br>
+      <small style="color:#aaa">Etiket gözlenen b sınıfıdır; deprem tehlikesi ya da tahmin değildir.</small>
     `;
 
     markers.push(L.circleMarker([p.lat, p.lon], {
@@ -9982,7 +9990,7 @@ function renderBAdaptLayer() {
   const zonStr = [bAdaptZones.HIGH?'🔴R20':'', (bAdaptZones.MID&&midCount>0)?'🟠R50':'', bAdaptZones.LOW?'🟡R100':''].filter(Boolean).join(' ');
   setStatus(
     `b-Adaptif · Öncel (2026) · ${markers.length} nokta [${zonStr}] · ` +
-    `🔴 Stres odağı: ${triage.red} · 🟠 Yüksek stres: ${triage.orange} · ` +
+    `🔴 Düşük b odağı: ${triage.red} · 🟠 Düşük b segmenti: ${triage.orange} · ` +
     `b=${bAdaptData.b_min?.toFixed(2)}–${bAdaptData.b_max?.toFixed(2)} · Gaussian σ=0.5×R`
   );
 }
@@ -10006,11 +10014,11 @@ function renderAValueLayer() {
     const a = p.a_ann;
     if (a === undefined || a === null) continue;
     const b = p.b;
-    // Triyaj: yüksek stres + yüksek üretkenlik = en tehlikeli
+    // b ve a sınıflaması (2026-10-18 dil denetimi: tehlike ima eden ifadeler kaldırıldı; eşikler aynı)
     let risk = '';
-    if (b < 0.7 && a > 1.5)       risk = '🔴 Aktif Stres+Üretkenlik';
-    else if (b < 0.85 && a > 1.0) risk = '🟠 Yüksek Aktivite';
-    else if (a > 2.0)              risk = '🟡 Yüksek Üretkenlik';
+    if (b < 0.7 && a > 1.5)       risk = '🔴 Düşük b + yüksek a (b < 0,7, a > 1,5)';
+    else if (b < 0.85 && a > 1.0) risk = '🟠 Görece düşük b + a > 1 (b < 0,85)';
+    else if (a > 2.0)              risk = '🟡 Yüksek a (a > 2)';
     const m = L.circleMarker([p.lat, p.lon], {
       radius: p.zone === 'HIGH' ? 5 : p.zone === 'MID' ? 4 : 3,
       color: 'transparent', weight: 0,
@@ -10019,7 +10027,7 @@ function renderAValueLayer() {
       `<b>Sismik Üretkenlik · Öncel&Wyss (2000)</b><br>` +
       `a<sub>ann</sub> = ${a.toFixed(3)}<br>b = ${b.toFixed(3)}<br>` +
       `N = ${p.n} | R = ${p.r} km<br>` +
-      (risk ? `<b>${risk}</b>` : '') +
+      (risk ? `<b>${risk}</b><br><small style="color:#aaa">sınıf etiketi; tehlike ya da tahmin değildir</small>` : '') +
       `<hr style="margin:4px 0"><small>log₁₀(N/ΔT) + b·Mc | ΔT=126yr | Mc=2.0(Mw)</small>`
     );
     markers.push(m);
@@ -10060,17 +10068,17 @@ function renderTLLayer() {
       `<b>Asperite T<sub>L</sub> Anomalisi · Öncel&Wyss (2001)</b><br>` +
       `Senaryo: <b>Mw ${tlTarget}</b><br>` +
       `T<sub>L</sub> = <b>${tl < 1000 ? tl.toFixed(0) : (tl/1000).toFixed(1)+'k'} yıl</b>` +
-      ` <span style="color:#ff6b6b;font-size:10px">${tl < 100 ? '⚠ Asperite Minima' : ''}</span><br>` +
+      ` <span style="color:#ff6b6b;font-size:10px">${tl < 100 ? 'T<sub>L</sub> minimumu' : ''}</span><br>` +
       `b = ${p.b?.toFixed(3)} | a<sub>ann</sub> = ${p.a_ann?.toFixed(3)}<br>` +
       `N = ${p.n} | R = ${p.r} km<br>` +
-      `<hr style="margin:4px 0"><small>Kırmızı odak = kilitli asperite (nucleation zone)<br>T<sub>L</sub> = 10^(b·M − a<sub>ann</sub>)</small>`
+      `<hr style="margin:4px 0"><small>Kırmızı = kısa T<sub>L</sub>; literatürde kilitli asperite ile ilişkilendirilir (Öncel &amp; Wyss 2001) — hipotez, kanıt ya da tahmin değildir<br>T<sub>L</sub> = 10^(b·M − a<sub>ann</sub>)</small>`
     );
     markers.push(m);
   }
   tlLayer = L.layerGroup(markers).addTo(map);
   const mn = tlData[`${key}_min`]; const mx = tlData[`${key}_max`];
   const alarm = markers.filter(m => { const t = m.options._tl; return t && t < 100; }).length;
-  setStatus(`Asperite T_L Anomalisi (Mw ${tlTarget}) · ${markers.length} nokta · min=${mn} yıl · ⚠ ${alarm} asperite odağı`);
+  setStatus(`T_L Anomalisi (Mw ${tlTarget}) · ${markers.length} nokta · min=${mn} yıl · T_L < 100 yıl: ${alarm} nokta · sınıf etiketi; tahmin değildir`);
 }
 
 function setTLTarget(m) {
@@ -10170,9 +10178,11 @@ function renderDeltaBLayer() {
     const db   = p.delta_b;
     const col  = deltaBColor(db);
     const r_px = p.zone === 'HIGH' ? 5 : p.zone === 'MID' ? 4 : 3;
-    const interp = p.interp === 'artci_baskisi'      ? '🔵 Artçı baskısı — declustering doğru karar'
-                 : p.interp === 'stres_artcisi'       ? '🟠 Stres artçısı — artçılar yüksek stres taşıyor'
-                 : '⚫ Ana deprem karakterli — b(main)≈b(all)';
+    // 2026-10-18 dil denetimi: etiketler Δb = b(main) − b(all) işaretini tanımlar; nedensel yorum ("stres taşıyor",
+    // "doğru karar") kaldırıldı. Sınıflar ve eşikler (±0,1) veri dosyasındaki interp alanıyla aynı.
+    const interp = p.interp === 'artci_baskisi'      ? '🔵 Artçılar b\'yi yükseltiyor (Δb < −0,1: b(all) > b(main))'
+                 : p.interp === 'stres_artcisi'       ? '🟠 Artçılar b\'yi düşürüyor (Δb > +0,1: b(all) < b(main))'
+                 : '⚫ Fark küçük (|Δb| ≤ 0,1: b(main) ≈ b(all))';
     if (p.interp === 'artci_baskisi') cnt.artci++;
     else if (p.interp === 'stres_artcisi') cnt.stres++;
     else cnt.ana++;
@@ -10193,7 +10203,7 @@ function renderDeltaBLayer() {
   deltaBLayer = L.layerGroup(markers).addTo(map);
   setStatus(
     `Δb İndeksi · ${markers.length} nokta · ` +
-    `🔵 Artçı baskısı: ${cnt.artci} · ⚫ Ana deprem: ${cnt.ana} · 🟠 Stres artçısı: ${cnt.stres}`
+    `🔵 Δb < −0,1: ${cnt.artci} · ⚫ |Δb| ≤ 0,1: ${cnt.ana} · 🟠 Δb > +0,1: ${cnt.stres} · sınıf etiketi; yorum ya da tahmin değildir`
   );
 }
 
