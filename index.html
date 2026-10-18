@@ -2733,7 +2733,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   // yerine yarı saydam %95 bandı çizilir — hata çubukları "saçılım" gibi
   // okunmasın (2026-09-27). Değerler aynı; yalnızca gösterim değişir.
   const BAND_MIN = 150, useBand = ser.length > BAND_MIN;
-  const band = useBand ? `<polygon points="${ser.map(s => `${x(s.t).toFixed(1)},${y(s.b + (s.err || 0)).toFixed(1)}`).join(' ')} ${ser.slice().reverse().map(s => `${x(s.t).toFixed(1)},${y(Math.max(0, s.b - (s.err || 0))).toFixed(1)}`).join(' ')}" fill="#06b6d4" fill-opacity="0.14" stroke="none"/>` : '';
+  const band = useBand ? `<polygon points="${ser.map(s => `${x(s.t).toFixed(1)},${y(s.b + (s.err || 0)).toFixed(1)}`).join(' ')} ${ser.slice().reverse().map(s => `${x(s.t).toFixed(1)},${y(Math.max(0, s.b - (s.err || 0))).toFixed(1)}`).join(' ')}" fill="#06b6d4" fill-opacity="0.11" stroke="none"/>` : '';
   const errBars = useBand ? '' : ser.map(s => {
     if (!s.err) return '';
     const xc = x(s.t).toFixed(1);
@@ -2829,7 +2829,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     ${band}
     ${errBars}
     ${rawLine}
-    <polyline points="${pts}" fill="none" stroke="#06b6d4" stroke-width="${lineOnly ? 1.2 : useBand ? 0.7 : 0.9}" stroke-opacity="${lineOnly ? 0.9 : 0.55}"/>
+    <polyline points="${pts}" fill="none" stroke="#0891b2" stroke-width="${lineOnly ? 1.4 : useBand ? 1.0 : 1.1}" stroke-opacity="${lineOnly ? 0.95 : 0.8}"/>
     ${lineOnly ? '' : dots}
     ${adNote}
     ${fixedDots}
@@ -3100,7 +3100,7 @@ function renderGutenbergRichter(evList, Mc) {
   let mcLine = '';
   if (Mc !== null && Mc >= mAxisMin && Mc <= mAxisMax) {
     mcLine = `<line x1="${x(Mc).toFixed(1)}" y1="${PAD_T}" x2="${x(Mc).toFixed(1)}" y2="${PAD_T+plotH}" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3"/>` +
-             `<text x="${x(Mc).toFixed(1)}" y="${PAD_T+10}" fill="#06b6d4" font-size="8" text-anchor="middle">Mc=${fmtM(Mc)}</text>`;
+             `<text x="${(x(Mc) + 3).toFixed(1)}" y="${PAD_T+10}" fill="#06b6d4" font-size="11" font-weight="700" text-anchor="start">Mc = ${fmtM(Mc)}</text>`;
   }
 
   // GR fit dogrusu: mevcut Aki MLE b hesabini (computeBvalue) DEGISTIRMEDEN
@@ -3137,7 +3137,7 @@ function renderGutenbergRichter(evList, Mc) {
       const xLabel = x(mLabel), yLabel = y(synthCum(mLabel) / normFactor);
       fitLine = `<line x1="${xStart.toFixed(1)}" y1="${yStart.toFixed(1)}" x2="${xEnd.toFixed(1)}" y2="${yEnd.toFixed(1)}" stroke="#f5a623" stroke-width="1.3" stroke-dasharray="2,2"/>` +
                 `<circle cx="${xStart.toFixed(1)}" cy="${yStart.toFixed(1)}" r="3" fill="#f5a623" stroke="#111" stroke-width="0.6"><title>Fit başlangıcı: Mc=${fmtM(Mc)}, N≥Mc=${nAboveMc}</title></circle>` +
-                `<text x="${(xLabel+4).toFixed(1)}" y="${(yLabel-4).toFixed(1)}" fill="#f5a623" font-size="9" font-weight="700">b=${bFit.toFixed(2)}</text>`;
+                `<text x="${(xLabel+4).toFixed(1)}" y="${(yLabel-4).toFixed(1)}" fill="#f5a623" font-size="12" font-weight="700">b = ${bFit.toFixed(2)}${bErr !== null ? ' ± ' + bErr.toFixed(2) : ''}</text>`;
       fitStatsStr = ` &nbsp;|&nbsp; N≥Mc=<b>${nAboveMc}</b> · a=<b>${aFit.toFixed(2)}</b> · b_GR=<b>${bFit.toFixed(2)}</b>${bErr !== null ? ' ± ' + bErr.toFixed(2) + ' <span style="color:#888">(%95, Aki 1965)</span>' : ''} · <span title="Aki MLE yalnızca M ≥ Mc olaylarıyla; GoF kümülatif N(≥M) ile Mc–Mmax aralığında. Mc tahmindir (maks. eğrilik +0,2): bölgeye, zaman aralığına ve yönteme bağlıdır.">uyum M ${Mc}–${mMax}</span> · <span title="Wiemer &amp; Wyss (2000) goodness-of-fit measure (not R²)">GoF=<b>${gofR !== null ? gofR.toFixed(1)+'%' : '—'}</b></span>`;
     } else {
       fitStatsStr = ` &nbsp;|&nbsp; GR fit: yetersiz veri (N≥Mc=${fmtM(Mc)}: ${nAboveMc} &lt; 10)`;
@@ -3166,6 +3166,9 @@ function renderGutenbergRichter(evList, Mc) {
     ${fitLine}
     ${cumMarkers}
     ${nonCumMarkers}
+    <g font-size="11"><circle cx="${W - PAD_R - 172}" cy="${PAD_T + 12}" r="2.6" fill="#e2e8f0" stroke="#111" stroke-width="0.4"/><text x="${W - PAD_R - 165}" y="${PAD_T + 16}" fill="#cbd5e1">birikimli N(≥M)</text>
+      <circle cx="${W - PAD_R - 172}" cy="${PAD_T + 27}" r="2.6" fill="none" stroke="#22c55e" stroke-width="1.1"/><text x="${W - PAD_R - 165}" y="${PAD_T + 31}" fill="#cbd5e1">bin-içi N</text>
+      <line x1="${W - PAD_R - 178}" y1="${PAD_T + 42}" x2="${W - PAD_R - 166}" y2="${PAD_T + 42}" stroke="#f5a623" stroke-width="1.3" stroke-dasharray="2,2"/><text x="${W - PAD_R - 162}" y="${PAD_T + 46}" fill="#cbd5e1">G–R uyumu (Aki 1965)</text></g>
     <line x1="${PAD_L}" y1="${PAD_T+plotH}" x2="${W-PAD_R}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
     <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T+plotH}" stroke="#555" stroke-width="1"/>
     <text x="9" y="${(PAD_T + plotH / 2).toFixed(1)}" fill="#888" font-size="8" text-anchor="middle" transform="rotate(-90 9 ${(PAD_T + plotH / 2).toFixed(1)})">${effMode === 'rate' ? 'Yıllık oran (/yıl)' : effMode === 'density' ? 'Yoğunluk (/10⁶ km²/yıl)' : 'Olay sayısı N'}</text>
@@ -3489,7 +3492,7 @@ function svgToEN(xml) {
     .replace(/ \/yıl/g, ' /yr').replace(/(N = \d+) olay/g, '$1 events').replace(/TÜM SINIFLAR/g, 'ALL CLASSES')
     .replace(/EĞRİ {9}/g, 'CURVE        ').replace(/EN İYİ TAHMİN/g, 'BEST ESTIMATE').replace(/ÜST EĞRİ {5}/g, 'UPPER CURVE  ').replace(/ALT EĞRİ {5}/g, 'LOWER CURVE  ')
     .replace(/Yetersiz veri:/g, 'Insufficient data:')
-    .replace(/>b-değeri</g, '>b-value<').replace(/>Büyüklük M</g, '>Magnitude M<').replace(/>Olay sayısı N</g, '>Number of events N<')
+    .replace(/>b-değeri</g, '>b-value<').replace(/>birikimli N\(≥M\)</g, '>cumulative N(≥M)<').replace(/>bin-içi N</g, '>per-bin N<').replace(/>G–R uyumu \(Aki 1965\)</g, '>G–R fit (Aki 1965)<').replace(/>Büyüklük M</g, '>Magnitude M<').replace(/>Olay sayısı N</g, '>Number of events N<')
     .replace(/>Yıllık oran \(\/yıl\)</g, '>Annual rate (/yr)<').replace(/>Yoğunluk \(\/10⁶ km²\/yıl\)</g, '>Density (/10⁶ km²/yr)<')
     .replace(/(\d+) yıl · n = /g, '$1 yr · n = ').replace(/p \(küme korumalı\)/g, 'p (cluster-preserving)').replace(/Σ√E \(göreli, t_f = 1\)/g, 'Σ√E (relative, t_f = 1)')
     .replace(/■ düşük b &lt; 0,7/g, '■ low b &lt; 0.7').replace(/■ tipik 0,7–1,4/g, '■ typical 0.7–1.4').replace(/■ yüksek b &gt; 1,4/g, '■ high b &gt; 1.4')
@@ -5962,7 +5965,7 @@ function renderBenioff(evList, Mc, cs) {
     const dMax = Math.max(...dS), sT = H0 + 4, sH = STRIP - 18;
     g += `<rect x="${PAD_L}" y="${sT}" width="${plotW}" height="${sH}" fill="none" stroke="#2a2a2a" stroke-width="0.6"/>`;
     if (dMax > 0) for (let i = 0; i < nb; i++) { if (!dS[i]) continue; const xa = x(t0 + i * bw), xb = x(Math.min(t1, t0 + (i + 1) * bw)), hh = dS[i] / dMax * sH;
-      g += `<rect x="${xa.toFixed(1)}" y="${(sT + sH - hh).toFixed(1)}" width="${Math.max(0.6, xb - xa - 0.4).toFixed(1)}" height="${hh.toFixed(1)}" fill="#f97316" fill-opacity="0.55"><title>${new Date(t0 + i * bw).toISOString().slice(0, 10)}: ΔS/Δt = ${(dS[i] / sc).toFixed(3)}×10^${k} erg^½/yıl (aralık ${binY === 1 ? '1 yıl' : binY === 0.25 ? '3 ay' : '1 ay'})</title></rect>`; }
+      g += `<rect x="${xa.toFixed(1)}" y="${(sT + sH - hh).toFixed(1)}" width="${Math.max(0.6, xb - xa - 0.4).toFixed(1)}" height="${hh.toFixed(1)}" fill="#f97316" fill-opacity="0.35"><title>${new Date(t0 + i * bw).toISOString().slice(0, 10)}: ΔS/Δt = ${(dS[i] / sc).toFixed(3)}×10^${k} erg^½/yıl (aralık ${binY === 1 ? '1 yıl' : binY === 0.25 ? '3 ay' : '1 ay'})</title></rect>`; }
     g += `<text x="${PAD_L + 4}" y="${sT + sH + 12}" fill="#888" font-size="8">ΔS/Δt: ${binY === 1 ? '1 yıllık' : binY === 0.25 ? '3 aylık' : '1 aylık'} aralıklarda Benioff salım hızı (sabit eşik, yıla ölçekli), en büyük çubuk = ${(dMax / sc).toFixed(2)}×10^${k} erg^½/yıl</text>`;
     // ΔS/Δt ayrıştırma şeridi (2026-10-17): aynı aralıklar, aynı zaman ekseni. log10 birimi; 0 = bütün dönem ortalaması.
     DEC = benDecompose(F.map(p => ({ t: p.t, m: p.m })), t0, t1, bw, mFix, cs ? 0.1 : tmMagDM);   // 2026-10-18: dönüşümde ΔM_Mw
@@ -5972,7 +5975,7 @@ function renderBenioff(evList, Mc, cs) {
     else {
       const vals = DEC.bins.flatMap(b2 => b2.n ? [b2.cnt, b2.bt, b2.res, b2.tot] : []).filter(Number.isFinite);
       const L = Math.min(2, Math.max(0.5, Math.ceil(Math.max(...vals.map(Math.abs)) * 2) / 2)), yd = v => dT + dH / 2 - Math.max(-L, Math.min(L, v)) / L * (dH / 2);
-      g += `<line x1="${PAD_L}" y1="${yd(0).toFixed(1)}" x2="${W - PAD_R}" y2="${yd(0).toFixed(1)}" stroke="#555" stroke-width="0.7"/>`;
+      g += `<line x1="${PAD_L}" y1="${yd(0).toFixed(1)}" x2="${W - PAD_R}" y2="${yd(0).toFixed(1)}" stroke="#94a3b8" stroke-width="1.1"/>`;
       [L, -L].forEach(v => { g += `<text x="${PAD_L - 6}" y="${(yd(v) + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${v > 0 ? '+' : '−'}${Math.abs(v).toFixed(1)}</text>`; });
       g += `<text x="9" y="${(dT + dH / 2).toFixed(1)}" fill="#888" font-size="8" text-anchor="middle" transform="rotate(-90 9 ${(dT + dH / 2).toFixed(1)})">log₁₀ oran</text>`;
       DEC.bins.forEach(b2 => { if (!b2.n) return;
@@ -5988,7 +5991,7 @@ function renderBenioff(evList, Mc, cs) {
   // tamlık dönemi sınırları
   if (cs) cs.periods.slice(1).forEach(p => { const xx = x(p.t0); if (xx > PAD_L && xx < W - PAD_R) g += `<line x1="${xx.toFixed(1)}" y1="${PAD_T}" x2="${xx.toFixed(1)}" y2="${PAD_T + plotH}" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="2,3" stroke-opacity="0.8"><title>Tamlık basamağı: ${csYearStart(p.t0)}, M≥${(+p.mc).toFixed(1)}</title></line>`; });
   if (V) g += `<path d="${stepPath(V)}" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-dasharray="5,3" stroke-opacity="0.8"/>`;
-  g += `<path d="${stepPath(F)}" fill="none" stroke="#f97316" stroke-width="2"/>`;
+  g += `<path d="${stepPath(F)}" fill="none" stroke="#f97316" stroke-width="2.6"/>`;
   F.filter(p => p.m >= Math.max(5, mFix + 0.5)).forEach(p => { g += `<circle cx="${x(p.t).toFixed(1)}" cy="${y(p.s).toFixed(1)}" r="2.6" fill="#f97316" stroke="#111" stroke-width="0.5"><title>M${p.m.toFixed(1)} · ${new Date(p.t).toISOString().slice(0, 10)}</title></circle>`; });
   g += `<line x1="${PAD_L}" y1="${PAD_T + plotH}" x2="${W - PAD_R}" y2="${PAD_T + plotH}" stroke="#555" stroke-width="1"/><line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T + plotH}" stroke="#555" stroke-width="1"/>`;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = g;
