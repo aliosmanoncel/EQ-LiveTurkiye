@@ -4037,14 +4037,28 @@ async function exportPosterAGU(scale, evt) {
   const refs = ['Aki, K. (1965). Bull. Earthq. Res. Inst. 43, 237–239.', 'Halchuk, S., Burke, K. B. S. & Adams, J. (2004). Seismol. Res. Lett. 75(3), 432–434.',
     'Kijko, A. & Sellevoll, M. A. (1989). Bull. Seismol. Soc. Am. 79(3), 645–654.', 'Öncel, A. O. & Wilson, T. H. (2007). Geophys. J. Int. 169(1), 259–270.',
     'Weichert, D. H. (1980). Bull. Seismol. Soc. Am. 70(4), 1337–1346.', 'Wiemer, S. & Wyss, M. (2000). Bull. Seismol. Soc. Am. 90(4), 859–869.'];
-  const colW = (RW - 48) / 2;
-  const half = Math.ceil(refs.length / 2), ry0 = y - 2;
-  if (INC.refs) [refs.slice(0, half), refs.slice(half)].forEach((colRefs, ci2) => { let yy = ry0;
-    colRefs.forEach(r => { yy = rich(r, X1 + 16 + ci2 * (colW + 16), yy, colW, { size: 14, lh: 18, hang: 22, maxY: BT + BH - 26 }) + 5; }); });
+  // 2026-10-18: altyazılarda atıf yapılan yöntemlerin kaynakları yalnızca ilgili şekil posterdeyse eklenir (AMR; b(t) sınıf notu → Gulia vd.)
+  if (AMR_ON) refs.push('Bowman, D. D., Ouillon, G., Sammis, C. G., Sornette, A. & Sornette, D. (1998). J. Geophys. Res. 103(B10), 24359–24372.',
+    'Bufe, C. G. & Varnes, D. J. (1993). J. Geophys. Res. 98(B6), 9871–9883.', 'Gardner, J. K. & Knopoff, L. (1974). Bull. Seismol. Soc. Am. 64(5), 1363–1367.',
+    'Hardebeck, J. L., Felzer, K. R. & Michael, A. J. (2008). J. Geophys. Res. 113(B8), B08310.');
+  if (INC.bt && bt && bt.cls) refs.push('Gulia, L. & Wiemer, S. (2019). Nature 574, 193–199.', 'Gulia, L., Wiemer, S., Biondini, E., Enescu, B. & Vannucci, G. (2024). Seismol. Res. Lett. 95(6), 3579–3592.');
+  refs.sort((a, b) => a.localeCompare(b, 'tr'));
+  // Sütun sayısı ve punto: kaynaklar kutuya sığana dek 2 → 3 → 4 sütun denenir; yükseklik rich(..., dry) ile ölçülür, sütunlar satır sayısına göre dengelenir
+  const RSZ = refs.length > 8 ? 10.5 : refs.length > 6 ? 12 : 14, RLH = refs.length > 8 ? 12.5 : Math.round(RSZ * 1.3), RGAP = refs.length > 8 ? 2 : 4, RHANG = refs.length > 8 ? 14 : 22;
+  const ry0 = y - 2; let RMAXY = BT + BH - 26, ACK_FOOT = false;
+  const layoutRefs = n => { const cw = (RW - 32 - 16 * n) / n, hs = refs.map(r => rich(r, 0, 0, cw, { size: RSZ, lh: RLH, hang: RHANG, dry: true }) + RGAP);
+    const tot = hs.reduce((u, v) => u + v, 0), out = [[]], colH = [0];
+    refs.forEach((r, i) => { const k = out.length - 1; if (colH[k] + hs[i] > tot / n + RLH && out.length < n && out[k].length) { out.push([]); colH.push(0); } out[out.length - 1].push(r); colH[out.length - 1] += hs[i]; });
+    return { cw, out, ok: Math.max(...colH) <= RMAXY - ry0 }; };
+  let RL = layoutRefs(2); if (!RL.ok) RL = layoutRefs(3); if (!RL.ok) RL = layoutRefs(4);
+  if (!RL.ok) { ACK_FOOT = true; RMAXY = BT + BH - 6; RL = layoutRefs(3); if (!RL.ok) RL = layoutRefs(4); }   // yer yetmezse teşekkür sayfa altına iner
+  const colW = RL.cw, rcols = RL.out;
+  if (INC.refs) rcols.forEach((colRefs, ci2) => { let yy = ry0;
+    colRefs.forEach(r => { const y2 = rich(r, X1 + 16 + ci2 * (colW + 16), yy, colW, { size: RSZ, lh: RLH, hang: RHANG, maxY: RMAXY }) + RGAP; if (y2 - RGAP > RMAXY && !PW.some(w => /Kaynaklar kutusu|References box/.test(w))) PW.push(L('Kaynaklar kutusu taştı; bazı kaynaklar kırpılmış olabilir.', 'References box overflowed; some references may be clipped.')); yy = y2; }); });
   // Teşekkür (AGU "Acknowledgments"): boşsa veri sağlayıcıya standart teşekkür
   const ackSrc = SRC(regionRect ? regionSourceLabel() : 'canlı akış').replace(/\s*\(.*\)\s*/g, ' ').trim();
   const ack = posterVal('posterAck', L(`Katalog verileri ${ackSrc} FDSN web servisinden alınmıştır; veri sağlayıcılara teşekkür ederiz. Analiz: EQ-Live Türkiye.`, `Catalogue data were obtained from the ${ackSrc} FDSN web service; we thank the data providers. Analysis: EQ-Live Türkiye.`));
-  if (INC.refs) rich(L('**Teşekkür:** ', '**Acknowledgments:** ') + ack, X1 + 16, BT + BH - 24, RW - 32, { size: 12, lh: 16, italic: true, col: MUTE, maxY: BT + BH - 2 });
+  if (INC.refs && !ACK_FOOT) rich(L('**Teşekkür:** ', '**Acknowledgments:** ') + ack, X1 + 16, BT + BH - 24, RW - 32, { size: 12, lh: 16, italic: true, col: MUTE, maxY: BT + BH - 2 });
   else rich(L('**Teşekkür:** ', '**Acknowledgments:** ') + ack, X1, H - 19, X3 - 20 - X1, { size: 11, lh: 14, italic: true, col: MUTE, maxY: H - 2 });   // kaynaklar çıkarıldı: teşekkür sayfa altında tek satır
   // Ek Bilgi: QR (tam analiz bağlantısı; tüm ayarlar URL'dedir) + kaynak/tarih + kısa adres
   if (INC.qr) {
