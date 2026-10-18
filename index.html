@@ -3914,7 +3914,7 @@ async function exportPosterAGU(scale, evt) {
     else if (regionRect) { const b = regionRect.getBounds(); [[b.getNorth(), b.getWest()], [b.getNorth(), b.getEast()], [b.getSouth(), b.getEast()], [b.getSouth(), b.getWest()]].forEach(([la, lo], i) => { const [px, py] = P(la, lo); i ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); }
     c.stroke(); c.setLineDash([]);
     // ana şok yıldızı (AMR ana şoku; yoksa en büyük olay)
-    if (MS) { const [sx, sy] = P(MS.lat, MS.lon), R5 = 11; c.beginPath(); for (let i = 0; i < 10; i++) { const rr = i % 2 ? R5 * 0.45 : R5, an = -Math.PI / 2 + i * Math.PI / 5; i ? c.lineTo(sx + rr * Math.cos(an), sy + rr * Math.sin(an)) : c.moveTo(sx + rr * Math.cos(an), sy + rr * Math.sin(an)); }
+    if (MS) { const [sx, sy] = P(MS.lat, MS.lon), R5 = 16; c.beginPath(); for (let i = 0; i < 10; i++) { const rr = i % 2 ? R5 * 0.45 : R5, an = -Math.PI / 2 + i * Math.PI / 5; i ? c.lineTo(sx + rr * Math.cos(an), sy + rr * Math.sin(an)) : c.moveTo(sx + rr * Math.cos(an), sy + rr * Math.sin(an)); }
       c.closePath(); c.fillStyle = '#facc15'; c.fill(); c.lineWidth = 1.5; c.strokeStyle = '#111'; c.stroke(); }
     // ölçek çubuğu ve kuzey oku
     const latC = (S + N) / 2, kmPerPx = 40075.017 * Math.cos(latC * Math.PI / 180) / sc;
@@ -3995,7 +3995,7 @@ async function exportPosterAGU(scale, evt) {
   const sA = INC.bt ? (NPAN > 1 ? '**(a)** ' : '') + L(`b-değeri, 100 olaylık kayan pencere (Aki 1965), %95 güven bandı; arka plan b sınıfı: {#dc2626|< 0,7}, {#ca8a04|0,7–1,4}, {#16a34a|> 1,4} (betimleyici, tehlike düzeyi değil).`, `b-value in 100-event moving windows (Aki 1965) with 95% CI; background b class: {#dc2626|< 0.7}, {#ca8a04|0.7–1.4}, {#16a34a|> 1.4} (descriptive, not a hazard level).`) : '';
   const sB = BEN_ON ? ` ${PL('ben') ? `**(${PL('ben')})** ` : ''}` + L(`Birikimli Benioff gerinimi S = Σ√E (M ≥ ${BB ? DC(fmtM(BB.mFix)) : '—'}); alt şerit: aralık başına Benioff salımının tüm dönem ortalamasına oranı, log ölçek (çizgi üstü hızlı, altı yavaş; {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b-değeri katkısı).`, `Cumulative Benioff strain S = Σ√E (M ≥ ${BB ? fmtM(BB.mFix) : '—'}); lower strip: Benioff release per interval divided by the whole-period mean, log scale (above = faster, below = slower; {#3b82f6|blue} event-count, {#16a34a|green} b-value contribution).`) : '';
   const sC = AMR_ON ? ` ${PL('amr') ? `**(${PL('amr')})** ` : ''}` + L(`AMR, en iyi hücre R = ${AP.r} km, ${AP.yr} yıl: {#ea580c|Σ√E}, {#2563eb|güç yasası}, gri doğrusal; q = ${DC(AP.q.toFixed(2))}, p = ${DC(AP.pK.toFixed(3))} (${amrSupport(AP.pK).tr.toLowerCase()}).`, `AMR, best cell R = ${AP.r} km, ${AP.yr} yr: {#ea580c|Σ√E}, {#2563eb|power law}, grey linear; q = ${AP.q.toFixed(2)}, p = ${AP.pK.toFixed(3)} (${amrSupport(AP.pK).en.toLowerCase()}).`) : '';
-  const cap3 = SHORTCAP ? L('**Şekil 3.** ', '**Figure 3.** ') + sA + sB + sC + L(' {#dc2626|Kırmızı kesikli}: ana şok. Geriye dönük; öncül değildir.', ' {#dc2626|Red dashed}: mainshock. Retrospective; not a precursor.').replace(AMR_ON || MSX ? /$^/ : / \{#dc2626\|(Kırmızı kesikli|Red dashed)\}: (ana şok|mainshock)\./, '') : cap3Full;
+  const cap3 = SHORTCAP ? L('**Şekil 3.** ', '**Figure 3.** ') + sA + sB + sC + L(` {#dc2626|Kırmızı kesikli}: ana şok; sağındaki değerler artçıları içerir${AMR_ON ? ', AMR penceresi ana şoktan önce biter' : ''}. Geriye dönük; öncül değildir.`, ` {#dc2626|Red dashed}: mainshock; values to its right include aftershocks${AMR_ON ? '; the AMR window ends before the mainshock' : ''}. Retrospective; not a precursor.`).replace(AMR_ON || MSX ? /$^/ : / \{#dc2626\|(Kırmızı kesikli|Red dashed)\}: (ana şok|mainshock)[^.]*\./, '') : cap3Full;
   const cap3O = STACK_ON ? { size: BEN_ON && AMR_ON ? 13 : 14, lh: BEN_ON && AMR_ON ? 17 : 18, italic: true, col: '#374151', maxY: MID2 - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID2 - 4 };
   if (STACK_ON) {
     // 2026-10-17 düzen A: Şekil 3a b(t) üstte, 3b Benioff ve/veya 3c AMR altta; AYNI genişlik ve sol kenar → SVG'lerin zaman
@@ -4082,6 +4082,9 @@ async function exportPosterAGU(scale, evt) {
   else {
     rItems = [];
     const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`, P = t => t;   // V: vurgulu değer; P: uyarı varken vurgusuz
+    if (!INC.meth && MSX) { const srcM = SRC(regionRect ? regionSourceLabel() : 'canlı akış').replace(/\s*\(.*\)\s*/g, ' ').trim(), mcM = gs ? fmtM(gs.mc) : '—';   // Yöntem kutusu yoksa kısa yöntem/sağlamlık maddesi
+      rItems.push(L(`**Veri ve yöntem:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${DC(mcM)} (maks. eğrilik + 0,2); b: Aki (1965), %95 aralık ±1,96·b/√N, 100 olaylık pencereler; tek Mc${regionRect && !regionDeclusterOn ? ', artçı ayıklanmadı' : ''}${AMR_ON ? `; AMR yalnız ana şok öncesi olaylarla, R × başlangıç ızgarası, anlamlılık ${AP.nSim} küme korumalı sentetik katalogla` : ''}.`,
+        `**Data & methods:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${mcM} (max. curvature + 0.2); b: Aki (1965), 95% CI ±1.96·b/√N, 100-event windows; single Mc${regionRect && !regionDeclusterOn ? ', not declustered' : ''}${AMR_ON ? `; AMR on pre-mainshock events only, R × start-time grid, significance from ${AP.nSim} cluster-preserving synthetic catalogues` : ''}.`)); }
     if (cs) rItems.push(posterQcSummary(qcObj, csQc, EN));   // kalite kontrol İLK madde, kesilmeden ve kısa/yapılandırılmış (seçenek A)
     if (gf) { const best = gf.curves[0], E = qcFlag ? P : V;   // metodoloji (i) ve (iv)
       const yr = L('yıl', 'yr');
@@ -4104,7 +4107,7 @@ async function exportPosterAGU(scale, evt) {
     if (document.getElementById('posterCaveat')?.checked) rItems.push(EN
       ? '**Interpretation limit:** b(t) variations are sensitive to window length, Mc and catalogue heterogeneity (magnitude types, network changes); on their own they are not a reliable precursor of a large earthquake.'
       : '**Yorum sınırı:** b(t) değişimleri pencere boyuna, Mc\'ye ve katalog heterojenliğine (büyüklük türleri, ağ değişimleri) duyarlıdır; tek başına büyük bir depremin güvenilir öncülü olarak yorumlanmamalıdır.');
-    if (!cs) rItems.push(EN ? '**Quality control:** no completeness steps were used; b and rates assume that a single Mc is valid for the whole period.' + (regionRect && !regionDeclusterOn ? ' Aftershocks were not removed (GK74 off).' : '')
+    if (!cs && !(MSX && !INC.meth)) rItems.push(EN ? '**Quality control:** no completeness steps were used; b and rates assume that a single Mc is valid for the whole period.' + (regionRect && !regionDeclusterOn ? ' Aftershocks were not removed (GK74 off).' : '')
       : '**Kalite kontrol:** tamlık basamakları kullanılmadı; b ve oranlar tek Mc\'nin tüm dönemde geçerli olduğu varsayımına dayanır.' + (regionRect && !regionDeclusterOn ? ' Artçılar ayıklanmadı (GK74 kapalı).' : ''));
   }
   // Sonuçlar kutusu (poster düzeltmesi iv; Patch 2b — madde bütünlüğü): punto 14,5 → 10 arasında küçültülür, küçük puntoda
