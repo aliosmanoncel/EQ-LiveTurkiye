@@ -18,9 +18,10 @@ const fn = name => {
   const i = src.indexOf('\nfunction ' + name + '('); if (i < 0) throw new Error('bulunamadı: ' + name);
   const j = src.slice(i + 1).search(/\n(?=[^\s}])/); return src.slice(i + 1, i + 2 + j);
 };
-const consts = ['AMR_M_GRID', 'AMR_PROTOS', 'AMR_Y_GRID', 'AMR_NMIN'].map(c => { const m = src.match(new RegExp('^const ' + c + ' = [^\\n]*$', 'm')); if (!m) throw new Error(c); return m[0].replace(/^const /, 'var '); });
+const consts = ['AMR_M_GRID', 'AMR_PROTOS', 'AMR_Y_GRID0', 'AMR_NMIN'].map(c => { const m = src.match(new RegExp('^const ' + c + ' = [^\\n]*$', 'm')); if (!m) throw new Error(c); return m[0].replace(/^const /, 'var '); });
 // 2026-10-18: R ızgarası protokole bağlı (AMR-P1 ≤ 300 km, AMR-P2 ≤ 500 km); AMR_PROTO ortam değişkeniyle seçilir
 consts.push(`var AMR_R_GRID = AMR_PROTOS['${process.env.AMR_PROTO || 'AMR-P2'}'];`);
+consts.push(`var AMR_PROTO_Y = { 'AMR-JW05': [5, 10, 15, 20, 25, 30] }; var AMR_Y_GRID = AMR_PROTO_Y['${process.env.AMR_PROTO || 'AMR-P2'}'] || AMR_Y_GRID0;`);
 const ctx = {}; vm.createContext(ctx);
 vm.runInContext([...new Set(consts)].join('\n') + '\n' + ['amrFitQ', 'amrGrid', 'amrSynthPoisson', 'amrSynthCluster', 'amrDropCheck', 'amrPvalue', 'mulberry32'].map(fn).join('\n') +
   '\nglobalThis.__x = { amrFitQ, amrGrid, amrSynthPoisson, amrSynthCluster, amrDropCheck, amrPvalue, mulberry32, AMR_R_GRID, AMR_Y_GRID, AMR_NMIN, AMR_YR };', ctx);
