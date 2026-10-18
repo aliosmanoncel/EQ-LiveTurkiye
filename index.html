@@ -1072,7 +1072,7 @@
 <!-- Zaman–Magnitude Dağılımı (Time–Magnitude Distribution) -->
 <div class="tmPanel" id="tmPanel">
   <div class="tmHead">
-    <span class="tmTitle">📈 Zaman–Magnitude Dağılımı<span id="tmModeLbl" style="color:#a855f7;"></span> <span style="color:#666;font-weight:400;">(Time–Magnitude Distribution)</span></span>
+    <span class="tmTitle">📈 Zaman–Magnitude Dağılımı<span id="tmModeLbl" style="color:#a855f7;"></span> <span style="color:#666;font-weight:400;">(Time–Magnitude Distribution)</span><label class="pcFig" title="Akademik posterde Zaman–büyüklük şekli (Şekil 2) yer alsın mı? Poster panelindeki “Bileşenler” ile aynı ayardır." style="font-size:.68rem;font-weight:400;color:#fbbf24;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" data-pc="pcTM" onchange="posterFigToggle(this)" style="vertical-align:middle;"> 🎓 posterde</label></span>
     <span>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('dark', event)" title="Üç grafiği (Time-Mag, b-değeri, Gutenberg-Richter) + bölge/yöntem bilgisini, ekrandakiyle AYNI koyu temada tek bir PNG olarak indir — Blogger/web paylaşımı için">🖼️ PNG — Web</button>
       <button class="tmFullscreenBtn" onclick="exportTimeMagPNG('light', event)" title="Aynı üç grafiği beyaz zemin/koyu metinli bir düzende PNG olarak indir — akademik rapor, Word veya PDF'e gömmek için; grafiklerin kendi renkleri değişmez, yalnızca başlık/metin rengi">📄 PNG — Rapor</button>
@@ -1149,6 +1149,7 @@
       <label style="cursor:pointer"><input type="checkbox" id="pcMap" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Çalışma alanı haritası</label>
       <label style="cursor:pointer"><input type="checkbox" id="pcTM" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Zaman–büyüklük</label>
       <label style="cursor:pointer" title="Yalnızca Benioff paneli çizilmişse kullanılır"><input type="checkbox" id="pcBen" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Benioff (3b)</label>
+      <label style="cursor:pointer" title="Yalnızca AMR testi çalıştırılıp şekli çizilmişse kullanılır (deneysel; varsayılan kapalı)"><input type="checkbox" id="pcAmr" onchange="posterCompChanged()" style="vertical-align:middle;"> AMR (3c)</label>
       <label style="cursor:pointer"><input type="checkbox" id="pcRefs" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Kaynaklar</label>
     </div>
     <div id="posterFitNote" style="margin-top:3px;color:#f59e0b;"></div>
@@ -1180,14 +1181,14 @@
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
     <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
-      <div class="tmTitle" style="font-size:.78rem;">⚡ Kümülatif Benioff Gerinim Ölçüsü Σ√E <span style="color:#666;font-weight:400;">(log E = 11,8 + 1,5M, erg; Gutenberg &amp; Richter 1956 — sabit eşik)</span></div>
+      <div class="tmTitle" style="font-size:.78rem;">⚡ Kümülatif Benioff Gerinim Ölçüsü Σ√E <span style="color:#666;font-weight:400;">(log E = 11,8 + 1,5M, erg; Gutenberg &amp; Richter 1956 — sabit eşik)</span><label class="pcFig" title="Akademik posterde Benioff şekli (Şekil 3b) yer alsın mı? Poster panelindeki “Bileşenler” ile aynı ayardır." style="font-size:.68rem;font-weight:400;color:#fbbf24;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" data-pc="pcBen" onchange="posterFigToggle(this)" style="vertical-align:middle;"> 🎓 posterde</label></div>
       <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
       <svg id="tmSvgBen" viewBox="0 0 660 210" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
       <div class="tmStats" id="tmStatsBen">—</div>
       <div id="amrPanel" style="margin-top:8px;font-size:.72rem;color:#9ab0c5;">
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
           <b style="color:#cbd5e1;">🧪 AMR geriye dönük testi</b> <span style="color:#f59e0b;border:1px solid #f59e0b;border-radius:3px;padding:0 4px;font-size:.9em;">DENEYSEL</span>
-          <span style="color:#666;">(hızlanan moment salımı · sıfır hipotezine karşı · öncül göstergesi değildir)</span>
+          <span style="color:#666;">(hızlanan moment salımı · sıfır hipotezine karşı · öncül göstergesi değildir)</span><label class="pcFig" title="Akademik posterde AMR şekli yer alsın mı? Şekil yalnızca test çalıştırıldıktan sonra çizilir; varsayılan kapalıdır (deneysel)." style="font-size:.68rem;font-weight:400;color:#fbbf24;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" data-pc="pcAmr" onchange="posterFigToggle(this)" style="vertical-align:middle;"> 🎓 posterde</label>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;">
           <label title="Boş bırakılırsa seçimdeki en büyük olay. Tarih girilirse o gündeki (±1 gün) en büyük olay. t_f bu olayın zamanına sabitlenir; t_f tahmini yapılmaz.">Ana şok tarihi <input id="amrDate" type="date" style="background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
@@ -1195,6 +1196,7 @@
           <button onclick="amrRun()" style="background:none;border:1px solid #334;color:#cbd5e1;border-radius:4px;font-size:.95em;padding:1px 7px;cursor:pointer;" title="Önceden tanımlı ızgara: R = 25, 50, 100, 150, 200, 300 km × ana şoktan 2, 5, 10, 15, 20 yıl önce. Eşik: Benioff panelinin sabit eşiği. Test istatistiği ızgaradaki en küçük q'dur; aynı arama her sentetik katalogda tekrarlanır.">▶ Testi çalıştır</button>
         </div>
         <div id="amrOut" style="margin-top:3px;line-height:1.5;"><span style="color:#666">Test henüz çalıştırılmadı.</span></div>
+        <svg id="tmSvgAmr" viewBox="0 0 660 200" preserveAspectRatio="xMidYMid meet" style="display:none;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
       </div>
     </div>
     <div id="sensPanel" style="margin-top:8px;font-size:.72rem;color:#9ab0c5;">
@@ -3326,23 +3328,32 @@ function tmSelectPoint(t, m) {
 ══════════════════════════════════════════ */
 const POSTER_KEYS = ['posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact', 'posterTheme', 'posterIntro', 'posterAck', 'posterLang', 'posterPreset'];
 // Poster bileşenleri (2026-10-18): seçilebilir şekil ve metin blokları; hazır düzenler yalnızca bu kutuları işaretler
-const POSTER_COMP = ['pcIntro', 'pcMap', 'pcTM', 'pcBen', 'pcRefs'];
-const POSTER_PRESETS = { akademik: { pcIntro: 1, pcMap: 1, pcTM: 1, pcBen: 1, pcRefs: 1 },
-  standart: { pcIntro: 1, pcMap: 1, pcTM: 0, pcBen: 1, pcRefs: 1 }, sade: { pcIntro: 0, pcMap: 1, pcTM: 0, pcBen: 0, pcRefs: 0 } };
+const POSTER_COMP = ['pcIntro', 'pcMap', 'pcTM', 'pcBen', 'pcAmr', 'pcRefs'];
+const POSTER_PRESETS = { akademik: { pcIntro: 1, pcMap: 1, pcTM: 1, pcBen: 1, pcAmr: 0, pcRefs: 1 },
+  standart: { pcIntro: 1, pcMap: 1, pcTM: 0, pcBen: 1, pcAmr: 0, pcRefs: 1 }, sade: { pcIntro: 0, pcMap: 1, pcTM: 0, pcBen: 0, pcAmr: 0, pcRefs: 0 } };
+// Şekil başlıklarının yanındaki “🎓 posterde” kutuları poster panelindeki bileşen kutularının aynasıdır (2026-10-18)
+function posterSyncFigToggles() {
+  document.querySelectorAll('input[data-pc]').forEach(cb => { const src = document.getElementById(cb.dataset.pc); if (src) cb.checked = src.checked; });
+}
+function posterFigToggle(cb) {
+  const src = document.getElementById(cb.dataset.pc); if (!src) return;
+  src.checked = cb.checked; posterCompChanged();
+}
 function posterApplyPreset() {
   const p = POSTER_PRESETS[(document.getElementById('posterPreset') || {}).value];
   if (p) POSTER_COMP.forEach(k => { const el = document.getElementById(k); if (el) el.checked = !!p[k]; });
-  posterSavePrefs();
+  posterSyncFigToggles(); posterSavePrefs();
 }
 function posterCompChanged() {
   const m = Object.entries(POSTER_PRESETS).find(([, p]) => POSTER_COMP.every(k => { const el = document.getElementById(k); return !el || el.checked === !!p[k]; }));
   const sel = document.getElementById('posterPreset'); if (sel) sel.value = m ? m[0] : 'ozel';
-  posterSavePrefs();
+  posterSyncFigToggles(); posterSavePrefs();
 }
 function posterLoadPrefs() {
   try { const o = JSON.parse(localStorage.getItem('eqlivePoster') || '{}'); POSTER_KEYS.forEach(k => { const el = document.getElementById(k); if (el && o[k] !== undefined && o[k] !== '') el.value = o[k]; });
     const cv = document.getElementById('posterCaveat'); if (cv) cv.checked = o.posterCaveat === '1';
     POSTER_COMP.forEach(k => { const el = document.getElementById(k); if (el && o[k] !== undefined) el.checked = o[k] !== '0'; }); } catch (e) {}
+  posterSyncFigToggles();
 }
 // Yazar fotoğrafı / logo: kullanıcının kendi dosyası, küçültülüp yalnızca bu tarayıcıda (localStorage) saklanır
 const POSTER_IMG_KEY = 'eqlivePosterImg';
@@ -3425,6 +3436,8 @@ function svgToEN(xml) {
     .replace(/ \/yıl/g, ' /yr').replace(/(N = \d+) olay/g, '$1 events').replace(/TÜM SINIFLAR/g, 'ALL CLASSES')
     .replace(/EĞRİ {9}/g, 'CURVE        ').replace(/EN İYİ TAHMİN/g, 'BEST ESTIMATE').replace(/ÜST EĞRİ {5}/g, 'UPPER CURVE  ').replace(/ALT EĞRİ {5}/g, 'LOWER CURVE  ')
     .replace(/Yetersiz veri:/g, 'Insufficient data:')
+    .replace(/(\d+) yıl · n = /g, '$1 yr · n = ').replace(/p \(küme korumalı\)/g, 'p (cluster-preserving)').replace(/Σ√E \(göreli, t_f = 1\)/g, 'Σ√E (relative, t_f = 1)')
+    .replace(/┅ güç yasası/g, '┅ power law').replace(/╌ doğrusal/g, '╌ linear').replace(/gölgeli: pencere dışı/g, 'shaded: outside window')
     .replace(/log₁₀ oran/g, 'log₁₀ ratio').replace(/Ayrıştırma için yeterli olay yok \(sabit eşikte N ≥ (\d+) gerekir\)/g, 'Not enough events for the decomposition (N ≥ $1 at the fixed threshold)')
     .replace(/Hesaplanan pencere: (\d+) · Gösterilen: (\d+) \(adım (\d+)\) · Zaman: (son olay|ortanca|ortalama)/g, (m, a, b, c, z) => `Computed windows: ${a} · Shown: ${b} (step ${c}) · Time: ${{ 'son olay': 'last event', ortanca: 'median', ortalama: 'mean' }[z]}`)
     .replace(/>(Oca|Şub|Mar|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)\.?( \d{4})?</g, (m, mo, y) => '>' + SVG_EN_MONTHS[mo] + (y || '') + '<');
@@ -3476,10 +3489,14 @@ async function exportPosterAGU(scale, evt) {
   const INC = {}; POSTER_COMP.forEach(k => { const el = document.getElementById(k); INC[k.slice(2).toLowerCase()] = !el || el.checked; });
   const PW = [];   // okunabilirlik / sığma uyarıları (#posterFitNote)
   const benEl = document.getElementById('tmSvgBen'), BEN_ON = !!(benEl && benEl.querySelector('path')) && INC.ben;
+  // 2026-10-18: AMR şekli (deneysel) — yalnızca test çalıştırılıp şekil çizilmişse ve seçildiyse; Şekil 3'te b(t) ve Benioff'un altında
+  const amrEl = document.getElementById('tmSvgAmr'), AMR_ON = !!(amrEl && amrEl.querySelector('path') && window.lastAmrPlot) && INC.amr;
+  if (INC.amr && !AMR_ON) PW.push(L('AMR seçili ama AMR şekli yok (önce AMR testini çalıştırın); posterde gösterilmedi.', 'AMR selected but no AMR figure (run the AMR test first); omitted.'));
+  const STACK_ON = BEN_ON || AMR_ON;   // düzen A: 2. sütun yalnızca Şekil 3 (alt alta hizalı paneller)
   // Şekil numaraları çizilen şekillere göre sırayla verilir (harita 1, zaman–büyüklük 2, b(t) 3, G-R 4 → çıkarılanlar atlanır)
   const FIG = {}; { let n = 0; if (INC.map) FIG[1] = ++n; if (INC.tm) FIG[2] = ++n; FIG[3] = ++n; FIG[4] = ++n; }
   const FN = t => String(t).replace(/(Şekil|Figure) ([1-4])(?![0-9])/g, (m, w, k) => FIG[k] ? `${w} ${FIG[k]}` : m);
-  const AXK = { tmSvg: 15.3, tmSvgB: BEN_ON ? 19 : 16, tmSvgGR: 15.5, tmSvgBen: 19 };
+  const AXK = { tmSvg: 15.3, tmSvgB: STACK_ON ? 19 : 16, tmSvgGR: 15.5, tmSvgBen: 19, tmSvgAmr: 19 };
   const svgImg = (el, k) => new Promise((res, rej) => {
     let src0 = new XMLSerializer().serializeToString(el);
     // Benioff poster kopyası: şerit alt yazıları (küçük, çok parçalı) çıkarılır; bilgileri Şekil 3b altyazısındadır
@@ -3497,7 +3514,8 @@ async function exportPosterAGU(scale, evt) {
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
   });
   let imgs;
-  try { imgs = await Promise.all(['tmSvg', BT_ID, 'tmSvgGR'].concat(BEN_ON ? ['tmSvgBen'] : []).map(id => svgImg(document.getElementById(id), 2.5 * SC))); }
+  const IMG_IDS = ['tmSvg', BT_ID, 'tmSvgGR'].concat(BEN_ON ? ['tmSvgBen'] : [], AMR_ON ? ['tmSvgAmr'] : []);
+  try { imgs = await Promise.all(IMG_IDS.map(id => svgImg(document.getElementById(id), 2.5 * SC))); }
   catch (e) { alert('Görsel oluşturulamadı: ' + e.message); done(); return; }
   const loadImg = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
   const idImgs = Object.assign({}, posterGetImgs(), window._posterImgMem || {});
@@ -3641,12 +3659,12 @@ async function exportPosterAGU(scale, evt) {
   // Veri ve Yöntem metnine göre ayarlanır; 2. sütun tamamen b(t) (üstte) + Benioff (altta, aynı genişlik → zaman eksenleri hizalı).
   // G(h): kutu yüksekliği + 12 px aralık; çıkarılan bileşen (h = 0) yer kaplamaz
   const G = h => h > 0 ? h + 12 : 0;
-  let GH = !INC.intro ? 0 : BEN_ON ? 104 : 124, MAPH = INC.map ? 183 : 0, MB = INC.map ? 44 + MAPH + 46 : 0, VY = G(GH) + G(MB), METH_SZ = 15;
-  let TMH = BEN_ON && INC.tm ? 196 : 0;
+  let GH = !INC.intro ? 0 : STACK_ON ? 104 : 124, MAPH = INC.map ? 183 : 0, MB = INC.map ? 44 + MAPH + 46 : 0, VY = G(GH) + G(MB), METH_SZ = 15;
+  let TMH = STACK_ON && INC.tm ? 196 : 0;
   const intro = posterVal('posterIntro', L(`Katalog tamlığı zamanla değiştiğinde tek bir Mc ile hesaplanan b-değeri ve deprem oranları yanlı olabilir. **Amaç:** ${region || 'çalışma alanı'} için zamana bağlı tamlık basamaklarıyla b-değerini, zamanla değişimini ve yıllık tekrarlanma oranlarını kestirmek.`,
     `When catalogue completeness changes over time, the b-value and earthquake rates computed with a single Mc can be biased. **Aim:** to estimate the b-value, its temporal variation and the annual recurrence rates for ${region || 'the study area'} using time-dependent completeness steps.`));
   // düzen A: Giriş kutusu metne göre (96–124 px); Benioff yoksa eski sabit 124 px
-  if (BEN_ON && INC.intro) GH = Math.max(96, Math.min(124, 44 + rich(intro, X1 + 16, 0, W1 - 32, { size: 14, lh: 18, dry: true }) + 4));
+  if (STACK_ON && INC.intro) GH = Math.max(96, Math.min(124, 44 + rich(intro, X1 + 16, 0, W1 - 32, { size: 14, lh: 18, dry: true }) + 4));
   let y = TOP;
   if (INC.intro) { y = box(X1, TOP, W1, GH, L('Giriş ve Amaç', 'Introduction and Aim'));
     rich(intro, X1 + 16, y - 4, W1 - 32, { size: 14, lh: 18, maxY: TOP + GH - 2 }); }
@@ -3682,7 +3700,7 @@ async function exportPosterAGU(scale, evt) {
     : [['1 · Veri', `${srcTag} kataloğu`], ['2 · Tamlık', cs ? 'Mc(t) basamakları' : 'tek Mc'], ['3 · b(t)', 'N = 100, adım ' + BT_STEP], ['4 · G–R', cs ? 'Weichert (1980)' : 'tek Mc · Aki MLE']];
   const tmCapT = cs ? L('Şekil 2. Olayların zaman–büyüklük dağılımı; turuncu basamak eğrisi zamana bağlı tamlık eşiği (soluk noktalar eşik altında).', 'Figure 2. Time–magnitude distribution of events; the orange step curve is the time-dependent completeness threshold (faded points lie below it).')
     : L('Şekil 2. Olayların zaman–büyüklük dağılımı; renkler büyüklük sınıflarını gösterir (tamlık basamağı kullanılmadı).', 'Figure 2. Time–magnitude distribution of events; colours show magnitude classes (no completeness steps used).');
-  if (BEN_ON) {
+  if (STACK_ON) {
     const mH = sz => mItems.reduce((a, t) => a + (rich(t, X1 + 16, 0, W1 - 32, { size: sz, lh: Math.round(sz * 1.33), bullet: true, dry: true }) + 5), 0);
     const need = sz => 44 + 54 + 12 + mH(sz) + 8;
     // Öncelik: metin hiç kesilmesin. Önce punto (15 → 12) harita ≥ 120 px kalacak şekilde; olmazsa harita 90 px'e,
@@ -3741,7 +3759,7 @@ async function exportPosterAGU(scale, evt) {
   })(X1 + 14, y, W1 - 28, MAPH);
   caption(L(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString(NF)} olayın dış merkezleri, büyüklüğe göre.`, `Figure 1. Study area (${shape}); epicentres of ${evs.length.toLocaleString(NF)} events, by magnitude.`), X1 + 16, y + MAPH + 4, W1 - 32, TOP + G(GH) + MB + 1);
   }
-  if (BEN_ON && INC.tm) {   // Şekil 2, 1. sütunda (harita ile Veri ve Yöntem arasında)
+  if (STACK_ON && INC.tm) {   // Şekil 2, 1. sütunda (harita ile Veri ve Yöntem arasında)
     const tmY = TOP + G(GH) + G(MB);
     y = box(X1, tmY, W1, TMH, L('Zaman–Büyüklük Dağılımı', 'Time–Magnitude Distribution'));
     y = figure(imgs[0], X1 + 16, y, W1 - 32, TMH - 44 - 50);
@@ -3761,13 +3779,13 @@ async function exportPosterAGU(scale, evt) {
   mItems.forEach(t => { y = rich(t, X1 + 16, y, W1 - 32, { size: METH_SZ, lh: METH_SZ === 15 ? 20 : Math.round(METH_SZ * 1.33), bullet: true, maxY: MID - 6 }) + 5; });
 
   // ── Sütun 2: zaman–büyüklük ve b(t)
-  const TM2 = !BEN_ON && INC.tm;   // düzen B: Şekil 2, 2. sütunun üstünde
+  const TM2 = !STACK_ON && INC.tm;   // düzen B: Şekil 2, 2. sütunun üstünde
   if (TM2) {
     y = box(X2, TOP, W2, 260, L('Zaman–Büyüklük Dağılımı', 'Time–Magnitude Distribution'));
     y = figure(imgs[0], X2 + 16, y, W2 - 32, 150);
     caption(tmCapT, X2 + 16, y, W2 - 32, TOP + 256);
   }
-  y = box(X2, TM2 ? TOP + 275 : TOP, W2, TM2 ? MID - TOP - 275 : MID - TOP, BEN_ON ? L('b-Değeri ve Benioff Gerinimi', 'b-Value and Benioff Strain') : L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
+  y = box(X2, TM2 ? TOP + 275 : TOP, W2, TM2 ? MID - TOP - 275 : MID - TOP, STACK_ON ? (BEN_ON && AMR_ON ? L('b-Değeri, Benioff Gerinimi ve AMR', 'b-Value, Benioff Strain and AMR') : BEN_ON ? L('b-Değeri ve Benioff Gerinimi', 'b-Value and Benioff Strain') : L('b-Değeri ve AMR', 'b-Value and AMR')) : L('b-Değerinin Zaman İçinde Değişimi', 'Temporal Variation of the b-Value'));
   const adF = !!(bt && bt.adaptive);
   const bandF = (BT_STEP === 1 && !adF) || (bt && bt.band), thinF = BT_STEP === 1 && !adF;
   const adEN = adF ? `, display step ${bt.dispStep} (${bt.nWin} windows > ${BT_ADAPT_MAX}; values unchanged)` : '';
@@ -3777,19 +3795,23 @@ async function exportPosterAGU(scale, evt) {
   const benCap = !BEN_ON ? '' : EN
     ? ` **(b)** Cumulative Benioff strain S(t) = Σ√E, log E = 11.8 + 1.5M (Gutenberg & Richter 1956), fixed threshold M ≥ ${BB ? fmtM(BB.mFix) : '—'} (N = ${BB ? BB.n : '—'}). Middle strip: ${binTxt} Benioff release rate ΔS/Δt. Lower strip (log₁₀, 0 = period mean): {#3b82f6|blue} event count, {#16a34a|green} b-value (n ≥ ${BEN_DEC_NB} per interval), {#6b7280|grey} residual, {#ea580c|orange} total = observed ΔS/Δt; truncated G–R${BD ? `, b_ref = ${BD.bRef.toFixed(2)}` : ''}. b and ΔS come from the same catalogue; descriptive decomposition, not a precursor.`
     : ` **(b)** Birikimli Benioff gerinimi S(t) = Σ√E, log E = 11,8 + 1,5M (Gutenberg & Richter 1956), sabit eşik M ≥ ${BB ? DC(fmtM(BB.mFix)) : '—'} (N = ${BB ? BB.n : '—'}). Orta şerit: ${binTxt} Benioff salım hızı ΔS/Δt. Alt şerit (log₁₀, 0 = dönem ortalaması): {#3b82f6|mavi} olay sayısı, {#16a34a|yeşil} b değeri (aralıkta n ≥ ${BEN_DEC_NB}), {#6b7280|gri} artık, {#ea580c|turuncu} toplam = gözlenen ΔS/Δt; kesilmiş G–R${BD ? `, b_ref = ${DC(BD.bRef.toFixed(2))}` : ''}. b ve ΔS aynı katalogdan; betimleyici ayrıştırmadır, öncül değildir.`;
-  const cap3 = EN ? '**Figure 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + benCap
-    : '**Şekil 3.** ' + (BEN_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + benCap;
-  const cap3O = BEN_ON ? { size: 14, lh: 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 };
-  if (BEN_ON) {
-    // 2026-10-17 düzen A: Şekil 3a b(t) üstte, 3b Benioff altta; AYNI genişlik ve sol kenar → iki SVG'nin zaman eksenleri
-    // (W = 660, PAD_L = 40, PAD_R = 14) dikey olarak hizalıdır. Genişlik, altyazıya kalan yükseklikten hesaplanır.
+  const AP = window.lastAmrPlot, amrL = BEN_ON ? 'c' : 'b';
+  const amrCap = !AMR_ON ? '' : EN
+    ? ` **(${amrL}) Experimental:** accelerating moment release (AMR) for the best grid cell (R = ${AP.r} km, ${AP.yr} yr before the M${AP.mMain.toFixed(1)} mainshock, t_f fixed; n = ${AP.n}, M ≥ ${fmtM(AP.mMin)}). {#3b82f6|Blue:} cumulative Σ√E normalised to 1 at t_f; {#ef4444|red} power law S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? AP.fit.m : '—'}, Bufe & Varnes 1993); {#6b7280|grey dashed} linear. q = rms(power law)/rms(linear) = ${AP.q.toFixed(2)}; cluster-preserving null p = ${AP.pK.toFixed(3)} (${AP.nSim} synthetic catalogues). Same time axis as (a); not a precursor.`
+    : ` **(${amrL}) Deneysel:** en iyi ızgara hücresi için hızlanan moment salımı (AMR) (R = ${AP.r} km, M${DC(AP.mMain.toFixed(1))} ana şoktan ${AP.yr} yıl önce, t_f sabit; n = ${AP.n}, M ≥ ${DC(fmtM(AP.mMin))}). {#3b82f6|Mavi:} t_f'de 1'e normalize birikimli Σ√E; {#ef4444|kırmızı} güç yasası S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? DC(AP.fit.m) : '—'}, Bufe & Varnes 1993); {#6b7280|gri kesikli} doğrusal. q = rms(güç yasası)/rms(doğrusal) = ${DC(AP.q.toFixed(2))}; küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} (${AP.nSim} sentetik katalog). Zaman ekseni (a) ile aynıdır; öncül değildir.`;
+  const cap3 = EN ? '**Figure 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + benCap + amrCap
+    : '**Şekil 3.** ' + (STACK_ON ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + benCap + amrCap;
+  const cap3O = STACK_ON ? { size: BEN_ON && AMR_ON ? 13 : 14, lh: BEN_ON && AMR_ON ? 17 : 18, italic: true, col: '#374151', maxY: MID - 4 } : { size: 16, lh: 21, italic: true, col: '#374151', maxY: MID - 4 };
+  if (STACK_ON) {
+    // 2026-10-17 düzen A: Şekil 3a b(t) üstte, 3b Benioff ve/veya 3c AMR altta; AYNI genişlik ve sol kenar → SVG'lerin zaman
+    // eksenleri (W = 660, PAD_L = 40, PAD_R = 14) dikey olarak hizalıdır. Genişlik, altyazıya kalan yükseklikten hesaplanır.
     const capH = rich(cap3, X2 + 16, 0, W2 - 32, { ...cap3O, dry: true }), g2 = 10;
-    const iB = imgs[1], iN = imgs[3], rB = iB.naturalHeight / iB.naturalWidth, rN = iN.naturalHeight / iN.naturalWidth;
-    const wF = Math.min(W2 - 32, (MID - 8 - y - capH - g2 - 18) / (rB + rN)), x0 = X2 + 16 + (W2 - 32 - wF) / 2;
-    figure(iB, x0, y, wF, wF * rB + 0.5); text('a', x0 + wF * 0.075, y + 3, 'bold 17px Arial', '#111827');
-    y += wF * rB + 8 + g2;
-    figure(iN, x0, y, wF, wF * rN + 0.5); text('b', x0 + wF * 0.075, y + 3, 'bold 17px Arial', '#111827');
-    y += wF * rN + 8;
+    const stack = [imgs[1]].concat(BEN_ON ? [imgs[IMG_IDS.indexOf('tmSvgBen')]] : [], AMR_ON ? [imgs[IMG_IDS.indexOf('tmSvgAmr')]] : []);
+    const rs = stack.map(im => im.naturalHeight / im.naturalWidth), rSum = rs.reduce((a, v) => a + v, 0);
+    const wF = Math.min(W2 - 32, (MID - 8 - y - capH - g2 * (stack.length - 1) - 18 - 8 * (stack.length - 2)) / rSum), x0 = X2 + 16 + (W2 - 32 - wF) / 2;
+    if (wF < 0.6 * (W2 - 32)) PW.push(L('Şekil 3 panelleri küçüldü; Benioff veya AMR\'den birini çıkarmayı düşünün.', 'Figure 3 panels became small; consider removing Benioff or AMR.'));
+    stack.forEach((im, i) => { figure(im, x0, y, wF, wF * rs[i] + 0.5); text('abc'[i], x0 + wF * 0.075, y + 3, 'bold 17px Arial', '#111827');
+      y += wF * rs[i] + 8 + (i < stack.length - 1 ? g2 : 0); });
   } else {
   // 2026-10-17: altyazı için ayrılan alan bir satır büyütüldü (önceden son satır "Alt şerit Mc(t)" kesiliyordu); seyreltmede bir satır daha
   y = figure(imgs[1], X2 + 16, y, W2 - 32, MID - y - 112 - 21 - (adF ? 21 : 0));
@@ -5793,6 +5815,7 @@ function benioffTwoPeriodTest(items, t0, ts, t1, o) {
 function renderBenioff(evList, Mc, cs) {
   const svg = document.getElementById('tmSvgBen'), st = document.getElementById('tmStatsBen'); if (!svg || !st) return;
   window.lastBenioffEv = evList; amrRunId++;   // veri değişti: süren AMR testi iptal, eski sonuç silinir
+  window.lastAmrPlot = null; { const sa = document.getElementById('tmSvgAmr'); if (sa) { sa.style.display = 'none'; sa.innerHTML = ''; } }
   { const ao = document.getElementById('amrOut'); if (ao) ao.innerHTML = '<span style="color:#666">Test henüz çalıştırılmadı.</span>'; }
   let DEC = null;
   const W = 660, H0 = 210, STRIP = 58, STRIP2 = 100, H = H0 + STRIP + STRIP2, PAD_L = 40, PAD_R = 14, PAD_T = 12, PAD_B = 24, plotW = W - PAD_L - PAD_R, plotH = H0 - PAD_T - PAD_B;
@@ -5815,6 +5838,7 @@ function renderBenioff(evList, Mc, cs) {
   // Ortak eksen (2026-10-11): Zaman–Magnitude ve b(t) ile aynı [t0, t1]; yoksa eski davranış.
   const t0 = tmSharedAxis ? Math.min(tmSharedAxis.t0, F[0].t, V ? V[0].t : Infinity) : Math.min(F[0].t, V ? V[0].t : Infinity, cs ? cs.tStart : Infinity),
         t1 = tmSharedAxis ? Math.max(tmSharedAxis.t1, F[F.length - 1].t, V ? V[V.length - 1].t : -Infinity) : Math.max(F[F.length - 1].t, V ? V[V.length - 1].t : -Infinity, cs ? Math.min(cs.tEnd, Date.now()) : -Infinity);
+  window.lastBenAxis = { t0, t1 };   // 2026-10-18: AMR şekli aynı zaman eksenini kullanır
   const sMax = Math.max(F[F.length - 1].s, V ? V[V.length - 1].s : 0), k = Math.floor(Math.log10(sMax)), sc = Math.pow(10, k);
   const x = t => PAD_L + (t1 > t0 ? (t - t0) / (t1 - t0) : 0) * plotW, y = v => PAD_T + plotH - v / sMax * plotH;
   const stepPath = A => { let d = `M${x(t0).toFixed(1)},${y(0).toFixed(1)}`, prev = 0; A.forEach(p => { d += ` L${x(p.t).toFixed(1)},${y(prev).toFixed(1)} L${x(p.t).toFixed(1)},${y(p.s).toFixed(1)}`; prev = p.s; }); return d + ` L${x(t1).toFixed(1)},${y(prev).toFixed(1)}`; };
@@ -6085,6 +6109,59 @@ async function amrRun() {
     (pD ? pTxt(pD, `GK74 kümesizleştirilmiş (n = ${dec.length})`, `en küçük q = ${fmt(decObs.T)}; Poisson sıfır, aynı ızgara`) : `<tr><td colspan="3" style="padding:1px 6px;color:#888">GK74 kümesizleştirilmiş katalogda test için yeterli olay yok.</td></tr>`) +
     `</table><div style="color:#f59e0b;margin-top:3px">⚠ Deneysel: p değerleri yön gösterici niteliktedir; kesin istatistiksel kanıt olarak okunmamalıdır. Yazılım denetimi: hızlanma içermeyen yapay Poisson kataloglarında (100 katalog) p ≤ 0,05 oranı 0,08–0,09 bulundu (nominal 0,05). Yöntemin kendi sınırlılıkları için literatüre bakınız (Hardebeck vd. 2008; Guilhem vd. 2013).</div><div style="color:#888;margin-top:3px">p = (1 + #{T_sim ≤ T_obs}) / (N + 1); T = ızgaradaki en küçük q (arama maliyeti dahil); tohum 20261017. Yöntem: Bufe &amp; Varnes (1993), q ölçütü Bowman vd. (1998), t_f ana şoka sabit (Jiang &amp; Wu 2005 ile aynı kurgu). <b>Bu test geriye dönüktür; t_f tahmin etmez ve alarm üretmez.</b> Küçük bir p yalnızca seçilen sıfır hipotezine göre olağandışı bir uyumu gösterir; ileriye dönük öngörü becerisinin kanıtı değildir. AMR benzeri örüntüler kümelenmeli sentetik kataloglarda da ortaya çıkar (Hardebeck, Felzer &amp; Michael 2008).</div>`;
   window.lastAmr = { ms: { t: tf, m: mOf(ms), lat: la0, lon: lo0 }, mMin, n: raw.length, T: obs.T, best: obs.best, pK: pK.p, pP: pP.p, pD: pD ? pD.p : null, nSim, cells: obs.cells, drop: DC };
+  window.lastAmrPlot = amrPlotData(raw, obs.best, tf, mMin, { mMain: mOf(ms), pK: pK.p, nSim });
+  renderAmrFig();
+}
+// 2026-10-18 — AMR şekli (yalnızca gösterim): en iyi ızgara hücresinin (R, başlangıç) olayları için birikimli Σ√E,
+// aynı uyumlar (amrFitQ: güç yasası S = K + k(t_f − t)^m ve doğrusal S = a + b·t; en küçük kareler, Bufe & Varnes 1993;
+// Bowman vd. 1998). Zaman ekseni b(t) ve Benioff panelleriyle aynıdır (W = 660, PAD_L = 40, PAD_R = 14); şekiller alt alta
+// hizalanır. Hesap değişmez: q, m ve p testten (amrRun) alınır.
+function amrPlotData(raw, best, tfMs, mMin, info) {
+  if (!best) return null;
+  const t0w = tfMs - best.yr * AMR_YR, sel = raw.filter(o => o.d <= best.r && o.t >= t0w && o.t < tfMs && o.m >= mMin - 1e-9).sort((a, b) => a.t - b.t);
+  if (sel.length < 5) return null;
+  const n = sel.length, ts = new Float64Array(n), ss = new Float64Array(n); let a = 0;
+  sel.forEach((o, i) => { ts[i] = o.t / AMR_YR; ss[i] = (a += Math.pow(10, 0.75 * o.m)); });
+  const f = amrFitQ(ts, ss, tfMs / AMR_YR);
+  let sx = 0, sy = 0, sxx = 0, sxy = 0; for (let i = 0; i < n; i++) { sx += ts[i]; sy += ss[i]; sxx += ts[i] * ts[i]; sxy += ts[i] * ss[i]; }
+  const d = n * sxx - sx * sx, lb = d ? (n * sxy - sx * sy) / d : 0, la = (sy - lb * sx) / n;
+  return { pts: sel.map((o, i) => ({ t: o.t, s: ss[i], m: o.m })), t0w, tf: tfMs, r: best.r, yr: best.yr, n, q: best.q, fit: f, lin: { a: la, b: lb }, mMin, ...info };
+}
+function renderAmrFig() {
+  const svg = document.getElementById('tmSvgAmr'), P = window.lastAmrPlot; if (!svg) return;
+  if (!P) { svg.style.display = 'none'; svg.innerHTML = ''; return; }
+  const W = 660, H = 200, PAD_L = 40, PAD_R = 14, PAD_T = 14, PAD_B = 24, plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
+  const ax = window.lastBenAxis || tmSharedAxis || { t0: P.t0w, t1: P.tf };
+  const t0 = Math.min(ax.t0, P.t0w), t1 = Math.max(ax.t1, P.tf);
+  const x = t => PAD_L + (t1 > t0 ? (t - t0) / (t1 - t0) : 0) * plotW;
+  const sMax = P.pts[P.n - 1].s, y = v => PAD_T + plotH - Math.max(0, Math.min(1.05, v / sMax)) / 1.05 * plotH;
+  let g = `<rect x="${PAD_L}" y="${PAD_T}" width="${Math.max(0, x(P.t0w) - PAD_L).toFixed(1)}" height="${plotH}" fill="#64748b" opacity="0.16"/>`;
+  timeAxisTicks(t0, t1).forEach((tk, i, A) => { const xc = x(tk.t); if (xc < PAD_L - 0.5 || xc > W - PAD_R + 0.5) return;
+    const anchor = i === 0 ? 'start' : i === A.length - 1 ? 'end' : 'middle';
+    g += `<line x1="${xc.toFixed(1)}" y1="${PAD_T}" x2="${xc.toFixed(1)}" y2="${PAD_T + plotH}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${xc.toFixed(1)}" y="${H - 8}" fill="#888" font-size="9" text-anchor="${anchor}">${tk.label}</text>`; });
+  for (let i = 0; i <= 4; i++) { const v = sMax * i / 4, yy = y(v).toFixed(1);
+    g += `<line x1="${PAD_L}" y1="${yy}" x2="${W - PAD_R}" y2="${yy}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${PAD_L - 5}" y="${(+yy + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${(i / 4).toFixed(2)}</text>`; }
+  // birikimli Σ√E (basamak), pencere başında 0
+  let dP = `M${x(P.t0w).toFixed(1)},${y(0).toFixed(1)}`, prev = 0;
+  P.pts.forEach(o => { dP += ` L${x(o.t).toFixed(1)},${y(prev).toFixed(1)} L${x(o.t).toFixed(1)},${y(o.s).toFixed(1)}`; prev = o.s; });
+  g += `<path d="${dP}" fill="none" stroke="#3b82f6" stroke-width="1.4"/>`;
+  // uyumlar: doğrusal (gri) ve güç yasası (kırmızı), yalnızca pencere içinde
+  const NS = 120, tw0 = P.pts[0].t, tw1 = P.pts[P.n - 1].t, YR = AMR_YR, tfY = P.tf / YR;
+  let dl = '', dw = '';
+  for (let i = 0; i <= NS; i++) { const t = tw0 + (tw1 - tw0) * i / NS, ty = t / YR;
+    const vl = P.lin.a + P.lin.b * ty; dl += `${i ? ' L' : 'M'}${x(t).toFixed(1)},${y(vl).toFixed(1)}`;
+    if (P.fit && P.fit.m !== null) { const vw = P.fit.K + P.fit.k * Math.pow(Math.max(tfY - ty, 0), P.fit.m); dw += `${i ? ' L' : 'M'}${x(t).toFixed(1)},${y(vw).toFixed(1)}`; } }
+  g += `<path d="${dl}" fill="none" stroke="#9ca3af" stroke-width="1.1" stroke-dasharray="5,3"/>`;
+  if (dw) g += `<path d="${dw}" fill="none" stroke="#ef4444" stroke-width="1.4" stroke-dasharray="2,2"/>`;
+  // ana şok (t_f) ve pencere başlangıcı
+  const xf = x(P.tf).toFixed(1), xw = x(P.t0w).toFixed(1);
+  g += `<line x1="${xf}" y1="${PAD_T}" x2="${xf}" y2="${PAD_T + plotH}" stroke="#f97316" stroke-width="1.2"/><text x="${xf}" y="${PAD_T - 3}" fill="#f97316" font-size="9" text-anchor="end">t_f: M${P.mMain.toFixed(1)}</text>`;
+  g += `<line x1="${xw}" y1="${PAD_T}" x2="${xw}" y2="${PAD_T + plotH}" stroke="#64748b" stroke-width="0.8" stroke-dasharray="3,3"/>`;
+  const fq = v => v.toFixed(2).replace('.', ','), lbl = `R = ${P.r} km · ${P.yr} yıl · n = ${P.n} · m = ${P.fit && P.fit.m !== null ? String(P.fit.m).replace('.', ',') : '—'} · q = ${fq(P.q)} · p (küme korumalı) = ${P.pK.toFixed(3).replace('.', ',')}`;
+  g += `<text x="${PAD_L + 30}" y="${PAD_T + 10}" fill="#cbd5e1" font-size="9">${lbl}</text>`;
+  g += `<text x="${PAD_L + 30}" y="${PAD_T + 21}" font-size="8"><tspan fill="#3b82f6">━ Σ√E (göreli, t_f = 1)</tspan><tspan fill="#ef4444" dx="8">┅ güç yasası</tspan><tspan fill="#9ca3af" dx="8">╌ doğrusal</tspan><tspan fill="#64748b" dx="8">gölgeli: pencere dışı</tspan></text>`;
+  g += `<line x1="${PAD_L}" y1="${PAD_T + plotH}" x2="${W - PAD_R}" y2="${PAD_T + plotH}" stroke="#555"/><line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T + plotH}" stroke="#555"/>`;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = g; svg.style.display = 'block';
 }
 
 /* Son büyük deprem için global referans */
