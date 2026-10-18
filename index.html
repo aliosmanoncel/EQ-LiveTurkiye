@@ -1181,7 +1181,7 @@
   </div><div class="tmCol tmColB">
 
   <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
-    <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=<span id="tmStepLbl">10</span> olay)</span> <label class="pcFig" title="Akademik posterde b(t) şekli (Şekil 3a) yer alsın mı? Poster panelindeki kontrol listesiyle aynı ayardır." style="font-size:.68rem;font-weight:400;color:#fbbf24;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" data-pc="pcBt" onchange="posterFigToggle(this)" style="vertical-align:middle;"> 🎓 posterde</label> <label title="Herkesin bildiği trafik ışığı renkleriyle b-değeri SINIFI (tehlike ya da alarm seviyesi DEĞİLDİR). Eşikler: düşük b &lt; 0,7 (kırmızı), tipik 0,7–1,4 (sarı), yüksek b &gt; 1,4 (yeşil) — uygulamanın b-değeri haritasıyla aynı. Bir pencere yalnızca %95 güven aralığının TAMAMI bir sınıfın içindeyse renklendirilir; aralık iki sınıfı kesiyorsa renksiz kalır (belirsiz). Hesabı değiştirmez. Betimleyici bir sınıflamadır; Gulia vd. (2019, 2024) öncü şok trafik ışığı sistemi (FTLS) DEĞİLDİR: göreli Δb, öncü şok/artçı ayrımı ya da deprem tahmini yapılmaz. URL: ?bclass=1" style="font-size:.68rem;font-weight:400;color:#cbd5e1;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" id="btClassChk" onchange="onBtClassChange()" style="vertical-align:middle;"> 🚦 b sınıfı</label></div>
+    <div class="tmTitle" style="font-size:.78rem;">📊 b-Değerinin Zaman İçindeki Değişimi <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007 — N=100 kayan pencere, adım=<span id="tmStepLbl">10</span> olay)</span> <label class="pcFig" title="Akademik posterde b(t) şekli (Şekil 3a) yer alsın mı? Poster panelindeki kontrol listesiyle aynı ayardır." style="font-size:.68rem;font-weight:400;color:#fbbf24;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" data-pc="pcBt" onchange="posterFigToggle(this)" style="vertical-align:middle;"> 🎓 posterde</label> <label title="Herkesin bildiği trafik ışığı renkleriyle b-değeri SINIFI (tehlike ya da alarm seviyesi DEĞİLDİR). Eşikler: düşük b &lt; 0,7 (kırmızı), tipik 0,7–1,4 (sarı), yüksek b &gt; 1,4 (yeşil) — uygulamanın b-değeri haritasıyla aynı. Bir pencere yalnızca %95 güven aralığının TAMAMI bir sınıfın içindeyse renklendirilir; aralık iki sınıfı kesiyorsa renksiz kalır (belirsiz). Hesabı değiştirmez; varsayılan açıktır (kapatmak için işareti kaldırın). Betimleyici bir sınıflamadır; Gulia vd. (2019, 2024) öncü şok trafik ışığı sistemi (FTLS) DEĞİLDİR: göreli Δb, öncü şok/artçı ayrımı ya da deprem tahmini yapılmaz. URL: ?bclass=0 kapatır" style="font-size:.68rem;font-weight:400;color:#cbd5e1;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" id="btClassChk" onchange="onBtClassChange()" style="vertical-align:middle;"> 🚦 b sınıfı</label></div>
     <div style="font-size:.7rem;color:#888;text-align:right;" title="Her pencerenin b-değeri hangi zamana çizilsin? Ortalama (varsayılan): pencerenin 100 olayının aritmetik ortalama zamanı (Öncel &amp; Wilson 2007). Ortanca: pencerenin ortanca olayı. Son: pencerenin en son olayı — yalnızca o ana kadarki veriyi kullanır (nedensel); ana şok öncesi (öncül) analizlerinde önerilir, çünkü ortalama/ortanca damgada son ~50 olay hiçbir noktada 'şimdi' olarak görünmez.">b(t) zaman damgası <select id="bAnchorSel" onchange="onBAnchorChange()" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"><option value="mean">pencere ortalama zamanı (Öncel &amp; Wilson 2007)</option><option value="mid">pencere ortancası</option><option value="end">pencere sonu (nedensel)</option></select> <label id="btRawWrap" style="display:none;cursor:pointer;margin-left:6px;" title="Seyreltilmiş görünüm etkinken, hesaplama adımındaki bütün pencerelerin b değerlerini ince çizgi olarak arkaya çizer (yalnızca denetim için). b değerleri iki görünümde de aynıdır."><input type="checkbox" id="btRawChk" onchange="onBtRawChange()" style="vertical-align:middle;"> ham b(t) çizgisi</label></div>
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
@@ -2394,11 +2394,14 @@ function btClassOf(b, err) {
   if (lo > BT_CLASS.hi + E) return 'high';
   return null;   // aralık sınıf sınırını kesiyor → belirsiz, renksiz
 }
-let btClassOn = (() => { try { return new URLSearchParams(location.search).get('bclass') === '1'; } catch (e) { return false; } })();
+// 2026-10-18: varsayılan AÇIK (kullanıcı kararı). Kapatmak: kutunun işaretini kaldırmak ya da ?bclass=0; seçim tarayıcıda hatırlanır.
+let btClassOn = (() => { try { const q = new URLSearchParams(location.search).get('bclass'); if (q === '0' || q === '1') return q === '1';
+  const v = localStorage.getItem('eqliveBtClass'); return v === null ? true : v === '1'; } catch (e) { return true; } })();
 try { const elc = document.getElementById('btClassChk'); if (elc) elc.checked = btClassOn; } catch (e) {}
 function onBtClassChange() {
   btClassOn = !!document.getElementById('btClassChk')?.checked;
-  try { const u = new URL(location.href); if (btClassOn) u.searchParams.set('bclass', '1'); else u.searchParams.delete('bclass'); history.replaceState(null, '', u); } catch (e) {}
+  try { localStorage.setItem('eqliveBtClass', btClassOn ? '1' : '0'); } catch (e) {}
+  try { const u = new URL(location.href); if (!btClassOn) u.searchParams.set('bclass', '0'); else u.searchParams.delete('bclass'); history.replaceState(null, '', u); } catch (e) {}
   if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents]);
 }
 // Ham b(t) katmanı (2026-10-17): yalnızca uyarlamalı (seyreltilmiş) görünümde anlamlıdır; varsayılan kapalı. URL: ?braw=1
@@ -2808,9 +2811,9 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   if (btClassOn) {
     const yc = v => y(Math.max(bMin, Math.min(bMax, v))), C = BT_CLASS.col;
     [[bMin, BT_CLASS.lo, C.low], [BT_CLASS.lo, BT_CLASS.hi, C.mid], [BT_CLASS.hi, bMax, C.high]].forEach(([a, b2, c]) => { if (b2 <= bMin || a >= bMax) return;
-      clsBands += `<rect x="${PAD_L}" y="${yc(b2).toFixed(1)}" width="${plotW}" height="${Math.max(0, yc(a) - yc(b2)).toFixed(1)}" fill="${c}" opacity="0.07"/>`; });
+      clsBands += `<rect x="${PAD_L}" y="${yc(b2).toFixed(1)}" width="${plotW}" height="${Math.max(0, yc(a) - yc(b2)).toFixed(1)}" fill="${c}" opacity="0.13"/>`; });
     clsCount = { low: 0, mid: 0, high: 0, none: 0 };
-    const RB = 7, yR = PAD_T + plotH - RB;
+    const RB = 9, yR = PAD_T + plotH - RB;
     const f2 = v => v.toFixed(2).replace('.', ','), NM = { low: 'düşük b', mid: 'tipik b', high: 'yüksek b' };
     ser.forEach((s2, i) => { const k = btClassOf(s2.b, s2.err); clsCount[k || 'none']++;
       const xa = i ? (x(ser[i - 1].t) + x(s2.t)) / 2 : x(s2.t), xb = i < ser.length - 1 ? (x(s2.t) + x(ser[i + 1].t)) / 2 : x(s2.t);
