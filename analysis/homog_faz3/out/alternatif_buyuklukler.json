@@ -1,0 +1,23 @@
+[
+ {
+  "id": "914191",
+  "time": "1910-02-18T05:09:18.000",
+  "lat": 36.0,
+  "lon": 24.5,
+  "dep": 150.0,
+  "mag": 7.0,
+  "mtype": "UK",
+  "mw": null,
+  "mw_method": "unconverted_uk",
+  "place": "Southern Greece",
+  "src": "ISC",
+  "M": 7.0,
+  "mw_src": "catalog_raw_uk",
+  "not": "eslesme_guclu_buyukluk_uyusmazligi_cozulmedi",
+  "alt_mw": 5.85,
+  "alt_mw_src": "iscgem_proxy",
+  "alt_gem_id": "16958073",
+  "alt_unc_mw": 0.2,
+  "alt_q_mw": "B"
+ }
+]

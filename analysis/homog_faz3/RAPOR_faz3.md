@@ -54,10 +54,21 @@ Testler yeniden çalıştırıldı: T1–T6 ✓, **T9 (bütün istisnalar Δt �
 
 - **Aynı olay olduğu güçlü kanıtla destekleniyor:** ±200 dk ve 250 km içinde tek aday; Δt 6 s, Δr 50 km (ISC-GEM'in yeniden konumlandırması: 0,5° batı, derinlik 150 → 60 km).
 - **Büyüklük farkı çözülmedi:** erken dönem ajans büyüklükleri (Gutenberg–Richter, Abe) ≈ 7, ISC-GEM'in sayısallaştırılmış genliklerden yeniden hesapladığı vekil Mw 5,85. Fark 1,15 birim; bu veriyle hangisinin doğru olduğu belirlenemiyor.
-- Prototipte kural gereği **özgün büyüklük (7,0) korundu** (`not: supheli_eslesme`). Karar seçenekleri: (i) 7,0 kalsın; (ii) ISC-GEM Mw 5,85 kullanılsın (ISC-GEM'in yeniden değerlendirmesi esas alınır); (iii) Mw tabanlı istatistiklerden çıkarılıp ayrı listelensin. Bu olay 1904–1962 M ≥ 6,5 sınıfındaki 36–44 olaydan biri; b ve λ(≥6,0) üzerindeki etkisi küçük ama sınırlı sayıda büyük olayda sıfır değil.
+- **Karar (2026-10-21, kullanıcı): seçenek (i).** Durum: **"eşleşmesi güçlü, büyüklük uyuşmazlığı çözülememiş"** (`not = eslesme_guclu_buyukluk_uyusmazligi_cozulmedi`). Ana katalogda özgün büyüklük **7,0 (UK)** korunur; ISC-GEM Mw 5,85 ± 0,20 (vekil, kalite B, olay 16958073) **alternatif yeniden değerlendirme** olarak `alt_mw`, `alt_mw_src`, `alt_gem_id`, `alt_unc_mw`, `alt_q_mw` alanlarında saklanır (`out/alternatif_buyuklukler.json`). Gerekçe: eşleşme güçlü, ama eşleşme hangi büyüklüğün güvenilir olduğunu göstermiyor; belirsizlik zorla çözülmüyor, iki kaynak değeri korunuyor.
+- Test T10 (alternatif kayıt): ana büyüklük değişmedi, alternatif değer yalnız ek alanda ✓.
 
 ## Kalan sınırlılık
 ISC-GEM genel olarak M ≥ 5,0'ı kapsadığından, M < 5 olaylar mb/ML/MD ile kalıyor. Büyüklük ölçeği M ≈ 5 civarında Mw'den diğer türlere geçiyor; bu eşiği kapsayan b-değeri hesapları (ör. M ≥ 4,5) bu geçişten etkilenebilir. Prototip bu konuyu çözmüyor; raporlanmak üzere not edildi.
 
-## Kapanış
-Testler güncel kuralla yeniden geçti; prototip tamamlandı. Bekleyen kararlar: 1910 olayı; tamlık merdiveni (ayrı karar); üretime geçiş (onaylanmadı).
+## Kapanış — prototip sabitlendi (2026-10-21)
+**Kabul edilen:** prototip testleri (T1–T6, T8–T10 ✓). **Ayrı değerlendirilecek:** tamlık merdiveni. **Onaylanmadı:** üretime geçiş; `main` ve korunan dosyalar değişmedi.
+
+Sabitlenen sürüm: `homog-faz0` dalında etiket **`homog-prototip-v1`**. Yeniden üretim: `python analysis/homog_faz3/faz3_mw_aktarim.py` (girdiler: `data/eq_historical.json` blob 879a89b9, `analysis/homog_faz1/out/iscgem_v12.1_kutu.json`, `scripts/decluster_gk74.py`; SHA-256 değerleri `out/faz3_rapor.json → meta.inputs`).
+
+| Dosya | SHA-256 |
+|---|---|
+| `faz3_mw_aktarim.py` | 085f7d83e7fd414010e1cbd9df2a6818ff60dcaf7b91a6cc71b1a2bf91ceae4d |
+| `out/aktarim_kaydi.json` (1.144 aktarım) | e0a9a5d2234ce37f3c2af74889196c0f598839b6ffb304f6a381bd86e5b673b7 |
+| `out/alternatif_buyuklukler.json` (1 olay) | e13e596114742919eb72902e2581b63a27428447212a442aaee684d1c29a8fd4 |
+
+(`out/faz3_rapor.json` üretim zamanı içerdiği için her çalıştırmada özeti değişir; içerik aynıdır.)

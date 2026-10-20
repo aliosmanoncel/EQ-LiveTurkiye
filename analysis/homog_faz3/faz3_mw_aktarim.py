@@ -57,7 +57,9 @@ def main():
             g, d = pa[e['_i']]; dM = e['_M'] - g['mw']; dts = abs(g['_t'] - e['_t'])
             if abs(dM) > 1.0 and not (dts <= 10 and d <= 30):   # 2026-10-21 onaylı koruma: Δt ≤ 10 s ve Δr ≤ 30 km ise ΔM engellemez
                 sus.append({'id': e['id'], 'time': e['time'], 'M': e['_M'], 'mtype': e['mtype'], 'gem_id': g['eventid'], 'gem_mw': g['mw'], 'dM': round(dM, 2), 'dr_km': round(d, 1), 'dt_s': round(dts, 1)})
-                P.append({**base, 'M': e['_M'], 'mw_src': raw_src(e), 'not': 'supheli_eslesme'}); continue
+                # 2026-10-21 karar: özgün büyüklük korunur; ISC-GEM Mw alternatif yeniden değerlendirme olarak kaydedilir (ana kataloğa aktarılmaz)
+                P.append({**base, 'M': e['_M'], 'mw_src': raw_src(e), 'not': 'eslesme_guclu_buyukluk_uyusmazligi_cozulmedi',
+                          'alt_mw': g['mw'], 'alt_mw_src': 'iscgem_direct' if g['s_mw'] == 'd' else 'iscgem_proxy', 'alt_gem_id': g['eventid'], 'alt_unc_mw': g['unc_mw'], 'alt_q_mw': g['q_mw']}); continue
             src = 'iscgem_direct' if g['s_mw'] == 'd' else 'iscgem_proxy'
             if y < 1963:   # ISC-GEM kaydı birincil
                 P.append({'id': 'iscgem:' + g['eventid'], 'time': g['date'].replace(' ', 'T'), 'lat': g['lat'], 'lon': g['lon'], 'dep': g['depth'], 'mag': e['mag'], 'mtype': e['mtype'],
@@ -83,6 +85,10 @@ def main():
     badm = sum(1 for p in P if p['mw_src'].startswith('iscgem') and abs(p['M'] - gem[p['gem_id']]) > 1e-12)
     T['T3_aktarilan_Mw_ISCGEM_ile_ayni'] = {'gecti': badm == 0, 'olay': sum(1 for p in P if p['mw_src'].startswith('iscgem')), 'farkli': badm}
     T['T4_ham_buyukluk_saklandi'] = {'gecti': all(('mag' in p and 'mtype' in p) for p in P)}
+    alt = [p for p in P if 'alt_mw' in p]
+    T['T10_alternatif_kayit'] = {'gecti': all(p['M'] == (p['mw'] if p['mw'] is not None else p['mag']) and p['mw_src'].startswith('catalog_') for p in alt), 'olay': len(alt),
+                                 'liste': [{k: p[k] for k in ('id', 'time', 'mag', 'mtype', 'M', 'alt_mw', 'alt_mw_src', 'alt_gem_id', 'not')} for p in alt]}
+    json.dump(alt, open('analysis/homog_faz3/out/alternatif_buyuklukler.json', 'w'), ensure_ascii=False, indent=1)
     T['T5_tahmini_Mw_yok'] = {'gecti': all(p['mw_src'] in ('iscgem_direct', 'iscgem_proxy', 'catalog_native_mw') or p['mw_src'].startswith('catalog_raw_') for p in P)}
     T['T6_2022_sonrasi_degismedi'] = {'gecti': all(p['mw_src'].startswith('catalog_') for p in P if int(p['time'][:4]) >= 2022)}
     dmt = collections.defaultdict(list)

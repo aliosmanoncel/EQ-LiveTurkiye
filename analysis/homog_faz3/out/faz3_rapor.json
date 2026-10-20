@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-10-20T22:27Z",
+  "generated": "2026-10-20T22:30Z",
   "inputs": {
    "data/eq_historical.json": "bd303aa30a17ae590073cfe664fd58c87cf93ed643cdb8374aa33c27a6d7545b",
    "analysis/homog_faz1/out/iscgem_v12.1_kutu.json": "314835223efcfb52be6830d35cc508d9d3560b97db3577ce83faa7bd7d0e6fb7",
@@ -39,6 +39,23 @@
   },
   "T4_ham_buyukluk_saklandi": {
    "gecti": true
+  },
+  "T10_alternatif_kayit": {
+   "gecti": true,
+   "olay": 1,
+   "liste": [
+    {
+     "id": "914191",
+     "time": "1910-02-18T05:09:18.000",
+     "mag": 7.0,
+     "mtype": "UK",
+     "M": 7.0,
+     "alt_mw": 5.85,
+     "alt_mw_src": "iscgem_proxy",
+     "alt_gem_id": "16958073",
+     "not": "eslesme_guclu_buyukluk_uyusmazligi_cozulmedi"
+    }
+   ]
   },
   "T5_tahmini_Mw_yok": {
    "gecti": true
