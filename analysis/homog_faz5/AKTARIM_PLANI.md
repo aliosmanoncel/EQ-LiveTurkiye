@@ -197,3 +197,12 @@ Dal `homog-uretim-aday` @ `baa3829`; ayrı commit.
 | Tarayıcı | Düğme üç basamak kuruyor; URL `rcs` doğru; sayfa hatası yok |
 
 Korunan dosyalar güncel `main` (`0e875b0`) ile aynı. Dal bekletiliyor. Birleştirme öncesinde dal güncel `main` üzerine yeniden kurulmalı ve CI tekrarlanmalı.
+
+## 9. Üretime aktarım (kullanıcı onayı "onay", 2026-10-21 02:29 TSİ)
+
+- PR #1 (`homog-uretim-aday` → `main`), birleştirme commit'i `7c606fb`. Birleştirilen ağaç, test edilen `baa3829` ile aynı.
+- Birleştirme öncesinde `main` ilerlememişti (`0e875b0`); yeniden kurulum gerekmedi.
+- PR denetimleri başarılı (GK74 eşdeğerlik ×2, ISC-GEM katmanı). Birleştirme sonrasında `main` üzerindeki iki iş akışı ve `pages-build-deployment` da başarılı.
+- Korunan dosyalar `0e875b0` ile aynı.
+- Canlı site (WebFetch): "ISC-GEM v12.1 Mw katmanı (deneysel · varsayılan kapalı)" ve "Aday merdiven" görünüyor; `data/LISANS_ISC-GEM.txt` yayında. Yayımlanan HTML'de işaret kutusu `checked` taşımıyor.
+- Geri alma: `git revert -m 1 7c606fb`.
