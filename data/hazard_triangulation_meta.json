@@ -1,7 +1,7 @@
 {
-  "generated": "2026-10-20T01:28:42Z",
+  "generated": "2026-10-20T07:00:12Z",
   "method": "Campbell (1981) GMPE · PGAmax · Delaunay triangülasyon",
-  "source_pts": 2709,
+  "source_pts": 2705,
   "valid_px": 107752,
   "total_px": 112500,
   "coverage_pct": 95.8,
