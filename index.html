@@ -878,6 +878,7 @@
     <button class="tbtn" data-hist="1003" data-hist-end="1899" data-hist-src="SHARE-CET" onclick="toggleHistoricalWindow(this,1003,1899,'SHARE-CET')" title="Yalnızca SHARE-CET (doğu/orta Anadolu-Kafkasya, tek kaynak) · Soysal ve ark. (1981) → Io-Ms (Kalafat ve ark. 2007) → Mw (Zare 2012) dönüşüm zinciri — EPICA'dan FARKLI metodoloji · birden fazla pencere aynı anda seçilebilir">SHARE-CET 1003–1899</button>
   </div>
   <div id="histHint" style="font-size:10px;color:#888;margin-top:2px;letter-spacing:0.3px"></div>
+  <label class="tr-only" id="histIscgemRow" style="font-size:.72rem;color:#9ca3af;display:flex;align-items:center;gap:5px;cursor:pointer;margin-top:2px" title="DENEYSEL, varsayılan KAPALI (homog-uretim-aday, 2026-10-21). Açıkken tarihsel katalogda ISC-GEM v12.1 (© International Seismological Centre ve GEM Vakfı; CC BY-SA 3.0; doi:10.31905/d808b825; Di Giacomo vd. 2018) ile eşleşen 1.144 olayın büyüklüğü ISC-GEM Mw olur (1963 öncesinde zaman/konum da ISC-GEM'den) ve EQ-Live'da karşılığı olmayan 273 olay (1904–1962) eklenir. Kaynak önceliği: mw_authority.json → ISC-GEM → katalog. ISC-GEM karşılığı olmayan olaylar değişmez. Kapalıyken sonuçlar birebir eskisiyle aynıdır. Veri: data/mw_iscgem.json, data/iscgem_ek_1904_1962.json, data/LISANS_ISC-GEM.txt."><input type="checkbox" id="histIscgem" onchange="onHistIscgemChange()"> ISC-GEM v12.1 Mw katmanı <span style="color:#666">(deneysel · varsayılan kapalı)</span></label>
 
   <div class="sep"></div>
 
@@ -1167,6 +1168,7 @@
       <label style="cursor:pointer;color:#cbd5e1;"><input type="checkbox" id="csEnabled" onchange="onCsChange()" style="vertical-align:middle;"> 🧩 Tamlık basamakları <span style="color:#666;">(zamana bağlı Mc · alt kataloglar)</span></label>
       <span id="csControls" style="display:none;gap:6px;">
         <button onclick="csAddRow()" style="background:none;border:1px solid #334;color:#cbd5e1;border-radius:4px;font-size:.95em;padding:1px 7px;cursor:pointer;">＋ Basamak</button>
+        <button onclick="csApplyPreset('iscgem2026')" style="background:none;border:1px solid #334;color:#cbd5e1;border-radius:4px;font-size:.95em;padding:1px 7px;cursor:pointer;" title="DENEYSEL aday tamlık merdiveni (homog-faz0 Faz 4, 2026-10-21; ISC-GEM Mw katmanıyla birlikte sınandı): 1904 Mc 6,0 · 1970 Mc 5,5 · 1979 Mc 4,5 · 1980 Mc 4,0 · 1990 Mc 3,5 · 1998 Mc 3,0. M ≥ 6,0, 5,5–6,0 ve 5,0–5,5 başlangıçları iki ölçütle (ISC-GEM kapsaması + Stepp 1972) değerlendirildi. M 4,5 basamağının 1979'a kayması tekdüzelik gereğidir (5,0 sınıfı 1979'dan önce tam değilse 4,5 de olamaz) ve BAĞIMSIZ OLARAK DOĞRULANMADI; Stepp testi bu sınıf için 1995'i gösterir. M < 4,5 basamakları mevcut sorgu eşikleridir (doğrulanmadı). Yalnız ISC-GEM katmanı açıkken tutarlıdır.">Aday merdiven</button>
         <button onclick="csSuggest()" style="background:none;border:1px solid #334;color:#cbd5e1;border-radius:4px;font-size:.95em;padding:1px 7px;cursor:pointer;" title="Takvim yılı başına maksimum eğrilik Mc (+0.2) hesaplanır; Mc'nin ≥0.3 değiştiği yıllarda yeni basamak açılır. Sonucu gözle doğrulayın.">⚙ Otomatik öner (yıllık Mc)</button>
         <label style="color:#9ca3af;" title="Duyarlılık testi: b(t) tüm pencere için TEK sabit Mc ile de hesaplanır (gri çizgi). Boş bırakılırsa: dönemlerin basamak Mc'si ile veri Mc'sinin (maks. eğrilik +0.2) en büyüğü — pencerede doğrulanabilen en yüksek güvenilir Mc. Değişken-Mc serisindeki bir b değişimi sabit-Mc serisinde de görülüyorsa tamlık değişimiyle açıklanamaz.">Sabit Mc karşılaştırması <input id="csFixedMc" type="number" step="0.1" min="-1" max="9" placeholder="oto" oninput="onCsChange(true)" style="width:52px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
       </span>
@@ -5255,6 +5257,15 @@ function csAddRow() {
   csSteps.push({ start: last ? last.start : `${new Date().getUTCFullYear()}-01-01`, mc: last ? (parseFloat(last.mc) - 0.5).toFixed(1) : '2.0' });
   csRenderRows(); onCsChange(true);
 }
+// Aday tamlık merdiveni (DENEYSEL; ISC-GEM katmanıyla sınandı — bkz. düğme açıklaması). Tekdüze: Mc zamanla artmaz.
+const CS_PRESETS = { iscgem2026: [['1904-01-01', '6.0'], ['1970-01-01', '5.5'], ['1979-01-01', '4.5'], ['1980-01-01', '4.0'], ['1990-01-01', '3.5'], ['1998-01-01', '3.0']] };
+function csApplyPreset(name) {
+  const p = CS_PRESETS[name]; if (!p) return;
+  csSteps = p.map(([start, mc]) => ({ start, mc }));
+  const cb = document.getElementById('csEnabled'); if (cb) cb.checked = true; csEnabled = true;
+  csRenderRows(); onCsChange(true);
+  if (name === 'iscgem2026' && !iscgemWanted()) setStatus('Aday merdiven ISC-GEM Mw katmanıyla sınandı; katman kapalıyken bu birleşim doğrulanmadı', true);
+}
 function csDelRow(i) { csSteps.splice(i, 1); csRenderRows(); onCsChange(true); }
 function csToggleRow(i, on) { csSteps[i].off = !on; csRenderRows(); onCsChange(true); }
 function csEditRow(i, field, val) { csSteps[i][field] = val; onCsChange(true); }
@@ -7029,6 +7040,59 @@ async function loadData(sourceName, h) {
    fonksiyonları (computeMc/computeBvalue) YENİDEN YAZILMADI.
 ══════════════════════════════════════════ */
 let historicalMode  = false;
+// ── ISC-GEM v12.1 Mw katmanı (DENEYSEL, varsayılan KAPALI; homog-uretim-aday 2026-10-21) ──
+// eq_historical.json DEĞİŞMEZ; katman yalnız #histIscgem işaretliyken, ayrı dosyalardan, bellekteki kopyaya uygulanır.
+// Kaynak önceliği (çakışma kuralı): mw_authority.json (doğrulanmış) → ISC-GEM → katalog. ISC-GEM aktarımı yapılan
+// bir olay mw_authority kaydıyla da eşleşirse (gk74BuildMwOverride: kaynak kimliği ya da ±60 s ve ≤ 50 km) mw_authority
+// Mw kullanılır. ISC-GEM karşılığı olmayan olaylara dokunulmaz (mw_authority onlarda yalnız GK74 seçeneğiyle kullanılır).
+// Aktarılan olay yerel Mw gibi işlenir (mtype 'mw'); Magnitude Conversion seçicisi ona bağıntı uygulamaz.
+let iscgemData = null, iscgemPending = null, iscgemViewCache = null;
+function iscgemWanted() { const cb = document.getElementById('histIscgem'); return !!(cb && cb.checked); }
+function iscgemApply(cat, ovTbl, ekEvents, authEntries) {
+  const byId = new Map(ovTbl.map(r => [r.A_id, r]));
+  let nTr = 0, nPos = 0;
+  const evs = (cat.events || []).map(e => {
+    const r = byId.get(e.id);
+    if (!r) return e;
+    nTr++;
+    const o = { ...e, mag: r.Mw, mtype: 'mw', mw: r.Mw, mw_method: r.mw_src, msrc: r.mw_src, mag_orig: e.mag, mtype_orig: e.mtype, gem_id: r.gem_id };
+    if (r.konum) { nPos++; o.time = r.konum.time; o.lat = r.konum.lat; o.lon = r.konum.lon; if (r.konum.dep != null) o.dep = r.konum.dep; }
+    return o;
+  });
+  const transferred = evs.filter(e => e.msrc === 'iscgem_direct' || e.msrc === 'iscgem_proxy');
+  let nAuth = 0; const authHits = [];
+  if (authEntries && authEntries.length) {
+    const ov = gk74BuildMwOverride(transferred.map(e => ({ ...e, time: new Date(e.time), _ref: e })), authEntries);
+    for (const [x, ent] of ov) { const e = x._ref; authHits.push({ id: e.id, iscgem_mw: e.mw, auth_mw: +ent.mw, name: ent.name });
+      e.mag = +ent.mw; e.mw = +ent.mw; e.msrc = 'mw_authority'; e.mw_method = 'mw_authority'; nAuth++; }
+  }
+  const ek = (ekEvents || []).map(e => ({ ...e, msrc: e.mw_method }));
+  return { ...cat, events: evs.concat(ek), iscgem: { nTransfer: nTr, nPosition: nPos, nAuth, authHits, nAdded: ek.length } };
+}
+async function loadIscgem() {
+  if (iscgemData) return iscgemData;
+  if (iscgemPending) return iscgemPending;
+  iscgemPending = (async () => {
+    try {
+      const [r1, r2] = await Promise.all([fetchTimeout('data/mw_iscgem.json', { cache: 'no-cache' }, 15000), fetchTimeout('data/iscgem_ek_1904_1962.json', { cache: 'no-cache' }, 15000)]);
+      if (!r1.ok || !r2.ok) throw new Error(`HTTP ${r1.status}/${r2.status}`);
+      const [a, b] = [await r1.json(), await r2.json()];
+      iscgemData = { meta: a.meta, rows: a.aktarim, ek: b.events };
+    } catch (err) { iscgemData = { err: err.message || String(err) }; }
+    finally { iscgemPending = null; }
+    return iscgemData;
+  })();
+  return iscgemPending;
+}
+async function iscgemCatalog(base) {
+  if (iscgemViewCache && iscgemViewCache.base === base) return iscgemViewCache.cat;
+  const d = await loadIscgem(), t = await loadMwAuth();
+  if (d.err) { setStatus(`ISC-GEM katmanı yüklenemedi (${d.err}) — katalog büyüklükleri kullanılıyor`, true); return base; }
+  const cat = iscgemApply(base, d.rows, d.ek, t && !t.err ? t.entries : null);
+  iscgemViewCache = { base, cat };
+  return cat;
+}
+function onHistIscgemChange() { gk74Cache = null; if (historicalMode) rebuildHistoricalView(); }
 let historicalCache = null; // { events, completeness, starttime, endtime, source } — ISC+EMSC, 1900-2026, bir kez indirilir
 let epicaCache       = null; // EPICA v1.1 + SHARE-CET, 1003-1899, bir kez indirilir (sadece startYear<=1899 seçilince)
 
@@ -7128,7 +7192,8 @@ async function rebuildHistoricalView() {
       historicalCache = await res.json();
       if (stale()) return;
     }
-    const cat = historicalCache;
+    const cat = iscgemWanted() ? await iscgemCatalog(historicalCache) : historicalCache;
+    if (stale()) return;
 
     const needsEpica = activeHistWindows.some(w => w.startYear <= 1899);
     if (needsEpica && !epicaCache) {
@@ -7167,6 +7232,7 @@ async function rebuildHistoricalView() {
     if (hint) {
       const compLine = (cat.completeness || []).map(c => `${c.period}: Mc≈${c.Mc}`).join(' · ');
       let text = `Katalog completeness (${cat.source || 'ISC+EMSC'}): ${compLine} — bu, aşağıdaki hesaplanan Mc ile AYNI şey değildir`;
+      if (cat.iscgem) text += ` · ⚗ ISC-GEM v12.1 katmanı AÇIK (deneysel): ${cat.iscgem.nTransfer} Mw aktarımı (${cat.iscgem.nPosition}'inde 1963 öncesi zaman/konum), ${cat.iscgem.nAuth} olayda mw_authority önceliği, ${cat.iscgem.nAdded} ek olay (1904–1962) — ISC-GEM © ISC ve GEM Vakfı, CC BY-SA 3.0, doi:10.31905/d808b825`;
       if (usedEpicaAny) {
         text += ` ⚠ 1003–1899 dönemi FARKLI bir Mw dönüşüm zinciri kullanır ve derinlik bilgisi içermez — ` +
                 `bu dönemi kapsayan Mc/b sonuçları büyük-depreme-yanlı, dikkatli yorumlanmalı.`;

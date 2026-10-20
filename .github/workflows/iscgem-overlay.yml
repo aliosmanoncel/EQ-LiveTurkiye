@@ -1,0 +1,35 @@
+name: ISC-GEM katmanı (deneysel, varsayılan kapalı)
+
+# Katman kapalıyken mevcut davranış birebir korunur; açıkken sabitlenmiş prototip
+# (homog-faz0) yeniden üretilir; kaynak önceliği, aday merdiven, lisans ve GK74 eşdeğerliği.
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'data/mw_iscgem.json'
+      - 'data/iscgem_ek_1904_1962.json'
+      - 'data/LISANS_ISC-GEM.txt'
+      - 'data/mw_authority.json'
+      - 'scripts/test_iscgem_overlay.js'
+      - 'scripts/fixtures/iscgem_overlay_ref.json'
+      - '.github/workflows/iscgem-overlay.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  overlay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Katman testi (kapalı = birebir, açık = prototip, öncelik, merdiven, 1910, lisans, GK74)
+        run: node scripts/test_iscgem_overlay.js
+      - name: Mevcut Weichert zinciri testi (değişmemeli)
+        run: node scripts/test_weichert_chain.js
