@@ -1,0 +1,340 @@
+[
+ {
+  "gem_id": "871958",
+  "tarih": "1963-03-11 07:27:23.38",
+  "enlem": 37.943,
+  "boylam": 29.218,
+  "derinlik": 30.0,
+  "Mw": 5.77,
+  "kaynak": "p",
+  "kalite": "B",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1963-03-11T07:22:23&endtime=1963-03-11T07:32:23&minlat=34.94&maxlat=40.94&minlon=26.22&maxlon=32.22",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1963-03-11T07:22:23&endtime=1963-03-11T07:32:23&minlat=34.94&maxlat=40.94&minlon=26.22&maxlon=32.22&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "871958",
+    "time": "1963-03-11T07:27:23.387",
+    "lat": 37.943,
+    "lon": 29.2184,
+    "author": "ISC",
+    "mtype": "MS",
+    "mag": 5.44,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "871613",
+  "tarih": "1964-01-30 17:45:53.80",
+  "enlem": 37.411,
+  "boylam": 30.049,
+  "derinlik": 15.0,
+  "Mw": 5.64,
+  "kaynak": "p",
+  "kalite": "C",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-01-30T17:40:53&endtime=1964-01-30T17:50:53&minlat=34.41&maxlat=40.41&minlon=27.05&maxlon=33.05",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-01-30T17:40:53&endtime=1964-01-30T17:50:53&minlat=34.41&maxlat=40.41&minlon=27.05&maxlon=33.05&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "871613",
+    "time": "1964-01-30T17:45:53.402",
+    "lat": 37.449,
+    "lon": 30.0873,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 5.3,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "870819",
+  "tarih": "1964-02-23 22:41:05.85",
+  "enlem": 39.154,
+  "boylam": 23.742,
+  "derinlik": 15.0,
+  "Mw": 5.63,
+  "kaynak": "p",
+  "kalite": "C",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-02-23T22:36:05&endtime=1964-02-23T22:46:05&minlat=36.15&maxlat=42.15&minlon=20.74&maxlon=26.74",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-02-23T22:36:05&endtime=1964-02-23T22:46:05&minlat=36.15&maxlat=42.15&minlon=20.74&maxlon=26.74&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "870819",
+    "time": "1964-02-23T22:41:07.895",
+    "lat": 39.1512,
+    "lon": 23.7137,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 4.69,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "868626",
+  "tarih": "1964-04-11 16:00:41.65",
+  "enlem": 40.159,
+  "boylam": 24.971,
+  "derinlik": 15.0,
+  "Mw": 5.8,
+  "kaynak": "p",
+  "kalite": "C",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-04-11T15:55:41&endtime=1964-04-11T16:05:41&minlat=37.16&maxlat=43.16&minlon=21.97&maxlon=27.97",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-04-11T15:55:41&endtime=1964-04-11T16:05:41&minlat=37.16&maxlat=43.16&minlon=21.97&maxlon=27.97&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "868626",
+    "time": "1964-04-11T16:00:40.959",
+    "lat": 40.1688,
+    "lon": 24.9838,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 5.29,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "868665",
+  "tarih": "1964-04-12 12:06:00.46",
+  "enlem": 42.518,
+  "boylam": 45.013,
+  "derinlik": 15.0,
+  "Mw": 5.21,
+  "kaynak": "p",
+  "kalite": "C",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-04-12T12:01:00&endtime=1964-04-12T12:11:00&minlat=39.52&maxlat=45.52&minlon=42.01&maxlon=48.01",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-04-12T12:01:00&endtime=1964-04-12T12:11:00&minlat=39.52&maxlat=45.52&minlon=42.01&maxlon=48.01&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "868665",
+    "time": "1964-04-12T12:05:59.828",
+    "lat": 42.4815,
+    "lon": 45.1538,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 4.95,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "869179",
+  "tarih": "1964-04-29 04:21:05.26",
+  "enlem": 39.115,
+  "boylam": 23.705,
+  "derinlik": 13.4,
+  "Mw": 5.83,
+  "kaynak": "p",
+  "kalite": "B",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-04-29T04:16:05&endtime=1964-04-29T04:26:05&minlat=36.12&maxlat=42.12&minlon=20.70&maxlon=26.70",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-04-29T04:16:05&endtime=1964-04-29T04:26:05&minlat=36.12&maxlat=42.12&minlon=20.70&maxlon=26.70&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "869179",
+    "time": "1964-04-29T04:21:05.407",
+    "lat": 39.102,
+    "lon": 23.6981,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 5.3,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "866810",
+  "tarih": "1964-06-14 12:38:02.53",
+  "enlem": 38.006,
+  "boylam": 38.58,
+  "derinlik": 15.0,
+  "Mw": 5.16,
+  "kaynak": "p",
+  "kalite": "C",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-06-14T12:33:02&endtime=1964-06-14T12:43:02&minlat=35.01&maxlat=41.01&minlon=35.58&maxlon=41.58",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-06-14T12:33:02&endtime=1964-06-14T12:43:02&minlat=35.01&maxlat=41.01&minlon=35.58&maxlon=41.58&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "866810",
+    "time": "1964-06-14T12:38:01.858",
+    "lat": 38.001,
+    "lon": 38.5993,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 4.84,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "865414",
+  "tarih": "1964-08-25 11:11:48.81",
+  "enlem": 35.598,
+  "boylam": 28.841,
+  "derinlik": 15.0,
+  "Mw": 5.67,
+  "kaynak": "p",
+  "kalite": "B",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-08-25T11:06:48&endtime=1964-08-25T11:16:48&minlat=32.60&maxlat=38.60&minlon=25.84&maxlon=31.84",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-08-25T11:06:48&endtime=1964-08-25T11:16:48&minlat=32.60&maxlat=38.60&minlon=25.84&maxlon=31.84&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "865414",
+    "time": "1964-08-25T11:11:51.528",
+    "lat": 35.6354,
+    "lon": 28.8926,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 4.9,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "865493",
+  "tarih": "1964-08-27 19:31:58.22",
+  "enlem": 35.608,
+  "boylam": 28.781,
+  "derinlik": 15.0,
+  "Mw": 5.62,
+  "kaynak": "p",
+  "kalite": "B",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-08-27T19:26:58&endtime=1964-08-27T19:36:58&minlat=32.61&maxlat=38.61&minlon=25.78&maxlon=31.78",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-08-27T19:26:58&endtime=1964-08-27T19:36:58&minlat=32.61&maxlat=38.61&minlon=25.78&maxlon=31.78&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "865493",
+    "time": "1964-08-27T19:32:00.708",
+    "lat": 35.5528,
+    "lon": 28.7942,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 4.88,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "864119",
+  "tarih": "1964-09-04 03:39:35.27",
+  "enlem": 39.662,
+  "boylam": 40.364,
+  "derinlik": 15.0,
+  "Mw": 5.15,
+  "kaynak": "p",
+  "kalite": "C",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-09-04T03:34:35&endtime=1964-09-04T03:44:35&minlat=36.66&maxlat=42.66&minlon=37.36&maxlon=43.36",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-09-04T03:34:35&endtime=1964-09-04T03:44:35&minlat=36.66&maxlat=42.66&minlon=37.36&maxlon=43.36&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "864119",
+    "time": "1964-09-04T03:39:36.159",
+    "lat": 39.7515,
+    "lon": 40.3959,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 4.82,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "864279",
+  "tarih": "1964-09-09 22:19:38.98",
+  "enlem": 35.082,
+  "boylam": 45.885,
+  "derinlik": 10.0,
+  "Mw": 5.17,
+  "kaynak": "p",
+  "kalite": "C",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-09-09T22:14:38&endtime=1964-09-09T22:24:38&minlat=32.08&maxlat=38.08&minlon=42.88&maxlon=48.88",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-09-09T22:14:38&endtime=1964-09-09T22:24:38&minlat=32.08&maxlat=38.08&minlon=42.88&maxlon=48.88&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "864279",
+    "time": "1964-09-09T22:19:37.911",
+    "lat": 35.0266,
+    "lon": 45.7517,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 4.86,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "864481",
+  "tarih": "1964-09-18 00:08:44.35",
+  "enlem": 35.507,
+  "boylam": 28.818,
+  "derinlik": 15.0,
+  "Mw": 5.6,
+  "kaynak": "p",
+  "kalite": "B",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-09-18T00:03:44&endtime=1964-09-18T00:13:44&minlat=32.51&maxlat=38.51&minlon=25.82&maxlon=31.82",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-09-18T00:03:44&endtime=1964-09-18T00:13:44&minlat=32.51&maxlat=38.51&minlon=25.82&maxlon=31.82&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "864481",
+    "time": "1964-09-18T00:08:47.033",
+    "lat": 35.6453,
+    "lon": 28.8984,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 4.85,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ },
+ {
+  "gem_id": "862737",
+  "tarih": "1964-11-15 06:33:23.28",
+  "enlem": 35.477,
+  "boylam": 45.59,
+  "derinlik": 15.0,
+  "Mw": 5.17,
+  "kaynak": "p",
+  "kalite": "C",
+  "B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-11-15T06:28:23&endtime=1964-11-15T06:38:23&minlat=32.48&maxlat=38.48&minlon=42.59&maxlon=48.59",
+  "B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1964-11-15T06:28:23&endtime=1964-11-15T06:38:23&minlat=32.48&maxlat=38.48&minlon=42.59&maxlon=48.59&minmagnitude=5.5",
+  "B1": [
+   {
+    "id": "862737",
+    "time": "1964-11-15T06:33:22.548",
+    "lat": 35.4727,
+    "lon": 45.6428,
+    "author": "ISC",
+    "mtype": "mb",
+    "mag": 4.84,
+    "magauthor": "ISC"
+   }
+  ],
+  "B2": [],
+  "sonuc": "ISC var, M≥5,5 süzgecinde yok"
+ }
+]
