@@ -106,3 +106,16 @@ Yorum:
 3. **Önemli uyarı (döngüsellik):** Eklenen olaylar ISC-GEM'den geldiği için, ISC-GEM'e dayalı K1 oranının yükselmesi kısmen yapı gereğidir; bağımsız bir kanıt sayılmaz. Bağımsız kanıt Stepp (K2) ölçütüdür ve 13 olaydan etkilenmiyor (1905). Bu analiz, olayların gerçekliğini yeniden sınamaz. Olay kimliği ISC sorgusuyla doğrulanmıştı. Vekil Mw'nin doğruluğu ise sınanamıyor ve 1960–64 oranlarını doğrudan etkiliyor.
 
 Mevcut merdiven, üretim, `main` ve korunan dosyalar değişmedi. Merdiven kararı kullanıcıya bırakıldı.
+
+---
+
+# Aday tamlık merdiveni — kullanıcı kararı (2026-10-21)
+
+| Sınıf | Aday başlangıç | Dayanak |
+|---|---|---|
+| M ≥ 6,0 | 1904 | K1 + K2 |
+| M 5,5–6,0 | **1970** | K1 (1960'lar %82). Stepp 1905'i veriyor; 13 olayla 1905 bulgusu yalnız duyarlılık sonucu olarak raporlanır |
+| M 5,0–5,5 | **1979** | K2; 13 olaya duyarsız |
+| M < 5,0 | mevcut eşikler (1965/1980/1990/1998) geçici olarak korunur | bağımsız doğrulama yok |
+
+13 olay ana kataloğa eklenmez; vekil Mw'leri bağımsız sınanamadı. Bilimsel değerlendirme bu noktada kapatıldı. Bu tablo **aday** niteliğindedir: mevcut merdiven, üretim kodu, `main` ve korunan dosyalar değişmedi. Üretime aktarım ayrı onaya bağlıdır.
