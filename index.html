@@ -8546,12 +8546,15 @@ function syncRegionURL(bounds, opt) {
   const df = document.getElementById('regionDateFrom')?.value, dt = document.getElementById('regionDateTo')?.value;
   if (df) url.searchParams.set('rfrom', df); else url.searchParams.delete('rfrom');
   if (dt) url.searchParams.set('rto', dt); else url.searchParams.delete('rto');
+  // 2026-10-20: daire bölgesi (merkez, yarıçap) da bağlantıda; yoksa link yalnız dış dikdörtgeni geri kurardı
+  if (regionIsCircle && regionCircleCenter && isFinite(regionCircleRadiusKm)) url.searchParams.set('rcirc', `${regionCircleCenter.lat.toFixed(4)},${regionCircleCenter.lon.toFixed(4)},${+regionCircleRadiusKm.toFixed(1)}`);
+  else url.searchParams.delete('rcirc');
   history.replaceState(null, '', url);
 }
 
 function clearRegionURL() {
   const url = new URL(location.href);
-  ['rminlat','rmaxlat','rminlon','rmaxlon','rlimit','rorder','rsource','rmagmin','rmagmax','rdepmin','rdepmax','rchunk','rfrom','rto']
+  ['rminlat','rmaxlat','rminlon','rmaxlon','rlimit','rorder','rsource','rmagmin','rmagmax','rdepmin','rdepmax','rchunk','rfrom','rto','rcirc']
     .forEach(k => url.searchParams.delete(k));
   history.replaceState(null, '', url);
 }
@@ -8585,8 +8588,18 @@ function restoreRegionFromURL() {
   const dfI = document.getElementById('regionDateFrom'), dtI = document.getElementById('regionDateTo');
   if (dfI && /^\d{4}-\d{2}-\d{2}$/.test(p.get('rfrom') || '')) dfI.value = p.get('rfrom');
   if (dtI && /^\d{4}-\d{2}-\d{2}$/.test(p.get('rto') || '')) dtI.value = p.get('rto');
-  regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
-  fetchRegionEvents(bounds);
+  // 2026-10-20: rcirc=lat,lon,R_km varsa bölge daire olarak kurulur (olaylar point-in-circle ile süzülür)
+  const rc = (p.get('rcirc') || '').split(',').map(Number);
+  if (rc.length === 3 && rc.every(isFinite) && Math.abs(rc[0]) <= 90 && Math.abs(rc[1]) <= 180 && rc[2] > 0) {
+    regionIsPolygon = false; regionIsCircle = true;
+    regionCircleCenter = { lat: rc[0], lon: rc[1] }; regionCircleRadiusKm = rc[2];
+    ['litCircleLat', 'litCircleLon', 'litCircleRadius'].forEach((id, i) => { const e = document.getElementById(id); if (e) e.value = rc[i]; });
+    regionRect = L.circle([rc[0], rc[1]], { radius: rc[2] * 1000, color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+    fetchRegionEvents(regionRect.getBounds());
+  } else {
+    regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+    fetchRegionEvents(bounds);
+  }
   // Linkle paylaşılan bölge varsa paneli otomatik aç — aksi halde sonuçlar
   // (regionInfo/CSV) kapalı panelin arkasında görünmez kalır.
   const body = document.getElementById('rcBody');
