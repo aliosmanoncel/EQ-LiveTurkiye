@@ -135,3 +135,48 @@ Toplam fark = C1·L1 − C0·L0. Etkiler iki sırada da hesaplandı ve ortaland�
 Net farkın tamamına yakını büyüklük homojenizasyonundan geliyor. Merdivenin net etkisi sıfıra yakın, ancak yönü kataloğa göre değişiyor (etkileşim).
 
 Tekdüzelik notu (bölüm 1.2): Faz 4'te 4,5–5,0 sınıfı için Stepp (K2) **1995** başlangıcını verdi. Faz 4'te bu sınıf için bağımsız doğrulama yoktu. 4,5 basamağının 1979'a kayması bu kanıttan daha tutucu değil, daha serbesttir.
+
+## 7. Geliştirme dalı ve test sonuçları (2026-10-21) — üretime ONAYLANMADI
+
+Dal `homog-uretim-aday` @ `5f73246`, `main` @ `0e875b0` üzerine. `main`'e birleştirilmedi, PR açılmadı.
+
+**Değişiklik listesi:**
+
+| Dosya | Tür | İçerik |
+|---|---|---|
+| `index.html` | +67 / −1 satır | `#histIscgem` işaret kutusu (varsayılan kapalı); `iscgemApply` / `loadIscgem` / `iscgemCatalog`; `rebuildHistoricalView` içinde tek koşullu satır; bilgi satırı; `CS_PRESETS` + `csApplyPreset` ve "Aday merdiven" düğmesi |
+| `data/mw_iscgem.json` | yeni | 1.144 aktarım (133'ünde 1963 öncesi zaman/konum) + 1910 alternatifi; lisans/atıf meta |
+| `data/iscgem_ek_1904_1962.json` | yeni | 273 olay, eq_historical şeması, `src: ISC-GEM` |
+| `data/LISANS_ISC-GEM.txt` | yeni | CC BY-SA 3.0, telif (ISC ve GEM Vakfı), veri ve makale atıfları, değişiklik bildirimi |
+| `scripts/test_iscgem_overlay.js`, `scripts/fixtures/iscgem_overlay_ref.json` | yeni | 35 denetim |
+| `.github/workflows/iscgem-overlay.yml` | yeni | Katman testi ve Weichert zinciri testi |
+
+Korunan dosyalar (`eq_historical.json`, `mw_authority.json`, `decluster_gk74.py`, `fetch_combined_catalog.py`) değişmedi.
+
+**Kaynak önceliği kuralı:**
+- ISC-GEM aktarılan bir olay `mw_authority` kaydıyla da eşleşirse `mw_authority` Mw kullanılır. Eşleştirme GK74 Faz 2a eşleştiricisiyle yapılır (kaynak kimliği ya da ±60 s ve ≤ 50 km).
+- ISC-GEM karşılığı olmayan olaylara dokunulmaz.
+- 7 çakışma bulundu: 1999 İzmit 7,58→7,6; 1999 Düzce 7,16→7,2; 2011 Van 7,14→7,1; 2020 Samos 6,99→7,0; 2017 Halabja 7,4→7,3; 2006 Kythira 6,73→6,7; 2018 Sarpol-e Zahab 6,3→6,3. Farklar en çok 0,1.
+
+**Test sonuçları:**
+
+| Test | Sonuç |
+|---|---|
+| Katman testi, yerel (35 denetim) | 35/0 |
+| Katman testi, GitHub Actions run 39513857705 | başarılı |
+| Kapalı seçenek: mevcut 10 JS testi ve 5 GK74 eşdeğerlik çalıştırması | Çıktılar `main` ile **bayt bayt aynı**. `test_fit_range.js` `main`'de de aynı hatayla bozuk; yalnız dosya yolu farklı |
+| Açık seçenek: katalog özeti (88.606 olay, zaman, konum, M) | Sabitlenmiş prototiple birebir aynı (SHA-256). Weichert N ve b, etki analiziyle aynı |
+| Açık seçenek: GK74 Python == tarayıcı JS (mag, mw) | BİREBİR AYNI |
+| Tarayıcı (Chromium, yerel sunucu, 1900–1970 penceresi) | Kapalıyken n = 662, `main` ile aynı; açıkken 935 (+273); kapatınca yine 662. Sayfa hatası yok. Ağa bağlı WebSocket hatası ortam kaynaklı |
+| GK74 eşdeğerlik iş akışı (dalda) | başarılı |
+
+**Lisans:** ISC indirme sayfası (erişim 2026-10-21) şunları belirtiyor:
+- Telif: "Copyright (C) 2025 International Seismological Centre and GEM Foundation".
+- Lisans: "CC-BY-SA 3.0 (unported)". Ayrı bir yeniden dağıtım kuralı belirtilmemiş.
+
+Atıf biçimi isc.ac.uk/iscgem/citing.php sayfasından alındı. Önceki dosyalarda telif sahibi yalnız ISC olarak yazılmıştı; düzeltildi. CC BY-SA 3.0'ın gerektirdikleri: atıf, lisans adresi, değişikliklerin belirtilmesi ve türetilmiş verinin aynı lisansla paylaşılması. Lisans yalnız iki veri dosyası için yazıldı. Bu bir hukuki görüş değildir.
+
+**Bilinen sınırlar:**
+1. `eq_historical.json`'daki ISC zamanları saat dilimi eki taşımaz ve tarayıcı bunları yerel saat olarak okur. Bu, `main`'de de var olan bir durumdur. Katman, aynı biçimi kullanarak tutarlılığı korur.
+2. Merdiven ön ayarı katman kapalıyken de seçilebilir; bu durumda bir uyarı gösterilir.
+3. M 4,5 basamağı bağımsız olarak doğrulanmadı (Stepp 1995).
