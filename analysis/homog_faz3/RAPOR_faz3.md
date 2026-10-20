@@ -63,7 +63,7 @@ ISC-GEM genel olarak M ≥ 5,0'ı kapsadığından, M < 5 olaylar mb/ML/MD ile k
 ## Kapanış — prototip sabitlendi (2026-10-21)
 **Kabul edilen:** prototip testleri (T1–T6, T8–T10 ✓). **Ayrı değerlendirilecek:** tamlık merdiveni. **Onaylanmadı:** üretime geçiş; `main` ve korunan dosyalar değişmedi.
 
-Sabitlenen sürüm: `homog-faz0` dalında etiket **`homog-prototip-v1`**. Yeniden üretim: `python analysis/homog_faz3/faz3_mw_aktarim.py` (girdiler: `data/eq_historical.json` blob 879a89b9, `analysis/homog_faz1/out/iscgem_v12.1_kutu.json`, `scripts/decluster_gk74.py`; SHA-256 değerleri `out/faz3_rapor.json → meta.inputs`).
+Sabitlenen sürüm: `homog-faz0` dalında commit **`f09b26c91525c5ced2c76db11ac06b3bfbad84ea`** (`homog-prototip-v1`; depo etiket gönderimine izin vermediği için etiket yerine commit kimliği kullanıldı). Yeniden üretim: `python analysis/homog_faz3/faz3_mw_aktarim.py` (girdiler: `data/eq_historical.json` blob 879a89b9, `analysis/homog_faz1/out/iscgem_v12.1_kutu.json`, `scripts/decluster_gk74.py`; SHA-256 değerleri `out/faz3_rapor.json → meta.inputs`).
 
 | Dosya | SHA-256 |
 |---|---|
