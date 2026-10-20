@@ -1,15 +1,53 @@
 {
  "meta": {
-  "generated": "2026-10-20T22:09Z",
+  "generated": "2026-10-20T22:16Z",
   "period": "1904-1962",
   "T_yil": 59,
   "inputs": {
    "data/eq_historical.json": "bd303aa30a17ae590073cfe664fd58c87cf93ed643cdb8374aa33c27a6d7545b",
    "analysis/homog_faz1/out/iscgem_v12.1_kutu.json": "314835223efcfb52be6830d35cc508d9d3560b97db3577ce83faa7bd7d0e6fb7",
-   "analysis/homog_faz2/out/isc_1904_1962_nofilter.json": null,
+   "analysis/homog_faz2/out/isc_1904_1962_nofilter.json": "27586b2bdac1c9380247dd495f092967ae5e3af638453b2a8e9d34ab3103cd4e",
    "scripts/decluster_gk74.py": "d196b6dfdcd2eb0cd4945e78e17ed4caa98ae63ada750a45f1a2981c509135dc"
   },
-  "a": null
+  "a": {
+   "generated": "2026-10-20T22:15Z",
+   "n": 1806,
+   "params": "format=xml&includeallmagnitudes=true; büyüklük süzgeci yok",
+   "yillar_hatali": [],
+   "kutu_disi_koken": 41,
+   "buyukluksuz_olay": 1405,
+   "secilen_tur_yazar": {
+    "ms|ISC": 127,
+    "ms|PAS": 95,
+    "other|ATH": 54,
+    "other|MOS": 50,
+    "mw|P&S": 13,
+    "other|JER": 3,
+    "other|KEW": 3,
+    "other|UPP": 2,
+    "other|KIR": 2,
+    "other|MAT": 2,
+    "other|QUE": 2,
+    "ms|AN2": 1,
+    "mb|ABE1": 1,
+    "other|SAF": 1,
+    "ms|ROTHE": 1
+   },
+   "Mw_cevrilemeyen(tur disi)": 125,
+   "c": {
+    "a_olay_ISCGEM_ana_ile_eslesen": 192,
+    "ISCGEM_ana_olayi_a_da_bulunan": 188,
+    "eslesmeyen_a_olayi(Mw_var)": 58,
+    "bunlardan_ISCGEM_ek_katalogda": 51,
+    "c_ye_eklenen": 7,
+    "c_ye_eklenen_M>=5.5": 7,
+    "eklenen_tur_yazar": {
+     "ms|PAS": 7
+    }
+   },
+   "a_M>=5.5_ham_A_da_yok": 31,
+   "a_M>=5.5_ham_toplam": 194
+  }
  },
  "sonuclar": {
   "A_mevcut": {
@@ -309,6 +347,350 @@
     }
    },
    "not": "alt küme; doğrudan Mw 1963 öncesinde yalnız büyük olaylarda var — b karşılaştırılamaz (seçim yanlılığı)"
+  },
+  "a_ham_buyukluk": {
+   "GK74_oncesi": {
+    "N_tumu": 360,
+    "siniflar": {
+     "5.0-5.5": 87,
+     "5.5-6.0": 95,
+     "6.0-6.5": 49,
+     ">=6.5": 50
+    },
+    "donem_sinif": {
+     "1904-1939|5.5-6.0": 41,
+     "1904-1939|>=6.0": 52,
+     "1940-1962|5.5-6.0": 54,
+     "1940-1962|>=6.0": 47
+    },
+    "lam_ge5.5": "3.288 ± 0.236",
+    "lam_ge6.0": "1.678 ± 0.169",
+    "Mc_maxc": 5.8,
+    "aki_M5.5": {
+     "b": 0.753,
+     "sb": 0.054,
+     "N": 194,
+     "dM": 0.0
+    },
+    "aki_M6.0": {
+     "b": 0.835,
+     "sb": 0.084,
+     "N": 99,
+     "dM": 0.0
+    },
+    "weichert_M5.5": {
+     "b": 0.604,
+     "sb": 0.06,
+     "lam_ge_mmin": 3.288,
+     "sd_lam": 0.236,
+     "N": 194
+    }
+   },
+   "GK74_sonrasi": {
+    "N_tumu": 298,
+    "siniflar": {
+     "5.0-5.5": 59,
+     "5.5-6.0": 79,
+     "6.0-6.5": 45,
+     ">=6.5": 48
+    },
+    "donem_sinif": {
+     "1904-1939|5.5-6.0": 39,
+     "1904-1939|>=6.0": 49,
+     "1940-1962|5.5-6.0": 40,
+     "1940-1962|>=6.0": 44
+    },
+    "lam_ge5.5": "2.915 ± 0.222",
+    "lam_ge6.0": "1.576 ± 0.163",
+    "Mc_maxc": 5.8,
+    "aki_M5.5": {
+     "b": 0.715,
+     "sb": 0.054,
+     "N": 172,
+     "dM": 0.0
+    },
+    "aki_M6.0": {
+     "b": 0.826,
+     "sb": 0.086,
+     "N": 93,
+     "dM": 0.0
+    },
+    "weichert_M5.5": {
+     "b": 0.555,
+     "sb": 0.062,
+     "lam_ge_mmin": 2.915,
+     "sd_lam": 0.222,
+     "N": 172
+    }
+   }
+  },
+  "a_Scordilis_Mw": {
+   "GK74_oncesi": {
+    "N_tumu": 235,
+    "siniflar": {
+     "5.0-5.5": 40,
+     "5.5-6.0": 103,
+     "6.0-6.5": 43,
+     ">=6.5": 49
+    },
+    "donem_sinif": {
+     "1904-1939|5.5-6.0": 43,
+     "1904-1939|>=6.0": 49,
+     "1940-1962|5.5-6.0": 60,
+     "1940-1962|>=6.0": 43
+    },
+    "lam_ge5.5": "3.305 ± 0.237",
+    "lam_ge6.0": "1.559 ± 0.163",
+    "Mc_maxc": 6.0,
+    "aki_M5.5": {
+     "b": 0.68,
+     "sb": 0.049,
+     "N": 195,
+     "dM": 0.0
+    },
+    "aki_M6.0": {
+     "b": 0.775,
+     "sb": 0.081,
+     "N": 92,
+     "dM": 0.0
+    },
+    "weichert_M5.5": {
+     "b": 0.536,
+     "sb": 0.057,
+     "lam_ge_mmin": 3.305,
+     "sd_lam": 0.237,
+     "N": 195
+    }
+   },
+   "GK74_sonrasi": {
+    "N_tumu": 200,
+    "siniflar": {
+     "5.0-5.5": 28,
+     "5.5-6.0": 86,
+     "6.0-6.5": 39,
+     ">=6.5": 47
+    },
+    "donem_sinif": {
+     "1904-1939|5.5-6.0": 41,
+     "1904-1939|>=6.0": 47,
+     "1940-1962|5.5-6.0": 45,
+     "1940-1962|>=6.0": 39
+    },
+    "lam_ge5.5": "2.915 ± 0.222",
+    "lam_ge6.0": "1.458 ± 0.157",
+    "Mc_maxc": 6.0,
+    "aki_M5.5": {
+     "b": 0.65,
+     "sb": 0.05,
+     "N": 172,
+     "dM": 0.0
+    },
+    "aki_M6.0": {
+     "b": 0.762,
+     "sb": 0.082,
+     "N": 86,
+     "dM": 0.0
+    },
+    "weichert_M5.5": {
+     "b": 0.494,
+     "sb": 0.059,
+     "lam_ge_mmin": 2.915,
+     "sd_lam": 0.222,
+     "N": 172
+    }
+   }
+  },
+  "c_birlesik": {
+   "GK74_oncesi": {
+    "N_tumu": 414,
+    "siniflar": {
+     "5.0-5.5": 54,
+     "5.5-6.0": 257,
+     "6.0-6.5": 66,
+     ">=6.5": 37
+    },
+    "donem_sinif": {
+     "1904-1939|5.5-6.0": 136,
+     "1904-1939|>=6.0": 62,
+     "1940-1962|5.5-6.0": 121,
+     "1940-1962|>=6.0": 41
+    },
+    "lam_ge5.5": "6.102 ± 0.322",
+    "lam_ge6.0": "1.746 ± 0.172",
+    "Mc_maxc": 5.7,
+    "aki_M5.5": {
+     "b": 1.04,
+     "sb": 0.055,
+     "N": 360,
+     "dM": 0.0
+    },
+    "aki_M6.0": {
+     "b": 0.915,
+     "sb": 0.09,
+     "N": 103,
+     "dM": 0.0
+    },
+    "weichert_M5.5": {
+     "b": 0.982,
+     "sb": 0.057,
+     "lam_ge_mmin": 6.102,
+     "sd_lam": 0.322,
+     "N": 360
+    }
+   },
+   "GK74_sonrasi": {
+    "N_tumu": 313,
+    "siniflar": {
+     "5.0-5.5": 40,
+     "5.5-6.0": 183,
+     "6.0-6.5": 54,
+     ">=6.5": 36
+    },
+    "donem_sinif": {
+     "1904-1939|5.5-6.0": 102,
+     "1904-1939|>=6.0": 53,
+     "1940-1962|5.5-6.0": 81,
+     "1940-1962|>=6.0": 37
+    },
+    "lam_ge5.5": "4.627 ± 0.280",
+    "lam_ge6.0": "1.525 ± 0.161",
+    "Mc_maxc": 5.7,
+    "aki_M5.5": {
+     "b": 0.922,
+     "sb": 0.056,
+     "N": 273,
+     "dM": 0.0
+    },
+    "aki_M6.0": {
+     "b": 0.839,
+     "sb": 0.088,
+     "N": 90,
+     "dM": 0.0
+    },
+    "weichert_M5.5": {
+     "b": 0.854,
+     "sb": 0.059,
+     "lam_ge_mmin": 4.627,
+     "sd_lam": 0.28,
+     "N": 273
+    }
+   }
+  },
+  "c_birlesik|iscgem_direct": {
+   "N_GK74_oncesi": 18,
+   "N_GK74_sonrasi": 17
+  },
+  "c_birlesik|iscgem_proxy": {
+   "N_GK74_oncesi": 389,
+   "N_GK74_sonrasi": 289
+  },
+  "c_birlesik|scordilis2006_ms": {
+   "N_GK74_oncesi": 7,
+   "N_GK74_sonrasi": 7
+  },
+  "c_birlesik|scordilis2006_mb": {
+   "N_GK74_oncesi": 0,
+   "N_GK74_sonrasi": 0
+  },
+  "c_birlesik|scordilis2006_mw": {
+   "N_GK74_oncesi": 0,
+   "N_GK74_sonrasi": 0
+  },
+  "c_birlesik_ek_katalog_dahil": {
+   "GK74_oncesi": {
+    "N_tumu": 465,
+    "siniflar": {
+     "5.0-5.5": 82,
+     "5.5-6.0": 275,
+     "6.0-6.5": 68,
+     ">=6.5": 40
+    },
+    "donem_sinif": {
+     "1904-1939|5.5-6.0": 149,
+     "1904-1939|>=6.0": 65,
+     "1940-1962|5.5-6.0": 126,
+     "1940-1962|>=6.0": 43
+    },
+    "lam_ge5.5": "6.492 ± 0.332",
+    "lam_ge6.0": "1.831 ± 0.176",
+    "Mc_maxc": 5.7,
+    "aki_M5.5": {
+     "b": 1.03,
+     "sb": 0.053,
+     "N": 383,
+     "dM": 0.0
+    },
+    "aki_M6.0": {
+     "b": 0.91,
+     "sb": 0.088,
+     "N": 108,
+     "dM": 0.0
+    },
+    "weichert_M5.5": {
+     "b": 0.969,
+     "sb": 0.054,
+     "lam_ge_mmin": 6.492,
+     "sd_lam": 0.332,
+     "N": 383
+    }
+   },
+   "GK74_sonrasi": {
+    "N_tumu": 353,
+    "siniflar": {
+     "5.0-5.5": 59,
+     "5.5-6.0": 200,
+     "6.0-6.5": 56,
+     ">=6.5": 38
+    },
+    "donem_sinif": {
+     "1904-1939|5.5-6.0": 114,
+     "1904-1939|>=6.0": 56,
+     "1940-1962|5.5-6.0": 86,
+     "1940-1962|>=6.0": 38
+    },
+    "lam_ge5.5": "4.983 ± 0.291",
+    "lam_ge6.0": "1.593 ± 0.164",
+    "Mc_maxc": 5.7,
+    "aki_M5.5": {
+     "b": 0.923,
+     "sb": 0.054,
+     "N": 294,
+     "dM": 0.0
+    },
+    "aki_M6.0": {
+     "b": 0.84,
+     "sb": 0.087,
+     "N": 94,
+     "dM": 0.0
+    },
+    "weichert_M5.5": {
+     "b": 0.853,
+     "sb": 0.057,
+     "lam_ge_mmin": 4.983,
+     "sd_lam": 0.291,
+     "N": 294
+    }
+   }
+  },
+  "c_birlesik_ek_katalog_dahil|iscgem_direct": {
+   "N_GK74_oncesi": 18,
+   "N_GK74_sonrasi": 17
+  },
+  "c_birlesik_ek_katalog_dahil|iscgem_proxy": {
+   "N_GK74_oncesi": 389,
+   "N_GK74_sonrasi": 288
+  },
+  "c_birlesik_ek_katalog_dahil|scordilis2006_ms": {
+   "N_GK74_oncesi": 7,
+   "N_GK74_sonrasi": 7
+  },
+  "c_birlesik_ek_katalog_dahil|scordilis2006_mb": {
+   "N_GK74_oncesi": 0,
+   "N_GK74_sonrasi": 0
+  },
+  "c_birlesik_ek_katalog_dahil|scordilis2006_mw": {
+   "N_GK74_oncesi": 0,
+   "N_GK74_sonrasi": 0
   }
  }
 }

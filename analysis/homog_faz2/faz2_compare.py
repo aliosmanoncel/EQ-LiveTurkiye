@@ -108,23 +108,36 @@ def main():
     if os.path.exists(pa):
         J = json.load(open(pa)); meta_a = {k: J['meta'][k] for k in ('generated', 'n', 'params')}; meta_a['yillar_hatali'] = [l for l in J['meta']['log'] if l['status'] not in (200, 204)]
         a_raw, a_types, nomag = [], collections.Counter(), 0
+        nbox = 0
         for e in J['events']:
             if not (Y0 <= int(e['time'][:4]) < Y1): continue
+            if not (33.0 <= e['lat'] <= 45.0 and 23.0 <= e['lon'] <= 48.0): nbox += 1; continue   # tercih edilen köken kutu dışı
             m, tp, au = pick(e)
             if m is None: nomag += 1; continue
             a_types[(tp, au)] += 1
             a_raw.append({'time': e['time'], 'lat': e['lat'], 'lon': e['lon'], 'Mraw': m, 'tp': tp, 'author': au, 'Mw': scord(m, tp), 'id': e['id']})
-        meta_a['buyukluksuz_olay'] = nomag; meta_a['secilen_tur_yazar'] = {f'{k[0]}|{k[1]}': v for k, v in a_types.most_common(15)}
+        meta_a['kutu_disi_koken'] = nbox; meta_a['buyukluksuz_olay'] = nomag; meta_a['secilen_tur_yazar'] = {f'{k[0]}|{k[1]}': v for k, v in a_types.most_common(15)}
         S['a_ham_buyukluk'] = [{**e, 'M': e['Mraw']} for e in a_raw]
         S['a_Scordilis_Mw'] = [{**e, 'M': e['Mw'], 'mw_src': 'scordilis2006_' + e['tp']} for e in a_raw if e['Mw'] is not None]
         meta_a['Mw_cevrilemeyen(tur disi)'] = sum(1 for e in a_raw if e['Mw'] is None)
         # (c) birleşik
         for e in a_raw + Bb: e['_t'] = ts(e['time'])
         mm = match(a_raw, Bb); matched_b = {id(r) for r in mm.values()}
-        C = [dict(e) for e in Bb] + [{**e, 'M': e['Mw'], 'mw_src': 'scordilis2006_' + e['tp']} for e in a_raw if id(e) not in mm and e['Mw'] is not None]
+        # ISC-GEM ek kataloğu: ISC-GEM'in güvenilir konum/büyüklük belirleyemediği olaylar. (a)'da bulunup ISC-GEM ana
+        # katalogla eşleşmeyen bir olay ek katalogla eşleşiyorsa, ISC-GEM onu bilerek dışarıda bırakmıştır → (c)'ye eklenmez.
+        sup = [{'time': g['date'], 'lat': g['lat'], 'lon': g['lon'], 'M': g['mw'], '_t': ts(g['date'])} for g in json.load(open('analysis/homog_faz1/out/iscgem_v12.1_kutu.json'))
+               if g['set'] == 'suppl' and Y0 <= int(g['date'][:4]) < Y1]
+        rest = [e for e in a_raw if id(e) not in mm and e['Mw'] is not None]
+        ms = match(rest, sup)
+        add = [e for e in rest if id(e) not in ms]
+        C = [dict(e) for e in Bb] + [{**e, 'M': e['Mw'], 'mw_src': 'scordilis2006_' + e['tp']} for e in add]
         S['c_birlesik'] = C
-        meta_a['c'] = {'a_olay_ISCGEM_ile_eslesen': len(mm), 'ISCGEM_olayi_a_da_bulunan': len(matched_b), 'eklenen_a_olayi': sum(1 for e in C if e.get('mw_src', '').startswith('scordilis')),
-                       'eklenen_a_M>=5.5': sum(1 for e in C if e.get('mw_src', '').startswith('scordilis') and e['M'] >= 5.5)}
+        S['c_birlesik_ek_katalog_dahil'] = C + [{**e, 'M': e['Mw'], 'mw_src': 'scordilis2006_' + e['tp'] + '_iscgem_suppl'} for e in rest if id(e) in ms]
+        json.dump([{'id': e['id'], 'time': e['time'], 'lat': e['lat'], 'lon': e['lon'], 'Mraw': e['Mraw'], 'tur': e['tp'], 'yazar': e['author'], 'Mw_scordilis': round(e['Mw'], 2),
+                    'ISCGEM_ek_katalogda': id(e) in ms} for e in rest], open(f'{OUT}/c_eklenen_aday_olaylar.json', 'w'), ensure_ascii=False, indent=0)
+        meta_a['c'] = {'a_olay_ISCGEM_ana_ile_eslesen': len(mm), 'ISCGEM_ana_olayi_a_da_bulunan': len(matched_b), 'eslesmeyen_a_olayi(Mw_var)': len(rest),
+                       'bunlardan_ISCGEM_ek_katalogda': len(ms), 'c_ye_eklenen': len(add), 'c_ye_eklenen_M>=5.5': sum(1 for e in add if e['Mw'] >= 5.5),
+                       'eklenen_tur_yazar': {f'{k[0]}|{k[1]}': v for k, v in collections.Counter((e['tp'], e['author']) for e in add).most_common(8)}}
         # süzgeç kaybının ölçümü: (a)'da ham büyüklüğü >= 5,5 olup A'da olmayanlar
         for e in A: e['_t'] = ts(e['time'])
         inA = match([e for e in a_raw], [{**x} for x in A])
@@ -137,7 +150,7 @@ def main():
             for src in ('iscgem_direct', 'iscgem_proxy'):
                 res[f'{k}|{src}'] = {'GK74_oncesi': stats([e for e in ev if e['mw_src'] == src]), 'GK74_sonrasi': stats([e for e in dc if e['mw_src'] == src]),
                                      'not': 'alt küme; doğrudan Mw 1963 öncesinde yalnız büyük olaylarda var — b karşılaştırılamaz (seçim yanlılığı)'}
-        if k == 'c_birlesik':
+        if k.startswith('c_birlesik'):
             for src in ('iscgem_direct', 'iscgem_proxy', 'scordilis2006_ms', 'scordilis2006_mb', 'scordilis2006_mw'):
                 res[f'{k}|{src}'] = {'N_GK74_oncesi': sum(1 for e in ev if e.get('mw_src') == src), 'N_GK74_sonrasi': sum(1 for e in dc if e.get('mw_src') == src)}
     json.dump({'meta': {'generated': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), 'period': f'{Y0}-{Y1 - 1}', 'T_yil': T,
