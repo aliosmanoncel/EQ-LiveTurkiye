@@ -2,7 +2,7 @@
 fetch_gnss_midas.py — Nevada Geodetic Laboratory (NGL) MIDAS GNSS hız alanını indirir,
 kalite süzgecinden geçirir ve tarayıcıda kullanılacak küçük bir JSON'a yazar.
 
-Kaynak : http://geodesy.unr.edu/velocities/midas.IGS14.txt   (readme: midas.readme.txt)
+Kaynak : http(s)://geodesy.unr.edu/velocities/midas.IGS20.txt (yoksa midas.IGS14.txt; readme: midas.readme.txt)
 Atıf   : Blewitt, G., Kreemer, C., Hammond, W. C., & Gazeaux, J. (2016). MIDAS robust trend estimator for
          accurate GPS station velocities without step detection. JGR Solid Earth, 121, 2054–2068.
          https://doi.org/10.1002/2015JB012552
@@ -17,7 +17,25 @@ Kullanım: python scripts/fetch_gnss_midas.py [--input yerel_dosya.txt] [--outpu
 """
 import argparse, datetime, json, sys, urllib.request
 
-URL = 'http://geodesy.unr.edu/velocities/midas.IGS14.txt'
+URLS = ['https://geodesy.unr.edu/velocities/midas.IGS20.txt', 'http://geodesy.unr.edu/velocities/midas.IGS20.txt',
+        'https://geodesy.unr.edu/velocities/midas.IGS14.txt', 'http://geodesy.unr.edu/velocities/midas.IGS14.txt']
+
+def download():
+    errs = []
+    for u in URLS:
+        for attempt in range(2):
+            try:
+                req = urllib.request.Request(u, headers={'User-Agent': 'EQ-LiveTurkiye (github.com/aliosmanoncel/EQ-LiveTurkiye)'})
+                with urllib.request.urlopen(req, timeout=600) as r:
+                    raw = r.read().decode('utf-8', errors='replace')
+                if raw.count('\n') > 1000:
+                    return u, raw
+                errs.append(f'{u}: yalnız {raw.count(chr(10))} satır')
+                break
+            except Exception as e:
+                errs.append(f'{u} (deneme {attempt + 1}): {type(e).__name__}: {e}')
+    print('::error::MIDAS indirilemedi — ' + ' | '.join(errs)[:3000])
+    sys.exit(1)
 
 def main():
     ap = argparse.ArgumentParser()
@@ -26,10 +44,9 @@ def main():
     ap.add_argument('--max-outlier', type=float, default=0.3); ap.add_argument('--max-speed', type=float, default=120.0)
     a = ap.parse_args()
     if a.input:
-        raw = open(a.input, encoding='utf-8', errors='replace').read()
+        URL, raw = a.input, open(a.input, encoding='utf-8', errors='replace').read()
     else:
-        req = urllib.request.Request(URL, headers={'User-Agent': 'EQ-LiveTurkiye (github.com/aliosmanoncel/EQ-LiveTurkiye)'})
-        raw = urllib.request.urlopen(req, timeout=180).read().decode('utf-8', errors='replace')
+        URL, raw = download()
     rows, n_all, rej = [], 0, {'parse': 0, 'years': 0, 'sigma': 0, 'outlier': 0, 'speed': 0}
     for line in raw.splitlines():
         p = line.split()
@@ -49,8 +66,8 @@ def main():
         if (ve * ve + vn * vn) ** 0.5 > a.max_speed: rej['speed'] += 1; continue
         rows.append([sid, round(lat, 4), round(lon, 4), round(ve, 2), round(vn, 2), round(se, 2), round(sn, 2), round(dur, 1)])
     if n_all < 1000 or len(rows) < 1000:
-        sys.exit(f'Beklenenden az istasyon (satır {n_all}, geçen {len(rows)}); dosya biçimi değişmiş olabilir — çıktı yazılmadı.')
-    out = {'meta': {'source': URL, 'frame': 'IGS14', 'units': 'mm/yr', 'downloaded_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
+        print(f'::error::Beklenenden az istasyon (satır {n_all}, geçen {len(rows)})'); sys.exit(f'Beklenenden az istasyon (satır {n_all}, geçen {len(rows)}); dosya biçimi değişmiş olabilir — çıktı yazılmadı.')
+    out = {'meta': {'source': URL, 'frame': 'IGS20' if 'IGS20' in URL else 'IGS14', 'units': 'mm/yr', 'downloaded_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
                     'n_input': n_all, 'n_kept': len(rows), 'rejected': rej,
                     'filters': {'min_years': a.min_years, 'max_sigma_mm_yr': a.max_sigma, 'max_outlier_frac': a.max_outlier, 'max_speed_mm_yr': a.max_speed},
                     'citation': 'Blewitt, G., Kreemer, C., Hammond, W. C., & Gazeaux, J. (2016). JGR Solid Earth, 121, 2054–2068. https://doi.org/10.1002/2015JB012552'},
