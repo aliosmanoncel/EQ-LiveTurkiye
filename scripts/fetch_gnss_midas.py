@@ -59,7 +59,7 @@ def main():
             lat, lon = float(p[24]), float(p[25])
         except ValueError:
             rej['parse'] += 1; continue
-        if lon > 180: lon -= 360
+        lon = ((lon + 180.0) % 360.0 + 360.0) % 360.0 - 180.0   # MIDAS boylamı [-360, 0] aralığında verebiliyor (ör. Darwin −229,16 = 130,84° D)
         if dur < a.min_years: rej['years'] += 1; continue
         if se > a.max_sigma or sn > a.max_sigma: rej['sigma'] += 1; continue
         if oe > a.max_outlier or on > a.max_outlier: rej['outlier'] += 1; continue
