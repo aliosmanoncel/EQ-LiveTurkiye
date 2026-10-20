@@ -121,3 +121,17 @@ Tüm sınıflar birlikte (M ≥ 3,0) fitlendiğinde b dört durumda da 1,02–1,
 4. ISC-GEM türetilmiş verisinin CC BY-SA 3.0 ile depoda yayımlanması.
 5. `eq_historical.json` → `completeness` tutarsızlığının belgelenip belgelenmeyeceği. Dosya korunduğu için düzeltilmez.
 6. Bu plana göre uygulamaya geçilip geçilmeyeceği (üretim onayı).
+
+## 6. Etki ayrıştırması (2×2 tasarım, GK74; bölüm 2'deki sayılardan, yeni hesap yok)
+
+Toplam fark = C1·L1 − C0·L0. Etkiler iki sırada da hesaplandı ve ortalandı (Shapley ayrıştırması). Etkileşim büyük olduğu için tek sıralı ayrıştırma yanıltıcı olur.
+
+| Gösterge | Toplam | Katalog etkisi (L0 / L1 altında → ort.) | Merdiven etkisi (C0 / C1 altında → ort.) |
+|---|---|---|---|
+| λ(≥5,0) /yıl | +2,87 | +3,72 / +2,24 → **+2,98** | +0,63 / −0,85 → **−0,11** |
+| λ(≥5,5) /yıl | +1,07 | +1,60 / +0,69 → **+1,14** | +0,39 / −0,53 → **−0,07** |
+| b (M ≥ 4,5) | −0,131 | −0,157 / −0,074 → **−0,116** | −0,057 / +0,026 → **−0,016** |
+
+Net farkın tamamına yakını büyüklük homojenizasyonundan geliyor. Merdivenin net etkisi sıfıra yakın, ancak yönü kataloğa göre değişiyor (etkileşim).
+
+Tekdüzelik notu (bölüm 1.2): Faz 4'te 4,5–5,0 sınıfı için Stepp (K2) **1995** başlangıcını verdi. Faz 4'te bu sınıf için bağımsız doğrulama yoktu. 4,5 basamağının 1979'a kayması bu kanıttan daha tutucu değil, daha serbesttir.
