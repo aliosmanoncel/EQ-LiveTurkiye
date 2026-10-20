@@ -1,0 +1,197 @@
+{
+ "generated": "2026-10-20T21:16Z",
+ "n_catalog": 88333,
+ "n_cat_ge4": 11742,
+ "n_comcat": 4450,
+ "n_comcat_mw": 1846,
+ "n_iscgem": 0,
+ "n_pairs": 1308,
+ "match_rate": {
+  "1900-1963|5.0-5.5": {
+   "N": 3,
+   "eslesen": 3,
+   "oran": 1.0
+  },
+  "1900-1963|>=5.5": {
+   "N": 163,
+   "eslesen": 143,
+   "oran": 0.877
+  },
+  "1963-1990|4.0-4.5": {
+   "N": 771,
+   "eslesen": 0,
+   "oran": 0.0
+  },
+  "1963-1990|4.5-5.0": {
+   "N": 1260,
+   "eslesen": 148,
+   "oran": 0.117
+  },
+  "1963-1990|5.0-5.5": {
+   "N": 227,
+   "eslesen": 108,
+   "oran": 0.476
+  },
+  "1963-1990|>=5.5": {
+   "N": 92,
+   "eslesen": 53,
+   "oran": 0.576
+  },
+  "1990-1998|4.0-4.5": {
+   "N": 885,
+   "eslesen": 0,
+   "oran": 0.0
+  },
+  "1990-1998|4.5-5.0": {
+   "N": 249,
+   "eslesen": 0,
+   "oran": 0.0
+  },
+  "1990-1998|5.0-5.5": {
+   "N": 65,
+   "eslesen": 34,
+   "oran": 0.523
+  },
+  "1990-1998|>=5.5": {
+   "N": 28,
+   "eslesen": 25,
+   "oran": 0.893
+  },
+  "1998-|4.0-4.5": {
+   "N": 5749,
+   "eslesen": 19,
+   "oran": 0.003
+  },
+  "1998-|4.5-5.0": {
+   "N": 1752,
+   "eslesen": 369,
+   "oran": 0.211
+  },
+  "1998-|5.0-5.5": {
+   "N": 369,
+   "eslesen": 297,
+   "oran": 0.805
+  },
+  "1998-|>=5.5": {
+   "N": 129,
+   "eslesen": 109,
+   "oran": 0.845
+  }
+ },
+ "dM_by_type": {
+  "mb": {
+   "n": 577,
+   "ort": -0.219,
+   "std": 0.235,
+   "ortanca": -0.2
+  },
+  "mw": {
+   "n": 515,
+   "ort": -0.001,
+   "std": 0.078,
+   "ortanca": 0.0
+  },
+  "ms": {
+   "n": 173,
+   "ort": -0.061,
+   "std": 0.291,
+   "ortanca": -0.08
+  },
+  "ml": {
+   "n": 39,
+   "ort": 0.018,
+   "std": 0.165,
+   "ortanca": 0.0
+  },
+  "uk": {
+   "n": 4,
+   "ort": 0.663,
+   "std": 0.33,
+   "ortanca": 0.54
+  }
+ },
+ "scordilis_minus_ref": {},
+ "bvalue": {
+  "1998-|A_mevcut": {
+   "N": 80929,
+   "Mc_maxc": 3.2,
+   "b_Mc": 1.021,
+   "sb": 0.005,
+   "N_ge_Mc": 50038,
+   "b_M4.5": 1.24,
+   "sb_M4.5": 0.026,
+   "N_ge_4.5": 2250
+  },
+  "1998-|B_refMw": {
+   "N": 80929,
+   "Mc_maxc": 3.2,
+   "b_Mc": 1.019,
+   "sb": 0.005,
+   "N_ge_Mc": 50038,
+   "b_M4.5": 1.181,
+   "sb_M4.5": 0.025,
+   "N_ge_4.5": 2269
+  },
+  "1963-1998|A_mevcut": {
+   "N": 7238,
+   "Mc_maxc": 3.7,
+   "b_Mc": 0.658,
+   "sb": 0.009,
+   "N_ge_Mc": 5304,
+   "b_M4.5": 1.099,
+   "sb_M4.5": 0.025,
+   "N_ge_4.5": 1921
+  },
+  "1963-1998|B_refMw": {
+   "N": 7238,
+   "Mc_maxc": 3.7,
+   "b_Mc": 0.641,
+   "sb": 0.009,
+   "N_ge_Mc": 5304,
+   "b_M4.5": 0.983,
+   "sb_M4.5": 0.022,
+   "N_ge_4.5": 1921
+  },
+  "tümü|A_mevcut": {
+   "N": 88333,
+   "Mc_maxc": 3.2,
+   "b_Mc": 0.87,
+   "sb": 0.004,
+   "N_ge_Mc": 57392,
+   "b_M4.5": 1.035,
+   "sb_M4.5": 0.016,
+   "N_ge_4.5": 4337
+  },
+  "tümü|B_refMw": {
+   "N": 88333,
+   "Mc_maxc": 3.2,
+   "b_Mc": 0.866,
+   "sb": 0.004,
+   "N_ge_Mc": 57392,
+   "b_M4.5": 0.97,
+   "sb_M4.5": 0.015,
+   "N_ge_4.5": 4356
+  }
+ },
+ "log": [
+  "eq_historical.json: 88333 olay",
+  "ComCat 1900-1910: 28 olay",
+  "ComCat 1910-1920: 57 olay",
+  "ComCat 1920-1930: 117 olay",
+  "ComCat 1930-1940: 167 olay",
+  "ComCat 1940-1950: 129 olay",
+  "ComCat 1950-1960: 134 olay",
+  "ComCat 1960-1970: 160 olay",
+  "ComCat 1970-1980: 492 olay",
+  "ComCat 1980-1990: 574 olay",
+  "ComCat 1990-2000: 501 olay",
+  "ComCat 2000-2010: 494 olay",
+  "ComCat 2010-2020: 734 olay",
+  "ComCat 2020-2027: 863 olay",
+  "ISC-GEM http://www.isc.ac.uk/iscgem/iscgem_download/isc-gem-cat.zip: HATA HTTP Error 404: Not Found",
+  "ISC-GEM https://www.isc.ac.uk/iscgem/iscgem_download/isc-gem-cat.zip: HATA HTTP Error 404: Not Found",
+  "ISC-GEM http://www.isc.ac.uk/iscgem/iscgem_download/isc-gem-cat.csv: HATA HTTP Error 404: Not Found",
+  "ISC-GEM https://www.isc.ac.uk/iscgem/iscgem_download/isc-gem-cat.csv: HATA HTTP Error 404: Not Found",
+  "Referans Mw olayları: ComCat Mw 1846, ISC-GEM 0"
+ ]
+}
