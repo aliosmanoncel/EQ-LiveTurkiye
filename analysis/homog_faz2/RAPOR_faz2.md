@@ -49,3 +49,20 @@ Mc (maks. eğrilik): A ve (a) 5,8–6,0; (b) ve (c) 5,7. Dönem ayrımı (GK74 s
 - **(c) duyarlılık olarak:** ana sonuçlara 7 olayın etkisini göstermek için.
 - **(a) yalnız tanı:** ana katalog için uygun değil.
 Seçimden önce açık konu: 1963 sınırında ISC-GEM'den mevcut ISC/EMSC dönemine geçişin (yinelenen ve büyüklük ölçeği değişen olaylar) ayrıca sınanması.
+
+---
+
+# Son kontrol: 1963 sınırında süreklilik ve karar (2026-10-21)
+
+**Kararlar (kullanıcı):** (b) ISC-GEM 1904–1962 için ana aday; (c) yalnız duyarlılık analizi; üretim kodu ve tamlık merdiveni son karara kadar değişmez. Betik `sinir_1963.py`, sonuç `out/sinir_1963.json`. Prototip P = ISC-GEM (≤ 1962) + mevcut katalog A (≥ 1963).
+
+| Kontrol | Sonuç |
+|---|---|
+| Sınırda yinelenen olay (1962-12 – 1963-01, ≤ 10 dk, ≤ 200 km) | **Yok** ✓ |
+| λ(≥6,0) sürekliliği, beşer yıl (GK74 sonrası) | P ile ISC-GEM uyumlu (1963–67: 2,6 / 2,2; 1968–72: 2,6 / 2,4; 1973–77: 0,8 / 0,8) ✓ |
+| λ(≥5,5) sürekliliği | **Uyumsuz:** 1963'ten sonra P, ISC-GEM'in %59–62'sinde kalıyor (1963–67: 4,0 / 6,4; 1968–72: 3,2 / 5,6; 1973–77: 2,0 / 3,4) ✗ |
+| Büyüklük ölçeği sıçraması, 1963–1975, aynı olaylar (A − ISC-GEM Mw) | mb −0,40 (n = 190), Ms −0,16 (n = 23), Mw +0,05 (n = 29) |
+
+**Sonuç:** Sınırda yinelenme yok, ama 1963'te büyüklük ölçeği Mw'den (ISC-GEM) mb'ye (A) geçtiği için M 5,5–6,0 oranı yapay olarak %40 düşüyor. **Yalnız 1904–1962'yi ISC-GEM'le değiştiren prototip tutarlı değil.** Süreklilik için ISC-GEM Mw'nin, ISC-GEM'in kapsadığı bütün dönemde (1904–2021) eşleşen A olaylarına da `mw_src` ile atanması gerekir; bu, Faz 1 planındaki "referans Mw" adımıdır ve son karar konusudur.
+
+**Kapanış:** Prototip tamamlandı. Seçilen aday (b); koşul: ölçek sürekliliği için ISC-GEM Mw 1963 sonrasında da eşleşen olaylara uygulanmalı. Üretim koduna ve merdivene dokunulmadı (korunan dosyalar `origin/main` ile aynı).

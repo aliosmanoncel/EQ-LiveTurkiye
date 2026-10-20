@@ -1,0 +1,61 @@
+{
+ "sinir_yinelenen_cift": [],
+ "oranlar_GK74_sonrasi": [
+  {
+   "donem": "1948-1952",
+   "P_lam5.5": "3.6",
+   "ISCGEM_lam5.5": "3.6",
+   "P_lam6.0": "1.2",
+   "ISCGEM_lam6.0": "1.2"
+  },
+  {
+   "donem": "1953-1957",
+   "P_lam5.5": "5.6",
+   "ISCGEM_lam5.5": "5.6",
+   "P_lam6.0": "2.4",
+   "ISCGEM_lam6.0": "2.4"
+  },
+  {
+   "donem": "1958-1962",
+   "P_lam5.5": "3.0",
+   "ISCGEM_lam5.5": "3.0",
+   "P_lam6.0": "0.6",
+   "ISCGEM_lam6.0": "0.6"
+  },
+  {
+   "donem": "1963-1967",
+   "P_lam5.5": "4.0",
+   "ISCGEM_lam5.5": "6.4",
+   "P_lam6.0": "2.6",
+   "ISCGEM_lam6.0": "2.2"
+  },
+  {
+   "donem": "1968-1972",
+   "P_lam5.5": "3.2",
+   "ISCGEM_lam5.5": "5.6",
+   "P_lam6.0": "2.6",
+   "ISCGEM_lam6.0": "2.4"
+  },
+  {
+   "donem": "1973-1977",
+   "P_lam5.5": "2.0",
+   "ISCGEM_lam5.5": "3.4",
+   "P_lam6.0": "0.8",
+   "ISCGEM_lam6.0": "0.8"
+  }
+ ],
+ "dM_1963_1975_A_eksi_ISCGEM": {
+  "mb": {
+   "n": 190,
+   "ort": -0.4
+  },
+  "ms": {
+   "n": 23,
+   "ort": -0.16
+  },
+  "mw": {
+   "n": 29,
+   "ort": 0.05
+  }
+ }
+}
