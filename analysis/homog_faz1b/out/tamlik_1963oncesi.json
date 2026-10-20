@@ -4,26 +4,35 @@
   "n_unmatched_250km": 268,
   "A_eqlive_has_nearby_event(<=60dk,<=300km)": 3,
   "B_counts": {
-   "ağ kapalı": 268
+   "ISC FDSN döndürmüyor (kaynak kapsamı)": 18,
+   "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)": 246,
+   "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)": 4
   },
   "B_by_class": {
    "1904-1939|5.0-5.5": {
-    "ağ kapalı": 22
+    "ISC FDSN döndürmüyor (kaynak kapsamı)": 1,
+    "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)": 20,
+    "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)": 1
    },
    "1904-1939|5.5-6.0": {
-    "ağ kapalı": 99
+    "ISC FDSN döndürmüyor (kaynak kapsamı)": 10,
+    "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)": 89
    },
    "1904-1939|>=6.0": {
-    "ağ kapalı": 25
+    "ISC FDSN döndürmüyor (kaynak kapsamı)": 7,
+    "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)": 17,
+    "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)": 1
    },
    "1940-1962|5.0-5.5": {
-    "ağ kapalı": 29
+    "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)": 28,
+    "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)": 1
    },
    "1940-1962|5.5-6.0": {
-    "ağ kapalı": 84
+    "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)": 83,
+    "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)": 1
    },
    "1940-1962|>=6.0": {
-    "ağ kapalı": 9
+    "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)": 9
    }
   },
   "sensitivity": {
@@ -72,7 +81,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "16957878",
+     "time": "1905-11-08T22:06:10.562",
+     "lat": 39.1136,
+     "lon": 23.974,
+     "author": "ISC",
+     "mtype": "UK",
+     "mag": 7.8,
+     "magauthor": "B&D"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "610326388",
@@ -84,7 +107,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   }
  ],
  "olaylar": [
@@ -98,7 +124,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "16957813",
@@ -110,7 +139,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "16957813",
+     "time": "1904-04-04T10:25:34.157",
+     "lat": 42.4351,
+     "lon": 23.4138,
+     "author": "ISC",
+     "mtype": "Mw",
+     "mag": 7.1,
+     "magauthor": "P&S"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "610548603",
@@ -122,7 +165,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "610326295",
@@ -134,7 +180,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "16957878",
@@ -146,7 +195,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "16957878",
+     "time": "1905-11-08T22:06:10.562",
+     "lat": 39.1136,
+     "lon": 23.974,
+     "author": "ISC",
+     "mtype": "UK",
+     "mag": 7.8,
+     "magauthor": "B&D"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "16957879",
@@ -165,7 +228,21 @@
     "mtype": "MS",
     "dt_min": 314.6,
     "dr_km": 105
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "16957879",
+     "time": "1905-12-04T12:20:07.961",
+     "lat": 37.2165,
+     "lon": 38.8301,
+     "author": "ISC",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "610548665",
@@ -177,7 +254,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "610548698",
@@ -189,7 +269,10 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "610326342",
@@ -201,7 +284,10 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "610326343",
@@ -213,7 +299,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "610326363",
@@ -225,7 +314,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "16958138",
@@ -237,7 +329,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "16958138",
+     "time": "1911-04-04T15:43:47.340",
+     "lat": 36.4063,
+     "lon": 25.8835,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 7.0,
+     "magauthor": "PAS"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "610326492",
@@ -249,7 +355,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "610326493",
@@ -261,7 +370,10 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "610326388",
@@ -273,7 +385,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "610326389",
@@ -285,7 +400,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "914033",
@@ -297,7 +415,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "914033",
+     "time": "1913-01-27T19:38:09.000",
+     "lat": 36.5,
+     "lon": 42.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "914057",
@@ -309,7 +441,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "914057",
+     "time": "1913-04-20T03:13:37.000",
+     "lat": 42.5,
+     "lon": 45.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "914076",
@@ -321,7 +467,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "914076",
+     "time": "1913-06-14T09:33:19.122",
+     "lat": 43.6028,
+     "lon": 25.9524,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 6.75,
+     "magauthor": "PAS"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913986",
@@ -333,7 +493,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913986",
+     "time": "1914-05-28T11:27:19.000",
+     "lat": 39.7,
+     "lon": 36.0,
+     "author": "PUL",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "610326513",
@@ -345,7 +519,10 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "914013",
@@ -364,7 +541,21 @@
     "mtype": "MS",
     "dt_min": 259.6,
     "dr_km": 28
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "914013",
+     "time": "1914-10-17T10:42:00.000",
+     "lat": 38.0,
+     "lon": 24.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "610326400",
@@ -376,7 +567,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "913909",
@@ -388,7 +582,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913909",
+     "time": "1915-05-19T04:48:21.000",
+     "lat": 38.5,
+     "lon": 40.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913918",
@@ -400,7 +608,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913918",
+     "time": "1915-06-24T05:20:24.000",
+     "lat": 35.0,
+     "lon": 24.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913959",
@@ -412,7 +634,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913959",
+     "time": "1915-12-25T06:06:01.000",
+     "lat": 37.0,
+     "lon": 35.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "610326402",
@@ -424,7 +660,10 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "913433",
@@ -436,7 +675,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913433",
+     "time": "1917-03-18T17:39:00.000",
+     "lat": 41.0,
+     "lon": 36.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913576",
@@ -448,7 +701,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913576",
+     "time": "1917-07-24T16:12:40.000",
+     "lat": 33.5,
+     "lon": 46.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913637",
@@ -460,7 +727,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913637",
+     "time": "1917-08-20T23:02:00.000",
+     "lat": 41.0,
+     "lon": 24.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913035",
@@ -472,7 +753,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913035",
+     "time": "1918-01-16T07:13:15.000",
+     "lat": 37.4,
+     "lon": 30.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913037",
@@ -484,7 +779,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913037",
+     "time": "1918-01-16T16:32:06.000",
+     "lat": 38.8,
+     "lon": 32.9,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913059",
@@ -496,7 +805,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "913092",
@@ -508,7 +820,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913092",
+     "time": "1918-03-17T13:45:05.000",
+     "lat": 36.0,
+     "lon": 28.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913130",
@@ -520,7 +846,10 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "913191",
@@ -532,7 +861,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913191",
+     "time": "1918-07-01T11:02:00.000",
+     "lat": 34.5,
+     "lon": 25.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913193",
@@ -544,7 +887,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913193",
+     "time": "1918-07-04T11:25:15.000",
+     "lat": 37.4,
+     "lon": 30.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913220",
@@ -556,7 +913,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913220",
+     "time": "1918-08-09T00:38:40.000",
+     "lat": 40.8,
+     "lon": 35.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913250",
@@ -568,7 +939,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913250",
+     "time": "1918-08-29T06:39:25.000",
+     "lat": 41.6,
+     "lon": 35.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912799",
@@ -580,7 +965,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912799",
+     "time": "1919-05-27T10:34:20.000",
+     "lat": 37.2,
+     "lon": 35.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912810",
@@ -592,7 +991,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912810",
+     "time": "1919-06-09T07:13:35.000",
+     "lat": 41.5,
+     "lon": 34.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912892",
@@ -604,7 +1017,10 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [],
+   "B2_isc_ge55": [],
+   "B": "ISC FDSN döndürmüyor (kaynak kapsamı)"
   },
   {
    "gem_id": "912992",
@@ -616,7 +1032,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912992",
+     "time": "1919-10-25T17:10:00.000",
+     "lat": 37.0,
+     "lon": 26.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "913024",
@@ -628,7 +1058,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "913024",
+     "time": "1919-12-25T21:42:20.000",
+     "lat": 45.0,
+     "lon": 36.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912436",
@@ -640,7 +1084,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912436",
+     "time": "1920-02-20T00:01:30.000",
+     "lat": 42.0,
+     "lon": 46.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912437",
@@ -652,7 +1110,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912437",
+     "time": "1920-02-20T11:44:25.000",
+     "lat": 42.0,
+     "lon": 46.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912469",
@@ -664,7 +1136,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912469",
+     "time": "1920-04-02T15:34:20.000",
+     "lat": 37.5,
+     "lon": 27.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912480",
@@ -676,7 +1162,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912480",
+     "time": "1920-05-01T06:34:40.000",
+     "lat": 37.0,
+     "lon": 28.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912569",
@@ -688,7 +1188,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912569",
+     "time": "1920-07-21T14:29:05.000",
+     "lat": 34.4,
+     "lon": 27.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912629",
@@ -700,7 +1214,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912629",
+     "time": "1920-09-28T15:17:20.000",
+     "lat": 38.0,
+     "lon": 29.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912156",
@@ -712,7 +1240,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912156",
+     "time": "1921-01-27T11:30:09.000",
+     "lat": 36.0,
+     "lon": 28.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912265",
@@ -724,7 +1266,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912265",
+     "time": "1921-06-29T11:37:50.000",
+     "lat": 43.0,
+     "lon": 44.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "912324",
@@ -736,7 +1292,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "912324",
+     "time": "1921-09-26T09:25:55.000",
+     "lat": 39.3,
+     "lon": 33.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911833",
@@ -748,7 +1318,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911833",
+     "time": "1922-03-02T14:49:27.000",
+     "lat": 43.0,
+     "lon": 44.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911837",
@@ -760,7 +1344,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911837",
+     "time": "1922-03-08T17:33:45.000",
+     "lat": 34.5,
+     "lon": 25.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911915",
@@ -772,7 +1370,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911915",
+     "time": "1922-06-05T04:31:05.000",
+     "lat": 35.0,
+     "lon": 22.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911972",
@@ -784,7 +1396,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911972",
+     "time": "1922-08-08T03:49:06.000",
+     "lat": 37.5,
+     "lon": 23.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911973",
@@ -796,7 +1422,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911973",
+     "time": "1922-08-11T08:19:41.638",
+     "lat": 34.989,
+     "lon": 27.1759,
+     "author": "ISC",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911976",
@@ -815,7 +1455,21 @@
     "mtype": "MS",
     "dt_min": 756.2,
     "dr_km": 12
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "911976",
+     "time": "1922-08-13T12:46:00.000",
+     "lat": 36.0,
+     "lon": 28.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911995",
@@ -827,7 +1481,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911995",
+     "time": "1922-08-29T03:36:00.000",
+     "lat": 38.0,
+     "lon": 33.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911308",
@@ -839,7 +1507,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911308",
+     "time": "1923-03-10T19:48:40.000",
+     "lat": 34.5,
+     "lon": 27.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911404",
@@ -851,7 +1533,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911404",
+     "time": "1923-06-04T20:33:00.000",
+     "lat": 35.5,
+     "lon": 25.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911481",
@@ -863,7 +1559,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911481",
+     "time": "1923-08-01T08:16:27.018",
+     "lat": 34.7861,
+     "lon": 25.1596,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 6.7,
+     "magauthor": "PAS"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911502",
@@ -875,7 +1585,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911502",
+     "time": "1923-08-14T17:51:00.000",
+     "lat": 39.5,
+     "lon": 24.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911504",
@@ -887,7 +1611,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911504",
+     "time": "1923-08-16T03:51:40.000",
+     "lat": 40.2,
+     "lon": 34.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "910837",
@@ -899,7 +1637,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "910837",
+     "time": "1924-02-16T09:01:06.000",
+     "lat": 37.5,
+     "lon": 23.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "910950",
@@ -911,7 +1663,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "910950",
+     "time": "1924-05-13T01:52:30.000",
+     "lat": 40.0,
+     "lon": 42.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911142",
@@ -923,7 +1689,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911142",
+     "time": "1924-09-27T04:27:23.000",
+     "lat": 40.0,
+     "lon": 42.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911188",
@@ -935,7 +1715,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911188",
+     "time": "1924-11-08T09:05:00.000",
+     "lat": 35.5,
+     "lon": 48.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911202",
@@ -947,7 +1741,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911202",
+     "time": "1924-11-20T20:27:38.000",
+     "lat": 39.0,
+     "lon": 31.0,
+     "author": "ATH",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "911236",
@@ -959,7 +1767,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "911236",
+     "time": "1924-12-23T17:04:50.000",
+     "lat": 41.0,
+     "lon": 24.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "910326",
@@ -971,7 +1793,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "910326",
+     "time": "1925-01-09T17:38:15.000",
+     "lat": 41.0,
+     "lon": 44.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "910436",
@@ -983,7 +1819,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "910436",
+     "time": "1925-04-05T03:04:25.000",
+     "lat": 35.5,
+     "lon": 29.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "910649",
@@ -995,7 +1845,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "910649",
+     "time": "1925-08-16T20:58:54.000",
+     "lat": 37.4,
+     "lon": 30.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "910667",
@@ -1007,7 +1871,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "910667",
+     "time": "1925-09-01T08:16:00.000",
+     "lat": 39.0,
+     "lon": 31.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909709",
@@ -1019,7 +1897,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "909709",
+     "time": "1926-01-13T01:46:44.000",
+     "lat": 38.0,
+     "lon": 29.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909710",
@@ -1031,7 +1923,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "909710",
+     "time": "1926-01-13T08:08:24.000",
+     "lat": 38.0,
+     "lon": 29.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909752",
@@ -1043,7 +1949,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "909752",
+     "time": "1926-03-01T20:01:42.000",
+     "lat": 36.8,
+     "lon": 30.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909772",
@@ -1062,7 +1982,21 @@
     "mtype": "MS",
     "dt_min": 226.6,
     "dr_km": 19
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "909772",
+     "time": "1926-03-18T17:52:44.000",
+     "lat": 35.5,
+     "lon": 29.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909773",
@@ -1081,7 +2015,21 @@
     "mtype": "MS",
     "dt_min": 622.2,
     "dr_km": 9
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "909773",
+     "time": "1926-03-19T00:28:24.000",
+     "lat": 35.5,
+     "lon": 29.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909782",
@@ -1093,7 +2041,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "909782",
+     "time": "1926-03-21T22:04:12.000",
+     "lat": 35.5,
+     "lon": 29.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909787",
@@ -1105,7 +2067,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "909787",
+     "time": "1926-03-24T07:04:30.000",
+     "lat": 35.5,
+     "lon": 29.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "910077",
@@ -1117,7 +2093,32 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "910077",
+     "time": "1926-08-30T11:38:04.446",
+     "lat": 36.5695,
+     "lon": 22.9951,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 6.22,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [
+    {
+     "id": "910077",
+     "time": "1926-08-30T11:38:04.446",
+     "lat": 36.5695,
+     "lon": 22.9951,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 6.22,
+     "magauthor": "ISC"
+    }
+   ],
+   "B": "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)"
   },
   {
    "gem_id": "910286",
@@ -1129,7 +2130,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "910286",
+     "time": "1926-12-16T17:53:50.000",
+     "lat": 39.0,
+     "lon": 31.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909165",
@@ -1141,7 +2156,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "909165",
+     "time": "1927-03-24T14:46:35.000",
+     "lat": 35.0,
+     "lon": 26.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909505",
@@ -1160,7 +2189,21 @@
     "mtype": "MS",
     "dt_min": 304.3,
     "dr_km": 37
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "909505",
+     "time": "1927-09-12T03:20:00.000",
+     "lat": 44.5,
+     "lon": 34.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909506",
@@ -1179,7 +2222,21 @@
     "mtype": "MS",
     "dt_min": 497.6,
     "dr_km": 39
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "909506",
+     "time": "1927-09-12T06:33:24.000",
+     "lat": 44.5,
+     "lon": 34.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909508",
@@ -1198,7 +2255,21 @@
     "mtype": "MS",
     "dt_min": 885.5,
     "dr_km": 47
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "909508",
+     "time": "1927-09-12T13:01:15.000",
+     "lat": 44.5,
+     "lon": 34.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909509",
@@ -1217,7 +2288,21 @@
     "mtype": "MS",
     "dt_min": 968.1,
     "dr_km": 27
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "909509",
+     "time": "1927-09-12T14:23:50.000",
+     "lat": 44.5,
+     "lon": 34.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909515",
@@ -1229,7 +2314,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "909515",
+     "time": "1927-09-14T02:32:50.000",
+     "lat": 44.5,
+     "lon": 34.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "909527",
@@ -1241,7 +2340,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "909527",
+     "time": "1927-09-24T06:13:51.000",
+     "lat": 44.5,
+     "lon": 34.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908469",
@@ -1253,7 +2366,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "908469",
+     "time": "1928-01-24T07:36:00.000",
+     "lat": 41.0,
+     "lon": 31.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908616",
@@ -1272,7 +2399,21 @@
     "mtype": "MS",
     "dt_min": 232.0,
     "dr_km": 18
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "908616",
+     "time": "1928-04-18T23:14:36.000",
+     "lat": 41.7,
+     "lon": 26.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908635",
@@ -1284,7 +2425,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "908635",
+     "time": "1928-04-22T20:13:46.000",
+     "lat": 38.0,
+     "lon": 23.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908643",
@@ -1296,7 +2451,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "908643",
+     "time": "1928-04-25T09:25:40.000",
+     "lat": 41.7,
+     "lon": 26.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908651",
@@ -1308,7 +2477,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "908651",
+     "time": "1928-04-28T17:58:50.000",
+     "lat": 41.7,
+     "lon": 26.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908652",
@@ -1320,7 +2503,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "908652",
+     "time": "1928-04-29T09:49:12.000",
+     "lat": 38.0,
+     "lon": 23.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908659",
@@ -1332,7 +2529,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "908659",
+     "time": "1928-05-02T21:54:21.000",
+     "lat": 39.7,
+     "lon": 29.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908788",
@@ -1344,7 +2555,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "908788",
+     "time": "1928-07-15T09:33:24.000",
+     "lat": 38.0,
+     "lon": 27.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908917",
@@ -1356,7 +2581,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "908917",
+     "time": "1928-10-04T11:13:54.000",
+     "lat": 39.7,
+     "lon": 34.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907873",
@@ -1368,7 +2607,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "907873",
+     "time": "1929-01-23T11:14:12.000",
+     "lat": 34.8,
+     "lon": 24.9,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "908310",
@@ -1380,7 +2633,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "908310",
+     "time": "1929-09-15T13:09:48.000",
+     "lat": 39.0,
+     "lon": 39.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907300",
@@ -1392,7 +2659,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "907300",
+     "time": "1930-03-31T12:33:55.000",
+     "lat": 40.0,
+     "lon": 24.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907320",
@@ -1404,7 +2685,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "907320",
+     "time": "1930-04-17T20:06:39.000",
+     "lat": 37.1,
+     "lon": 23.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907353",
@@ -1423,7 +2718,21 @@
     "mtype": "Mw",
     "dt_min": 931.0,
     "dr_km": 18
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "907353",
+     "time": "1930-05-06T07:03:22.000",
+     "lat": 37.0,
+     "lon": 44.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907371",
@@ -1435,7 +2744,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "907371",
+     "time": "1930-05-08T15:35:24.000",
+     "lat": 37.3,
+     "lon": 44.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907418",
@@ -1447,7 +2770,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "907418",
+     "time": "1930-05-23T09:48:20.000",
+     "lat": 37.5,
+     "lon": 45.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907426",
@@ -1459,7 +2796,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "907426",
+     "time": "1930-05-29T17:14:55.000",
+     "lat": 37.5,
+     "lon": 45.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907434",
@@ -1471,7 +2822,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "907434",
+     "time": "1930-06-04T07:28:10.000",
+     "lat": 37.9,
+     "lon": 45.1,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907795",
@@ -1483,7 +2848,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "907795",
+     "time": "1930-12-10T10:31:30.000",
+     "lat": 39.5,
+     "lon": 39.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "906772",
@@ -1495,7 +2874,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "906772",
+     "time": "1931-05-12T10:25:10.000",
+     "lat": 37.5,
+     "lon": 45.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "906950",
@@ -1507,7 +2900,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "906950",
+     "time": "1931-08-18T09:47:10.000",
+     "lat": 39.5,
+     "lon": 24.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "907178",
@@ -1519,7 +2926,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "907178",
+     "time": "1931-12-24T23:00:05.000",
+     "lat": 37.3,
+     "lon": 44.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "906171",
@@ -1531,7 +2952,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "906171",
+     "time": "1932-05-27T10:42:15.000",
+     "lat": 45.2,
+     "lon": 25.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "906265",
@@ -1550,7 +2985,21 @@
     "mtype": "MS",
     "dt_min": 963.5,
     "dr_km": 99
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "906265",
+     "time": "1932-06-29T18:33:31.000",
+     "lat": 35.5,
+     "lon": 27.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "906324",
@@ -1562,7 +3011,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "906324",
+     "time": "1932-08-09T07:44:22.000",
+     "lat": 34.5,
+     "lon": 27.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "906388",
@@ -1574,7 +3037,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "906388",
+     "time": "1932-09-28T16:52:17.000",
+     "lat": 40.4,
+     "lon": 23.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "906392",
@@ -1586,7 +3063,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "906392",
+     "time": "1932-09-29T03:57:24.443",
+     "lat": 40.709,
+     "lon": 23.4368,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 6.25,
+     "magauthor": "PAS"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "906398",
@@ -1598,7 +3089,32 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "906398",
+     "time": "1932-09-30T06:12:09.000",
+     "lat": 36.0,
+     "lon": 22.75,
+     "author": "GUTE",
+     "mtype": "MS",
+     "mag": 5.6,
+     "magauthor": "PAS"
+    }
+   ],
+   "B2_isc_ge55": [
+    {
+     "id": "906398",
+     "time": "1932-09-30T06:12:09.000",
+     "lat": 36.0,
+     "lon": 22.75,
+     "author": "GUTE",
+     "mtype": "MS",
+     "mag": 5.6,
+     "magauthor": "PAS"
+    }
+   ],
+   "B": "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)"
   },
   {
    "gem_id": "906402",
@@ -1610,7 +3126,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "906402",
+     "time": "1932-10-01T13:36:22.000",
+     "lat": 39.8,
+     "lon": 23.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "906413",
@@ -1622,7 +3152,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "906413",
+     "time": "1932-10-09T06:24:52.000",
+     "lat": 39.8,
+     "lon": 23.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "905467",
@@ -1634,7 +3178,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "905467",
+     "time": "1933-03-14T01:19:39.000",
+     "lat": 38.4,
+     "lon": 25.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "905606",
@@ -1646,7 +3204,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "905606",
+     "time": "1933-06-01T02:40:30.000",
+     "lat": 38.7,
+     "lon": 23.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "905887",
@@ -1658,7 +3230,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "905887",
+     "time": "1933-10-24T16:25:12.000",
+     "lat": 42.5,
+     "lon": 45.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "905903",
@@ -1670,7 +3256,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "905903",
+     "time": "1933-11-06T07:07:16.000",
+     "lat": 39.0,
+     "lon": 43.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "904088",
@@ -1682,7 +3282,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "904088",
+     "time": "1935-02-18T06:40:12.000",
+     "lat": 40.4,
+     "lon": 23.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "904581",
@@ -1694,7 +3308,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "904581",
+     "time": "1935-10-13T19:32:15.000",
+     "lat": 38.1,
+     "lon": 41.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "903476",
@@ -1706,7 +3334,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "903476",
+     "time": "1936-02-12T10:57:30.000",
+     "lat": 34.6,
+     "lon": 23.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "903549",
@@ -1718,7 +3360,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "903549",
+     "time": "1936-04-08T04:17:18.000",
+     "lat": 41.5,
+     "lon": 23.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "903822",
@@ -1730,7 +3386,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "903822",
+     "time": "1936-09-02T13:12:26.000",
+     "lat": 41.6,
+     "lon": 46.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "903949",
@@ -1742,7 +3412,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "903949",
+     "time": "1936-11-18T15:50:15.000",
+     "lat": 41.0,
+     "lon": 33.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "903051",
@@ -1754,7 +3438,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "903051",
+     "time": "1937-04-28T02:36:40.000",
+     "lat": 35.7,
+     "lon": 30.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "903088",
@@ -1766,7 +3464,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "903088",
+     "time": "1937-05-23T10:57:20.000",
+     "lat": 38.0,
+     "lon": 27.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902316",
@@ -1778,7 +3490,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902316",
+     "time": "1938-01-02T10:54:44.000",
+     "lat": 34.1,
+     "lon": 24.9,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902343",
@@ -1790,7 +3516,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902343",
+     "time": "1938-01-26T03:40:02.000",
+     "lat": 33.2,
+     "lon": 46.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902371",
@@ -1802,7 +3542,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902371",
+     "time": "1938-02-10T20:37:53.000",
+     "lat": 34.8,
+     "lon": 26.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902446",
@@ -1821,7 +3575,21 @@
     "mtype": "MS",
     "dt_min": 731.9,
     "dr_km": 8
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "902446",
+     "time": "1938-04-19T23:11:12.000",
+     "lat": 39.5,
+     "lon": 33.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902483",
@@ -1833,7 +3601,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902483",
+     "time": "1938-05-12T22:09:37.000",
+     "lat": 34.8,
+     "lon": 26.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902596",
@@ -1845,7 +3627,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902596",
+     "time": "1938-07-21T21:56:03.000",
+     "lat": 39.5,
+     "lon": 33.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901755",
@@ -1857,7 +3653,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901755",
+     "time": "1939-01-02T04:35:22.000",
+     "lat": 36.3,
+     "lon": 30.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902087",
@@ -1869,7 +3679,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902087",
+     "time": "1939-07-25T03:40:22.000",
+     "lat": 39.8,
+     "lon": 29.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902103",
@@ -1881,7 +3705,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902103",
+     "time": "1939-08-03T12:32:47.000",
+     "lat": 39.8,
+     "lon": 29.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902196",
@@ -1893,7 +3731,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902196",
+     "time": "1939-10-19T21:32:44.000",
+     "lat": 39.8,
+     "lon": 29.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902235",
@@ -1905,7 +3757,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902235",
+     "time": "1939-11-21T08:48:52.000",
+     "lat": 39.7,
+     "lon": 39.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902298",
@@ -1917,7 +3783,21 @@
    "q_mw": "B",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902298",
+     "time": "1939-12-28T03:25:20.000",
+     "lat": 40.0,
+     "lon": 37.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "902302",
@@ -1929,7 +3809,21 @@
    "q_mw": "C",
    "per": "1904-1939",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "902302",
+     "time": "1939-12-29T11:33:31.000",
+     "lat": 39.7,
+     "lon": 39.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901144",
@@ -1941,7 +3835,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901144",
+     "time": "1940-01-04T20:44:57.000",
+     "lat": 40.8,
+     "lon": 36.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901148",
@@ -1953,7 +3861,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901148",
+     "time": "1940-01-06T19:04:33.000",
+     "lat": 35.7,
+     "lon": 25.9,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901243",
@@ -1965,7 +3887,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901243",
+     "time": "1940-03-17T09:08:51.000",
+     "lat": 38.0,
+     "lon": 43.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901295",
@@ -1977,7 +3913,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901295",
+     "time": "1940-04-22T12:20:39.000",
+     "lat": 39.7,
+     "lon": 39.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901384",
@@ -1989,7 +3939,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901384",
+     "time": "1940-05-29T15:24:44.000",
+     "lat": 39.7,
+     "lon": 39.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901537",
@@ -2001,7 +3965,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901537",
+     "time": "1940-08-16T16:02:23.000",
+     "lat": 35.7,
+     "lon": 30.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901658",
@@ -2013,7 +3991,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901658",
+     "time": "1940-10-18T12:25:44.000",
+     "lat": 38.5,
+     "lon": 45.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900615",
@@ -2025,7 +4017,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900615",
+     "time": "1941-01-09T18:13:24.000",
+     "lat": 38.0,
+     "lon": 27.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900838",
@@ -2037,7 +4043,32 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900838",
+     "time": "1941-06-10T20:38:43.000",
+     "lat": 32.0,
+     "lon": 47.5,
+     "author": "GUTE",
+     "mtype": "MS",
+     "mag": 5.6,
+     "magauthor": "PAS"
+    }
+   ],
+   "B2_isc_ge55": [
+    {
+     "id": "900838",
+     "time": "1941-06-10T20:38:43.000",
+     "lat": 32.0,
+     "lon": 47.5,
+     "author": "GUTE",
+     "mtype": "MS",
+     "mag": 5.6,
+     "magauthor": "PAS"
+    }
+   ],
+   "B": "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)"
   },
   {
    "gem_id": "900963",
@@ -2049,7 +4080,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900963",
+     "time": "1941-08-28T00:18:35.000",
+     "lat": 33.4,
+     "lon": 47.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901015",
@@ -2061,7 +4106,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901015",
+     "time": "1941-09-21T22:40:20.000",
+     "lat": 37.2,
+     "lon": 28.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "901072",
@@ -2073,7 +4132,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "901072",
+     "time": "1941-11-12T10:04:49.000",
+     "lat": 39.7,
+     "lon": 39.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900186",
@@ -2085,7 +4158,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900186",
+     "time": "1942-02-02T17:05:12.000",
+     "lat": 33.8,
+     "lon": 26.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900189",
@@ -2097,7 +4184,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900189",
+     "time": "1942-02-05T01:15:55.000",
+     "lat": 39.0,
+     "lon": 28.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900336",
@@ -2109,7 +4210,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900336",
+     "time": "1942-06-16T04:47:30.000",
+     "lat": 33.8,
+     "lon": 26.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900337",
@@ -2121,7 +4236,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900337",
+     "time": "1942-06-16T05:42:27.000",
+     "lat": 40.4,
+     "lon": 28.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900456",
@@ -2133,7 +4262,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900456",
+     "time": "1942-09-01T09:42:15.000",
+     "lat": 36.4,
+     "lon": 27.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900513",
@@ -2145,7 +4288,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900513",
+     "time": "1942-10-28T02:22:46.000",
+     "lat": 39.0,
+     "lon": 27.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900552",
@@ -2157,7 +4314,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900552",
+     "time": "1942-11-15T17:01:15.000",
+     "lat": 39.8,
+     "lon": 29.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900563",
@@ -2169,7 +4340,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900563",
+     "time": "1942-11-21T14:01:41.000",
+     "lat": 40.6,
+     "lon": 35.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900573",
@@ -2181,7 +4366,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900573",
+     "time": "1942-12-02T19:04:19.000",
+     "lat": 40.6,
+     "lon": 35.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900580",
@@ -2193,7 +4392,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900580",
+     "time": "1942-12-11T02:39:11.000",
+     "lat": 40.6,
+     "lon": 35.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899692",
@@ -2205,7 +4418,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899692",
+     "time": "1943-01-11T11:56:16.000",
+     "lat": 37.2,
+     "lon": 28.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900095",
@@ -2217,7 +4444,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900095",
+     "time": "1943-11-20T10:01:52.000",
+     "lat": 36.9,
+     "lon": 28.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900102",
@@ -2229,7 +4470,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900102",
+     "time": "1943-11-26T22:20:48.726",
+     "lat": 40.9162,
+     "lon": 33.5625,
+     "author": "ISC",
+     "mtype": "Mw",
+     "mag": 7.5,
+     "magauthor": "P&S"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "900112",
@@ -2241,7 +4496,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "900112",
+     "time": "1943-11-29T18:45:35.000",
+     "lat": 38.5,
+     "lon": 41.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899257",
@@ -2253,7 +4522,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899257",
+     "time": "1944-01-05T07:44:04.000",
+     "lat": 36.4,
+     "lon": 27.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899281",
@@ -2272,7 +4555,21 @@
     "mtype": "Mw",
     "dt_min": 1082.0,
     "dr_km": 138
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "899281",
+     "time": "1944-02-01T21:24:37.000",
+     "lat": 41.5,
+     "lon": 32.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899282",
@@ -2284,7 +4581,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899282",
+     "time": "1944-02-02T03:33:09.000",
+     "lat": 41.5,
+     "lon": 32.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899295",
@@ -2296,7 +4607,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899295",
+     "time": "1944-02-10T12:05:24.000",
+     "lat": 41.5,
+     "lon": 32.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899351",
@@ -2308,7 +4633,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899351",
+     "time": "1944-04-05T04:40:40.000",
+     "lat": 40.6,
+     "lon": 30.9,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899440",
@@ -2320,7 +4659,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899440",
+     "time": "1944-06-25T04:16:17.368",
+     "lat": 38.7642,
+     "lon": 30.2011,
+     "author": "ISC",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899441",
@@ -2332,7 +4685,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899441",
+     "time": "1944-06-25T06:57:44.000",
+     "lat": 39.0,
+     "lon": 29.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899464",
@@ -2344,7 +4711,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899464",
+     "time": "1944-07-17T10:53:46.000",
+     "lat": 35.8,
+     "lon": 43.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899467",
@@ -2356,7 +4737,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899467",
+     "time": "1944-07-20T10:37:20.000",
+     "lat": 35.5,
+     "lon": 26.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899498",
@@ -2375,7 +4770,32 @@
     "mtype": "MS",
     "dt_min": 0.2,
     "dr_km": 203
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "899498",
+     "time": "1944-08-09T17:36:37.000",
+     "lat": 36.5,
+     "lon": 27.5,
+     "author": "GUTE",
+     "mtype": "MS",
+     "mag": 5.5,
+     "magauthor": "PAS"
+    }
+   ],
+   "B2_isc_ge55": [
+    {
+     "id": "899498",
+     "time": "1944-08-09T17:36:37.000",
+     "lat": 36.5,
+     "lon": 27.5,
+     "author": "GUTE",
+     "mtype": "MS",
+     "mag": 5.5,
+     "magauthor": "PAS"
+    }
+   ],
+   "B": "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)"
   },
   {
    "gem_id": "899559",
@@ -2387,7 +4807,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899559",
+     "time": "1944-09-30T04:13:12.000",
+     "lat": 41.2,
+     "lon": 35.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899571",
@@ -2399,7 +4833,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899571",
+     "time": "1944-10-07T21:34:22.000",
+     "lat": 39.4,
+     "lon": 26.7,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898759",
@@ -2411,7 +4859,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898759",
+     "time": "1945-01-15T05:30:01.000",
+     "lat": 38.0,
+     "lon": 43.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898823",
@@ -2423,7 +4885,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898823",
+     "time": "1945-03-02T10:39:39.000",
+     "lat": 41.0,
+     "lon": 33.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898851",
@@ -2435,7 +4911,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898851",
+     "time": "1945-03-20T07:58:49.000",
+     "lat": 37.4,
+     "lon": 35.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899161",
@@ -2447,7 +4937,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899161",
+     "time": "1945-10-26T13:56:44.000",
+     "lat": 41.7,
+     "lon": 33.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "899203",
@@ -2459,7 +4963,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "899203",
+     "time": "1945-11-20T06:27:53.000",
+     "lat": 38.0,
+     "lon": 43.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898259",
@@ -2471,7 +4989,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898259",
+     "time": "1946-02-21T15:43:04.000",
+     "lat": 38.3,
+     "lon": 31.8,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898350",
@@ -2483,7 +5015,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898350",
+     "time": "1946-04-12T07:36:43.000",
+     "lat": 35.5,
+     "lon": 26.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898467",
@@ -2495,7 +5041,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898467",
+     "time": "1946-07-16T05:26:26.000",
+     "lat": 33.8,
+     "lon": 25.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898468",
@@ -2507,7 +5067,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898468",
+     "time": "1946-07-16T19:45:23.000",
+     "lat": 38.5,
+     "lon": 31.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898626",
@@ -2519,7 +5093,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898626",
+     "time": "1946-10-13T21:24:31.000",
+     "lat": 33.8,
+     "lon": 26.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897787",
@@ -2531,7 +5119,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897787",
+     "time": "1947-03-21T23:00:00.000",
+     "lat": 35.1,
+     "lon": 23.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897815",
@@ -2543,7 +5145,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897815",
+     "time": "1947-04-12T14:05:09.000",
+     "lat": 40.2,
+     "lon": 25.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897822",
@@ -2555,7 +5171,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897822",
+     "time": "1947-04-19T17:39:06.000",
+     "lat": 37.7,
+     "lon": 43.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897823",
@@ -2567,7 +5197,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897823",
+     "time": "1947-04-19T20:29:35.000",
+     "lat": 38.8,
+     "lon": 23.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897991",
@@ -2579,7 +5223,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897991",
+     "time": "1947-08-15T04:11:06.000",
+     "lat": 42.9,
+     "lon": 44.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898012",
@@ -2591,7 +5249,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898012",
+     "time": "1947-08-30T22:21:31.000",
+     "lat": 35.1,
+     "lon": 23.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "898175",
@@ -2603,7 +5275,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "898175",
+     "time": "1947-12-09T23:40:00.000",
+     "lat": 36.6,
+     "lon": 34.1,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897186",
@@ -2615,7 +5301,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897186",
+     "time": "1948-02-10T15:58:52.000",
+     "lat": 35.5,
+     "lon": 27.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897192",
@@ -2627,7 +5327,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897192",
+     "time": "1948-02-12T22:27:10.000",
+     "lat": 35.5,
+     "lon": 27.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897201",
@@ -2639,7 +5353,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897201",
+     "time": "1948-02-15T17:54:55.000",
+     "lat": 35.5,
+     "lon": 27.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897226",
@@ -2651,7 +5379,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897226",
+     "time": "1948-03-06T20:12:48.000",
+     "lat": 34.8,
+     "lon": 25.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897269",
@@ -2663,7 +5405,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897269",
+     "time": "1948-03-29T02:32:53.000",
+     "lat": 35.5,
+     "lon": 27.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897270",
@@ -2675,7 +5431,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897270",
+     "time": "1948-03-29T10:22:40.000",
+     "lat": 35.1,
+     "lon": 23.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897462",
@@ -2687,7 +5457,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": ">=6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897462",
+     "time": "1948-07-24T06:03:05.000",
+     "lat": 34.4,
+     "lon": 24.5,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897559",
@@ -2699,7 +5483,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897559",
+     "time": "1948-09-20T17:59:52.000",
+     "lat": 34.9,
+     "lon": 27.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897590",
@@ -2711,7 +5509,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897590",
+     "time": "1948-10-10T17:43:01.000",
+     "lat": 35.1,
+     "lon": 23.4,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897601",
@@ -2723,7 +5535,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897601",
+     "time": "1948-10-18T08:59:53.000",
+     "lat": 35.5,
+     "lon": 27.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897602",
@@ -2735,7 +5561,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897602",
+     "time": "1948-10-19T03:04:28.000",
+     "lat": 35.5,
+     "lon": 27.2,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897633",
@@ -2747,7 +5587,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897633",
+     "time": "1948-11-13T04:44:36.000",
+     "lat": 39.8,
+     "lon": 29.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "896274",
@@ -2759,7 +5613,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "896274",
+     "time": "1949-01-14T15:53:55.000",
+     "lat": 38.8,
+     "lon": 25.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "896311",
@@ -2771,7 +5639,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "896311",
+     "time": "1949-02-05T00:28:15.000",
+     "lat": 39.8,
+     "lon": 29.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "896487",
@@ -2783,7 +5665,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "896487",
+     "time": "1949-04-25T23:09:11.000",
+     "lat": 38.2,
+     "lon": 39.0,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "896529",
@@ -2795,7 +5691,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "896529",
+     "time": "1949-05-13T20:14:01.000",
+     "lat": 40.8,
+     "lon": 32.9,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "896774",
@@ -2814,7 +5724,21 @@
     "mtype": "MS",
     "dt_min": 121.1,
     "dr_km": 31
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "896774",
+     "time": "1949-08-17T20:45:25.000",
+     "lat": 39.5,
+     "lon": 40.6,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "897043",
@@ -2826,7 +5750,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "897043",
+     "time": "1949-11-23T16:50:56.000",
+     "lat": 38.6,
+     "lon": 26.3,
+     "author": "ISS",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "895416",
@@ -2838,7 +5776,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "895416",
+     "time": "1950-05-09T09:20:03.913",
+     "lat": 38.039,
+     "lon": 38.5154,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 4.9,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "895856",
@@ -2850,7 +5802,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "895856",
+     "time": "1950-09-23T06:23:46.605",
+     "lat": 34.6826,
+     "lon": 25.7275,
+     "author": "ISC",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "894701",
@@ -2862,7 +5828,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "894701",
+     "time": "1951-09-15T22:52:11.224",
+     "lat": 40.1122,
+     "lon": 27.8966,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.15,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "895034",
@@ -2874,7 +5854,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "895034",
+     "time": "1951-12-13T20:46:06.728",
+     "lat": 40.0079,
+     "lon": 24.9913,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.1,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "893546",
@@ -2886,7 +5880,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "893546",
+     "time": "1952-10-13T16:42:31.942",
+     "lat": 38.9647,
+     "lon": 23.2358,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.12,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "893584",
@@ -2898,7 +5906,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "893584",
+     "time": "1952-10-22T04:14:56.001",
+     "lat": 36.3935,
+     "lon": 27.7691,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 5.5,
+     "magauthor": "UPP"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "893586",
@@ -2910,7 +5932,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "893586",
+     "time": "1952-10-22T17:00:41.865",
+     "lat": 36.8411,
+     "lon": 35.4956,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.36,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "891486",
@@ -2922,7 +5958,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "891486",
+     "time": "1953-02-07T22:31:09.659",
+     "lat": 34.7272,
+     "lon": 24.1307,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.12,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "891564",
@@ -2941,7 +5991,21 @@
     "mtype": "Mw",
     "dt_min": 131.8,
     "dr_km": 40
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "891564",
+     "time": "1953-03-18T21:18:08.750",
+     "lat": 39.8213,
+     "lon": 27.5453,
+     "author": "ISC",
+     "mtype": "",
+     "mag": null,
+     "magauthor": ""
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "891583",
@@ -2953,7 +6017,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "891583",
+     "time": "1953-03-24T21:17:36.284",
+     "lat": 36.8551,
+     "lon": 36.9658,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 4.93,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "891649",
@@ -2965,7 +6043,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "891649",
+     "time": "1953-05-02T05:41:55.812",
+     "lat": 38.3205,
+     "lon": 26.207,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 5.5,
+     "magauthor": "ATH"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "891652",
@@ -2977,7 +6069,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "891652",
+     "time": "1953-05-02T18:37:40.463",
+     "lat": 38.4572,
+     "lon": 26.6157,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.17,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "891762",
@@ -2989,7 +6095,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "891762",
+     "time": "1953-06-18T05:44:12.714",
+     "lat": 41.7666,
+     "lon": 26.6357,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.13,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "891841",
@@ -3001,7 +6121,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "891841",
+     "time": "1953-07-22T15:09:36.318",
+     "lat": 39.1233,
+     "lon": 28.5921,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.31,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "890595",
@@ -3013,7 +6147,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "890595",
+     "time": "1954-05-01T20:53:28.077",
+     "lat": 37.7351,
+     "lon": 27.1413,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.32,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "891213",
@@ -3025,7 +6173,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "891213",
+     "time": "1954-10-30T23:43:33.120",
+     "lat": 40.3061,
+     "lon": 46.0145,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 6.0,
+     "magauthor": "JER"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "889454",
@@ -3037,7 +6199,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "889454",
+     "time": "1955-04-22T10:02:25.848",
+     "lat": 34.3752,
+     "lon": 23.9455,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 4.85,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "889598",
@@ -3049,7 +6225,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "889598",
+     "time": "1955-06-02T23:34:38.564",
+     "lat": 40.2743,
+     "lon": 25.6526,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.2,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "889865",
@@ -3061,7 +6251,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "889865",
+     "time": "1955-08-28T13:39:22.583",
+     "lat": 37.327,
+     "lon": 27.1837,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.1,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "888080",
@@ -3073,7 +6277,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "888080",
+     "time": "1956-03-16T19:43:31.238",
+     "lat": 33.6873,
+     "lon": 35.8116,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.13,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "888415",
@@ -3085,7 +6303,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "888415",
+     "time": "1956-06-30T01:50:24.409",
+     "lat": 43.4707,
+     "lon": 28.9591,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 5.2,
+     "magauthor": "HRB"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "888451",
@@ -3104,7 +6336,31 @@
     "mtype": "M",
     "dt_min": 73.6,
     "dr_km": 36
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "888450",
+     "time": "1956-07-09T06:19:10.068",
+     "lat": 36.5935,
+     "lon": 25.8607,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 5.5,
+     "magauthor": "ATH"
+    },
+    {
+     "id": "888451",
+     "time": "1956-07-09T06:22:49.990",
+     "lat": 36.6224,
+     "lon": 25.787,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 5.75,
+     "magauthor": "ATH"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "888457",
@@ -3123,7 +6379,31 @@
     "mtype": "M",
     "dt_min": 757.5,
     "dr_km": 16
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "888456",
+     "time": "1956-07-09T20:10:24.000",
+     "lat": 36.9,
+     "lon": 26.0,
+     "author": "BCIS",
+     "mtype": "M",
+     "mag": 5.0,
+     "magauthor": "ATH"
+    },
+    {
+     "id": "888457",
+     "time": "1956-07-09T20:13:57.294",
+     "lat": 36.8309,
+     "lon": 26.1561,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.1,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "888463",
@@ -3142,7 +6422,21 @@
     "mtype": "M",
     "dt_min": 1165.0,
     "dr_km": 30
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "888463",
+     "time": "1956-07-10T03:01:29.242",
+     "lat": 36.6914,
+     "lon": 26.2139,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.42,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "888539",
@@ -3161,7 +6455,21 @@
     "mtype": "MS",
     "dt_min": 85.0,
     "dr_km": 30
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "888539",
+     "time": "1956-07-30T10:40:00.616",
+     "lat": 35.9995,
+     "lon": 25.9171,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 5.25,
+     "magauthor": "HRB"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "888699",
@@ -3173,7 +6481,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "888699",
+     "time": "1956-09-16T18:07:38.440",
+     "lat": 35.516,
+     "lon": 25.7777,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 4.89,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "888863",
@@ -3185,7 +6507,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "888863",
+     "time": "1956-11-02T16:04:36.288",
+     "lat": 39.2668,
+     "lon": 23.1726,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.22,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "888929",
@@ -3197,7 +6533,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "888929",
+     "time": "1956-11-20T23:20:55.600",
+     "lat": 39.2751,
+     "lon": 26.18,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.21,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "885880",
@@ -3209,7 +6559,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "885880",
+     "time": "1957-01-26T16:30:50.901",
+     "lat": 42.5199,
+     "lon": 42.3515,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 5.0,
+     "magauthor": "MOS"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "886202",
@@ -3221,7 +6585,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "886202",
+     "time": "1957-03-18T23:17:28.931",
+     "lat": 44.565,
+     "lon": 33.1561,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.33,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "886603",
@@ -3240,7 +6618,21 @@
     "mtype": "MS",
     "dt_min": 41.8,
     "dr_km": 2
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "886603",
+     "time": "1957-05-26T08:54:49.386",
+     "lat": 40.6411,
+     "lon": 30.8544,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.24,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "886644",
@@ -3252,7 +6644,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "886644",
+     "time": "1957-06-01T05:26:55.860",
+     "lat": 40.7731,
+     "lon": 30.9758,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.0,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "886808",
@@ -3264,7 +6670,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "886808",
+     "time": "1957-07-07T05:58:52.793",
+     "lat": 39.0667,
+     "lon": 40.4097,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.14,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "883703",
@@ -3276,7 +6696,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "883703",
+     "time": "1958-01-16T04:18:19.051",
+     "lat": 39.4761,
+     "lon": 25.4729,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.29,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "884107",
@@ -3288,7 +6722,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "884107",
+     "time": "1958-04-03T07:18:37.510",
+     "lat": 34.9017,
+     "lon": 27.5242,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.32,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "884317",
@@ -3300,7 +6748,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "884317",
+     "time": "1958-05-05T05:21:34.456",
+     "lat": 35.6435,
+     "lon": 44.6684,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.14,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "884322",
@@ -3312,7 +6774,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "884322",
+     "time": "1958-05-06T04:15:48.474",
+     "lat": 43.071,
+     "lon": 47.7925,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 4.7,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "884337",
@@ -3324,7 +6800,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "884337",
+     "time": "1958-05-09T02:40:52.058",
+     "lat": 36.5116,
+     "lon": 27.6973,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.42,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "885722",
@@ -3336,7 +6826,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "885722",
+     "time": "1958-12-19T03:27:30.516",
+     "lat": 37.7477,
+     "lon": 29.4571,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 4.55,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "881861",
@@ -3355,7 +6859,21 @@
     "mtype": "MS",
     "dt_min": 39.0,
     "dr_km": 7
-   }
+   },
+   "B1_isc_any": [
+    {
+     "id": "881861",
+     "time": "1959-04-25T01:05:44.130",
+     "lat": 36.9693,
+     "lon": 28.711,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.12,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "882062",
@@ -3367,7 +6885,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "882062",
+     "time": "1959-05-20T19:49:16.631",
+     "lat": 41.8973,
+     "lon": 41.996,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.1,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "882528",
@@ -3379,7 +6911,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "882528",
+     "time": "1959-07-26T17:07:05.634",
+     "lat": 40.78,
+     "lon": 27.7149,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.14,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "883166",
@@ -3391,7 +6937,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "883166",
+     "time": "1959-10-25T15:57:55.827",
+     "lat": 39.177,
+     "lon": 41.5989,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.07,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "883310",
@@ -3403,7 +6963,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "883310",
+     "time": "1959-11-19T14:00:31.858",
+     "lat": 38.8167,
+     "lon": 26.6137,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.16,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "878165",
@@ -3415,7 +6989,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.0-5.5",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "878165",
+     "time": "1960-02-01T11:59:45.525",
+     "lat": 35.1895,
+     "lon": 23.0354,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 5.5,
+     "magauthor": "ATH"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "879788",
@@ -3427,7 +7015,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "879788",
+     "time": "1960-07-13T13:01:04.385",
+     "lat": 40.606,
+     "lon": 23.4147,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.27,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "874645",
@@ -3439,7 +7041,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "874645",
+     "time": "1962-04-28T11:19:03.065",
+     "lat": 36.0212,
+     "lon": 26.8604,
+     "author": "ISC",
+     "mtype": "M",
+     "mag": 5.9,
+     "magauthor": "UPP"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "874646",
@@ -3451,7 +7067,21 @@
    "q_mw": "B",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "874646",
+     "time": "1962-04-28T12:43:52.290",
+     "lat": 35.9778,
+     "lon": 26.7547,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.26,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   },
   {
    "gem_id": "875315",
@@ -3463,7 +7093,21 @@
    "q_mw": "C",
    "per": "1940-1962",
    "cls": "5.5-6.0",
-   "A_nearest_eqlive": null
+   "A_nearest_eqlive": null,
+   "B1_isc_any": [
+    {
+     "id": "875315",
+     "time": "1962-09-10T09:36:25.215",
+     "lat": 34.5867,
+     "lon": 26.78,
+     "author": "ISC",
+     "mtype": "MS",
+     "mag": 5.32,
+     "magauthor": "ISC"
+    }
+   ],
+   "B2_isc_ge55": [],
+   "B": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)"
   }
  ]
 }
