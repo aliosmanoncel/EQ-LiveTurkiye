@@ -1,0 +1,25 @@
+name: Homogenization phase 0 (analysis only)
+on:
+  push:
+    branches: [homog-faz0]
+    paths: ['analysis/homog_faz0/faz0_reference_match.py', '.github/workflows/homog-faz0.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    if: github.ref == 'refs/heads/homog-faz0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: python analysis/homog_faz0/faz0_reference_match.py
+      - name: Sonuçları homog-faz0 dalına yaz
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add analysis/homog_faz0/out
+          git diff --cached --quiet && exit 0
+          git commit -m "Faz 0 analiz çıktıları ($(date -u +%Y-%m-%dT%H:%MZ))"
+          git push origin HEAD:homog-faz0
