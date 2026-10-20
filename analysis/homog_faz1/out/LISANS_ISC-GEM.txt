@@ -1,0 +1,8 @@
+iscgem_v12.1_kutu.json ve iscgem_eslesmeler.json, ISC-GEM Global Instrumental Earthquake Catalogue v12.1'den
+(released 2025-11-26) türetilmiştir. Lisans: CC BY-SA 3.0 (unported), http://creativecommons.org/licenses/by-sa/3.0/
+Atıf: International Seismological Centre (2025), ISC-GEM Earthquake Catalogue, https://doi.org/10.31905/D808B825
+Copyright (C) 2025 International Seismological Centre (ISC). Bu türetilmiş dosyalar da CC BY-SA 3.0 ile paylaşılır.
+Kaynak dosyalar (depoya konmadı; resmî formdan indirildi, 2026-10-21):
+  isc-gem.zip       sha256 92a52fb933594f0c99f76c96c16fb6a04a360980283e7e22483b587f502949c5
+  isc-gem-cat.csv   sha256 b4e63841e8a6527f1fa6a0ea823b83cfc5b053ab1c7d8746446e34645592cc8d  (74.159 olay, 1904–2021)
+  isc-gem-suppl.csv sha256 1ea390ab6fc319746e7799bf08ea543d2e747dea64f5ba937ac61b481b0f21bf  (9.834 olay)
