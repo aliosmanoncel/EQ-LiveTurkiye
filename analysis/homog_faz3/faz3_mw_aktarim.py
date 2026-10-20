@@ -11,7 +11,8 @@ Kurallar (önceden tanımlı):
  4. Eşleştirme: yalnız zaman–konum, Candia & Macedo (2026) Tablo 2 (ΔT dk / ΔR km: 1900–1940 200/250*, 1940–1963 10/200,
     1963–1990 2/150, 1990– 0,5/100; *1940 öncesi ΔR uyarlaması). Bire-bir: bir ISC-GEM olayı en çok bir A olayına
     atanır (en küçük Δt/ΔT + Δr/ΔR). Koruma: |M_A − Mw_ISC-GEM| > 1,0 ise aktarım yapılmaz, olay 'supheli_eslesme' olarak
-    işaretlenir ve büyüklüğü değişmez.
+    işaretlenir ve büyüklüğü değişmez — İSTİSNA (2026-10-21, kullanıcı onayı): Δt ≤ 10 s ve Δr ≤ 30 km ise ΔM
+    aktarımı engellemez (mb doygunluğu / küçük Ms).
  5. Hiçbir olaya tahminî/dönüştürülmüş Mw atanmaz.
  mw_src: iscgem_direct | iscgem_proxy | catalog_native_mw | catalog_raw_<tür>
 Doğrulama testleri ve süreklilik kontrolü sonunda; sonuç: out/faz3_rapor.json, değişen/eklenen kayıtlar: out/aktarim_kaydi.json.
@@ -53,9 +54,9 @@ def main():
     for e in A:
         y = int(e['time'][:4]); base = {k: e[k] for k in ('id', 'time', 'lat', 'lon', 'dep', 'mag', 'mtype', 'mw', 'mw_method', 'place', 'src')}
         if e['_i'] in pa:
-            g, d = pa[e['_i']]; dM = e['_M'] - g['mw']
-            if abs(dM) > 1.0:
-                sus.append({'id': e['id'], 'time': e['time'], 'M': e['_M'], 'mtype': e['mtype'], 'gem_id': g['eventid'], 'gem_mw': g['mw'], 'dM': round(dM, 2), 'dr_km': round(d, 1)})
+            g, d = pa[e['_i']]; dM = e['_M'] - g['mw']; dts = abs(g['_t'] - e['_t'])
+            if abs(dM) > 1.0 and not (dts <= 10 and d <= 30):   # 2026-10-21 onaylı koruma: Δt ≤ 10 s ve Δr ≤ 30 km ise ΔM engellemez
+                sus.append({'id': e['id'], 'time': e['time'], 'M': e['_M'], 'mtype': e['mtype'], 'gem_id': g['eventid'], 'gem_mw': g['mw'], 'dM': round(dM, 2), 'dr_km': round(d, 1), 'dt_s': round(dts, 1)})
                 P.append({**base, 'M': e['_M'], 'mw_src': raw_src(e), 'not': 'supheli_eslesme'}); continue
             src = 'iscgem_direct' if g['s_mw'] == 'd' else 'iscgem_proxy'
             if y < 1963:   # ISC-GEM kaydı birincil
@@ -63,7 +64,7 @@ def main():
                           'M': g['mw'], 'mw_src': src, 'gem_id': g['eventid'], 'eslesen_A_id': e['id'], 'src': 'ISC-GEM'})
             else:
                 P.append({**base, 'M': g['mw'], 'mw_src': src, 'gem_id': g['eventid']})
-            log.append({'A_id': e['id'], 'time': e['time'], 'M_eski': e['_M'], 'mtype': e['mtype'], 'M_yeni': g['mw'], 'mw_src': src, 'gem_id': g['eventid'], 'dr_km': round(d, 1)})
+            log.append({'A_id': e['id'], 'time': e['time'], 'M_eski': e['_M'], 'mtype': e['mtype'], 'M_yeni': g['mw'], 'mw_src': src, 'gem_id': g['eventid'], 'dr_km': round(d, 1), 'dt_s': round(dts, 1), 'koruma_istisnasi': abs(dM) > 1.0})
         else:
             P.append({**base, 'M': e['_M'], 'mw_src': raw_src(e)})
     added_pre = [g for g in G if int(g['date'][:4]) < 1963 and id(g) not in usedG]
@@ -87,6 +88,9 @@ def main():
     dmt = collections.defaultdict(list)
     for l in log: dmt[(('1904-1962' if int(l['time'][:4]) < 1963 else '1963-1997' if int(l['time'][:4]) < 1998 else '1998-2021'), (l['mtype'] or '?').lower())].append(l['M_eski'] - l['M_yeni'])
     T['T7_dM_tani'] = {f'{a}|{b}': {'n': len(v), 'ort': round(sum(v) / len(v), 2), 'std': round((sum((x - sum(v) / len(v)) ** 2 for x in v) / max(1, len(v) - 1)) ** .5, 2)} for (a, b), v in sorted(dmt.items()) if len(v) >= 5}
+    exc = [l for l in log if l['koruma_istisnasi']]
+    T['T9_koruma_istisnalari'] = {'gecti': all(l['dt_s'] <= 10 and l['dr_km'] <= 30 for l in exc), 'olay': len(exc),
+                                  'liste': [{k: l[k] for k in ('time', 'mtype', 'M_eski', 'M_yeni', 'dt_s', 'dr_km')} for l in exc]}
     # ── süreklilik: beşer yıllık λ (GK74 sonrası) P ile ISC-GEM'in tamamı ────────────────────────────────
     def dc(ev): rows, fl = GK.decluster([{'time': e['time'], 'lat': e['lat'], 'lon': e['lon'], 'mag': e['M']} for e in ev], mag_field='mag'); return [r for r, c in zip(rows, fl) if not c]
     Pd = dc([p for p in P if int(p['time'][:4]) <= 2021]); Gd = dc([{'time': g['date'], 'lat': g['lat'], 'lon': g['lon'], 'M': g['mw']} for g in G])

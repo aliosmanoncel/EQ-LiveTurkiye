@@ -5,17 +5,17 @@
 ## Kurallar (önceden tanımlı)
 - 1904–1962: ISC-GEM birincil; A'nın eşleşmeyen olayları olduğu gibi kalır. 1963–2021: A korunur, eşleşen olaya ISC-GEM Mw atanır; A'da karşılığı olmayan ISC-GEM olayı eklenmez. 2022–: değişmez.
 - Eşleştirme: zaman–konum (Tablo 2), bire-bir (en yakın önce). Koruma: |M_A − Mw| > 1,0 ise aktarım yapılmaz.
-- `mw_src`: `iscgem_direct` 639 · `iscgem_proxy` 764 · `catalog_native_mw` 1.214 · `catalog_raw_<tür>` 85.989.
+- `mw_src` (güncel kural): `iscgem_direct` 641 · `iscgem_proxy` 776 · `catalog_native_mw` 1.214 · `catalog_raw_<tür>` 85.975.
 
 ## Sayılar
-A 88.333 olay → prototip 88.606. Eşleşen çift 1.145; Mw aktarılan 1.130; koruma nedeniyle aktarılmayan 15; 1963 öncesi ISC-GEM'den eklenen 273; 1963 öncesi A'nın eşleşmeyen ve olduğu gibi kalan 33 olayı; 1963–2021'de A'da karşılığı olmayan ve eklenmeyen ISC-GEM olayı 21.
+A 88.333 olay → prototip 88.606. Eşleşen çift 1.145; Mw aktarılan 1.144 (kural güncellemesinden önce 1.130); koruma nedeniyle aktarılmayan 1 (önce 15); 1963 öncesi ISC-GEM'den eklenen 273; 1963 öncesi A'nın eşleşmeyen ve olduğu gibi kalan 33 olayı; 1963–2021'de A'da karşılığı olmayan ve eklenmeyen ISC-GEM olayı 21.
 
 ## Doğrulama testleri
 | Test | Sonuç |
 |---|---|
 | T1 Bire-bir (bir ISC-GEM olayı en çok bir kez) | ✓ |
-| T2 Eşleşmeyen 87.203 olayın büyüklüğü değişmedi | ✓ (değişen 0) |
-| T3 Aktarılan 1.403 Mw, ISC-GEM değeriyle birebir aynı | ✓ (farklı 0) |
+| T2 Eşleşmeyen 87.189 olayın büyüklüğü değişmedi | ✓ (değişen 0) |
+| T3 Aktarılan 1.417 Mw, ISC-GEM değeriyle birebir aynı | ✓ (farklı 0) |
 | T4 Ham `mag`/`mtype` her kayıtta saklı | ✓ |
 | T5 Tahminî/dönüştürülmüş Mw yok | ✓ |
 | T6 2022 sonrası değişmedi | ✓ |
@@ -34,11 +34,30 @@ A 88.333 olay → prototip 88.606. Eşleşen çift 1.145; Mw aktarılan 1.130; k
 
 **Tanı, ΔM = M_A − Mw_ISC-GEM:** 1963–1997 mb −0,37, Ms −0,45, Mw 0,00 · 1998–2021 mb −0,21, Ms −0,42, Mw −0,07 · 1904–1962 Ms −0,02.
 
-## Açık konu (onay gerekiyor): koruma kuralı gerçek eşleşmeleri engelliyor
-Aktarılmayan 15 çiftin 14'ü açıkça aynı olay (Δt ≤ 3 s, Δr ≤ 13 km); ΔM'nin büyük olması mb doygunluğundan ya da küçük Ms'ten kaynaklanıyor. Bunların arasında **17 Ağustos 1999 İzmit (mb 6,3 → Mw 7,58)** ve **12 Kasım 1999 Düzce (mb 6,0 → Mw 7,16)** var. Yalnız 1910-02-18 (UK 7,0 → 5,85, Δr 50 km) gerçekten belirsiz. Öneri (uygulanmadı): koruma kuralını "Δt ≤ 10 s ve Δr ≤ 30 km ise ΔM'ye bakılmaz; aksi hâlde |ΔM| ≤ 1,0" olarak değiştirmek.
+## Koruma kuralı güncellemesi (2026-10-21, kullanıcı onayı) ve testlerin tekrarı
+Kural: |ΔM| > 1,0 olan çiftte aktarım yapılmaz; **istisna: Δt ≤ 10 s ve Δr ≤ 30 km ise ΔM aktarımı engellemez.**
+
+| | Önce | Sonra |
+|---|---|---|
+| Mw aktarılan | 1.130 | **1.144** |
+| Aktarılmayan (şüpheli) | 15 | **1** |
+| `mw_src`: doğrudan / vekil | 639 / 764 | 641 / 776 |
+
+Testler yeniden çalıştırıldı: T1–T6 ✓, **T9 (bütün istisnalar Δt ≤ 10 s ve Δr ≤ 30 km)** ✓ (14 olay; Δt 0–3 s, Δr 0,2–12,9 km), T8 süreklilik ✓ — M ≥ 5,5 blok oranları 1,07 / 0,94 / 0,98 / 1,02; 1963 sıçraması −0,13 (M ≥ 5,5), −0,10 (M ≥ 6,0). İstisnayla aktarılanlar: 1999-08-17 İzmit mb 6,3 → Mw 7,58; 1999-11-12 Düzce mb 6,0 → 7,16; 2009-09-07 MD 3,4 → 5,09; 2011-10-23 Ms 4,1 → 5,14; 1981–1996 arası 10 ISC Ms 3,8–4,4 → Mw 5,1–5,5.
+
+## 1910-02-18 olayı (ayrı inceleme; karar bekliyor)
+| Kaynak | Zaman | Konum, derinlik | Büyüklük |
+|---|---|---|---|
+| A (ISC, köken yazarı GUTE) | 05:09:18 | 36,0° K 24,5° D, 150 km | UK 7,0 |
+| ISC Bulletin, aynı olayın bütün büyüklükleri | | | Ms 7,0 (PAS, tercih edilen) · mB 6,9 (ABE1) · UK 7,0 (GUTE) · UK 7,0 (B&D) |
+| ISC-GEM v12.1 (16958073) | 05:09:12,69 | 35,81° K 23,99° D, 60 km | **Mw 5,85 ± 0,20, vekil, kalite B** |
+
+- **Aynı olay olduğu güçlü kanıtla destekleniyor:** ±200 dk ve 250 km içinde tek aday; Δt 6 s, Δr 50 km (ISC-GEM'in yeniden konumlandırması: 0,5° batı, derinlik 150 → 60 km).
+- **Büyüklük farkı çözülmedi:** erken dönem ajans büyüklükleri (Gutenberg–Richter, Abe) ≈ 7, ISC-GEM'in sayısallaştırılmış genliklerden yeniden hesapladığı vekil Mw 5,85. Fark 1,15 birim; bu veriyle hangisinin doğru olduğu belirlenemiyor.
+- Prototipte kural gereği **özgün büyüklük (7,0) korundu** (`not: supheli_eslesme`). Karar seçenekleri: (i) 7,0 kalsın; (ii) ISC-GEM Mw 5,85 kullanılsın (ISC-GEM'in yeniden değerlendirmesi esas alınır); (iii) Mw tabanlı istatistiklerden çıkarılıp ayrı listelensin. Bu olay 1904–1962 M ≥ 6,5 sınıfındaki 36–44 olaydan biri; b ve λ(≥6,0) üzerindeki etkisi küçük ama sınırlı sayıda büyük olayda sıfır değil.
 
 ## Kalan sınırlılık
 ISC-GEM genel olarak M ≥ 5,0'ı kapsadığından, M < 5 olaylar mb/ML/MD ile kalıyor. Büyüklük ölçeği M ≈ 5 civarında Mw'den diğer türlere geçiyor; bu eşiği kapsayan b-değeri hesapları (ör. M ≥ 4,5) bu geçişten etkilenebilir. Prototip bu konuyu çözmüyor; raporlanmak üzere not edildi.
 
 ## Kapanış
-Testler geçti; prototip tamamlandı. Üretime geçiş, tamlık merdiveninin yeniden belirlenmesi ve koruma kuralı değişikliği ayrı onay gerektiriyor.
+Testler güncel kuralla yeniden geçti; prototip tamamlandı. Bekleyen kararlar: 1910 olayı; tamlık merdiveni (ayrı karar); üretime geçiş (onaylanmadı).
