@@ -79,3 +79,30 @@ Yöntem: Faz 1b'deki iki ISC FDSN sorgusunun aynısı (±5 dk, ±3°; B1 süzge�
 **Merdiven:** M 5,5–6,0 tamlık başlangıcı **1970 olarak kalıyor** (karar). 13 olayın 8'i M 5,5–6,0 (Mw 5,60–5,83), 5'i M 5,0–5,5 (Mw 5,15–5,21) sınıfındadır. Eklenmeleri durumunda K1 ve K2 yeniden hesaplanmalıdır; sonuç burada önceden varsayılmamıştır.
 
 Üretim, `main`, korunan dosyalar ve mevcut tamlık merdiveni değişmedi.
+
+---
+
+# 13 olay duyarlılık analizi (karar b, 2026-10-21) — ana kataloğa ekleme yok
+
+Betik `faz4_duyarlilik.py`. Veri kümesi `out/duyarlilik_13_veri.json`: 13 olay; her biri `mw_src = iscgem_proxy`, kalite, ISC büyüklüğü ve "yalnız duyarlılık" etiketiyle. Sonuçlar `out/duyarlilik_13_sonuc.json`. Ölçütler `faz4_merdiven.py` ile birebir aynı. S0 serisi, önceki `merdiven_degerlendirme.json` sonucunu yeniden üretiyor (kontrol edildi).
+
+| Sınıf | S0: 13 olaysız (K1 / K2 → kabul) | S1: +13 olay, B+C | S2: +5 olay, yalnız B |
+|---|---|---|---|
+| 5,0–5,5 | 1970 / 1979 → **1979** | 1900 / 1979 → **1979** | 1970 / 1979 → **1979** |
+| 5,5–6,0 | 1970 / 1905 → **1970** | 1900 / 1905 → **1905** | 1900 / 1905 → **1905** |
+| ≥ 6,0 | 1900 / 1904 → **1904** | aynı | aynı |
+| < 5,0 | yalnız K2; değişmedi | aynı | aynı |
+
+K1'i belirleyen tek dilim 1960–1969. Bu dilimde ISC-GEM olaylarının prototipte bulunma oranı:
+
+| Sınıf | S0 | S1 | S2 |
+|---|---|---|---|
+| 5,5–6,0 | 41/50 = %82 | 49/50 = %98 | 46/50 = %92 |
+| 5,0–5,5 | 35/42 = %83 | 40/42 = %95 | 35/42 = %83 |
+
+Yorum:
+1. **M 5,0–5,5:** Sonuç 13 olaya duyarsız. Başlangıç 1979'da kalıyor, çünkü bu yılı Stepp ölçütü (K2) belirliyor.
+2. **M 5,5–6,0:** Sonuç 13 olaya duyarlı. 1970 başlangıcını yalnız K1 ölçütündeki 1960'lar boşluğu belirliyordu; Stepp ölçütü her üç seride de 1905'i veriyor. Boşluk kapanınca başlangıç 1905'e iniyor. Yalnız B kaliteli olaylarla oran %92; bu, %90 eşiğinin hemen üstünde, yani sınırda.
+3. **Önemli uyarı (döngüsellik):** Eklenen olaylar ISC-GEM'den geldiği için, ISC-GEM'e dayalı K1 oranının yükselmesi kısmen yapı gereğidir; bağımsız bir kanıt sayılmaz. Bağımsız kanıt Stepp (K2) ölçütüdür ve 13 olaydan etkilenmiyor (1905). Bu analiz, olayların gerçekliğini yeniden sınamaz. Olay kimliği ISC sorgusuyla doğrulanmıştı. Vekil Mw'nin doğruluğu ise sınanamıyor ve 1960–64 oranlarını doğrudan etkiliyor.
+
+Mevcut merdiven, üretim, `main` ve korunan dosyalar değişmedi. Merdiven kararı kullanıcıya bırakıldı.
