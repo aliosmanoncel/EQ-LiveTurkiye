@@ -72,10 +72,10 @@ Yöntem: Faz 1b'deki iki ISC FDSN sorgusunun aynısı (±5 dk, ±3°; B1 süzge�
 |---|---|---|
 | Olay kimliği | Her olayda ISC'nin döndürdüğü olay kimliği, ISC-GEM olay kimliğiyle **birebir aynı** (ör. 871958, 868626, 864481); zaman farkı 0–3 s | Doğrulandı |
 | Eksiklik nedeni | ISC'nin tercih ettiği büyüklük süzgeç eşiğinin altında: 12 olayda ISC mb 4,69–5,30, 1 olayda ISC Ms 5,44 | Doğrulandı |
-| Büyüklük kaynağı | ISC-GEM Mw 5,15–5,83, hepsi **vekil**; kalite 5 olayda B, 8 olayda C. ISC-GEM Mw ile ISC mb farkı +0,3 ile +0,9 | Doğrulandı (değerler); vekil Mw'nin doğruluğu bu veriyle sınanamaz |
+| Büyüklük kaynağı | ISC-GEM Mw 5,15–5,83, hepsi **vekil**; kalite 5 olayda B, 8 olayda C. ISC-GEM Mw ile ISC mb farkı +0,26 ile +0,94 (Ms için +0,33) | Doğrulandı (değerler); vekil Mw'nin doğruluğu bu veriyle sınanamaz |
 
 **Karar (kullanıcı, önceden):** doğrulansalar da otomatik eklenmezler; önce olay kimliği ve büyüklük kaynağı değerlendirilir. Değerlendirme yukarıda: kimlik kesin, büyüklük tamamen vekil (B/C). Eklenip eklenmeyeceği ayrı karar konusudur.
 
-**Merdiven:** M 5,5–6,0 tamlık başlangıcı **1970 olarak kalıyor** (karar). 8 olay (M 5,5–6,0) eklenirse K1 ölçütüne göre başlangıç 1904'e çekilir.
+**Merdiven:** M 5,5–6,0 tamlık başlangıcı **1970 olarak kalıyor** (karar). 13 olayın 8'i M 5,5–6,0 (Mw 5,60–5,83), 5'i M 5,0–5,5 (Mw 5,15–5,21) sınıfındadır. Eklenmeleri durumunda K1 ve K2 yeniden hesaplanmalıdır; sonuç burada önceden varsayılmamıştır.
 
 Üretim, `main`, korunan dosyalar ve mevcut tamlık merdiveni değişmedi.
