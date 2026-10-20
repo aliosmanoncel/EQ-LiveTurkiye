@@ -4037,7 +4037,15 @@ async function exportPosterAGU(scale, evt) {
 
   // ── Sütun 2: zaman–büyüklük ve b(t)
   const TM2 = !STACK_ON && INC.tm;   // düzen B: Şekil 2, 2. sütunun üstünde
-  if (TM2) {
+  if (TM2 && !NPAN) {   // 2026-10-20: 2. sütunda yalnız Şekil 2 varsa sütunun tamamını kullanır; şekil + altyazı dikey ortalanır
+    const im = imgs[0], fw = W2 - 32, fh = fw * im.naturalHeight / im.naturalWidth;
+    const capH = rich(tmCap.replace(/^((?:Şekil|Figure) \d+\.)/, '**$1**'), X2 + 16, 0, fw, { size: 16, lh: 20, italic: true, dry: true });
+    let yy = box(X2, TOP, W2, MID2 - TOP, L('Zaman–Büyüklük Dağılımı', 'Time–Magnitude Distribution'));
+    const room = MID2 - 8 - yy, fhUse = Math.min(fh, room - capH - 12);
+    yy += Math.max(0, (room - fhUse - capH - 12) / 2);
+    yy = figure(im, X2 + 16, yy, fw, fhUse);
+    caption(tmCap, X2 + 16, yy, fw, MID2 - 4);
+  } else if (TM2) {
     y = box(X2, TOP, W2, 260, L('Zaman–Büyüklük Dağılımı', 'Time–Magnitude Distribution'));
     y = figure(imgs[0], X2 + 16, y, W2 - 32, 150);
     caption(tmCap, X2 + 16, y, W2 - 32, TOP + 256);
