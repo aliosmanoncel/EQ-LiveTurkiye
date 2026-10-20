@@ -1,0 +1,4996 @@
+[
+{
+"gem_id": "610326271",
+"date": "1904-04-04 10:02:34.56",
+"mw": 6.84,
+"s_mw": "d",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1904-04-04T09:57:34&endtime=1904-04-04T10:07:34&minlat=38.80&maxlat=44.80&minlon=20.11&maxlon=26.11",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1904-04-04T09:57:34&endtime=1904-04-04T10:07:34&minlat=38.80&maxlat=44.80&minlon=20.11&maxlon=26.11&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "16957813",
+"date": "1904-04-04 10:26:00.88",
+"mw": 7.02,
+"s_mw": "d",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1904-04-04T10:21:00&endtime=1904-04-04T10:31:00&minlat=38.76&maxlat=44.76&minlon=20.25&maxlon=26.25",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1904-04-04T10:21:00&endtime=1904-04-04T10:31:00&minlat=38.76&maxlat=44.76&minlon=20.25&maxlon=26.25&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+7.1,
+"Mw",
+"P&S"
+]
+]
+},
+{
+"gem_id": "610548603",
+"date": "1905-05-20 11:06:10.25",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1905-05-20T11:01:10&endtime=1905-05-20T11:11:10&minlat=37.16&maxlat=43.16&minlon=36.40&maxlon=42.40",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1905-05-20T11:01:10&endtime=1905-05-20T11:11:10&minlat=37.16&maxlat=43.16&minlon=36.40&maxlon=42.40&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "610326295",
+"date": "1905-10-08 07:27:37.23",
+"mw": 6.12,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1905-10-08T07:22:37&endtime=1905-10-08T07:32:37&minlat=39.46&maxlat=45.46&minlon=20.14&maxlon=26.14",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1905-10-08T07:22:37&endtime=1905-10-08T07:32:37&minlat=39.46&maxlat=45.46&minlon=20.14&maxlon=26.14&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "16957878",
+"date": "1905-11-08 22:06:11.84",
+"mw": 7.24,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1905-11-08T22:01:11&endtime=1905-11-08T22:11:11&minlat=37.09&maxlat=43.09&minlon=21.63&maxlon=27.63",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1905-11-08T22:01:11&endtime=1905-11-08T22:11:11&minlat=37.09&maxlat=43.09&minlon=21.63&maxlon=27.63&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+7.8,
+"UK",
+"B&D"
+]
+]
+},
+{
+"gem_id": "16957879",
+"date": "1905-12-04 12:20:07.96",
+"mw": 5.56,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1905-12-04T12:15:07&endtime=1905-12-04T12:25:07&minlat=34.22&maxlat=40.22&minlon=35.83&maxlon=41.83",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1905-12-04T12:15:07&endtime=1905-12-04T12:25:07&minlat=34.22&maxlat=40.22&minlon=35.83&maxlon=41.83&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "610548665",
+"date": "1906-10-20 16:08:49.90",
+"mw": 5.54,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1906-10-20T16:03:49&endtime=1906-10-20T16:13:49&minlat=38.13&maxlat=44.13&minlon=42.54&maxlon=48.54",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1906-10-20T16:03:49&endtime=1906-10-20T16:13:49&minlat=38.13&maxlat=44.13&minlon=42.54&maxlon=48.54&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "610548698",
+"date": "1907-08-29 11:40:44.20",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1907-08-29T11:35:44&endtime=1907-08-29T11:45:44&minlat=39.53&maxlat=45.53&minlon=39.05&maxlon=45.05",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1907-08-29T11:35:44&endtime=1907-08-29T11:45:44&minlat=39.53&maxlat=45.53&minlon=39.05&maxlon=45.05&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "610326342",
+"date": "1909-01-19 04:56:39.66",
+"mw": 6.0,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1909-01-19T04:51:39&endtime=1909-01-19T05:01:39&minlat=35.83&maxlat=41.83&minlon=23.58&maxlon=29.58",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1909-01-19T04:51:39&endtime=1909-01-19T05:01:39&minlat=35.83&maxlat=41.83&minlon=23.58&maxlon=29.58&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "610326343",
+"date": "1909-02-15 09:33:31.03",
+"mw": 6.09,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1909-02-15T09:28:31&endtime=1909-02-15T09:38:31&minlat=39.22&maxlat=45.22&minlon=23.68&maxlon=29.68",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1909-02-15T09:28:31&endtime=1909-02-15T09:38:31&minlat=39.22&maxlat=45.22&minlon=23.68&maxlon=29.68&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "610326363",
+"date": "1910-06-25 19:20:46.41",
+"mw": 6.51,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1910-06-25T19:15:46&endtime=1910-06-25T19:25:46&minlat=37.80&maxlat=43.80&minlon=31.63&maxlon=37.63",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1910-06-25T19:15:46&endtime=1910-06-25T19:25:46&minlat=37.80&maxlat=43.80&minlon=31.63&maxlon=37.63&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "16958138",
+"date": "1911-04-04 15:43:48.98",
+"mw": 6.07,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1911-04-04T15:38:48&endtime=1911-04-04T15:48:48&minlat=33.52&maxlat=39.52&minlon=22.74&maxlon=28.74",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1911-04-04T15:38:48&endtime=1911-04-04T15:48:48&minlat=33.52&maxlat=39.52&minlon=22.74&maxlon=28.74&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+7.0,
+"MS",
+"PAS"
+]
+]
+},
+{
+"gem_id": "610326492",
+"date": "1912-08-10 09:23:48.18",
+"mw": 6.23,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1912-08-10T09:18:48&endtime=1912-08-10T09:28:48&minlat=37.40&maxlat=43.40&minlon=24.40&maxlon=30.40",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1912-08-10T09:18:48&endtime=1912-08-10T09:28:48&minlat=37.40&maxlat=43.40&minlon=24.40&maxlon=30.40&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "610326493",
+"date": "1912-08-10 18:30:17.94",
+"mw": 5.58,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1912-08-10T18:25:17&endtime=1912-08-10T18:35:17&minlat=37.97&maxlat=43.97&minlon=24.70&maxlon=30.70",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1912-08-10T18:25:17&endtime=1912-08-10T18:35:17&minlat=37.97&maxlat=43.97&minlon=24.70&maxlon=30.70&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "610326388",
+"date": "1912-09-13 23:31:26.33",
+"mw": 6.72,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1912-09-13T23:26:26&endtime=1912-09-13T23:36:26&minlat=37.69&maxlat=43.69&minlon=24.20&maxlon=30.20",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1912-09-13T23:26:26&endtime=1912-09-13T23:36:26&minlat=37.69&maxlat=43.69&minlon=24.20&maxlon=30.20&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "610326389",
+"date": "1912-10-12 19:48:47.47",
+"mw": 5.79,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1912-10-12T19:43:47&endtime=1912-10-12T19:53:47&minlat=38.01&maxlat=44.01&minlon=41.35&maxlon=47.35",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1912-10-12T19:43:47&endtime=1912-10-12T19:53:47&minlat=38.01&maxlat=44.01&minlon=41.35&maxlon=47.35&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "914033",
+"date": "1913-01-27 19:38:38.85",
+"mw": 5.72,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1913-01-27T19:33:38&endtime=1913-01-27T19:43:38&minlat=35.82&maxlat=41.82&minlon=39.39&maxlon=45.39",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1913-01-27T19:33:38&endtime=1913-01-27T19:43:38&minlat=35.82&maxlat=41.82&minlon=39.39&maxlon=45.39&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "914057",
+"date": "1913-04-20 03:13:41.08",
+"mw": 5.75,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1913-04-20T03:08:41&endtime=1913-04-20T03:18:41&minlat=38.91&maxlat=44.91&minlon=42.12&maxlon=48.12",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1913-04-20T03:08:41&endtime=1913-04-20T03:18:41&minlat=38.91&maxlat=44.91&minlon=42.12&maxlon=48.12&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "914076",
+"date": "1913-06-14 09:33:28.43",
+"mw": 6.69,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1913-06-14T09:28:28&endtime=1913-06-14T09:38:28&minlat=40.15&maxlat=46.15&minlon=22.76&maxlon=28.76",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1913-06-14T09:28:28&endtime=1913-06-14T09:38:28&minlat=40.15&maxlat=46.15&minlon=22.76&maxlon=28.76&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+6.75,
+"MS",
+"PAS"
+]
+]
+},
+{
+"gem_id": "913986",
+"date": "1914-05-28 11:27:28.60",
+"mw": 5.79,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1914-05-28T11:22:28&endtime=1914-05-28T11:32:28&minlat=36.70&maxlat=42.70&minlon=32.99&maxlon=38.99",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1914-05-28T11:22:28&endtime=1914-05-28T11:32:28&minlat=36.70&maxlat=42.70&minlon=32.99&maxlon=38.99&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "610326513",
+"date": "1914-10-11 09:45:15.26",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1914-10-11T09:40:15&endtime=1914-10-11T09:50:15&minlat=35.79&maxlat=41.79&minlon=27.83&maxlon=33.83",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1914-10-11T09:40:15&endtime=1914-10-11T09:50:15&minlat=35.79&maxlat=41.79&minlon=27.83&maxlon=33.83&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "914013",
+"date": "1914-10-17 10:42:07.77",
+"mw": 5.74,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1914-10-17T10:37:07&endtime=1914-10-17T10:47:07&minlat=35.26&maxlat=41.26&minlon=20.82&maxlon=26.82",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1914-10-17T10:37:07&endtime=1914-10-17T10:47:07&minlat=35.26&maxlat=41.26&minlon=20.82&maxlon=26.82&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "610326400",
+"date": "1915-01-14 05:09:43.39",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1915-01-14T05:04:43&endtime=1915-01-14T05:14:43&minlat=39.88&maxlat=45.88&minlon=42.46&maxlon=48.46",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1915-01-14T05:04:43&endtime=1915-01-14T05:14:43&minlat=39.88&maxlat=45.88&minlon=42.46&maxlon=48.46&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "913909",
+"date": "1915-05-19 04:48:30.93",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1915-05-19T04:43:30&endtime=1915-05-19T04:53:30&minlat=35.40&maxlat=41.40&minlon=36.67&maxlon=42.67",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1915-05-19T04:43:30&endtime=1915-05-19T04:53:30&minlat=35.40&maxlat=41.40&minlon=36.67&maxlon=42.67&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913918",
+"date": "1915-06-24 05:20:34.17",
+"mw": 5.69,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1915-06-24T05:15:34&endtime=1915-06-24T05:25:34&minlat=31.54&maxlat=37.54&minlon=22.03&maxlon=28.03",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1915-06-24T05:15:34&endtime=1915-06-24T05:25:34&minlat=31.54&maxlat=37.54&minlon=22.03&maxlon=28.03&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913959",
+"date": "1915-12-25 06:06:09.81",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1915-12-25T06:01:09&endtime=1915-12-25T06:11:09&minlat=33.43&maxlat=39.43&minlon=33.17&maxlon=39.17",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1915-12-25T06:01:09&endtime=1915-12-25T06:11:09&minlat=33.43&maxlat=39.43&minlon=33.17&maxlon=39.17&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "610326402",
+"date": "1916-02-06 14:39:40.45",
+"mw": 5.86,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1916-02-06T14:34:40&endtime=1916-02-06T14:44:40&minlat=36.00&maxlat=42.00&minlon=20.32&maxlon=26.32",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1916-02-06T14:34:40&endtime=1916-02-06T14:44:40&minlat=36.00&maxlat=42.00&minlon=20.32&maxlon=26.32&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "913433",
+"date": "1917-03-18 17:39:09.03",
+"mw": 5.63,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1917-03-18T17:34:09&endtime=1917-03-18T17:44:09&minlat=37.87&maxlat=43.87&minlon=33.44&maxlon=39.44",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1917-03-18T17:34:09&endtime=1917-03-18T17:44:09&minlat=37.87&maxlat=43.87&minlon=33.44&maxlon=39.44&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913576",
+"date": "1917-07-24 16:13:17.72",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1917-07-24T16:08:17&endtime=1917-07-24T16:18:17&minlat=31.87&maxlat=37.87&minlon=42.78&maxlon=48.78",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1917-07-24T16:08:17&endtime=1917-07-24T16:18:17&minlat=31.87&maxlat=37.87&minlon=42.78&maxlon=48.78&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913637",
+"date": "1917-08-20 23:02:02.40",
+"mw": 5.82,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1917-08-20T22:57:02&endtime=1917-08-20T23:07:02&minlat=37.21&maxlat=43.21&minlon=22.98&maxlon=28.98",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1917-08-20T22:57:02&endtime=1917-08-20T23:07:02&minlat=37.21&maxlat=43.21&minlon=22.98&maxlon=28.98&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913035",
+"date": "1918-01-16 07:13:19.73",
+"mw": 5.98,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-01-16T07:08:19&endtime=1918-01-16T07:18:19&minlat=35.25&maxlat=41.25&minlon=27.49&maxlon=33.49",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-01-16T07:08:19&endtime=1918-01-16T07:18:19&minlat=35.25&maxlat=41.25&minlon=27.49&maxlon=33.49&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913037",
+"date": "1918-01-16 16:32:34.50",
+"mw": 5.55,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-01-16T16:27:34&endtime=1918-01-16T16:37:34&minlat=35.61&maxlat=41.61&minlon=27.86&maxlon=33.86",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-01-16T16:27:34&endtime=1918-01-16T16:37:34&minlat=35.61&maxlat=41.61&minlon=27.86&maxlon=33.86&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913059",
+"date": "1918-02-09 12:28:39.76",
+"mw": 5.75,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-02-09T12:23:39&endtime=1918-02-09T12:33:39&minlat=36.23&maxlat=42.23&minlon=20.78&maxlon=26.78",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-02-09T12:23:39&endtime=1918-02-09T12:33:39&minlat=36.23&maxlat=42.23&minlon=20.78&maxlon=26.78&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "913092",
+"date": "1918-03-17 13:45:10.89",
+"mw": 5.73,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-03-17T13:40:10&endtime=1918-03-17T13:50:10&minlat=32.25&maxlat=38.25&minlon=24.32&maxlon=30.32",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-03-17T13:40:10&endtime=1918-03-17T13:50:10&minlat=32.25&maxlat=38.25&minlon=24.32&maxlon=30.32&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913130",
+"date": "1918-04-25 02:22:57.79",
+"mw": 5.74,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-04-25T02:17:57&endtime=1918-04-25T02:27:57&minlat=35.12&maxlat=41.12&minlon=41.00&maxlon=47.00",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-04-25T02:17:57&endtime=1918-04-25T02:27:57&minlat=35.12&maxlat=41.12&minlon=41.00&maxlon=47.00&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "913191",
+"date": "1918-07-01 11:02:08.12",
+"mw": 5.57,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-07-01T10:57:08&endtime=1918-07-01T11:07:08&minlat=32.20&maxlat=38.20&minlon=23.36&maxlon=29.36",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-07-01T10:57:08&endtime=1918-07-01T11:07:08&minlat=32.20&maxlat=38.20&minlon=23.36&maxlon=29.36&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913193",
+"date": "1918-07-04 11:25:37.57",
+"mw": 5.63,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-07-04T11:20:37&endtime=1918-07-04T11:30:37&minlat=34.58&maxlat=40.58&minlon=26.18&maxlon=32.18",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-07-04T11:20:37&endtime=1918-07-04T11:30:37&minlat=34.58&maxlat=40.58&minlon=26.18&maxlon=32.18&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913220",
+"date": "1918-08-09 00:39:01.96",
+"mw": 5.75,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-08-09T00:34:01&endtime=1918-08-09T00:44:01&minlat=38.17&maxlat=44.17&minlon=31.73&maxlon=37.73",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-08-09T00:34:01&endtime=1918-08-09T00:44:01&minlat=38.17&maxlat=44.17&minlon=31.73&maxlon=37.73&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913250",
+"date": "1918-08-29 06:39:45.47",
+"mw": 5.78,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-08-29T06:34:45&endtime=1918-08-29T06:44:45&minlat=38.08&maxlat=44.08&minlon=31.76&maxlon=37.76",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1918-08-29T06:34:45&endtime=1918-08-29T06:44:45&minlat=38.08&maxlat=44.08&minlon=31.76&maxlon=37.76&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912799",
+"date": "1919-05-27 10:34:27.13",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-05-27T10:29:27&endtime=1919-05-27T10:39:27&minlat=34.38&maxlat=40.38&minlon=32.80&maxlon=38.80",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-05-27T10:29:27&endtime=1919-05-27T10:39:27&minlat=34.38&maxlat=40.38&minlon=32.80&maxlon=38.80&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912810",
+"date": "1919-06-09 07:13:52.04",
+"mw": 6.12,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-06-09T07:08:52&endtime=1919-06-09T07:18:52&minlat=38.17&maxlat=44.17&minlon=29.98&maxlon=35.98",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-06-09T07:08:52&endtime=1919-06-09T07:18:52&minlat=38.17&maxlat=44.17&minlon=29.98&maxlon=35.98&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912892",
+"date": "1919-08-19 20:18:03.03",
+"mw": 5.73,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-08-19T20:13:03&endtime=1919-08-19T20:23:03&minlat=37.44&maxlat=43.44&minlon=34.18&maxlon=40.18",
+"B1_n": 0,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-08-19T20:13:03&endtime=1919-08-19T20:23:03&minlat=37.44&maxlat=43.44&minlon=34.18&maxlon=40.18&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC FDSN döndürmüyor (kaynak kapsamı)",
+"B1_buyuklukler": []
+},
+{
+"gem_id": "912992",
+"date": "1919-10-25 17:10:07.23",
+"mw": 6.03,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-10-25T17:05:07&endtime=1919-10-25T17:15:07&minlat=33.51&maxlat=39.51&minlon=22.87&maxlon=28.87",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-10-25T17:05:07&endtime=1919-10-25T17:15:07&minlat=33.51&maxlat=39.51&minlon=22.87&maxlon=28.87&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "913024",
+"date": "1919-12-25 21:42:21.03",
+"mw": 5.83,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-12-25T21:37:21&endtime=1919-12-25T21:47:21&minlat=41.94&maxlat=47.94&minlon=31.90&maxlon=37.90",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1919-12-25T21:37:21&endtime=1919-12-25T21:47:21&minlat=41.94&maxlat=47.94&minlon=31.90&maxlon=37.90&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912436",
+"date": "1920-02-20 00:01:48.74",
+"mw": 5.97,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-02-19T23:56:48&endtime=1920-02-20T00:06:48&minlat=38.93&maxlat=44.93&minlon=42.62&maxlon=48.62",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-02-19T23:56:48&endtime=1920-02-20T00:06:48&minlat=38.93&maxlat=44.93&minlon=42.62&maxlon=48.62&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912437",
+"date": "1920-02-20 11:44:40.68",
+"mw": 6.31,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-02-20T11:39:40&endtime=1920-02-20T11:49:40&minlat=38.29&maxlat=44.29&minlon=42.63&maxlon=48.63",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-02-20T11:39:40&endtime=1920-02-20T11:49:40&minlat=38.29&maxlat=44.29&minlon=42.63&maxlon=48.63&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912469",
+"date": "1920-04-02 15:34:21.30",
+"mw": 5.56,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-04-02T15:29:21&endtime=1920-04-02T15:39:21&minlat=33.35&maxlat=39.35&minlon=23.73&maxlon=29.73",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-04-02T15:29:21&endtime=1920-04-02T15:39:21&minlat=33.35&maxlat=39.35&minlon=23.73&maxlon=29.73&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912480",
+"date": "1920-05-01 06:34:40.02",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-05-01T06:29:40&endtime=1920-05-01T06:39:40&minlat=31.84&maxlat=37.84&minlon=24.47&maxlon=30.47",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-05-01T06:29:40&endtime=1920-05-01T06:39:40&minlat=31.84&maxlat=37.84&minlon=24.47&maxlon=30.47&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912569",
+"date": "1920-07-21 14:29:14.63",
+"mw": 5.57,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-07-21T14:24:14&endtime=1920-07-21T14:34:14&minlat=30.81&maxlat=36.81&minlon=23.08&maxlon=29.08",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-07-21T14:24:14&endtime=1920-07-21T14:34:14&minlat=30.81&maxlat=36.81&minlon=23.08&maxlon=29.08&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912629",
+"date": "1920-09-28 15:17:44.25",
+"mw": 5.84,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-09-28T15:12:44&endtime=1920-09-28T15:22:44&minlat=35.12&maxlat=41.12&minlon=24.61&maxlon=30.61",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1920-09-28T15:12:44&endtime=1920-09-28T15:22:44&minlat=35.12&maxlat=41.12&minlon=24.61&maxlon=30.61&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912156",
+"date": "1921-01-27 11:30:24.85",
+"mw": 5.54,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1921-01-27T11:25:24&endtime=1921-01-27T11:35:24&minlat=33.85&maxlat=39.85&minlon=24.99&maxlon=30.99",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1921-01-27T11:25:24&endtime=1921-01-27T11:35:24&minlat=33.85&maxlat=39.85&minlon=24.99&maxlon=30.99&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912265",
+"date": "1921-06-29 11:37:59.22",
+"mw": 5.92,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1921-06-29T11:32:59&endtime=1921-06-29T11:42:59&minlat=40.09&maxlat=46.09&minlon=41.28&maxlon=47.28",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1921-06-29T11:32:59&endtime=1921-06-29T11:42:59&minlat=40.09&maxlat=46.09&minlon=41.28&maxlon=47.28&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "912324",
+"date": "1921-09-26 09:26:04.67",
+"mw": 6.01,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1921-09-26T09:21:04&endtime=1921-09-26T09:31:04&minlat=35.96&maxlat=41.96&minlon=30.05&maxlon=36.05",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1921-09-26T09:21:04&endtime=1921-09-26T09:31:04&minlat=35.96&maxlat=41.96&minlon=30.05&maxlon=36.05&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911833",
+"date": "1922-03-02 14:49:42.33",
+"mw": 5.67,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-03-02T14:44:42&endtime=1922-03-02T14:54:42&minlat=40.28&maxlat=46.28&minlon=40.98&maxlon=46.98",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-03-02T14:44:42&endtime=1922-03-02T14:54:42&minlat=40.28&maxlat=46.28&minlon=40.98&maxlon=46.98&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911837",
+"date": "1922-03-08 17:33:59.14",
+"mw": 5.66,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-03-08T17:28:59&endtime=1922-03-08T17:38:59&minlat=31.42&maxlat=37.42&minlon=20.74&maxlon=26.74",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-03-08T17:28:59&endtime=1922-03-08T17:38:59&minlat=31.42&maxlat=37.42&minlon=20.74&maxlon=26.74&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911915",
+"date": "1922-06-05 04:31:11.56",
+"mw": 5.92,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-06-05T04:26:11&endtime=1922-06-05T04:36:11&minlat=31.99&maxlat=37.99&minlon=20.00&maxlon=26.00",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-06-05T04:26:11&endtime=1922-06-05T04:36:11&minlat=31.99&maxlat=37.99&minlon=20.00&maxlon=26.00&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911972",
+"date": "1922-08-08 03:49:20.02",
+"mw": 5.88,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-08-08T03:44:20&endtime=1922-08-08T03:54:20&minlat=35.26&maxlat=41.26&minlon=20.59&maxlon=26.59",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-08-08T03:44:20&endtime=1922-08-08T03:54:20&minlat=35.26&maxlat=41.26&minlon=20.59&maxlon=26.59&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911973",
+"date": "1922-08-11 08:19:41.38",
+"mw": 6.37,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-08-11T08:14:41&endtime=1922-08-11T08:24:41&minlat=31.99&maxlat=37.99&minlon=24.16&maxlon=30.16",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-08-11T08:14:41&endtime=1922-08-11T08:24:41&minlat=31.99&maxlat=37.99&minlon=24.16&maxlon=30.16&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911976",
+"date": "1922-08-13 12:46:07.15",
+"mw": 5.93,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-08-13T12:41:07&endtime=1922-08-13T12:51:07&minlat=32.35&maxlat=38.35&minlon=24.41&maxlon=30.41",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-08-13T12:41:07&endtime=1922-08-13T12:51:07&minlat=32.35&maxlat=38.35&minlon=24.41&maxlon=30.41&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911995",
+"date": "1922-08-29 03:36:02.05",
+"mw": 5.76,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-08-29T03:31:02&endtime=1922-08-29T03:41:02&minlat=33.76&maxlat=39.76&minlon=30.18&maxlon=36.18",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1922-08-29T03:31:02&endtime=1922-08-29T03:41:02&minlat=33.76&maxlat=39.76&minlon=30.18&maxlon=36.18&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911308",
+"date": "1923-03-10 19:48:57.86",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-03-10T19:43:57&endtime=1923-03-10T19:53:57&minlat=31.97&maxlat=37.97&minlon=24.00&maxlon=30.00",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-03-10T19:43:57&endtime=1923-03-10T19:53:57&minlat=31.97&maxlat=37.97&minlon=24.00&maxlon=30.00&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911404",
+"date": "1923-06-04 20:33:05.91",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-06-04T20:28:05&endtime=1923-06-04T20:38:05&minlat=31.71&maxlat=37.71&minlon=20.20&maxlon=26.20",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-06-04T20:28:05&endtime=1923-06-04T20:38:05&minlat=31.71&maxlat=37.71&minlon=20.20&maxlon=26.20&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911481",
+"date": "1923-08-01 08:16:27.11",
+"mw": 5.75,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-08-01T08:11:27&endtime=1923-08-01T08:21:27&minlat=31.84&maxlat=37.84&minlon=22.21&maxlon=28.21",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-08-01T08:11:27&endtime=1923-08-01T08:21:27&minlat=31.84&maxlat=37.84&minlon=22.21&maxlon=28.21&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+6.7,
+"MS",
+"PAS"
+]
+]
+},
+{
+"gem_id": "911502",
+"date": "1923-08-14 17:51:03.92",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-08-14T17:46:03&endtime=1923-08-14T17:56:03&minlat=36.29&maxlat=42.29&minlon=21.32&maxlon=27.32",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-08-14T17:46:03&endtime=1923-08-14T17:56:03&minlat=36.29&maxlat=42.29&minlon=21.32&maxlon=27.32&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911504",
+"date": "1923-08-16 03:51:59.65",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-08-16T03:46:59&endtime=1923-08-16T03:56:59&minlat=38.07&maxlat=44.07&minlon=31.12&maxlon=37.12",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1923-08-16T03:46:59&endtime=1923-08-16T03:56:59&minlat=38.07&maxlat=44.07&minlon=31.12&maxlon=37.12&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "910837",
+"date": "1924-02-16 09:01:10.13",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-02-16T08:56:10&endtime=1924-02-16T09:06:10&minlat=36.79&maxlat=42.79&minlon=22.60&maxlon=28.60",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-02-16T08:56:10&endtime=1924-02-16T09:06:10&minlat=36.79&maxlat=42.79&minlon=22.60&maxlon=28.60&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "910950",
+"date": "1924-05-13 01:52:36.18",
+"mw": 5.56,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-05-13T01:47:36&endtime=1924-05-13T01:57:36&minlat=37.01&maxlat=43.01&minlon=39.78&maxlon=45.78",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-05-13T01:47:36&endtime=1924-05-13T01:57:36&minlat=37.01&maxlat=43.01&minlon=39.78&maxlon=45.78&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911142",
+"date": "1924-09-27 04:27:46.40",
+"mw": 5.63,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-09-27T04:22:46&endtime=1924-09-27T04:32:46&minlat=36.88&maxlat=42.88&minlon=38.47&maxlon=44.47",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-09-27T04:22:46&endtime=1924-09-27T04:32:46&minlat=36.88&maxlat=42.88&minlon=38.47&maxlon=44.47&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911188",
+"date": "1924-11-08 09:05:07.14",
+"mw": 5.8,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-11-08T09:00:07&endtime=1924-11-08T09:10:07&minlat=32.65&maxlat=38.65&minlon=44.48&maxlon=50.48",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-11-08T09:00:07&endtime=1924-11-08T09:10:07&minlat=32.65&maxlat=38.65&minlon=44.48&maxlon=50.48&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911202",
+"date": "1924-11-20 20:27:44.05",
+"mw": 6.1,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-11-20T20:22:44&endtime=1924-11-20T20:32:44&minlat=35.36&maxlat=41.36&minlon=27.89&maxlon=33.89",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-11-20T20:22:44&endtime=1924-11-20T20:32:44&minlat=35.36&maxlat=41.36&minlon=27.89&maxlon=33.89&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "911236",
+"date": "1924-12-23 17:04:56.51",
+"mw": 5.55,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-12-23T16:59:56&endtime=1924-12-23T17:09:56&minlat=38.18&maxlat=44.18&minlon=21.58&maxlon=27.58",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1924-12-23T16:59:56&endtime=1924-12-23T17:09:56&minlat=38.18&maxlat=44.18&minlon=21.58&maxlon=27.58&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "910326",
+"date": "1925-01-09 17:38:32.69",
+"mw": 5.81,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1925-01-09T17:33:32&endtime=1925-01-09T17:43:32&minlat=38.52&maxlat=44.52&minlon=40.15&maxlon=46.15",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1925-01-09T17:33:32&endtime=1925-01-09T17:43:32&minlat=38.52&maxlat=44.52&minlon=40.15&maxlon=46.15&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "910436",
+"date": "1925-04-05 03:04:41.16",
+"mw": 5.73,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1925-04-05T02:59:41&endtime=1925-04-05T03:09:41&minlat=33.83&maxlat=39.83&minlon=25.66&maxlon=31.66",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1925-04-05T02:59:41&endtime=1925-04-05T03:09:41&minlat=33.83&maxlat=39.83&minlon=25.66&maxlon=31.66&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "910649",
+"date": "1925-08-16 20:59:06.58",
+"mw": 5.55,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1925-08-16T20:54:06&endtime=1925-08-16T21:04:06&minlat=33.76&maxlat=39.76&minlon=26.25&maxlon=32.25",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1925-08-16T20:54:06&endtime=1925-08-16T21:04:06&minlat=33.76&maxlat=39.76&minlon=26.25&maxlon=32.25&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "910667",
+"date": "1925-09-01 08:16:15.51",
+"mw": 5.75,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1925-09-01T08:11:15&endtime=1925-09-01T08:21:15&minlat=35.02&maxlat=41.02&minlon=27.50&maxlon=33.50",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1925-09-01T08:11:15&endtime=1925-09-01T08:21:15&minlat=35.02&maxlat=41.02&minlon=27.50&maxlon=33.50&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909709",
+"date": "1926-01-13 01:46:57.22",
+"mw": 5.84,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-01-13T01:41:57&endtime=1926-01-13T01:51:57&minlat=35.40&maxlat=41.40&minlon=25.46&maxlon=31.46",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-01-13T01:41:57&endtime=1926-01-13T01:51:57&minlat=35.40&maxlat=41.40&minlon=25.46&maxlon=31.46&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909710",
+"date": "1926-01-13 08:08:43.93",
+"mw": 5.73,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-01-13T08:03:43&endtime=1926-01-13T08:13:43&minlat=35.53&maxlat=41.53&minlon=25.40&maxlon=31.40",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-01-13T08:03:43&endtime=1926-01-13T08:13:43&minlat=35.53&maxlat=41.53&minlon=25.40&maxlon=31.40&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909752",
+"date": "1926-03-01 20:01:59.76",
+"mw": 5.92,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-01T19:56:59&endtime=1926-03-01T20:06:59&minlat=34.10&maxlat=40.10&minlon=26.19&maxlon=32.19",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-01T19:56:59&endtime=1926-03-01T20:06:59&minlat=34.10&maxlat=40.10&minlon=26.19&maxlon=32.19&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909772",
+"date": "1926-03-18 17:52:49.65",
+"mw": 5.6,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-18T17:47:49&endtime=1926-03-18T17:57:49&minlat=33.16&maxlat=39.16&minlon=26.64&maxlon=32.64",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-18T17:47:49&endtime=1926-03-18T17:57:49&minlat=33.16&maxlat=39.16&minlon=26.64&maxlon=32.64&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909773",
+"date": "1926-03-19 00:28:27.81",
+"mw": 5.53,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-19T00:23:27&endtime=1926-03-19T00:33:27&minlat=32.96&maxlat=38.96&minlon=26.46&maxlon=32.46",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-19T00:23:27&endtime=1926-03-19T00:33:27&minlat=32.96&maxlat=38.96&minlon=26.46&maxlon=32.46&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909782",
+"date": "1926-03-21 22:04:43.91",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-21T21:59:43&endtime=1926-03-21T22:09:43&minlat=34.32&maxlat=40.32&minlon=26.56&maxlon=32.56",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-21T21:59:43&endtime=1926-03-21T22:09:43&minlat=34.32&maxlat=40.32&minlon=26.56&maxlon=32.56&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909787",
+"date": "1926-03-24 07:04:32.61",
+"mw": 5.73,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-24T06:59:32&endtime=1926-03-24T07:09:32&minlat=32.84&maxlat=38.84&minlon=26.52&maxlon=32.52",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-03-24T06:59:32&endtime=1926-03-24T07:09:32&minlat=32.84&maxlat=38.84&minlon=26.52&maxlon=32.52&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "910077",
+"date": "1926-08-30 11:38:05.52",
+"mw": 6.27,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-08-30T11:33:05&endtime=1926-08-30T11:43:05&minlat=33.73&maxlat=39.73&minlon=20.02&maxlon=26.02",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-08-30T11:33:05&endtime=1926-08-30T11:43:05&minlat=33.73&maxlat=39.73&minlon=20.02&maxlon=26.02&minmagnitude=5.5",
+"B2_n": 1,
+"sonuc": "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)",
+"B1_buyuklukler": [
+[
+6.22,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "910286",
+"date": "1926-12-16 17:54:06.87",
+"mw": 5.8,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-12-16T17:49:06&endtime=1926-12-16T17:59:06&minlat=37.68&maxlat=43.68&minlon=28.03&maxlon=34.03",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1926-12-16T17:49:06&endtime=1926-12-16T17:59:06&minlat=37.68&maxlat=43.68&minlon=28.03&maxlon=34.03&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909165",
+"date": "1927-03-24 14:46:43.50",
+"mw": 5.67,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-03-24T14:41:43&endtime=1927-03-24T14:51:43&minlat=31.79&maxlat=37.79&minlon=23.26&maxlon=29.26",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-03-24T14:41:43&endtime=1927-03-24T14:51:43&minlat=31.79&maxlat=37.79&minlon=23.26&maxlon=29.26&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909505",
+"date": "1927-09-12 03:20:12.94",
+"mw": 6.1,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-12T03:15:12&endtime=1927-09-12T03:25:12&minlat=41.71&maxlat=47.71&minlon=31.66&maxlon=37.66",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-12T03:15:12&endtime=1927-09-12T03:25:12&minlat=41.71&maxlat=47.71&minlon=31.66&maxlon=37.66&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909506",
+"date": "1927-09-12 06:33:28.12",
+"mw": 5.64,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-12T06:28:28&endtime=1927-09-12T06:38:28&minlat=41.74&maxlat=47.74&minlon=31.64&maxlon=37.64",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-12T06:28:28&endtime=1927-09-12T06:38:28&minlat=41.74&maxlat=47.74&minlon=31.64&maxlon=37.64&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909508",
+"date": "1927-09-12 13:01:23.06",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-12T12:56:23&endtime=1927-09-12T13:06:23&minlat=41.78&maxlat=47.78&minlon=31.74&maxlon=37.74",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-12T12:56:23&endtime=1927-09-12T13:06:23&minlat=41.78&maxlat=47.78&minlon=31.74&maxlon=37.74&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909509",
+"date": "1927-09-12 14:23:57.41",
+"mw": 5.96,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-12T14:18:57&endtime=1927-09-12T14:28:57&minlat=41.66&maxlat=47.66&minlon=31.55&maxlon=37.55",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-12T14:18:57&endtime=1927-09-12T14:28:57&minlat=41.66&maxlat=47.66&minlon=31.55&maxlon=37.55&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909515",
+"date": "1927-09-14 02:33:01.36",
+"mw": 5.56,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-14T02:28:01&endtime=1927-09-14T02:38:01&minlat=41.71&maxlat=47.71&minlon=31.77&maxlon=37.77",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-14T02:28:01&endtime=1927-09-14T02:38:01&minlat=41.71&maxlat=47.71&minlon=31.77&maxlon=37.77&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "909527",
+"date": "1927-09-24 06:13:58.20",
+"mw": 5.82,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-24T06:08:58&endtime=1927-09-24T06:18:58&minlat=41.70&maxlat=47.70&minlon=31.63&maxlon=37.63",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1927-09-24T06:08:58&endtime=1927-09-24T06:18:58&minlat=41.70&maxlat=47.70&minlon=31.63&maxlon=37.63&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908469",
+"date": "1928-01-24 07:36:18.92",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-01-24T07:31:18&endtime=1928-01-24T07:41:18&minlat=38.99&maxlat=44.99&minlon=28.05&maxlon=34.05",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-01-24T07:31:18&endtime=1928-01-24T07:41:18&minlat=38.99&maxlat=44.99&minlon=28.05&maxlon=34.05&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908616",
+"date": "1928-04-18 23:14:54.69",
+"mw": 5.75,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-18T23:09:54&endtime=1928-04-18T23:19:54&minlat=39.44&maxlat=45.44&minlon=22.30&maxlon=28.30",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-18T23:09:54&endtime=1928-04-18T23:19:54&minlat=39.44&maxlat=45.44&minlon=22.30&maxlon=28.30&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908635",
+"date": "1928-04-22 20:13:54.17",
+"mw": 6.3,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-22T20:08:54&endtime=1928-04-22T20:18:54&minlat=34.81&maxlat=40.81&minlon=20.03&maxlon=26.03",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-22T20:08:54&endtime=1928-04-22T20:18:54&minlat=34.81&maxlat=40.81&minlon=20.03&maxlon=26.03&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908643",
+"date": "1928-04-25 09:25:56.13",
+"mw": 5.84,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-25T09:20:56&endtime=1928-04-25T09:30:56&minlat=39.06&maxlat=45.06&minlon=22.79&maxlon=28.79",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-25T09:20:56&endtime=1928-04-25T09:30:56&minlat=39.06&maxlat=45.06&minlon=22.79&maxlon=28.79&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908651",
+"date": "1928-04-28 17:59:07.04",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-28T17:54:07&endtime=1928-04-28T18:04:07&minlat=39.06&maxlat=45.06&minlon=21.85&maxlon=27.85",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-28T17:54:07&endtime=1928-04-28T18:04:07&minlat=39.06&maxlat=45.06&minlon=21.85&maxlon=27.85&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908652",
+"date": "1928-04-29 09:49:17.21",
+"mw": 5.55,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-29T09:44:17&endtime=1928-04-29T09:54:17&minlat=34.84&maxlat=40.84&minlon=20.06&maxlon=26.06",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-04-29T09:44:17&endtime=1928-04-29T09:54:17&minlat=34.84&maxlat=40.84&minlon=20.06&maxlon=26.06&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908659",
+"date": "1928-05-02 21:54:32.44",
+"mw": 6.23,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-05-02T21:49:32&endtime=1928-05-02T21:59:32&minlat=36.63&maxlat=42.63&minlon=26.12&maxlon=32.12",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-05-02T21:49:32&endtime=1928-05-02T21:59:32&minlat=36.63&maxlat=42.63&minlon=26.12&maxlon=32.12&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908788",
+"date": "1928-07-15 09:33:33.76",
+"mw": 5.79,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-07-15T09:28:33&endtime=1928-07-15T09:38:33&minlat=35.00&maxlat=41.00&minlon=24.21&maxlon=30.21",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-07-15T09:28:33&endtime=1928-07-15T09:38:33&minlat=35.00&maxlat=41.00&minlon=24.21&maxlon=30.21&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908917",
+"date": "1928-10-04 11:14:08.44",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-10-04T11:09:08&endtime=1928-10-04T11:19:08&minlat=37.07&maxlat=43.07&minlon=30.50&maxlon=36.50",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1928-10-04T11:09:08&endtime=1928-10-04T11:19:08&minlat=37.07&maxlat=43.07&minlon=30.50&maxlon=36.50&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907873",
+"date": "1929-01-23 11:14:26.56",
+"mw": 5.46,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1929-01-23T11:09:26&endtime=1929-01-23T11:19:26&minlat=31.70&maxlat=37.70&minlon=21.64&maxlon=27.64",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1929-01-23T11:09:26&endtime=1929-01-23T11:19:26&minlat=31.70&maxlat=37.70&minlon=21.64&maxlon=27.64&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "908310",
+"date": "1929-09-15 13:10:06.68",
+"mw": 5.53,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1929-09-15T13:05:06&endtime=1929-09-15T13:15:06&minlat=36.70&maxlat=42.70&minlon=36.03&maxlon=42.03",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1929-09-15T13:05:06&endtime=1929-09-15T13:15:06&minlat=36.70&maxlat=42.70&minlon=36.03&maxlon=42.03&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907300",
+"date": "1930-03-31 12:33:50.71",
+"mw": 6.06,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-03-31T12:28:50&endtime=1930-03-31T12:38:50&minlat=36.36&maxlat=42.36&minlon=20.34&maxlon=26.34",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-03-31T12:28:50&endtime=1930-03-31T12:38:50&minlat=36.36&maxlat=42.36&minlon=20.34&maxlon=26.34&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907320",
+"date": "1930-04-17 20:06:40.55",
+"mw": 6.02,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-04-17T20:01:40&endtime=1930-04-17T20:11:40&minlat=34.64&maxlat=40.64&minlon=20.10&maxlon=26.10",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-04-17T20:01:40&endtime=1930-04-17T20:11:40&minlat=34.64&maxlat=40.64&minlon=20.10&maxlon=26.10&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907353",
+"date": "1930-05-06 07:03:26.82",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-05-06T06:58:26&endtime=1930-05-06T07:08:26&minlat=35.25&maxlat=41.25&minlon=41.80&maxlon=47.80",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-05-06T06:58:26&endtime=1930-05-06T07:08:26&minlat=35.25&maxlat=41.25&minlon=41.80&maxlon=47.80&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907371",
+"date": "1930-05-08 15:35:27.77",
+"mw": 6.21,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-05-08T15:30:27&endtime=1930-05-08T15:40:27&minlat=35.46&maxlat=41.46&minlon=42.06&maxlon=48.06",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-05-08T15:30:27&endtime=1930-05-08T15:40:27&minlat=35.46&maxlat=41.46&minlon=42.06&maxlon=48.06&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907418",
+"date": "1930-05-23 09:48:22.44",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-05-23T09:43:22&endtime=1930-05-23T09:53:22&minlat=35.03&maxlat=41.03&minlon=42.09&maxlon=48.09",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-05-23T09:43:22&endtime=1930-05-23T09:53:22&minlat=35.03&maxlat=41.03&minlon=42.09&maxlon=48.09&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907426",
+"date": "1930-05-29 17:14:59.23",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-05-29T17:09:59&endtime=1930-05-29T17:19:59&minlat=35.34&maxlat=41.34&minlon=41.66&maxlon=47.66",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-05-29T17:09:59&endtime=1930-05-29T17:19:59&minlat=35.34&maxlat=41.34&minlon=41.66&maxlon=47.66&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907434",
+"date": "1930-06-04 07:28:08.90",
+"mw": 5.61,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-06-04T07:23:08&endtime=1930-06-04T07:33:08&minlat=35.34&maxlat=41.34&minlon=42.16&maxlon=48.16",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-06-04T07:23:08&endtime=1930-06-04T07:33:08&minlat=35.34&maxlat=41.34&minlon=42.16&maxlon=48.16&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907795",
+"date": "1930-12-10 10:31:30.01",
+"mw": 5.81,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-12-10T10:26:30&endtime=1930-12-10T10:36:30&minlat=36.97&maxlat=42.97&minlon=36.15&maxlon=42.15",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1930-12-10T10:26:30&endtime=1930-12-10T10:36:30&minlat=36.97&maxlat=42.97&minlon=36.15&maxlon=42.15&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "906772",
+"date": "1931-05-12 10:25:13.47",
+"mw": 5.51,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1931-05-12T10:20:13&endtime=1931-05-12T10:30:13&minlat=35.51&maxlat=41.51&minlon=42.82&maxlon=48.82",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1931-05-12T10:20:13&endtime=1931-05-12T10:30:13&minlat=35.51&maxlat=41.51&minlon=42.82&maxlon=48.82&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "906950",
+"date": "1931-08-18 09:47:05.18",
+"mw": 5.54,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1931-08-18T09:42:05&endtime=1931-08-18T09:52:05&minlat=36.60&maxlat=42.60&minlon=21.26&maxlon=27.26",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1931-08-18T09:42:05&endtime=1931-08-18T09:52:05&minlat=36.60&maxlat=42.60&minlon=21.26&maxlon=27.26&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "907178",
+"date": "1931-12-24 23:00:10.22",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1931-12-24T22:55:10&endtime=1931-12-24T23:05:10&minlat=35.61&maxlat=41.61&minlon=41.29&maxlon=47.29",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1931-12-24T22:55:10&endtime=1931-12-24T23:05:10&minlat=35.61&maxlat=41.61&minlon=41.29&maxlon=47.29&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "906171",
+"date": "1932-05-27 10:42:01.65",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-05-27T10:37:01&endtime=1932-05-27T10:47:01&minlat=41.32&maxlat=47.32&minlon=21.94&maxlon=27.94",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-05-27T10:37:01&endtime=1932-05-27T10:47:01&minlat=41.32&maxlat=47.32&minlon=21.94&maxlon=27.94&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "906265",
+"date": "1932-06-29 18:33:33.39",
+"mw": 5.6,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-06-29T18:28:33&endtime=1932-06-29T18:38:33&minlat=32.58&maxlat=38.58&minlon=23.41&maxlon=29.41",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-06-29T18:28:33&endtime=1932-06-29T18:38:33&minlat=32.58&maxlat=38.58&minlon=23.41&maxlon=29.41&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "906324",
+"date": "1932-08-09 07:44:27.59",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-08-09T07:39:27&endtime=1932-08-09T07:49:27&minlat=32.09&maxlat=38.09&minlon=23.96&maxlon=29.96",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-08-09T07:39:27&endtime=1932-08-09T07:49:27&minlat=32.09&maxlat=38.09&minlon=23.96&maxlon=29.96&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "906388",
+"date": "1932-09-28 16:52:10.55",
+"mw": 5.87,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-09-28T16:47:10&endtime=1932-09-28T16:57:10&minlat=37.52&maxlat=43.52&minlon=20.34&maxlon=26.34",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-09-28T16:47:10&endtime=1932-09-28T16:57:10&minlat=37.52&maxlat=43.52&minlon=20.34&maxlon=26.34&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "906392",
+"date": "1932-09-29 03:57:23.75",
+"mw": 6.33,
+"s_mw": "p",
+"sinif": "1904-1939|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-09-29T03:52:23&endtime=1932-09-29T04:02:23&minlat=37.70&maxlat=43.70&minlon=20.37&maxlon=26.37",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-09-29T03:52:23&endtime=1932-09-29T04:02:23&minlat=37.70&maxlat=43.70&minlon=20.37&maxlon=26.37&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+6.25,
+"MS",
+"PAS"
+]
+]
+},
+{
+"gem_id": "906398",
+"date": "1932-09-30 06:12:18.64",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-09-30T06:07:18&endtime=1932-09-30T06:17:18&minlat=33.61&maxlat=39.61&minlon=20.07&maxlon=26.07",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-09-30T06:07:18&endtime=1932-09-30T06:17:18&minlat=33.61&maxlat=39.61&minlon=20.07&maxlon=26.07&minmagnitude=5.5",
+"B2_n": 1,
+"sonuc": "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)",
+"B1_buyuklukler": [
+[
+5.6,
+"MS",
+"PAS"
+]
+]
+},
+{
+"gem_id": "906402",
+"date": "1932-10-01 13:36:17.66",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-10-01T13:31:17&endtime=1932-10-01T13:41:17&minlat=36.79&maxlat=42.79&minlon=20.66&maxlon=26.66",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-10-01T13:31:17&endtime=1932-10-01T13:41:17&minlat=36.79&maxlat=42.79&minlon=20.66&maxlon=26.66&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "906413",
+"date": "1932-10-09 06:24:45.76",
+"mw": 5.65,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-10-09T06:19:45&endtime=1932-10-09T06:29:45&minlat=36.08&maxlat=42.08&minlon=20.43&maxlon=26.43",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1932-10-09T06:19:45&endtime=1932-10-09T06:29:45&minlat=36.08&maxlat=42.08&minlon=20.43&maxlon=26.43&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "905467",
+"date": "1933-03-14 01:19:36.59",
+"mw": 5.75,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1933-03-14T01:14:36&endtime=1933-03-14T01:24:36&minlat=35.65&maxlat=41.65&minlon=22.24&maxlon=28.24",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1933-03-14T01:14:36&endtime=1933-03-14T01:24:36&minlat=35.65&maxlat=41.65&minlon=22.24&maxlon=28.24&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "905606",
+"date": "1933-06-01 02:40:28.59",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1933-06-01T02:35:28&endtime=1933-06-01T02:45:28&minlat=35.95&maxlat=41.95&minlon=20.35&maxlon=26.35",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1933-06-01T02:35:28&endtime=1933-06-01T02:45:28&minlat=35.95&maxlat=41.95&minlon=20.35&maxlon=26.35&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "905887",
+"date": "1933-10-24 16:25:01.46",
+"mw": 5.51,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1933-10-24T16:20:01&endtime=1933-10-24T16:30:01&minlat=39.58&maxlat=45.58&minlon=42.59&maxlon=48.59",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1933-10-24T16:20:01&endtime=1933-10-24T16:30:01&minlat=39.58&maxlat=45.58&minlon=42.59&maxlon=48.59&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "905903",
+"date": "1933-11-06 07:07:18.84",
+"mw": 5.56,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1933-11-06T07:02:18&endtime=1933-11-06T07:12:18&minlat=36.39&maxlat=42.39&minlon=40.27&maxlon=46.27",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1933-11-06T07:02:18&endtime=1933-11-06T07:12:18&minlat=36.39&maxlat=42.39&minlon=40.27&maxlon=46.27&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "904088",
+"date": "1935-02-18 06:40:09.96",
+"mw": 5.54,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1935-02-18T06:35:09&endtime=1935-02-18T06:45:09&minlat=37.57&maxlat=43.57&minlon=20.38&maxlon=26.38",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1935-02-18T06:35:09&endtime=1935-02-18T06:45:09&minlat=37.57&maxlat=43.57&minlon=20.38&maxlon=26.38&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "904581",
+"date": "1935-10-13 19:32:18.89",
+"mw": 5.49,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1935-10-13T19:27:18&endtime=1935-10-13T19:37:18&minlat=36.11&maxlat=42.11&minlon=37.58&maxlon=43.58",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1935-10-13T19:27:18&endtime=1935-10-13T19:37:18&minlat=36.11&maxlat=42.11&minlon=37.58&maxlon=43.58&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "903476",
+"date": "1936-02-12 10:57:24.91",
+"mw": 5.55,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1936-02-12T10:52:24&endtime=1936-02-12T11:02:24&minlat=31.45&maxlat=37.45&minlon=20.18&maxlon=26.18",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1936-02-12T10:52:24&endtime=1936-02-12T11:02:24&minlat=31.45&maxlat=37.45&minlon=20.18&maxlon=26.18&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "903549",
+"date": "1936-04-08 04:17:13.48",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1936-04-08T04:12:13&endtime=1936-04-08T04:22:13&minlat=38.43&maxlat=44.43&minlon=20.30&maxlon=26.30",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1936-04-08T04:12:13&endtime=1936-04-08T04:22:13&minlat=38.43&maxlat=44.43&minlon=20.30&maxlon=26.30&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "903822",
+"date": "1936-09-02 13:12:21.78",
+"mw": 5.56,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1936-09-02T13:07:21&endtime=1936-09-02T13:17:21&minlat=38.89&maxlat=44.89&minlon=43.55&maxlon=49.55",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1936-09-02T13:07:21&endtime=1936-09-02T13:17:21&minlat=38.89&maxlat=44.89&minlon=43.55&maxlon=49.55&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "903949",
+"date": "1936-11-18 15:50:14.92",
+"mw": 5.67,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1936-11-18T15:45:14&endtime=1936-11-18T15:55:14&minlat=38.12&maxlat=44.12&minlon=30.50&maxlon=36.50",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1936-11-18T15:45:14&endtime=1936-11-18T15:55:14&minlat=38.12&maxlat=44.12&minlon=30.50&maxlon=36.50&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "903051",
+"date": "1937-04-28 02:36:42.95",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1937-04-28T02:31:42&endtime=1937-04-28T02:41:42&minlat=33.02&maxlat=39.02&minlon=27.92&maxlon=33.92",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1937-04-28T02:31:42&endtime=1937-04-28T02:41:42&minlat=33.02&maxlat=39.02&minlon=27.92&maxlon=33.92&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "903088",
+"date": "1937-05-23 10:57:28.71",
+"mw": 5.65,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1937-05-23T10:52:28&endtime=1937-05-23T11:02:28&minlat=35.62&maxlat=41.62&minlon=24.94&maxlon=30.94",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1937-05-23T10:52:28&endtime=1937-05-23T11:02:28&minlat=35.62&maxlat=41.62&minlon=24.94&maxlon=30.94&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902316",
+"date": "1938-01-02 10:54:55.35",
+"mw": 5.52,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-01-02T10:49:55&endtime=1938-01-02T10:59:55&minlat=32.05&maxlat=38.05&minlon=22.43&maxlon=28.43",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-01-02T10:49:55&endtime=1938-01-02T10:59:55&minlat=32.05&maxlat=38.05&minlon=22.43&maxlon=28.43&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902343",
+"date": "1938-01-26 03:40:07.06",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-01-26T03:35:07&endtime=1938-01-26T03:45:07&minlat=30.23&maxlat=36.23&minlon=42.71&maxlon=48.71",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-01-26T03:35:07&endtime=1938-01-26T03:45:07&minlat=30.23&maxlat=36.23&minlon=42.71&maxlon=48.71&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902371",
+"date": "1938-02-10 20:37:57.02",
+"mw": 5.72,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-02-10T20:32:57&endtime=1938-02-10T20:42:57&minlat=31.80&maxlat=37.80&minlon=23.49&maxlon=29.49",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-02-10T20:32:57&endtime=1938-02-10T20:42:57&minlat=31.80&maxlat=37.80&minlon=23.49&maxlon=29.49&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902446",
+"date": "1938-04-19 23:11:14.57",
+"mw": 5.52,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-04-19T23:06:14&endtime=1938-04-19T23:16:14&minlat=36.44&maxlat=42.44&minlon=30.91&maxlon=36.91",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-04-19T23:06:14&endtime=1938-04-19T23:16:14&minlat=36.44&maxlat=42.44&minlon=30.91&maxlon=36.91&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902483",
+"date": "1938-05-12 22:09:42.76",
+"mw": 5.97,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-05-12T22:04:42&endtime=1938-05-12T22:14:42&minlat=32.04&maxlat=38.04&minlon=22.93&maxlon=28.93",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-05-12T22:04:42&endtime=1938-05-12T22:14:42&minlat=32.04&maxlat=38.04&minlon=22.93&maxlon=28.93&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902596",
+"date": "1938-07-21 21:56:05.91",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-07-21T21:51:05&endtime=1938-07-21T22:01:05&minlat=36.17&maxlat=42.17&minlon=30.54&maxlon=36.54",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1938-07-21T21:51:05&endtime=1938-07-21T22:01:05&minlat=36.17&maxlat=42.17&minlon=30.54&maxlon=36.54&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901755",
+"date": "1939-01-02 04:35:32.81",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-01-02T04:30:32&endtime=1939-01-02T04:40:32&minlat=33.73&maxlat=39.73&minlon=27.26&maxlon=33.26",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-01-02T04:30:32&endtime=1939-01-02T04:40:32&minlat=33.73&maxlat=39.73&minlon=27.26&maxlon=33.26&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902087",
+"date": "1939-07-25 03:40:24.30",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1904-1939|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-07-25T03:35:24&endtime=1939-07-25T03:45:24&minlat=36.79&maxlat=42.79&minlon=26.86&maxlon=32.86",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-07-25T03:35:24&endtime=1939-07-25T03:45:24&minlat=36.79&maxlat=42.79&minlon=26.86&maxlon=32.86&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902103",
+"date": "1939-08-03 12:32:49.80",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-08-03T12:27:49&endtime=1939-08-03T12:37:49&minlat=36.85&maxlat=42.85&minlon=27.07&maxlon=33.07",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-08-03T12:27:49&endtime=1939-08-03T12:37:49&minlat=36.85&maxlat=42.85&minlon=27.07&maxlon=33.07&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902196",
+"date": "1939-10-19 21:32:45.84",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-10-19T21:27:45&endtime=1939-10-19T21:37:45&minlat=36.72&maxlat=42.72&minlon=26.64&maxlon=32.64",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-10-19T21:27:45&endtime=1939-10-19T21:37:45&minlat=36.72&maxlat=42.72&minlon=26.64&maxlon=32.64&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902235",
+"date": "1939-11-21 08:48:56.27",
+"mw": 5.93,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-11-21T08:43:56&endtime=1939-11-21T08:53:56&minlat=37.05&maxlat=43.05&minlon=37.12&maxlon=43.12",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-11-21T08:43:56&endtime=1939-11-21T08:53:56&minlat=37.05&maxlat=43.05&minlon=37.12&maxlon=43.12&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902298",
+"date": "1939-12-28 03:25:26.26",
+"mw": 5.86,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-12-28T03:20:26&endtime=1939-12-28T03:30:26&minlat=37.47&maxlat=43.47&minlon=34.14&maxlon=40.14",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-12-28T03:20:26&endtime=1939-12-28T03:30:26&minlat=37.47&maxlat=43.47&minlon=34.14&maxlon=40.14&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "902302",
+"date": "1939-12-29 11:33:39.61",
+"mw": 5.58,
+"s_mw": "p",
+"sinif": "1904-1939|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-12-29T11:28:39&endtime=1939-12-29T11:38:39&minlat=37.03&maxlat=43.03&minlon=36.19&maxlon=42.19",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1939-12-29T11:28:39&endtime=1939-12-29T11:38:39&minlat=37.03&maxlat=43.03&minlon=36.19&maxlon=42.19&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901144",
+"date": "1940-01-04 20:44:55.39",
+"mw": 5.51,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-01-04T20:39:55&endtime=1940-01-04T20:49:55&minlat=37.41&maxlat=43.41&minlon=34.93&maxlon=40.93",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-01-04T20:39:55&endtime=1940-01-04T20:49:55&minlat=37.41&maxlat=43.41&minlon=34.93&maxlon=40.93&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901148",
+"date": "1940-01-06 19:04:35.17",
+"mw": 5.84,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-01-06T18:59:35&endtime=1940-01-06T19:09:35&minlat=32.37&maxlat=38.37&minlon=22.81&maxlon=28.81",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-01-06T18:59:35&endtime=1940-01-06T19:09:35&minlat=32.37&maxlat=38.37&minlon=22.81&maxlon=28.81&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901243",
+"date": "1940-03-17 09:08:55.06",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-03-17T09:03:55&endtime=1940-03-17T09:13:55&minlat=35.01&maxlat=41.01&minlon=39.90&maxlon=45.90",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-03-17T09:03:55&endtime=1940-03-17T09:13:55&minlat=35.01&maxlat=41.01&minlon=39.90&maxlon=45.90&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901295",
+"date": "1940-04-22 12:20:43.06",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-04-22T12:15:43&endtime=1940-04-22T12:25:43&minlat=36.31&maxlat=42.31&minlon=36.96&maxlon=42.96",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-04-22T12:15:43&endtime=1940-04-22T12:25:43&minlat=36.31&maxlat=42.31&minlon=36.96&maxlon=42.96&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901384",
+"date": "1940-05-29 15:24:45.06",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-05-29T15:19:45&endtime=1940-05-29T15:29:45&minlat=36.04&maxlat=42.04&minlon=37.56&maxlon=43.56",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-05-29T15:19:45&endtime=1940-05-29T15:29:45&minlat=36.04&maxlat=42.04&minlon=37.56&maxlon=43.56&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901537",
+"date": "1940-08-16 16:02:28.87",
+"mw": 5.69,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-08-16T15:57:28&endtime=1940-08-16T16:07:28&minlat=32.96&maxlat=38.96&minlon=27.62&maxlon=33.62",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-08-16T15:57:28&endtime=1940-08-16T16:07:28&minlat=32.96&maxlat=38.96&minlon=27.62&maxlon=33.62&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901658",
+"date": "1940-10-18 12:25:54.69",
+"mw": 5.73,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-10-18T12:20:54&endtime=1940-10-18T12:30:54&minlat=35.59&maxlat=41.59&minlon=41.20&maxlon=47.20",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1940-10-18T12:20:54&endtime=1940-10-18T12:30:54&minlat=35.59&maxlat=41.59&minlon=41.20&maxlon=47.20&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900615",
+"date": "1941-01-09 18:13:29.92",
+"mw": 5.6,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-01-09T18:08:29&endtime=1941-01-09T18:18:29&minlat=35.01&maxlat=41.01&minlon=24.30&maxlon=30.30",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-01-09T18:08:29&endtime=1941-01-09T18:18:29&minlat=35.01&maxlat=41.01&minlon=24.30&maxlon=30.30&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900838",
+"date": "1941-06-10 20:38:44.10",
+"mw": 5.7,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-06-10T20:33:44&endtime=1941-06-10T20:43:44&minlat=30.09&maxlat=36.09&minlon=44.27&maxlon=50.27",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-06-10T20:33:44&endtime=1941-06-10T20:43:44&minlat=30.09&maxlat=36.09&minlon=44.27&maxlon=50.27&minmagnitude=5.5",
+"B2_n": 1,
+"sonuc": "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)",
+"B1_buyuklukler": [
+[
+5.6,
+"MS",
+"PAS"
+]
+]
+},
+{
+"gem_id": "900963",
+"date": "1941-08-28 00:18:38.33",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-08-28T00:13:38&endtime=1941-08-28T00:23:38&minlat=30.06&maxlat=36.06&minlon=44.22&maxlon=50.22",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-08-28T00:13:38&endtime=1941-08-28T00:23:38&minlat=30.06&maxlat=36.06&minlon=44.22&maxlon=50.22&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901015",
+"date": "1941-09-21 22:40:28.42",
+"mw": 5.57,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-09-21T22:35:28&endtime=1941-09-21T22:45:28&minlat=35.99&maxlat=41.99&minlon=26.98&maxlon=32.98",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-09-21T22:35:28&endtime=1941-09-21T22:45:28&minlat=35.99&maxlat=41.99&minlon=26.98&maxlon=32.98&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "901072",
+"date": "1941-11-12 10:04:54.79",
+"mw": 6.04,
+"s_mw": "p",
+"sinif": "1940-1962|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-11-12T09:59:54&endtime=1941-11-12T10:09:54&minlat=36.78&maxlat=42.78&minlon=36.51&maxlon=42.51",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1941-11-12T09:59:54&endtime=1941-11-12T10:09:54&minlat=36.78&maxlat=42.78&minlon=36.51&maxlon=42.51&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900186",
+"date": "1942-02-02 17:05:30.17",
+"mw": 5.67,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-02-02T17:00:30&endtime=1942-02-02T17:10:30&minlat=33.29&maxlat=39.29&minlon=25.10&maxlon=31.10",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-02-02T17:00:30&endtime=1942-02-02T17:10:30&minlat=33.29&maxlat=39.29&minlon=25.10&maxlon=31.10&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900189",
+"date": "1942-02-05 01:15:56.18",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-02-05T01:10:56&endtime=1942-02-05T01:20:56&minlat=35.67&maxlat=41.67&minlon=24.77&maxlon=30.77",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-02-05T01:10:56&endtime=1942-02-05T01:20:56&minlat=35.67&maxlat=41.67&minlon=24.77&maxlon=30.77&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900336",
+"date": "1942-06-16 04:47:37.60",
+"mw": 5.78,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-06-16T04:42:37&endtime=1942-06-16T04:52:37&minlat=31.45&maxlat=37.45&minlon=23.66&maxlon=29.66",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-06-16T04:42:37&endtime=1942-06-16T04:52:37&minlat=31.45&maxlat=37.45&minlon=23.66&maxlon=29.66&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900337",
+"date": "1942-06-16 05:42:32.89",
+"mw": 5.86,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-06-16T05:37:32&endtime=1942-06-16T05:47:32&minlat=37.73&maxlat=43.73&minlon=24.73&maxlon=30.73",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-06-16T05:37:32&endtime=1942-06-16T05:47:32&minlat=37.73&maxlat=43.73&minlon=24.73&maxlon=30.73&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900456",
+"date": "1942-09-01 09:42:15.33",
+"mw": 5.96,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-09-01T09:37:15&endtime=1942-09-01T09:47:15&minlat=32.18&maxlat=38.18&minlon=23.77&maxlon=29.77",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-09-01T09:37:15&endtime=1942-09-01T09:47:15&minlat=32.18&maxlat=38.18&minlon=23.77&maxlon=29.77&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900513",
+"date": "1942-10-28 02:22:49.37",
+"mw": 5.84,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-10-28T02:17:49&endtime=1942-10-28T02:27:49&minlat=36.05&maxlat=42.05&minlon=24.96&maxlon=30.96",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-10-28T02:17:49&endtime=1942-10-28T02:27:49&minlat=36.05&maxlat=42.05&minlon=24.96&maxlon=30.96&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900552",
+"date": "1942-11-15 17:01:20.85",
+"mw": 6.17,
+"s_mw": "p",
+"sinif": "1940-1962|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-11-15T16:56:20&endtime=1942-11-15T17:06:20&minlat=36.36&maxlat=42.36&minlon=25.89&maxlon=31.89",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-11-15T16:56:20&endtime=1942-11-15T17:06:20&minlat=36.36&maxlat=42.36&minlon=25.89&maxlon=31.89&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900563",
+"date": "1942-11-21 14:01:46.97",
+"mw": 5.81,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-11-21T13:56:46&endtime=1942-11-21T14:06:46&minlat=37.75&maxlat=43.75&minlon=31.89&maxlon=37.89",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-11-21T13:56:46&endtime=1942-11-21T14:06:46&minlat=37.75&maxlat=43.75&minlon=31.89&maxlon=37.89&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900573",
+"date": "1942-12-02 19:04:23.93",
+"mw": 5.98,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-12-02T18:59:23&endtime=1942-12-02T19:09:23&minlat=38.17&maxlat=44.17&minlon=32.59&maxlon=38.59",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-12-02T18:59:23&endtime=1942-12-02T19:09:23&minlat=38.17&maxlat=44.17&minlon=32.59&maxlon=38.59&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900580",
+"date": "1942-12-11 02:39:16.47",
+"mw": 6.0,
+"s_mw": "p",
+"sinif": "1940-1962|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-12-11T02:34:16&endtime=1942-12-11T02:44:16&minlat=37.94&maxlat=43.94&minlon=32.08&maxlon=38.08",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1942-12-11T02:34:16&endtime=1942-12-11T02:44:16&minlat=37.94&maxlat=43.94&minlon=32.08&maxlon=38.08&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899692",
+"date": "1943-01-11 11:56:17.87",
+"mw": 5.46,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1943-01-11T11:51:17&endtime=1943-01-11T12:01:17&minlat=33.57&maxlat=39.57&minlon=24.59&maxlon=30.59",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1943-01-11T11:51:17&endtime=1943-01-11T12:01:17&minlat=33.57&maxlat=39.57&minlon=24.59&maxlon=30.59&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900095",
+"date": "1943-11-20 10:01:55.88",
+"mw": 5.84,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1943-11-20T09:56:55&endtime=1943-11-20T10:06:55&minlat=33.56&maxlat=39.56&minlon=25.68&maxlon=31.68",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1943-11-20T09:56:55&endtime=1943-11-20T10:06:55&minlat=33.56&maxlat=39.56&minlon=25.68&maxlon=31.68&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "900102",
+"date": "1943-11-26 22:20:48.56",
+"mw": 7.5,
+"s_mw": "d",
+"sinif": "1940-1962|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1943-11-26T22:15:48&endtime=1943-11-26T22:25:48&minlat=37.87&maxlat=43.87&minlon=30.65&maxlon=36.65",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1943-11-26T22:15:48&endtime=1943-11-26T22:25:48&minlat=37.87&maxlat=43.87&minlon=30.65&maxlon=36.65&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+7.5,
+"Mw",
+"P&S"
+]
+]
+},
+{
+"gem_id": "900112",
+"date": "1943-11-29 18:45:38.36",
+"mw": 5.79,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1943-11-29T18:40:38&endtime=1943-11-29T18:50:38&minlat=35.54&maxlat=41.54&minlon=38.48&maxlon=44.48",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1943-11-29T18:40:38&endtime=1943-11-29T18:50:38&minlat=35.54&maxlat=41.54&minlon=38.48&maxlon=44.48&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899257",
+"date": "1944-01-05 07:44:06.61",
+"mw": 5.7,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-01-05T07:39:06&endtime=1944-01-05T07:49:06&minlat=33.28&maxlat=39.28&minlon=24.80&maxlon=30.80",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-01-05T07:39:06&endtime=1944-01-05T07:49:06&minlat=33.28&maxlat=39.28&minlon=24.80&maxlon=30.80&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899281",
+"date": "1944-02-01 21:24:43.68",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-02-01T21:19:43&endtime=1944-02-01T21:29:43&minlat=37.73&maxlat=43.73&minlon=28.36&maxlon=34.36",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-02-01T21:19:43&endtime=1944-02-01T21:29:43&minlat=37.73&maxlat=43.73&minlon=28.36&maxlon=34.36&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899282",
+"date": "1944-02-02 03:33:14.73",
+"mw": 5.67,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-02-02T03:28:14&endtime=1944-02-02T03:38:14&minlat=37.55&maxlat=43.55&minlon=28.52&maxlon=34.52",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-02-02T03:28:14&endtime=1944-02-02T03:38:14&minlat=37.55&maxlat=43.55&minlon=28.52&maxlon=34.52&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899295",
+"date": "1944-02-10 12:05:24.56",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-02-10T12:00:24&endtime=1944-02-10T12:10:24&minlat=38.31&maxlat=44.31&minlon=29.95&maxlon=35.95",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-02-10T12:00:24&endtime=1944-02-10T12:10:24&minlat=38.31&maxlat=44.31&minlon=29.95&maxlon=35.95&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899351",
+"date": "1944-04-05 04:40:43.90",
+"mw": 5.65,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-04-05T04:35:43&endtime=1944-04-05T04:45:43&minlat=37.80&maxlat=43.80&minlon=28.15&maxlon=34.15",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-04-05T04:35:43&endtime=1944-04-05T04:45:43&minlat=37.80&maxlat=43.80&minlon=28.15&maxlon=34.15&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899440",
+"date": "1944-06-25 04:16:16.66",
+"mw": 6.07,
+"s_mw": "p",
+"sinif": "1940-1962|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-06-25T04:11:16&endtime=1944-06-25T04:21:16&minlat=35.90&maxlat=41.90&minlon=27.30&maxlon=33.30",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-06-25T04:11:16&endtime=1944-06-25T04:21:16&minlat=35.90&maxlat=41.90&minlon=27.30&maxlon=33.30&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899441",
+"date": "1944-06-25 06:57:47.75",
+"mw": 5.55,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-06-25T06:52:47&endtime=1944-06-25T07:02:47&minlat=35.84&maxlat=41.84&minlon=26.95&maxlon=32.95",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-06-25T06:52:47&endtime=1944-06-25T07:02:47&minlat=35.84&maxlat=41.84&minlon=26.95&maxlon=32.95&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899464",
+"date": "1944-07-17 10:53:49.16",
+"mw": 5.99,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-07-17T10:48:49&endtime=1944-07-17T10:58:49&minlat=33.02&maxlat=39.02&minlon=40.29&maxlon=46.29",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-07-17T10:48:49&endtime=1944-07-17T10:58:49&minlat=33.02&maxlat=39.02&minlon=40.29&maxlon=46.29&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899467",
+"date": "1944-07-20 10:37:29.37",
+"mw": 5.67,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-07-20T10:32:29&endtime=1944-07-20T10:42:29&minlat=32.74&maxlat=38.74&minlon=24.10&maxlon=30.10",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-07-20T10:32:29&endtime=1944-07-20T10:42:29&minlat=32.74&maxlat=38.74&minlon=24.10&maxlon=30.10&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899498",
+"date": "1944-08-09 17:36:25.47",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-08-09T17:31:25&endtime=1944-08-09T17:41:25&minlat=32.01&maxlat=38.01&minlon=23.19&maxlon=29.19",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-08-09T17:31:25&endtime=1944-08-09T17:41:25&minlat=32.01&maxlat=38.01&minlon=23.19&maxlon=29.19&minmagnitude=5.5",
+"B2_n": 1,
+"sonuc": "ISC M≥5,5 ile döndürüyor (EQ-Live çekiminde başka bir kayıp)",
+"B1_buyuklukler": [
+[
+5.5,
+"MS",
+"PAS"
+]
+]
+},
+{
+"gem_id": "899559",
+"date": "1944-09-30 04:13:18.95",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-09-30T04:08:18&endtime=1944-09-30T04:18:18&minlat=38.05&maxlat=44.05&minlon=31.64&maxlon=37.64",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-09-30T04:08:18&endtime=1944-09-30T04:18:18&minlat=38.05&maxlat=44.05&minlon=31.64&maxlon=37.64&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899571",
+"date": "1944-10-07 21:34:25.25",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-10-07T21:29:25&endtime=1944-10-07T21:39:25&minlat=36.18&maxlat=42.18&minlon=23.41&maxlon=29.41",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1944-10-07T21:29:25&endtime=1944-10-07T21:39:25&minlat=36.18&maxlat=42.18&minlon=23.41&maxlon=29.41&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898759",
+"date": "1945-01-15 05:30:11.14",
+"mw": 5.63,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-01-15T05:25:11&endtime=1945-01-15T05:35:11&minlat=35.43&maxlat=41.43&minlon=40.87&maxlon=46.87",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-01-15T05:25:11&endtime=1945-01-15T05:35:11&minlat=35.43&maxlat=41.43&minlon=40.87&maxlon=46.87&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898823",
+"date": "1945-03-02 10:39:45.43",
+"mw": 5.75,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-03-02T10:34:45&endtime=1945-03-02T10:44:45&minlat=38.37&maxlat=44.37&minlon=30.43&maxlon=36.43",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-03-02T10:34:45&endtime=1945-03-02T10:44:45&minlat=38.37&maxlat=44.37&minlon=30.43&maxlon=36.43&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898851",
+"date": "1945-03-20 07:58:52.30",
+"mw": 6.06,
+"s_mw": "p",
+"sinif": "1940-1962|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-03-20T07:53:52&endtime=1945-03-20T08:03:52&minlat=34.24&maxlat=40.24&minlon=32.86&maxlon=38.86",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-03-20T07:53:52&endtime=1945-03-20T08:03:52&minlat=34.24&maxlat=40.24&minlon=32.86&maxlon=38.86&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899161",
+"date": "1945-10-26 13:56:47.20",
+"mw": 6.13,
+"s_mw": "p",
+"sinif": "1940-1962|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-10-26T13:51:47&endtime=1945-10-26T14:01:47&minlat=38.41&maxlat=44.41&minlon=30.47&maxlon=36.47",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-10-26T13:51:47&endtime=1945-10-26T14:01:47&minlat=38.41&maxlat=44.41&minlon=30.47&maxlon=36.47&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "899203",
+"date": "1945-11-20 06:27:58.59",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-11-20T06:22:58&endtime=1945-11-20T06:32:58&minlat=35.53&maxlat=41.53&minlon=40.58&maxlon=46.58",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1945-11-20T06:22:58&endtime=1945-11-20T06:32:58&minlat=35.53&maxlat=41.53&minlon=40.58&maxlon=46.58&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898259",
+"date": "1946-02-21 15:43:07.76",
+"mw": 5.78,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-02-21T15:38:07&endtime=1946-02-21T15:48:07&minlat=35.21&maxlat=41.21&minlon=28.87&maxlon=34.87",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-02-21T15:38:07&endtime=1946-02-21T15:48:07&minlat=35.21&maxlat=41.21&minlon=28.87&maxlon=34.87&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898350",
+"date": "1946-04-12 07:36:55.26",
+"mw": 5.51,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-04-12T07:31:55&endtime=1946-04-12T07:41:55&minlat=33.31&maxlat=39.31&minlon=23.67&maxlon=29.67",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-04-12T07:31:55&endtime=1946-04-12T07:41:55&minlat=33.31&maxlat=39.31&minlon=23.67&maxlon=29.67&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898467",
+"date": "1946-07-16 05:26:30.96",
+"mw": 5.78,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-07-16T05:21:30&endtime=1946-07-16T05:31:30&minlat=30.88&maxlat=36.88&minlon=22.51&maxlon=28.51",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-07-16T05:21:30&endtime=1946-07-16T05:31:30&minlat=30.88&maxlat=36.88&minlon=22.51&maxlon=28.51&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898468",
+"date": "1946-07-16 19:45:27.20",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-07-16T19:40:27&endtime=1946-07-16T19:50:27&minlat=35.51&maxlat=41.51&minlon=28.13&maxlon=34.13",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-07-16T19:40:27&endtime=1946-07-16T19:50:27&minlat=35.51&maxlat=41.51&minlon=28.13&maxlon=34.13&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898626",
+"date": "1946-10-13 21:24:38.92",
+"mw": 5.67,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-10-13T21:19:38&endtime=1946-10-13T21:29:38&minlat=30.90&maxlat=36.90&minlon=23.01&maxlon=29.01",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1946-10-13T21:19:38&endtime=1946-10-13T21:29:38&minlat=30.90&maxlat=36.90&minlon=23.01&maxlon=29.01&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897787",
+"date": "1947-03-21 23:00:01.98",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-03-21T22:55:01&endtime=1947-03-21T23:05:01&minlat=31.81&maxlat=37.81&minlon=20.41&maxlon=26.41",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-03-21T22:55:01&endtime=1947-03-21T23:05:01&minlat=31.81&maxlat=37.81&minlon=20.41&maxlon=26.41&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897815",
+"date": "1947-04-12 14:05:14.35",
+"mw": 5.73,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-04-12T14:00:14&endtime=1947-04-12T14:10:14&minlat=36.59&maxlat=42.59&minlon=22.30&maxlon=28.30",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-04-12T14:00:14&endtime=1947-04-12T14:10:14&minlat=36.59&maxlat=42.59&minlon=22.30&maxlon=28.30&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897822",
+"date": "1947-04-19 17:39:10.18",
+"mw": 5.64,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-04-19T17:34:10&endtime=1947-04-19T17:44:10&minlat=34.37&maxlat=40.37&minlon=40.38&maxlon=46.38",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-04-19T17:34:10&endtime=1947-04-19T17:44:10&minlat=34.37&maxlat=40.37&minlon=40.38&maxlon=46.38&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897823",
+"date": "1947-04-19 20:29:39.29",
+"mw": 5.69,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-04-19T20:24:39&endtime=1947-04-19T20:34:39&minlat=35.84&maxlat=41.84&minlon=20.49&maxlon=26.49",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-04-19T20:24:39&endtime=1947-04-19T20:34:39&minlat=35.84&maxlat=41.84&minlon=20.49&maxlon=26.49&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897991",
+"date": "1947-08-15 04:11:07.45",
+"mw": 5.71,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-08-15T04:06:07&endtime=1947-08-15T04:16:07&minlat=39.73&maxlat=45.73&minlon=42.10&maxlon=48.10",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-08-15T04:06:07&endtime=1947-08-15T04:16:07&minlat=39.73&maxlat=45.73&minlon=42.10&maxlon=48.10&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898012",
+"date": "1947-08-30 22:21:37.53",
+"mw": 6.27,
+"s_mw": "p",
+"sinif": "1940-1962|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-08-30T22:16:37&endtime=1947-08-30T22:26:37&minlat=32.34&maxlat=38.34&minlon=20.38&maxlon=26.38",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-08-30T22:16:37&endtime=1947-08-30T22:26:37&minlat=32.34&maxlat=38.34&minlon=20.38&maxlon=26.38&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "898175",
+"date": "1947-12-09 23:40:01.52",
+"mw": 5.84,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-12-09T23:35:01&endtime=1947-12-09T23:45:01&minlat=33.51&maxlat=39.51&minlon=31.75&maxlon=37.75",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1947-12-09T23:35:01&endtime=1947-12-09T23:45:01&minlat=33.51&maxlat=39.51&minlon=31.75&maxlon=37.75&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897186",
+"date": "1948-02-10 15:58:54.92",
+"mw": 5.64,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-02-10T15:53:54&endtime=1948-02-10T16:03:54&minlat=32.36&maxlat=38.36&minlon=24.46&maxlon=30.46",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-02-10T15:53:54&endtime=1948-02-10T16:03:54&minlat=32.36&maxlat=38.36&minlon=24.46&maxlon=30.46&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897192",
+"date": "1948-02-12 22:27:15.13",
+"mw": 5.63,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-02-12T22:22:15&endtime=1948-02-12T22:32:15&minlat=32.84&maxlat=38.84&minlon=24.43&maxlon=30.43",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-02-12T22:22:15&endtime=1948-02-12T22:32:15&minlat=32.84&maxlat=38.84&minlon=24.43&maxlon=30.43&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897201",
+"date": "1948-02-15 17:54:58.11",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-02-15T17:49:58&endtime=1948-02-15T17:59:58&minlat=32.47&maxlat=38.47&minlon=24.48&maxlon=30.48",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-02-15T17:49:58&endtime=1948-02-15T17:59:58&minlat=32.47&maxlat=38.47&minlon=24.48&maxlon=30.48&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897226",
+"date": "1948-03-06 20:12:54.07",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-03-06T20:07:54&endtime=1948-03-06T20:17:54&minlat=32.09&maxlat=38.09&minlon=22.92&maxlon=28.92",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-03-06T20:07:54&endtime=1948-03-06T20:17:54&minlat=32.09&maxlat=38.09&minlon=22.92&maxlon=28.92&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897269",
+"date": "1948-03-29 02:32:55.70",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-03-29T02:27:55&endtime=1948-03-29T02:37:55&minlat=32.49&maxlat=38.49&minlon=24.12&maxlon=30.12",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-03-29T02:27:55&endtime=1948-03-29T02:37:55&minlat=32.49&maxlat=38.49&minlon=24.12&maxlon=30.12&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897270",
+"date": "1948-03-29 10:22:43.04",
+"mw": 5.81,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-03-29T10:17:43&endtime=1948-03-29T10:27:43&minlat=32.02&maxlat=38.02&minlon=20.23&maxlon=26.23",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-03-29T10:17:43&endtime=1948-03-29T10:27:43&minlat=32.02&maxlat=38.02&minlon=20.23&maxlon=26.23&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897462",
+"date": "1948-07-24 06:03:10.07",
+"mw": 6.43,
+"s_mw": "p",
+"sinif": "1940-1962|>=6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-07-24T05:58:10&endtime=1948-07-24T06:08:10&minlat=31.76&maxlat=37.76&minlon=21.58&maxlon=27.58",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-07-24T05:58:10&endtime=1948-07-24T06:08:10&minlat=31.76&maxlat=37.76&minlon=21.58&maxlon=27.58&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897559",
+"date": "1948-09-20 17:59:53.23",
+"mw": 5.49,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-09-20T17:54:53&endtime=1948-09-20T18:04:53&minlat=31.37&maxlat=37.37&minlon=23.50&maxlon=29.50",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-09-20T17:54:53&endtime=1948-09-20T18:04:53&minlat=31.37&maxlat=37.37&minlon=23.50&maxlon=29.50&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897590",
+"date": "1948-10-10 17:43:05.85",
+"mw": 5.79,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-10-10T17:38:05&endtime=1948-10-10T17:48:05&minlat=32.22&maxlat=38.22&minlon=20.52&maxlon=26.52",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-10-10T17:38:05&endtime=1948-10-10T17:48:05&minlat=32.22&maxlat=38.22&minlon=20.52&maxlon=26.52&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897601",
+"date": "1948-10-18 08:59:57.41",
+"mw": 5.68,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-10-18T08:54:57&endtime=1948-10-18T09:04:57&minlat=32.61&maxlat=38.61&minlon=24.30&maxlon=30.30",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-10-18T08:54:57&endtime=1948-10-18T09:04:57&minlat=32.61&maxlat=38.61&minlon=24.30&maxlon=30.30&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897602",
+"date": "1948-10-19 03:04:33.35",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-10-19T02:59:33&endtime=1948-10-19T03:09:33&minlat=32.38&maxlat=38.38&minlon=24.35&maxlon=30.35",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-10-19T02:59:33&endtime=1948-10-19T03:09:33&minlat=32.38&maxlat=38.38&minlon=24.35&maxlon=30.35&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897633",
+"date": "1948-11-13 04:44:49.71",
+"mw": 5.73,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-11-13T04:39:49&endtime=1948-11-13T04:49:49&minlat=37.31&maxlat=43.31&minlon=25.81&maxlon=31.81",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1948-11-13T04:39:49&endtime=1948-11-13T04:49:49&minlat=37.31&maxlat=43.31&minlon=25.81&maxlon=31.81&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "896274",
+"date": "1949-01-14 15:53:58.88",
+"mw": 5.84,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-01-14T15:48:58&endtime=1949-01-14T15:58:58&minlat=35.56&maxlat=41.56&minlon=22.06&maxlon=28.06",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-01-14T15:48:58&endtime=1949-01-14T15:58:58&minlat=35.56&maxlat=41.56&minlon=22.06&maxlon=28.06&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "896311",
+"date": "1949-02-05 00:28:19.71",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-02-05T00:23:19&endtime=1949-02-05T00:33:19&minlat=36.83&maxlat=42.83&minlon=26.56&maxlon=32.56",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-02-05T00:23:19&endtime=1949-02-05T00:33:19&minlat=36.83&maxlat=42.83&minlon=26.56&maxlon=32.56&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "896487",
+"date": "1949-04-25 23:09:12.11",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-04-25T23:04:12&endtime=1949-04-25T23:14:12&minlat=34.91&maxlat=40.91&minlon=36.23&maxlon=42.23",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-04-25T23:04:12&endtime=1949-04-25T23:14:12&minlat=34.91&maxlat=40.91&minlon=36.23&maxlon=42.23&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "896529",
+"date": "1949-05-13 20:14:06.44",
+"mw": 5.51,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-05-13T20:09:06&endtime=1949-05-13T20:19:06&minlat=37.93&maxlat=43.93&minlon=29.68&maxlon=35.68",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-05-13T20:09:06&endtime=1949-05-13T20:19:06&minlat=37.93&maxlat=43.93&minlon=29.68&maxlon=35.68&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "896774",
+"date": "1949-08-17 20:45:26.03",
+"mw": 5.51,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-08-17T20:40:26&endtime=1949-08-17T20:50:26&minlat=36.22&maxlat=42.22&minlon=37.72&maxlon=43.72",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-08-17T20:40:26&endtime=1949-08-17T20:50:26&minlat=36.22&maxlat=42.22&minlon=37.72&maxlon=43.72&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "897043",
+"date": "1949-11-23 16:50:59.51",
+"mw": 5.59,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-11-23T16:45:59&endtime=1949-11-23T16:55:59&minlat=35.43&maxlat=41.43&minlon=23.38&maxlon=29.38",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1949-11-23T16:45:59&endtime=1949-11-23T16:55:59&minlat=35.43&maxlat=41.43&minlon=23.38&maxlon=29.38&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "895416",
+"date": "1950-05-09 09:20:03.91",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1950-05-09T09:15:03&endtime=1950-05-09T09:25:03&minlat=35.04&maxlat=41.04&minlon=35.52&maxlon=41.52",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1950-05-09T09:15:03&endtime=1950-05-09T09:25:03&minlat=35.04&maxlat=41.04&minlon=35.52&maxlon=41.52&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+4.9,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "895856",
+"date": "1950-09-23 06:23:46.60",
+"mw": 5.46,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1950-09-23T06:18:46&endtime=1950-09-23T06:28:46&minlat=31.68&maxlat=37.68&minlon=22.73&maxlon=28.73",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1950-09-23T06:18:46&endtime=1950-09-23T06:28:46&minlat=31.68&maxlat=37.68&minlon=22.73&maxlon=28.73&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "894701",
+"date": "1951-09-15 22:52:11.22",
+"mw": 5.46,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1951-09-15T22:47:11&endtime=1951-09-15T22:57:11&minlat=37.11&maxlat=43.11&minlon=24.90&maxlon=30.90",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1951-09-15T22:47:11&endtime=1951-09-15T22:57:11&minlat=37.11&maxlat=43.11&minlon=24.90&maxlon=30.90&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.15,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "895034",
+"date": "1951-12-13 20:46:06.72",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1951-12-13T20:41:06&endtime=1951-12-13T20:51:06&minlat=37.01&maxlat=43.01&minlon=21.99&maxlon=27.99",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1951-12-13T20:41:06&endtime=1951-12-13T20:51:06&minlat=37.01&maxlat=43.01&minlon=21.99&maxlon=27.99&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.1,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "893546",
+"date": "1952-10-13 16:42:31.94",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1952-10-13T16:37:31&endtime=1952-10-13T16:47:31&minlat=35.97&maxlat=41.97&minlon=20.24&maxlon=26.24",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1952-10-13T16:37:31&endtime=1952-10-13T16:47:31&minlat=35.97&maxlat=41.97&minlon=20.24&maxlon=26.24&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.12,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "893584",
+"date": "1952-10-22 04:14:56.00",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1952-10-22T04:09:56&endtime=1952-10-22T04:19:56&minlat=33.39&maxlat=39.39&minlon=24.77&maxlon=30.77",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1952-10-22T04:09:56&endtime=1952-10-22T04:19:56&minlat=33.39&maxlat=39.39&minlon=24.77&maxlon=30.77&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.5,
+"M",
+"UPP"
+]
+]
+},
+{
+"gem_id": "893586",
+"date": "1952-10-22 17:00:41.86",
+"mw": 5.66,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1952-10-22T16:55:41&endtime=1952-10-22T17:05:41&minlat=33.84&maxlat=39.84&minlon=32.50&maxlon=38.50",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1952-10-22T16:55:41&endtime=1952-10-22T17:05:41&minlat=33.84&maxlat=39.84&minlon=32.50&maxlon=38.50&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.36,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "891486",
+"date": "1953-02-07 22:31:09.65",
+"mw": 5.55,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-02-07T22:26:09&endtime=1953-02-07T22:36:09&minlat=31.73&maxlat=37.73&minlon=21.13&maxlon=27.13",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-02-07T22:26:09&endtime=1953-02-07T22:36:09&minlat=31.73&maxlat=37.73&minlon=21.13&maxlon=27.13&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.12,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "891564",
+"date": "1953-03-18 21:18:08.75",
+"mw": 5.49,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-03-18T21:13:08&endtime=1953-03-18T21:23:08&minlat=36.82&maxlat=42.82&minlon=24.55&maxlon=30.55",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-03-18T21:13:08&endtime=1953-03-18T21:23:08&minlat=36.82&maxlat=42.82&minlon=24.55&maxlon=30.55&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+null,
+"",
+""
+]
+]
+},
+{
+"gem_id": "891583",
+"date": "1953-03-24 21:17:36.28",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-03-24T21:12:36&endtime=1953-03-24T21:22:36&minlat=33.85&maxlat=39.85&minlon=33.97&maxlon=39.97",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-03-24T21:12:36&endtime=1953-03-24T21:22:36&minlat=33.85&maxlat=39.85&minlon=33.97&maxlon=39.97&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+4.93,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "891649",
+"date": "1953-05-02 05:41:55.81",
+"mw": 5.51,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-05-02T05:36:55&endtime=1953-05-02T05:46:55&minlat=35.32&maxlat=41.32&minlon=23.21&maxlon=29.21",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-05-02T05:36:55&endtime=1953-05-02T05:46:55&minlat=35.32&maxlat=41.32&minlon=23.21&maxlon=29.21&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.5,
+"M",
+"ATH"
+]
+]
+},
+{
+"gem_id": "891652",
+"date": "1953-05-02 18:37:40.46",
+"mw": 5.51,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-05-02T18:32:40&endtime=1953-05-02T18:42:40&minlat=35.46&maxlat=41.46&minlon=23.62&maxlon=29.62",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-05-02T18:32:40&endtime=1953-05-02T18:42:40&minlat=35.46&maxlat=41.46&minlon=23.62&maxlon=29.62&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.17,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "891762",
+"date": "1953-06-18 05:44:12.71",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-06-18T05:39:12&endtime=1953-06-18T05:49:12&minlat=38.77&maxlat=44.77&minlon=23.64&maxlon=29.64",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-06-18T05:39:12&endtime=1953-06-18T05:49:12&minlat=38.77&maxlat=44.77&minlon=23.64&maxlon=29.64&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.13,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "891841",
+"date": "1953-07-22 15:09:36.31",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-07-22T15:04:36&endtime=1953-07-22T15:14:36&minlat=36.12&maxlat=42.12&minlon=25.59&maxlon=31.59",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1953-07-22T15:04:36&endtime=1953-07-22T15:14:36&minlat=36.12&maxlat=42.12&minlon=25.59&maxlon=31.59&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.31,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "890595",
+"date": "1954-05-01 20:53:28.07",
+"mw": 5.55,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1954-05-01T20:48:28&endtime=1954-05-01T20:58:28&minlat=34.73&maxlat=40.73&minlon=24.14&maxlon=30.14",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1954-05-01T20:48:28&endtime=1954-05-01T20:58:28&minlat=34.73&maxlat=40.73&minlon=24.14&maxlon=30.14&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.32,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "891213",
+"date": "1954-10-30 23:43:33.12",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1954-10-30T23:38:33&endtime=1954-10-30T23:48:33&minlat=37.31&maxlat=43.31&minlon=43.02&maxlon=49.02",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1954-10-30T23:38:33&endtime=1954-10-30T23:48:33&minlat=37.31&maxlat=43.31&minlon=43.02&maxlon=49.02&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+6.0,
+"M",
+"JER"
+]
+]
+},
+{
+"gem_id": "889454",
+"date": "1955-04-22 10:02:25.84",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1955-04-22T09:57:25&endtime=1955-04-22T10:07:25&minlat=31.38&maxlat=37.38&minlon=20.95&maxlon=26.95",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1955-04-22T09:57:25&endtime=1955-04-22T10:07:25&minlat=31.38&maxlat=37.38&minlon=20.95&maxlon=26.95&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+4.85,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "889598",
+"date": "1955-06-02 23:34:38.56",
+"mw": 5.59,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1955-06-02T23:29:38&endtime=1955-06-02T23:39:38&minlat=37.27&maxlat=43.27&minlon=22.65&maxlon=28.65",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1955-06-02T23:29:38&endtime=1955-06-02T23:39:38&minlat=37.27&maxlat=43.27&minlon=22.65&maxlon=28.65&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.2,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "889865",
+"date": "1955-08-28 13:39:22.58",
+"mw": 5.62,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1955-08-28T13:34:22&endtime=1955-08-28T13:44:22&minlat=34.33&maxlat=40.33&minlon=24.18&maxlon=30.18",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1955-08-28T13:34:22&endtime=1955-08-28T13:44:22&minlat=34.33&maxlat=40.33&minlon=24.18&maxlon=30.18&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.1,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "888080",
+"date": "1956-03-16 19:43:31.23",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-03-16T19:38:31&endtime=1956-03-16T19:48:31&minlat=30.69&maxlat=36.69&minlon=32.81&maxlon=38.81",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-03-16T19:38:31&endtime=1956-03-16T19:48:31&minlat=30.69&maxlat=36.69&minlon=32.81&maxlon=38.81&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.13,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "888415",
+"date": "1956-06-30 01:50:24.40",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-06-30T01:45:24&endtime=1956-06-30T01:55:24&minlat=40.47&maxlat=46.47&minlon=25.96&maxlon=31.96",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-06-30T01:45:24&endtime=1956-06-30T01:55:24&minlat=40.47&maxlat=46.47&minlon=25.96&maxlon=31.96&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.2,
+"M",
+"HRB"
+]
+]
+},
+{
+"gem_id": "888451",
+"date": "1956-07-09 06:22:49.99",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-07-09T06:17:49&endtime=1956-07-09T06:27:49&minlat=33.62&maxlat=39.62&minlon=22.79&maxlon=28.79",
+"B1_n": 2,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-07-09T06:17:49&endtime=1956-07-09T06:27:49&minlat=33.62&maxlat=39.62&minlon=22.79&maxlon=28.79&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.5,
+"M",
+"ATH"
+],
+[
+5.75,
+"M",
+"ATH"
+]
+]
+},
+{
+"gem_id": "888457",
+"date": "1956-07-09 20:13:57.29",
+"mw": 5.5,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-07-09T20:08:57&endtime=1956-07-09T20:18:57&minlat=33.83&maxlat=39.83&minlon=23.16&maxlon=29.16",
+"B1_n": 2,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-07-09T20:08:57&endtime=1956-07-09T20:18:57&minlat=33.83&maxlat=39.83&minlon=23.16&maxlon=29.16&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.0,
+"M",
+"ATH"
+],
+[
+5.1,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "888463",
+"date": "1956-07-10 03:01:29.24",
+"mw": 5.65,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-07-10T02:56:29&endtime=1956-07-10T03:06:29&minlat=33.69&maxlat=39.69&minlon=23.21&maxlon=29.21",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-07-10T02:56:29&endtime=1956-07-10T03:06:29&minlat=33.69&maxlat=39.69&minlon=23.21&maxlon=29.21&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.42,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "888539",
+"date": "1956-07-30 10:40:00.61",
+"mw": 5.67,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-07-30T10:35:00&endtime=1956-07-30T10:45:00&minlat=33.00&maxlat=39.00&minlon=22.92&maxlon=28.92",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-07-30T10:35:00&endtime=1956-07-30T10:45:00&minlat=33.00&maxlat=39.00&minlon=22.92&maxlon=28.92&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.25,
+"M",
+"HRB"
+]
+]
+},
+{
+"gem_id": "888699",
+"date": "1956-09-16 18:07:38.44",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-09-16T18:02:38&endtime=1956-09-16T18:12:38&minlat=32.52&maxlat=38.52&minlon=22.78&maxlon=28.78",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-09-16T18:02:38&endtime=1956-09-16T18:12:38&minlat=32.52&maxlat=38.52&minlon=22.78&maxlon=28.78&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+4.89,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "888863",
+"date": "1956-11-02 16:04:36.28",
+"mw": 5.55,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-11-02T15:59:36&endtime=1956-11-02T16:09:36&minlat=36.27&maxlat=42.27&minlon=20.17&maxlon=26.17",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-11-02T15:59:36&endtime=1956-11-02T16:09:36&minlat=36.27&maxlat=42.27&minlon=20.17&maxlon=26.17&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.22,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "888929",
+"date": "1956-11-20 23:20:55.60",
+"mw": 5.58,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-11-20T23:15:55&endtime=1956-11-20T23:25:55&minlat=36.27&maxlat=42.27&minlon=23.18&maxlon=29.18",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1956-11-20T23:15:55&endtime=1956-11-20T23:25:55&minlat=36.27&maxlat=42.27&minlon=23.18&maxlon=29.18&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.21,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "885880",
+"date": "1957-01-26 16:30:50.90",
+"mw": 5.61,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-01-26T16:25:50&endtime=1957-01-26T16:35:50&minlat=39.52&maxlat=45.52&minlon=39.35&maxlon=45.35",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-01-26T16:25:50&endtime=1957-01-26T16:35:50&minlat=39.52&maxlat=45.52&minlon=39.35&maxlon=45.35&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.0,
+"M",
+"MOS"
+]
+]
+},
+{
+"gem_id": "886202",
+"date": "1957-03-18 23:17:28.93",
+"mw": 5.48,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-03-18T23:12:28&endtime=1957-03-18T23:22:28&minlat=41.56&maxlat=47.56&minlon=30.16&maxlon=36.16",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-03-18T23:12:28&endtime=1957-03-18T23:22:28&minlat=41.56&maxlat=47.56&minlon=30.16&maxlon=36.16&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.33,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "886603",
+"date": "1957-05-26 08:54:49.38",
+"mw": 5.58,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-05-26T08:49:49&endtime=1957-05-26T08:59:49&minlat=37.64&maxlat=43.64&minlon=27.85&maxlon=33.85",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-05-26T08:49:49&endtime=1957-05-26T08:59:49&minlat=37.64&maxlat=43.64&minlon=27.85&maxlon=33.85&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.24,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "886644",
+"date": "1957-06-01 05:26:55.86",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-06-01T05:21:55&endtime=1957-06-01T05:31:55&minlat=37.77&maxlat=43.77&minlon=27.98&maxlon=33.98",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-06-01T05:21:55&endtime=1957-06-01T05:31:55&minlat=37.77&maxlat=43.77&minlon=27.98&maxlon=33.98&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.0,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "886808",
+"date": "1957-07-07 05:58:52.79",
+"mw": 5.52,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-07-07T05:53:52&endtime=1957-07-07T06:03:52&minlat=36.07&maxlat=42.07&minlon=37.41&maxlon=43.41",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1957-07-07T05:53:52&endtime=1957-07-07T06:03:52&minlat=36.07&maxlat=42.07&minlon=37.41&maxlon=43.41&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.14,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "883703",
+"date": "1958-01-16 04:18:19.05",
+"mw": 5.63,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-01-16T04:13:19&endtime=1958-01-16T04:23:19&minlat=36.48&maxlat=42.48&minlon=22.47&maxlon=28.47",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-01-16T04:13:19&endtime=1958-01-16T04:23:19&minlat=36.48&maxlat=42.48&minlon=22.47&maxlon=28.47&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.29,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "884107",
+"date": "1958-04-03 07:18:37.51",
+"mw": 5.54,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-04-03T07:13:37&endtime=1958-04-03T07:23:37&minlat=31.90&maxlat=37.90&minlon=24.52&maxlon=30.52",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-04-03T07:13:37&endtime=1958-04-03T07:23:37&minlat=31.90&maxlat=37.90&minlon=24.52&maxlon=30.52&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.32,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "884317",
+"date": "1958-05-05 05:21:34.45",
+"mw": 5.53,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-05-05T05:16:34&endtime=1958-05-05T05:26:34&minlat=32.64&maxlat=38.64&minlon=41.67&maxlon=47.67",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-05-05T05:16:34&endtime=1958-05-05T05:26:34&minlat=32.64&maxlat=38.64&minlon=41.67&maxlon=47.67&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.14,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "884322",
+"date": "1958-05-06 04:15:48.47",
+"mw": 5.59,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-05-06T04:10:48&endtime=1958-05-06T04:20:48&minlat=40.07&maxlat=46.07&minlon=44.79&maxlon=50.79",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-05-06T04:10:48&endtime=1958-05-06T04:20:48&minlat=40.07&maxlat=46.07&minlon=44.79&maxlon=50.79&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+4.7,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "884337",
+"date": "1958-05-09 02:40:52.05",
+"mw": 5.65,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-05-09T02:35:52&endtime=1958-05-09T02:45:52&minlat=33.51&maxlat=39.51&minlon=24.70&maxlon=30.70",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-05-09T02:35:52&endtime=1958-05-09T02:45:52&minlat=33.51&maxlat=39.51&minlon=24.70&maxlon=30.70&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.42,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "885722",
+"date": "1958-12-19 03:27:30.51",
+"mw": 5.47,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-12-19T03:22:30&endtime=1958-12-19T03:32:30&minlat=34.75&maxlat=40.75&minlon=26.46&maxlon=32.46",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1958-12-19T03:22:30&endtime=1958-12-19T03:32:30&minlat=34.75&maxlat=40.75&minlon=26.46&maxlon=32.46&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+4.55,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "881861",
+"date": "1959-04-25 01:05:44.13",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-04-25T01:00:44&endtime=1959-04-25T01:10:44&minlat=33.97&maxlat=39.97&minlon=25.71&maxlon=31.71",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-04-25T01:00:44&endtime=1959-04-25T01:10:44&minlat=33.97&maxlat=39.97&minlon=25.71&maxlon=31.71&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.12,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "882062",
+"date": "1959-05-20 19:49:16.63",
+"mw": 5.51,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-05-20T19:44:16&endtime=1959-05-20T19:54:16&minlat=38.90&maxlat=44.90&minlon=39.00&maxlon=45.00",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-05-20T19:44:16&endtime=1959-05-20T19:54:16&minlat=38.90&maxlat=44.90&minlon=39.00&maxlon=45.00&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.1,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "882528",
+"date": "1959-07-26 17:07:05.63",
+"mw": 5.45,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-07-26T17:02:05&endtime=1959-07-26T17:12:05&minlat=37.78&maxlat=43.78&minlon=24.71&maxlon=30.71",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-07-26T17:02:05&endtime=1959-07-26T17:12:05&minlat=37.78&maxlat=43.78&minlon=24.71&maxlon=30.71&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.14,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "883166",
+"date": "1959-10-25 15:57:55.82",
+"mw": 5.44,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-10-25T15:52:55&endtime=1959-10-25T16:02:55&minlat=36.18&maxlat=42.18&minlon=38.60&maxlon=44.60",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-10-25T15:52:55&endtime=1959-10-25T16:02:55&minlat=36.18&maxlat=42.18&minlon=38.60&maxlon=44.60&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.07,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "883310",
+"date": "1959-11-19 14:00:31.85",
+"mw": 5.52,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-11-19T13:55:31&endtime=1959-11-19T14:05:31&minlat=35.82&maxlat=41.82&minlon=23.61&maxlon=29.61",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1959-11-19T13:55:31&endtime=1959-11-19T14:05:31&minlat=35.82&maxlat=41.82&minlon=23.61&maxlon=29.61&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.16,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "878165",
+"date": "1960-02-01 11:59:45.52",
+"mw": 5.49,
+"s_mw": "p",
+"sinif": "1940-1962|5.0-5.5",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1960-02-01T11:54:45&endtime=1960-02-01T12:04:45&minlat=32.19&maxlat=38.19&minlon=20.04&maxlon=26.04",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1960-02-01T11:54:45&endtime=1960-02-01T12:04:45&minlat=32.19&maxlat=38.19&minlon=20.04&maxlon=26.04&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.5,
+"M",
+"ATH"
+]
+]
+},
+{
+"gem_id": "879788",
+"date": "1960-07-13 13:01:04.38",
+"mw": 5.58,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1960-07-13T12:56:04&endtime=1960-07-13T13:06:04&minlat=37.61&maxlat=43.61&minlon=20.41&maxlon=26.41",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1960-07-13T12:56:04&endtime=1960-07-13T13:06:04&minlat=37.61&maxlat=43.61&minlon=20.41&maxlon=26.41&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.27,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "874645",
+"date": "1962-04-28 11:19:03.06",
+"mw": 5.81,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1962-04-28T11:14:03&endtime=1962-04-28T11:24:03&minlat=33.02&maxlat=39.02&minlon=23.86&maxlon=29.86",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1962-04-28T11:14:03&endtime=1962-04-28T11:24:03&minlat=33.02&maxlat=39.02&minlon=23.86&maxlon=29.86&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.9,
+"M",
+"UPP"
+]
+]
+},
+{
+"gem_id": "874646",
+"date": "1962-04-28 12:43:52.29",
+"mw": 5.6,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1962-04-28T12:38:52&endtime=1962-04-28T12:48:52&minlat=32.98&maxlat=38.98&minlon=23.75&maxlon=29.75",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1962-04-28T12:38:52&endtime=1962-04-28T12:48:52&minlat=32.98&maxlat=38.98&minlon=23.75&maxlon=29.75&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.26,
+"MS",
+"ISC"
+]
+]
+},
+{
+"gem_id": "875315",
+"date": "1962-09-10 09:36:25.21",
+"mw": 5.58,
+"s_mw": "p",
+"sinif": "1940-1962|5.5-6.0",
+"B1_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1962-09-10T09:31:25&endtime=1962-09-10T09:41:25&minlat=31.59&maxlat=37.59&minlon=23.78&maxlon=29.78",
+"B1_n": 1,
+"B2_url": "http://www.isc.ac.uk/fdsnws/event/1/query?format=text&starttime=1962-09-10T09:31:25&endtime=1962-09-10T09:41:25&minlat=31.59&maxlat=37.59&minlon=23.78&maxlon=29.78&minmagnitude=5.5",
+"B2_n": 0,
+"sonuc": "ISC var, M≥5,5 süzgecinde yok (büyüklük süzgeci)",
+"B1_buyuklukler": [
+[
+5.32,
+"MS",
+"ISC"
+]
+]
+}
+]
