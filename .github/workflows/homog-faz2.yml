@@ -1,0 +1,22 @@
+name: Homogenization phase 2a (ISC 1904-1962 without magnitude filter, analysis only)
+on:
+  push:
+    branches: [homog-faz0]
+    paths: ['analysis/homog_faz2/fetch_isc_nofilter.py', '.github/workflows/homog-faz2.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    if: github.ref == 'refs/heads/homog-faz0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: python analysis/homog_faz2/fetch_isc_nofilter.py
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add analysis/homog_faz2/out; git diff --cached --quiet && exit 0
+          git commit -m "Faz 2a: süzgeçsiz ISC 1904–1962 ($(date -u +%Y-%m-%dT%H:%MZ))"; git pull --rebase origin homog-faz0; git push origin HEAD:homog-faz0
