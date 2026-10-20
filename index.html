@@ -1153,7 +1153,7 @@
       <div style="display:flex;gap:18px;flex-wrap:wrap;">
         <div style="min-width:150px;"><div style="color:#94a3b8;font-size:.92em;margin-bottom:1px;">1. sütun</div><label style="cursor:pointer;display:block;"><input type="checkbox" id="pcIntro" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Giriş</label><label style="cursor:pointer;display:block;"><input type="checkbox" id="pcMap" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Çalışma Alanı (harita)</label><label style="cursor:pointer;display:block;" title="Benioff ya da AMR seçiliyse 1. sütunda, değilse 2. sütunun üstünde"><input type="checkbox" id="pcTM" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Zaman–Büyüklük Dağılımı</label><label style="cursor:pointer;display:block;"><input type="checkbox" id="pcMeth" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Veri ve Yöntem</label></div>
         <div style="min-width:150px;"><div style="color:#94a3b8;font-size:.92em;margin-bottom:1px;">2. sütun (Şekil 3, alt alta hizalı)</div><label style="cursor:pointer;display:block;"><input type="checkbox" id="pcBt" checked onchange="posterCompChanged()" style="vertical-align:middle;"> b(t) — b-değerinin zamanla değişimi</label><label style="cursor:pointer;display:block;" title="Yalnızca Benioff paneli çizilmişse kullanılır"><input type="checkbox" id="pcBen" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Benioff gerinimi</label><label style="cursor:pointer;display:block;" title="Yalnızca AMR testi çalıştırılıp şekli çizilmişse kullanılır; varsayılan kapalı"><input type="checkbox" id="pcAmr" onchange="posterCompChanged()" style="vertical-align:middle;"> AMR (deneysel)</label></div>
-        <div style="min-width:150px;"><div style="color:#94a3b8;font-size:.92em;margin-bottom:1px;">3. sütun</div><label style="cursor:pointer;display:block;"><input type="checkbox" id="pcGR" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Gutenberg–Richter Dağılımı</label><label style="cursor:pointer;display:block;"><input type="checkbox" id="pcRes" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Sonuçlar</label></div>
+        <div style="min-width:150px;"><div style="color:#94a3b8;font-size:.92em;margin-bottom:1px;">3. sütun</div><label style="cursor:pointer;display:block;"><input type="checkbox" id="pcGR" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Gutenberg–Richter Dağılımı</label><label style="cursor:pointer;display:block;" title="G–R kutusunun yerine bölge karşılaştırması (G–R panelinin altındaki listeden; en az 2 bölge). Harita tüm bölgeleri gösterir."><input type="checkbox" id="pcCmp" onchange="posterCompChanged()" style="vertical-align:middle;"> Bölge karşılaştırması (G–R yerine)</label><label style="cursor:pointer;display:block;"><input type="checkbox" id="pcRes" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Sonuçlar</label></div>
         <div style="min-width:150px;"><div style="color:#94a3b8;font-size:.92em;margin-bottom:1px;">Alt şerit</div><label style="cursor:pointer;display:block;" title="Çıkarılırsa teşekkür sayfa altında tek satır olarak kalır; 1.–2. sütun uzar"><input type="checkbox" id="pcRefs" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Kaynaklar (+ teşekkür)</label><label style="cursor:pointer;display:block;" title="Çıkarılırsa 3. sütun sayfa altına uzar"><input type="checkbox" id="pcQr" checked onchange="posterCompChanged()" style="vertical-align:middle;"> Daha Fazla Bilgi (QR)</label></div>
       </div>
     </div>
@@ -3140,7 +3140,11 @@ function cmpAdd() {
   const types = {}; ev.forEach(e => { const k = (e.mtype || e.magType || '?').toString().toLowerCase(); types[k] = (types[k] || 0) + 1; });
   const nm = document.getElementById('cmpName').value.trim() || (document.getElementById('posterRegion')?.value.trim()) || `Bölge ${CMP.length + 1}`;
   CMP.push({ name: nm, src: regionSourceLabel(), shape: regionShapeText(), area: regionAreaKm2(), cLat, t0, t1, Mc, dm,
-    mags: ev.map(e => Math.round((e.mw ?? e.mag) * 100) / 100), types, url: location.href, added: new Date().toISOString() });
+    mags: ev.map(e => Math.round((e.mw ?? e.mag) * 100) / 100), types, url: location.href, added: new Date().toISOString(),
+    pts: ev.filter(e => isFinite(e.lat) && isFinite(e.lon)).map(e => [Math.round(e.lat * 1e3) / 1e3, Math.round(e.lon * 1e3) / 1e3, Math.round((e.mw ?? e.mag) * 100) / 100]),
+    geom: !regionRect ? null : regionIsCircle && regionCircleCenter ? { k: 'c', lat: regionCircleCenter.lat, lon: regionCircleCenter.lon, R: regionCircleRadiusKm }
+      : regionIsPolygon ? { k: 'p', ring: regionRect.getLatLngs()[0].map(ll => [ll.lat, ll.lng]) }
+      : (B => ({ k: 'r', S: B.getSouth(), N: B.getNorth(), W: B.getWest(), E: B.getEast() }))(regionRect.getBounds()) });
   document.getElementById('cmpName').value = '';
   cmpSave(); cmpRender();
 }
@@ -3177,13 +3181,13 @@ function cmpRender() {
   const y0 = Math.floor(Math.min(...all.map(p => p.y))), y1 = Math.ceil(Math.max(...all.map(p => p.y)));
   const X = m => L + (m - xm0) / (xm1 - xm0) * pw, Y = v => Tp + (y1 - v) / Math.max(1e-9, y1 - y0) * ph;
   let g = `<rect x="${L}" y="${Tp}" width="${pw}" height="${ph}" fill="none" stroke="#555"/>`;
-  for (let v = y0; v <= y1; v++) g += `<line x1="${L}" x2="${L + pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="#333" stroke-dasharray="2 3"/><text x="${L - 5}" y="${Y(v) + 3}" fill="#aaa" font-size="10" text-anchor="end">10<tspan dy="-4" font-size="8">${v}</tspan></text>`;
+  for (let v = y0; v <= y1; v++) g += `<line x1="${L}" x2="${L + pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="#475569" stroke-dasharray="2 3"/><text x="${L - 5}" y="${Y(v) + 3}" fill="#aaa" font-size="10" text-anchor="end">10<tspan dy="-4" font-size="8">${v}</tspan></text>`;
   for (let m = Math.ceil(xm0); m <= xm1; m++) g += `<text x="${X(m)}" y="${Tp + ph + 14}" fill="#aaa" font-size="10" text-anchor="middle">${m}</text>`;
   g += `<text x="${L + pw / 2}" y="${H - 6}" fill="#aaa" font-size="10" text-anchor="middle">Büyüklük M</text><text transform="translate(12 ${Tp + ph / 2}) rotate(-90)" fill="#aaa" font-size="10" text-anchor="middle">N(≥M) ${uLab}</text>`;
   CMP.forEach((r, i) => { const c = CMP_COL[i], s = S[i];
     pts[i].forEach(p => { g += `<circle cx="${X(p.m).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="2.6" fill="${p.inFit ? c : 'none'}" stroke="${c}" stroke-width="1"/>`; });
-    if (s.b && s.a !== null) { const ma = r.Mc, mb = Math.max(s.Mmax, r.Mc + 0.5); g += `<line x1="${X(ma)}" y1="${Y(s.a - s.b * ma)}" x2="${X(mb)}" y2="${Y(s.a - s.b * mb)}" stroke="${c}" stroke-dasharray="5 3" stroke-width="1.4"/>`; }
-    g += `<rect x="${L + pw - 150}" y="${Tp + 6 + i * 14}" width="9" height="9" fill="${c}"/><text x="${L + pw - 137}" y="${Tp + 14 + i * 14}" fill="#ddd" font-size="10">${r.name.replace(/</g, '&lt;').slice(0, 24)}</text>`; });
+    if (s.b && s.a !== null) { const ma = r.Mc, mb = Math.min(Math.max(s.Mmax, r.Mc + 0.5), (s.a - y0) / s.b, xm1); g += `<line x1="${X(ma)}" y1="${Y(s.a - s.b * ma)}" x2="${X(mb)}" y2="${Y(s.a - s.b * mb)}" stroke="${c}" stroke-dasharray="5 3" stroke-width="1.4"/>`; }
+    g += `<rect x="${L + pw - 150}" y="${Tp + 6 + i * 14}" width="9" height="9" fill="${c}"/><text x="${L + pw - 137}" y="${Tp + 14 + i * 14}" fill="#e2e8f0" font-size="10">${r.name.replace(/</g, '&lt;').slice(0, 24)}</text>`; });
   svg.innerHTML = g; svg.style.display = 'block';
   // — tablo
   const f = (v, d = 2) => v === null || v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(d);
@@ -3582,7 +3586,7 @@ function tmSelectPoint(t, m) {
 ══════════════════════════════════════════ */
 const POSTER_KEYS = ['posterBasemap', 'posterRegion', 'posterTitle', 'posterEvent', 'posterAuthor', 'posterAffil', 'posterResults', 'posterMessage', 'posterContact', 'posterTheme', 'posterIntro', 'posterAck', 'posterLang', 'posterPreset', 'posterCap1', 'posterCap2', 'posterCap3', 'posterCap4'];
 // Poster bileşenleri (2026-10-18): seçilebilir şekil ve metin blokları; hazır düzenler yalnızca bu kutuları işaretler
-const POSTER_COMP = ['pcIntro', 'pcMap', 'pcMeth', 'pcTM', 'pcBt', 'pcBen', 'pcAmr', 'pcGR', 'pcRes', 'pcRefs', 'pcQr'];
+const POSTER_COMP = ['pcIntro', 'pcMap', 'pcMeth', 'pcTM', 'pcBt', 'pcBen', 'pcAmr', 'pcGR', 'pcCmp', 'pcRes', 'pcRefs', 'pcQr'];
 const POSTER_PRESETS = { akademik: { pcIntro: 1, pcMap: 1, pcMeth: 1, pcTM: 1, pcBt: 1, pcBen: 1, pcAmr: 0, pcGR: 1, pcRes: 1, pcRefs: 1, pcQr: 1 },
   standart: { pcIntro: 1, pcMap: 1, pcMeth: 1, pcTM: 0, pcBt: 1, pcBen: 1, pcAmr: 0, pcGR: 1, pcRes: 1, pcRefs: 1, pcQr: 1 },
   sade: { pcIntro: 0, pcMap: 1, pcMeth: 0, pcTM: 0, pcBt: 1, pcBen: 0, pcAmr: 0, pcGR: 1, pcRes: 1, pcRefs: 0, pcQr: 1 },
@@ -3769,7 +3773,14 @@ async function exportPosterAGU(scale, evt) {
   // 2026-10-17: Benioff (S, ΔS/Δt, ayrıştırma) b(t) ile yan yana Şekil 3b; ikisi daha küçük ölçekte çizildiği için eksen puntosu büyütülür
   // 2026-10-18: seçilebilir bileşenler (sunum katmanı). b(t), G-R, Veri ve Yöntem ve Sonuçlar her zaman çizilir.
   const INC = {}; POSTER_COMP.forEach(k => { const el = document.getElementById(k); INC[k.slice(2).toLowerCase()] = !el || el.checked; });
+  INC.cmp = !!document.getElementById('pcCmp')?.checked;
+  const CMP_ON = INC.cmp && CMP.length >= 2;   // 2026-10-20: bölge karşılaştırması G–R kutusunun yerine
+  const NPAN_PRE = () => INC.bt || INC.ben || INC.amr;
+  if (CMP_ON) INC.gr = true;
+  if (CMP_ON) { try { cmpRender(); } catch (e) {} }
   const PW = [];   // okunabilirlik / sığma uyarıları (#posterFitNote)
+  if (INC.cmp && !CMP_ON) PW.push(L('Bölge karşılaştırması için G–R panelinin altındaki listeye en az 2 bölge ekleyin; şimdilik G–R gösterildi.', 'Add at least 2 regions to the comparison list (below the G–R panel); G–R shown instead.'));
+  if (CMP_ON && (INC.tm || NPAN_PRE())) PW.push(L('Karşılaştırma modunda Şekil 2 ve b(t)/Benioff yalnızca son sorgulanan bölgeyi gösterir.', 'In comparison mode, the time–magnitude and b(t)/Benioff figures show only the last queried region.'));
   const benEl = document.getElementById('tmSvgBen'), BEN_ON = !!(benEl && benEl.querySelector('path')) && INC.ben;
   // 2026-10-18: AMR şekli (deneysel) — yalnızca test çalıştırılıp şekil çizilmişse ve seçildiyse; Şekil 3'te b(t) ve Benioff'un altında
   const amrEl = document.getElementById('tmSvgAmr'), AMR_ON = !!(amrEl && amrEl.querySelector('path') && window.lastAmrPlot) && INC.amr;
@@ -3817,7 +3828,7 @@ async function exportPosterAGU(scale, evt) {
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
   });
   let imgs;
-  const IMG_IDS = ['tmSvg', BT_ID, 'tmSvgGR'].concat(BEN_ON ? ['tmSvgBen'] : [], AMR_ON ? ['tmSvgAmr'] : []);
+  const IMG_IDS = ['tmSvg', BT_ID, 'tmSvgGR'].concat(BEN_ON ? ['tmSvgBen'] : [], AMR_ON ? ['tmSvgAmr'] : [], CMP_ON ? ['cmpSvg'] : []);
   try { imgs = await Promise.all(IMG_IDS.map(id => svgImg(document.getElementById(id), 2.5 * SC))); }
   catch (e) { alert('Görsel oluşturulamadı: ' + e.message); done(); return; }
   const loadImg = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
@@ -4056,9 +4067,13 @@ async function exportPosterAGU(scale, evt) {
     // 2026-10-18: Web Mercator; isteğe bağlı Esri altlığı (uydu + yer adları ya da topoğrafya), ana şok yıldızı ve konum eki.
     // Karolar CORS ile yüklenir; yüklenemezse (ağ, zaman aşımı) altlıksız çizilir ve uyarı verilir.
     c.fillStyle = '#f8fafc'; c.fillRect(x, y0, w, h); c.strokeStyle = '#9ca3af'; c.lineWidth = 1; c.strokeRect(x, y0, w, h);
-    const pts = evs.filter(e => isFinite(e.lat) && isFinite(e.lon));
+    const pts = CMP_ON ? CMP.flatMap(r => (r.pts || []).map(q => ({ lat: q[0], lon: q[1], mag: q[2] }))) : evs.filter(e => isFinite(e.lat) && isFinite(e.lon));
     let S, N, Wl, E;
-    if (regionRect) { const b = regionRect.getBounds(); S = b.getSouth(); N = b.getNorth(); Wl = b.getWest(); E = b.getEast(); }
+    const cmpBB = r => { const g = r.geom; if (!g) return null; if (g.k === 'r') return [g.S, g.N, g.W, g.E];
+      if (g.k === 'p') return [Math.min(...g.ring.map(q => q[0])), Math.max(...g.ring.map(q => q[0])), Math.min(...g.ring.map(q => q[1])), Math.max(...g.ring.map(q => q[1]))];
+      const dLa = g.R / 111.195, dLo = g.R / (111.195 * Math.max(0.05, Math.cos(g.lat * Math.PI / 180))); return [g.lat - dLa, g.lat + dLa, g.lon - dLo, g.lon + dLo]; };
+    if (CMP_ON && CMP.some(cmpBB)) { const bbs = CMP.map(cmpBB).filter(Boolean); S = Math.min(...bbs.map(q => q[0])); N = Math.max(...bbs.map(q => q[1])); Wl = Math.min(...bbs.map(q => q[2])); E = Math.max(...bbs.map(q => q[3])); }
+    else if (regionRect) { const b = regionRect.getBounds(); S = b.getSouth(); N = b.getNorth(); Wl = b.getWest(); E = b.getEast(); }
     else if (pts.length) { S = Math.min(...pts.map(e => e.lat)); N = Math.max(...pts.map(e => e.lat)); Wl = Math.min(...pts.map(e => e.lon)); E = Math.max(...pts.map(e => e.lon)); }
     else return;
     const padLat = (N - S) * 0.08 + 0.05, padLon = (E - Wl) * 0.08 + 0.05; S -= padLat; N += padLat; Wl -= padLon; E += padLon;
@@ -4100,13 +4115,21 @@ async function exportPosterAGU(scale, evt) {
     const sorted = pts.filter((_, i) => i % stride === 0).sort((a2, b2) => (a2.mw ?? a2.mag) - (b2.mw ?? b2.mag));
     sorted.forEach(e => { const m = e.mw ?? e.mag, [px, py] = P(e.lat, e.lon), r = Math.max(1.2, 0.9 + Math.max(0, m - 1) * 1.3); c.fillStyle = col(m); c.globalAlpha = m >= 4 ? 0.95 : 0.7; c.beginPath(); c.arc(px, py, r, 0, 2 * Math.PI); c.fill();
       if (dark && r > 2) { c.globalAlpha = 0.8; c.lineWidth = 0.6; c.strokeStyle = '#000'; c.stroke(); } });
+    if (CMP_ON) { c.globalAlpha = 1; c.lineWidth = 3; c.setLineDash([7, 4]);
+      CMP.forEach((r, k) => { const g = r.geom; if (!g) return; c.strokeStyle = CMP_COL[k]; c.beginPath();
+        const ring = g.k === 'c' ? Array.from({ length: 91 }, (_, q) => { const a2 = q * 4 * Math.PI / 180; return [g.lat + g.R / 111.195 * Math.cos(a2), g.lon + g.R / (111.195 * Math.max(0.05, Math.cos(g.lat * Math.PI / 180))) * Math.sin(a2)]; })
+          : g.k === 'p' ? g.ring : [[g.N, g.W], [g.N, g.E], [g.S, g.E], [g.S, g.W]];
+        ring.forEach(([la, lo], q) => { const [px, py] = P(la, lo); q ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); c.stroke();
+        const [lx, ly] = P(Math.max(...ring.map(q => q[0])), ring.reduce((s2, q) => s2 + q[1], 0) / ring.length); halo(r.name, lx - 20, ly - 16, 'bold 13px Arial', CMP_COL[k]); });
+      c.setLineDash([]); } else {
     c.globalAlpha = 1; c.strokeStyle = dark ? '#ffffff' : '#1e3a5f'; c.lineWidth = 2; c.setLineDash([6, 4]); c.beginPath();
     if (regionIsCircle && regionCircleCenter) { for (let a2 = 0; a2 <= 360; a2 += 4) { const la = regionCircleCenter.lat + regionCircleRadiusKm / 111.195 * Math.cos(a2 * Math.PI / 180), lo = regionCircleCenter.lon + regionCircleRadiusKm / (111.195 * Math.cos(regionCircleCenter.lat * Math.PI / 180)) * Math.sin(a2 * Math.PI / 180); const [px, py] = P(la, lo); a2 ? c.lineTo(px, py) : c.moveTo(px, py); } c.closePath(); }
     else if (regionIsPolygon && regionRect) { regionRect.getLatLngs()[0].forEach((ll, i) => { const [px, py] = P(ll.lat, ll.lng); i ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); }
     else if (regionRect) { const b = regionRect.getBounds(); [[b.getNorth(), b.getWest()], [b.getNorth(), b.getEast()], [b.getSouth(), b.getEast()], [b.getSouth(), b.getWest()]].forEach(([la, lo], i) => { const [px, py] = P(la, lo); i ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); }
     c.stroke(); c.setLineDash([]);
+    }
     // ana şok yıldızı (AMR ana şoku; yoksa en büyük olay)
-    if (MS) { const [sx, sy] = P(MS.lat, MS.lon), R5 = 16; c.beginPath(); for (let i = 0; i < 10; i++) { const rr = i % 2 ? R5 * 0.45 : R5, an = -Math.PI / 2 + i * Math.PI / 5; i ? c.lineTo(sx + rr * Math.cos(an), sy + rr * Math.sin(an)) : c.moveTo(sx + rr * Math.cos(an), sy + rr * Math.sin(an)); }
+    if (MS && !CMP_ON) { const [sx, sy] = P(MS.lat, MS.lon), R5 = 16; c.beginPath(); for (let i = 0; i < 10; i++) { const rr = i % 2 ? R5 * 0.45 : R5, an = -Math.PI / 2 + i * Math.PI / 5; i ? c.lineTo(sx + rr * Math.cos(an), sy + rr * Math.sin(an)) : c.moveTo(sx + rr * Math.cos(an), sy + rr * Math.sin(an)); }
       c.closePath(); c.fillStyle = '#facc15'; c.fill(); c.lineWidth = 1.5; c.strokeStyle = '#111'; c.stroke(); }
     // ölçek çubuğu ve kuzey oku
     const latC = (S + N) / 2, kmPerPx = 40075.017 * Math.cos(latC * Math.PI / 180) / sc;
@@ -4134,7 +4157,7 @@ async function exportPosterAGU(scale, evt) {
     if (tilesOk) { c.textAlign = 'right'; halo(BM === 'uydu' ? '© Esri, Maxar, Earthstar Geographics' : '© Esri, HERE, Garmin, OSM, USGS', x + w - 4, y0 + h - 11, '9px Arial', dark ? '#e5e7eb' : '#4b5563'); c.textAlign = 'left'; }
     c.restore();
   })(X1 + 14, y, W1 - 28, MAPH);
-  caption(posterCapOv(1, L(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString(NF)} olayın dış merkezleri, büyüklüğe göre.${msTxt ? ` Yıldız: ${AMR_ON ? 'ana şok' : 'en büyük olay'} (${msTxt}).` : ''}`, `Figure 1. Study area (${shape}); epicentres of ${evs.length.toLocaleString(NF)} events, by magnitude.${msTxt ? ` Star: ${AMR_ON ? 'mainshock' : 'largest event'} (${msTxt}).` : ''}`), EN), X1 + 16, y + MAPH + 4, W1 - 32, TOP + G(GH) + MB + 1);
+  caption(posterCapOv(1, CMP_ON ? L(`Şekil 1. Karşılaştırılan bölgeler: ${CMP.map((r, k) => `${r.name} (${r.shape})`).join('; ')}; ${CMP.reduce((s2, r) => s2 + (r.pts || []).length, 0).toLocaleString(NF)} olayın dış merkezleri, büyüklüğe göre.`, `Figure 1. Compared regions: ${CMP.map(r => `${r.name} (${r.shape})`).join('; ')}; epicentres of ${CMP.reduce((s2, r) => s2 + (r.pts || []).length, 0).toLocaleString(NF)} events, by magnitude.`) : L(`Şekil 1. Çalışma alanı (${shape}); ${evs.length.toLocaleString(NF)} olayın dış merkezleri, büyüklüğe göre.${msTxt ? ` Yıldız: ${AMR_ON ? 'ana şok' : 'en büyük olay'} (${msTxt}).` : ''}`, `Figure 1. Study area (${shape}); epicentres of ${evs.length.toLocaleString(NF)} events, by magnitude.${msTxt ? ` Star: ${AMR_ON ? 'mainshock' : 'largest event'} (${msTxt}).` : ''}`), EN), X1 + 16, y + MAPH + 4, W1 - 32, TOP + G(GH) + MB + 1);
   }
   if (STACK_ON && INC.tm) {   // Şekil 2, 1. sütunda (harita ile Veri ve Yöntem arasında)
     const tmY = TOP + G(GH) + G(MB);
@@ -4227,8 +4250,8 @@ async function exportPosterAGU(scale, evt) {
   const GRH = !INC.gr ? 0 : !INC.res ? MID3 - TOP : INC.qr ? 515 + Math.round((MID3 - MID) / 2) : 545;   // QR yoksa kazanılan alan Sonuçlar'a verilir
   if (!INC.gr && !INC.res) PW.push(L('3. sütun boş: Gutenberg–Richter veya Sonuçlar\'dan birini seçin.', 'Column 3 is empty: select Gutenberg–Richter or Results.'));
   if (INC.gr) {
-  y = box(X3, TOP, W3, GRH, cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
-  { const grMax = Math.max(260, (gf ? 300 : 360) + (GRH - 515 - (gf ? 40 : 0))), im = imgs[2];   // 2026-10-18: G–R şekli kutuyu doldurur
+  y = box(X3, TOP, W3, GRH, CMP_ON ? L('Bölge Karşılaştırması', 'Regional Comparison') : cs ? 'Gutenberg–Richter (Weichert 1980)' : L('Gutenberg–Richter Dağılımı', 'Gutenberg–Richter Distribution'));
+  { const grMax = Math.max(260, (gf && !CMP_ON ? 300 : 360) + (GRH - 515 - (gf && !CMP_ON ? 40 : 0))), im = CMP_ON ? imgs[IMG_IDS.indexOf('cmpSvg')] : imgs[2];   // 2026-10-18: G–R şekli kutuyu doldurur
     if (!gf && !INC.res) { const fh = Math.min(grMax, (W3 - 32) * im.naturalHeight / im.naturalWidth), spare = (TOP + GRH - 8 - y) - (fh + 90);
       if (spare > 40) y += Math.round(spare / 2);
       if (spare > 250) PW.push(L('Yerleşim önerisi: 3. sütunda geniş boşluk var; Sonuçlar kutusu eklenebilir.', 'Layout hint: column 3 has a large gap; consider adding the Results box.')); }   // Sonuçlar yoksa şekil + altyazı dikey ortalanır
@@ -4238,9 +4261,13 @@ async function exportPosterAGU(scale, evt) {
     ? L(` Dikey eksen: yıllık oran N/T; T = ${DC(GN.years.toFixed(1))} yıl (gözlem süresi ${gnD(GN.t0)} – ${gnD(GN.t1)}).`, ` Vertical axis: annual rate N/T; T = ${GN.years.toFixed(1)} yr (observation period ${gnD(GN.t0)} – ${gnD(GN.t1)}).`)
     : L(` Dikey eksen: N/(T·A) (10⁶ km² ve yıl başına); T = ${DC(GN.years.toFixed(1))} yıl, A = ${Math.round(GN.area).toLocaleString(NF)} km².`, ` Vertical axis: N/(T·A) per 10⁶ km² per year; T = ${GN.years.toFixed(1)} yr, A = ${Math.round(GN.area).toLocaleString(NF)} km².`);
   if (!cs && GN && GN.mode === 'raw' && regionIsCircle) PW.push(L('G–R ham sayılarla çizildi; yayın için G–R panelinde "Oran" (N/T) seçmeyi düşünün.', 'G–R plotted as raw counts; consider selecting "Rate" (N/T) in the G–R panel for publication.'));
+  const cmpCapTxt = !CMP_ON ? '' : (() => { const S2 = CMP.map(cmpStats), uL = S2[0].unit === 'deg' ? L('yıl ve kare derece başına', 'per year per square degree') : S2[0].unit === '1e4' ? L('yıl ve 10⁴ km² başına', 'per year per 10⁴ km²') : L('yıllık', 'per year');
+    const per = CMP.map((r, k) => { const s2 = S2[k]; return `{${CMP_COL[k]}|${r.name.replace(/[{}|*]/g, '')}}: ` + (s2.b ? `b = ${DC(s2.b.toFixed(2))} ± ${DC(s2.sb.toFixed(2))}, a = ${DC(s2.a.toFixed(2))}` : 'b —') + `, Mc = ${DC(fmtM(r.Mc))}, N(≥Mc) = ${s2.n}${s2.small ? ' ⚠' : ''}, T = ${DC(s2.T.toFixed(1))} ${L('yıl', 'yr')}${r.area ? `, A = ${Math.round(r.area).toLocaleString(NF)} km²` : ''}`; }).join('; ');
+    return L(`Şekil 4. Kümülatif oran N(≥M), ${uL} (Ambraseys 2006); dolu noktalar M ≥ Mc, kesikli çizgiler G–R doğruları (Aki 1965). `, `Figure 4. Cumulative rate N(≥M), ${uL} (Ambraseys 2006); filled points M ≥ Mc, dashed lines G–R fits (Aki 1965). `) + per + '.'; })();
+  if (CMP_ON) { y = rich(posterCapOv(4, cmpCapTxt, EN, true).replace(/^((?:Şekil|Figure) \d+\.)/, '**$1**'), X3 + 16, y, W3 - 32, { size: 15, lh: 19, italic: true, col: '#374151', maxY: TOP + GRH - 4, justify: false }); } else
   y = caption(posterCapOv(4, EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? ' ± ' + gs.err.toFixed(2) : ''}, N = ${gs.n}, fit M ≥ ${fmtM(gs.mc)})` : ''}, blue dashed Mc${gs ? ` = ${fmtM(gs.mc)}` : ''} (maximum curvature + 0.2; Wiemer & Wyss 2000).${grNormTxt}` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? ' ± ' + gs.err.toFixed(2).replace('.', ',') : ''}, N = ${gs.n}, uyum M ≥ ${String(fmtM(gs.mc)).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(fmtM(gs.mc)).replace('.', ',')}` : ''} (maksimum eğrilik + 0,2; Wiemer & Wyss 2000).${grNormTxt}` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, EN), X3 + 16, y, W3 - 32, TOP + GRH - 4);
   // G-R parametre tablosu (büyük punto)
-  if (gf && gf.curves && gf.curves.length) {
+  if (!CMP_ON && gf && gf.curves && gf.curves.length) {
     const cols = [[L('Eğri', 'Curve'), 0], ['b ± 1σ', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/${L('yıl', 'yr')}`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
     let ry = y + 4; c.fillStyle = '#f3f4f6'; c.fillRect(tx, ry - 3, W3 - 32, rowH);
     cols.forEach(([h, dx]) => text(h, tx + 6 + dx, ry, 'bold 16px Arial', INK)); ry += rowH;
