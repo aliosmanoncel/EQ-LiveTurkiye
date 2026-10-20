@@ -77,13 +77,20 @@ ok(OA.iscgem.authHits.every(h => idx.get(h.id).mw === h.auth_mw && idx.get(h.id)
   ctx.__a = [c, [{ A_id: 'a', Mw: 6.5, mw_src: 'iscgem_direct', gem_id: 'g', konum: null }], [], null]; const r2 = run('iscgemApply(...__a)');
   ok(r2.events[0].mw === 6.5 && r2.events[0].mtype === 'mw' && r2.events[0].mag_orig === 5.0 && r2.events[0].mtype_orig === 'mb', 'sentetik: otorite yokken ISC-GEM Mw; özgün büyüklük ve tür saklanır'); }
 
-console.log('\n4. Aday merdiven: değerler ve tekdüzelik');
+console.log('\n4. Aday merdiven: yalnız doğrulanmış üç basamak (karar 2026-10-21)');
 { const P = ctx.CS_PRESETS.iscgem2026.map(([s, m]) => [s, +m]);
-  ok(JSON.stringify(P.map(([s, m]) => [s.slice(0, 4), m])) === JSON.stringify(REF.L1.map(([y, m]) => [y, m])), 'hazır basamaklar = L1 (1904 6,0 · 1970 5,5 · 1979 4,5 · 1980 4,0 · 1990 3,5 · 1998 3,0)');
+  ok(JSON.stringify(P) === JSON.stringify([['1904-01-01', 6.0], ['1970-01-01', 5.5], ['1979-01-01', 5.0]]), 'hazır basamaklar: 1904 6,0 · 1970 5,5 · 1979 5,0');
+  ok(P.every(([, m]) => m >= 5.0), 'M < 5,0 için hazır basamak yok');
   ok(P.every((x, i) => i === 0 || (x[0] > P[i - 1][0] && x[1] <= P[i - 1][1])), 'tekdüze: başlangıçlar artan, Mc artmayan');
   const start = M => { const s = P.find(([, mc]) => mc <= M + 1e-9); return s ? +s[0].slice(0, 4) : null; };
-  for (const [M, y] of [[6.0, 1904], [5.5, 1970], [5.0, 1979], [4.5, 1979]]) ok(start(M) === y, `M ${M.toFixed(1)} sınıfı ${start(M)}'dan itibaren tam sayılır (karar: ${y})`);
-  ok(/BAĞIMSIZ OLARAK DOĞRULANMADI/.test(src), 'düğme açıklaması: M 4,5 için bağımsız doğrulama olmadığı yazılı'); }
+  for (const [M, y] of [[6.0, 1904], [5.5, 1970], [5.0, 1979], [4.9, null]]) ok(start(M) === y, `M ${M.toFixed(1)} sınıfı: ${start(M) ?? 'hazır basamakta tam sayılmaz'} (karar: ${y ?? 'yok'})`);
+  const btn = src.slice(src.indexOf("csApplyPreset('iscgem2026')\" style"), src.indexOf('>Aday merdiven</button>'));
+  ok(/BAĞIMSIZ OLARAK DOĞRULANMADI/.test(btn) && /4,5–5,0 → 1995/.test(btn) && /4,0–4,5 → 1995/.test(btn) && /3,5–4,0 → 1993/.test(btn) && /3,0–3,5 → 2002/.test(btn), 'düğme açıklaması: M < 5 Stepp sonuçları ve bağımsız doğrulama eksikliği');
+  // tarayıcı yolu: hazır basamaklarla csBuild, 1979 sonrası M < 5 olayları dışarıda
+  ctx.csSteps = ctx.CS_PRESETS.iscgem2026.map(([start, mc]) => ({ start, mc })); ctx.csEnabled = true;
+  ctx.__ev = [{ time: new Date('1990-01-01T00:00:00Z'), mag: 4.9 }, { time: new Date('1990-01-01T00:00:00Z'), mag: 5.0 }, { time: new Date('1975-01-01T00:00:00Z'), mag: 5.4 }, { time: new Date('1903-06-01T00:00:00Z'), mag: 7.0 }];
+  ctx.regionRect = {}; ctx.regionWindowStart = new Date('1900-01-01T00:00:00Z'); ctx.regionWindowEnd = new Date('2021-12-31T23:59:59Z');
+  const k = run('csBuild(__ev)').kept.map(x => x.m); ok(JSON.stringify(k) === JSON.stringify([5.0]), `csBuild: yalnız 1990 M 5,0 tutulur (4,9 / 1975 M 5,4 / 1903 öncesi dışarıda) → [${k}]`); }
 
 console.log('\n5. 1910-02-18 (id 914191)');
 { const e = OA.events.find(e => e.id === '914191'); ok(e && e.mag === 7.0 && !e.msrc, 'M 7,0 korunur, aktarım yok');
