@@ -180,3 +180,20 @@ Atıf biçimi isc.ac.uk/iscgem/citing.php sayfasından alındı. Önceki dosyala
 1. `eq_historical.json`'daki ISC zamanları saat dilimi eki taşımaz ve tarayıcı bunları yerel saat olarak okur. Bu, `main`'de de var olan bir durumdur. Katman, aynı biçimi kullanarak tutarlılığı korur.
 2. Merdiven ön ayarı katman kapalıyken de seçilebilir; bu durumda bir uyarı gösterilir.
 3. M 4,5 basamağı bağımsız olarak doğrulanmadı (Stepp 1995).
+
+## 8. Aday merdiven yalnız doğrulanmış üç basamakla sınırlandı (karar 2026-10-21)
+
+Dal `homog-uretim-aday` @ `baa3829`; ayrı commit.
+
+- "Aday merdiven" düğmesi yalnız şu basamakları kurar: 1904 Mc 6,0 · 1970 Mc 5,5 · 1979 Mc 5,0.
+- M < 5,0 için hazır basamak yoktur. Düğme açıklamasında Faz 4 Stepp başlangıçları (4,5–5,0 → 1995 · 4,0–4,5 → 1995 · 3,5–4,0 → 1993 · 3,0–3,5 → 2002) ve bağımsız doğrulama eksikliği yazılıdır.
+- L1 (altı basamak) yalnız prototipi yeniden üretme testinde (fikstür) kalır. Arayüzde sunulmaz.
+
+| Test | Sonuç |
+|---|---|
+| Katman testi (yerel) | 37/0 |
+| Katman testi ve GK74 eşdeğerlik iş akışı (CI, `baa3829`) | başarılı |
+| Mevcut 15 test çalıştırması, `main` ile karşılaştırma | birebir aynı (dosya yolu dışında) |
+| Tarayıcı | Düğme üç basamak kuruyor; URL `rcs` doğru; sayfa hatası yok |
+
+Korunan dosyalar güncel `main` (`0e875b0`) ile aynı. Dal bekletiliyor. Birleştirme öncesinde dal güncel `main` üzerine yeniden kurulmalı ve CI tekrarlanmalı.
