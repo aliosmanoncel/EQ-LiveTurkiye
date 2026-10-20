@@ -1,0 +1,36 @@
+name: GNSS MIDAS velocity update
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'   # Haftada bir, pazartesi 04:17 UTC (NGL MIDAS haftalık güncellenir)
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/fetch_gnss_midas.py'
+      - '.github/workflows/gnss-update.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-commit
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: NGL MIDAS indir ve süz
+        run: python scripts/fetch_gnss_midas.py --output data/gnss_midas.json
+      - name: Değişiklik varsa commit et
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/gnss_midas.json
+          if git diff --cached --quiet; then echo "Değişiklik yok"; exit 0; fi
+          git commit -m "🛰 GNSS MIDAS hız alanı güncellemesi ($(date -u +%Y-%m-%d))"
+          for i in 1 2 3; do git pull --rebase origin main && git push && break; sleep 10; done

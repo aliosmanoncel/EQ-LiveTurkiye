@@ -1272,6 +1272,13 @@
         <button onclick="cmpExportCSV()" style="background:none;border:1px solid #334;color:#888;border-radius:4px;cursor:pointer;padding:1px 6px;">⬇ CSV</button>
         <button onclick="cmpClear()" style="background:none;border:1px solid #334;color:#888;border-radius:4px;cursor:pointer;padding:1px 6px;">temizle</button>
       </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px;" title="Moment oranı ve sismik kenetlenme (Sparacino vd. 2022 yaklaşımı). GNSS: NGL MIDAS (Blewitt vd. 2016). H: sismojenik kalınlık; μ: kayma modülü; Mmax: kesik G–R için en büyük olası büyüklük (boş: gözlenen en büyük).">
+        <span style="color:#cbd5e1;">Moment oranı:</span>
+        <label>H <input id="cmpH" type="number" step="1" value="15" oninput="cmpRender()" style="width:44px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"> km</label>
+        <label>μ <input id="cmpMu" type="number" step="1" value="30" oninput="cmpRender()" style="width:44px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"> GPa</label>
+        <label>Mmax <input id="cmpMmax" type="number" step="0.1" placeholder="gözlenen" oninput="cmpRender()" style="width:62px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
+        <span id="cmpGnssInfo" style="color:#666"></span>
+      </div>
       <div id="cmpMsg" style="margin-top:3px;color:#f59e0b;"></div>
       <svg id="cmpSvg" viewBox="0 0 420 400" preserveAspectRatio="xMidYMid meet" style="display:none;margin:6px auto;width:100%;max-width:400px;height:auto"></svg>
       <div id="cmpTable" style="overflow-x:auto;"></div>
@@ -3194,6 +3201,8 @@ function cmpRender() {
     `<text x="${(L + pw / 2).toFixed(1)}" y="${H - 1}" fill="#888" font-size="8" text-anchor="middle">Büyüklük M</text>`;
   svg.innerHTML = g; svg.style.display = 'block';
   // — tablo
+  gnssLoad(); const M = CMP.map((r, i) => cmpMoment(r, S[i]));
+  { const gi = document.getElementById('cmpGnssInfo'); if (gi) gi.textContent = GNSS ? `GNSS: ${GNSS.meta.n_kept.toLocaleString('tr-TR')} istasyon, ${GNSS.meta.frame}, ${String(GNSS.meta.downloaded_utc).slice(0, 10)}` : 'GNSS: ' + GNSS_STATE; }
   const f = (v, d = 2) => v === null || v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(d);
   const ex = v => v === null || !Number.isFinite(v) ? '—' : v >= 1e4 || v < 0.01 ? v.toExponential(2) : v.toPrecision(3);
   const th = 'style="text-align:left;padding:2px 6px;border-bottom:1px solid #334;color:#cbd5e1;"', td = 'style="padding:2px 6px;border-bottom:1px solid #222;vertical-align:top;"';
@@ -3202,18 +3211,90 @@ function cmpRender() {
     ['N(≥Mc)', (r, s) => s.n + (s.small ? ' ⚠' : '')], ['b ± σ (Aki 1965)', (r, s) => s.b ? `${f(s.b)} ± ${f(s.sb)}` : '—'], [`a (${uLab})`, (r, s) => f(s.a)],
     ['Mmax', (r, s) => f(s.Mmax, 1)], ['N(≥5) / N(≥6)', (r, s) => `${s.N5} / ${s.N6}`], [`λ(≥5) ${uLab}`, (r, s) => ex(s.lam5)],
     ['M≥6 tekrarlanma (yıl, tüm bölge)', (r, s) => s.tr6 ? ex(s.tr6) + (s.extrap ? ' (ekstrapolasyon)' : '') : '—'],
+    ['GNSS istasyonu (MIDAS)', (r, s, i) => M[i].geo !== null ? `${M[i].nSt} (rms ${f(M[i].st.rms, 1)} mm/yıl)` : `${M[i].nSt ?? '—'}${M[i].geoWhy ? ` <span style="color:#f59e0b">${M[i].geoWhy}</span>` : ''}`],
+    ['ε̇₁ / ε̇₂ (nstrain/yıl)', (r, s, i) => M[i].geo !== null ? `${f(M[i].st.e1 * 1e9, 1)} / ${f(M[i].st.e2 * 1e9, 1)}` : '—'],
+    ['Ṁ₀ jeodezik (N·m/yıl)', (r, s, i) => M[i].geo !== null ? `${ex(M[i].geo)} ± ${ex(M[i].geoSd)}` : '—'],
+    ['Ṁ₀ sismik, Kostrov ΣM₀/T', (r, s, i) => ex(M[i].kostrov)],
+    ['Ṁ₀ sismik, kesik G–R', (r, s, i) => M[i].trGR ? `${ex(M[i].trGR)} (Mmax ${f(M[i].mmaxUsed, 1)})` : '—'],
+    ['Sismik kenetlenme (Kostrov / G–R)', (r, s, i) => M[i].geo !== null ? `<b>%${f(100 * M[i].cKos, 0)}</b> / <b>%${M[i].cGR !== null ? f(100 * M[i].cGR, 0) : '—'}</b>` : '—'],
     ['Büyüklük türleri', r => Object.entries(r.types).sort((p, q) => q[1] - p[1]).slice(0, 3).map(([k, v]) => `${k} %${Math.round(100 * v / r.mags.length)}`).join(', ')],
     ['', (r, s, i) => `<a href="${r.url.replace(/"/g, '&quot;')}" target="_blank" rel="noopener" style="color:#67e8f9">bağlantı</a> · <a href="#" onclick="cmpRemove(${i});return false;" style="color:#f87171">çıkar</a>`]];
   tbl.innerHTML = `<table style="border-collapse:collapse;width:100%;font-size:.95em;margin-top:4px;"><tr><th ${th}></th>${CMP.map((r, i) => `<th ${th}><span style="color:${CMP_COL[i]}">■</span> ${r.name.replace(/</g, '&lt;')}</th>`).join('')}</tr>` +
     rows.map(([k, fn]) => `<tr><td ${td} style="color:#94a3b8">${k}</td>${CMP.map((r, i) => `<td ${td}>${fn(r, S[i], i)}</td>`).join('')}</tr>`).join('') + '</table>' +
-    `<div style="color:#666;margin-top:3px;">Oranlar ${uLab} biriminde (Ambraseys 2006 yaklaşımı). a, Mc'deki gözlenen orandan; tekrarlanma süresi G–R doğrusundan, tüm bölge alanı için. Retrospektif; tehlike değerlendirmesi değildir.</div>`;
+    `<div style="color:#666;margin-top:3px;">Oranlar ${uLab} biriminde (Ambraseys 2006 yaklaşımı). Moment oranları tüm bölge içindir: jeodezik Savage & Simpson (1997), H = ${cmpParams().H} km, μ = ${cmpParams().mu / 1e9} GPa; sismik Kostrov (1974) toplamı ve kesik G–R (Hyndman & Weichert 1983); kenetlenme = sismik ÷ jeodezik (Sparacino vd. 2022). Kısa katalog süresi kenetlenmeyi olduğundan düşük gösterebilir. a, Mc'deki gözlenen orandan; tekrarlanma süresi G–R doğrusundan, tüm bölge alanı için. Retrospektif; tehlike değerlendirmesi değildir.</div>`;
 }
+// ══ Aşama 2 (2026-10-20): jeodezik ve sismik moment oranı, sismik kenetlenme ═════════════════════════════
+// GNSS: NGL MIDAS (Blewitt vd. 2016), data/gnss_midas.json (haftalık GitHub Actions). Bölge içindeki istasyonlardan
+// ağırlıklı en küçük kareler ile tek düzgün hız gradyanı → yatay gerinim oranı tensörü (yerel düzlem).
+// Jeodezik moment oranı: Savage & Simpson (1997): Ṁ_geo = 2 μ H A max(|ε1|, |ε2|, |ε1+ε2|).
+// Sismik moment oranı: (i) Kostrov (1974) toplamı ΣM0/T, M0 = 10^(1,5M + 9,1) N·m (Hanks & Kanamori 1979);
+// (ii) kesik G–R (Hyndman & Weichert 1983): Ṁ = φ·b/(c−b)·10^((c−b)Mmax + a + d), φ = 1,27, c = 1,5, d = 9,1.
+// Yaklaşım Sparacino vd. (2022, Earth-Sci. Rev.) ile aynıdır; tek fark bölge başına tek tensör (hücre ızgarası değil).
+let GNSS = null, GNSS_STATE = 'yok';
+function gnssLoad() {
+  if (GNSS || GNSS_STATE === 'yükleniyor') return;
+  GNSS_STATE = 'yükleniyor';
+  fetch('data/gnss_midas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(j => { GNSS = j; GNSS_STATE = 'hazır'; try { cmpRender(); } catch (e) {} })
+    .catch(e => { GNSS_STATE = 'hata'; try { cmpRender(); } catch (e2) {} });
+}
+function cmpGeomHas(g, lat, lon) {
+  if (!g) return false;
+  if (g.k === 'c') return haversineKm(g.lat, g.lon, lat, lon) <= g.R;
+  if (g.k === 'p') return pointInPolygon(lat, lon, g.ring.map(q => ({ lat: q[0], lng: q[1] })));
+  return lat >= g.S && lat <= g.N && lon >= g.W && lon <= g.E;
+}
+function cmpParams() {
+  const num = (id, d) => { const v = parseFloat(document.getElementById(id)?.value); return Number.isFinite(v) && v > 0 ? v : d; };
+  return { H: num('cmpH', 15), mu: num('cmpMu', 30) * 1e9, mmax: parseFloat(document.getElementById('cmpMmax')?.value) };
+}
+// 3×3 simetrik sistemin çözümü ve tersi (Gauss–Jordan)
+function inv3(A) { const m = A.map((r, i) => r.concat([0, 0, 0].map((_, j) => +(i === j)))); for (let c = 0; c < 3; c++) { let p = c; for (let r = c + 1; r < 3; r++) if (Math.abs(m[r][c]) > Math.abs(m[p][c])) p = r; if (Math.abs(m[p][c]) < 1e-30) return null; [m[c], m[p]] = [m[p], m[c]]; const d = m[c][c]; for (let j = 0; j < 6; j++) m[c][j] /= d; for (let r = 0; r < 3; r++) if (r !== c) { const f = m[r][c]; for (let j = 0; j < 6; j++) m[r][j] -= f * m[c][j]; } } return m.map(r => r.slice(3)); }
+function gnssStrain(st) {
+  if (st.length < 5) return { ok: false, why: `istasyon sayısı ${st.length} (< 5)` };
+  const lat0 = st.reduce((s, q) => s + q[1], 0) / st.length, lon0 = st.reduce((s, q) => s + q[2], 0) / st.length, kx = 111.195 * Math.cos(lat0 * Math.PI / 180);
+  const P = st.map(q => ({ x: (q[2] - lon0) * kx, y: (q[1] - lat0) * 111.195, ve: q[3], vn: q[4], se: Math.max(q[5], 0.2), sn: Math.max(q[6], 0.2) }));
+  const sd = a => Math.sqrt(a.reduce((s, v) => s + v * v, 0) / a.length), spx = sd(P.map(p => p.x)), spy = sd(P.map(p => p.y));
+  if (spx < 20 || spy < 20) return { ok: false, why: `istasyonların yayılımı dar (σx = ${spx.toFixed(0)} km, σy = ${spy.toFixed(0)} km)` };
+  const fit = (val, sig) => { const N = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], r = [0, 0, 0];
+    P.forEach(p => { const g = [1, p.x, p.y], w = 1 / (sig(p) ** 2); for (let i = 0; i < 3; i++) { r[i] += w * g[i] * val(p); for (let j = 0; j < 3; j++) N[i][j] += w * g[i] * g[j]; } });
+    const Ni = inv3(N); if (!Ni) return null; const x = Ni.map(row => row.reduce((s, v, j) => s + v * r[j], 0));
+    const chi = P.reduce((s, p) => s + ((val(p) - x[0] - x[1] * p.x - x[2] * p.y) / sig(p)) ** 2, 0), f = Math.max(1, chi / Math.max(1, P.length - 3));
+    return { x, C: Ni.map(row => row.map(v => v * f)), rms: Math.sqrt(P.reduce((s, p) => s + (val(p) - x[0] - x[1] * p.x - x[2] * p.y) ** 2, 0) / P.length) }; };
+  const E = fit(p => p.ve, p => p.se), Nn = fit(p => p.vn, p => p.sn); if (!E || !Nn) return { ok: false, why: 'gradyan çözülemedi' };
+  const princ = (Lxx, Lxy, Lyx, Lyy) => { const exx = Lxx, eyy = Lyy, exy = (Lxy + Lyx) / 2, m = (exx + eyy) / 2, r = Math.hypot((exx - eyy) / 2, exy); return { e1: m + r, e2: m - r, w: (Lyx - Lxy) / 2 }; };
+  const pr = princ(E.x[1], E.x[2], Nn.x[1], Nn.x[2]);   // birim: mm/yıl/km = 1e-6 /yıl
+  // belirsizlik: parametre kovaryansından 400 Monte Carlo örneği (doğu ve kuzey uydurmaları bağımsız)
+  const ch = C => { const a = Math.sqrt(Math.max(C[1][1], 0)), b = C[2][1] / (a || 1), c2 = Math.sqrt(Math.max(C[2][2] - b * b, 0)); return [a, b, c2]; };
+  const cE = ch(E.C), cN = ch(Nn.C); let s1 = 0, s2 = 0, sm = 0, sm2 = 0; const K = 400; let seed = 12345;
+  const rn = () => { seed = (seed * 16807) % 2147483647; const u = seed / 2147483647; seed = (seed * 16807) % 2147483647; const v = seed / 2147483647; return Math.sqrt(-2 * Math.log(u + 1e-12)) * Math.cos(2 * Math.PI * v); };
+  for (let k = 0; k < K; k++) { const z1 = rn(), z2 = rn(), z3 = rn(), z4 = rn();
+    const q = princ(E.x[1] + cE[0] * z1, E.x[2] + cE[1] * z1 + cE[2] * z2, Nn.x[1] + cN[0] * z3, Nn.x[2] + cN[1] * z3 + cN[2] * z4), mx = Math.max(Math.abs(q.e1), Math.abs(q.e2), Math.abs(q.e1 + q.e2));
+    sm += mx; sm2 += mx * mx; }
+  const mxMean = sm / K, mxSd = Math.sqrt(Math.max(0, sm2 / K - mxMean * mxMean));
+  const mx = Math.max(Math.abs(pr.e1), Math.abs(pr.e2), Math.abs(pr.e1 + pr.e2));
+  return { ok: true, n: st.length, e1: pr.e1 * 1e-6, e2: pr.e2 * 1e-6, w: pr.w * 1e-6, emax: mx * 1e-6, emaxSd: mxSd * 1e-6, rms: Math.hypot(E.rms, Nn.rms) / Math.SQRT2, spx, spy };
+}
+function cmpMoment(r, s) {
+  const pa = cmpParams(), out = { pa };
+  out.kostrov = s.T > 0 ? r.mags.reduce((acc, m) => acc + Math.pow(10, 1.5 * m + 9.1), 0) / s.T : null;
+  const mmaxObs = s.Mmax, mmax = Number.isFinite(pa.mmax) ? pa.mmax : mmaxObs;
+  if (s.b && s.T > 0 && s.b < 1.5) { const aY = Math.log10(s.n / s.T) + s.b * r.Mc; out.trGR = 1.27 * s.b / (1.5 - s.b) * Math.pow(10, (1.5 - s.b) * mmax + aY + 9.1); out.mmaxUsed = mmax; } else out.trGR = null;
+  if (!GNSS) { out.geo = null; out.geoWhy = GNSS_STATE === 'hata' ? 'GNSS verisi bulunamadı (data/gnss_midas.json)' : 'GNSS verisi yükleniyor…'; return out; }
+  const st = GNSS.s.filter(q => cmpGeomHas(r.geom, q[1], q[2])), sr = gnssStrain(st);
+  out.st = sr; out.nSt = st.length;
+  if (!sr.ok || !r.area) { out.geo = null; out.geoWhy = !r.area ? 'alan bilinmiyor' : sr.why; return out; }
+  const k = 2 * pa.mu * pa.H * 1e3 * r.area * 1e6; out.geo = k * sr.emax; out.geoSd = k * sr.emaxSd;
+  out.cKos = out.kostrov && out.geo ? out.kostrov / out.geo : null; out.cGR = out.trGR && out.geo ? out.trGR / out.geo : null;
+  return out;
+}
+
 function cmpRemove(i) { CMP.splice(i, 1); cmpSave(); cmpRender(); }
 function cmpExportCSV() {
   if (!CMP.length) return;
   const S = CMP.map(cmpStats), q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const head = ['ad', 'katalog', 'bolge', 't0', 't1', 'T_yil', 'A_km2', 'birim', 'N', 'Mc', 'N_geMc', 'b', 'sigma_b', 'a', 'Mmax', 'N_ge5', 'N_ge6', 'lambda_ge5', 'Tr_M6_yil', 'url'];
-  const lines = [head.join(',')].concat(CMP.map((r, i) => { const s = S[i]; return [q(r.name), q(r.src), q(r.shape), new Date(r.t0).toISOString(), new Date(r.t1).toISOString(), s.T.toFixed(2), r.area ? r.area.toFixed(0) : '', s.unit, r.mags.length, r.Mc, s.n, s.b ? s.b.toFixed(3) : '', s.sb ? s.sb.toFixed(3) : '', s.a !== null ? s.a.toFixed(3) : '', s.Mmax, s.N5, s.N6, s.lam5 ?? '', s.tr6 ?? '', q(r.url)].join(','); }));
+  const head = ['ad', 'katalog', 'bolge', 't0', 't1', 'T_yil', 'A_km2', 'birim', 'N', 'Mc', 'N_geMc', 'b', 'sigma_b', 'a', 'Mmax', 'N_ge5', 'N_ge6', 'lambda_ge5', 'Tr_M6_yil', 'gnss_n', 'e1_per_yr', 'e2_per_yr', 'M0dot_geod_Nm_yr', 'M0dot_geod_sd', 'M0dot_kostrov_Nm_yr', 'M0dot_truncGR_Nm_yr', 'Mmax_used', 'coupling_kostrov', 'coupling_truncGR', 'H_km', 'mu_GPa', 'url'];
+  const lines = [head.join(',')].concat(CMP.map((r, i) => { const s = S[i]; return [q(r.name), q(r.src), q(r.shape), new Date(r.t0).toISOString(), new Date(r.t1).toISOString(), s.T.toFixed(2), r.area ? r.area.toFixed(0) : '', s.unit, r.mags.length, r.Mc, s.n, s.b ? s.b.toFixed(3) : '', s.sb ? s.sb.toFixed(3) : '', s.a !== null ? s.a.toFixed(3) : '', s.Mmax, s.N5, s.N6, s.lam5 ?? '', s.tr6 ?? '', ...(m => [m.nSt ?? '', m.st && m.st.ok ? m.st.e1 : '', m.st && m.st.ok ? m.st.e2 : '', m.geo ?? '', m.geoSd ?? '', m.kostrov ?? '', m.trGR ?? '', m.mmaxUsed ?? '', m.cKos ?? '', m.cGR ?? '', m.pa.H, m.pa.mu / 1e9])(cmpMoment(r, s)), q(r.url)].join(','); }));
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv' })); a.download = 'EQ-Live-bolge-karsilastirma.csv'; a.click();
 }
 
