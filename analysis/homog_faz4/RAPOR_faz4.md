@@ -35,3 +35,27 @@
 | — | < 5,0 | Belirsiz; homojen büyüklük olmadan önerilmiyor |
 
 Açık kararlar: (i) 1963–2021'de mevcut katalogda karşılığı olmayan 21 ISC-GEM olayının eklenip eklenmeyeceği; (ii) M < 5 için homojen büyüklük sağlanana kadar mevcut basamakların korunması; (iii) üretime geçiş (onaylanmadı).
+
+---
+
+# 21 ISC-GEM olayının incelemesi (2026-10-21) — ekleme yapılmadı
+
+Kapsam: 1963–2021'de mevcut katalogda karşılığı olmayan ISC-GEM v12.1 ana katalog olayları. Yalnız yerel veriyle (yeni sorgu yok). Betik `inceleme_21.py`, olay bazında sonuç `out/inceleme_21.json` (zaman, konum, derinlik, Mw, kaynak/kalite, kutu sınırına uzaklık, ±1 gün / 300 km içinde mevcut katalogdaki en yakın aday).
+
+| Grup | Olay | Bulgu | Kanıt düzeyi | Öneri |
+|---|---|---|---|---|
+| **S1 Kutu sınırı** | 3 | 1972-06-23 (sınıra 1 km), 1997-02-28 Mw 6,1 (2 km), 2019-02-17 (4 km). Mevcut katalogdaki konum kutunun dışında kalıyor olabilir | Güçlü kanıt (konum sınırda) | Eklenmesin; sınır etkisi |
+| **S2 ISC-GEM'de yakın çift** | 5 | 1964-10-06 (Mw 5,49; Manyas ana şoku Mw 6,8'den 84 s önce), 1965-03-13, 1969-03-25, 1971-05-12, 1999-08-11. Her birinde mevcut katalogdaki aday, 11–84 s sonraki **başka bir ISC-GEM olayıyla zaten doğru eşleşmiş** | Doğrulandı (eşleşme); olayın ayrı bir deprem mi ISC-GEM içi tekrar mı olduğu **belirsiz** | Eklenmesin; ayrı doğrulama gerekir |
+| **S3 1963–1964, katalogda yok** | 13 | Mw 5,15–5,83; ±1 gün ve 300 km içinde mevcut katalogda hiç olay yok. Mevcut merdivenin 1900–1965 basamağı (ISC, `minmagnitude=5.5`) bu dönemi de kapsıyor | Faz 1b'deki süzgeç bulgusuyla **tutarlı**, olay bazında **doğrulanmadı** | Yalnız Faz 1b yöntemiyle (iki ISC sorgusu) doğrulanırsa değerlendirilsin |
+
+**Merdivene etkisi:** S3'teki 13 olayın 8'i M 5,5–6,0 sınıfında. Doğrulanıp eklenirlerse 1960'lar dilimindeki bulunma oranı %82'den %98'e çıkar; K1 ölçütüne göre M 5,5–6,0 başlangıcı 1970'ten 1904'e çekilir (K2 ile uyumlu). Eklenmezlerse 1970 kalır.
+
+## Karar tablosu (öneri; uygulanmadı)
+| Sınıf | Karar |
+|---|---|
+| M ≥ 6,0 | 1904'ten itibaren |
+| M 5,5–6,0 | Koşullu: S3 doğrulanırsa 1904, doğrulanmazsa 1970 |
+| M 5,0–5,5 | 1979'dan itibaren |
+| M < 5,0 | Mevcut basamaklar **geçici olarak korunur** — doğrulandıkları için değil, yeni kanıt gelene kadar değiştirilmedikleri için |
+
+Üretime geçiş onaylanmadı; `main` ve korunan dosyalar değişmedi.
