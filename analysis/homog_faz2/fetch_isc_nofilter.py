@@ -28,9 +28,14 @@ def main():
                 time.sleep(10 * (k + 1))
             except Exception as e:
                 st = f'{type(e).__name__}: {e}'; time.sleep(10 * (k + 1))
-        n = 0
+        n = 0; perr = None
         if raw:
-            root = ET.fromstring(raw)
+            try:
+                root = ET.fromstring(raw)
+            except ET.ParseError as e:
+                perr = f'XML ayrıştırılamadı: {e}; ilk baytlar: {raw[:200]!r}'; root = None
+                print(f'::warning::{y}: {perr}')
+        if raw and root is not None:
             for ev in root.iter('{http://quakeml.org/xmlns/bed/1.2}event'):
                 pid = t(ev, 'q:preferredOriginID'); pmid = t(ev, 'q:preferredMagnitudeID')
                 orgs = {o.get('publicID'): o for o in ev.findall('q:origin', NS)}
@@ -41,12 +46,20 @@ def main():
                     v = t(m, 'q:mag/q:value')
                     mags.append({'id': m.get('publicID'), 'mag': float(v) if v else None, 'type': t(m, 'q:type'), 'author': t(m, 'q:creationInfo/q:author'),
                                  'origin': t(m, 'q:originID'), 'nsta': t(m, 'q:stationCount'), 'pref': m.get('publicID') == pmid})
-                dep = t(o, 'q:depth/q:value')
-                events.append({'id': ev.get('publicID').split('=')[-1], 'time': t(o, 'q:time/q:value'), 'lat': float(t(o, 'q:latitude/q:value')), 'lon': float(t(o, 'q:longitude/q:value')),
+                dep = t(o, 'q:depth/q:value'); la, lo, tm = t(o, 'q:latitude/q:value'), t(o, 'q:longitude/q:value'), t(o, 'q:time/q:value')
+                if la is None or lo is None or tm is None: continue
+                events.append({'id': (ev.get('publicID') or '').split('=')[-1], 'time': tm, 'lat': float(la), 'lon': float(lo),
                                'dep_km': float(dep) / 1000 if dep else None, 'origin_author': t(o, 'q:creationInfo/q:author'), 'mags': mags})
                 n += 1
-        log.append({'year': y, 'url': u, 'status': st, 'n': n}); print(y, st, n, flush=True); time.sleep(2)
+        log.append({'year': y, 'url': u, 'status': st, 'n': n, 'parse_error': perr}); print(y, st, n, flush=True); time.sleep(2)
+        if st not in (200, 204): print(f'::warning::{y}: HTTP durum {st}')
+    print(f"::notice::toplam {len(events)} olay; hatalı yıl {sum(1 for l in log if l['status'] not in (200, 204) or l['parse_error'])}")
     json.dump({'meta': {'generated': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), 'source': URL, 'box': B, 'params': 'format=xml&includeallmagnitudes=true; büyüklük süzgeci yok',
                         'citation': 'International Seismological Centre, On-line Bulletin, https://doi.org/10.31905/D808B830', 'log': log, 'n': len(events)}, 'events': events},
               open('analysis/homog_faz2/out/isc_1904_1962_nofilter.json', 'w'), ensure_ascii=False, separators=(',', ':'))
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as e:
+        import traceback; tb = traceback.format_exc().replace('\n', ' | ')
+        print(f'::error::{type(e).__name__}: {e} || {tb[-1500:]}'); raise
