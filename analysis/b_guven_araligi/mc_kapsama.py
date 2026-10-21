@@ -5,7 +5,7 @@ Gerçek b bilinen sentetik G–R örneklemleri: m = m0 + Üstel(β), β = b·ln1
   ΔM = 0,1 / 0,5 : sınıf indeksi k = ⌊(m − m0)/ΔM⌋, büyüklük = Mc + kΔM, Mc = m0 + ΔM/2;
                    kestirici EQ-Live: b̂ = log10e/(M̄ − Mc + ΔM/2); T–M için r = Σk (tam sayı)
 Ölçütler: kapsama (Wilson %95 MC aralığı), alttan/üstten kaçırma, genişlik, asimetri, sonsuz/başarısız uç sayısı.
-Kullanım: python3 mc_kapsama.py [tekrar=20000] [tohum=20261021]
+Kullanım: python3 mc_kapsama.py [tekrar=20000] [tohum=20261021] [ΔM listesi=0,0.1,0.5] [çıktı=out/mc_kapsama.json]
 """
 import sys, json, math, time
 import numpy as np
@@ -13,7 +13,9 @@ from scipy import stats, special
 LOG10E = math.log10(math.e)
 REPS = int(sys.argv[1]) if len(sys.argv) > 1 else 20000
 SEED = int(sys.argv[2]) if len(sys.argv) > 2 else 20261021
-NS = [4, 10, 20, 30, 40, 49, 100]; BS = [0.7, 1.0, 1.5]; DMS = [0.0, 0.1, 0.5]; ALPHA = 0.05
+NS = [4, 10, 20, 30, 40, 49, 100]; BS = [0.7, 1.0, 1.5]; ALPHA = 0.05
+DMS = [float(x) for x in sys.argv[3].split(',')] if len(sys.argv) > 3 else [0.0, 0.1, 0.5]
+OUT = sys.argv[4] if len(sys.argv) > 4 else 'out/mc_kapsama.json'
 
 def wilson(k, n, z=1.96):
     p = k / n; d = 1 + z * z / n; c = (p + z * z / (2 * n)) / d; h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
@@ -67,7 +69,7 @@ def run():
 
 if __name__ == '__main__':
     meta, res = run()
-    json.dump({'meta': meta, 'sonuc': res}, open('out/mc_kapsama.json', 'w'), ensure_ascii=False, indent=1)
+    json.dump({'meta': meta, 'sonuc': res}, open(OUT, 'w'), ensure_ascii=False, indent=1)
     print(json.dumps(meta, ensure_ascii=False))
     for dm in DMS:
         print(f'\n=== ΔM = {dm}  (b = 1,0)   kapsama [MC %95]  | alttan/üstten kaçırma | göreli genişlik (ortanca) | asimetri | üst ∞')
