@@ -119,3 +119,46 @@ python3 analysis/b_guven_araligi/mc_kapsama.py 20000 20261021   # out/mc_kapsama
 ```
 
 Ortam: Python 3, NumPy 2.5.3, SciPy 1.18.1. Normal yöntemin denetimi için Node.js ve depo kökündeki `index.html` gerekir.
+
+## 9. Ek: ΔM = 0,2 ve 0,3 (eşik gerekip gerekmediğinin sınanması)
+
+Aynı tasarım, tohum 20261022, çıktı `out/mc_kapsama_dM02_03.json` (komut: `python3 mc_kapsama.py 20000 20261022 0.2,0.3 out/mc_kapsama_dM02_03.json`).
+
+χ² aralığının bozulması ΔM'ye tek başına değil, **β·ΔM çarpımına** bağlıdır (β = b·ln 10). Bunun kanıtı şudur: aynı β·ΔM değerini veren iki farklı (ΔM, b) çifti aynı sonucu verir. β·ΔM = 0,69'da (ΔM = 0,3 ile b = 1,0 ve ΔM = 0,2 ile b = 1,5) gerçek b'nin aralığın üstünde kalma oranı ikisinde de en çok %4,9'dur.
+
+| β·ΔM | Örnek (ΔM, b) | chi2 kapsama (en düşük) | chi2: gerçek b aralığın üstünde (en çok) | tm kapsama (en düşük) | tm üst uç ∞, N ≥ 10 (en çok) |
+|---|---|---|---|---|---|
+| 0,16–0,35 | (0,1; 0,7–1,5), (0,2; 0,7) | 0,946–0,950 | %2,8–3,0 | 0,950 | %0 |
+| 0,46–0,48 | (0,2; 1,0), (0,3; 0,7) | 0,947–0,952 | %3,4–3,5 | 0,951–0,953 | %0 |
+| 0,69 | (0,3; 1,0), (0,2; 1,5) | 0,945 | %4,9 | 0,953–0,955 | %0,1 |
+| 0,81 | (0,5; 0,7) | 0,932 | %6,6 | 0,950 | %0,3 |
+| 1,04 | (0,3; 1,5) | 0,887 | %11,2 | 0,953 | %1,2 |
+| 1,15 | (0,5; 1,0) | 0,844 | %15,6 | 0,957 | %2,3 |
+| 1,73 | (0,5; 1,5) | 0,354 | %64,6 | 0,955 | %14,3 |
+
+**Sonuç:**
+- χ² aralığı β·ΔM ≲ 0,5 için yeterlidir. EQ-Live'ın olağan ızgarasında (ΔM = 0,1) bu koşul b ≲ 2,2'ye kadar sağlanır; yani pratikte her zaman.
+- Tinti–Mulargia bütün denenen koşullarda 0,95–0,99 kapsar.
+- Bir yöntem seçimi gerekirse, ölçüt sabit bir ΔM eşiği değil, veriden hesaplanan b̂·ln10·ΔM olmalıdır. Bu da bir tahmindir; sınırda duyarlılık analizi gerekir.
+- Uygulama notu: Tinti–Mulargia, büyüklüklerin tam olarak ΔM ızgarasında olmasını gerektirir (r tam sayı). EQ-Live'da dönüştürülmüş büyüklükler ızgara dışıdır (`mcScale`). Bu durumda χ² doğrudan uygulanabilir, Tinti–Mulargia ise yeniden sınıflama gerektirir.
+
+## 10. Ek: b(t) için N = 50 penceresi (iki kademeli öneri için ön bilgi)
+
+Bugün EQ-Live'da M ≥ Mc olay sayısı 100'ün altındaysa b(t) hiç hesaplanmaz ("N < 100 — kayan pencere b-değeri hesaplanamıyor"). N = 50 penceresinin ne kaybettirdiğini ölçmek için tek bir pencerede şu soru sınandı: %95 χ² aralığı, b₀ = 1,0 referansını ne sıklıkla dışarıda bırakır? (ΔM = 0,1; 20.000 tekrar; tohum 20261023; `bt_pencere.py`, `out/bt_pencere.json`.)
+
+| Gerçek b | N = 50 | N = 100 |
+|---|---|---|
+| 0,6 | %95 | %100 |
+| 0,7 | %74 | %95 |
+| 0,8 | %39 | %64 |
+| 0,9 | %13 | %21 |
+| 1,0 (yanlış alarm) | %5,2 | %4,9 |
+| 1,2 | %22 | %39 |
+| %95 aralığın yarı genişliği (b = 1,0) | ±0,28 | ±0,20 |
+
+**Yorum:**
+- N = 50 penceresi tek başına yanlış alarm üretmez (%5).
+- Ancak orta büyüklükteki değişimleri belirgin biçimde daha seyrek ayırt eder: b = 0,8'i yakalama oranı %39'dur (N = 100'de %64).
+- Kayan pencere boyunca çok sayıda pencere incelendiğinde, rastlantısal "anomali" sayısı pencere sayısıyla artar. 5 olaylık adım, bilgi eklemeden pencere sayısını iki katına çıkarır.
+- Bu nedenle ikinci kademe ancak ayrı etiketle, daha geniş aralıklarla ve yalnız N = 100'ün sağlanamadığı durumda gösterilmelidir.
+- Bu bir üretim değişikliğidir; ayrı onay gerekir.
