@@ -206,3 +206,21 @@ Korunan dosyalar güncel `main` (`0e875b0`) ile aynı. Dal bekletiliyor. Birleş
 - Korunan dosyalar `0e875b0` ile aynı.
 - Canlı site (WebFetch): "ISC-GEM v12.1 Mw katmanı (deneysel · varsayılan kapalı)" ve "Aday merdiven" görünüyor; `data/LISANS_ISC-GEM.txt` yayında. Yayımlanan HTML'de işaret kutusu `checked` taşımıyor.
 - Geri alma: `git revert -m 1 7c606fb`.
+
+## 10. Kapanış ve açık işler (2026-10-21)
+
+Homojenizasyon çalışmasının bu aşaması kapatıldı. Metodoloji belgesi (`Final\seismo-report\eqlive-turkey-methodology.html`, 487.227 bayt) güncellendi:
+- Yeni bölüm eklendi: "Tarihsel katalog homojenizasyonu".
+- 5. bölüm panelinin eksik kapanış etiketi düzeltildi. Hata 2026-09-29'dan beri vardı.
+- Aki (1965) paragrafı düzeltildi: kestiricinin varsayımları ve EQ-Live'daki fiilî formül ayrı ayrı yazıldı. EQ-Live'da Utsu ΔM/2 düzeltmesi uygulanıyor; küçük örneklem çarpanı uygulanmıyor; σ ≈ b/√N; Shi & Bolt (1982) uygulanmadı.
+
+ISC-GEM v12.1 zip dosyası `Final\seismo-report\veri-arsivi\` klasörüne taşındı (SHA-256 doğrulandı, OKUBENI.txt ile).
+
+**Açık işler (her biri ayrı karar ve onayla; sıra: mevcut sürüm ve testleri doğrula → tek değişiklik → test → doğrulama):**
+1. **Arayüz düzeltmesi (üretim onayı gerekir):** Tamlık bilgi satırı (`eq_historical.json` → `completeness`) sorgu eşikleriyle uyuşmuyor. Aday merdivenin kapsamı (katalog sürümü, kutu, dönem) düğme açıklamasında belirtilmeli. İkisi tek bir işte ele alınacak. Korunan dosyaya dokunmadan, `index.html`'de çözüm aranacak.
+2. **18 + 4 olay denetim tablosu (yalnız analiz):**
+   - 18: ISC-GEM'de kayıtlı, ISC sorgularında eşleşme bulunamadı.
+   - 4: ISC M ≥ 5,5 ile döndürüyor ama EQ-Live'da yok.
+   - Tablonun sütunları: olay kimliği, zaman, konum, büyüklük ve türü, uygulanan sorgu ve pencere, eşleşmeme nedeni.
+   - Amaç: gerçek veri eksikliğini; sorgu süzgeci, eşleştirme toleransı ya da büyüklük ölçeği kaynaklı farklardan ayırmak.
+3. **Gelecek geliştirmeler (karar bekliyor):** b için küçük örneklem düzeltmesi ve Shi & Bolt (1982) belirsizliği; `scripts/test_fit_range.js` onarımı (`main`'de bozuk).
