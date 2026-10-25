@@ -4,8 +4,9 @@
 //   1. Varsayılan (BT_WIN_N = 100) ile açıkça nWin = 100 aynı seriyi verir; ?btn yoksa BT_WIN_N = 100.
 //   2. nWin = 50 / 30 / 20'de her pencere tam nWin olaydır; pencere sayısı ⌊(N − nWin)/adım⌋ + 1; her b, aynı olaylardan
 //      computeBvalue ile birebirdir; aralık alanları (lo, hi, ciM) doludur.
-//   3. Adım varsayılanı N/10 (100 → 10, 50 → 5, 30 → 3, 20 → 2); ?btn yalnız 100/50/30/20 kabul eder.
-//   4. Uyarı metni N = 100'de boş, N < 100'de dolu; N = 20 "keşif" olarak etiketlenir.
+//   3. Adım varsayılanı N/10 (20 → 2 … 500 → 50); ?btn yalnız 20/30/50/100/200/300/500 kabul eder.
+//   4. Uyarı metni N = 100'de boş; N < 100'de küçük örneklem, N > 100'de düzleşme uyarısı; N = 20 "keşif" olarak etiketlenir.
+//   5. N = 200 / 300 / 500 (1500 olaylık katalog): pencere sayısı ve b'ler birebir.
 // Kullanım (depo kökünde): node scripts/test_bt_window.js [index.html]
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -28,7 +29,7 @@ const T0 = Date.parse('2015-01-01'), T1 = Date.parse('2025-01-01');
 const ev = Array.from({ length: 400 }, () => ({ time: new Date(T0 + rnd() * (T1 - T0)), mag: +(2.0 + Math.floor(-Math.log(1 - rnd()) / Math.LN10 / 0.1) * 0.1).toFixed(1) }));
 const Mc = 2.0;
 
-ok(X.N === 100 && mk('?btn=50').N === 50 && mk('?btn=40').N === 100 && mk('?btn=20').N === 20, `URL: varsayılan ${X.N}; ?btn=50 → 50; ?btn=40 (geçersiz) → 100; ?btn=20 → 20`);
+ok(X.N === 100 && mk('?btn=50').N === 50 && mk('?btn=40').N === 100 && mk('?btn=20').N === 20 && mk('?btn=500').N === 500 && mk('?btn=400').N === 100, `URL: varsayılan ${X.N}; ?btn=50 → 50; ?btn=40 / 400 (geçersiz) → 100; ?btn=20 → 20; ?btn=500 → 500`);
 { const a = X.computeBvalueTimeSeries(ev, Mc, 10, 0.1), b = X.computeBvalueTimeSeries(ev, Mc, 10, 0.1, 100);
   ok(JSON.stringify(a) === JSON.stringify(b) && a.series.length === Math.floor((400 - 100) / 10) + 1, `varsayılan = nWin 100 (${a.series.length} pencere)`); }
 for (const [n, st] of [[100, 10], [50, 5], [30, 3], [20, 2]]) {
@@ -43,5 +44,11 @@ X.N = 30; ok(/N = 30/.test(X.btWinNote()) && !/keşif/.test(X.btWinNote()), 'N =
 X.N = 20; ok(/keşif/.test(X.btWinNote()) && /exploratory/.test(X.btWinNote(true)), 'N = 20: keşif amaçlı olarak etiketlenir');
 { X.N = 50; const small = ev.slice(0, 60); ok(X.computeBvalueTimeSeries(small, Mc, 5, 0.1).series.length > 0 && X.computeBvalueTimeSeries(small, Mc, 10, 0.1, 100).series.length === 0,
     '60 olay: N = 100 ile b(t) yok, N = 50 ile var'); }
+
+X.N = 200; ok(/büyük pencere/.test(X.btWinNote()) && /düzleşir/.test(X.btWinNote()) && /smoothed/.test(X.btWinNote(true)) && /180 olayı/.test(X.btWinNote()), 'N = 200: düzleşme uyarısı, paylaşılan olay sayısı (180)');
+{ const big = Array.from({ length: 1500 }, () => ({ time: new Date(T0 + rnd() * (T1 - T0)), mag: +(2.0 + Math.floor(-Math.log(1 - rnd()) / Math.LN10 / 0.1) * 0.1).toFixed(1) })), sb = big.slice().sort((p, q) => p.time - q.time);
+  for (const [n, st] of [[200, 20], [300, 30], [500, 50]]) { X.N = n; const r = X.computeBvalueTimeSeries(big, Mc, X.btDefaultStep(), 0.1, n), expN = Math.floor((1500 - n) / st) + 1; let same = true, nar = true;
+    r.series.forEach((q, k) => { same = same && Math.abs(q.b - X.computeBvalue(sb.slice(k * st, k * st + n).map(e => e.mag), Mc, 0.1)) < 1e-12; nar = nar && q.ciM === 'tm' && q.hi - q.lo < 0.45; });
+    ok(X.btDefaultStep() === st && r.series.length === expN && same && nar, `N = ${n}: adım ${st}, ${r.series.length} pencere (beklenen ${expN}); b'ler birebir; T–M aralığı dar`); } }
 
 console.log(`\n${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);

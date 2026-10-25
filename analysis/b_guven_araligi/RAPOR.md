@@ -318,3 +318,25 @@ Tarihsel katalog üretimde kullanılır: "1900–1970" ve "1971–1997" ISC dü�
 | 1971–1997 (Mc 3,7) | 4808 | %56 | 0,718 | 0,782 | 0,723 |
 
 Hangi tutarlı düzeltmenin (yuvarlama ya da çözünürlüğe göre ΔM) seçileceği bir yöntem kararıdır; ertelendi. Bugün bu pencerelerde aralık χ²'dir (ızgara dışı).
+
+## 15. Büyük pencereler (N = 200 / 300 / 500) ve düzleşme (2026-10-25)
+
+**Uygulama:** Seçenekler 20, 30, 50, 100 (varsayılan), 200, 300, 500; adım N/10; `?btn=` yalnız bu değerleri kabul eder. N > 100'de uyarı: "aralıklar dar, ancak yaklaşık N olaydan kısa süren değişimler düzleşir; ardışık pencereler N − adım olayı paylaşır". Seçicide M ≥ Mc olay sayısının yetmediği seçenekler "— yetersiz (N = …)" olarak işaretlenir (devre dışı bırakılmaz). N ≤ 30 uyarısına uzun serilerde rastlantısal sınıflama ve en düşük pencere b'sinin aşağı sapması eklendi. `test_bt_window.js` 18/0.
+
+**Monte Carlo (`mc_btbuyuk.js`, üretim kodu; 300 tekrar, tohum 20261028):** 5000 olaylık YAPAY katalog (ideal G–R, 0,1 ızgarası), arka plan b = 1,0; ortada L olay süren b = 0,6 bölümü. "Yakalama": bölümle örtüşen pencerelerden en az biri "düşük b" sınıfında (aralığın tamamı < 0,7). Hücrelerde: yakalama olasılığı, serinin en düşük b̂'si (ortanca).
+
+| N | durağan: pencere kapsaması | durağan: en az bir yanlış sınıflı pencere içeren seri | durağan: en düşük b̂ | L = 100 | L = 200 | L = 400 | L = 1000 |
+|---|---|---|---|---|---|---|---|
+| 20 | 0,951 | %67 | 0,53 | 0,76 / 0,43 | 0,93 / 0,40 | 0,99 / 0,38 | 1,00 / 0,35 |
+| 30 | 0,951 | %21 | 0,60 | 0,64 / 0,48 | 0,86 / 0,44 | 0,99 / 0,42 | 1,00 / 0,40 |
+| 50 | 0,952 | %2 | 0,68 | 0,54 / 0,53 | 0,81 / 0,49 | 0,97 / 0,47 | 1,00 / 0,44 |
+| 100 | 0,951 | %0 | 0,77 | 0,37 / 0,60 | 0,73 / 0,55 | 0,95 / 0,52 | 1,00 / 0,49 |
+| 200 | 0,950 | %0 | 0,84 | 0,01 / 0,73 | 0,60 / 0,60 | 0,91 / 0,56 | 1,00 / 0,54 |
+| 300 | 0,949 | %0 | 0,88 | 0,00 / 0,79 | 0,09 / 0,68 | 0,87 / 0,59 | 1,00 / 0,56 |
+| 500 | 0,952 | %0 | 0,91 | 0,00 / 0,85 | 0,00 / 0,77 | 0,46 / 0,64 | 1,00 / 0,58 |
+
+**Sonuçlar:**
+1. Pencere başına aralık her N'de nominaldir; büyük pencere geçerliliği bozmaz, aralığı daraltır.
+2. Bir b anomalisi ancak süresi pencereden uzunsa (L ≳ N olay) güvenilir biçimde yakalanır: N = 500, 200 olaylık bir bölümü hiç yakalamaz; N = 200, 100 olaylık bölümü %1 olasılıkla yakalar. Büyük pencerede eğrinin inebildiği en düşük değer de yükselir (L = 200'de N = 500 için 0,77; gerçek 0,6).
+3. Küçük pencerenin bedeli rastlantısal anomalidir ve seri uzadıkça artar: durağan 5000 olayda N = 20'de serilerin %67'si en az bir yanlış sınıflı pencere içerir (§14'teki 600 olaylık seride %12). Serinin en düşük b̂'si, çok sayıda pencere arasından seçildiği için aşağı yanlıdır (N = 20'de 0,53, gerçek 1,0). Küçük N'de yakalanan "düşük b" dolayısıyla tek başına kanıt değildir; örtüşmeyen dönemler Utsu testiyle karşılaştırılmalıdır (§13).
+4. Pratik kural: beklenen değişimin süresinden (olay sayısı olarak) daha kısa bir pencere seçilmeli; N ≤ 30 yalnız kısa ya da az olaylı serilerde keşif için kullanılmalıdır.
