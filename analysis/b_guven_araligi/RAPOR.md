@@ -137,7 +137,7 @@ Aynı tasarım, tohum 20261022, çıktı `out/mc_kapsama_dM02_03.json` (komut: `
 | 1,73 | (0,5; 1,5) | 0,354 | %64,6 | 0,955 | %14,3 |
 
 **Sonuç:**
-- χ² aralığı β·ΔM ≲ 0,5 için yeterlidir. EQ-Live'ın olağan ızgarasında (ΔM = 0,1) bu koşul b ≲ 2,2'ye kadar sağlanır; yani pratikte her zaman.
+- χ² aralığı β·ΔM ≲ 0,5 için yeterlidir. EQ-Live'ın olağan ızgarasında (ΔM = 0,1) bu koşul b ≲ 2,2'ye kadar sağlanır; yani pratikte her zaman. **Düzeltme (§12):** Bu sonuç N ≤ 100 için geçerlidir; N ≳ 2000'de ΔM = 0,1'de de geçerli değildir.
 - Tinti–Mulargia bütün denenen koşullarda 0,95–0,99 kapsar.
 - Bir yöntem seçimi gerekirse, ölçüt sabit bir ΔM eşiği değil, veriden hesaplanan b̂·ln10·ΔM olmalıdır. Bu da bir tahmindir; sınırda duyarlılık analizi gerekir.
 - Uygulama notu: Tinti–Mulargia, büyüklüklerin tam olarak ΔM ızgarasında olmasını gerektirir (r tam sayı). EQ-Live'da dönüştürülmüş büyüklükler ızgara dışıdır (`mcScale`). Bu durumda χ² doğrudan uygulanabilir, Tinti–Mulargia ise yeniden sınıflama gerektirir.
@@ -165,6 +165,8 @@ Bugün EQ-Live'da M ≥ Mc olay sayısı 100'ün altındaysa b(t) hiç hesaplanm
 
 ## 11. Üretim uygulaması (dal `b-ci-chi2`, 2026-10-25; `main`'e birleştirme ayrı onaya bağlı)
 
+> **Not (aynı gün, §12):** Aşağıdaki seçim kuralı (varsayılan χ², β̂·ΔM > 0,5'te T–M) birleşik kural simülasyonunda başarısız oldu ve değiştirildi. Güncel kural §12'dedir; bu bölüm kayıt olarak korunur.
+
 Karar (2026-10-21, kullanıcı onayı): bütün b aralıkları birlikte χ²'ye geçer; N = 50'de geçiş eşiği yok; kestirici değişmez; kaba gruplama için Tinti–Mulargia.
 
 **Uygulama (`index.html`):**
@@ -183,3 +185,64 @@ Karar (2026-10-21, kullanıcı onayı): bütün b aralıkları birlikte χ²'ye 
 - Sentetik katalogla (yapay veri) tarayıcıda: T–M dalı 47 pencerede tetiklendi, uçları `bci.py` ile 3 ondalıkta aynı; SVG'lerde NaN/∞ yok; dizi paneli ve dizi b(t) şeridi hatasız.
 
 **Açık kalanlar:** yöntem belgesi (eqlive-turkey-methodology.html, depo dışında) birleştirme onayından sonra güncellenecek; `test_b_ci.js` henüz bir CI iş akışına bağlı değil.
+
+## 12. Birleştirme öncesi denetim ve kural değişikliği (2026-10-25)
+
+Amaç: üretimdeki **birleşik** kuralı (yalnız bileşenleri değil) üretim kodunun kendisiyle sınamak, büyük N'yi kapsamak ve kod–rapor–yöntem belgesi tutarlılığını sağlamak.
+
+### 12.1 Birleşik kural simülasyonu (`mc_secim.js`, üretim `bCiFields`, kopya yok)
+
+İdeal G–R, büyüklükler ızgarada; 4000 tekrar, tohum 20261025; ΔM ∈ {0,1; 0,2; 0,3; 0,5}, b ∈ {0,5 … 3,0}, N ∈ {10, 20, 49, 100, 500} (100 hücre). Çıktı `out/mc_secim.json` (yeni kural); eski kuralın sonucu bu bölümdeki tabloda.
+
+**Eski kural (χ², β̂·ΔM > 0,5 ise T–M):** 11 hücrede kapsama < 0,935, en düşük 0,903 (ΔM = 0,1, b = 2,2, N = 500). Birleşik kural eşik çevresinde **her iki bileşeninden de kötüdür**:
+
+| ΔM | b | N | birleşik (eski) | yalnız χ² | yalnız T–M |
+|---|---|---|---|---|---|
+| 0,1 | 2,2 | 500 | 0,903 | 0,918 | 0,954 |
+| 0,1 | 2,1 | 500 | 0,921 | 0,936 | 0,953 |
+| 0,2 | 1,1 | 500 | 0,921 | 0,936 | 0,962 |
+| 0,3 | 0,7 | 500 | 0,923 | 0,940 | 0,956 |
+
+Nedenleri: (i) seçim b̂'ye bağlıdır; b̂ rastlantısal olarak düşük çıktığında χ² seçilir ve o örneklemlerde χ² aralığı da aşağı kaymıştır (gerçek b üstte kalır); (ii) 0,5 eşiği N ≤ 100 verisinden türetilmişti.
+
+### 12.2 Büyük N'de χ² (ΔM = 0,1, EQ-Live'ın olağan ızgarası)
+
+| b | β·ΔM | N | tekrar | χ² kapsama (gerçek b üstte) | T–M kapsama |
+|---|---|---|---|---|---|
+| 0,8 | 0,18 | 2000 | 1500 | 0,931 (%4,5) | 0,939 |
+| 1,0 | 0,23 | 2000 | 1500 | 0,945 (%4,4) | 0,952 |
+| 1,0 | 0,23 | 10 000 | 600 | 0,933 (%6,0) | 0,952 |
+| 1,2 | 0,28 | 10 000 | 600 | 0,895 (%10,3) | 0,947 |
+| 1,5 | 0,35 | 10 000 | 600 | 0,830 (%17,0) | 0,942 |
+
+Utsu'nun ΔM/2 düzeltmesi gruplamanın etkisini tam gidermez; kalan yanlılık sabit kalırken standart hata 1/√N ile küçüldüğü için büyük N'de belirleyici olur. χ² aralığı b̂'ye bağlı olduğundan bu yanlılığı taşır; T–M aralığı b̂'ye değil N ve r'ye bağlıdır. (b = 0,8, N = 2000'deki 0,939, 1500 tekrarda Monte Carlo standart hatası ≈ 0,006 içinde nominalin biraz altındadır.)
+
+### 12.3 Yeni kural
+
+- Bütün büyüklükler ΔM ızgarasındaysa (|(m − Mc)/ΔM − tam sayı| ≤ 10⁻⁶): **her zaman T–M**. b̂'ye bağlı eşik yok.
+- Izgara dışı en az bir büyüklük varsa ya da fark dizisi verilmemişse: χ²₂N (sürekli büyüklükte kesin, gruplanmışta yaklaşık).
+- Çift kesik fit aralığı: Fisher SE (değişmedi). `?bci=normal`: eski ±1,96·b/√N (değişmedi).
+
+Sonuç (aynı 100 hücre): kapsama 0,944–0,984; birleşik kural 100/100 hücrede yalnız T–M ile özdeş; tek yönlü kaçırma en çok %2,8. N = 10'da tek uç sınırsız olma oranı en çok %13,9 (ΔM = 0,5, b = 1,5; veri üst sınır taşımıyor).
+
+### 12.4 Yan bulgular
+
+- **Gerçek kataloglarda hangi yol çalışıyor (tarayıcı, 2026-10-25 verisi):** güncel katalog → T–M (b(t) 2/2 pencere, G–R); tarihsel katalog (`eq_historical.json`) → χ² (34/34 pencere, G–R). Tarihsel katalogda büyüklüklerin %3,7'si (3285/88 333) iki ondalıklı; tek bir ızgara dışı değer örneklemin tamamını χ²'ye düşürür. Bu, kullanıcı kararı gerektirir (aşağıda).
+- **Kestirici:** b̂ (Aki–Utsu) gruplamadan dolayı hafifçe düşüktür (β·ΔM = 0,35'te ≈ %1). T–M aralığı bunu taşımadığı için b̂ büyük N'de aralığın alt kısmına yakın durur; çok büyük N'de (b ≈ 1,5, N ≳ 10⁵) aralığın dışına düşebilir. Kestiricinin T&M Eş. 14 ile değiştirilmesi ayrı bir karardır; bu çalışmada kestirici değişmedi.
+- **Performans:** T–M çekirdeği tarayıcıda/Node'da ~0,06 ms/çağrı (önceki 5 ms ölçümü Node `vm` ortamının yüküydü); sonuçlar (N, r, ΔM) anahtarıyla önbelleğe alınır.
+- **Atlanan tüketici bulundu ve düzeltildi:** bölge karşılaştırma tablosu `b ± σ` (1σ) gösteriyordu; artık `b [%95]` (normal kipte eski gösterim). CSV dışa aktarımı eski sütunları korur, sona `b_alt95, b_ust95, b_aralik_yontemi` ekler.
+
+### 12.5 Doğrulama (bu bölümdeki kod durumu)
+
+- `test_b_ci.js` 32/0 (seçim kuralı güncellendi; N = 10 000 büyük-N kontrolü eklendi). Mevcut testler değişmedi.
+- Tarayıcı, `?bci=normal`: 45 öğe ve poster PNG'si main ile bayt bayt aynı (fark yalnız durum nesnelerindeki yeni alanlar ve Mc tablosu başlığındaki statik etiket). Sentetik katalogda (yapay veri) main ile dalın normal kipi bölge karşılaştırma tablosu dahil birebir aynı; yeni kuralda 167/167 pencere T–M, SVG'lerde NaN/∞ yok, sayfa hatası yok.
+
+### 12.6 Sınırlar (geçerlilik iddiasının kapsamı)
+
+Bütün kapsama sonuçları **ideal** G–R örneklemlerine aittir: tam tamlık, hatasız büyüklük, tek ölçek, bağımsız olaylar. Aralıklar yalnız örnekleme belirsizliğini temsil eder. Gerçek kataloglarda tamlık hatası, büyüklük ölçüm hatası (Tinti & Mulargia 1985), ölçek karışımı ve artçı kümelenmesi kapsamayı düşürebilir; bunlar sınanmadı. b(t) pencereleri örtüştüğü için ardışık pencerelerin aralıkları bağımsız değildir. Sentetik katalog görüntüleri (ör. `cmp_sens.png`) tek gerçekleşmedir ve kapsama kanıtı değildir.
+
+### 12.7 Karar bekleyenler
+
+1. Yeni kural (ızgarada her zaman T–M) — 2026-10-21 onayındaki "varsayılan χ²" kararının yerine geçer.
+2. Kısmen ızgara dışı kataloglar (tarihsel katalog %3,7): (a) bugünkü katı kural (χ²), (b) büyüklükleri sınıf merkezine yuvarlayıp T–M (G–R panelindeki sınıflamayla ve kestiricinin ΔM/2 varsayımıyla tutarlı), (c) ızgara dışı oranına bağlı eşik (önerilmez: yeni bir veri bağımlı seçim).
+3. Kestirici (T&M Eş. 14) — ayrı iş.

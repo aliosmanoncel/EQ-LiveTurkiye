@@ -4,8 +4,8 @@
 // Denetlenen iddialar:
 //   1. χ² uçları (Utsu 1966; Shi & Bolt 1982) ve Tinti & Mulargia (1987) Eş. 19–21 uçları, scipy ile üretilmiş
 //      referans değerlerle (analysis/b_guven_araligi/bci.py) 1e-9 göreli hata içinde aynıdır; r = 0 → üst uç sonsuz.
-//   2. Yöntem seçimi: varsayılan χ²; β̂·ΔM > 0,5 VE bütün büyüklükler ΔM ızgarasında → T–M; ızgara dışı → χ².
-//      N < 50'de ayrı bir geçiş yoktur (aynı veri N = 49 ve N = 50'de aynı yöntemle hesaplanır).
+//   2. Yöntem seçimi (2026-10-25, RAPOR §12): bütün büyüklükler ΔM ızgarasında → T–M (b̂'ye bağlı eşik yok); ızgara dışı
+//      ya da fark dizisi yok → χ². N'ye bağlı geçiş yoktur (aynı veri N = 49 ve N = 50'de aynı yöntemle hesaplanır).
 //   3. 'normal' kipte (?bci=normal) alanlar eski ±1,96·b/√N hesabıyla birebir aynıdır; metin biçimi " ± 0.12" kalır.
 //   4. btClassOf asimetrik uçları kullanır; bCiDiffSig 'normal'de eski formülü, aksi hâlde karşıya bakan kolları kullanır.
 //   5. Tohumlu küçük kapsama denetimi: ΔM = 0,1'de χ² nominal kapsar; ΔM = 0,5, b = 1,5'te χ² düşer, T–M nominal kalır.
@@ -43,7 +43,8 @@ REF.tm.forEach(([n, r, dm, lo, hi]) => { const t = X.bCiTintiMulargia(n, r, dm);
 const grid = (b, n, dm, seed) => { let s = seed; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
   return Array.from({ length: n }, () => Math.floor(-Math.log(1 - r()) / (b * Math.LN10) / dm) * dm); };   // (m − Mc), ızgarada
 { const ex = grid(1.0, 60, 0.1, 7), b = Math.LOG10E / (ex.reduce((a, v) => a + v, 0) / ex.length + 0.05), f = X.bCiFields(b, ex.length, ex, 0.1);
-  ok(f.ciM === 'chi2', `ΔM = 0,1, b̂ = ${b.toFixed(2)} → ${f.ciM}`); }
+  ok(f.ciM === 'tm', `ΔM = 0,1, b̂ = ${b.toFixed(2)} (ızgarada, düşük β̂ΔM) → ${f.ciM}`);
+  const o = X.bCiFields(b, ex.length, ex.map(v => v + 0.0371), 0.1); ok(o.ciM === 'chi2' && Math.abs(o.lo - X.bCiChi2(b, ex.length).lo) < 1e-15, `ızgara dışı → ${o.ciM}`); }
 { const ex = grid(2.8, 60, 0.1, 11), b = Math.LOG10E / (ex.reduce((a, v) => a + v, 0) / ex.length + 0.05), f = X.bCiFields(b, ex.length, ex, 0.1);
   ok(b * Math.LN10 * 0.1 > 0.5 && f.ciM === 'tm' && Number.isFinite(f.lo), `ΔM = 0,1, b̂ = ${b.toFixed(2)} (β̂ΔM = ${(b * Math.LN10 * 0.1).toFixed(2)}) → ${f.ciM}`);
   const off = ex.map((v, i) => v + (i === 3 ? 0.013 : 0)), g = X.bCiFields(b, ex.length, off, 0.1); ok(g.ciM === 'chi2', `ızgara dışı büyüklük → ${g.ciM} (T–M r tam sayı ister)`);
@@ -51,7 +52,7 @@ const grid = (b, n, dm, seed) => { let s = seed; const r = () => (s = (s * 16807
 { const ex = grid(1.5, 50, 0.5, 5), b = Math.LOG10E / (ex.reduce((a, v) => a + v, 0) / 50 + 0.25), f = X.bCiFields(b, 50, ex, 0.5);
   ok(f.ciM === 'tm', `ΔM = 0,5, b̂ = ${b.toFixed(2)} → ${f.ciM}`); }
 { const ex = grid(1.0, 50, 0.1, 3), a = ex.slice(0, 49), A = X.bCiFields(1.0, 49, a, 0.1), B = X.bCiFields(1.0, 50, ex, 0.1);
-  ok(A.ciM === B.ciM && A.ciM === 'chi2', `N = 49 ve N = 50 aynı yöntem (${A.ciM}/${B.ciM}); 50'de geçiş yok`); }
+  ok(A.ciM === B.ciM && A.ciM === 'tm', `N = 49 ve N = 50 aynı yöntem (${A.ciM}/${B.ciM}); 50'de geçiş yok`); }
 { const t = X.bCiFields(2.5, 20, Array(20).fill(0), 0.1); ok(t.ciM === 'tm' && t.hi === Infinity && t.err === Infinity && X.bCiTxt({ b: 2.5, ...t }).endsWith('–∞]'), `r = 0 → üst uç sınırsız, metin "${X.bCiTxt({ b: 2.5, ...t })}"`); }
 ok(X.bCiFields(null, 30).lo === null && X.bCiFields(1, 0).err === null, 'b yok ya da N = 0 → aralık yok');
 
@@ -77,5 +78,10 @@ const cover = (b, n, dm, reps, seed) => { let s = seed; const r = () => (s = (s 
     c += q.lo <= b && b <= q.hi; t += tq.lo <= b && b <= tq.hi; } return [c / reps, t / reps]; };
 { const [c, t] = cover(1.0, 10, 0.1, 3000, 20261025); ok(Math.abs(c - 0.95) < 0.02 && Math.abs(t - 0.95) < 0.02, `ΔM = 0,1, b = 1, N = 10: χ² ${c.toFixed(3)}, T–M ${t.toFixed(3)}`); }
 { const [c, t] = cover(1.5, 49, 0.5, 2000, 777); ok(c < 0.85 && t >= 0.93, `ΔM = 0,5, b = 1,5, N = 49: χ² ${c.toFixed(3)} (düşer), T–M ${t.toFixed(3)} (nominal)`); }
+
+{ let s2 = 99, cc = 0, ct = 0; const R = 300, N = 10000, b = 1.5, beta = b * Math.LN10, rr = () => (s2 = (s2 * 48271) % 2147483647) / 2147483647;
+  for (let k = 0; k < R; k++) { let sum = 0; for (let i = 0; i < N; i++) sum += Math.floor(-Math.log(1 - rr()) / beta / 0.1);
+    const bh = Math.LOG10E / (0.1 * (sum / N + 0.5)), q = X.bCiChi2(bh, N), t = X.bCiTintiMulargia(N, sum, 0.1); cc += q.lo <= b && b <= q.hi; ct += t.lo <= b && b <= t.hi; }
+  ok(cc / R < 0.9 && ct / R > 0.92, `ΔM = 0,1, b = 1,5, N = 10 000 (${R} tekrar): χ² ${(cc / R).toFixed(3)} (büyük N'de düşer), T–M ${(ct / R).toFixed(3)}`); }
 
 console.log(`\n${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);
