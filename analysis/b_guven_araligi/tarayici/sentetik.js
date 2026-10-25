@@ -37,7 +37,7 @@ const [port, q, tag] = process.argv.slice(2), LB = process.env.LB, SP = process.
   out.pbPanelBad = await p.evaluate(() => /NaN|Infinity/.test(document.getElementById('pbSeqPanel')?.innerHTML || '')); out.pbPanelLen = await p.evaluate(() => (document.getElementById('pbSeqPanel')?.innerHTML || '').length);
   out.cmp = await p.evaluate(() => { try { const L = window.__syn, mkR = (nm, a, z) => { const ev = L.filter(e => e.time >= Date.parse(a) && e.time < Date.parse(z));
       return { name: nm, src: 'sentetik', shape: 'kutu', area: 50000, cLat: 39, t0: Date.parse(a), t1: Date.parse(z), Mc: 3.2, dm: 0.1, mags: ev.map(e => Math.round(e.mag * 100) / 100), types: {}, url: '', added: '', pts: ev.map(e => [e.lat, e.lon, e.mag]) }; };
-      CMP.length = 0; CMP.push(mkR('A 2010–2014', '2010-01-01', '2014-01-01'), mkR('B 2024–2026', '2024-01-01', '2026-06-01')); cmpRender();
+      CMP.length = 0; CMP.push(mkR('A 2010–2014', '2010-01-01', '2014-01-01'), mkR('B 2024–2026', '2024-01-01', '2026-06-01'), mkR('C 2011 (kısa)', '2011-01-01', '2011-07-01')); cmpRender();
       return (document.getElementById('cmpTable')?.innerText || '').replace(/\s+/g, ' ').slice(0, 700); } catch (e) { return 'HATA ' + e.message; } });
   const shot = async (id, f) => { const e = await p.$('#' + id); if (e && await e.isVisible()) { await e.screenshot({ path: `${SP}/${tag}_${f}.png` }); return f; } return null; };
   out.shots = [await shot('pbSeqSvg', 'pbseq')];

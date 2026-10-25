@@ -21,7 +21,7 @@ const cls = src.match(/^const BT_CLASS = [^\n]*$/m);
 const mk = search => { const ctx = { URLSearchParams }; vm.createContext(ctx);
   vm.runInContext(`var location = { search: ${JSON.stringify(search)} };\n` + (cls ? cls[0].replace('const ', 'var ') + '\n' : 'var BT_CLASS = { lo: 0.7, hi: 1.4 };\n')
     + fn('computeBvalue') + '\n' + fn('btClassOf') + '\n' + block()
-    + '\nglobalThis.__x = { computeBvalue, bConfidence95, bCiChi2, bCiTintiMulargia, bCiFields, bCiFromSym, bCiTxt, bCiDiffSig, btClassOf, method: () => B_CI_METHOD };', ctx);
+    + '\nglobalThis.__x = { computeBvalue, bConfidence95, bCiChi2, bCiTintiMulargia, bCiFields, bCiFromSym, bCiTxt, bCiDiffSig, bUtsuP, btClassOf, method: () => B_CI_METHOD };', ctx);
   return ctx.__x; };
 const X = mk(''), N0 = mk('?bci=normal');
 let pass = 0, fail = 0;
@@ -83,5 +83,13 @@ const cover = (b, n, dm, reps, seed) => { let s = seed; const r = () => (s = (s 
   for (let k = 0; k < R; k++) { let sum = 0; for (let i = 0; i < N; i++) sum += Math.floor(-Math.log(1 - rr()) / beta / 0.1);
     const bh = Math.LOG10E / (0.1 * (sum / N + 0.5)), q = X.bCiChi2(bh, N), t = X.bCiTintiMulargia(N, sum, 0.1); cc += q.lo <= b && b <= q.hi; ct += t.lo <= b && b <= t.hi; }
   ok(cc / R < 0.9 && ct / R > 0.92, `ΔM = 0,1, b = 1,5, N = 10 000 (${R} tekrar): χ² ${(cc / R).toFixed(3)} (büyük N'de düşer), T–M ${(ct / R).toFixed(3)}`); }
+
+// 6. Utsu (1992) fark testi: özdeş b ve N'de dA = −2 → P = e⁻¹; simetri; küçük N kalibrasyonu (yanlış alarm ≈ %5)
+ok(Math.abs(X.bUtsuP(1, 30, 1, 30) - Math.exp(-1)) < 1e-12 && Math.abs(X.bUtsuP(0.8, 25, 1.2, 40) - X.bUtsuP(1.2, 40, 0.8, 25)) < 1e-12, 'Utsu P: özdeşte e⁻¹, örneklemlerin sırasına göre simetrik');
+ok(X.bUtsuP(1, 30, 1.6, 30) < X.bUtsuP(1, 30, 1.3, 30) && X.bUtsuP(1, 0, 1, 30) === null, 'Utsu P: fark büyüdükçe küçülür; N = 0 → yok');
+{ let s3 = 31, fa = 0; const R = 3000, N = 30, beta = Math.LN10, rr = () => (s3 = (s3 * 48271) % 2147483647) / 2147483647;
+  const bh = () => { let sum = 0; for (let i = 0; i < N; i++) sum += Math.floor(-Math.log(1 - rr()) / beta / 0.1); return Math.LOG10E / (0.1 * (sum / N + 0.5)); };
+  for (let k = 0; k < R; k++) fa += X.bUtsuP(bh(), N, bh(), N) < 0.05;
+  ok(Math.abs(fa / R - 0.05) < 0.015, `Utsu P < 0,05 yanlış alarm (N = 30, b₁ = b₂ = 1, ${R} çift): ${(fa / R).toFixed(3)}`); }
 
 console.log(`\n${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);

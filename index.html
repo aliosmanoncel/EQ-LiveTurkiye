@@ -2695,6 +2695,14 @@ function bCiTmNote(list, en = false) {   // yöntemi T&M dışında kalan öğel
   return (c ? (en ? `; χ²₂N in ${c} window(s) with off-grid magnitudes` : `; ızgara dışı büyüklüklü ${c} pencerede χ²₂N`) : '')
     + (f ? (en ? `; Fisher SE (symmetric) in ${f} doubly truncated window(s)` : `; çift kesik ${f} pencerede Fisher SE (simetrik)`) : '');
 }
+// İki bağımsız b tahmininin doğrudan karşılaştırılması: Utsu (1992) testi (Schorlemmer vd. 2004 biçimi).
+// dA = −2N ln N + 2N₁ ln(N₁ + N₂b₁/b₂) + 2N₂ ln(N₁b₂/b₁ + N₂) − 2, N = N₁ + N₂; P ≈ exp(−dA/2 − 2) (iki b'nin aynı olduğu hipotezi).
+// Monte Carlo (RAPOR §13): N = 10–49'da P < 0,05 yanlış alarm oranı %4–5; iki %95 aralığın örtüşmemesi ölçütünden belirgin biçimde güçlü.
+function bUtsuP(b1, n1, b2, n2) {
+  if (!(b1 > 0) || !(b2 > 0) || !(n1 > 0) || !(n2 > 0)) return null;
+  const n = n1 + n2, dA = -2 * n * Math.log(n) + 2 * n1 * Math.log(n1 + n2 * b1 / b2) + 2 * n2 * Math.log(n1 * b2 / b1 + n2) - 2;
+  return Math.min(1, Math.exp(-dA / 2 - 2));
+}
 function bCiS(orig, alt) { return B_CI_METHOD === 'normal' ? orig : alt; }   // metin: 'normal'de özgün ifade, aksi hâlde yeni
 function bCiMethodTxt(en = false) {
   if (B_CI_METHOD === 'normal') return en ? '95% CI ±1.96·b/√N (Aki 1965)' : '%95 aralık ±1,96·b/√N (Aki 1965)';
@@ -3291,7 +3299,7 @@ function cmpRender() {
   const notes = [];
   if (new Set(CMP.map(r => r.src)).size > 1) notes.push('kataloglar farklı');
   if (new Set(CMP.map(r => r.Mc)).size > 1) notes.push('Mc değerleri farklı (her bölge kendi Mc\'siyle)');
-  if (S.some(s => s.small)) notes.push('N(≥Mc) < 50 olan bölgede b güvenilmez');
+  if (S.some(s => s.small)) notes.push(bCiS('N(≥Mc) < 50 olan bölgede b güvenilmez', 'N(≥Mc) < 50 olan bölgede b aralığı geniş; farkları Utsu testiyle değerlendirin (küçük N\'de yalnız büyük farklar saptanabilir)'));
   if (CMP.some(r => !r.area) && unit !== 'none') notes.push('alanı bilinmeyen bölge yalnız yıllık oranla çizildi');
   if (msg) msg.textContent = notes.length ? '⚠ ' + notes.join(' · ') : '';
   // — grafik: kümülatif normalleştirilmiş oran, log ölçek. Boyut, kenar boşlukları, eksen ve ızgara biçimi
@@ -3325,6 +3333,8 @@ function cmpRender() {
   const rows = [['Katalog', r => r.src], ['Bölge', r => r.shape], ['Dönem', r => `${new Date(r.t0).toISOString().slice(0, 10)} – ${new Date(r.t1).toISOString().slice(0, 10)}`],
     ['T (yıl)', (r, s) => f(s.T, 1)], ['A (km²)', r => r.area ? Math.round(r.area).toLocaleString('tr-TR') : '—'], ['N (tümü)', r => r.mags.length], ['Mc', r => fmtM(r.Mc)],
     ['N(≥Mc)', (r, s) => s.n + (s.small ? ' ⚠' : '')], [bCiS('b ± σ (Aki 1965)', 'b [%95]'), (r, s) => s.b ? (B_CI_METHOD === 'normal' ? `${f(s.b)} ± ${f(s.sb)}` : `${f(s.b)}${bCiTxt({ b: s.b, ...s.ci })}${s.ci.ciM === 'chi2' ? ' (χ²)' : ''}`) : '—'], [`a (${uLab})`, (r, s) => f(s.a)],
+    ...(B_CI_METHOD !== 'normal' && CMP.length > 1 ? [['b farkı, 1. bölgeye göre (Utsu 1992, P)', (r, s, i) => { if (!i) return '<span style="color:#888">referans</span>'; const P = s.b && S[0].b ? bUtsuP(S[0].b, S[0].n, s.b, s.n) : null;
+      return P === null ? '—' : `<span title="P: iki b'nin aynı olduğu hipotezi altında olasılık; P &lt; 0,05 → b farkı anlamlı (%95). Küçük N'de anlamsız sonuç 'fark yok' demek değildir: güç düşüktür." style="color:${P < 0.05 ? '#fbbf24' : '#cbd5e1'}">${P < 0.001 ? '&lt; 0,001' : P.toFixed(3).replace('.', ',')}${P < 0.05 ? ' (anlamlı)' : ''}</span>`; }]] : []),
     ['Mmax', (r, s) => f(s.Mmax, 1)], ['N(≥5) / N(≥6)', (r, s) => `${s.N5} / ${s.N6}`], [`λ(≥5) ${uLab}`, (r, s) => ex(s.lam5)],
     ['M≥6 tekrarlanma (yıl, tüm bölge)', (r, s) => s.tr6 ? ex(s.tr6) + (s.extrap ? ' (ekstrapolasyon)' : '') : '—'],
     ['GNSS istasyonu (MIDAS)', (r, s, i) => M[i].geo !== null ? `${M[i].nSt} (rms ${f(M[i].st.rms, 1)} mm/yıl)` : `${M[i].nSt ?? '—'}${M[i].geoWhy ? ` <span style="color:#f59e0b">${M[i].geoWhy}</span>` : ''}`],

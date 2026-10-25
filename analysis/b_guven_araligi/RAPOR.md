@@ -246,3 +246,39 @@ Bütün kapsama sonuçları **ideal** G–R örneklemlerine aittir: tam tamlık,
 1. Yeni kural (ızgarada her zaman T–M) — 2026-10-21 onayındaki "varsayılan χ²" kararının yerine geçer.
 2. Kısmen ızgara dışı kataloglar (tarihsel katalog %3,7): (a) bugünkü katı kural (χ²), (b) büyüklükleri sınıf merkezine yuvarlayıp T–M (G–R panelindeki sınıflamayla ve kestiricinin ΔM/2 varsayımıyla tutarlı), (c) ızgara dışı oranına bağlı eşik (önerilmez: yeni bir veri bağımlı seçim).
 3. Kestirici (T&M Eş. 14) — ayrı iş.
+
+## 13. Küçük örneklem (N < 50) test grubu ve doğrudan fark testi (2026-10-25)
+
+Bağlam: Tinti–Mulargia'nın EQ-Live'daki amacı, Hong Kong gibi az deprem üreten bölgelerde N = 50/100 koşulunu sağlamayan pencere ve bölgelerde b'nin zamansal ve bölgesel değişimini, belirsizliği gizlemeden incelenebilir kılmaktır. Bu bölüm, bunun hangi koşulda mümkün olduğunu ölçer. Betik `mc_kucukN.js` (üretim `computeBvalue` + `bCiFields`, kopya yok), çıktı `out/mc_kucukN.json`; tek örneklemde 20 000, iki örneklemde 5000 tekrar; tohum 20261026; ideal G–R, büyüklükler ızgarada.
+
+**A) Tek örneklem, N = 10–49** (ΔM ∈ {0,1; 0,2}, b ∈ {0,7; 1,0; 1,3; 1,6}; 56 hücre):
+
+| | kapsama | tek yönlü kaçırma (en çok) |
+|---|---|---|
+| T–M (üretim kuralı) | 0,949–0,973 | %2,7 |
+| eski ±1,96·b/√N | 0,941–0,960 | %5,4 (hep üst tarafta) |
+
+ΔM = 0,1, b = 1,0'da göreli genişlik (ortanca, (üst − alt)/b): N = 10'da 1,31; N = 20'de 0,90; N = 30'da 0,73; N = 49'da 0,57. Kestirici yanlılığı (ortalama b̂/b): N = 10'da 1,09–1,11; N = 20'de 1,04–1,05; N = 49'da 1,01–1,02 (Aki kestiricisinin bilinen küçük örneklem yanlılığı; kestirici bu çalışmada değiştirilmedi; aynı N'li iki pencere karşılaştırıldığında büyük ölçüde birbirini götürür).
+
+**B) İki bağımsız örneklem (her biri N olay, b₁ = 1,0), b farkının saptanma olasılığı:**
+
+| N | ölçüt | b₂ = 1,0 (yanlış alarm) | 0,8 | 0,7 | 0,5 | 1,3 |
+|---|---|---|---|---|---|---|
+| 10 | %95 aralıklar örtüşmez | 0,003 | 0,008 | 0,019 | 0,089 | 0,013 |
+| 10 | Utsu P < 0,05 | 0,046 | 0,070 | 0,111 | 0,320 | 0,079 |
+| 20 | aralıklar örtüşmez | 0,006 | 0,019 | 0,046 | 0,261 | 0,023 |
+| 20 | Utsu P < 0,05 | 0,047 | 0,104 | 0,178 | 0,564 | 0,124 |
+| 30 | aralıklar örtüşmez | 0,007 | 0,027 | 0,077 | 0,448 | 0,032 |
+| 30 | Utsu P < 0,05 | 0,044 | 0,125 | 0,263 | 0,751 | 0,160 |
+| 49 | aralıklar örtüşmez | 0,006 | 0,042 | 0,149 | 0,729 | 0,065 |
+| 49 | Utsu P < 0,05 | 0,042 | 0,184 | 0,409 | 0,919 | 0,240 |
+
+**Sonuçlar:**
+1. Küçük N, aralık hesabı için engel değildir: T–M N = 10'da da nominal kapsar. Engel, **ayırt etme gücüdür**.
+2. "İki %95 aralık örtüşmüyor" ölçütü çok tutucudur (yanlış alarm ≈ %0,5); b farkı için uygun test değildir. Utsu (1992) testi doğru kalibre (%4–5) ve 2–4 kat daha güçlüdür.
+3. N ≤ 49'da yalnız büyük farklar (Δb ≈ 0,5) makul olasılıkla saptanır (N = 30'da %75). Δb ≈ 0,2–0,3 için anlamsız sonuç "fark yok" anlamına gelmez.
+4. Bu sonuçlar ideal koşullara aittir (§12.6); gerçek küçük kataloglarda Mc belirsizliği küçük N'de görece daha etkilidir.
+
+**Uygulananlar (dal `b-ci-chi2`):** `bUtsuP` (Utsu 1992; Schorlemmer vd. 2004 biçimi); bölge karşılaştırma tablosuna "b farkı, 1. bölgeye göre (Utsu 1992, P)" satırı (yalnız varsayılan kipte; `?bci=normal` çıktısı main ile aynı kalır); "N(≥Mc) < 50 olan bölgede b güvenilmez" notu "aralık geniş; farkları Utsu testiyle değerlendirin" olarak değiştirildi. `test_b_ci.js` 35/0 (Utsu: özdeşte e⁻¹, simetri, N = 30 yanlış alarm).
+
+**Uygulanmayan (karar gerektirir):** b(t) penceresi bugün sabit N = 100'dür; bu, az olaylı bölgelerde zamansal analizin asıl engelidir. Seçilebilir küçük pencere (ör. N = 50/30/20) ve ardışık bağımsız dönemler arasında Utsu testi ayrı bir üretim işidir. §10'daki güç sonuçları ile bu bölümün B tablosu bu kararın dayanağıdır.
