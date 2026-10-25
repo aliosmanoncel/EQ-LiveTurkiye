@@ -70,6 +70,10 @@
     .tbtn{padding:5px 11px;border-radius:5px;border:1px solid #333;background:transparent;color:#888;font-size:.8rem;cursor:pointer;transition:all .12s}
     .tbtn:hover{border-color:#06b6d4;color:#06b6d4}
     .tbtn.active{background:#06b6d4;color:#000;border-color:#06b6d4;font-weight:700}
+    /* GK74 düğmesi durumları (2026-10-25): metin + renk birlikte; renk tek başına anlam taşımaz */
+    .tbtn.gkBusy{background:#f59e0b;color:#000;border-color:#f59e0b;font-weight:700;cursor:progress}
+    .tbtn.gkOn{background:#16a34a;color:#fff;border-color:#16a34a;font-weight:700}
+    .tbtn.gkWarn{background:#16a34a;color:#fff;border-color:#f59e0b;border-width:2px;font-weight:700}
     /* Türkiye ⇄ Global anahtarı: bölgesel veri gerektiren katmanlar (Hazard,
        Risk, ESHM20, b-value ailesi, Fraktal, Forecast, Tarihsel replay)
        Global modda gizlenir; Kanto gibi Türkiye-dışı içerik tersine sadece
@@ -479,7 +483,8 @@
     Sadece bu bölgeyi göster
   </label>
   <button class="tbtn" id="btnLitRegionQuery" onclick="litRegionCommitToQuery()" style="display:none;background:#3b0764;border-color:#a855f7" title="Bu araştırma bölgesinin geometrisini aktif sorgu alanına (regionRect) kopyalar ve seçili Kaynak (EMSC/USGS/AFAD) ile canlı sorgular — otomatik değildir, sadece bu butona basınca çalışır">▶ Bu bölgede sorgula</button>
-  <button class="tbtn" id="btnRegionDecluster" onclick="toggleRegionDecluster()" style="display:none" title="GK74 (Gardner &amp; Knopoff 1974) declustering — seçili bölge verisi (EMSC/USGS/AFAD/Tarihsel) üzerinde tarayıcıda hesaplanır: her olayın T(M) gün / D(M) km penceresindeki daha küçük sonraki olaylar artçı sayılıp çıkarılır. Temel sorgu değişmez; info kutusu, harita, Time-Mag/G-R/Weichert ve poster filtrelenmiş küme ile çalışır. Tekrar basınca ham veriye döner.">🔻 Decluster (GK74)</button>
+  <button class="tbtn" id="btnRegionDecluster" onclick="toggleRegionDecluster()" style="display:none" title="GK74 (Gardner &amp; Knopoff 1974) declustering — seçili bölge verisi (EMSC/USGS/AFAD/Tarihsel) üzerinde tarayıcıda hesaplanır: her olayın T(M) gün / D(M) km penceresindeki daha küçük sonraki olaylar artçı sayılıp çıkarılır. Temel sorgu değişmez; info kutusu, harita, Time-Mag/G-R/Weichert ve poster filtrelenmiş küme ile çalışır. Tekrar basınca ham veriye döner." aria-pressed="false">🔻 GK74 artçı ayıklama: KAPALI</button>
+  <div id="gkReport" role="status" aria-live="polite" style="display:none;font-size:.72rem;color:#e2e8f0;background:rgba(20,20,20,.92);border:1px solid #334;border-radius:6px;padding:6px 8px;width:260px;line-height:1.45"></div>
   <label id="regionDeclusterCtxRow" style="display:none;align-items:center;gap:6px;font-size:.72rem;color:#ccc;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;cursor:pointer;width:260px" title="Bağlamlı GK74 (yalnız Daire modu; EMSC/USGS canlı ve Tarihsel Katalog): daire dışındaki olaylar taramaya bağlam olarak katılır — dar halka R+30 km (M ≥ sorgu alt eşiği), geniş halka R+90 km (M ≥ 4), başlangıçtan 1100 gün önce. Bağlam olayları pencere açabilir ama sonuca girmez. Tüm katalog üzerinde uygulanan GK74 ile aynı sonucu verir; M ≥ 7 bir kırığın uç bölgesinde artçılar eksik ayıklanabilir (episantr uzaklığı).">
     <input type="checkbox" id="regionDeclusterCtx" onchange="onRegionDeclusterCtxChange()">
     Daire dışı ana şokları dahil et (bağlamlı GK74)
@@ -8068,8 +8073,8 @@ function applyGk74Filter(evList) {
   const mwE = mwAuthActive() ? mwAuthTable.entries : null;
   const ctx = regionCtxReady(evList) ? regionCtxList() : null;
   if (!gk74Cache || gk74Cache.src !== evList || gk74Cache.n !== evList.length || gk74Cache.ctx !== ctx || gk74Cache.mwE !== mwE) {
-    const r = gk74Decluster(evList, ctx || [], mwE);
-    gk74Cache = { src: evList, n: evList.length, ctx, mwE, keep: r.keep, removed: r.removed,
+    const tG = performance.now(), r = gk74Decluster(evList, ctx || [], mwE);
+    gk74Cache = { src: evList, n: evList.length, ctx, mwE, ms: Math.round(performance.now() - tG), keep: r.keep, removed: r.removed,
                   removedByCtx: r.removedByCtx, rec: r.rec, byCtx: r.byCtx, override: r.override };
   }
   return evList.filter(e => gk74Cache.keep.has(e));
@@ -8149,6 +8154,7 @@ async function ensureRegionContext() {
   const tEnd   = regionWindowEnd   ? regionWindowEnd.getTime()   : Math.max(...forEvents.map(e => e.time.getTime()));
   const mminRaw = document.getElementById('regionMagMin')?.value;
   const mmin = mminRaw === '' || mminRaw == null ? null : +mminRaw;
+  setTimeout(syncDeclusterBtn, 0);   // bağlam yükleniyor durumunu göster (pending atandıktan hemen sonra)
   regionCtxPending = (async () => {
     try {
       let pool = [], capped = false;
@@ -8193,6 +8199,7 @@ async function ensureRegionContext() {
     } finally {
       regionCtxPending = null;
     }
+    syncDeclusterBtn();
     if (regionEvents === forEvents) {
       renderRegionInfo();
       redrawRegionMarkers();
@@ -8354,6 +8361,7 @@ function renderRegionInfo() {
   const circleAreaKm2 = (regionIsCircle && regionCircleRadiusKm) ? Math.PI * regionCircleRadiusKm * regionCircleRadiusKm : null;
   line += `<br>${computeRegionStatsLine(statsEvs, regionOrderUsed, regionCapped, circleAreaKm2)}`;
   info.innerHTML = line;
+  syncDeclusterBtn();
 }
 
 function regionSelectStart() {
@@ -8546,11 +8554,14 @@ async function fetchRegionEventsFromHistorical(bounds) {
 async function fetchRegionEvents(bounds) {
   // Parçalı sorgu özeti yalnızca USGS canlı + parçalı yolda yeniden doldurulur
   if (typeof regionChunkInfo !== 'undefined') { regionChunkInfo = null; renderChunkLog(); }
-  if (historicalMode) return fetchRegionEventsFromHistorical(bounds);
-  if (regionSource === 'afad') return fetchRegionEventsFromAfad(bounds);
-  if (regionSource === 'hk_local') return fetchRegionEventsFromHKLocal(bounds);
-  if (regionSource === 'hk_historical') return fetchRegionEventsFromHKHistorical(bounds);
-  return fetchRegionEventsLive(bounds, regionSource === 'usgs' ? 'usgs' : 'emsc');
+  regionLoading = true; syncDeclusterBtn();   // GK74 düğmesi yükleme sırasında eski bölgenin sayılarını göstermesin
+  try {
+    if (historicalMode) return await fetchRegionEventsFromHistorical(bounds);
+    if (regionSource === 'afad') return await fetchRegionEventsFromAfad(bounds);
+    if (regionSource === 'hk_local') return await fetchRegionEventsFromHKLocal(bounds);
+    if (regionSource === 'hk_historical') return await fetchRegionEventsFromHKHistorical(bounds);
+    return await fetchRegionEventsLive(bounds, regionSource === 'usgs' ? 'usgs' : 'emsc');
+  } finally { regionLoading = false; syncDeclusterBtn(); }
 }
 
 // HK Yerel Katalog — data/hongkong_local_catalog.json (GEO Pub. 1/2012, Appendix D,
@@ -8995,12 +9006,55 @@ function redrawRegionMarkers() {
 // Araştırma Bölgesi panelindeki "🔻 Decluster (GK74)" butonu — temel
 // regionEvents/fetch mantığına DOKUNMAZ, yalnızca görünüm/analiz katmanını
 // (info kutusu, harita işaretçileri, Time-Mag/Mc/b/GR) filtreler.
-function toggleRegionDecluster() {
-  const btn = document.getElementById('btnRegionDecluster');
+// ── GK74 düğmesinin durumu ve sonuç raporu (2026-10-25) ─────────────────────────────────────────────────────
+// Düğme metni ve rengi HER ZAMAN gerçek durumdan yeniden çizilir (syncDeclusterBtn): KAPALI / ÇALIŞIYOR… / AÇIK (sayılarla) /
+// AÇIK (bağlamsız, uyarı). Sonuç raporu düğmenin altında kalıcıdır (durum satırı gibi silinmez). Çağrıldığı yerler: toggle,
+// bölge verisi yüklenirken ve sonrasında (fetchRegionEvents), bağlam yüklenirken/sonra, renderRegionInfo, bölgeyi temizle.
+let gkBusy = false, regionLoading = false;
+function gkClusters(rec, kept, topN = 3) {   // ana şok başına doğrudan ya da zincirle bağlanan artçı sayısı (yalnız daire içi hedef olaylar)
+  const cnt = new Map();
+  for (const [e, r] of rec) { if (r.role !== 'target' || r.status !== 'suppressed') continue;
+    let root = r.by, guard = 0; while (root && rec.get(root) && rec.get(root).status === 'suppressed' && rec.get(root).by && guard++ < 50) root = rec.get(root).by;
+    if (root) cnt.set(root, (cnt.get(root) || 0) + 1); }
+  return [...cnt.entries()].sort((a, b) => b[1] - a[1]).slice(0, topN);
+}
+function syncDeclusterBtn() {
+  const btn = document.getElementById('btnRegionDecluster'), rep = document.getElementById('gkReport');
+  if (!btn) return;
+  const visible = btn.style.display !== 'none';
+  btn.classList.remove('active', 'gkBusy', 'gkOn', 'gkWarn'); btn.disabled = false;
+  const f = n => n.toLocaleString('tr-TR'), pc = (a, b) => b ? (100 * a / b).toFixed(0) : '0';
+  if (!regionDeclusterOn) { btn.textContent = '🔻 GK74 artçı ayıklama: KAPALI'; btn.setAttribute('aria-pressed', 'false'); if (rep) rep.style.display = 'none'; return; }
+  btn.setAttribute('aria-pressed', 'true');
+  const ctxBusy = !!(regionCtxPending && regionCtxWanted && regionCtxWanted());
+  const ready = !!(gk74Cache && gk74Cache.src === regionEvents && regionEvents && regionEvents.length);
+  if (gkBusy || regionLoading || ctxBusy || !ready) {
+    const why = regionLoading ? 'bölge verisi yükleniyor' : ctxBusy ? 'bağlam olayları yükleniyor' : 'hesaplanıyor';
+    btn.textContent = `⏳ GK74 ÇALIŞIYOR… (${why})`; btn.classList.add('gkBusy'); btn.disabled = gkBusy;
+    if (rep && visible) { rep.style.display = ''; rep.innerHTML = `<b style="color:#fbbf24">⏳ GK74 çalışıyor</b> — ${why}. Sonuç hazır olunca burada rapor görünecek.`; }
+    return;
+  }
+  const n0 = regionEvents.length, n1 = gk74Cache.keep.size, nr = n0 - n1;
+  const ctxOn = regionCtxWanted && regionCtxWanted(), ctxErr = !!(regionCtx && regionCtx.err && regionCtx.forEvents === regionEvents), ctxUsed = !!gk74Cache.ctx;
+  btn.textContent = `${ctxOn && !ctxUsed ? '⚠' : '✅'} GK74 AÇIK · ${f(n0)} → ${f(n1)} ana şok`;
+  btn.classList.add(ctxOn && !ctxUsed ? 'gkWarn' : 'gkOn');
+  if (!rep || !visible) return;
+  const top = gkClusters(gk74Cache.rec, gk74Cache.keep);
+  const tops = top.map(([e, k]) => `M${(+(e.mw ?? e.mag)).toFixed(1)} ${e.time.toISOString().slice(0, 10)} (${f(k)} artçı)`).join('; ');
+  rep.style.display = '';
+  rep.innerHTML = `<b style="color:#4ade80">✅ GK74 tamamlandı</b>${ctxUsed ? ' (bağlamlı)' : ctxOn ? ' <span style="color:#fbbf24">(bağlamsız — ' + (ctxErr ? 'bağlam alınamadı' : 'bağlam bu bölgede kullanılamıyor') + ')</span>' : ''}<br>` +
+    `Toplam <b>${f(n0)}</b> olay → <b>${f(n1)}</b> ana şok (<b>%${pc(n1, n0)}</b>)<br>` +
+    `Ayıklanan artçı: <b>${f(nr)}</b> (<b>%${pc(nr, n0)}</b>)${ctxUsed && gk74Cache.removedByCtx ? `, bunların ${f(gk74Cache.removedByCtx)}'i daire dışı ana şoklarca` : ''}` +
+    (tops ? `<br><span style="color:#9ab0c5">En büyük diziler: ${tops}</span>` : '') +
+    `<br><span style="color:#888">Süre ${f(gk74Cache.ms ?? 0)} ms · Analizler (info kutusu, harita, Time-Mag, G–R, poster) ana şoklarla çalışıyor · tekrar basınca ham veri</span>`;
+}
+async function toggleRegionDecluster() {
+  if (gkBusy) return;   // hesap sürerken ikinci tıklama yok sayılır
   regionDeclusterOn = !regionDeclusterOn;
-  btn.classList.toggle('active', regionDeclusterOn);
   if (regionDeclusterOn) {
-    if (regionCtxWanted()) ensureRegionContext();
+    gkBusy = true; syncDeclusterBtn();
+    await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));   // "ÇALIŞIYOR" önce ekrana çizilsin
+    if (regionCtxWanted()) { ensureRegionContext(); syncDeclusterBtn(); }
     const t0 = performance.now();
     const kept = applyGk74Filter(regionEvents);
     const n0 = regionEvents.length, n1 = kept.length;
@@ -9008,9 +9062,8 @@ function toggleRegionDecluster() {
   } else {
     setStatus('GK74 kapalı — ham veri');
   }
-  renderRegionInfo();
-  redrawRegionMarkers();
-  if (tmAnyOpen()) renderTimeMag(regionEvents);
+  try { renderRegionInfo(); redrawRegionMarkers(); if (tmAnyOpen()) renderTimeMag(regionEvents); }
+  finally { gkBusy = false; syncDeclusterBtn(); }
 }
 
 /* URL'de bölge seçimini kalıcı kıl — paylaşılan link açıldığında aynı bölge
@@ -9139,6 +9192,7 @@ function regionDeselect() {
   regionDeclusterOn = false; gk74Cache = null; regionCtx = null;
   const btnDecluster = document.getElementById('btnRegionDecluster');
   if (btnDecluster) { btnDecluster.style.display = 'none'; btnDecluster.classList.remove('active'); }
+  syncDeclusterBtn();
   syncRegionCtxRow();
   setStatus('');
   const info = document.getElementById('regionInfo');
