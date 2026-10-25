@@ -2804,6 +2804,30 @@ function renderSensTable(evList, Mc, cs) {
     `<div style="color:#666;margin-top:2px;">b: Aki (1965) MLE, b = log10(e)/(M̄ − Mc + ΔM/2); hata: ${bCiS('%95 yaklaşık güven aralığı ±1.96·b/√N', '%95 güven aralığı: Tinti &amp; Mulargia (1987) gruplanmış büyüklük aralığı (asimetrik, [alt–üst]; χ²: büyüklükler ızgarada değil, χ²₂N, Utsu 1966)')}, her hücre kendi N'i ile. — : sabit Mc &lt; dönemin geçerli Mc'si${cs ? ' (dönemle örtüşen basamakların en büyüğü)' : ' (tek Mc)'}. Soluk ⚠: N&lt;50. Dönemler [başlangıç, bitiş).</div>`;
 }
 
+// ── Karma büyüklük çözünürlüğü (2026-10-25, RAPOR §16): analiz örnekleminde en az bir büyüklük katalog ızgarasının dışındaysa
+// (ör. ISC'nin 0,01 çözünürlüklü mb'leri ile 0,1 çözünürlüklü değerler bir arada), b hesabından ÖNCE bütün büyüklükler ızgaranın sınıf
+// merkezlerine (a + kΔM, en yakın; yarım değer yukarı) yuvarlanır. Mc (computeMcSrc de en yakın 0,1 sınıfını kullanır), tamlık basamakları,
+// b, %95 aralık (her iki kipte), G–R, Mc–dönem tablosu ve artçı dizileri AYNI dönüştürülmüş kümeyi kullanır; zaman–büyüklük grafiği,
+// Benioff ve tablolar ham değerleri gösterir. Izgaradaki kataloglarda hiçbir şey değişmez. ?bgrid=ham: uyumluluk seçeneği (eski hesap,
+// yuvarlama yok). Izgara: ΔM = tmMagDM, çapa a = 0 (0,1'in katları) ya da dönüşümlü veride eşlenmiş Mc.
+let B_GRID_MODE = (() => { try { return new URLSearchParams(location.search).get('bgrid') === 'ham' ? 'ham' : 'sinif'; } catch (e) { return 'sinif'; } })();
+let tmGridInfo = null;   // { nOff, n, dm } — son Time-Mag analizinde yuvarlama bilgisi
+function bGridRound(v, a, dm) { return +(a + dm * Math.round((v - a) / dm + 1e-9)).toFixed(6); }
+function bGridOffCount(vals, a, dm) { let k = 0; for (const v of vals) { const q = (v - a) / dm; if (Math.abs(q - Math.round(q)) > 1e-6) k++; } return k; }
+function bGridVals(vals, a = 0, dm = 0.1) {   // sayı dizisi → { vals, nOff }
+  if (B_GRID_MODE === 'ham' || !(dm > 0)) return { vals, nOff: 0 };
+  const nOff = bGridOffCount(vals, a, dm); return nOff ? { vals: vals.map(v => bGridRound(v, a, dm)), nOff } : { vals, nOff: 0 };
+}
+function bGridList(list, a = 0, dm = 0.1) {   // olay listesi → { list, nOff, n }; kullanılan büyüklük (mw ?? mag) yuvarlanır, ham değer _mRaw'da
+  const vals = list.map(e => e.mw ?? e.mag), g = bGridVals(vals, a, dm);
+  if (!g.nOff) return { list, nOff: 0, n: list.length, dm };
+  return { list: list.map((e, i) => g.vals[i] === vals[i] ? e : (e.mw !== null && e.mw !== undefined) ? { ...e, mw: g.vals[i], _mRaw: vals[i] } : { ...e, mag: g.vals[i], _mRaw: vals[i] }), nOff: g.nOff, n: list.length, dm };
+}
+function bGridNote(en = false) {
+  const g = tmGridInfo; if (!g || !g.nOff) return '';
+  return en ? `mixed magnitude resolution: ${g.nOff} of ${g.n} magnitudes off the ΔM = ${g.dm} grid; all magnitudes binned to class centres before b (raw values shown)`
+            : `karma büyüklük çözünürlüğü: ${g.n} büyüklüğün ${g.nOff}'i ΔM = ${String(g.dm).replace('.', ',')} ızgarasının dışında; b hesabından önce bütün büyüklükler sınıf merkezlerine yuvarlandı (gösterimde ham değerler)`;
+}
 let tmMagDM = 0.1, tmMcScale = null;   // 2026-10-18: Time-Mag panelinin büyüklük ızgarası (dönüşümde ΔM_Mw) ve Mc eşlemesi
 let tmSharedAxis = null; // { t0, t1 } — Zaman–Magnitude panelinin ekseni; b(t) ve Benioff bunu paylaşır
 // o: { svgId, statsId, step, store, storeInce } — varsayılan Time-Mag normal modu (tmSvgB, adım 10, lastBts kaydı). İnce mod
@@ -3310,13 +3334,14 @@ function cmpStats(r) {
   const unit = document.getElementById('cmpUnit')?.value || '1e4';
   const T = (r.t1 - r.t0) / (365.25 * 864e5);
   const u = unit === 'none' || !r.area ? 1 : unit === 'deg' ? r.area / (CMP_DEG_KM * CMP_DEG_KM * Math.cos((r.cLat || 0) * Math.PI / 180)) : r.area / 1e4;
-  const sub = r.Mc === null ? [] : r.mags.filter(m => m >= r.Mc - 1e-9), n = sub.length;
-  const b = r.Mc === null ? null : computeBvalue(r.mags, r.Mc, r.dm || 0.1), sb = b ? b / Math.sqrt(n) : null;
+  const gM = bGridVals(r.mags, (r.dm || 0.1) !== 0.1 && r.Mc !== null ? r.Mc : 0, r.dm || 0.1), mg = gM.vals;   // 2026-10-25: karma çözünürlükte ortak sınıf (RAPOR §16)
+  const sub = r.Mc === null ? [] : mg.filter(m => m >= r.Mc - 1e-9), n = sub.length;
+  const b = r.Mc === null ? null : computeBvalue(mg, r.Mc, r.dm || 0.1), sb = b ? b / Math.sqrt(n) : null;
   const a = b && T > 0 ? Math.log10(n / (T * u)) + b * r.Mc : null;
   const cnt = M => r.mags.filter(m => m >= M - 1e-9).length, Mmax = Math.max(...r.mags);
   const tr6 = a !== null ? 1 / (Math.pow(10, a - 6 * b) * u) : null;
   const ci = b ? bCiFields(b, n, sub.map(m => m - r.Mc), r.dm || 0.1) : null;   // 2026-10-25: %95 aralık (normal kipte gösterilmez, eski ± σ kalır)
-  return { T, u, n, b, sb, ci, a, N5: cnt(5), N6: cnt(6), Mmax, tr6, lam5: T > 0 ? cnt(5) / (T * u) : null, unit, small: n < 50, extrap: Mmax < 6 };
+  return { T, u, n, b, sb, ci, gridOff: gM.nOff, a, N5: cnt(5), N6: cnt(6), Mmax, tr6, lam5: T > 0 ? cnt(5) / (T * u) : null, unit, small: n < 50, extrap: Mmax < 6 };
 }
 function cmpRender() {
   const svg = document.getElementById('cmpSvg'), tbl = document.getElementById('cmpTable'), msg = document.getElementById('cmpMsg');
@@ -3359,7 +3384,7 @@ function cmpRender() {
   const th = 'style="text-align:left;padding:2px 6px;border-bottom:1px solid #334;color:#cbd5e1;"', td = 'style="padding:2px 6px;border-bottom:1px solid #222;vertical-align:top;"';
   const rows = [['Katalog', r => r.src], ['Bölge', r => r.shape], ['Dönem', r => `${new Date(r.t0).toISOString().slice(0, 10)} – ${new Date(r.t1).toISOString().slice(0, 10)}`],
     ['T (yıl)', (r, s) => f(s.T, 1)], ['A (km²)', r => r.area ? Math.round(r.area).toLocaleString('tr-TR') : '—'], ['N (tümü)', r => r.mags.length], ['Mc', r => fmtM(r.Mc)],
-    ['N(≥Mc)', (r, s) => s.n + (s.small ? ' ⚠' : '')], [bCiS('b ± σ (Aki 1965)', 'b [%95]'), (r, s) => s.b ? (B_CI_METHOD === 'normal' ? `${f(s.b)} ± ${f(s.sb)}` : `${f(s.b)}${bCiTxt({ b: s.b, ...s.ci })}${s.ci.ciM === 'chi2' ? ' (χ²)' : ''}`) : '—'], [`a (${uLab})`, (r, s) => f(s.a)],
+    ['N(≥Mc)', (r, s) => s.n + (s.small ? ' ⚠' : '')], [bCiS('b ± σ (Aki 1965)', 'b [%95]'), (r, s) => s.b ? (B_CI_METHOD === 'normal' ? `${f(s.b)} ± ${f(s.sb)}` : `${f(s.b)}${bCiTxt({ b: s.b, ...s.ci })}${s.ci.ciM === 'chi2' ? ' (χ²)' : ''}${s.gridOff ? ` <span style="color:#f59e0b" title="${s.gridOff} büyüklük ızgara dışında; b hesabından önce sınıf merkezlerine yuvarlandı (RAPOR §16)">ⁱ</span>` : ''}`) : '—'], [`a (${uLab})`, (r, s) => f(s.a)],
     ...(B_CI_METHOD !== 'normal' && CMP.length > 1 ? [['b farkı, 1. bölgeye göre (Utsu 1992, P)', (r, s, i) => { if (!i) return '<span style="color:#888">referans</span>'; const P = s.b && S[0].b ? bUtsuP(S[0].b, S[0].n, s.b, s.n) : null;
       return P === null ? '—' : `<span title="P: iki b'nin aynı olduğu hipotezi altında olasılık; P &lt; 0,05 → b farkı anlamlı (%95). Küçük N'de anlamsız sonuç 'fark yok' demek değildir: güç düşüktür." style="color:${P < 0.05 ? '#fbbf24' : '#cbd5e1'}">${P < 0.001 ? '&lt; 0,001' : P.toFixed(3).replace('.', ',')}${P < 0.05 ? ' (anlamlı)' : ''}</span>`; }]] : []),
     ['Mmax', (r, s) => f(s.Mmax, 1)], ['N(≥5) / N(≥6)', (r, s) => `${s.N5} / ${s.N6}`], [`λ(≥5) ${uLab}`, (r, s) => ex(s.lam5)],
@@ -4550,8 +4575,8 @@ async function exportPosterAGU(scale, evt) {
     rItems = [];
     const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`, P = t => t;   // V: vurgulu değer; P: uyarı varken vurgusuz
     if (!INC.meth && MSX) { const srcM = SRC(regionRect ? regionSourceLabel() : 'canlı akış').replace(/\s*\(.*\)\s*/g, ' ').trim(), mcM = gs ? fmtM(gs.mc) : '—';   // Yöntem kutusu yoksa kısa yöntem/sağlamlık maddesi
-      rItems.push(L(`**Veri ve yöntem:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${DC(mcM)} (maks. eğrilik + 0,2); b: Aki (1965), ${bCiS('%95 aralık ±1,96·b/√N', '%95 aralık Tinti & Mulargia 1987 (asimetrik)')}, ${BT_WIN_N} olaylık pencereler${btWinNote() ? ' (' + btWinNote() + ')' : ''}; tek Mc${regionRect && !regionDeclusterOn ? ', artçı ayıklanmadı' : ''}${AMR_ON ? `; AMR yalnız ana şok öncesi olaylarla, R × başlangıç ızgarası, anlamlılık ${AP.nSim} küme korumalı sentetik katalogla` : ''}.`,
-        `**Data & methods:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${mcM} (max. curvature + 0.2); b: Aki (1965), ${bCiS('95% CI ±1.96·b/√N', '95% CI Tinti & Mulargia 1987 (asymmetric)')}, ${BT_WIN_N}-event windows${btWinNote(true) ? ' (' + btWinNote(true) + ')' : ''}; single Mc${regionRect && !regionDeclusterOn ? ', not declustered' : ''}${AMR_ON ? `; AMR on pre-mainshock events only, R × start-time grid, significance from ${AP.nSim} cluster-preserving synthetic catalogues` : ''}.`)); }
+      rItems.push(L(`**Veri ve yöntem:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${DC(mcM)} (maks. eğrilik + 0,2); b: Aki (1965), ${bCiS('%95 aralık ±1,96·b/√N', '%95 aralık Tinti & Mulargia 1987 (asimetrik)')}, ${BT_WIN_N} olaylık pencereler${btWinNote() ? ' (' + btWinNote() + ')' : ''}${bGridNote() ? '; ' + bGridNote() : ''}; tek Mc${regionRect && !regionDeclusterOn ? ', artçı ayıklanmadı' : ''}${AMR_ON ? `; AMR yalnız ana şok öncesi olaylarla, R × başlangıç ızgarası, anlamlılık ${AP.nSim} küme korumalı sentetik katalogla` : ''}.`,
+        `**Data & methods:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${mcM} (max. curvature + 0.2); b: Aki (1965), ${bCiS('95% CI ±1.96·b/√N', '95% CI Tinti & Mulargia 1987 (asymmetric)')}, ${BT_WIN_N}-event windows${btWinNote(true) ? ' (' + btWinNote(true) + ')' : ''}${bGridNote(true) ? '; ' + bGridNote(true) : ''}; single Mc${regionRect && !regionDeclusterOn ? ', not declustered' : ''}${AMR_ON ? `; AMR on pre-mainshock events only, R × start-time grid, significance from ${AP.nSim} cluster-preserving synthetic catalogues` : ''}.`)); }
     if (cs) rItems.push(posterQcSummary(qcObj, csQc, EN));   // kalite kontrol İLK madde, kesilmeden ve kısa/yapılandırılmış (seçenek A)
     if (gf) { const best = gf.curves[0], E = qcFlag ? P : V;   // metodoloji (i) ve (iv)
       const yr = L('yıl', 'yr');
@@ -6063,8 +6088,11 @@ function renderTimeMag(evList) {
   // Tamlık basamakları (alt kataloglar) — etkinse tek Mc yerine basamaklı eşik
   lastTmEvList = evList;
   const cs = csIsActive() ? csBuild(evList) : null;
-  lastCs = cs;
-  csRenderDiag(cs);
+  // b analizleri için ortak sınıflanmış küme (karma çözünürlükte); Benioff ve gösterim ham listeyle kalır
+  const gridA = tmMcScale && tmMcScale.mapped ? tmMcScale.mc : 0, G = bGridList(evList, gridA, tmMagDM); tmGridInfo = G;
+  const evB = G.list, csB = evB === evList ? cs : (csIsActive() ? csBuild(evB) : null);
+  lastCs = csB;   // G–R yeniden çizimleri ve poster b ile aynı kümeyi kullanır (Benioff aşağıda ham cs ile)
+  csRenderDiag(csB);
 
   const x = t => PAD_L + Math.max(0, Math.min(1, (t-t0)/(t1-t0))) * plotW;
   const y = m => PAD_T + plotH - ((m-magMin)/(magMax-magMin)) * plotH;
@@ -6130,17 +6158,18 @@ function renderTimeMag(evList) {
   statsEl.innerHTML = `N = <b>${evList.length}</b> &nbsp;|&nbsp; Mmax = <b>${mMax}</b> &nbsp;|&nbsp; Mc = <b>${Mc !== null ? Mc : '—'}</b>${mcIsManual ? ' (elle)' : ''}${convStatsStr}` +
     (cs ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">Tamlık dönemleri: ${cs.periods.map(csLabel).join('; ')} · analize giren N=<b>${cs.kept.length}</b> (${cs.nExcluded} olay basamak altında, soluk)</span>` : '');
 
-  if (tmMode === 'ince') renderBvalueTS(evList, Mc, cs, { step: 1, store: false, storeInce: true });   // ince mod: aynı öğeler, adım 1
-  else renderBvalueTS(evList, Mc, cs);
+  if (bGridNote()) statsEl.innerHTML += `<div style="color:#f59e0b;font-size:.85em" title="RAPOR §16: karma çözünürlükte ortak sınıflama b'yi yansız, %95 aralığı nominal tutar. ?bgrid=ham ile eski hesap.">ℹ ${bGridNote()}</div>`;
+  if (tmMode === 'ince') renderBvalueTS(evB, Mc, csB, { step: 1, store: false, storeInce: true });   // ince mod: aynı öğeler, adım 1
+  else renderBvalueTS(evB, Mc, csB);
   { const am = document.getElementById('aftMeta'), tm = document.getElementById('tmMeta'); if (am && tm) am.textContent = tm.textContent; }
   try {
     // Kümesizleştirme açıksa artçılar evList'ten çıkarılmıştır; diziler ham listeden, aynı dönüşüm ve tür filtresiyle kurulur
     const seqList = (usingRegion && regionDeclusterOn)
       ? tmTypeFilter(applyMagConversionForDisplay(seqRawList, mcConversionMode).list, tmTypeFilterOpts()).list : evList;
-    renderPBSequences(seqList);
+    renderPBSequences(seqList === evList ? evB : bGridList(seqList, gridA, tmMagDM).list);
   } catch (e) { console.warn('[pb-seq]', e); }
-  renderSensTable(evList, Mc, cs);
-  if (cs) renderGutenbergRichterCS(cs); else renderGutenbergRichter(evList, Mc);
+  renderSensTable(evB, Mc, csB);
+  if (csB) renderGutenbergRichterCS(csB); else renderGutenbergRichter(evB, Mc);
   try { renderBenioff(evList, Mc, cs); } catch (e) { console.warn('[benioff]', e); }
 }
 
@@ -8203,7 +8232,7 @@ function computeRegionStatsLine(evs, orderby, capped, areaKm2) {
   }
   if (evs.length < 10) return `Mc/b: N=${evs.length} (min. 10 olay gerekir)`;
 
-  const mags = evs.map(e => e.mag);
+  const magsG = bGridVals(evs.map(e => e.mag), 0, 0.1), mags = magsG.vals;   // 2026-10-25: karma çözünürlükte ortak 0,1 sınıfı (RAPOR §16)
   const overrideRaw = document.getElementById('regionMcOverride').value;
   const override = overrideRaw !== '' ? parseFloat(overrideRaw) : null;
 
@@ -8221,7 +8250,7 @@ function computeRegionStatsLine(evs, orderby, capped, areaKm2) {
   const nAbove = mags.filter(m => m >= Mc).length;
   const bCiR = b !== null ? bCiFields(b, nAbove, mags.filter(m => m >= Mc - 1e-9).map(m => m - Mc)) : null, bErr = bCiR ? bCiR.err : null;
   const bLabel = b !== null ? `${b.toFixed(2)}${bErr !== null ? bCiTxt({ b, ...bCiR }) : ''}` : '—';
-  let line = `${mcLabel} · b = <b>${bLabel}</b>${bErr !== null ? ' <span style="color:#888;font-size:.85em">(%95)</span>' : ''} · N(M≥Mc) = ${nAbove}`;
+  let line = `${mcLabel} · b = <b>${bLabel}</b>${magsG.nOff ? ` <span style="color:#f59e0b" title="${magsG.nOff}/${mags.length} büyüklük 0,1 ızgarası dışında; b hesabından önce sınıf merkezlerine yuvarlandı (RAPOR §16; ?bgrid=ham ile eski hesap)">ⁱ</span>` : ''}${bErr !== null ? ' <span style="color:#888;font-size:.85em">(%95)</span>' : ''} · N(M≥Mc) = ${nAbove}`;
   if (areaKm2 && regionWindowStart && regionWindowEnd) {
     const years = (regionWindowEnd - regionWindowStart) / (365.25*24*3600*1000);
     if (years > 0) {

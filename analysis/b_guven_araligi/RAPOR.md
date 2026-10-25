@@ -382,3 +382,61 @@ Kural: **Bir analiz örnekleminde en az bir büyüklük ΔM ızgarasının dış
 ### 16.5 Varsayılan pencere davranışı (doğrulama)
 
 `main`'de varsayılan b(t) adımı 10'dur (`STEPB = o.step || 10`; ince adım kipinde 1). Dalda N = 100'de `btDefaultStep()` = 10, ince kipte 1: aynıdır. Tarayıcı karşılaştırması (§14.1, §15) bunu çıktı düzeyinde de doğrular.
+
+## 17. Ortak sınıflamanın uygulanması (2026-10-25; yöntem kararı onaylandı, `main`'e birleştirme ayrı karar)
+
+Onay koşulları ve karşılanma biçimi:
+
+| koşul | uygulama |
+|---|---|
+| Kural açıkça belgelensin | `index.html` (`bGridRound` … `bGridNote` başlık yorumu), bu bölüm, yöntem belgesi taslağı; arayüzde etkin olduğunda not |
+| Ham büyüklükler korunsun | Yalnız b analizlerine giden kopya değişir (`_mRaw` ham değeri tutar); zaman–büyüklük grafiği, Benioff ve tablolar ham listeyi kullanır. Tarayıcıda: varsayılan ile `?bgrid=ham` arasında zaman–büyüklük SVG'si ve Benioff çıktısı bayt bayt aynı |
+| Mc, b ve aralık aynı kümeyi kullansın | `renderTimeMag` analiz girişinde tek bir sınıflanmış küme (`evB`) kurar; tamlık basamakları (`csB`), b(t), Mc–dönem tablosu, G–R (tek Mc ve basamaklı), artçı dizileri ve poster bu kümeyi kullanır. Mc yuvarlamadan bağımsızdır, çünkü `computeMcSrc` zaten en yakın 0,1 sınıfını kullanır; yuvarlama kuralı bununla birebir aynıdır (test: 2,00–8,00 arası 601 değer, yarım değerler dahil). Gerçek ISC pencerelerinde Mc yuvarlamadan önce ve sonra aynıdır |
+| İki aralık kipi aynı ön işlemeyi kullansın | Sınıflama aralık kipinden bağımsızdır; `?bci=normal` yalnız aralık yöntemini değiştirir (1900–1970: iki kipte de b = 0,561, N = 464, 37 pencere). Eski hesabın aynısı ayrı uyumluluk seçeneğiyle alınır: `?bgrid=ham` (`?bci=normal&bgrid=ham` = `main`, poster PNG'si dahil bayt bayt) |
+| 1900–1970 için yeniden test ve karşılaştırma | aşağıda |
+
+**Izgara:** ΔM = panelin büyüklük ızgarası (`tmMagDM`), çapa 0 (0,1'in katları) ya da dönüşümlü veride eşlenmiş Mc. Elle girilen ızgara dışı Mc (ör. 4,75) veriyi kaydırmaz.
+
+**Kapsam:** Time–Mag paneli (b(t) iki yol, G–R, Weichert/basamaklı G–R, Mc–dönem tablosu, artçı dizileri, poster), bölge satırı, bölge karşılaştırması. b-değeri haritaları (Python üreticileri) bu çalışmanın dışındadır.
+
+**Tarayıcı (gerçek veri), 1900–1970 ISC penceresi:**
+
+| | G–R b [%95] | aralık | N(≥Mc) | b(t) pencere / ortalama |
+|---|---|---|---|---|
+| `?bgrid=ham` (eski) | 0,526 [0,477–0,577] | χ² | 430 | 34 / 0,709 |
+| varsayılan | 0,561 [0,512–0,615] | T–M | 464 | 37 / 0,797 |
+| `?bci=normal` | 0,561 [0,510–0,613] | normal | 464 | 37 / 0,797 |
+
+Panel notu: "karma büyüklük çözünürlüğü: 662 büyüklüğün 433'ü ΔM = 0,1 ızgarasının dışında; b hesabından önce bütün büyüklükler sınıf merkezlerine yuvarlandı (gösterimde ham değerler)". Güncel katalogda (ızgarada) varsayılan ile `?bgrid=ham` bütün öğelerde aynıdır.
+
+**Testler:** `scripts/test_b_grid.js` (yeni, 15/0; CI'ya eklendi), mevcut testlerin hepsi (test_fit_range hariç, bilinen eski arıza).
+
+## 18. Nokta kestiricisi: Aki–Utsu ve Tinti & Mulargia gruplanmış en çok olabilirlik (2026-10-25; bilgi amaçlı, üretim değişmedi)
+
+Soru: Tinti & Mulargia yalnız N < 50 için mi? N ≥ 50'de Aki–Utsu ile aynı sonucu mu verir? Ek seçenek olarak eklense ne kaybedilir?
+
+Önce ayrım: EQ-Live'da Tinti & Mulargia yalnız **aralık** için kullanılır; b̂ Aki–Utsu'dur. Makalenin gruplanmış veri için bir **nokta kestiricisi** de vardır: sınıf indeksleri geometrik dağıldığından p̂ = z̄/(1 + z̄), β̂ = ln(1 + 1/z̄)/ΔM (z̄ ortalama sınıf indeksi). Aki–Utsu bunun birinci dereceden yaklaşımıdır: β̂_U = 1/(ΔM(z̄ + ½)). İkisi de her N için geçerlidir; "N < 50 yöntemi" ayrımı aralıklar içindir (küçük N'de asimetri), kestirici için değildir.
+
+`mc_kestirici.js` (üretim `computeBvalue`; 4000 tekrar, N = 5000'de 800; tohum 20261030):
+
+| ΔM | b | β·ΔM | N | Aki–Utsu b̂/b (RMSE) | T&M b̂/b (RMSE) | iki kestirici arası fark |
+|---|---|---|---|---|---|---|
+| 0,1 | 1,0 | 0,23 | 20 | 1,052 (0,250) | 1,058 (0,256) | %0,6 |
+| 0,1 | 1,0 | 0,23 | 100 | 1,007 (0,102) | 1,011 (0,104) | %0,5 |
+| 0,1 | 1,0 | 0,23 | 5000 | 0,996 (0,015) | 1,001 (0,014) | %0,4 |
+| 0,1 | 1,5 | 0,34 | 5000 | 0,990 (0,017) | 1,000 (0,015) | %1,0 |
+| 0,1 | 2,5 | 0,58 | 5000 | 0,974 (0,029) | 1,000 (0,014) | %2,7 |
+| 0,2 | 1,5 | 0,69 | 20 | 1,000 (0,216) | 1,051 (0,262) | %5,1 |
+| 0,2 | 1,5 | 0,69 | 5000 | 0,962 (0,041) | 1,000 (0,015) | %3,8 |
+
+Gerçek kataloglar (ortak 0,1 sınıfı): ISC 1900–1970 0,5615 / 0,5623 (N = 464); ISC 1971–1997 0,7202 / 0,7219 (N = 4855); EMSC 1998– 1,0212 / 1,0260 (N = 50 038; fark 0,005, bu N'de %95 aralığın yarı genişliği ≈ 0,009).
+
+**Sonuçlar:**
+1. Fark N'ye değil β·ΔM'ye bağlıdır: ΔM = 0,1 ve b ≈ 1'de %0,4–0,8 (pratikte aynı), b = 1,5'te %1, b = 2,5 ya da ΔM = 0,2'de %3–5.
+2. Küçük N'de (≤ 50) T&M kestiricisi daha iyi değildir: ikisi de yukarı yanlıdır, T&M biraz daha fazla; RMSE'de Aki–Utsu küçük farkla öndedir.
+3. Büyük N'de T&M kestiricisi yansızdır (b̂/b = 1,000–1,003); Aki–Utsu gruplamadan dolayı %0,4–3,8 düşük kalır ve N büyüdükçe bu yanlılık standart hatayı aşar (ΔM = 0,1, b = 1,5, N = 5000'de RMSE 0,017'ye karşı 0,015).
+4. T&M kestiricisi, EQ-Live'daki T&M aralığıyla aynı olabilirlikten gelir; Aki–Utsu b̂'si ise büyük N'de bu aralığın kenarına kayar (§12.4).
+
+**Ek seçenek olarak eklenirse kazanılan / kaybedilen:**
+- Kazanç: büyük N ve büyük β·ΔM'de yansızlık; kestirici ile aralığın aynı modele dayanması.
+- Kayıp: (i) yayımlanmış Aki–Utsu değerleriyle ve EQ-Live'ın önceki çıktılarıyla doğrudan karşılaştırılabilirlik (Öncel & Wilson 2007 dahil); (ii) küçük N'de biraz daha yüksek yanlılık; (iii) z̄ = 0'da (bütün olaylar en küçük sınıfta) tanımsız (N = 10, ΔM = 0,2, b = 1,5'te %0,2); (iv) ızgara koşulu (§17'deki sınıflamayla sağlanır); (v) iki kestirici arasında sonuca bakarak seçim yapma riski — seçenek eklenirse raporlanan kestirici çıktıda açıkça yazılmalı ve varsayılan sabit kalmalıdır.
