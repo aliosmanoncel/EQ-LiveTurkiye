@@ -1,0 +1,363 @@
+{
+ "meta": {
+  "tekrar": 300,
+  "tohum": 20261028,
+  "olay": 5000,
+  "b_arka": 1,
+  "b_bolum": 0.6,
+  "sure_s": 47.744,
+  "kaynak": "index.html"
+ },
+ "sonuc": [
+  {
+   "L": 0,
+   "N": 20,
+   "adim": 2,
+   "pencere": 2491,
+   "yakalama": null,
+   "en_dusuk_b_ortanca": 0.5328766649119656,
+   "durgun_yanlis_sinifli_seri": 0.6733333333333333,
+   "durgun_kapsama": 0.9512377893750836
+  },
+  {
+   "L": 0,
+   "N": 30,
+   "adim": 3,
+   "pencere": 1657,
+   "yakalama": null,
+   "en_dusuk_b_ortanca": 0.6004071178385969,
+   "durgun_yanlis_sinifli_seri": 0.20666666666666667,
+   "durgun_kapsama": 0.9506035003017501
+  },
+  {
+   "L": 0,
+   "N": 50,
+   "adim": 5,
+   "pencere": 991,
+   "yakalama": null,
+   "en_dusuk_b_ortanca": 0.6828529589673762,
+   "durgun_yanlis_sinifli_seri": 0.023333333333333334,
+   "durgun_kapsama": 0.9521123444332324
+  },
+  {
+   "L": 0,
+   "N": 100,
+   "adim": 10,
+   "pencere": 491,
+   "yakalama": null,
+   "en_dusuk_b_ortanca": 0.7700256771334248,
+   "durgun_yanlis_sinifli_seri": 0,
+   "durgun_kapsama": 0.9506313645621182
+  },
+  {
+   "L": 0,
+   "N": 200,
+   "adim": 20,
+   "pencere": 241,
+   "yakalama": null,
+   "en_dusuk_b_ortanca": 0.8416559726807173,
+   "durgun_yanlis_sinifli_seri": 0,
+   "durgun_kapsama": 0.9497925311203319
+  },
+  {
+   "L": 0,
+   "N": 300,
+   "adim": 30,
+   "pencere": 157,
+   "yakalama": null,
+   "en_dusuk_b_ortanca": 0.8779538043866209,
+   "durgun_yanlis_sinifli_seri": 0,
+   "durgun_kapsama": 0.9489596602972399
+  },
+  {
+   "L": 0,
+   "N": 500,
+   "adim": 50,
+   "pencere": 91,
+   "yakalama": null,
+   "en_dusuk_b_ortanca": 0.9112347501117377,
+   "durgun_yanlis_sinifli_seri": 0,
+   "durgun_kapsama": 0.9522710622710623
+  },
+  {
+   "L": 100,
+   "N": 20,
+   "adim": 2,
+   "pencere": 2491,
+   "yakalama": 0.76,
+   "en_dusuk_b_ortanca": 0.43213381283905666,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 100,
+   "N": 30,
+   "adim": 3,
+   "pencere": 1657,
+   "yakalama": 0.64,
+   "en_dusuk_b_ortanca": 0.48254942433694614,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 100,
+   "N": 50,
+   "adim": 5,
+   "pencere": 991,
+   "yakalama": 0.54,
+   "en_dusuk_b_ortanca": 0.5335313045494495,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 100,
+   "N": 100,
+   "adim": 10,
+   "pencere": 491,
+   "yakalama": 0.37,
+   "en_dusuk_b_ortanca": 0.5973789297156146,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 100,
+   "N": 200,
+   "adim": 20,
+   "pencere": 241,
+   "yakalama": 0.01,
+   "en_dusuk_b_ortanca": 0.729293840307728,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 100,
+   "N": 300,
+   "adim": 30,
+   "pencere": 157,
+   "yakalama": 0,
+   "en_dusuk_b_ortanca": 0.7925081786555654,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 100,
+   "N": 500,
+   "adim": 50,
+   "pencere": 91,
+   "yakalama": 0,
+   "en_dusuk_b_ortanca": 0.854910397447345,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 200,
+   "N": 20,
+   "adim": 2,
+   "pencere": 2491,
+   "yakalama": 0.9333333333333333,
+   "en_dusuk_b_ortanca": 0.40399486688674574,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 200,
+   "N": 30,
+   "adim": 3,
+   "pencere": 1657,
+   "yakalama": 0.8633333333333333,
+   "en_dusuk_b_ortanca": 0.443157634595155,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 200,
+   "N": 50,
+   "adim": 5,
+   "pencere": 991,
+   "yakalama": 0.81,
+   "en_dusuk_b_ortanca": 0.4923973717723942,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 200,
+   "N": 100,
+   "adim": 10,
+   "pencere": 491,
+   "yakalama": 0.7266666666666667,
+   "en_dusuk_b_ortanca": 0.5511351293188468,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 200,
+   "N": 200,
+   "adim": 20,
+   "pencere": 241,
+   "yakalama": 0.6033333333333334,
+   "en_dusuk_b_ortanca": 0.6006839307098903,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 200,
+   "N": 300,
+   "adim": 30,
+   "pencere": 157,
+   "yakalama": 0.09333333333333334,
+   "en_dusuk_b_ortanca": 0.681068189079853,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 200,
+   "N": 500,
+   "adim": 50,
+   "pencere": 91,
+   "yakalama": 0,
+   "en_dusuk_b_ortanca": 0.7702988327478768,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 400,
+   "N": 20,
+   "adim": 2,
+   "pencere": 2491,
+   "yakalama": 0.9933333333333333,
+   "en_dusuk_b_ortanca": 0.37764737556804484,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 400,
+   "N": 30,
+   "adim": 3,
+   "pencere": 1657,
+   "yakalama": 0.99,
+   "en_dusuk_b_ortanca": 0.42028498248701784,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 400,
+   "N": 50,
+   "adim": 5,
+   "pencere": 991,
+   "yakalama": 0.9733333333333334,
+   "en_dusuk_b_ortanca": 0.4679897434302284,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 400,
+   "N": 100,
+   "adim": 10,
+   "pencere": 491,
+   "yakalama": 0.95,
+   "en_dusuk_b_ortanca": 0.5238775414997003,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 400,
+   "N": 200,
+   "adim": 20,
+   "pencere": 241,
+   "yakalama": 0.9066666666666666,
+   "en_dusuk_b_ortanca": 0.56401880766656,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 400,
+   "N": 300,
+   "adim": 30,
+   "pencere": 157,
+   "yakalama": 0.87,
+   "en_dusuk_b_ortanca": 0.5855655935774193,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 400,
+   "N": 500,
+   "adim": 50,
+   "pencere": 91,
+   "yakalama": 0.46,
+   "en_dusuk_b_ortanca": 0.6449279505542835,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 1000,
+   "N": 20,
+   "adim": 2,
+   "pencere": 2491,
+   "yakalama": 1,
+   "en_dusuk_b_ortanca": 0.35452610767612397,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 1000,
+   "N": 30,
+   "adim": 3,
+   "pencere": 1657,
+   "yakalama": 1,
+   "en_dusuk_b_ortanca": 0.3960132053829043,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 1000,
+   "N": 50,
+   "adim": 5,
+   "pencere": 991,
+   "yakalama": 1,
+   "en_dusuk_b_ortanca": 0.44225507322123425,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 1000,
+   "N": 100,
+   "adim": 10,
+   "pencere": 491,
+   "yakalama": 0.9966666666666667,
+   "en_dusuk_b_ortanca": 0.4940779088774197,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 1000,
+   "N": 200,
+   "adim": 20,
+   "pencere": 241,
+   "yakalama": 0.9966666666666667,
+   "en_dusuk_b_ortanca": 0.5381592092977082,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 1000,
+   "N": 300,
+   "adim": 30,
+   "pencere": 157,
+   "yakalama": 0.9966666666666667,
+   "en_dusuk_b_ortanca": 0.5558376474870969,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  },
+  {
+   "L": 1000,
+   "N": 500,
+   "adim": 50,
+   "pencere": 91,
+   "yakalama": 1,
+   "en_dusuk_b_ortanca": 0.5770588385639807,
+   "durgun_yanlis_sinifli_seri": null,
+   "durgun_kapsama": null
+  }
+ ]
+}

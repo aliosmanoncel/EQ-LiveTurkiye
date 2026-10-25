@@ -13,11 +13,14 @@ const src = fs.readFileSync(process.argv[2] || path.join(__dirname, '..', 'index
 const cut = (a, b) => { const i = src.indexOf(a), j = src.indexOf(b, i); if (i < 0 || j < 0) throw new Error('bulunamadı: ' + a); return src.slice(i, j); };
 const fn = name => { const i = src.indexOf('\nfunction ' + name + '('); if (i < 0) throw new Error('bulunamadı: ' + name);
   const j = src.slice(i + 1).search(/\n(?=[^\s}])/); return src.slice(i + 1, i + 2 + j); };
+const ciBlock = () => {   // 2026-10-25: b güven aralığı bloğu (bConfidence95 … bCiMethodTxt); BCI=normal ortam değişkeni eski ±1,96·b/√N kipini seçer
+  const i = src.indexOf('\nfunction bConfidence95('), j = src.indexOf('// Kayan pencere b-değeri', i); if (i < 0 || j < 0) throw new Error('bulunamadı: aralık bloğu');
+  return src.slice(i + 1, j) + (process.env.BCI && src.includes('let B_CI_METHOD') ? `\nB_CI_METHOD = '${process.env.BCI}';` : ''); };
 const ctx = {}; vm.createContext(ctx);
 // Sınama bağıntıları: Çıvgın & Scordilis (2019) biçiminde doğrusal (0,93·ML + 0,29) ve ikinci bir doğrusal bağıntı (0,85·mb + 1,03)
 vm.runInContext(`var bTimeAnchor = 'mean'; var MAG_CONVERSIONS = { lin: { convert(e) { return 0.93 * e.mag + 0.29; } }, mbx: { convert(e) { return 0.85 * e.mag + 1.03; } } };\n`
   + cut('const MC_DM = 0.1;', '// Aki (1965) MLE b-değeri').replace('const MC_DM', 'var MC_DM')
-  + ['computeBvalue', 'bConfidence95', 'bWinStart', 'bWinTime', 'computeBvalueTimeSeries'].map(fn).join('\n')
+  + ['computeBvalue', 'bWinStart', 'bWinTime', 'computeBvalueTimeSeries'].map(fn).join('\n') + '\n' + ciBlock()
   + '\nglobalThis.__x = { computeMc, computeMcScale, computeBvalue, computeBvalueTimeSeries, fmtM };', ctx);
 const X = ctx.__x;
 let pass = 0, fail = 0;
