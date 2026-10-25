@@ -440,3 +440,13 @@ Gerçek kataloglar (ortak 0,1 sınıfı): ISC 1900–1970 0,5615 / 0,5623 (N = 4
 **Ek seçenek olarak eklenirse kazanılan / kaybedilen:**
 - Kazanç: büyük N ve büyük β·ΔM'de yansızlık; kestirici ile aralığın aynı modele dayanması.
 - Kayıp: (i) yayımlanmış Aki–Utsu değerleriyle ve EQ-Live'ın önceki çıktılarıyla doğrudan karşılaştırılabilirlik (Öncel & Wilson 2007 dahil); (ii) küçük N'de biraz daha yüksek yanlılık; (iii) z̄ = 0'da (bütün olaylar en küçük sınıfta) tanımsız (N = 10, ΔM = 0,2, b = 1,5'te %0,2); (iv) ızgara koşulu (§17'deki sınıflamayla sağlanır); (v) iki kestirici arasında sonuca bakarak seçim yapma riski — seçenek eklenirse raporlanan kestirici çıktıda açıkça yazılmalı ve varsayılan sabit kalmalıdır.
+
+## 19. Birleştirme öncesi son kontroller (2026-10-25)
+
+1. **`?bgrid=ham` eski hesabı yeniden üretir ve yalnız b analizlerini etkiler.** `?bci=normal&bgrid=ham` ile `main` karşılaştırmasında 45 öğe ve poster PNG'si bayt bayt aynıdır (fark yalnız durum nesnelerindeki yeni alanlar ve pencere seçicisi). Varsayılan ile `?bgrid=ham` arasında yalnız b'ye bağlı öğeler değişir (b(t), G–R, Mc tablosu, diziler, poster metni); zaman–büyüklük grafiği ve Benioff aynıdır; güncel (ızgaradaki) katalogda hiçbir öğe değişmez.
+2. **Tarihsel katalogda N, Mc ve aralık.** N artışı tam olarak [Mc − 0,05, Mc) aralığındaki ham olaylardan gelir (1900–1970: 34 / 34; 1971–1997: 47 / 47); yuvarlamayla eşiğin altına düşen olay yoktur. Mc yuvarlamadan önce ve sonra aynıdır (`test_b_grid.js`). Aralık kapsaması gerçek veride ölçülemez (gerçek b bilinmez); karma çözünürlük sentetiklerinde 0,944–0,957'dir (§16.2).
+3. **Yöntem belgesi.** Taslakta nokta kestiricisi (Aki–Utsu) ile aralık (Tinti & Mulargia) ayrımı ayrı paragrafta anlatılır; ortak sınıflamanın sınırı eklendi: kural kayıt çözünürlüğü farkını giderir, ölçek karışımını (mb, MS, md, Mw) çözmez; başka katalog ve ölçek bileşimlerinde ayrıca değerlendirilmelidir.
+
+**Kapsam kararı:** Tinti & Mulargia nokta kestiricisi bu dala eklenmez; ayrı bir araştırma dalında, kendi aralığıyla birlikte yanlılık, kapsama ve kataloglar arası karşılaştırılabilirlik açısından değerlendirilecektir (§18).
+
+**Yayın notu:** Site GitHub Pages ile yayımlanır (README: aliosmanoncel.github.io/EQ-LiveTurkiye) ve depoda ayrı bir yayın iş akışı yoktur; yayın dalı `main` ise birleştirme aynı zamanda canlıya yayındır.
