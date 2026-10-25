@@ -162,3 +162,24 @@ Bugün EQ-Live'da M ≥ Mc olay sayısı 100'ün altındaysa b(t) hiç hesaplanm
 - Kayan pencere boyunca çok sayıda pencere incelendiğinde, rastlantısal "anomali" sayısı pencere sayısıyla artar. 5 olaylık adım, bilgi eklemeden pencere sayısını iki katına çıkarır.
 - Bu nedenle ikinci kademe ancak ayrı etiketle, daha geniş aralıklarla ve yalnız N = 100'ün sağlanamadığı durumda gösterilmelidir.
 - Bu bir üretim değişikliğidir; ayrı onay gerekir.
+
+## 11. Üretim uygulaması (dal `b-ci-chi2`, 2026-10-25; `main`'e birleştirme ayrı onaya bağlı)
+
+Karar (2026-10-21, kullanıcı onayı): bütün b aralıkları birlikte χ²'ye geçer; N = 50'de geçiş eşiği yok; kestirici değişmez; kaba gruplama için Tinti–Mulargia.
+
+**Uygulama (`index.html`):**
+- Tek giriş noktası `bCiFields(b, N, ex, ΔM)` → `{err, lo, hi, ciM}`. `ex`: (m − Mc) farkları (olay başına Mc'de m_i − Mc_i).
+- Yöntem seçimi: varsayılan `chi2` (Gamma(N,1) yüzdelikleri, ters eksik gamma; önbellekli). β̂·ΔM > 0,5 **ve** bütün büyüklükler ΔM ızgarasındaysa `tm` (Eş. 19–21, ters eksik beta). Izgara dışı (ör. dönüştürülmüş Mw) → `chi2`. r = 0 → üst uç sınırsız, "[alt–∞]" olarak gösterilir.
+- `?bci=normal` eski ±1,96·b/√N hesabını seçer.
+- Çift kesik (fit aralığı M_max) b(t): Fisher SE simetrik kalır (χ² orada kesin değildir); metin "±" olarak sürer.
+- Tüketiciler asimetrik uçlara geçirildi: b(t) bandı ve çubukları, yakınlaştırma paneli, b(t) sınıflama şeridi (`btClassOf` uçları kullanır), Mc–dönem tablosu, G–R b_GR, bölge satırı, artçı dizisi tablosu, grafiği ve dizi b(t) şeridi, poster metinleri ve ilk–son pencere karşılaştırması (`bCiDiffSig`: büyük tahminin alt kolu ile küçük tahminin üst kolu).
+- Metin biçimi: "b = 1,02 [0,81–1,28]"; T–M kullanılan yerler açıkça etiketlenir (b(t) lejantında pencere sayısı, tabloda "TM").
+
+**Doğrulama:**
+- JS çekirdeği ↔ `bci.py` (scipy): χ² 36 durumda en büyük göreli fark 6·10⁻¹⁴ (N = 1–50 000); T–M 128 durumda 5·10⁻¹¹; r = 0'da sonsuz üst uç 16/16.
+- `scripts/test_b_ci.js` (yeni, 30/0): gömülü scipy referansları, seçim kuralı, `normal` kipte birebirlik, sınıflama/anlamlılık, tohumlu kapsama (ΔM = 0,1 N = 10: χ² ve T–M nominal; ΔM = 0,5 b = 1,5 N = 49: χ² düşer, T–M nominal).
+- Mevcut testler: 11 testin 10'u dalda geçer (`test_bt_adaptive` ve `test_mc_grid` aralık bloğunu okuyacak biçimde güncellendi; `BCI=normal` ile eski kip). `test_fit_range.js` main'de de çalışmıyor (2026-10-17'den beri bilinen TODO; bu işle ilgisi yok).
+- Tarayıcı (Chromium, başsız, sabit saat): `?bci=normal` kipinde dalın ürettiği 45 SVG/metin öğesi ve poster PNG'si (SHA-256) main ile bayt bayt aynı. Fark yalnız durum nesnelerine eklenen `lo/hi/ciM` alanları ve Mc tablosu başlığındaki statik "±1.96·b/√N" → "%95 aralık" etiketi.
+- Sentetik katalogla (yapay veri) tarayıcıda: T–M dalı 47 pencerede tetiklendi, uçları `bci.py` ile 3 ondalıkta aynı; SVG'lerde NaN/∞ yok; dizi paneli ve dizi b(t) şeridi hatasız.
+
+**Açık kalanlar:** yöntem belgesi (eqlive-turkey-methodology.html, depo dışında) birleştirme onayından sonra güncellenecek; `test_b_ci.js` henüz bir CI iş akışına bağlı değil.

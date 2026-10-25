@@ -1213,7 +1213,7 @@
     <div id="sensPanel" style="margin-top:8px;font-size:.72rem;color:#9ab0c5;">
       <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
         <b style="color:#cbd5e1;">🧪 Mc-eşik duyarlılık tablosu</b>
-        <span style="color:#666;">(sabit Mc × dönem · Aki MLE · ±1.96·b/√N)</span>
+        <span style="color:#666;">(sabit Mc × dönem · Aki MLE · %95 aralık)</span>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;">
         <label>Mc düzeyleri <input id="sensMcs" value="1.0, 1.2, 1.5, 2.0, 2.2" oninput="renderSensTable()" style="width:130px;background:#111;border:1px solid #334;color:#e2e8f0;border-radius:3px;font-size:.95em;padding:0 3px;"></label>
@@ -2431,10 +2431,11 @@ function onBAnchorChange() {
 // haritasıyla aynı (0,7 ve 1,4). Bir pencere yalnızca %95 aralığının tamamı bir sınıftaysa renklenir; aksi halde renksiz (belirsiz).
 // Renkler b-değeri SINIFIDIR; deprem tehlikesi ya da alarm seviyesi değildir.
 const BT_CLASS = { lo: 0.7, hi: 1.4, col: { low: '#dc2626', mid: '#eab308', high: '#16a34a' } };
-function btClassOf(b, err) {
-  if (!Number.isFinite(b) || !Number.isFinite(err) || err < 0) return null;   // eksik/geçersiz aralık → sınıflanmaz
+function btClassOf(b, err, lo0, hi0) {   // lo0/hi0 (2026-10-25): asimetrik aralık uçları; verilmezse b ± err
+  const asym = Number.isFinite(lo0) && (Number.isFinite(hi0) || hi0 === Infinity);
+  if (!Number.isFinite(b) || (!asym && (!Number.isFinite(err) || err < 0))) return null;   // eksik/geçersiz aralık → sınıflanmaz
   // Sınır kuralı: b = 0,7 ve b = 1,4 tipik sınıfa aittir (lo ≥ 0,7 ve hi ≤ 1,4); arka plan bantları aynı sınırlarla çizilir.
-  const lo = b - err, hi = b + err, E = 1e-9;   // E: kayan nokta yuvarlaması (ör. 1,3 + 0,1 = 1,4000000000000001) sınıfı değiştirmesin
+  const lo = asym ? lo0 : b - err, hi = asym ? hi0 : b + err, E = 1e-9;   // E: kayan nokta yuvarlaması (ör. 1,3 + 0,1 = 1,4000000000000001) sınıfı değiştirmesin
   if (hi < BT_CLASS.lo - E) return 'low';
   if (lo >= BT_CLASS.lo - E && hi <= BT_CLASS.hi + E) return 'mid';
   if (lo > BT_CLASS.hi + E) return 'high';
@@ -2589,6 +2590,111 @@ function bConfidence95(b, n) {
   return 1.96 * b / Math.sqrt(n);
 }
 
+// ── b-değeri %95 güven aralığı: yöntem seçimi (2026-10-25) ───────────────────────────────────────
+// Gerekçe ve doğrulama: analysis/b_guven_araligi/RAPOR.md (dal b-guven-araligi, Monte Carlo 20 000 tekrar).
+//  'chi2'   (varsayılan): kesin aralık, 2βΣ(m − Mc + ΔM/2) ~ χ²_{2N} → b ∈ [b̂·g_{α/2}/N, b̂·g_{1−α/2}/N],
+//           g_q: Gamma(N,1) yüzdeliği (= χ²_{2N}/2). Utsu (1966); Shi & Bolt (1982); Tinti & Mulargia (1987) Eş. 4a–4b.
+//           Olay başına Mc'de de (Σ(m_i − Mc_i)) aynen geçerli. Simetrik değildir: üst kol daha uzundur.
+//  'tm'     : Tinti & Mulargia (1987) gruplanmış büyüklükler, Eş. 19–21 (geometrik dağılım; aralık b̂'ye değil N ve
+//           r = Σk_i'ye bağlı). Yalnız β̂·ΔM > 0,5 (kaba gruplama; χ² kapsaması orada bozuluyor, RAPOR §9) VE bütün
+//           büyüklükler ΔM ızgarasındaysa kullanılır. r = 0 → üst uç sınırsız (veri üst sınır taşımaz; gizlenmez).
+//  'normal' : eski yaklaşım ±1,96·b/√N (Aki 1965). URL'de ?bci=normal ile seçilir; çıktılar 2026-10-24 main ile birebirdir.
+// N < 50'de ayrı bir geçiş eşiği YOKTUR: ΔM = 0,1'de χ² bütün N için nominal kapsar (RAPOR §4–5); eşik süreksizlik yaratırdı.
+const B_CI_TM_BDM = 0.5;   // β̂·ΔM eşiği (RAPOR §9: χ² β·ΔM ≲ 0,5'e kadar yeterli)
+let B_CI_METHOD = (() => { try { const v = new URLSearchParams(location.search).get('bci'); return v === 'normal' ? 'normal' : 'chi2'; } catch (e) { return 'chi2'; } })();
+function _lnGamma(x) {   // Lanczos (g = 7, n = 9); göreli hata ~1e-15
+  const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059,
+    12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  if (x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * x)) - _lnGamma(1 - x);
+  x -= 1; let a = c[0]; const t = x + 7.5;
+  for (let i = 1; i < 9; i++) a += c[i] / (x + i);
+  return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+}
+function _gammaP(a, x) {   // düzenlenmiş alt eksik gamma P(a, x) (seri / sürekli kesir)
+  if (x <= 0) return 0;
+  const lf = a * Math.log(x) - x - _lnGamma(a);
+  if (x < a + 1) { let ap = a, sum = 1 / a, d = sum; for (let n = 0; n < 100000; n++) { ap += 1; d *= x / ap; sum += d; if (Math.abs(d) < Math.abs(sum) * 1e-16) break; } return Math.min(1, sum * Math.exp(lf)); }
+  let b = x + 1 - a, c = 1e300, d = 1 / b, h = d;
+  for (let i = 1; i < 100000; i++) { const an = -i * (i - a); b += 2; d = an * d + b; if (Math.abs(d) < 1e-300) d = 1e-300; c = b + an / c; if (Math.abs(c) < 1e-300) c = 1e-300; d = 1 / d; const del = d * c; h *= del; if (Math.abs(del - 1) < 1e-16) break; }
+  return Math.max(0, 1 - Math.exp(lf) * h);
+}
+function _betaI(a, b, x) {   // düzenlenmiş eksik beta I_x(a, b) (Lentz sürekli kesri)
+  if (x <= 0) return 0; if (x >= 1) return 1;
+  const lbt = _lnGamma(a + b) - _lnGamma(a) - _lnGamma(b) + a * Math.log(x) + b * Math.log1p(-x);
+  const cf = (a, b, x) => { const qab = a + b, qap = a + 1, qam = a - 1; let c = 1, d = 1 - qab * x / qap; if (Math.abs(d) < 1e-300) d = 1e-300; d = 1 / d; let h = d;
+    for (let m = 1; m < 100000; m++) { const m2 = 2 * m; let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+      d = 1 + aa * d; if (Math.abs(d) < 1e-300) d = 1e-300; c = 1 + aa / c; if (Math.abs(c) < 1e-300) c = 1e-300; d = 1 / d; h *= d * c;
+      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+      d = 1 + aa * d; if (Math.abs(d) < 1e-300) d = 1e-300; c = 1 + aa / c; if (Math.abs(c) < 1e-300) c = 1e-300; d = 1 / d; const del = d * c; h *= del; if (Math.abs(del - 1) < 1e-16) break; }
+    return h; };
+  return x < (a + 1) / (a + b + 2) ? Math.exp(lbt) * cf(a, b, x) / a : 1 - Math.exp(lbt) * cf(b, a, 1 - x) / b;
+}
+function _invMono(f, target, lo, hi) {   // artan f için f(x) = target (ikiye bölme; 200 adım, göreli 1e-15)
+  for (let i = 0; i < 200; i++) { const mid = 0.5 * (lo + hi); if (f(mid) < target) lo = mid; else hi = mid; if (hi - lo <= 1e-15 * Math.max(1, Math.abs(hi))) break; }
+  return 0.5 * (lo + hi);
+}
+const _gammaQCache = new Map();
+function gammaQuantilePair(n, alpha = 0.05) {   // Gamma(n,1) yüzdelikleri [g_{α/2}, g_{1−α/2}] (önbellekli)
+  const k = n + '|' + alpha; if (_gammaQCache.has(k)) return _gammaQCache.get(k);
+  const top = n + 40 * Math.sqrt(n) + 60, f = x => _gammaP(n, x);
+  const r = [_invMono(f, alpha / 2, 0, top), _invMono(f, 1 - alpha / 2, 0, top)];
+  _gammaQCache.set(k, r); return r;
+}
+function bCiChi2(b, n, alpha = 0.05) {
+  if (b === null || !Number.isFinite(b) || !(n >= 1)) return null;
+  const [gl, gu] = gammaQuantilePair(n, alpha);
+  return { lo: b * gl / n, hi: b * gu / n };
+}
+function bCiTintiMulargia(n, r, dm, alpha = 0.05) {   // Eş. 21 → 19; dönüş b uçları (hi = Infinity olabilir)
+  if (!(n >= 1) || !(r >= 0) || !(dm > 0)) return null;
+  const pl = r === 0 ? 0 : _invMono(p => _betaI(r, n, p), alpha / 2, 0, 1);      // I_{p_l}(r, N) = α/2
+  const qu = _invMono(q => _betaI(n, r + 1, q), alpha / 2, 0, 1), pu = 1 - qu;  // I_{q_u}(N, r+1) = α/2
+  return { lo: -Math.log(pu) / dm * Math.LOG10E, hi: pl > 0 ? -Math.log(pl) / dm * Math.LOG10E : Infinity };
+}
+// Tek giriş noktası. ex: (m − Mc) farkları (olay başına Mc'de m_i − Mc_i); dm: büyüklük ızgarası.
+// Dönüş: { err, lo, hi, ciM } — err: yalnız 'normal'/'fisher'de simetrik yarı genişlik; diğerlerinde (hi − lo)/2 (yalnız varlık
+// ve kaba ölçek için; konumsal hesaplarda kullanılmaz, lo/hi kullanılır).
+function bCiFields(b, n, ex = null, dm = 0.1) {
+  if (b === null || !Number.isFinite(b) || !n) return { err: null, lo: null, hi: null, ciM: null };
+  if (B_CI_METHOD === 'normal') { const e = bConfidence95(b, n); return { err: e, lo: b - e, hi: b + e, ciM: 'normal' }; }
+  if (ex && ex.length === n && dm > 0 && b / Math.LOG10E * dm > B_CI_TM_BDM) {
+    let r = 0, onGrid = true;
+    for (const x of ex) { const k = x / dm, kr = Math.round(k); if (Math.abs(k - kr) > 1e-6 || kr < 0) { onGrid = false; break; } r += kr; }
+    if (onGrid) { const t = bCiTintiMulargia(n, r, dm); if (t) return { err: Number.isFinite(t.hi) ? (t.hi - t.lo) / 2 : Infinity, lo: t.lo, hi: t.hi, ciM: 'tm' }; }
+  }
+  const c = bCiChi2(b, n); return { err: (c.hi - c.lo) / 2, lo: c.lo, hi: c.hi, ciM: 'chi2' };
+}
+function bCiFromSym(b, err, m = 'fisher') {   // simetrik (Fisher) aralığı aynı alanlara çevirir
+  return Number.isFinite(err) ? { err, lo: b - err, hi: b + err, ciM: m } : { err: null, lo: null, hi: null, ciM: null };
+}
+function bHiCap(q, cap) { const h = bHiOf(q); return Number.isFinite(h) ? h : cap; }   // çizim: sınırsız üst uç eksen tavanında kesilir
+function bLoOf(q) { return q && q.lo !== undefined && q.lo !== null ? q.lo : q.b - (q.err || 0); }
+function bHiOf(q) { return q && q.hi !== undefined && q.hi !== null ? q.hi : q.b + (q.err || 0); }
+// Metin: 'normal' kipinde eski biçim " ± 0.12"; diğerlerinde " [0.81–1.24]" (üst uç sınırsızsa "–∞"). dc: ondalık ayırıcı dönüştürücü.
+function bCiTxt(q, dc = (s => s), dig = 2) {
+  if (!q || !Number.isFinite(q.err)) { if (q && q.err === Infinity && Number.isFinite(q.lo)) return ` [${dc(q.lo.toFixed(dig))}–∞]`; return ''; }
+  if (q.ciM === 'normal' || q.ciM === 'fisher' || q.lo === undefined || q.lo === null) return ' ± ' + dc(q.err.toFixed(dig));
+  return ` [${dc(q.lo.toFixed(dig))}–${Number.isFinite(q.hi) ? dc(q.hi.toFixed(dig)) : '∞'}]`;
+}
+// İki b tahmini arasındaki farkın %95 aralıklarıyla karşılaştırılması: |Δb| > √(e_a² + e_b²). Asimetrik aralıkta
+// her tahminin karşı tarafa bakan kolu kullanılır (büyük olanın alt kolu, küçük olanın üst kolu). 'normal'de eski formül.
+function bCiDiffSig(a, c) {
+  const sym = q => q.ciM === 'normal' || q.ciM === 'fisher' || q.lo === undefined || q.lo === null;
+  if (sym(a) && sym(c)) return Number.isFinite(a.err) && Number.isFinite(c.err) ? Math.abs(a.b - c.b) > Math.sqrt(a.err ** 2 + c.err ** 2) : null;
+  const [u, d] = a.b >= c.b ? [a, c] : [c, a], eu = u.b - bLoOf(u), ed = bHiOf(d) - d.b;
+  return Number.isFinite(eu) && Number.isFinite(ed) ? u.b - d.b > Math.sqrt(eu ** 2 + ed ** 2) : null;
+}
+function bCiTmNote(list, en = false) {   // T–M kullanılan öğe sayısı notu (yoksa boş; 'normal'de hiç oluşmaz)
+  const n = (list || []).filter(q => q && q.ciM === 'tm').length;
+  return n ? (en ? `; Tinti & Mulargia (1987) in ${n} window(s) with β·ΔM > 0.5` : `; β·ΔM > 0,5 olan ${n} pencerede Tinti & Mulargia (1987)`) : '';
+}
+function bCiS(orig, alt) { return B_CI_METHOD === 'normal' ? orig : alt; }   // metin: 'normal'de özgün ifade, aksi hâlde yeni
+function bCiMethodTxt(en = false) {
+  if (B_CI_METHOD === 'normal') return en ? '95% CI ±1.96·b/√N (Aki 1965)' : '%95 aralık ±1,96·b/√N (Aki 1965)';
+  return en ? '95% CI exact χ²₂N interval (Utsu 1966; Shi & Bolt 1982), asymmetric; Tinti & Mulargia (1987) for coarse grouping (β·ΔM > 0.5)'
+            : '%95 aralık kesin χ²₂N aralığı (Utsu 1966; Shi & Bolt 1982), asimetrik; kaba gruplamada (β·ΔM > 0,5) Tinti & Mulargia (1987)';
+}
+
 // Kayan pencere b-değeri zaman serisi — Öncel & Wilson (2007, GJI, İzmit) §3.1 metodolojisi:
 // sabit N=100 olay pencere, adım=10 olay, Mc sabit/global (pencere başına değil)
 function computeBvalueTimeSeries(evList, Mc, step = 10, dm = 0.1) {
@@ -2601,7 +2707,7 @@ function computeBvalueTimeSeries(evList, Mc, step = 10, dm = 0.1) {
     const win  = sorted.slice(i, i + N_WIN);
     const mags = win.map(e => e.mw ?? e.mag);
     const b = computeBvalue(mags, Mc, dm);
-    if (b !== null) series.push({ t: bWinTime(win, e => e.time.getTime()), b, err: bConfidence95(b, N_WIN), span: win[N_WIN-1].time - win[0].time, t0: win[0].time.getTime(), t1: win[N_WIN-1].time.getTime() });
+    if (b !== null) series.push({ t: bWinTime(win, e => e.time.getTime()), b, ...bCiFields(b, N_WIN, mags.map(m => m - Mc), dm), span: win[N_WIN-1].time - win[0].time, t0: win[0].time.getTime(), t1: win[N_WIN-1].time.getTime() });
   }
   return { series, N: sorted.length };
 }
@@ -2652,11 +2758,11 @@ function renderSensTable(evList, Mc, cs) {
     const mags = ev.filter(e => e.t >= p.a && e.t < p.b && e.m >= mc - 1e-9).map(e => e.m);
     const n = mags.length, b = computeBvalue(mags, mc);
     if (b === null) return `<td style="padding:2px 6px;color:#666;text-align:center;opacity:.55;">N=${n} (&lt;10)</td>`;
-    const err = bConfidence95(b, n), faint = n < 50;
-    return `<td style="padding:2px 6px;text-align:center;white-space:nowrap;${faint ? 'opacity:.45;' : ''}" title="${faint ? 'N<50: hesaplandı, güvenilirlik sınırlı' : ''}"><b style="color:#e2e8f0;">${b.toFixed(2)}</b> ± ${err.toFixed(2)}<div style="color:#888;">N=${n}${faint ? ' ⚠' : ''}</div></td>`;
+    const ci = bCiFields(b, n, mags.map(m => m - mc)), faint = n < 50;
+    return `<td style="padding:2px 6px;text-align:center;white-space:nowrap;${faint ? 'opacity:.45;' : ''}" title="${faint ? (ci.ciM === 'normal' ? 'N<50: hesaplandı, güvenilirlik sınırlı' : 'N<50: aralık geniş; kesin χ² aralığı küçük N için de geçerlidir') : ''}"><b style="color:#e2e8f0;">${b.toFixed(2)}</b>${ci.ciM === 'normal' ? ' ± ' + ci.err.toFixed(2) : bCiTxt({ b, ...ci })}${ci.ciM === 'tm' ? '<sup title="β̂·ΔM &gt; 0,5: Tinti &amp; Mulargia (1987) gruplanmış büyüklük aralığı">TM</sup>' : ''}<div style="color:#888;">N=${n}${faint ? ' ⚠' : ''}</div></td>`;
   }).join('') + `</tr>`).join('');
   el.innerHTML = `<table style="border-collapse:collapse;border:1px solid #2a2a3a;">${head}${rows}</table>` +
-    `<div style="color:#666;margin-top:2px;">b: Aki (1965) MLE, b = log10(e)/(M̄ − Mc + ΔM/2); hata: %95 yaklaşık güven aralığı ±1.96·b/√N, her hücre kendi N'i ile. — : sabit Mc &lt; dönemin geçerli Mc'si${cs ? ' (dönemle örtüşen basamakların en büyüğü)' : ' (tek Mc)'}. Soluk ⚠: N&lt;50. Dönemler [başlangıç, bitiş).</div>`;
+    `<div style="color:#666;margin-top:2px;">b: Aki (1965) MLE, b = log10(e)/(M̄ − Mc + ΔM/2); hata: ${bCiS('%95 yaklaşık güven aralığı ±1.96·b/√N', '%95 kesin güven aralığı (χ²₂N; Utsu 1966, Shi &amp; Bolt 1982; asimetrik, [alt–üst]; TM: β̂·ΔM &gt; 0,5 olan hücrelerde Tinti &amp; Mulargia 1987, gruplanmış büyüklükler)')}, her hücre kendi N'i ile. — : sabit Mc &lt; dönemin geçerli Mc'si${cs ? ' (dönemle örtüşen basamakların en büyüğü)' : ' (tek Mc)'}. Soluk ⚠: N&lt;50. Dönemler [başlangıç, bitiş).</div>`;
 }
 
 let tmMagDM = 0.1, tmMcScale = null;   // 2026-10-18: Time-Mag panelinin büyüklük ızgarası (dönüşümde ΔM_Mw) ve Mc eşlemesi
@@ -2673,7 +2779,7 @@ function renderBtZoom(bt) {
   const iP = ser.findIndex(q => (q.t0 ?? q.t) >= mw.tMS - 1000), nMix = (iP < 0 ? ser.length : iP) - i0, nPost = iP < 0 ? 0 : ser.length - iP;
   const span = Math.max(nMix, 30), a = Math.max(0, i0 - Math.max(2 * span, 60)), z = ser.length - 1, sub = ser.slice(a, z + 1);
   const W = 660, H = 175, PL = 40, PR = 14, PT = 16, PB = 34, pw = W - PL - PR, ph = H - PT - PB;
-  const bs = sub.flatMap(q => [q.b - (q.err || 0), q.b + (q.err || 0)]).filter(Number.isFinite);
+  const bs = sub.flatMap(q => [bLoOf(q), bHiOf(q)]).filter(Number.isFinite);
   let lo = Math.min(...bs), hi = Math.max(...bs); lo = Math.max(0, Math.floor(lo * 4) / 4); hi = Math.ceil(hi * 4) / 4; if (hi - lo < 0.5) hi = lo + 0.5;
   const X = i => PL + (z > a ? (i - a) / (z - a) : 0.5) * pw, Y = b => PT + ph - (b - lo) / (hi - lo) * ph;
   let g = `<text x="${PL}" y="10" fill="#9ab0c5" font-size="9">Ana şok çevresi (yakınlaştırma): pencere sırası, seyreltmesiz · 0 = M${mw.m.toFixed(1)} dahil ilk pencere</text>`;
@@ -2682,7 +2788,7 @@ function renderBtZoom(bt) {
   const yst = hi - lo > 1.01 ? 0.5 : 0.25;
   for (let v = lo; v <= hi + 1e-9; v += yst) { g += `<line x1="${PL}" y1="${Y(v).toFixed(1)}" x2="${W - PR}" y2="${Y(v).toFixed(1)}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${PL - 4}" y="${(Y(v) + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${v.toFixed(2)}</text>`; }
   if (1 >= lo && 1 <= hi) g += `<line x1="${PL}" y1="${Y(1).toFixed(1)}" x2="${W - PR}" y2="${Y(1).toFixed(1)}" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2,3"/>`;
-  const up = sub.map((q, k) => `${X(a + k).toFixed(1)},${Y(q.b + (q.err || 0)).toFixed(1)}`), dn = sub.map((q, k) => `${X(a + k).toFixed(1)},${Y(q.b - (q.err || 0)).toFixed(1)}`).reverse();
+  const up = sub.map((q, k) => `${X(a + k).toFixed(1)},${Y(bHiCap(q, hi)).toFixed(1)}`), dn = sub.map((q, k) => `${X(a + k).toFixed(1)},${Y(bLoOf(q)).toFixed(1)}`).reverse();
   g += `<polygon points="${up.concat(dn).join(' ')}" fill="#0891b2" fill-opacity="0.15"/>`;
   g += `<polyline points="${sub.map((q, k) => `${X(a + k).toFixed(1)},${Y(q.b).toFixed(1)}`).join(' ')}" fill="none" stroke="#0891b2" stroke-width="1.3"/>`;
   g += `<line x1="${X(i0).toFixed(1)}" y1="${PT}" x2="${X(i0).toFixed(1)}" y2="${PT + ph}" stroke="#dc2626" stroke-width="1.4" stroke-dasharray="5,3"/><text x="${(X(i0) - 3).toFixed(1)}" y="${PT + 9}" fill="#dc2626" font-size="9" font-weight="bold" text-anchor="end">M${mw.m.toFixed(1)} girer →</text>`;
@@ -2793,8 +2899,8 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   // 2026-10-11: eksen artık %95 aralıklarını da kapsar (çubuklar çerçeveden taşmasın; az pencereli
   // serilerde "aşırı büyük hata" görüntüsü taşmadan kaynaklanıyordu). Değerler değişmedi.
   const axS = series.concat(fs);
-  const dataLo = Math.min(...axS.map(s2 => s2.b - (s2.err || 0)));
-  const dataHi = Math.max(...axS.map(s2 => s2.b + (s2.err || 0)));
+  const dataLo = Math.min(...axS.map(s2 => bLoOf(s2)));
+  const dataHi = Math.max(...axS.map(s2 => bHiOf(s2)).filter(Number.isFinite));
   const padding = Math.max((dataHi - dataLo) * 0.10, 0.05);
   let bMin = dataLo - padding, bMax = dataHi + padding;
   if (bMax - bMin < MIN_SPAN) {
@@ -2814,24 +2920,24 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   // yerine yarı saydam %95 bandı çizilir — hata çubukları "saçılım" gibi
   // okunmasın (2026-09-27). Değerler aynı; yalnızca gösterim değişir.
   const BAND_MIN = 150, useBand = ser.length > BAND_MIN;
-  const band = useBand ? `<polygon points="${ser.map(s => `${x(s.t).toFixed(1)},${y(s.b + (s.err || 0)).toFixed(1)}`).join(' ')} ${ser.slice().reverse().map(s => `${x(s.t).toFixed(1)},${y(Math.max(0, s.b - (s.err || 0))).toFixed(1)}`).join(' ')}" fill="#06b6d4" fill-opacity="0.11" stroke="none"/>` : '';
+  const band = useBand ? `<polygon points="${ser.map(s => `${x(s.t).toFixed(1)},${y(bHiCap(s, bMax)).toFixed(1)}`).join(' ')} ${ser.slice().reverse().map(s => `${x(s.t).toFixed(1)},${y(Math.max(0, bLoOf(s))).toFixed(1)}`).join(' ')}" fill="#06b6d4" fill-opacity="0.11" stroke="none"/>` : '';
   const errBars = useBand ? '' : ser.map(s => {
     if (!s.err) return '';
     const xc = x(s.t).toFixed(1);
-    return `<line x1="${xc}" y1="${y(s.b - s.err).toFixed(1)}" x2="${xc}" y2="${y(s.b + s.err).toFixed(1)}" stroke="#06b6d4" stroke-width="1" stroke-opacity="0.35"/>`;
+    return `<line x1="${xc}" y1="${y(bLoOf(s)).toFixed(1)}" x2="${xc}" y2="${y(bHiCap(s, bMax)).toFixed(1)}" stroke="#06b6d4" stroke-width="1" stroke-opacity="0.35"/>`;
   }).join('');
   // 2026-10-12 (kullanıcı kararı): trend / hareketli ortalama çizgileri KALDIRILDI. 21 pencerelik ortalama hiçbir yayına
   // dayanmıyordu (Öncel & Wilson 2007 b(t) eğrisine yumuşatma uygulamaz); akademik çıktıda fiziksel eğilim gibi
   // okunabiliyordu. Yalnız ham pencere b değerleri ve kendi %95 aralıkları çizilir; noktalar bu yüzden daha belirgin.
   // Nokta boyutu gösterilen pencere sayısına göre ölçeklenir (2026-10-17): az pencerede belirgin, çok pencerede küçük.
   const dotR = ser.length <= 60 ? 2.2 : ser.length <= 150 ? 1.8 : ser.length <= 300 ? 1.4 : 1.1;
-  const dots = ser.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="${dotR}" fill="#06b6d4" fill-opacity="${useBand ? 0.75 : 0.9}"><title>b=${s.b.toFixed(2)} ± ${s.err !== null && s.err !== undefined ? s.err.toFixed(2) : '—'} (%95) · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
+  const dots = ser.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="${dotR}" fill="#06b6d4" fill-opacity="${useBand ? 0.75 : 0.9}"><title>b=${s.b.toFixed(2)}${s.err !== null && s.err !== undefined ? bCiTxt(s) : ' ± —'} (%95) · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
 
   // (b) sabit-Mc serisi: ham pencere değerleri (yumuşatma yok), gri kesikli
   let fixedLine = '', fixedDots = '';
   if (fs.length) {
     fixedLine = `<polyline points="${fsD.map(s => `${x(s.t).toFixed(1)},${y(s.b).toFixed(1)}`).join(' ')}" fill="none" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,2" stroke-opacity="0.8"/>`;
-    fixedDots = fsD.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="1" fill="#d1d5db" fill-opacity="0.35"><title>sabit Mc=${fixed.mc.toFixed(1)}: b=${s.b.toFixed(2)} ± ${s.err.toFixed(2)} · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
+    fixedDots = fsD.map(s => `<circle cx="${x(s.t).toFixed(1)}" cy="${y(s.b).toFixed(1)}" r="1" fill="#d1d5db" fill-opacity="0.35"><title>sabit Mc=${fixed.mc.toFixed(1)}: b=${s.b.toFixed(2)}${bCiTxt(s)} · ${new Date(s.t).toLocaleDateString('tr-TR')}</title></circle>`).join('');
   }
 
   // (c) Mc(t) şeridi — b(t) ile AYNI zaman ekseni
@@ -2893,11 +2999,11 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     clsCount = { low: 0, mid: 0, high: 0, none: 0 };
     const RB = 9, yR = PAD_T + plotH - RB;
     const f2 = v => v.toFixed(2).replace('.', ','), NM = { low: 'düşük b', mid: 'tipik b', high: 'yüksek b' };
-    ser.forEach((s2, i) => { const k = btClassOf(s2.b, s2.err); clsCount[k || 'none']++;
+    ser.forEach((s2, i) => { const k = btClassOf(s2.b, s2.err, s2.lo, s2.hi); clsCount[k || 'none']++;
       const xa = i ? (x(ser[i - 1].t) + x(s2.t)) / 2 : x(s2.t), xb = i < ser.length - 1 ? (x(s2.t) + x(ser[i + 1].t)) / 2 : x(s2.t);
-      const lo = s2.b - (s2.err || 0), hi = s2.b + (s2.err || 0);
-      const why = !Number.isFinite(s2.err) ? 'güven aralığı yok' : k ? `%95 aralığı tamamen ${NM[k]} sınıfında` : `%95 aralığı ${lo < BT_CLASS.lo && hi >= BT_CLASS.lo ? '0,7' : '1,4'} sınırını kesiyor — sınıflanmadı (belirsiz)`;
-      const tt = `<title>${new Date(s2.t).toISOString().slice(0, 10)} · b = ${f2(s2.b)} · %95: ${f2(lo)}–${f2(hi)} · ${why}</title>`;
+      const lo = bLoOf(s2), hi = bHiOf(s2);
+      const why = !Number.isFinite(s2.err) && !(s2.err === Infinity && Number.isFinite(lo)) ? 'güven aralığı yok' : k ? `%95 aralığı tamamen ${NM[k]} sınıfında` : `%95 aralığı ${lo < BT_CLASS.lo && hi >= BT_CLASS.lo ? '0,7' : '1,4'} sınırını kesiyor — sınıflanmadı (belirsiz)`;
+      const tt = `<title>${new Date(s2.t).toISOString().slice(0, 10)} · b = ${f2(s2.b)} · %95: ${f2(lo)}–${Number.isFinite(hi) ? f2(hi) : '∞'} · ${why}</title>`;
       clsRibbon += `<rect class="btRib" x="${xa.toFixed(1)}" y="${yR}" width="${Math.max(0.8, xb - xa).toFixed(1)}" height="${RB}" fill="${k ? C[k] : 'transparent'}">${tt}</rect>`; });
     clsLegend = `<text class="btLeg" x="${PAD_L + 30}" y="${PAD_T + 20}" font-size="8"><tspan fill="${C.low}">■ düşük b &lt; 0,7</tspan><tspan fill="${C.mid}" dx="6">■ tipik 0,7–1,4</tspan><tspan fill="${C.high}" dx="6">■ yüksek b &gt; 1,4</tspan></text><text class="btLeg" x="${PAD_L + 30}" y="${PAD_T + 30}" font-size="8" fill="#888">şerit: %95 aralığı tamamen sınıf içinde; boşluk = aralık sınırı kesiyor (belirsiz) · alarm değildir · FTLS değildir</text>`;
   }
@@ -2942,15 +3048,15 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
   `;
 
   const bLast = series[series.length-1];
-  const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, err: btAll.series[btAll.series.length - 1].err, nWin: btAll.series.length, N: btAll.N } : null;
-  const btsObj = { bAvg, bLast: bLast.b, err: bLast.err, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
+  const allS = btAll && btAll.series.length ? { bAvg: btAll.series.reduce((a, c) => a + c.b, 0) / btAll.series.length, bLast: btAll.series[btAll.series.length - 1].b, ...(({ err, lo, hi, ciM }) => ({ err, lo, hi, ciM }))(btAll.series[btAll.series.length - 1]), nWin: btAll.series.length, N: btAll.N } : null;
+  const btsObj = { bAvg, bLast: bLast.b, err: bLast.err, lo: bLast.lo, hi: bLast.hi, ciM: bLast.ciM, nWin: series.length, N, fixed: fixed && fixed.series.length ? { mc: fixed.mc, bAvg: fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length } : null,
               fit: btFitOn ? { lo: btFit.lo, hi: btFit.hi } : null, all: allS, anchor: bTimeAnchor, band: useBand,
               adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn, cls: clsCount, ser: series.map(q => { const t0 = q.t0 ?? (q.t - (q.span || 0)), t1 = q.t1 ?? (q.t + (q.span || 0));
-                return { t: q.t, b: q.b, err: q.err, t0, t1, inc: !cs && Number.isFinite(Mc) && mcSeries.some(m => m.t >= t0 && m.t <= t1 && m.mc > Mc + 0.1 + 1e-9) }; }), msWin };   // inc: pencere süresinde veri Mc(t) > kullanılan Mc + 0,1 (eksik kayıt kuşkusu)
+                return { t: q.t, b: q.b, err: q.err, lo: q.lo, hi: q.hi, ciM: q.ciM, t0, t1, inc: !cs && Number.isFinite(Mc) && mcSeries.some(m => m.t >= t0 && m.t <= t1 && m.mc > Mc + 0.1 + 1e-9) }; }), msWin };   // inc: pencere süresinde veri Mc(t) > kullanılan Mc + 0,1 (eksik kayıt kuşkusu)
   if (STORE) lastBts = btsObj;
   if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB };
   try { renderBtZoom(btsObj); } catch (e) { console.warn('[btzoom]', e); }
-  const lastErrStr = bLast.err !== null ? ` ± ${bLast.err.toFixed(2)}` : '';
+  const lastErrStr = bLast.err !== null ? bCiTxt(bLast) : '';
   // Lejant iki seviyeye ayrıldı -- "grafik açıklaması" (renk/sembol anahtarı)
   // ile "istatistik özeti" aynı satırda karışmasın (2026-09-17, kullanıcı
   // geri bildirimi). Sayılar/mantık aynı, yalnızca sunum iki satıra bölündü.
@@ -2958,7 +3064,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
     `<div style="font-size:.85em;color:#aaa">` +
       (lineOnly ? `<span style="color:#06b6d4">─</span> Ham b-değeri (ince çizgi) &nbsp; ` : AD.on ? `<span style="color:#06b6d4">●</span> Pencere b-değeri (gösterim adımı ${STEPD}) &nbsp; ` : `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; `) +
       (rawOn ? `<span style="color:#7dd3fc;opacity:.6">─</span> Ham b(t), adım ${STEPB} (denetim katmanı) &nbsp; ` : '') +
-      (useBand ? `<span style="color:#06b6d4;opacity:.6">▮</span> %95 yaklaşık güven bandı (±1.96·b/√n, pencere başına) &nbsp; ` : `<span style="color:#06b6d4">│</span> %95 güven aralığı &nbsp; `) +
+      (useBand ? `<span style="color:#06b6d4;opacity:.6">▮</span> ${bCiS('%95 yaklaşık güven bandı (±1.96·b/√n, pencere başına)', '%95 güven bandı (kesin χ²₂N, asimetrik, pencere başına' + bCiTmNote(series) + ')')} &nbsp; ` : `<span style="color:#06b6d4">│</span> %95 güven aralığı${bCiS('', ' (kesin χ²₂N, asimetrik' + bCiTmNote(series) + ')')} &nbsp; `) +
       (fixed ? `<span style="color:#d1d5db">┄</span> Sabit Mc=${fixed.mc.toFixed(1)} (${fixed.src}) ham b(t) &nbsp; ` : '') +
       `<span style="color:#f59e0b">┄</span> Genel ortalama` +
     `</div>` +
@@ -2969,7 +3075,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
       (AD.on ? `<div style="color:#f59e0b;margin-top:2px;" title="Seyreltme yalnızca gösterimi etkiler: hesaplanan ${series.length} pencereden her ${AD.f}. pencere çizilir (son pencere korunur). b değerleri, %95 aralıkları, b ort. ve b son değişmez; ek yumuşatma uygulanmaz. Bütün pencereleri görmek için 'ham b(t) çizgisi' kutusunu işaretleyin.">ℹ Yüksek veri yoğunluğu (${series.length} pencere &gt; ${BT_ADAPT_MAX}) nedeniyle seyreltilmiş görünüm etkin: gösterim adımı ${STEPD} olay, ${ser.length} pencere; nokta zamanı ${bAnchorText(false)}. b değerleri değişmedi, ek yumuşatma yok.</div>` : '') +
       (cs ? (btFitOn
         ? ` &nbsp;|&nbsp; <span style="color:#f5a623">Fit aralığı M ${btFit.lo ?? 'Mc'}–${btFit.hi ?? '∞'}: olay başına eşik max(Mc_i, M_min)${btFit.hi !== null ? ', M &lt; M_max, çift kesik Aki–Utsu (hata ±1,96·SE, Fisher)' : ' (Aki 1965 genelleştirmesi)'}</span>` +
-          (allS ? ` &nbsp;|&nbsp; <span style="color:#94a3b8">karşılaştırma — tüm sınıflar: b ort. = ${allS.bAvg.toFixed(2)}, b son = ${allS.bLast.toFixed(2)}${allS.err !== null ? ' ± ' + allS.err.toFixed(2) : ''} (${allS.nWin} pencere, N=${allS.N})</span>` : '')
+          (allS ? ` &nbsp;|&nbsp; <span style="color:#94a3b8">karşılaştırma — tüm sınıflar: b ort. = ${allS.bAvg.toFixed(2)}, b son = ${allS.bLast.toFixed(2)}${allS.err !== null ? bCiTxt({ b: allS.bLast, ...allS }) : ''} (${allS.nWin} pencere, N=${allS.N})</span>` : '')
         : ` &nbsp;|&nbsp; <span style="color:#f59e0b">Tamlık basamaklı: olay başına Mc (Aki 1965 genelleştirmesi)</span>`) : '') +
       (fixed ? (fixed.series.length
         ? ` &nbsp;|&nbsp; <span style="color:#d1d5db">Sabit Mc=${fixed.mc.toFixed(1)}: b ort. = <b>${(fixed.series.reduce((a, c) => a + c.b, 0) / fixed.series.length).toFixed(2)}</b>, ${fixed.series.length} pencere (N=${fixed.N})` +
@@ -3415,8 +3521,8 @@ function renderGutenbergRichter(evList, Mc) {
       let sumAbsDiff = 0, sumObs = 0;
       fitBins.forEach(p => { sumAbsDiff += Math.abs(p.cum - synthCum(p.m)); sumObs += p.cum; });
       const gofR = sumObs > 0 ? 100 * (1 - sumAbsDiff / sumObs) : null;
-      const bErr = bConfidence95(bFit, nAboveMc);   // 2026-10-17: b_GR belirsizliği, b(t) ile aynı tanım (Aki 1965, ±1,96·b/√N)
-      lastGrSimple = { mc: Mc, b: bFit, a: aFit, gof: gofR, n: nAboveMc, err: bErr, mMax };
+      const bCi = bCiFields(bFit, nAboveMc, mags.filter(m => m >= Mc - 1e-9).map(m => m - Mc), tmMagDM), bErr = bCi.err;   // 2026-10-17: b_GR belirsizliği, b(t) ile aynı tanım; 2026-10-25: χ² (bCiFields)
+      lastGrSimple = { mc: Mc, b: bFit, a: aFit, gof: gofR, n: nAboveMc, ...bCi, mMax };
       const mFitStart = Math.max(Mc, 0), mFitEnd = mMax;
       const xStart = x(mFitStart), yStart = y(synthCum(mFitStart) / normFactor);
       const xEnd   = x(mFitEnd),   yEnd   = y(synthCum(mFitEnd) / normFactor);
@@ -3429,8 +3535,8 @@ function renderGutenbergRichter(evList, Mc) {
       const xLabel = x(mLabel), yLabel = y(synthCum(mLabel) / normFactor);
       fitLine = `<line x1="${xStart.toFixed(1)}" y1="${yStart.toFixed(1)}" x2="${xEnd.toFixed(1)}" y2="${yEnd.toFixed(1)}" stroke="#f5a623" stroke-width="1.3" stroke-dasharray="2,2"/>` +
                 `<circle cx="${xStart.toFixed(1)}" cy="${yStart.toFixed(1)}" r="3" fill="#f5a623" stroke="#111" stroke-width="0.6"><title>Fit başlangıcı: Mc=${fmtM(Mc)}, N≥Mc=${nAboveMc}</title></circle>` +
-                `<text x="${(xLabel+4).toFixed(1)}" y="${(yLabel-4).toFixed(1)}" fill="#f5a623" font-size="12" font-weight="700">b = ${bFit.toFixed(2)}${bErr !== null ? ' ± ' + bErr.toFixed(2) : ''}</text>`;
-      fitStatsStr = ` &nbsp;|&nbsp; N≥Mc=<b>${nAboveMc}</b> · a=<b>${aFit.toFixed(2)}</b> · b_GR=<b>${bFit.toFixed(2)}</b>${bErr !== null ? ' ± ' + bErr.toFixed(2) + ' <span style="color:#888">(%95, Aki 1965)</span>' : ''} · <span title="Aki MLE yalnızca M ≥ Mc olaylarıyla; GoF kümülatif N(≥M) ile Mc–Mmax aralığında. Mc tahmindir (maks. eğrilik +0,2): bölgeye, zaman aralığına ve yönteme bağlıdır.">uyum M ${Mc}–${mMax}</span> · <span title="Wiemer &amp; Wyss (2000) goodness-of-fit measure (not R²)">GoF=<b>${gofR !== null ? gofR.toFixed(1)+'%' : '—'}</b></span>`;
+                `<text x="${(xLabel+4).toFixed(1)}" y="${(yLabel-4).toFixed(1)}" fill="#f5a623" font-size="12" font-weight="700">b = ${bFit.toFixed(2)}${bErr !== null ? bCiTxt(lastGrSimple) : ''}</text>`;
+      fitStatsStr = ` &nbsp;|&nbsp; N≥Mc=<b>${nAboveMc}</b> · a=<b>${aFit.toFixed(2)}</b> · b_GR=<b>${bFit.toFixed(2)}</b>${bErr !== null ? bCiTxt(lastGrSimple) + ` <span style="color:#888">(%95, ${lastGrSimple.ciM === 'normal' ? 'Aki 1965' : lastGrSimple.ciM === 'tm' ? 'Tinti &amp; Mulargia 1987' : 'kesin χ², Utsu 1966'})</span>` : ''} · <span title="Aki MLE yalnızca M ≥ Mc olaylarıyla; GoF kümülatif N(≥M) ile Mc–Mmax aralığında. Mc tahmindir (maks. eğrilik +0,2): bölgeye, zaman aralığına ve yönteme bağlıdır.">uyum M ${Mc}–${mMax}</span> · <span title="Wiemer &amp; Wyss (2000) goodness-of-fit measure (not R²)">GoF=<b>${gofR !== null ? gofR.toFixed(1)+'%' : '—'}</b></span>`;
     } else {
       fitStatsStr = ` &nbsp;|&nbsp; GR fit: yetersiz veri (N≥Mc=${fmtM(Mc)}: ${nAboveMc} &lt; 10)`;
     }
@@ -4099,14 +4205,14 @@ async function exportPosterAGU(scale, evt) {
     ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitude-type sensitivity scenario:** ${[!lastTmTypeFilter.md ? `MD (duration magnitude) events excluded (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `unconverted ML<1.7 events excluded (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; events were neither deleted from the catalogue nor converted.`] : []),
     cs ? `**Completeness periods** (sub-catalogues): ${cs.periods.map(csLab).join('; ')}; N entering the analysis = ${cs.kept.length.toLocaleString(NF)}.` : '**Completeness:** single Mc (maximum curvature +0.2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit range ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} with per-event threshold max(Mc_i, M_min)${bt.fit.hi !== null ? ', upper bound M_max; doubly truncated Aki–Utsu maximum likelihood' : '; Aki (1965) maximum likelihood'}; N = 100 moving window, step 10 (Öncel & Wilson 2007); 95% interval ±1.96·SE.`
-      : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (consecutive windows overlap by 99%)' : '') + ' (Öncel & Wilson 2007); 95% interval ±1.96·b/√N.',
+      : '**b(t):** Aki (1965) maximum likelihood, per-event Mc; N = 100 moving window, step ' + BT_STEP + (BT_STEP === 1 ? ' (consecutive windows overlap by 99%)' : '') + ' (Öncel & Wilson 2007); ' + bCiS('95% interval ±1.96·b/√N.', '95% interval: exact χ²₂N (Utsu 1966; Shi & Bolt 1982), asymmetric.'),
     cs ? `**Gutenberg–Richter:** Weichert (1980) maximum likelihood with unequal observation periods${fitT ? `; fit range ${fitT} (M_min ≤ M < M_max; shared by b, D/sd, the R profile and b(t); chosen by a b(M_min) stability scan)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model input, not an Mmax estimate)` : ''}. Sub-catalogue merging principle: Kijko & Sellevoll (1989).${gf && gf.consistency && gf.consistency.gof && gf.consistency.gof.ok ? ` Fit test: Poisson deviance, parametric bootstrap (B = ${gf.consistency.gof.B}).` : ''}` : '**Gutenberg–Richter:** single Mc; b_GR by Aki (1965) maximum likelihood, a = log N(≥Mc) + b·Mc; goodness of fit after Wiemer & Wyss (2000).'];
   const mItems = EN ? mItemsEN() : [
     `**Katalog:** ${src}; ${evs.length.toLocaleString('tr-TR')} olay, ${tr}` + (regionRect && regionDeclusterOn ? `; Gardner & Knopoff (1974) ile kümesizleştirilmiş (ham N = ${regionEvents.length.toLocaleString('tr-TR')})` + (regionCtxReady(regionEvents) ? `; daire dışı bağlamla (dar halka R+30 km, geniş halka R+90 km M ≥ 4; ${(regionCtxList() || []).length.toLocaleString('tr-TR')} bağlam olayı)` : '') + (mwAuthActive() ? `; büyük depremlerde otoriter Mw (USGS ComCat; ${mwAuthTable.version}).` : '.') : '.') + mtNote,
     ...((typeof lastTmTypeFilter !== 'undefined' && lastTmTypeFilter && (!lastTmTypeFilter.md || !lastTmTypeFilter.mlLow)) ? [`**Magnitüd tipi duyarlılık senaryosu:** ${[!lastTmTypeFilter.md ? `MD (süre magnitüdü) olayları analiz dışı (${lastTmTypeFilter.nMD})` : '', !lastTmTypeFilter.mlLow ? `dönüştürülmemiş ML<1,7 olayları analiz dışı (${lastTmTypeFilter.nMLlow})` : ''].filter(Boolean).join('; ')}; olaylar katalogdan silinmedi, dönüştürülmedi.`] : []),
     cs ? `**Tamlık dönemleri** (alt kataloglar): ${cs.periods.map(csLabel).join('; ')}; analize giren N = ${cs.kept.length.toLocaleString('tr-TR')}.` : '**Tamlık:** tek Mc (maksimum eğrilik +0,2; Wiemer & Wyss 2000).',
     bt && bt.fit ? `**b(t):** fit aralığı ${fitT || `M ${bt.fit.lo ?? '—'}–${bt.fit.hi ?? '—'}`} ile olay başına eşik max(Mc_i, M_min)${bt.fit.hi !== null ? ', üst sınır M_max; çift kesik Aki–Utsu en çok olabilirlik' : '; Aki (1965) en çok olabilirlik'}; N = 100 kayan pencere, adım 10 (Öncel & Wilson 2007); %95 aralık ±1,96·SE.`
-      : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ardışık pencereler %99 örtüşür)' : '') + ' (Öncel & Wilson 2007); %95 aralık ±1,96·b/√N.',
+      : '**b(t):** Aki (1965) en çok olabilirlik, olay başına Mc; N = 100 kayan pencere, adım ' + BT_STEP + (BT_STEP === 1 ? ' (ardışık pencereler %99 örtüşür)' : '') + ' (Öncel & Wilson 2007); ' + bCiS('%95 aralık ±1,96·b/√N.', '%95 aralık: kesin χ²₂N (Utsu 1966; Shi & Bolt 1982), asimetrik.'),
     cs ? `**Gutenberg–Richter:** eşit olmayan gözlem süreleriyle Weichert (1980) en çok olabilirlik${fitT ? `; fit aralığı ${fitT} (M_min ≤ M < M_max; b, D/sd, R profili ve b(t) için ortak; seçim b(M_min) kararlılık taramasıyla)` : ''}${gf && gf.Mx !== null ? `; Mx = ${gf.Mx} (model girdisi, Mmax kestirimi değil)` : ''}. Alt katalog birleştirme ilkesi: Kijko & Sellevoll (1989).${gf && gf.consistency && gf.consistency.gof && gf.consistency.gof.ok ? ` Uyum testi: Poisson sapması, parametrik bootstrap (B = ${gf.consistency.gof.B}).` : ''}` : '**Gutenberg–Richter:** tek Mc; b_GR Aki (1965) en çok olabilirlik, a = log N(≥Mc) + b·Mc; uyum Wiemer & Wyss (2000) GoF.'];
   // İş akışı şeması (AGU örneğindeki aşamalı akıştan esinlenilmiştir)
   const srcTag = SRC(regionRect ? regionSourceLabel() : 'Canlı akış').split(/[ (·]/)[0];
@@ -4299,8 +4405,8 @@ async function exportPosterAGU(scale, evt) {
   const amrCap = !AMR_ON ? '' : EN
     ? ` **${amrL ? `(${amrL}) ` : ''}Experimental:** accelerating moment release (AMR) for the best grid cell (R = ${AP.r} km, ${AP.yr} yr before the M${AP.mMain.toFixed(1)} mainshock, t_f fixed; n = ${AP.n}, M ≥ ${fmtM(AP.mMin)}). {#ea580c|Orange}${BEN_ON ? ' (as in b)' : ''}: cumulative Σ√E normalised to 1 at t_f; {#2563eb|blue} power law S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? AP.fit.m : '—'}, Bufe & Varnes 1993); {#6b7280|grey dashed} linear. q = rms(power law)/rms(linear) = ${AP.q.toFixed(2)}; cluster-preserving null p = ${AP.pK.toFixed(3)} (${AP.nSim} synthetic catalogues): ${amrSupport(AP.pK).en.toLowerCase()} (predefined: p ≤ 0.01 strong, ≤ 0.05 limited, otherwise insufficient). {#dc2626|Red} line: mainshock (t_f fixed, not estimated). Same time axis as (a). Protocol ${APR}: grid R = ${AGR.join(', ')} km × ${AYG.join(', ')} yr fixed before the test; the test statistic is the smallest q on the grid, and the same search is repeated on every synthetic catalogue.${amrInclTxt ? ` Case-registry inclusion criterion: ${amrInclTxt}.` : ''} Retrospective test; not a precursor or forecast.`
     : ` **${amrL ? `(${amrL}) ` : ''}Deneysel:** en iyi ızgara hücresi için hızlanan moment salımı (AMR) (R = ${AP.r} km, M${DC(AP.mMain.toFixed(1))} ana şoktan ${AP.yr} yıl önce, t_f sabit; n = ${AP.n}, M ≥ ${DC(fmtM(AP.mMin))}). {#ea580c|Turuncu}${BEN_ON ? " (b'deki gibi)" : ''}: t_f'de 1'e normalize birikimli Σ√E; {#2563eb|mavi} güç yasası S = K + k(t_f − t)^m (m = ${AP.fit && AP.fit.m !== null ? DC(AP.fit.m) : '—'}, Bufe & Varnes 1993); {#6b7280|gri kesikli} doğrusal. q = rms(güç yasası)/rms(doğrusal) = ${DC(AP.q.toFixed(2))}; küme korumalı sıfır p = ${DC(AP.pK.toFixed(3))} (${AP.nSim} sentetik katalog): ${amrSupport(AP.pK).tr.toLowerCase()} (önceden tanımlı: p ≤ 0,01 güçlü, ≤ 0,05 sınırlı, aksi halde yetersiz). {#dc2626|Kırmızı} çizgi: ana şok (t_f sabit, kestirilmez). Zaman ekseni (a) ile aynıdır. Protokol ${APR}: ızgara R = ${AGR.join(', ')} km × ${AYG.join(', ')} yıl, testten önce sabittir; test istatistiği ızgaradaki en küçük q'dur ve aynı arama her sentetik katalogda tekrarlanır.${amrInclTxt ? ` Vaka sicili dahil etme ölçütü: ${amrInclTxt}.` : ''} Geriye dönük testtir; öncül ya da tahmin değildir.`;
-  const cap3Full = EN ? '**Figure 3.** ' + (!INC.bt ? '' : (NPAN > 1 ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = approx. 95% CI (±1.96·b/√N); consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + (bt && bt.cls ? ' Background and bottom strip: b-value class ({#dc2626|low} < 0.7, {#ca8a04|typical} 0.7–1.4, {#16a34a|high} > 1.4); a window is coloured only if its whole 95% CI lies in one class; gaps in the strip are windows whose CI crosses a boundary (uncertain). Class colours are not a hazard or alarm level; this is a descriptive classification, not the FTLS of Gulia et al. (2019, 2024).' : '')) + benCap + amrCap
-    : '**Şekil 3.** ' + (!INC.bt ? '' : (NPAN > 1 ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' yaklaşık %95 güven aralığı (±1,96·b/√N); ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + (bt && bt.cls ? ' Arka plan ve alt şerit: b-değeri sınıfı ({#dc2626|düşük} < 0,7, {#ca8a04|tipik} 0,7–1,4, {#16a34a|yüksek} > 1,4); pencere yalnızca %95 aralığının tamamı bir sınıftaysa renklenir; şeritteki boşluklar aralığın bir sınırı kestiği (belirsiz) pencerelerdir. Sınıf renkleri tehlike ya da alarm seviyesi değildir; betimleyici sınıflamadır, Gulia vd. (2019, 2024) FTLS yöntemi değildir.' : '')) + benCap + amrCap;
+  const cap3Full = EN ? '**Figure 3.** ' + (!INC.bt ? '' : (NPAN > 1 ? '**(a)** ' : '') + 'b(t): N = 100 moving window, step ' + BT_STEP + adEN + '; plotted at the ' + bAnchorText(true, true) + '. {#0891b2|Cyan:} raw window b-values' + (thinF ? ' (thin line)' : ' (points)') + (bandF ? ', band' : ', bars') + ' = ' + bCiS('approx. 95% CI (±1.96·b/√N)', '95% CI (exact χ²₂N, asymmetric)') + bCiTmNote(typeof lastBts !== 'undefined' && lastBts ? lastBts.ser : null, true) + '; consecutive windows share ' + (100 - BT_STEP) + ' events, so values are not independent; no additional smoothing; {#6b7280|grey dashed:} fixed Mc; {#6b7280|grey dotted:} b = 1.0. Lower strip Mc(t): {#0891b2|cyan} data Mc' + (cs ? ', {#d97706|orange} completeness steps.' : '.') + (bt && bt.cls ? ' Background and bottom strip: b-value class ({#dc2626|low} < 0.7, {#ca8a04|typical} 0.7–1.4, {#16a34a|high} > 1.4); a window is coloured only if its whole 95% CI lies in one class; gaps in the strip are windows whose CI crosses a boundary (uncertain). Class colours are not a hazard or alarm level; this is a descriptive classification, not the FTLS of Gulia et al. (2019, 2024).' : '')) + benCap + amrCap
+    : '**Şekil 3.** ' + (!INC.bt ? '' : (NPAN > 1 ? '**(a)** ' : '') + 'b(t): N = 100 kayan pencere, adım ' + BT_STEP + adTR + '; nokta zamanı ' + bAnchorText(false, true) + '. {#0891b2|Camgöbeği:} ham pencere b değerleri' + (thinF ? ' (ince çizgi)' : ' (noktalar)') + (bandF ? ', bant' : ', çubuklar') + ' ' + bCiS('yaklaşık %95 güven aralığı (±1,96·b/√N)', '%95 güven aralığı (kesin χ²₂N, asimetrik)') + bCiTmNote(typeof lastBts !== 'undefined' && lastBts ? lastBts.ser : null) + '; ardışık pencereler ' + (100 - BT_STEP) + ' olayı paylaşır, değerler bağımsız değildir; ek yumuşatma uygulanmaz; {#6b7280|gri kesikli:} sabit Mc; {#6b7280|gri noktalı:} b = 1,0. Alt şerit Mc(t): {#0891b2|camgöbeği} veri Mc' + (cs ? ', {#d97706|turuncu} tamlık basamakları.' : '.') + (bt && bt.cls ? ' Arka plan ve alt şerit: b-değeri sınıfı ({#dc2626|düşük} < 0,7, {#ca8a04|tipik} 0,7–1,4, {#16a34a|yüksek} > 1,4); pencere yalnızca %95 aralığının tamamı bir sınıftaysa renklenir; şeritteki boşluklar aralığın bir sınırı kestiği (belirsiz) pencerelerdir. Sınıf renkleri tehlike ya da alarm seviyesi değildir; betimleyici sınıflamadır, Gulia vd. (2019, 2024) FTLS yöntemi değildir.' : '')) + benCap + amrCap;
   // 2026-10-18: kısa altyazı (varsayılan): poster görsele dayanır; ayrıntılar metodoloji belgesindedir
   const SHORTCAP = document.getElementById('posterShortCap')?.checked !== false;
   const sA = INC.bt ? (NPAN > 1 ? '**(a)** ' : '') + L(`b-değeri, 100 olaylık kayan pencere (Aki 1965), %95 güven bandı; arka plan b sınıfı: {#dc2626|< 0,7}, {#ca8a04|0,7–1,4}, {#16a34a|> 1,4} (betimleyici, tehlike düzeyi değil)${bt && bt.msWin ? '; gri: ana şoku içeren pencereler (ortalama zamanda çizildikleri için ana şok çizgisinin solundan başlar); {#7c3aed|mor}: yalnız ana şok sonrası olaylardan oluşan pencereler; alt ek: ana şok çevresindeki pencereler pencere sırasıyla, hiçbiri atlanmadan' : ''}.`, `b-value in 100-event moving windows (Aki 1965) with 95% CI; background b class: {#dc2626|< 0.7}, {#ca8a04|0.7–1.4}, {#16a34a|> 1.4} (descriptive, not a hazard level)${bt && bt.msWin ? '; grey: windows containing the mainshock (plotted at their mean time, so the band starts left of the red line); {#7c3aed|violet}: windows of post-mainshock events only; lower inset: the same windows around the mainshock by window order, none omitted' : ''}.`) : '';
@@ -4352,7 +4458,7 @@ async function exportPosterAGU(scale, evt) {
     const per = CMP.map((r, k) => { const s2 = S2[k]; return `{${CMP_COL[k]}|${r.name.replace(/[{}|*]/g, '')}}: ` + (s2.b ? `b = ${DC(s2.b.toFixed(2))} ± ${DC(s2.sb.toFixed(2))}, a = ${DC(s2.a.toFixed(2))}` : 'b —') + `, Mc = ${DC(fmtM(r.Mc))}, N(≥Mc) = ${s2.n}${s2.small ? ' ⚠' : ''}, T = ${DC(s2.T.toFixed(1))} ${L('yıl', 'yr')}${r.area ? `, A = ${Math.round(r.area).toLocaleString(NF)} km²` : ''}`; }).join('; ');
     return L(`Şekil 4. Kümülatif oran N(≥M), ${uL} (Ambraseys 2006); dolu noktalar M ≥ Mc, kesikli çizgiler G–R doğruları (Aki 1965). `, `Figure 4. Cumulative rate N(≥M), ${uL} (Ambraseys 2006); filled points M ≥ Mc, dashed lines G–R fits (Aki 1965). `) + per + '.'; })();
   if (CMP_ON) { y = rich(posterCapOv(4, cmpCapTxt, EN, true).replace(/^((?:Şekil|Figure) \d+\.)/, '**$1**'), X3 + 16, y, W3 - 32, { size: 15, lh: 19, italic: true, col: '#374151', maxY: TOP + GRH - 4, justify: false }); } else
-  y = caption(posterCapOv(4, EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? ' ± ' + gs.err.toFixed(2) : ''}, N = ${gs.n}, fit M ≥ ${fmtM(gs.mc)})` : ''}, blue dashed Mc${gs ? ` = ${fmtM(gs.mc)}` : ''} (maximum curvature + 0.2; Wiemer & Wyss 2000).${grNormTxt}` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? ' ± ' + gs.err.toFixed(2).replace('.', ',') : ''}, N = ${gs.n}, uyum M ≥ ${String(fmtM(gs.mc)).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(fmtM(gs.mc)).replace('.', ',')}` : ''} (maksimum eğrilik + 0,2; Wiemer & Wyss 2000).${grNormTxt}` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, EN), X3 + 16, y, W3 - 32, TOP + GRH - 4);
+  y = caption(posterCapOv(4, EN ? (!cs ? `Figure 4. Frequency–magnitude distribution: grey cumulative N(≥M), green per-bin N; orange dashed G-R line${gs ? ` (b_GR = ${gs.b.toFixed(2)}${gs.err != null ? bCiTxt(gs) : ''}, N = ${gs.n}, fit M ≥ ${fmtM(gs.mc)})` : ''}, blue dashed Mc${gs ? ` = ${fmtM(gs.mc)}` : ''} (maximum curvature + 0.2; Wiemer & Wyss 2000).${grNormTxt}` : `Figure 4. Cumulative annual rate λ(≥M) ±1 S.D.; Weichert (1980) best estimate${fitT ? ` (fit ${fitT}; shaded region outside the fit, grey dotted line: all-classes comparison)` : ''}${gf && gf.Mx !== null ? `, truncated at Mx = ${gf.Mx}; upper/lower sensitivity curves (display after Halchuk et al. 2004)` : ''}.`) : !cs ? `Şekil 4. Frekans–büyüklük dağılımı: gri birikimli N(≥M), yeşil bin-içi N; turuncu kesikli G-R doğrusu${gs ? ` (b_GR = ${gs.b.toFixed(2).replace('.', ',')}${gs.err != null ? bCiTxt(gs, v => v.replace('.', ',')) : ''}, N = ${gs.n}, uyum M ≥ ${String(fmtM(gs.mc)).replace('.', ',')})` : ''}, mavi kesikli Mc${gs ? ` = ${String(fmtM(gs.mc)).replace('.', ',')}` : ''} (maksimum eğrilik + 0,2; Wiemer & Wyss 2000).${grNormTxt}` : `Şekil 4. Birikimli yıllık oran λ(≥M) ±1 S.D.; Weichert (1980) en iyi tahmin${fitT ? ` (fit ${fitT}; gölgeli bölge fit dışı, gri noktalı çizgi tüm sınıflar karşılaştırması)` : ''}${gf && gf.Mx !== null ? `, Mx = ${gf.Mx} ile kesik; üst/alt duyarlılık eğrileri (gösterim: Halchuk vd. 2004)` : ''}.`, EN), X3 + 16, y, W3 - 32, TOP + GRH - 4);
   // G-R parametre tablosu (büyük punto)
   if (!CMP_ON && gf && gf.curves && gf.curves.length) {
     const cols = [[L('Eğri', 'Curve'), 0], ['b ± 1σ', 135], ['β', 285], [`λ(M≥${gf.m0.toFixed(1)})/${L('yıl', 'yr')}`, 358], ['Mx', 474]], tx = X3 + 16, rowH = 23;
@@ -4378,7 +4484,7 @@ async function exportPosterAGU(scale, evt) {
   const qcFlag = !!cs && (mcFlag || gofRej);
   const PRE = (() => { if (!MSX || !bt || !bt.ser) return null; const pre0 = bt.ser.filter(q => (q.t1 ?? q.t) < MSX.t && Number.isFinite(q.b)), pre = pre0.filter(q => !q.inc), nInc = pre0.length - pre.length; if (pre.length < 3) return null;   // yalnız son olayı ana şoktan önce olan ve tamlık denetimini geçen pencereler
     const f = pre[0], l = pre[pre.length - 1], mn = pre.reduce((a2, q) => q.b < a2.b ? q : a2, pre[0]);
-    const sig = Number.isFinite(l.err) && Number.isFinite(f.err) ? Math.abs(l.b - f.b) > Math.sqrt(l.err ** 2 + f.err ** 2) : null; return { pre, f, l, mn, sig, up: l.b > f.b, nInc }; })();
+    const sig = bCiDiffSig(l, f); return { pre, f, l, mn, sig, up: l.b > f.b, nInc }; })();
   const autoMsg = MSX && !qcFlag ? (() => { const parts = [];
     if (AMR_ON) parts.push(AP.pK <= 0.05 ? L(`AMR kümelenmiş rastgele kataloglardan ayırt edilebiliyor (p = ${DC(AP.pK.toFixed(3))})`, `AMR distinguishable from clustered random catalogues (p = ${AP.pK.toFixed(3)})`) : L(`istatistiksel olarak saptanabilir AMR yok (p = ${DC(AP.pK.toFixed(3))})`, `no statistically detectable AMR (p = ${AP.pK.toFixed(3)})`));
     if (PRE && PRE.sig !== null) parts.push(PRE.sig ? (PRE.up ? L('b-değeri %95 belirsizliği aşacak biçimde arttı (azalma yok)', 'b-value increased beyond the 95% uncertainty (no decrease)') : L('b-değeri %95 belirsizliği aşacak biçimde azaldı', 'b-value decreased beyond the 95% uncertainty')) : L('%95 belirsizliği aşan b-değeri değişimi yok', 'no b-value change beyond the 95% uncertainty'));
@@ -4399,8 +4505,8 @@ async function exportPosterAGU(scale, evt) {
     rItems = [];
     const V = t => `{${TH.deep}|${t.replace(/ /g, '\u00a0')}}`, P = t => t;   // V: vurgulu değer; P: uyarı varken vurgusuz
     if (!INC.meth && MSX) { const srcM = SRC(regionRect ? regionSourceLabel() : 'canlı akış').replace(/\s*\(.*\)\s*/g, ' ').trim(), mcM = gs ? fmtM(gs.mc) : '—';   // Yöntem kutusu yoksa kısa yöntem/sağlamlık maddesi
-      rItems.push(L(`**Veri ve yöntem:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${DC(mcM)} (maks. eğrilik + 0,2); b: Aki (1965), %95 aralık ±1,96·b/√N, 100 olaylık pencereler; tek Mc${regionRect && !regionDeclusterOn ? ', artçı ayıklanmadı' : ''}${AMR_ON ? `; AMR yalnız ana şok öncesi olaylarla, R × başlangıç ızgarası, anlamlılık ${AP.nSim} küme korumalı sentetik katalogla` : ''}.`,
-        `**Data & methods:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${mcM} (max. curvature + 0.2); b: Aki (1965), 95% CI ±1.96·b/√N, 100-event windows; single Mc${regionRect && !regionDeclusterOn ? ', not declustered' : ''}${AMR_ON ? `; AMR on pre-mainshock events only, R × start-time grid, significance from ${AP.nSim} cluster-preserving synthetic catalogues` : ''}.`)); }
+      rItems.push(L(`**Veri ve yöntem:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${DC(mcM)} (maks. eğrilik + 0,2); b: Aki (1965), ${bCiS('%95 aralık ±1,96·b/√N', '%95 aralık kesin χ²₂N (asimetrik)')}, 100 olaylık pencereler; tek Mc${regionRect && !regionDeclusterOn ? ', artçı ayıklanmadı' : ''}${AMR_ON ? `; AMR yalnız ana şok öncesi olaylarla, R × başlangıç ızgarası, anlamlılık ${AP.nSim} küme korumalı sentetik katalogla` : ''}.`,
+        `**Data & methods:** ${srcM}${tYrs ? ', ' + tYrs : ''}; Mc = ${mcM} (max. curvature + 0.2); b: Aki (1965), ${bCiS('95% CI ±1.96·b/√N', '95% CI exact χ²₂N (asymmetric)')}, 100-event windows; single Mc${regionRect && !regionDeclusterOn ? ', not declustered' : ''}${AMR_ON ? `; AMR on pre-mainshock events only, R × start-time grid, significance from ${AP.nSim} cluster-preserving synthetic catalogues` : ''}.`)); }
     if (cs) rItems.push(posterQcSummary(qcObj, csQc, EN));   // kalite kontrol İLK madde, kesilmeden ve kısa/yapılandırılmış (seçenek A)
     if (gf) { const best = gf.curves[0], E = qcFlag ? P : V;   // metodoloji (i) ve (iv)
       const yr = L('yıl', 'yr');
@@ -4408,19 +4514,19 @@ async function exportPosterAGU(scale, evt) {
         (gf.fit && gf.all ? ` ${L('Karşılaştırma (tüm sınıflar)', 'Comparison (all classes)')}: b = ${gf.all.b.toFixed(3)} ± ${gf.all.sigma !== null ? gf.all.sigma.toFixed(3) : '—'}, N = ${gf.all.N}${gf.all.dPerDf !== null ? `, D/sd = ${gf.all.dPerDf.toFixed(1)}` : ''}.` : '') +
         (qcFlag && bt && bt.fixed ? L(` Karşılaştırma: sabit Mc = ${bt.fixed.mc.toFixed(1)} ile b(t) ortalaması ${bt.fixed.bAvg.toFixed(2)}.`, ` Comparison: mean b(t) with fixed Mc = ${bt.fixed.mc.toFixed(1)} is ${bt.fixed.bAvg.toFixed(2)}.`) : '')); }
     if (!gf && gs) { rItems.push(`**G-R (${L('tek Mc', 'single Mc')}):** ${V(`Mc = ${DC(fmtM(gs.mc))}`)}; ${V(`b_GR = ${DC(gs.b.toFixed(2))}`)}; N(≥Mc) = ${gs.n.toLocaleString(NF)}${gs.gof !== null ? `; GoF = ${EN ? gs.gof.toFixed(1) + '%' : '%' + DC(gs.gof.toFixed(1))}` : ''}.`); }
-    if (bt && !PRE) { rItems.push(EN ? `**b(t)${bt.fit ? ` (${fitT || 'fit range'})` : ''}:** mean ${V(bt.bAvg.toFixed(2))}, last window ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} windows).` +
+    if (bt && !PRE) { rItems.push(EN ? `**b(t)${bt.fit ? ` (${fitT || 'fit range'})` : ''}:** mean ${V(bt.bAvg.toFixed(2))}, last window ${V(`${bt.bLast.toFixed(2)}${bt.err !== null ? bCiTxt({ ...bt, b: bt.bLast }) : ' ± —'}`)} (${bt.nWin} windows).` +
       (bt.fit && bt.all ? ` All classes: mean ${bt.all.bAvg.toFixed(2)}, last ${bt.all.bLast.toFixed(2)} (${bt.all.nWin} windows).` : '') + (bt.fixed && !(qcFlag && gf) ? ` With fixed Mc = ${bt.fixed.mc.toFixed(1)}, mean ${V(bt.fixed.bAvg.toFixed(2))}.` : '')
-      : `**b(t)${bt.fit ? ` (${fitT || 'fit aralığı'})` : ''}:** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)} ± ${bt.err !== null ? bt.err.toFixed(2) : '—'}`)} (${bt.nWin} pencere).` +
+      : `**b(t)${bt.fit ? ` (${fitT || 'fit aralığı'})` : ''}:** ortalama ${V(bt.bAvg.toFixed(2))}, son pencere ${V(`${bt.bLast.toFixed(2)}${bt.err !== null ? bCiTxt({ ...bt, b: bt.bLast }) : ' ± —'}`)} (${bt.nWin} pencere).` +
       (bt.fit && bt.all ? ` Tüm sınıflar: ortalama ${bt.all.bAvg.toFixed(2)}, son ${bt.all.bLast.toFixed(2)} (${bt.all.nWin} pencere).` : '') + (bt.fixed && !(qcFlag && gf) ? ` Sabit Mc = ${bt.fixed.mc.toFixed(1)} ile ortalama ${V(bt.fixed.bAvg.toFixed(2))}.` : '')); }
     // 2026-10-18: AMR posterdeyse sonuçlara yalnızca testin kendi çıktısı eklenir (yorum yok)
     if (PRE) { const { pre, f, l, mn, sig, up, nInc } = PRE;   // b(t)'nin ana şok öncesi seyri (betimleyici)
-      const yy = t => new Date(t).getUTCFullYear(), dd = t => new Date(t).toISOString().slice(0, 7), pm = q => `${DC(q.b.toFixed(2))}${Number.isFinite(q.err) ? ' ± ' + DC(q.err.toFixed(2)) : ''}`;
+      const yy = t => new Date(t).getUTCFullYear(), dd = t => new Date(t).toISOString().slice(0, 7), pm = q => `${DC(q.b.toFixed(2))}${Number.isFinite(q.err) || q.err === Infinity ? bCiTxt(q, DC) : ''}`;
       const sg = sig === null ? '' : sig ? (up ? L('artış %95 aralıklarının birleşiminden büyük', 'increase exceeds the combined 95% CIs') : L('azalma %95 aralıklarının birleşiminden büyük', 'decrease exceeds the combined 95% CIs')) : L('fark %95 belirsizlik içinde', 'difference within the 95% uncertainty');
       rItems.push(L(`**Ana şok öncesi b(t):** ${yy(f.t)}'te ${pm(f)}; en düşük ${pm(mn)} (${dd(mn.t)}); ana şoktan önceki son pencerede ${pm(l)} (${pre.length} pencere${sg ? '; ilk–son ' + sg : ''}${nInc ? `; veri Mc(t)'si kullanılan Mc'nin üstünde olan ${nInc} pencere hariç` : ''})${bt.msWin ? `; M${DC(bt.msWin.m.toFixed(1))} ya da sonrasını içeren ${bt.msWin.n} pencere (gri/mor bant, ${new Date(bt.msWin.tA).toISOString().slice(0, 7)} sonrası) hariç` : ''}.`,
         `**b(t) before the mainshock:** ${pm(f)} in ${yy(f.t)}; minimum ${pm(mn)} (${dd(mn.t)}); ${pm(l)} in the last window before the mainshock (${pre.length} windows${sg ? '; first vs last: ' + sg : ''}${nInc ? `; ${nInc} early windows with data Mc(t) above the Mc used excluded` : ''})${bt.msWin ? `; the ${bt.msWin.n} windows containing the M${bt.msWin.m.toFixed(1)} or later events (grey/violet bands, plotted from ${new Date(bt.msWin.tA).toISOString().slice(0, 7)}) excluded` : ''}.`)); }
     if (MSX && bt && bt.ser) { const po = bt.ser.filter(q => (q.t0 ?? q.t) >= MSX.t - 1000 && Number.isFinite(q.b));   // ana şok sonrası (artçı dönemi) pencereler
-      if (po.length >= 3) { const p0 = po[0], p1 = po[po.length - 1], dd = t => new Date(t).toISOString().slice(0, 7), pm = q => `${DC(q.b.toFixed(2))}${Number.isFinite(q.err) ? ' ± ' + DC(q.err.toFixed(2)) : ''}`;
-        const lp = PRE ? PRE.l : null, cmp = lp && Number.isFinite(lp.err) && Number.isFinite(p0.err) ? (Math.abs(p0.b - lp.b) > Math.sqrt(p0.err ** 2 + lp.err ** 2) ? L('fark %95 aralıklarının birleşiminden büyük', 'difference exceeds the combined 95% CIs') : L('fark %95 belirsizlik içinde', 'difference within the 95% uncertainty')) : '';
+      if (po.length >= 3) { const p0 = po[0], p1 = po[po.length - 1], dd = t => new Date(t).toISOString().slice(0, 7), pm = q => `${DC(q.b.toFixed(2))}${Number.isFinite(q.err) || q.err === Infinity ? bCiTxt(q, DC) : ''}`;
+        const lp = PRE ? PRE.l : null, cmp = lp && bCiDiffSig(p0, lp) !== null ? (bCiDiffSig(p0, lp) ? L('fark %95 aralıklarının birleşiminden büyük', 'difference exceeds the combined 95% CIs') : L('fark %95 belirsizlik içinde', 'difference within the 95% uncertainty')) : '';
         rItems.push(L(`**Ana şok sonrası b(t):** ilk artçı penceresi ${pm(p0)} (${dd(p0.t)}), son ${pm(p1)} (${dd(p1.t)}) (${po.length} pencere${cmp ? '; ana şok öncesi son pencereye göre ' + cmp : ''}).`,
           `**b(t) after the mainshock:** first post-mainshock window ${pm(p0)} (${dd(p0.t)}), last ${pm(p1)} (${dd(p1.t)}) (${po.length} windows${cmp ? '; vs last pre-mainshock window: ' + cmp : ''}).`)); } }
     if (AMR_ON) rItems.push(EN ? `**AMR (retrospective, M ≥ ${fmtM(AP.mMin)}):** best cell R = ${AP.r} km, ${AP.yr} yr; q = ${AP.q.toFixed(2)}, cluster-preserving null p = ${AP.pK.toFixed(3)} — ${amrSupport(AP.pK).en.toLowerCase()} (protocol ${APR}).`
@@ -5431,11 +5537,11 @@ function csBvalueTimeSeries(cs, fit, step = 10) {
     const win = items.slice(i, i + N_WIN);
     if (on) {
       const r = csAkiBRange(win, fit.hi);
-      if (r) series.push({ t: bWinTime(win, it => it.t), b: r.b, err: r.se !== null ? 1.96 * r.se : null, span: win[N_WIN - 1].t - win[0].t });
+      if (r) series.push({ t: bWinTime(win, it => it.t), b: r.b, ...bCiFromSym(r.b, r.se !== null ? 1.96 * r.se : null), span: win[N_WIN - 1].t - win[0].t });   // çift kesik: Fisher, simetrik (χ² burada kesin değil)
       continue;
     }
     const b = csAkiB(win);
-    if (b !== null) series.push({ t: bWinTime(win, it => it.t), b, err: bConfidence95(b, N_WIN), span: win[N_WIN - 1].t - win[0].t });
+    if (b !== null) series.push({ t: bWinTime(win, it => it.t), b, ...bCiFields(b, N_WIN, win.map(it => it.m - it.mc), 0.1), span: win[N_WIN - 1].t - win[0].t });
   }
   return { series, N: items.length };
 }
@@ -6029,7 +6135,7 @@ function pbSequences(list) {
     const grid = []; for (let v = OMORI_P_MIN; v <= OMORI_P_MAX + 1e-9; v += 0.02) grid.push(+v.toFixed(2));
     rec.p = best.p; rec.c = Math.exp(best.lc); rec.ciP = omoriProfileCI(t, PB_SEQ_S, T, 'p', best.nll, grid);
     rec.ks = omoriKS(t, PB_SEQ_S, T, K, rec.c, rec.p);
-    rec.b = computeBvalue(sel.map(x => x.m), Mc); rec.bErr = bConfidence95(rec.b, sel.length);
+    rec.b = computeBvalue(sel.map(x => x.m), Mc); { const f = bCiFields(rec.b, sel.length, sel.map(x => x.m - Mc)); rec.bErr = f.err; rec.bLo = f.lo; rec.bHi = f.hi; rec.bCiM = f.ciM; }
     rec.flags = [];
     rec.notes = [];
     if (rec.c <= OMORI_C_MIN * 1.05) rec.notes.push(`c belirlenemedi (S = ${PB_SEQ_S} gün kesmesinden küçük); p etkilenmez`);
@@ -6058,7 +6164,8 @@ function renderPBSequences(list) {
   const x = t => PAD_L + Math.max(0, Math.min(1, (t - t0) / (t1 - t0))) * plotW;
   const lohi = (vals, lo0, hi0) => { const lo = Math.min(lo0, ...vals), hi = Math.max(hi0, ...vals); return [Math.floor(lo * 5) / 5, Math.ceil(hi * 5) / 5]; };
   const [pLo, pHi] = lohi(ok.flatMap(s => [s.ciP.lo ?? s.p, s.ciP.hi ?? s.p]), 0.6, 1.4);
-  const [bLo, bHi] = lohi(ok.flatMap(s => [s.b - (s.bErr || 0), s.b + (s.bErr || 0)]), 0.6, 1.4);
+  const sLo = s => s.bLo ?? (s.b - (s.bErr || 0)), sHi = s => s.bHi ?? (s.b + (s.bErr || 0));
+  const [bLo, bHi] = lohi(ok.flatMap(s => [sLo(s), sHi(s)]).filter(Number.isFinite), 0.6, 1.4);
   const yP = v => PAD_T + hP - (v - pLo) / (pHi - pLo) * hP, yB = v => PAD_T + hP + GAP + hP - (v - bLo) / (bHi - bLo) * hP;
   let g = '';
   const strip = (y, lo, hi, lab, ref) => {
@@ -6078,19 +6185,19 @@ function renderPBSequences(list) {
     g += `<line x1="${xc}" y1="${yP(pl).toFixed(1)}" x2="${xc}" y2="${yP(ph).toFixed(1)}" stroke="#ec4899" stroke-width="1.2" stroke-opacity="${op}"/>`;
     g += `<circle cx="${xc}" cy="${yP(s.p).toFixed(1)}" r="${r.toFixed(1)}" fill="#ec4899" fill-opacity="${op}" stroke="#111" stroke-width="0.6"><title>${ttl}\np = ${s.p.toFixed(2)} [%95 profil: ${s.ciP.lo != null ? s.ciP.lo.toFixed(2) : '—'}–${s.ciP.hi != null ? s.ciP.hi.toFixed(2) : '—'}], c = ${s.c.toExponential(1)} gün${s.flags.length ? '\n⚠ ' + s.flags.join('; ') : ''}${s.notes.length ? '\nℹ ' + s.notes.join('; ') : ''}</title></circle>`;
     if (s.b != null) {
-      g += `<line x1="${xc}" y1="${yB(s.b - s.bErr).toFixed(1)}" x2="${xc}" y2="${yB(s.b + s.bErr).toFixed(1)}" stroke="#06b6d4" stroke-width="1.2" stroke-opacity="${op}"/>`;
-      g += `<circle cx="${xc}" cy="${yB(s.b).toFixed(1)}" r="${r.toFixed(1)}" fill="#06b6d4" fill-opacity="${op}" stroke="#111" stroke-width="0.6"><title>${ttl}\nb = ${s.b.toFixed(2)} ± ${s.bErr.toFixed(2)} (%95)</title></circle>`;
+      g += `<line x1="${xc}" y1="${yB(sLo(s)).toFixed(1)}" x2="${xc}" y2="${yB(Number.isFinite(sHi(s)) ? sHi(s) : bHi).toFixed(1)}" stroke="#06b6d4" stroke-width="1.2" stroke-opacity="${op}"/>`;
+      g += `<circle cx="${xc}" cy="${yB(s.b).toFixed(1)}" r="${r.toFixed(1)}" fill="#06b6d4" fill-opacity="${op}" stroke="#111" stroke-width="0.6"><title>${ttl}\nb = ${s.b.toFixed(2)}${bCiTxt({ b: s.b, err: s.bErr, lo: s.bLo, hi: s.bHi, ciM: s.bCiM })} (%95)</title></circle>`;
     }
   });
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = g;
   const f2 = v => v == null || !isFinite(v) ? '—' : v.toFixed(2);
   window.__pbOk = ok;
-  const rows = ok.map((s, i) => `<tr onclick="openPBSeqPanel(${i})" title="Bu dizinin M, b ve p zaman grafiğini aç" style="cursor:pointer;${s.N < PB_SEQ_NSOFT || s.flags.length ? 'opacity:.6' : ''}"><td>${new Date(s.t0).toISOString().slice(0, 10)}</td><td>${(+s.ms.lat).toFixed(2)}</td><td>${(+s.ms.lon).toFixed(2)}</td><td>${s.M.toFixed(1)}</td><td>${Number.isFinite(+s.ms.dep) ? (+s.ms.dep).toFixed(0) : '—'}</td><td>${s.N}</td><td>${s.Mc.toFixed(1)}</td><td><b>${f2(s.p)}</b> [${f2(s.ciP.lo)}–${f2(s.ciP.hi)}]</td><td><b>${f2(s.b)}</b> ± ${f2(s.bErr)}</td><td>${f2(s.ks.pvalue)}</td><td style="padding:1px 5px;color:#f59e0b">${s.flags.join('; ')}${s.notes.length ? `<span style="color:#888">${s.flags.length ? '; ' : ''}${s.notes.join('; ')}</span>` : ''}</td></tr>`).join('');
+  const rows = ok.map((s, i) => `<tr onclick="openPBSeqPanel(${i})" title="Bu dizinin M, b ve p zaman grafiğini aç" style="cursor:pointer;${s.N < PB_SEQ_NSOFT || s.flags.length ? 'opacity:.6' : ''}"><td>${new Date(s.t0).toISOString().slice(0, 10)}</td><td>${(+s.ms.lat).toFixed(2)}</td><td>${(+s.ms.lon).toFixed(2)}</td><td>${s.M.toFixed(1)}</td><td>${Number.isFinite(+s.ms.dep) ? (+s.ms.dep).toFixed(0) : '—'}</td><td>${s.N}</td><td>${s.Mc.toFixed(1)}</td><td><b>${f2(s.p)}</b> [${f2(s.ciP.lo)}–${f2(s.ciP.hi)}]</td><td><b>${f2(s.b)}</b>${Number.isFinite(s.bErr) || s.bErr === Infinity ? bCiTxt({ b: s.b, err: s.bErr, lo: s.bLo, hi: s.bHi, ciM: s.bCiM }) : ' ± ' + f2(s.bErr)}</td><td>${f2(s.ks.pvalue)}</td><td style="padding:1px 5px;color:#f59e0b">${s.flags.join('; ')}${s.notes.length ? `<span style="color:#888">${s.flags.length ? '; ' : ''}${s.notes.join('; ')}</span>` : ''}</td></tr>`).join('');
   const td = 'style="padding:1px 5px;"';
-  st.innerHTML = `<span style="color:#ec4899">●</span> p (%95 profil olabilirlik) &nbsp;|&nbsp; <span style="color:#06b6d4">●</span> b (±1,96·b/√N) &nbsp;|&nbsp; nokta boyutu: ana şok M &nbsp;|&nbsp; tablodaki satıra tıklayın → dizinin M, b ve p zaman grafiği &nbsp;|&nbsp; soluk: N &lt; ${PB_SEQ_NSOFT} ya da uyarı &nbsp;|&nbsp; ${ok.length} dizi analiz edildi, ${rej.length} aday ölçütü sağlamadı` +
-    `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:4px;font-size:.68rem;"><tr style="color:#cbd5e1">${['Tarih', 'Enlem', 'Boylam', 'M', 'h (km)', 'N', 'Mc', 'p [%95]', 'b ± %95', 'KS p', 'Uyarı'].map(h => `<th ${td}>${h}</th>`).join('')}</tr>${rows.replace(/<td>/g, `<td ${td}>`)}</table>` +
+  st.innerHTML = `<span style="color:#ec4899">●</span> p (%95 profil olabilirlik) &nbsp;|&nbsp; <span style="color:#06b6d4">●</span> b (${bCiS('±1,96·b/√N', '%95 kesin χ²₂N')}) &nbsp;|&nbsp; nokta boyutu: ana şok M &nbsp;|&nbsp; tablodaki satıra tıklayın → dizinin M, b ve p zaman grafiği &nbsp;|&nbsp; soluk: N &lt; ${PB_SEQ_NSOFT} ya da uyarı &nbsp;|&nbsp; ${ok.length} dizi analiz edildi, ${rej.length} aday ölçütü sağlamadı` +
+    `<table style="border-collapse:collapse;border:1px solid #2a2a3a;margin-top:4px;font-size:.68rem;"><tr style="color:#cbd5e1">${['Tarih', 'Enlem', 'Boylam', 'M', 'h (km)', 'N', 'Mc', 'p [%95]', bCiS('b ± %95', 'b [%95]'), 'KS p', 'Uyarı'].map(h => `<th ${td}>${h}</th>`).join('')}</tr>${rows.replace(/<td>/g, `<td ${td}>`)}</table>` +
     `<div style="color:#888;margin-top:3px;">Yöntem: dizi = GK74 (Gardner &amp; Knopoff 1974) zaman–mesafe penceresinde ana şoka doğrudan bağlanan artçılar (yalnız ileri pencere; ikincil artçılar kendi penceresini açmaz). Tamlık her dizide ayrı belirlenir: Mc = maks. eğrilik + 0,2 (b(t) ile aynı); yalnız M ≥ Mc ve ana şoktan ${PB_SEQ_S} gün sonrası kullanılır (kısa süreli eksik kayıt). p: Omori–Utsu n(t) = K/(t+c)^p, Ogata (1983) en çok olabilirlik, [S, T] üzerinde; T = GK74 süresi ya da katalog sonu. b: Aki (1965). Asgari N = ${PB_SEQ_NMIN}. Sınırlama: GK74 penceresi aynı alandaki arka plan depremlerini de içerir; sabit hızlı bu katkı uzun pencerelerde bozunmayı yavaşlatır ve p'yi düşük tahmin ettirebilir (sentetik testte ≈ 0,05–0,1). Ávila-Barrientos vd. (2015) p'yi ZMAP en küçük kareleriyle ve Kagan (2002) yarıçapıyla hesaplar; burada yöntem farklıdır, değerler doğrudan karşılaştırılmamalıdır. p bir dizi parametresidir; kayan pencere (Öncel &amp; Wilson 2007) yalnız b(t) için kullanılır. Büyüklükler panelin seçili dönüşümüyle (${MAG_CONVERSIONS[mcConversionMode].label}).</div>`;
-  window.lastPBSeq = { n: ok.length, rejected: rej.length, S: PB_SEQ_S, nmin: PB_SEQ_NMIN, seq: ok.map(s => ({ t0: s.t0, M: s.M, N: s.N, Mc: s.Mc, p: s.p, ciP: s.ciP, b: s.b, bErr: s.bErr, ks: s.ks.pvalue, flags: s.flags })) };
+  window.lastPBSeq = { n: ok.length, rejected: rej.length, S: PB_SEQ_S, nmin: PB_SEQ_NMIN, seq: ok.map(s => ({ t0: s.t0, M: s.M, N: s.N, Mc: s.Mc, p: s.p, ciP: s.ciP, b: s.b, bErr: s.bErr, bLo: s.bLo, bHi: s.bHi, bCiM: s.bCiM, ks: s.ks.pvalue, flags: s.flags })) };
 }
 
 // ── Artçı Dizisi: M, b ve p (zaman) — dizi içi kayan pencere (2026-10-12) ──────────────────────────
@@ -6136,7 +6243,7 @@ function pbWindows(rec, N = pbwN, fine = pbwFine) {
     const incomplete = incWin || incSub;
     if (incWin) r.why.push(`pencere Mc = ${r.McW.toFixed(1)} > dizi Mc = ${rec.Mc.toFixed(1)} (eksik kayıt)`);
     else if (incSub) r.why.push(`alt blok (${PBW_SUB} olay) Mc = ${r.McSub.toFixed(1)} ≥ dizi Mc + ${PBW_SUB_TOL} = ${(rec.Mc + PBW_SUB_TOL).toFixed(1)} (pencerenin bir kısmında eksik kayıt)`);
-    r.b = computeBvalue(w.map(x => x.m), rec.Mc); r.bErr = bConfidence95(r.b, PBW_N);
+    r.b = computeBvalue(w.map(x => x.m), rec.Mc); { const f = bCiFields(r.b, PBW_N, w.map(x => x.m - rec.Mc)); r.bErr = f.err; r.bLo = f.lo; r.bHi = f.hi; r.bCiM = f.ciM; }
     r.bOk = !incomplete && r.b != null;
     r.N = PBW_N; r.step = PBW_STEP;   // 2026-10-12: pencere başına p kaldırıldı (gerçek dizilerde güvenilir değer üretmedi); p model özetine bakınız
     out.push(r);
@@ -6245,6 +6352,7 @@ function pbSeqSvg(rec, wins) {
     const okW = wins.filter(w => w[okKey]);
     const vals = okW.flatMap(w => [loF(w), hiF(w)]).filter(Number.isFinite);
     const lo = Math.floor(Math.min(0.6, ...vals) * 5) / 5, hi = Math.ceil(Math.max(1.4, ...vals) * 5) / 5, y = lin(S, lo, hi);
+    const hiC = w => { const v = hiF(w); return Number.isFinite(v) ? v : hi; };   // sınırsız üst uç (T–M, r = 0) eksen tavanında kesilir
     yticks(S, lo, hi, hi - lo > 1.6 ? 0.4 : 0.2, y);
     g += `<line x1="${PAD_L}" y1="${y(ref).toFixed(1)}" x2="${W - PAD_R}" y2="${y(ref).toFixed(1)}" stroke="#666" stroke-width="1" stroke-dasharray="2,3"/>`;
     let seg = [];
@@ -6253,7 +6361,7 @@ function pbSeqSvg(rec, wins) {
       // İnce adım: nokta ve hata çubuğu yerine çizgi + %95 bant; gizlenen pencereler alt kenarda gri şerit
       let run = [];
       const flushBand = () => { if (run.length > 1) {
-          const up = run.map(w => `${x(w.tMid).toFixed(1)},${y(hiF(w)).toFixed(1)}`), dn = run.slice().reverse().map(w => `${x(w.tMid).toFixed(1)},${y(loF(w)).toFixed(1)}`);
+          const up = run.map(w => `${x(w.tMid).toFixed(1)},${y(hiC(w)).toFixed(1)}`), dn = run.slice().reverse().map(w => `${x(w.tMid).toFixed(1)},${y(loF(w)).toFixed(1)}`);
           g += `<polygon points="${up.concat(dn).join(' ')}" fill="${col}" fill-opacity="0.18" stroke="none"/>`;
           g += `<polyline points="${run.map(w => `${x(w.tMid).toFixed(1)},${y(w[key]).toFixed(1)}`).join(' ')}" fill="none" stroke="${col}" stroke-width="1.6"/>`; }
         run = []; };
@@ -6263,13 +6371,13 @@ function pbSeqSvg(rec, wins) {
     wins.forEach(w => {
       const xc = x(w.tMid).toFixed(1);
       if (!w[okKey]) { flush(); g += `<line x1="${xc}" y1="${S.y + S.h - 5}" x2="${xc}" y2="${S.y + S.h}" stroke="#6b7280" stroke-width="1"><title>Değer çizilmedi: ${w.why.join('; ')}</title></line>`; return; }
-      g += `<line x1="${xc}" y1="${y(loF(w)).toFixed(1)}" x2="${xc}" y2="${y(hiF(w)).toFixed(1)}" stroke="${col}" stroke-width="0.8" stroke-opacity="0.45"/>`;
-      g += `<circle cx="${xc}" cy="${y(w[key]).toFixed(1)}" r="2" fill="${col}"><title>${lab} = ${w[key].toFixed(2)} [${loF(w).toFixed(2)}–${hiF(w).toFixed(2)}] · olay ${w.i + 1}–${w.i + PBW_N} · ${w.tFirst.toPrecision(3)}–${w.tLast.toPrecision(3)} gün</title></circle>`;
+      g += `<line x1="${xc}" y1="${y(loF(w)).toFixed(1)}" x2="${xc}" y2="${y(hiC(w)).toFixed(1)}" stroke="${col}" stroke-width="0.8" stroke-opacity="0.45"/>`;
+      g += `<circle cx="${xc}" cy="${y(w[key]).toFixed(1)}" r="2" fill="${col}"><title>${lab} = ${w[key].toFixed(2)} [${loF(w).toFixed(2)}–${Number.isFinite(hiF(w)) ? hiF(w).toFixed(2) : '∞'}] · olay ${w.i + 1}–${w.i + PBW_N} · ${w.tFirst.toPrecision(3)}–${w.tLast.toPrecision(3)} gün</title></circle>`;
       seg.push(`${xc},${y(w[key]).toFixed(1)}`);
     });
     flush(); frame(S, lab);
   };
-  strip(S2, 'b', 'bOk', w => w.b - w.bErr, w => w.b + w.bErr, '#06b6d4', 'b', 1.0);
+  strip(S2, 'b', 'bOk', w => w.bLo ?? (w.b - w.bErr), w => w.bHi ?? (w.b + w.bErr), '#06b6d4', 'b', 1.0);
   // Pencere kurulamadıysa ya da hiçbiri gösterilemiyorsa nedeni grafikte de yazılır (PNG'ye de geçer)
   const bMsg = !wins.length ? `b(t) pencereleri kurulamadı: M ≥ Mc olay sayısı ${(rec.sel || []).length} < N = ${PBW_N}`
     : !wins.some(w => w.bOk) ? `${wins.length} pencerenin hiçbiri tamlık denetimini geçmedi; b(t) gösterilmiyor` : null;
@@ -6330,7 +6438,7 @@ function openPBSeqPanel(idx) {
     <div style="margin-top:3px;color:${rec.def === 'kagan' && rec.covered && !rec.big.length ? '#cbd5e1' : '#f59e0b'};">Dizi tanımı: ${defNote}</div>` : ''}${curIdx < 0 ? `
     <div style="margin-top:3px;color:#f59e0b;">⚠ Dizi tablosu bu panel açıldıktan sonra yenilendi; panel ve PNG, açıldığı andaki dizi verisini gösterir. Güncel sonuç için tablodan yeniden açın.</div>` : ''}
     <div style="margin-top:3px;color:#9ab0c5;">Kayıt: ${TM_VERSION} (${TM_VERSION_DATE}) · N = ${PBW_N}, adım = ${PBW_STEP}${pbwFine ? ' (ince, N/100)' : ' (N/10)'} · dizi Mc = ${rec.Mc.toFixed(1)} · dizi tanımı: ${pbSeqDefLabel(rec)}, ana şok ${new Date(rec.t0).toISOString().replace('T', ' ').slice(0, 19)} UTC · başlangıç kesmesi S = ${PB_SEQ_S} gün · süre T = ${rec.T.toFixed(1)} gün (${rec.T < rec.Td - 1e-9 ? 'katalog sonu' : 'GK74 T(M)'}) · büyüklük: ${MAG_CONVERSIONS[mcConversionMode].label}</div>
-    <div style="margin-top:3px;color:#888;">Yöntem — b(t): Öncel &amp; Wilson (2007) pencerelemesinin dizi içi uyarlaması; N olaylık pencere, adım N/10 (varsayılan; Öncel &amp; Wilson ve ana b(t) paneliyle aynı oran) ya da isteğe bağlı ince adım N/100 (çizgi + %95 bant); Aki (1965), ±1,96·b/√N. Pencereler örtüşür ve tahminler bağımsız değildir; ince adım değişimin zamanlamasını ayrıntılı gösterir ama yeni bağımsız bilgi ya da daha yüksek kesinlik sağlamaz. Yorum uyarısı: eşiğin ilk geçildiği zaman örtüşen pencerelerden türetilmiş bir tahmindir, fiziksel değişimin başlangıç zamanı değildir; ince adımda rastgele eşik aşımları daha sık görülür. Değişim zamanı için istatistiksel test (ör. iki dönem b farkı, Utsu 1992) gerekir. Gri çentik = pencere gizlendi: pencere Mc'si (pencere süresindeki tüm artçılardan) dizi Mc'sini aşıyor ya da pencerenin 100 olaylık alt bloklarından birinin Mc'si dizi Mc'sini 0,2'den fazla aşıyor; alt blok denetimi N'den bağımsız olarak aynı çözünürlüktedir. Mc'nin dizi Mc'sine eşit çıkması eksiksizliği kanıtlamaz; özellikle büyük ana şoklardan hemen sonraki ilk pencereler ihtiyatla yorumlanmalıdır. <b>Tamlık denetiminin sınırlamaları:</b> alt blok tabanlı Mc kontrolü erken dönem eksik kayıtlarını sentetik testlerde %95–100 oranında yakalamıştır; dizinin ortasındaki kısa süreli tamlık kesintilerinde yakalama oranı yaklaşık %56–57'dir (2026-10-12, 10 tohum, N = 500 ve 1000). Bu nedenle bir pencerenin denetimden geçmesi, o pencerenin eksiksiz olduğunu garanti etmez. Tersine, eksiksiz sentetik katalogda da pencerelerin bir kısmı gizlenir (yanlış alarm): N = 100'de ≈ %21, N = 200'de ≈ %10, N ≥ 300'de ≤ %6 (2026-10-12, 10 tohumlu sentetik test). Küçük pencerelerde boşluk her zaman eksik kayıt anlamına gelmez. Bu oranlar sentetik senaryolardaki ölçümlerdir; gerçek kataloglarda aynı oranların geçerli olacağı garanti edilemez. Özellikle katalog kapsamının veya büyüklük belirleme yönteminin zaman içinde değiştiği dizilerde b değerleri ihtiyatla yorumlanmalıdır. Hız şeridi: M ≥ Mc artçıların log-zaman kutularındaki hızı (olay/gün; gri = eksik kayıt dönemi, uyuma girmez) ve tam dönem için tek Omori–Utsu eğrisi (Ogata 1983 en çok olabilirlik, %95 profil aralığı, Ogata 1988 KS testi). Uyumun başlangıcı seçilen N'den bağımsızdır: 100 olaylık pencerelerle (adım 10) aynı tamlık denetimi uygulanır ve ilk geçen pencerenin başı alınır; geçen pencere yoksa ya da M ≥ Mc olay sayısı 100'den azsa p tahmini yapılmaz. Başlangıçtan sonraki dönemde tamlık yeniden denetlenmez: dizi ortasındaki kısa kesintiler (b(t)'de gri çentik) uyuma girer ve p'yi etkileyebilir. Pencere başına p(t) bu sürümde YOK: Pazarcık 2023 ve Flores 2026 testlerinde güvenilir pencere üretmedi. Uyum yetersizse (c üst sınırda, aralık açık ya da KS p &lt; 0,05) eğri kesikli gri çizilir; bu genellikle ikinci ana şok, ikincil diziler ya da değişken katalog tamlığına işaret eder. Arka plan hızı modellenmez. Dizi tanımı varsayılan olarak GK74'tür; M ≳ 7 depremlerde GK74 dizisi parçalanabilir (Pazarcık 2023, Flores 2026: D(M) artçı zonunu kırptı). M ≥ 7 için deneysel seçenek: Kagan (2002) seçim yarıçapı rm = 20·10^((M−6)/2) km (Eş. 6). Kagan rm'yi artçı zonu boyutunu ölçmek için bir seçim penceresi olarak kullanır (episantroid merkezli, 1 gün, h = 0–70 km); burada merkez ana şok episantrı, h ≤ 70 km ve süre GK74 ile aynıdır. rm ölçülmüş bir zon sınırı değildir; bu kullanım bağıntının özgün amacının genişletilmesidir ve doğrulanmış bir standart değil, sınanan bir seçenektir. Kagan seçiminde başka bir ana şokun penceresine düşmüş olaylar da diziye girer; rm içinde M ≥ M_ana − 1 başka bir deprem varsa (olası çift ana şok, ör. Pazarcık–Elbistan 2023) iki dizinin artçıları karışır ve panel uyarır. Hiçbir seçim (GK74, Kagan) çift ana şoku fiziksel olarak ayırmaz. p modeli ayrıca uyumun bitiş zamanına (T = GK74 süresi ya da katalog sonu, Kayıt satırında) duyarlıdır: Pazarcık 2023 GK74 dizisinde katalog Haziran 2023'te bitince p = 1,11 (uyum yeterli), Ekim 2023'te bitince p = 1,19 (c üst sınırda, uyum yetersiz) bulundu.</div>`;
+    <div style="margin-top:3px;color:#888;">Yöntem — b(t): Öncel &amp; Wilson (2007) pencerelemesinin dizi içi uyarlaması; N olaylık pencere, adım N/10 (varsayılan; Öncel &amp; Wilson ve ana b(t) paneliyle aynı oran) ya da isteğe bağlı ince adım N/100 (çizgi + %95 bant); Aki (1965), ${bCiS('±1,96·b/√N', '%95 kesin χ²₂N aralığı (asimetrik)')}. Pencereler örtüşür ve tahminler bağımsız değildir; ince adım değişimin zamanlamasını ayrıntılı gösterir ama yeni bağımsız bilgi ya da daha yüksek kesinlik sağlamaz. Yorum uyarısı: eşiğin ilk geçildiği zaman örtüşen pencerelerden türetilmiş bir tahmindir, fiziksel değişimin başlangıç zamanı değildir; ince adımda rastgele eşik aşımları daha sık görülür. Değişim zamanı için istatistiksel test (ör. iki dönem b farkı, Utsu 1992) gerekir. Gri çentik = pencere gizlendi: pencere Mc'si (pencere süresindeki tüm artçılardan) dizi Mc'sini aşıyor ya da pencerenin 100 olaylık alt bloklarından birinin Mc'si dizi Mc'sini 0,2'den fazla aşıyor; alt blok denetimi N'den bağımsız olarak aynı çözünürlüktedir. Mc'nin dizi Mc'sine eşit çıkması eksiksizliği kanıtlamaz; özellikle büyük ana şoklardan hemen sonraki ilk pencereler ihtiyatla yorumlanmalıdır. <b>Tamlık denetiminin sınırlamaları:</b> alt blok tabanlı Mc kontrolü erken dönem eksik kayıtlarını sentetik testlerde %95–100 oranında yakalamıştır; dizinin ortasındaki kısa süreli tamlık kesintilerinde yakalama oranı yaklaşık %56–57'dir (2026-10-12, 10 tohum, N = 500 ve 1000). Bu nedenle bir pencerenin denetimden geçmesi, o pencerenin eksiksiz olduğunu garanti etmez. Tersine, eksiksiz sentetik katalogda da pencerelerin bir kısmı gizlenir (yanlış alarm): N = 100'de ≈ %21, N = 200'de ≈ %10, N ≥ 300'de ≤ %6 (2026-10-12, 10 tohumlu sentetik test). Küçük pencerelerde boşluk her zaman eksik kayıt anlamına gelmez. Bu oranlar sentetik senaryolardaki ölçümlerdir; gerçek kataloglarda aynı oranların geçerli olacağı garanti edilemez. Özellikle katalog kapsamının veya büyüklük belirleme yönteminin zaman içinde değiştiği dizilerde b değerleri ihtiyatla yorumlanmalıdır. Hız şeridi: M ≥ Mc artçıların log-zaman kutularındaki hızı (olay/gün; gri = eksik kayıt dönemi, uyuma girmez) ve tam dönem için tek Omori–Utsu eğrisi (Ogata 1983 en çok olabilirlik, %95 profil aralığı, Ogata 1988 KS testi). Uyumun başlangıcı seçilen N'den bağımsızdır: 100 olaylık pencerelerle (adım 10) aynı tamlık denetimi uygulanır ve ilk geçen pencerenin başı alınır; geçen pencere yoksa ya da M ≥ Mc olay sayısı 100'den azsa p tahmini yapılmaz. Başlangıçtan sonraki dönemde tamlık yeniden denetlenmez: dizi ortasındaki kısa kesintiler (b(t)'de gri çentik) uyuma girer ve p'yi etkileyebilir. Pencere başına p(t) bu sürümde YOK: Pazarcık 2023 ve Flores 2026 testlerinde güvenilir pencere üretmedi. Uyum yetersizse (c üst sınırda, aralık açık ya da KS p &lt; 0,05) eğri kesikli gri çizilir; bu genellikle ikinci ana şok, ikincil diziler ya da değişken katalog tamlığına işaret eder. Arka plan hızı modellenmez. Dizi tanımı varsayılan olarak GK74'tür; M ≳ 7 depremlerde GK74 dizisi parçalanabilir (Pazarcık 2023, Flores 2026: D(M) artçı zonunu kırptı). M ≥ 7 için deneysel seçenek: Kagan (2002) seçim yarıçapı rm = 20·10^((M−6)/2) km (Eş. 6). Kagan rm'yi artçı zonu boyutunu ölçmek için bir seçim penceresi olarak kullanır (episantroid merkezli, 1 gün, h = 0–70 km); burada merkez ana şok episantrı, h ≤ 70 km ve süre GK74 ile aynıdır. rm ölçülmüş bir zon sınırı değildir; bu kullanım bağıntının özgün amacının genişletilmesidir ve doğrulanmış bir standart değil, sınanan bir seçenektir. Kagan seçiminde başka bir ana şokun penceresine düşmüş olaylar da diziye girer; rm içinde M ≥ M_ana − 1 başka bir deprem varsa (olası çift ana şok, ör. Pazarcık–Elbistan 2023) iki dizinin artçıları karışır ve panel uyarır. Hiçbir seçim (GK74, Kagan) çift ana şoku fiziksel olarak ayırmaz. p modeli ayrıca uyumun bitiş zamanına (T = GK74 süresi ya da katalog sonu, Kayıt satırında) duyarlıdır: Pazarcık 2023 GK74 dizisinde katalog Haziran 2023'te bitince p = 1,11 (uyum yeterli), Ekim 2023'te bitince p = 1,19 (c üst sınırda, uyum yetersiz) bulundu.</div>`;
   window.lastPBSeqWin = { idx: curIdx, N: PBW_N, def: rec.def || 'gk74', rec: { M: rec.M, t0: rec.t0, N: rec.N, Mc: rec.Mc, nAll: rec.nAll, rm: rec.rm, covered: rec.covered, common: rec.common }, model: mod, wins };
 }
 async function exportPBSeqPNG() {
@@ -6340,7 +6448,7 @@ async function exportPBSeqPNG() {
   const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const xml = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * SC}" height="${H * SC}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#ffffff"/>` +
     `<text x="10" y="16" font-size="11" font-weight="700" fill="#111827" font-family="sans-serif">${esc(`${TM_VERSION} | Artçı Dizisi Analizi — M${rec.M.toFixed(1)}, ${d}, ${Math.abs(+rec.ms.lat).toFixed(2)}°${+rec.ms.lat < 0 ? 'G' : 'K'} ${Math.abs(+rec.ms.lon).toFixed(2)}°${+rec.ms.lon < 0 ? 'B' : 'D'}`)}</text>` +
-    `<text x="10" y="29" font-size="8" fill="#374151" font-family="sans-serif">${esc(`N = ${rec.N} (M ≥ Mc = ${rec.Mc.toFixed(1)}) · b(t): pencere ${pbwN} olay, adım ${Math.max(1, Math.round(pbwN / (pbwFine ? 100 : 10)))}${pbwFine ? ' (ince adım, %99 örtüşme)' : ' (N/10)'}, Aki (1965), ±1,96·b/√N`)}</text>` +
+    `<text x="10" y="29" font-size="8" fill="#374151" font-family="sans-serif">${esc(`N = ${rec.N} (M ≥ Mc = ${rec.Mc.toFixed(1)}) · b(t): pencere ${pbwN} olay, adım ${Math.max(1, Math.round(pbwN / (pbwFine ? 100 : 10)))}${pbwFine ? ' (ince adım, %99 örtüşme)' : ' (N/10)'}, Aki (1965), ${bCiS('±1,96·b/√N', '%95 kesin χ²₂N')}`)}</text>` +
     `<text x="10" y="40" font-size="8" fill="#374151" font-family="sans-serif">${esc(`p: tam dönem Omori–Utsu, Ogata (1983)${rec.model ? (rec.model.p == null ? ' — p tahmini yapılmadı' : !rec.model.ok ? ' — uyum yetersiz' : '') : ''} · dizi: ${pbSeqDefLabel(rec, true)} · ${TM_VERSION} (${TM_VERSION_DATE}), EQ-Live deneysel`)}</text>` +
     `<g transform="translate(0,45)" font-family="sans-serif">${inner}</g></svg>`;
   const img = new Image(); img.onload = () => { const cv = document.createElement('canvas'); cv.width = W * SC; cv.height = H * SC; const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0);
@@ -8066,8 +8174,8 @@ function computeRegionStatsLine(evs, orderby, capped, areaKm2) {
 
   const b = computeBvalue(mags, Mc);
   const nAbove = mags.filter(m => m >= Mc).length;
-  const bErr = b !== null ? bConfidence95(b, nAbove) : null;
-  const bLabel = b !== null ? `${b.toFixed(2)}${bErr !== null ? ` ± ${bErr.toFixed(2)}` : ''}` : '—';
+  const bCiR = b !== null ? bCiFields(b, nAbove, mags.filter(m => m >= Mc - 1e-9).map(m => m - Mc)) : null, bErr = bCiR ? bCiR.err : null;
+  const bLabel = b !== null ? `${b.toFixed(2)}${bErr !== null ? bCiTxt({ b, ...bCiR }) : ''}` : '—';
   let line = `${mcLabel} · b = <b>${bLabel}</b>${bErr !== null ? ' <span style="color:#888;font-size:.85em">(%95)</span>' : ''} · N(M≥Mc) = ${nAbove}`;
   if (areaKm2 && regionWindowStart && regionWindowEnd) {
     const years = (regionWindowEnd - regionWindowStart) / (365.25*24*3600*1000);

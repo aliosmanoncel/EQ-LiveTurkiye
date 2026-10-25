@@ -16,9 +16,12 @@ const fn = name => {   // üst düzey "function name(" bloğunu, bir sonraki üs
   const j = src.slice(i + 1).search(/\n(?=[^\s}])/); return src.slice(i + 1, i + 2 + j);
 };
 const cst = src.match(/^const BT_ADAPT_MAX = [^\n]*$/m); if (!cst) throw new Error('BT_ADAPT_MAX bulunamadı');
+const ciBlock = () => {   // 2026-10-25: b güven aralığı bloğu (bConfidence95 … bCiMethodTxt); BCI=normal ortam değişkeni eski ±1,96·b/√N kipini seçer
+  const i = src.indexOf('\nfunction bConfidence95('), j = src.indexOf('// Kayan pencere b-değeri', i); if (i < 0 || j < 0) throw new Error('bulunamadı: aralık bloğu');
+  return src.slice(i + 1, j) + (process.env.BCI && src.includes('let B_CI_METHOD') ? `\nB_CI_METHOD = '${process.env.BCI}';` : ''); };
 const ctx = {}; vm.createContext(ctx);
 vm.runInContext(['var bTimeAnchor = "mean";', cst[0].replace('const ', 'var '),
-  ...['bWinStart', 'bWinTime', 'btAdaptive', 'computeBvalue', 'bConfidence95', 'computeBvalueTimeSeries'].map(fn),
+  ...['bWinStart', 'bWinTime', 'btAdaptive', 'computeBvalue', 'computeBvalueTimeSeries'].map(fn), ciBlock(),
   'globalThis.__x = { bWinStart, bWinTime, btAdaptive, computeBvalueTimeSeries, setA: a => { bTimeAnchor = a; } };'].join('\n'), ctx);
 const X = ctx.__x;
 let pass = 0, fail = 0;
