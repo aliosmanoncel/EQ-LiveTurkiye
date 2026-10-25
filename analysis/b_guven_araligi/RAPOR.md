@@ -340,3 +340,45 @@ Hangi tutarlı düzeltmenin (yuvarlama ya da çözünürlüğe göre ΔM) seçil
 2. Bir b anomalisi ancak süresi pencereden uzunsa (L ≳ N olay) güvenilir biçimde yakalanır: N = 500, 200 olaylık bir bölümü hiç yakalamaz; N = 200, 100 olaylık bölümü %1 olasılıkla yakalar. Büyük pencerede eğrinin inebildiği en düşük değer de yükselir (L = 200'de N = 500 için 0,77; gerçek 0,6).
 3. Küçük pencerenin bedeli rastlantısal anomalidir ve seri uzadıkça artar: durağan 5000 olayda N = 20'de serilerin %67'si en az bir yanlış sınıflı pencere içerir (§14'teki 600 olaylık seride %12). Serinin en düşük b̂'si, çok sayıda pencere arasından seçildiği için aşağı yanlıdır (N = 20'de 0,53, gerçek 1,0). Küçük N'de yakalanan "düşük b" dolayısıyla tek başına kanıt değildir; örtüşmeyen dönemler Utsu testiyle karşılaştırılmalıdır (§13).
 4. Pratik kural: beklenen değişimin süresinden (olay sayısı olarak) daha kısa bir pencere seçilmeli; N ≤ 30 yalnız kısa ya da az olaylı serilerde keşif için kullanılmalıdır.
+
+## 16. Tarihsel katalogda karma büyüklük çözünürlüğü: yöntem önerisi (2026-10-25; üretim değişmedi)
+
+### 16.1 Izgara dışı değerler nedir?
+
+ISC 1900–1997 penceresinde b'ye giren değer `mw || mag`'dir; bu pencerelerde Mw dönüşümü uygulanmaz (`mw` alanı boş). Izgara dışı değerlerin **tamamı ham ISC kayıtlarıdır**: mb'nin %83'ü, MS'nin %77'si, MW'nin %75'i iki ondalıklı; md, mL, Mpv tek ondalıklı. İki ondalıklılarda ikinci hane 1–9 arasında düzgün dağılır (334–381 olay/hane), yani bunlar gerçekten 0,01 çözünürlüklü değerlerdir (istasyon ortalamaları). Ancak 1964 sonrası mb'lerde ikinci hanesi 0 olan değerlerin oranı %16,6'dır (saf 0,01 çözünürlükte %10 beklenir): mb'lerin yaklaşık %7'si 0,1 çözünürlükle gelmiştir. Sonuç: "4,70" gibi bir değerin 0,1 mi 0,01 çözünürlüklü mü olduğu tek tek kayıtta belirlenemez. Ondalık basamak sayısı çözünürlüğün kanıtı değildir; olay başına ΔM seçimi bu katalogda iyi tanımlı değildir.
+
+### 16.2 Monte Carlo (`mc_karma.js`, üretim kodu; 4000 tekrar, tohum 20261029)
+
+Gerçek büyüklük sürekli G–R (m ≥ 3,0); her olay f₂ olasılıkla 0,01'e, aksi hâlde 0,1'e en yakın değere yuvarlanarak kaydedilir; Mc = 3,2. f₂ ∈ {0; 0,56; 1}, b ∈ {0,7; 1,0; 1,3}, N(≥Mc) ≈ 100 / 500 / 3000 (27 koşul).
+
+- (A) bugünkü hesap (karma değerler, ΔM/2 = 0,05),
+- (B) sürekli varsayım (ΔM = 0),
+- (C) ortak 0,1 sınıfı (her değer 0,1'e en yakın değere yuvarlanır, sonra ΔM/2 = 0,05 ve T–M).
+
+| f₂ | b | N | A: b̂/b, kapsama | B: b̂/b, kapsama | C: b̂/b, kapsama |
+|---|---|---|---|---|---|
+| 0,56 | 0,7 | 3124 | 0,961, 0,381 | 1,042, 0,383 | 0,998, 0,949 |
+| 0,56 | 1,0 | 106 | 0,953, 0,913 | 1,071, 0,899 | 1,004, 0,951 |
+| 0,56 | 1,0 | 3182 | 0,946, 0,105 | 1,061, 0,103 | 0,996, 0,945 |
+| 0,56 | 1,3 | 3238 | 0,931, 0,013 | 1,082, 0,011 | 0,993, 0,950 |
+| 1 | 1,0 | 3035 | 0,906, 0,000 | 1,012, 0,898 | 0,996, 0,947 |
+| 0 | 1,0 | 3366 | 0,996, 0,945 | 1,125, 0,000 | 0,996, 0,945 |
+
+Bütün 27 koşulda C yansızdır (|b̂/b − 1| ≤ %0,7) ve nominal kapsar (0,944–0,957); f₂'den bağımsızdır. A, f₂ arttıkça bozulur (b düşük; büyük N'de aralık neredeyse hiç kapsamaz). B, 0,1 çözünürlüklü değerlerde yukarı yanlıdır; yalnız saf 0,01 katalogda kabul edilebilir. f₂ = 0'da (bugünkü güncel kataloglar) A ve C özdeştir.
+
+### 16.3 Gerçek ISC pencereleri (`gercek_karma.js`, üretim kodu; Mc computeMc ile)
+
+| pencere | bugünkü b̂ [%95], N | 0,1'e yuvarlanmış b̂ [%95], N | b(t) N = 100 ortalaması (bugün → yuvarlanmış) |
+|---|---|---|---|
+| 1900–1970 (Mc 4,7) | 0,526 [0,48–0,58], 430 (χ²) | 0,561 [0,51–0,61], 464 (T–M) | 0,709 → 0,797 (34 → 37 pencere) |
+| 1971–1997 (Mc 3,7) | 0,718 [0,70–0,74], 4808 (χ²) | 0,720 [0,70–0,74], 4855 (T–M) | 0,918 → 0,931 (471 → 476 pencere) |
+
+§14.3'teki "sürekli varsayım 0,782" değeri bir doğru-değer adayı değildir: (B) %4–9 yukarı yanlıdır. Önerilen yöntemin 1971–1997'deki etkisi küçüktür (+0,002); asıl etkilenen 1900–1970'tir (+0,035; b(t) ortalaması +0,09). N artar, çünkü 4,65–4,69 gibi değerler 4,7 sınıfına girer (eşik sınıflamayla tutarlı hâle gelir; `computeMc` zaten 0,1 sınıflarıyla çalışır).
+
+### 16.4 Öneri (karar bekliyor)
+
+Kural: **Bir analiz örnekleminde en az bir büyüklük ΔM ızgarasının dışındaysa, b hesabından önce bütün büyüklükler ΔM sınıf merkezlerine (Mc + kΔM, en yakın) yuvarlanır;** gösterim (zaman–büyüklük grafiği, tablolar) ham değerleri korur. Izgaradaki kataloglarda (bugünkü güncel kataloglar) sonuç değişmez. Gerekçe: tek ortak sınıflama, kestiricinin ΔM/2 varsayımı, Mc'nin 0,1 sınıflarıyla belirlenmesi ve Tinti–Mulargia'nın ızgara koşuluyla tutarlıdır; kayıt çözünürlüğü olay başına belirlenemediği için olay başına ΔM tanımlanamaz. Bedel: 0,1'in altındaki çözünürlük bilgisi kullanılmaz (bu N'lerde etkisi ihmal edilebilir; C'nin kapsaması f₂ = 1'de de nominal). Uygulama yerleri: b(t) (iki yol), Mc–dönem tablosu, G–R, bölge satırı, bölge karşılaştırması, artçı dizileri; `?bci=normal` kipinde uygulanmaz.
+
+### 16.5 Varsayılan pencere davranışı (doğrulama)
+
+`main`'de varsayılan b(t) adımı 10'dur (`STEPB = o.step || 10`; ince adım kipinde 1). Dalda N = 100'de `btDefaultStep()` = 10, ince kipte 1: aynıdır. Tarayıcı karşılaştırması (§14.1, §15) bunu çıktı düzeyinde de doğrular.

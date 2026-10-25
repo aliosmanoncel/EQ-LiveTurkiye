@@ -1,0 +1,48 @@
+[
+ {
+  "donem": "1900–1970",
+  "Mc": 4.7,
+  "N_toplam": 662,
+  "bugun": {
+   "N": 430,
+   "b": 0.526,
+   "aralik": "[0.48–0.58]",
+   "yontem": "chi2",
+   "bt_pencere": 34,
+   "bt_ort": 0.709,
+   "bt_yontem": "chi2"
+  },
+  "yuvarla": {
+   "N": 464,
+   "b": 0.561,
+   "aralik": "[0.51–0.61]",
+   "yontem": "tm",
+   "bt_pencere": 37,
+   "bt_ort": 0.797,
+   "bt_yontem": "tm"
+  }
+ },
+ {
+  "donem": "1971–1997",
+  "Mc": 3.7,
+  "N_toplam": 6742,
+  "bugun": {
+   "N": 4808,
+   "b": 0.718,
+   "aralik": "[0.70–0.74]",
+   "yontem": "chi2",
+   "bt_pencere": 471,
+   "bt_ort": 0.918,
+   "bt_yontem": "chi2"
+  },
+  "yuvarla": {
+   "N": 4855,
+   "b": 0.72,
+   "aralik": "[0.70–0.74]",
+   "yontem": "tm",
+   "bt_pencere": 476,
+   "bt_ort": 0.931,
+   "bt_yontem": "tm"
+  }
+ }
+]
