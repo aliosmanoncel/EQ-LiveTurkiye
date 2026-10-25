@@ -282,3 +282,39 @@ Bağlam: Tinti–Mulargia'nın EQ-Live'daki amacı, Hong Kong gibi az deprem ür
 **Uygulananlar (dal `b-ci-chi2`):** `bUtsuP` (Utsu 1992; Schorlemmer vd. 2004 biçimi); bölge karşılaştırma tablosuna "b farkı, 1. bölgeye göre (Utsu 1992, P)" satırı (yalnız varsayılan kipte; `?bci=normal` çıktısı main ile aynı kalır); "N(≥Mc) < 50 olan bölgede b güvenilmez" notu "aralık geniş; farkları Utsu testiyle değerlendirin" olarak değiştirildi. `test_b_ci.js` 35/0 (Utsu: özdeşte e⁻¹, simetri, N = 30 yanlış alarm).
 
 **Uygulanmayan (karar gerektirir):** b(t) penceresi bugün sabit N = 100'dür; bu, az olaylı bölgelerde zamansal analizin asıl engelidir. Seçilebilir küçük pencere (ör. N = 50/30/20) ve ardışık bağımsız dönemler arasında Utsu testi ayrı bir üretim işidir. §10'daki güç sonuçları ile bu bölümün B tablosu bu kararın dayanağıdır.
+
+## 14. Seçilebilir b(t) penceresi (N = 100 / 50 / 30 / 20) ve tarihsel katalogda çözünürlük (2026-10-25)
+
+### 14.1 Uygulama
+
+- `BT_WIN_N` (varsayılan 100; Öncel & Wilson 2007). b(t) panelinde "pencere N" seçicisi; URL `?btn=50`, seçim tarayıcıda hatırlanır. Adım N/10 (100 → 10, 50 → 5, 30 → 3, 20 → 2); ince adım 1.
+- `computeBvalueTimeSeries` ve `csBvalueTimeSeries` `nWin` alır; b(t) metinleri, yöntem satırı, örtüşme sayısı ("ardışık pencereler N − adım olayı paylaşır") ve poster yazıları seçili N'yi kullanır.
+- N < 100'de istatistik satırında ve posterde açık uyarı: "küçük örneklem penceresi … aralıklar geniş, b değişimini saptama gücü düşük"; N = 20 "keşif amaçlı" ve "sınıf şeridi tek tük pencereleri rastlantısal olarak boyayabilir". Yetersiz veri iletisi küçük pencere seçilebileceğini söyler.
+- Artçı dizisi panelinin pencereleri (`pbwN`) ayrıdır, değişmedi.
+- `scripts/test_bt_window.js` (yeni, 14/0) CI iş akışına eklendi. Varsayılan N = 100'de, `?bci=normal` kipinde tarayıcı çıktısı ve poster PNG'si main ile aynı; `tmPanel`'deki fark yalnız eklenen seçici ve iki etiket (bunlar çıkarılınca bayt bayt aynı).
+
+### 14.2 Monte Carlo (`mc_btpencere.js`, üretim kodu; 2000 tekrar, tohum 20261027)
+
+600 olaylık YAPAY katalog (ideal G–R, 0,1 ızgarası). S0: durağan b = 1. S1/S2: ilk 300 olay b = 1,0, son 300 olay b = 0,8 / 0,6. "İlk–son Utsu" ilk ve son pencere (örtüşmüyor, bağımsız) arasındaki testtir.
+
+| N (adım) | pencere kapsaması | b̂/b | S0: en az bir yanlış sınıf içeren seri | S0: ilk–son Utsu P < 0,05 | S1: ilk–son Utsu (1,0 → 0,8) | S2: ilk–son Utsu (1,0 → 0,6) | S2: yeni dönem pencerelerinin "düşük b" sınıfı |
+|---|---|---|---|---|---|---|---|
+| 100 (10) | 0,948–0,950 | 1,00–1,01 | %0 | %4,8 | %35 | %94 | %35 |
+| 50 (5) | 0,949–0,952 | 1,02 | %0 | %4,7 | %19 | %71 | %20 |
+| 30 (3) | 0,949–0,953 | 1,03 | %3 | %5,1 | %14 | %48 | %14 |
+| 20 (2) | 0,950–0,952 | 1,05 | %12 | %4,5 | %10 | %34 | %12 |
+
+**Yorum:** Pencere başına aralık her N'de nominaldir; küçük pencere ölçümü geçersiz kılmaz. Bedel güçtür: N = 30'da büyük bir düşüş (1,0 → 0,6) bile ancak yarı yarıya saptanır, orta büyüklükte bir değişim (1,0 → 0,8) neredeyse hiç. N = 20'de durağan serilerin %12'sinde sınıf şeridi en az bir pencereyi boyar (çoğu tek tük, yüksek b; Aki'nin yukarı yanlılığı ve geniş aralık). Örtüşen pencereler bağımsız olmadığından komşu pencerelerin "anlamlı" görünmesi bağımsız kanıt değildir; fark için örtüşmeyen dönemler Utsu testiyle karşılaştırılmalıdır.
+
+**Tarayıcı (gerçek veri):** tarihsel 1900–1970 penceresinde N = 30 b(t)'yi ≈ 1918'den başlatır (N = 100'de ≈ 1929); güncel katalogda 112 olayla N = 100'de 2, N = 30'da 28 pencere. Görüntü: `tarayici/pencere_goruntu.js`.
+
+### 14.3 Tarihsel katalogda büyüklük çözünürlüğü (karar ertelendi)
+
+Tarihsel katalog üretimde kullanılır: "1900–1970" ve "1971–1997" ISC düğmeleri `eq_historical.json`'ı doğrudan b(t) ve G–R'ye verir. Izgara dışı değerler ISC'nin iki ondalıklı mb (%83), MS (%78) ve MW (%75) değerleridir; ağırlıkla 1960–1997. Yani sorun ondalık sayısı değil, karışık ölçüm çözünürlüğüdür (0,1 ve 0,01). Bu, aralık yönteminden önce kestiriciyi etkiler (ΔM/2 = 0,05 düzeltmesi 0,01 çözünürlüklü değerlere de uygulanıyor):
+
+| ISC penceresi | N(≥Mc) | ızgara dışı | bugünkü b̂ | sürekli varsayım (ΔM = 0) | 0,1'e yuvarlanmış |
+|---|---|---|---|---|---|
+| 1900–1970 (Mc 4,7) | 430 | %57 | 0,526 | 0,560 | 0,565 |
+| 1971–1997 (Mc 3,7) | 4808 | %56 | 0,718 | 0,782 | 0,723 |
+
+Hangi tutarlı düzeltmenin (yuvarlama ya da çözünürlüğe göre ΔM) seçileceği bir yöntem kararıdır; ertelendi. Bugün bu pencerelerde aralık χ²'dir (ızgara dışı).

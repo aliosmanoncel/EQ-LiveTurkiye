@@ -9,6 +9,7 @@ on:
       - 'scripts/test_b_ci.js'
       - 'scripts/test_bt_adaptive.js'
       - 'scripts/test_mc_grid.js'
+      - 'scripts/test_bt_window.js'
       - '.github/workflows/b-ci.yml'
   workflow_dispatch:
 
@@ -27,5 +28,7 @@ jobs:
         run: node scripts/test_b_ci.js
       - name: b(t) ve Mc–ızgara testleri (varsayılan kip)
         run: node scripts/test_bt_adaptive.js && node scripts/test_mc_grid.js
+      - name: Seçilebilir b(t) penceresi (N = 100/50/30/20)
+        run: node scripts/test_bt_window.js
       - name: b(t) ve Mc–ızgara testleri (eski kip, ?bci=normal)
         run: BCI=normal node scripts/test_bt_adaptive.js && BCI=normal node scripts/test_mc_grid.js

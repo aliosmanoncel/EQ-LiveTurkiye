@@ -1,0 +1,155 @@
+{
+ "meta": {
+  "tekrar": 2000,
+  "tohum": 20261027,
+  "olay": 600,
+  "Mc": 3,
+  "sure_s": 20.936
+ },
+ "sonuc": [
+  {
+   "N": 100,
+   "adim": 10,
+   "senaryo": "S0",
+   "b_sonra": 1,
+   "pencere_kapsama": 0.9495196078431373,
+   "bhat_oran": 1.0053070849683647,
+   "yanlis_sinif_pencere": 0,
+   "yanlis_sinif_seri": 0,
+   "dusuk_sinif_sonra": null,
+   "utsu_ilk_son": 0.0475
+  },
+  {
+   "N": 100,
+   "adim": 10,
+   "senaryo": "S1",
+   "b_sonra": 0.8,
+   "pencere_kapsama": 0.9480952380952381,
+   "bhat_oran": 1.0077553257369505,
+   "yanlis_sinif_pencere": 0,
+   "yanlis_sinif_seri": 0,
+   "dusuk_sinif_sonra": 0.0005,
+   "utsu_ilk_son": 0.346
+  },
+  {
+   "N": 100,
+   "adim": 10,
+   "senaryo": "S2",
+   "b_sonra": 0.6,
+   "pencere_kapsama": 0.9501190476190476,
+   "bhat_oran": 1.0024895060674004,
+   "yanlis_sinif_pencere": 0,
+   "yanlis_sinif_seri": 0,
+   "dusuk_sinif_sonra": 0.35069047619047616,
+   "utsu_ilk_son": 0.939
+  },
+  {
+   "N": 50,
+   "adim": 5,
+   "senaryo": "S0",
+   "b_sonra": 1,
+   "pencere_kapsama": 0.9518288288288288,
+   "bhat_oran": 1.0159486906365616,
+   "yanlis_sinif_pencere": 0.000013513513513513513,
+   "yanlis_sinif_seri": 0.0015,
+   "dusuk_sinif_sonra": null,
+   "utsu_ilk_son": 0.0465
+  },
+  {
+   "N": 50,
+   "adim": 5,
+   "senaryo": "S1",
+   "b_sonra": 0.8,
+   "pencere_kapsama": 0.9493529411764706,
+   "bhat_oran": 1.015438522136414,
+   "yanlis_sinif_pencere": 0.000009803921568627451,
+   "yanlis_sinif_seri": 0.0005,
+   "dusuk_sinif_sonra": 0.001196078431372549,
+   "utsu_ilk_son": 0.19
+  },
+  {
+   "N": 50,
+   "adim": 5,
+   "senaryo": "S2",
+   "b_sonra": 0.6,
+   "pencere_kapsama": 0.950764705882353,
+   "bhat_oran": 1.01648207711742,
+   "yanlis_sinif_pencere": 0.000029411764705882354,
+   "yanlis_sinif_seri": 0.001,
+   "dusuk_sinif_sonra": 0.20107843137254902,
+   "utsu_ilk_son": 0.71
+  },
+  {
+   "N": 30,
+   "adim": 3,
+   "senaryo": "S0",
+   "b_sonra": 1,
+   "pencere_kapsama": 0.9495026178010472,
+   "bhat_oran": 1.0278563693244298,
+   "yanlis_sinif_pencere": 0.00022513089005235602,
+   "yanlis_sinif_seri": 0.0305,
+   "dusuk_sinif_sonra": null,
+   "utsu_ilk_son": 0.0505
+  },
+  {
+   "N": 30,
+   "adim": 3,
+   "senaryo": "S1",
+   "b_sonra": 0.8,
+   "pencere_kapsama": 0.9531208791208792,
+   "bhat_oran": 1.0304389054511933,
+   "yanlis_sinif_pencere": 0.0003021978021978022,
+   "yanlis_sinif_seri": 0.014,
+   "dusuk_sinif_sonra": 0.0027252747252747254,
+   "utsu_ilk_son": 0.1375
+  },
+  {
+   "N": 30,
+   "adim": 3,
+   "senaryo": "S2",
+   "b_sonra": 0.6,
+   "pencere_kapsama": 0.9494835164835165,
+   "bhat_oran": 1.0308145061206617,
+   "yanlis_sinif_pencere": 0.00025824175824175826,
+   "yanlis_sinif_seri": 0.0155,
+   "dusuk_sinif_sonra": 0.14452747252747253,
+   "utsu_ilk_son": 0.48
+  },
+  {
+   "N": 20,
+   "adim": 2,
+   "senaryo": "S0",
+   "b_sonra": 1,
+   "pencere_kapsama": 0.9504158075601374,
+   "bhat_oran": 1.0474711596643744,
+   "yanlis_sinif_pencere": 0.0008402061855670104,
+   "yanlis_sinif_seri": 0.1205,
+   "dusuk_sinif_sonra": null,
+   "utsu_ilk_son": 0.0455
+  },
+  {
+   "N": 20,
+   "adim": 2,
+   "senaryo": "S1",
+   "b_sonra": 0.8,
+   "pencere_kapsama": 0.9523510638297872,
+   "bhat_oran": 1.0460969818633745,
+   "yanlis_sinif_pencere": 0.000801418439716312,
+   "yanlis_sinif_seri": 0.0585,
+   "dusuk_sinif_sonra": 0.003581560283687943,
+   "utsu_ilk_son": 0.099
+  },
+  {
+   "N": 20,
+   "adim": 2,
+   "senaryo": "S2",
+   "b_sonra": 0.6,
+   "pencere_kapsama": 0.9503794326241135,
+   "bhat_oran": 1.0468582443823218,
+   "yanlis_sinif_pencere": 0.0007624113475177305,
+   "yanlis_sinif_seri": 0.059,
+   "dusuk_sinif_sonra": 0.11526950354609929,
+   "utsu_ilk_son": 0.337
+  }
+ ]
+}
