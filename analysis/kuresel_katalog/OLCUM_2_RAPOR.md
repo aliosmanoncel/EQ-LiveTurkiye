@@ -30,7 +30,11 @@
 | 1971–1997 | 145 410 | 1 936 | 24 167 | 119 307 |
 | 1998–2021 | 310 831 | 213 | 36 668 | 273 950 |
 
-**Sonuç:** USGS'nin 1904–1970 kayıtları büyük ölçüde ISC-GEM'in kendisi. ISC-GEM ile eşleşen 1904–1970 USGS kayıtlarının hiçbiri "ISC-GEM katkısı görünmeyen" sınıfında değil. Bu nedenle iki katalog arasındaki yüksek örtüşme bağımsız bir doğrulama değildir; aynı kaydın iki kopyasının karşılaştırılmasıdır.
+**Sonuç:** USGS'nin 1904–1970 kayıtları büyük ölçüde ISC-GEM'in kendisi. Bu dönemde bir ISC-GEM olayına eşleşme olarak seçilen USGS kayıtları:
+- `tekil`: 13 108 tercihli, 51 katkılı;
+- `karsilikli_cok_adayli`: 425 tercihli, 23 katkılı.
+
+Hiçbiri "ISC-GEM katkısı görünmeyen" sınıfında değil. Bu sınıftaki 2 697 kaydın 2 613'ü "yalnız USGS"; kalan 84'ü pencerede aday olmuş ama seçilmemiş kayıtlar (ağırlıkla bölgesel ağ kayıtları). 1971 sonrasında katkısı görünmeyen seçilmiş eşleşme yalnız 8 (1971–1997) ve 12 (1998–2021). Bu nedenle iki katalog arasındaki yüksek örtüşme bağımsız bir doğrulama değildir; aynı kaydın iki kopyasının karşılaştırılmasıdır.
 
 ## 4. Eşleştirme sonuçları (zaman + uzaklık; büyüklük kullanılmadı)
 
@@ -40,8 +44,19 @@
 | 1971–1997 | 23 690 | 23 439 (%98,9) | 235 | 3 | 13 |
 | 1998–2021 | 36 860 | 36 539 (%99,1) | 289 | 4 | 28 |
 
-**Kimlikle bağımsız denetim:**
-- Pencereyle bulunan eşleşme, USGS `ids` alanındaki ISC-GEM kimliğiyle 13 607 / 13 609, 23 665 / 23 690 ve 36 816 / 36 860 olayda aynı.
+**Kimlikle bağımsız denetim:** Her ISC-GEM olayının pencere adayları arasında, `ids` alanında o olayın kimliğini taşıyan USGS kaydı arandı.
+
+| Dönem | Kimlikli kayıt = pencere eşleşmesi | Kimlikli kayıt başka aday | Kimlikli kayıt adaylar arasında yok |
+|---|---|---|---|
+| 1904–1970 | 13 607 | 0 | 2 |
+| 1971–1997 | 23 665 | 6 | 19 |
+| 1998–2021 | 36 816 | 6 | 38 |
+
+"Adaylar arasında yok" iki durumu birlikte sayar:
+- kimliğin hiçbir USGS kaydında geçmemesi (Ek 1: 2 / 8 / 16);
+- kimlikli USGS kaydının zaman/uzaklık penceresinin dışında kalması (0 / 11 / 22). Bu olaylarda USGS ile ISC-GEM'in konumu ya da zamanı pencereden fazla ayrışıyor.
+
+Kimlik birleştirmesi her iki durumu doğrudan çözer. Pencere eşleştirmesi ise ikinci durumda olayı "yalnız ISC-GEM" sayar ve USGS kaydını ayrıca ekler; yani 33 olay çift sayılır.
 
 ## 5. Çift kayıt riski
 
