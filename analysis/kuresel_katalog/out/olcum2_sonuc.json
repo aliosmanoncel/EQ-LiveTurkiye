@@ -1,0 +1,483 @@
+{
+ "onkayit": "analysis/kuresel_katalog/OLCUM_2_ONKAYIT.md",
+ "iscgem_meta": {
+  "surum": "Version 12.1 - released on 2025-11-26",
+  "girdi_sha256": {
+   "isc-gem-cat.csv": "b4e63841e8a6527f1fa6a0ea823b83cfc5b053ab1c7d8746446e34645592cc8d",
+   "isc-gem-suppl.csv": "1ea390ab6fc319746e7799bf08ea543d2e747dea64f5ba937ac61b481b0f21bf"
+  }
+ },
+ "usgs_meta": {
+  "kaynak": "https://earthquake.usgs.gov/fdsnws/event/1/",
+  "minmagnitude": 4.0,
+  "donem": [
+   1904,
+   2021
+  ],
+  "sorgu_baslangic_utc": "2026-10-26T15:18:56.244655+00:00",
+  "sorgu_bitis_utc": "2026-10-26T15:25:34.844576+00:00",
+  "parca_sayisi": 118,
+  "count_eksik_indirilen": [],
+  "ham_olay": 474109,
+  "tekil_olay": 474109,
+  "alanlar": [
+   "id",
+   "ids",
+   "sources",
+   "net",
+   "time_ms",
+   "lat",
+   "lon",
+   "depth",
+   "mag",
+   "magType",
+   "type"
+  ]
+ },
+ "usgs_net_dagilimi": {
+  "us": 446376,
+  "iscgem": 15404,
+  "ci": 3123,
+  "ak": 2959,
+  "iscgemsup": 1794,
+  "nc": 1381,
+  "ushis": 902,
+  "hv": 811,
+  "uw": 433,
+  "pr": 297,
+  "nn": 187,
+  "gcmt": 133,
+  "official": 101,
+  "uu": 75,
+  "nm": 29,
+  "se": 25,
+  "tx": 15,
+  "cdmg": 14,
+  "eqh": 9,
+  "mb": 7,
+  "snm": 5,
+  "ld": 5,
+  "rusms": 5,
+  "aacse": 4,
+  "ok": 4,
+  "flag": 3,
+  "ott": 3,
+  "wes": 2,
+  "usgs": 1,
+  "av": 1,
+  "ew": 1
+ },
+ "usgs_ids_katalog_onekleri": {
+  "usp": 321690,
+  "us": 104779,
+  "iscgem": 75040,
+  "gcmt": 35400,
+  "a": 31240,
+  "gcmtb": 18544,
+  "b": 17761,
+  "d": 17301,
+  "f": 16761,
+  "e": 16634,
+  "usb": 16478,
+  "j": 16376,
+  "c": 16164,
+  "h": 15798,
+  "g": 14819,
+  "gcmtc": 14705,
+  "usc": 14597,
+  "ak": 10745,
+  "k": 9851,
+  "t": 8997,
+  "s": 8836,
+  "m": 8191,
+  "n": 8039,
+  "r": 7869,
+  "p": 7861,
+  "q": 7613,
+  "x": 7380,
+  "u": 7372,
+  "z": 7328,
+  "w": 7240,
+  "y": 7119,
+  "v": 7047,
+  "atlas": 6822,
+  "ci": 4297,
+  "iscgemsup": 4140,
+  "choy": 3642,
+  "ushis": 3228,
+  "l": 2947,
+  "i": 2871,
+  "at": 1982
+ },
+ "usgs_olay_turleri": {
+  "earthquake": 473151,
+  "nuclear explosion": 811,
+  "volcanic eruption": 62,
+  "explosion": 34,
+  "mine collapse": 18,
+  "quarry blast": 12,
+  "rock burst": 8,
+  "mining explosion": 6,
+  "other event": 3,
+  "sonic boom": 2,
+  "landslide": 1,
+  "collapse": 1
+ },
+ "donemler": {
+  "1904–1970": {
+   "iscgem_olay": 13609,
+   "usgs_olay": 17868,
+   "iscgem_sinif": {
+    "karsilikli_cok_adayli": 448,
+    "tekil": 13159,
+    "yalniz_iscgem": 2
+   },
+   "iscgem_sinif_oran": {
+    "karsilikli_cok_adayli": 0.0329,
+    "tekil": 0.9669,
+    "yalniz_iscgem": 0.0001
+   },
+   "eslesen_usgs_koken": {
+    "karsilikli_cok_adayli": {
+     "iscgem_tercihli": 425,
+     "iscgem_katkili": 23
+    },
+    "tekil": {
+     "iscgem_tercihli": 13108,
+     "iscgem_katkili": 51
+    }
+   },
+   "usgs_koken_tum": {
+    "iscgem_tercihli": 15049,
+    "iscgem_katkisi_yok": 2697,
+    "iscgem_katkili": 122
+   },
+   "yalniz_usgs": 4143,
+   "yalniz_usgs_mag_x_tur": {
+    "4,0–5,0 diger": 2017,
+    "4,0–5,0 mb": 81,
+    "4,0–5,0 ms": 6,
+    "4,0–5,0 mw*": 45,
+    "5,0–5,5 diger": 252,
+    "5,0–5,5 mb": 21,
+    "5,0–5,5 ms": 20,
+    "5,0–5,5 mw*": 840,
+    "5,5–6,0 diger": 93,
+    "5,5–6,0 mb": 20,
+    "5,5–6,0 ms": 52,
+    "5,5–6,0 mw*": 260,
+    "≥6,0 diger": 24,
+    "≥6,0 mb": 67,
+    "≥6,0 ms": 57,
+    "≥6,0 mw*": 288
+   },
+   "olasi_cift_kayit_iscgem_olayi": 448,
+   "olasi_cift_kayit_ornek": [
+    {
+     "iscgem_eventid": 610326271,
+     "usgs": [
+      "iscgem610326271",
+      "iscgem16957813"
+     ]
+    },
+    {
+     "iscgem_eventid": 16957813,
+     "usgs": [
+      "iscgem16957813",
+      "iscgem610326271"
+     ]
+    },
+    {
+     "iscgem_eventid": 610326404,
+     "usgs": [
+      "iscgem610326404",
+      "iscgemsup610548598"
+     ]
+    },
+    {
+     "iscgem_eventid": 610548658,
+     "usgs": [
+      "iscgem610548658",
+      "iscgem16957915"
+     ]
+    },
+    {
+     "iscgem_eventid": 16957915,
+     "usgs": [
+      "iscgem16957915",
+      "iscgem610548658"
+     ]
+    }
+   ],
+   "buyukluk_tanisi_tekil_usgs_eksi_mw": {
+    "diger": {
+     "N": 24,
+     "ortanca": -0.42,
+     "q25": -0.48,
+     "q75": -0.32
+    },
+    "ms": {
+     "N": 3,
+     "ortanca": -0.03,
+     "q25": -0.03,
+     "q75": 0.07
+    },
+    "mw*": {
+     "N": 13132,
+     "ortanca": 0.0,
+     "q25": 0.0,
+     "q75": 0.0
+    }
+   },
+   "kimlik_denetimi": {
+    "kimlik_bagi_pencere_eslesmesiyle_ayni": 13607,
+    "kimlik_bagi_yok": 2
+   }
+  },
+  "1971–1997": {
+   "iscgem_olay": 23690,
+   "usgs_olay": 145410,
+   "iscgem_sinif": {
+    "tekil": 23439,
+    "karsilikli_cok_adayli": 235,
+    "yalniz_iscgem": 13,
+    "belirsiz": 3
+   },
+   "iscgem_sinif_oran": {
+    "tekil": 0.9894,
+    "karsilikli_cok_adayli": 0.0099,
+    "yalniz_iscgem": 0.0005,
+    "belirsiz": 0.0001
+   },
+   "eslesen_usgs_koken": {
+    "tekil": {
+     "iscgem_tercihli": 1638,
+     "iscgem_katkili": 21796,
+     "iscgem_katkisi_yok": 5
+    },
+    "karsilikli_cok_adayli": {
+     "iscgem_katkili": 212,
+     "iscgem_tercihli": 20,
+     "iscgem_katkisi_yok": 3
+    }
+   },
+   "usgs_koken_tum": {
+    "iscgem_tercihli": 1936,
+    "iscgem_katkisi_yok": 119307,
+    "iscgem_katkili": 24167
+   },
+   "yalniz_usgs": 121577,
+   "yalniz_usgs_mag_x_tur": {
+    "4,0–5,0 diger": 6217,
+    "4,0–5,0 mb": 94610,
+    "4,0–5,0 ms": 1175,
+    "4,0–5,0 mw*": 133,
+    "5,0–5,5 diger": 81,
+    "5,0–5,5 mb": 17394,
+    "5,0–5,5 ms": 811,
+    "5,0–5,5 mw*": 298,
+    "5,5–6,0 diger": 8,
+    "5,5–6,0 mb": 566,
+    "5,5–6,0 ms": 120,
+    "5,5–6,0 mw*": 33,
+    "≥6,0 mb": 98,
+    "≥6,0 ms": 14,
+    "≥6,0 mw*": 19
+   },
+   "olasi_cift_kayit_iscgem_olayi": 234,
+   "olasi_cift_kayit_ornek": [
+    {
+     "iscgem_eventid": 787038,
+     "usgs": [
+      "ci3347678",
+      "ci3360255",
+      "ci3360254",
+      "ci3360253"
+     ]
+    },
+    {
+     "iscgem_eventid": 785278,
+     "usgs": [
+      "iscgem785278",
+      "iscgem785279"
+     ]
+    },
+    {
+     "iscgem_eventid": 785279,
+     "usgs": [
+      "iscgem785279",
+      "iscgem785278"
+     ]
+    },
+    {
+     "iscgem_eventid": 784349,
+     "usgs": [
+      "iscgem784349",
+      "iscgem784350"
+     ]
+    },
+    {
+     "iscgem_eventid": 784350,
+     "usgs": [
+      "iscgem784350",
+      "iscgem784349"
+     ]
+    }
+   ],
+   "buyukluk_tanisi_tekil_usgs_eksi_mw": {
+    "diger": {
+     "N": 149,
+     "ortanca": -0.14,
+     "q25": -0.39,
+     "q75": 0.06
+    },
+    "mb": {
+     "N": 8581,
+     "ortanca": -0.22,
+     "q25": -0.34,
+     "q75": -0.09
+    },
+    "ms": {
+     "N": 2207,
+     "ortanca": -0.18,
+     "q25": -0.31,
+     "q75": -0.04
+    },
+    "mw*": {
+     "N": 12502,
+     "ortanca": 0.03,
+     "q25": 0.0,
+     "q75": 0.06
+    }
+   },
+   "kimlik_denetimi": {
+    "kimlik_bagi_pencere_eslesmesiyle_ayni": 23665,
+    "kimlik_bagi_yok": 19,
+    "kimlik_bagi_farkli_aday_karsilikli_cok_adayli": 4,
+    "kimlik_bagi_farkli_aday_belirsiz": 2
+   }
+  },
+  "1998–2021": {
+   "iscgem_olay": 36860,
+   "usgs_olay": 310831,
+   "iscgem_sinif": {
+    "tekil": 36539,
+    "karsilikli_cok_adayli": 289,
+    "yalniz_iscgem": 28,
+    "belirsiz": 4
+   },
+   "iscgem_sinif_oran": {
+    "tekil": 0.9913,
+    "karsilikli_cok_adayli": 0.0078,
+    "yalniz_iscgem": 0.0008,
+    "belirsiz": 0.0001
+   },
+   "eslesen_usgs_koken": {
+    "tekil": {
+     "iscgem_katkili": 36326,
+     "iscgem_tercihli": 205,
+     "iscgem_katkisi_yok": 8
+    },
+    "karsilikli_cok_adayli": {
+     "iscgem_katkili": 277,
+     "iscgem_tercihli": 8,
+     "iscgem_katkisi_yok": 4
+    }
+   },
+   "usgs_koken_tum": {
+    "iscgem_katkisi_yok": 273950,
+    "iscgem_katkili": 36668,
+    "iscgem_tercihli": 213
+   },
+   "yalniz_usgs": 273774,
+   "yalniz_usgs_mag_x_tur": {
+    "4,0–5,0 diger": 16593,
+    "4,0–5,0 mb": 238283,
+    "4,0–5,0 ms": 184,
+    "4,0–5,0 mw*": 9368,
+    "5,0–5,5 diger": 88,
+    "5,0–5,5 mb": 8434,
+    "5,0–5,5 ms": 52,
+    "5,0–5,5 mw*": 606,
+    "5,5–6,0 diger": 1,
+    "5,5–6,0 mb": 116,
+    "5,5–6,0 ms": 3,
+    "5,5–6,0 mw*": 16,
+    "<4,0 diger": 1,
+    "≥6,0 mb": 27,
+    "≥6,0 mw*": 2
+   },
+   "olasi_cift_kayit_iscgem_olayi": 282,
+   "olasi_cift_kayit_ornek": [
+    {
+     "iscgem_eventid": 1061854,
+     "usgs": [
+      "usp0008dkb",
+      "usp0008dka"
+     ]
+    },
+    {
+     "iscgem_eventid": 1078787,
+     "usgs": [
+      "usp0008gkg",
+      "usp0008gkf"
+     ]
+    },
+    {
+     "iscgem_eventid": 1167082,
+     "usgs": [
+      "usp0008rpe",
+      "usp0008rpf"
+     ]
+    },
+    {
+     "iscgem_eventid": 1334557,
+     "usgs": [
+      "usp0008zuz",
+      "usp0008zuy"
+     ]
+    },
+    {
+     "iscgem_eventid": 1443289,
+     "usgs": [
+      "usp00091pg",
+      "usp00091pf"
+     ]
+    }
+   ],
+   "buyukluk_tanisi_tekil_usgs_eksi_mw": {
+    "diger": {
+     "N": 65,
+     "ortanca": -0.05,
+     "q25": -0.17,
+     "q75": 0.03
+    },
+    "mb": {
+     "N": 9286,
+     "ortanca": -0.16,
+     "q25": -0.3,
+     "q75": -0.03
+    },
+    "ms": {
+     "N": 52,
+     "ortanca": -0.21,
+     "q25": -0.33,
+     "q75": -0.09
+    },
+    "mw*": {
+     "N": 27136,
+     "ortanca": 0.01,
+     "q25": -0.03,
+     "q75": 0.04
+    }
+   },
+   "kimlik_denetimi": {
+    "kimlik_bagi_pencere_eslesmesiyle_ayni": 36816,
+    "kimlik_bagi_yok": 38,
+    "kimlik_bagi_farkli_aday_belirsiz": 3,
+    "kimlik_bagi_farkli_aday_karsilikli_cok_adayli": 3
+   }
+  }
+ },
+ "sure_s": 8.6
+}
