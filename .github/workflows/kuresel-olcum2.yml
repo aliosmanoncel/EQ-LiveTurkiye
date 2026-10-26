@@ -1,0 +1,48 @@
+name: Küresel katalog Ölçüm 2 (ISC-GEM – USGS, yalnız analiz dalı)
+
+# Yalnız kuresel-katalog-olcum dalında çalışır; canlı siteyi ve main'i etkilemez.
+# Kurallar: analysis/kuresel_katalog/OLCUM_2_ONKAYIT.md. Sonuç bu dala geri yazılır; USGS ham önbelleği yalnız 30 günlük eser (artifact) olarak saklanır.
+on:
+  push:
+    branches: [kuresel-katalog-olcum]
+    paths:
+      - 'analysis/kuresel_katalog/olcum2_usgs.py'
+      - '.github/workflows/kuresel-olcum2.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kuresel-olcum2
+  cancel-in-progress: false
+
+jobs:
+  olcum2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: kuresel-katalog-olcum
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: İç denetim (yapay veri)
+        run: python analysis/kuresel_katalog/olcum2_usgs.py sina
+      - name: USGS ComCat indir (1904–2021, M ≥ 4,0, küresel)
+        run: python analysis/kuresel_katalog/olcum2_usgs.py indir "$RUNNER_TEMP/usgs_1904_2021_m4.json.gz"
+      - name: Eşleştir ve raporla
+        run: python analysis/kuresel_katalog/olcum2_usgs.py esle "$RUNNER_TEMP/usgs_1904_2021_m4.json.gz" analysis/kuresel_katalog/out/olcum2_sonuc.json
+      - name: USGS önbelleğini eser olarak sakla (30 gün)
+        uses: actions/upload-artifact@v4
+        with:
+          name: usgs_1904_2021_m4
+          path: ${{ runner.temp }}/usgs_1904_2021_m4.json.gz
+          retention-days: 30
+      - name: Sonucu dala yaz
+        run: |
+          git config user.name  "eq-bot"
+          git config user.email "eq-bot@users.noreply.github.com"
+          git add analysis/kuresel_katalog/out/olcum2_sonuc.json
+          git commit -m "Ölçüm 2 sonucu (Actions, $(date -u '+%Y-%m-%d %H:%M') UTC, çalıştırma ${GITHUB_RUN_ID})" || echo "değişiklik yok"
+          git pull --rebase -q origin kuresel-katalog-olcum && git push origin HEAD:kuresel-katalog-olcum
