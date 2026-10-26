@@ -1,4 +1,4 @@
-uretim/iscgem_global.json, ISC-GEM Global Instrumental Earthquake Catalogue v12.1 (released 2025-11-26) verisinden türetilmiştir.
+data/iscgem_global.json, ISC-GEM Global Instrumental Earthquake Catalogue v12.1 (released 2025-11-26) verisinden türetilmiştir.
 Lisans: CC BY-SA 3.0 (unported), http://creativecommons.org/licenses/by-sa/3.0/
 Telif: Copyright (C) 2025 International Seismological Centre and GEM Foundation
 Atıf (veri): International Seismological Centre (2025), ISC-GEM Earthquake Catalogue, https://doi.org/10.31905/D808B825 (kullanılan sürüm: v12.1, 2025-11-26; atıf biçimi isc.ac.uk/iscgem/citing.php, erişim 2026-10-21)

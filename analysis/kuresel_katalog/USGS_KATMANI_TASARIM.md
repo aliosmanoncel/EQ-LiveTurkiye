@@ -8,7 +8,7 @@
 - **Sınır:** Katman ana katalogun parçası değildir. Duyarlılık analizi dışında, ana katalogla birleştirilip tek bir homojen katalog gibi kullanılmaz.
 
 ## 2. Dosya ve şema
-- **Dosya:** `uretim/usgs_ek_katman.json`, `iscgem_global.json` ile aynı şema (`eq-live/kuresel-katalog/1`, `katman: "usgs_ek"`).
+- **Dosya:** `data/usgs_ek_katman.json` (üretilirse), `data/iscgem_global.json` ile aynı şema (`eq-live/kuresel-katalog/1`, `katman: "usgs_ek"`).
 - **Ortak alanlar:**
   - `id = "usgs:<ComCat id>"`
   - `M`: USGS `mag` değeri, değiştirilmeden.

@@ -18,7 +18,7 @@ vm.runInContext([fn('bGridRound'), 'var MC_DM = 0.1;', fn('mcSrcMag'), fn('compu
   'globalThis.__x = { bGridRound, computeMcSrc, computeBvalue, bCiFields, get ci() { return B_CI_METHOD; } };'].join('\n'), ctx);
 const X = ctx.__x;
 
-const dosya = path.join(root, 'analysis', 'kuresel_katalog', 'uretim', 'iscgem_global.json');
+const dosya = path.join(root, 'data', 'iscgem_global.json');
 const ham = fs.readFileSync(dosya), G = JSON.parse(ham), A = Object.fromEntries(G.alanlar.map((a, i) => [a, i]));
 const ev = G.olaylar.filter(o => +o[A.t].slice(0, 4) >= 1980 && +o[A.t].slice(0, 4) <= 2021);
 const grup = o => o[A.Mw_yontem] === 'vekil' ? 'V' : (o[A.Mw_yontem] === 'dogrudan' && o[A.Mw_M0_kaynak]) ? 'D' : 'belirsiz';
@@ -31,7 +31,7 @@ function bAt(m, Mc) {
   const b = X.computeBvalue(m, Mc, 0.1), ci = X.bCiFields(b, sub.length, sub.map(x => +(x - Mc).toFixed(10)), 0.1);
   return { Mc: +Mc.toFixed(1), N: sub.length, M_aralik: [Math.min(...sub), Math.max(...sub)], b: r3(b), ci95: [r3(ci.lo), r3(ci.hi)], ci_yontem: ci.ciM };
 }
-const out = { girdi: { dosya: 'analysis/kuresel_katalog/uretim/iscgem_global.json', sha256: crypto.createHash('sha256').update(ham).digest('hex') },
+const out = { girdi: { dosya: 'data/iscgem_global.json', sha256: crypto.createHash('sha256').update(ham).digest('hex') },
   yontem: { donem: '1980–2021', kapsam: 'küresel (ISC-GEM ana katalog)', yuvarlama: 'bGridRound 0,1', Mc: 'maksimum eğrilik + 0,2 (computeMcSrc)', b: 'Aki–Utsu, ΔM = 0,1', aralik: X.ci,
     not: 'T ⊃ D (iç içe); bağımsız örneklem testi uygulanamaz.' }, orneklem: {}, ortak_Mc: {}, b_Mc_egrisi: {}, histogram: {} };
 for (const [k, L] of Object.entries(S)) {

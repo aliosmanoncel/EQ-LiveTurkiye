@@ -1,7 +1,7 @@
 """
 Aşama 2 (2026-10-26): ISC-GEM v12.1 ANA katalogundan küresel katalog dosyasını üretir ve doğrular.
 Girdi: doğrulanmış çıkarım out/iscgem_v12.1_ana.json.gz (iscgem_cikar.py; ham CSV SHA-256'ları meta'da).
-Çıktı: uretim/iscgem_global.json  (yalnız ana katalog; ek katalog ve USGS kayıtları YOK).
+Çıktı: data/iscgem_global.json (2026-10-26'ya dek analysis/kuresel_katalog/uretim/)  (yalnız ana katalog; ek katalog ve USGS kayıtları YOK).
 
 Kurallar (OLCUM_2_RAPOR.md §9 ve kullanıcı kararı 2026-10-26):
   - Değerler kaynaktaki gibi aktarılır; dönüştürme, yuvarlama, tahminle doldurma yapılmaz.
@@ -19,7 +19,7 @@ import gzip, hashlib, json, os, sys, collections
 
 KOK = os.path.dirname(os.path.abspath(__file__))
 GIRDI = os.path.join(KOK, 'out', 'iscgem_v12.1_ana.json.gz')
-CIKTI = os.path.join(KOK, 'uretim', 'iscgem_global.json')
+CIKTI = os.path.join(KOK, '..', '..', 'data', 'iscgem_global.json')   # 2026-10-26: uretim/ → data/ (arayüz hazırlığı)
 SEMA = 'eq-live/kuresel-katalog/1'
 ALANLAR = ['id', 't', 'lat', 'lon', 'dep', 'M', 'M_tur', 'M_unc', 'M_q', 'Mw_yontem', 'Mw_M0_kaynak', 'loc_q', 'dep_unc', 'dep_q']
 YONTEM = {'d': 'dogrudan', 'p': 'vekil'}
@@ -54,7 +54,7 @@ def meta_yap(d, girdi_sha, olaylar):
     return {'sema': SEMA, 'katman': 'iscgem_ana',
             'aciklama': 'ISC-GEM v12.1 ana katalogu, 1904–2021, küresel. Ek katalog (Supplement) ve USGS kayıtları bu dosyada YOK.',
             'kaynak': m['kaynak'], 'surum': m['surum'], 'telif': m['telif'], 'lisans': 'CC BY-SA 3.0 (unported), http://creativecommons.org/licenses/by-sa/3.0/',
-            'atif': m['atif'], 'lisans_dosyasi': 'analysis/kuresel_katalog/uretim/LISANS_ISC-GEM_kuresel.txt',
+            'atif': m['atif'], 'lisans_dosyasi': 'data/LISANS_ISC-GEM_kuresel.txt',
             'degisiklikler': 'Ana katalogdan yalnız konum, derinlik, Mw ve kalite alanları alındı; alan adları değiştirildi; s_mw kodu (d/p) Mw_yontem, mo_auth Mw_M0_kaynak olarak yazıldı. Değer değiştirilmedi.',
             'uretici': 'analysis/kuresel_katalog/iscgem_global_uret.py', 'girdi': {'dosya': 'analysis/kuresel_katalog/out/iscgem_v12.1_ana.json.gz', 'sha256': girdi_sha},
             'ham_girdi_sha256': m['girdi_sha256'], 'eksik_deger': 'null (tahminle doldurulmaz)',
@@ -67,7 +67,7 @@ def uret():
     os.makedirs(os.path.dirname(CIKTI), exist_ok=True)
     b = json.dumps({'meta': meta_yap(d, gs, olaylar), 'alanlar': ALANLAR, 'olaylar': olaylar}, ensure_ascii=False, separators=(',', ':')).encode()
     open(CIKTI, 'wb').write(b)
-    print(json.dumps({'cikti': os.path.relpath(CIKTI, os.path.join(KOK, '..', '..')), 'olay': len(olaylar), 'bayt': len(b), 'bayt_gzip': len(gzip.compress(b, mtime=0)), 'sha256': sha(b)}, ensure_ascii=False))
+    print(json.dumps({'cikti': os.path.relpath(os.path.normpath(CIKTI), os.path.normpath(os.path.join(KOK, '..', '..'))), 'olay': len(olaylar), 'bayt': len(b), 'bayt_gzip': len(gzip.compress(b, mtime=0)), 'sha256': sha(b)}, ensure_ascii=False))
 
 def dogrula():
     d, gs = oku_girdi(); ham = open(CIKTI, 'rb').read(); g = json.loads(ham)
@@ -102,7 +102,7 @@ def dogrula():
     ek = json.loads(gzip.decompress(open(os.path.join(KOK, 'out', 'iscgem_v12.1_ek.json.gz'), 'rb').read()))
     eki = set('iscgem:%d' % e[ek['alanlar'].index('eventid')] for e in ek['olaylar'])
     chk(not (eki & set(o[0] for o in O)), f'ek katalog olayı yok (ek katalog {len(eki)} kimlik, kesişim 0)')
-    chk(g['meta']['lisans'].startswith('CC BY-SA 3.0') and 'D808B825' in g['meta']['atif'] and os.path.exists(os.path.join(KOK, 'uretim', 'LISANS_ISC-GEM_kuresel.txt')), 'lisans, atıf ve lisans dosyası')
+    chk(g['meta']['lisans'].startswith('CC BY-SA 3.0') and 'D808B825' in g['meta']['atif'] and os.path.exists(os.path.join(KOK, '..', '..', 'data', 'LISANS_ISC-GEM_kuresel.txt')), 'lisans, atıf ve lisans dosyası')
     ozet = {'olay': len(O), 'Mw_yontem': dict(collections.Counter(o[J['Mw_yontem']] for o in O)), 'M_q': dict(collections.Counter(o[J['M_q']] for o in O)),
             'Mw_grubu': {'1_dogrudan_M0_kaynakli': sum(v for k, v in mk.items() if k[0] == 'dogrudan' and k[1]), '2_vekil': sum(v for k, v in mk.items() if k[0] == 'vekil'),
                          '3_dogrudan_M0_kaynagi_yok': [o[0] for o in O if o[J['Mw_yontem']] == 'dogrudan' and o[J['Mw_M0_kaynak']] is None]},

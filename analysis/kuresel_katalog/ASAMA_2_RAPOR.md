@@ -3,7 +3,7 @@
 **Kapsam:** Kullanıcı kararıyla (2026-10-26) yalnız doğrulanmış ISC-GEM v12.1 **ana** katalogunu içeren küresel dosya.
 - USGS ek katmanı yalnız tasarlandı (`USGS_KATMANI_TASARIM.md`); veri üretilmedi.
 - `main`, arayüz, canlı site, `data/mw_iscgem.json` ve Türkiye kataloğu değişmedi.
-- Dosya `data/` altına konmadı. Yayıma alınması ayrı bir karardır.
+- Dosya ilk olarak `data/` dışında üretildi. 2026-10-26 arayüz hazırlığında `data/`'ya taşındı (`kabul/RAPOR.md`); yayıma alınması ayrı bir karardır.
 
 ## 1. Kararlar
 
@@ -17,11 +17,11 @@
 | Eksik değer | `null`; tahminle doldurma yok |
 
 ## 2. Dosyalar
-- **`uretim/iscgem_global.json`**
+- **`uretim/iscgem_global.json`** (2026-10-26'dan beri `data/iscgem_global.json`; olaylar aynı, meta'da yalnız lisans yolu değişti, yeni SHA-256 `f35e29fa…c87c`)
   - 74 159 olay; 8,32 MB (gzip ile 1,92 MB).
   - SHA-256 `85aae041ca40d8aaa7b42e76660cd2e0906c41c3880049bd16fc89b537df26c9`.
   - Şema `eq-live/kuresel-katalog/1`, 14 alan: `id, t, lat, lon, dep, M, M_tur, M_unc, M_q, Mw_yontem, Mw_M0_kaynak, loc_q, dep_unc, dep_q`. Alan tanımları dosyanın `meta.alan_tanimlari` bölümünde.
-- **`uretim/LISANS_ISC-GEM_kuresel.txt`:** CC BY-SA 3.0, telif, veri ve makale atıfları, yapılan değişiklikler, kaynak SHA-256'ları.
+- **`uretim/LISANS_ISC-GEM_kuresel.txt`** (şimdi `data/LISANS_ISC-GEM_kuresel.txt`): CC BY-SA 3.0, telif, veri ve makale atıfları, yapılan değişiklikler, kaynak SHA-256'ları.
 - **`iscgem_global_uret.py`:** `uret` ve `dogrula` modları. Girdi, depodaki doğrulanmış çıkarım.
 - **`iscgem_cikar.py` / `out/iscgem_v12.1_ana.json.gz`:** `mo_auth` alanı eklendi. Ham dosyadan (zip SHA-256 aynı) yeniden üretildi. Önceki 12 alan ve meta bilgisi her olayda değişmedi; Ölçüm 2 sonuçları etkilenmez (alanlar adla okunuyor).
 

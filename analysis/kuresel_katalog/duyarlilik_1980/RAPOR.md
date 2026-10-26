@@ -1,7 +1,7 @@
 # Duyarlılık analizi: vekil Mw'nin b-değerine etkisi, ISC-GEM v12.1, 1980–2021 (2026-10-26)
 
 **Amaç:** Önerilen varsayılan küme (tüm ISC-GEM Mw) ile "yalnız doğrudan Mw" kümesinin b-değeri açısından ne ölçüde ayrıştığını görmek. Ayrışmanın Mc farkından mı yoksa örneklem bileşiminden mi geldiği ayrılmaya çalışıldı. Bu analiz evrensel bir doğrulama değildir.
-**Kapsam:** 1980–2021, küresel, `uretim/iscgem_global.json` (SHA-256 `sonuc.json` içinde). Yeni katalog birleştirmesi yok. Arayüz, `main` ve Türkiye kataloğu değişmedi.
+**Kapsam:** 1980–2021, küresel, `uretim/iscgem_global.json` (SHA-256 `sonuc.json` içinde; 2026-10-26'da `data/iscgem_global.json`'a taşındı, olaylar birebir aynı, yalnız meta'daki lisans yolu ve dolayısıyla SHA-256 değişti — sonuçlar etkilenmez). Yeni katalog birleştirmesi yok. Arayüz, `main` ve Türkiye kataloğu değişmedi.
 
 **Yöntem:** EQ-Live'ın varsayılan yolu; fonksiyonlar `index.html`'den değiştirilmeden okundu.
 - Büyüklük 0,1 sınıfına yuvarlandı (`bGridRound`).

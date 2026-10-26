@@ -1,0 +1,90 @@
+{
+ "denetimler": [
+  "GEÇTİ TR pencere .tbtn[data-hist=\"1998\"]: önce/sonra aynı (N = 80929, özet 1ecd930cfa018ee5, Mc 3.2, b 1.021219)",
+  "GEÇTİ TR pencere .tbtn[data-hist=\"1900\"]: önce/sonra aynı (N = 662, özet 9cc423ed57192ac4, Mc 4.7, b 0.525988)",
+  "GEÇTİ TR pencere .tbtn[data-hist=\"1971\"]: önce/sonra aynı (N = 6742, özet e0e851a81f2508b5, Mc 3.7, b 0.717578)",
+  "GEÇTİ TR pencere .tbtn[data-hist-src=\"EPICA\"]: önce/sonra aynı (N = 3553, özet f06edeb6d3fef67a, Mc 5.3, b 0.553395)",
+  "GEÇTİ TR pencere .tbtn[data-hist-src=\"SHARE-CET\"]: önce/sonra aynı (N = 165, özet 8e080f8100ba24ee, Mc 6.4, b 0.788649)",
+  "GEÇTİ TR ISC-GEM katmanı (ISC 1900–1970): önce/sonra aynı (N = 935, özet 01c7b202fc1920ec, b 0.908401)",
+  "GEÇTİ TR çoklu seçim (ISC 1900–1970 + 1971–1997): önce/sonra aynı (N = 7404)",
+  "GEÇTİ Türkiye modunda küresel satır gizli",
+  "GEÇTİ Sayfa açılışında ve Türkiye testlerinde data/iscgem_global.json indirilmedi",
+  "GEÇTİ Global modda küresel satır görünür",
+  "GEÇTİ Varsayılan kapalı (düğme etkin değil, tarihsel mod kapalı)",
+  "GEÇTİ Önceki sürümde küresel satır yok (karşılaştırma tabanı)",
+  "GEÇTİ Küresel pencere: 74159 olay (beklenen 74 159), düğme etkin, tarihsel mod açık",
+  "GEÇTİ Doğrudan/vekil/belirsiz: 51227/22931/1 (beklenen 51 227/22 931/1)",
+  "GEÇTİ Büyüklük türü yalnız 'mw' (dönüşüm uygulanmaz), kaynak 'ISC-GEM'",
+  "GEÇTİ Kapsam 1904-04-04 – 2021-12-31",
+  "GEÇTİ İpucu: doğrudan/vekil oranı, kapsam uyarısı (tam katalog değil), lisans ve atıf",
+  "GEÇTİ Yer etiketi: boş 0, 'Türkiye' 0; en büyük deprem kartı \"38,14°G 73,41°B · ISC-GEM 879136\"; örnek 1960 Şili: \"38,14°G 73,41°B · ISC-GEM 879136\"",
+  "GEÇTİ Durum satırı: \"74159 deprem · Tarihsel katalog (ISC-GEM) · 1904–2021 · katalog sonu: 2021-12-31\"",
+  "GEÇTİ Türkiye moduna dönünce küresel pencere kapandı, olaylar temizlendi",
+  "GEÇTİ Sayfa hatası yok (önce 0, sonra 0)"
+ ],
+ "kuresel": {
+  "n": 74159,
+  "Mc": 5.4,
+  "b": 0.796543,
+  "ipucu": "🌍 ISC-GEM v12.1 küresel (deneysel): 74159 olay · Mw: doğrudan 51227 (%69), vekil 22931 (%31), yöntemi belirsiz 1 — KAPSAM: büyük depremler kataloğu (seçim eşiği ≈ Mw 5,5; erken dönemde daha yüksek; Mw 5,0–5,5 kapsamı 2019 öncesinde bölgeye göre tekdüze değil); tüm büyüklükleri içeren tam bir katalog değildir. Vekil Mw, ISC-GEM'in Ms/mb'den hesapladığı değerdir (Di Giacomo vd. 2015a). ISC-GEM © ISC ve GEM Vakfı, CC BY-SA 3.0, doi:10.31905/D808B825",
+  "durum": "74159 deprem · Tarihsel katalog (ISC-GEM) · 1904–2021 · katalog sonu: 2021-12-31",
+  "d": 51227,
+  "v": 22931,
+  "mt": [
+   "mw"
+  ],
+  "src": [
+   "ISC-GEM"
+  ],
+  "ilk": "1904-04-04T10:02:34.560Z",
+  "yer": {
+   "bos": 0,
+   "turkiye": 0,
+   "ornek": "38,14°G 73,41°B · ISC-GEM 879136",
+   "kart": "38,14°G 73,41°B · ISC-GEM 879136"
+  },
+  "son": "2021-12-31T16:56:12.900Z",
+  "mmin": 4.75
+ },
+ "tr": {
+  ".tbtn[data-hist=\"1998\"]": {
+   "n": 80929,
+   "ozet_sha16": "1ecd930cfa018ee5",
+   "Mc": 3.2,
+   "b": 1.021219
+  },
+  ".tbtn[data-hist=\"1900\"]": {
+   "n": 662,
+   "ozet_sha16": "9cc423ed57192ac4",
+   "Mc": 4.7,
+   "b": 0.525988
+  },
+  ".tbtn[data-hist=\"1971\"]": {
+   "n": 6742,
+   "ozet_sha16": "e0e851a81f2508b5",
+   "Mc": 3.7,
+   "b": 0.717578
+  },
+  ".tbtn[data-hist-src=\"EPICA\"]": {
+   "n": 3553,
+   "ozet_sha16": "f06edeb6d3fef67a",
+   "Mc": 5.3,
+   "b": 0.553395
+  },
+  ".tbtn[data-hist-src=\"SHARE-CET\"]": {
+   "n": 165,
+   "ozet_sha16": "8e080f8100ba24ee",
+   "Mc": 6.4,
+   "b": 0.788649
+  }
+ },
+ "tr_iscgem": {
+  "n": 935,
+  "ozet_sha16": "01c7b202fc1920ec",
+  "b": 0.908401
+ },
+ "ozet": {
+  "pass": 21,
+  "fail": 0
+ }
+}
