@@ -1,0 +1,192 @@
+{
+ "senaryolar": {
+  "A: EMSC 1998 → 1 Ay → ISC 1900": [
+   "h:.tbtn[data-hist=\"1998\"]",
+   "c:720",
+   "h:.tbtn[data-hist=\"1900\"]"
+  ],
+  "B: ISC 1900 → 1 Ay → ISC 1900": [
+   "h:.tbtn[data-hist=\"1900\"]",
+   "c:720",
+   "h:.tbtn[data-hist=\"1900\"]"
+  ],
+  "C: ISC 1900 + 1971 → 1 Ay": [
+   "h:.tbtn[data-hist=\"1900\"]",
+   "h:.tbtn[data-hist=\"1971\"]",
+   "c:720"
+  ],
+  "R1: ISC 1900": [
+   "h:.tbtn[data-hist=\"1900\"]"
+  ],
+  "R2: ISC 1900 + 1971": [
+   "h:.tbtn[data-hist=\"1900\"]",
+   "h:.tbtn[data-hist=\"1971\"]"
+  ],
+  "R3: EMSC 1998 + ISC 1900 − EMSC 1998": [
+   "h:.tbtn[data-hist=\"1998\"]",
+   "h:.tbtn[data-hist=\"1900\"]",
+   "h:.tbtn[data-hist=\"1998\"]"
+  ]
+ },
+ "sonuc": {
+  "once": {
+   "A: EMSC 1998 → 1 Ay → ISC 1900": {
+    "n": 81591,
+    "aktif": [
+     "1900"
+    ],
+    "liste": [
+     "1998||",
+     "1900|1970|"
+    ],
+    "tarihsel": true,
+    "srcs": "EMSC+ISC",
+    "hatalar": 0
+   },
+   "B: ISC 1900 → 1 Ay → ISC 1900": {
+    "n": null,
+    "aktif": [],
+    "liste": [],
+    "tarihsel": false,
+    "srcs": "",
+    "hatalar": 0
+   },
+   "C: ISC 1900 + 1971 → 1 Ay": {
+    "n": null,
+    "aktif": [],
+    "liste": [
+     "1900|1970|",
+     "1971|1997|"
+    ],
+    "tarihsel": false,
+    "srcs": "",
+    "hatalar": 0
+   },
+   "R1: ISC 1900": {
+    "n": 662,
+    "aktif": [
+     "1900"
+    ],
+    "liste": [
+     "1900|1970|"
+    ],
+    "tarihsel": true,
+    "srcs": "ISC",
+    "hatalar": 0
+   },
+   "R2: ISC 1900 + 1971": {
+    "n": 7404,
+    "aktif": [
+     "1900",
+     "1971"
+    ],
+    "liste": [
+     "1900|1970|",
+     "1971|1997|"
+    ],
+    "tarihsel": true,
+    "srcs": "ISC",
+    "hatalar": 0
+   },
+   "R3: EMSC 1998 + ISC 1900 − EMSC 1998": {
+    "n": 662,
+    "aktif": [
+     "1900"
+    ],
+    "liste": [
+     "1900|1970|"
+    ],
+    "tarihsel": true,
+    "srcs": "ISC",
+    "hatalar": 0
+   }
+  },
+  "sonra": {
+   "A: EMSC 1998 → 1 Ay → ISC 1900": {
+    "n": 662,
+    "aktif": [
+     "1900"
+    ],
+    "liste": [
+     "1900|1970|"
+    ],
+    "tarihsel": true,
+    "srcs": "ISC",
+    "hatalar": 0
+   },
+   "B: ISC 1900 → 1 Ay → ISC 1900": {
+    "n": 662,
+    "aktif": [
+     "1900"
+    ],
+    "liste": [
+     "1900|1970|"
+    ],
+    "tarihsel": true,
+    "srcs": "ISC",
+    "hatalar": 0
+   },
+   "C: ISC 1900 + 1971 → 1 Ay": {
+    "n": null,
+    "aktif": [],
+    "liste": [],
+    "tarihsel": false,
+    "srcs": "",
+    "hatalar": 0
+   },
+   "R1: ISC 1900": {
+    "n": 662,
+    "aktif": [
+     "1900"
+    ],
+    "liste": [
+     "1900|1970|"
+    ],
+    "tarihsel": true,
+    "srcs": "ISC",
+    "hatalar": 0
+   },
+   "R2: ISC 1900 + 1971": {
+    "n": 7404,
+    "aktif": [
+     "1900",
+     "1971"
+    ],
+    "liste": [
+     "1900|1970|",
+     "1971|1997|"
+    ],
+    "tarihsel": true,
+    "srcs": "ISC",
+    "hatalar": 0
+   },
+   "R3: EMSC 1998 + ISC 1900 − EMSC 1998": {
+    "n": 662,
+    "aktif": [
+     "1900"
+    ],
+    "liste": [
+     "1900|1970|"
+    ],
+    "tarihsel": true,
+    "srcs": "ISC",
+    "hatalar": 0
+   }
+  }
+ },
+ "denetimler": [
+  "GEÇTİ Hata önce yeniden üretildi (A): görünen düğme [\"1900\"], liste 2 pencere, N 81591, kaynak EMSC+ISC",
+  "GEÇTİ Sonra (A): yalnız ISC 1900 — N 662, düğme [\"1900\"], kaynak ISC",
+  "GEÇTİ Hata önce (B): ikinci basış pencereyi açmadı (tarihsel mod false)",
+  "GEÇTİ Sonra (B): ikinci basış pencereyi açtı (N 662)",
+  "GEÇTİ C: 1 Ay sonrası liste önce 2, sonra 0; tarihsel mod kapalı, vurgulu düğme yok",
+  "GEÇTİ Gerileme R1: ISC 1900: önce = sonra (N 662, düğme [\"1900\"])",
+  "GEÇTİ Gerileme R2: ISC 1900 + 1971: önce = sonra (N 7404, düğme [\"1900\",\"1971\"])",
+  "GEÇTİ Gerileme R3: EMSC 1998 + ISC 1900 − EMSC 1998: önce = sonra (N 662, düğme [\"1900\"])",
+  "GEÇTİ Sayfa hatası yok"
+ ],
+ "ozet": {
+  "pass": 9,
+  "fail": 0
+ }
+}
