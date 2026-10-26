@@ -65,3 +65,13 @@ Bu belge, **sonuçlar görülmeden önce** kaydedilmiştir. Kurallar sonuçlara 
 - **ISC-GEM'in Mw 5,0–5,5 kapsamı küresel olarak düzgün değildir.** Bu büyüklükteki olaylar katalogun sürüm geçmişinde yalnız belirli gruplarda eklenmiştir: kıtasal olaylar; kıyıya 50 km içindeki sığ olaylar; 1976 sonrası GCMT Mw'li olaylar; 2019 ve sonrası tüm küresel olaylar. Bu yüzden `yalniz_usgs` sayılarının bir kısmı ISC-GEM'in seçim ölçütünden kaynaklanır; bir eksiklik değildir.
 - **Toleranslar:** 1940 öncesi ΔT = 200 dk geniştir; bu dönemde `belirsiz` ve `karsilikli_cok_adayli` sayıları yüksek çıkabilir. Bu bir sonuçtur; toleransı değiştirme gerekçesi değildir.
 - **Ortam:** Ölçüm GitHub Actions'ta çalıştırılır. Çalışma oturumunun kendi ortamları USGS'ye erişemiyor.
+
+## Ek 1 (2026-10-26, ilk sonuç görüldükten sonra; kurallar değişmedi, yalnız çıktı eklendi)
+
+İlk çalıştırmada (40348075491) USGS'de ISC-GEM ek kataloğunun da bulunduğu görüldü (`net = iscgemsup`). Ayrıca pencereyle bulunan "olası çift kayıt" sayısı, birbirine yakın gerçek ayrı olayları da içeriyor. Birleştirme kararı için şu çıktılar eklendi; eşleştirme kuralı, toleranslar ve sınıflar **değişmedi**:
+
+- **`yalniz_usgs` ayrıntısı:** Dönem × `net` dağılımı ve köken sınıfı dağılımı. Ayrıca `iscgemsup` kökenli olanların sayısı.
+- **Kimliğe dayalı çift kayıt denetimi:**
+  - (a) `ids` alanında aynı ISC-GEM kimliği (`iscgem<n>` / `iscgemsup<n>`) birden çok USGS kaydında geçiyor mu?
+  - (b) Tek bir USGS kaydının `ids` alanında birden çok farklı ana katalog ISC-GEM kimliği var mı?
+  - (c) ISC-GEM ana katalog olaylarından kimliği hiçbir USGS kaydında geçmeyenler hangileri? Örneklerle.

@@ -131,7 +131,8 @@ def rapor(G, U, aday_g, aday_u, sinif, es):
             if idsx is None: kim['kimlik_bagi_yok'] += 1
             elif es.get(i) == idsx: kim['kimlik_bagi_pencere_eslesmesiyle_ayni'] += 1
             else: kim['kimlik_bagi_farkli_aday_' + sinif[i]] += 1
-        R[ad] = {'iscgem_olay': len(gi_d), 'usgs_olay': len(ui_d), 'iscgem_sinif': dict(s), 'iscgem_sinif_oran': {k: round(v / max(1, len(gi_d)), 4) for k, v in s.items()},
+        yu_net = collections.Counter(U[i][8] for i in yu); yu_koken = collections.Counter(U[i][5] for i in yu)
+        R[ad] = {'yalniz_usgs_net': dict(yu_net.most_common()), 'yalniz_usgs_koken': dict(yu_koken), 'iscgem_olay': len(gi_d), 'usgs_olay': len(ui_d), 'iscgem_sinif': dict(s), 'iscgem_sinif_oran': {k: round(v / max(1, len(gi_d)), 4) for k, v in s.items()},
                  'eslesen_usgs_koken': {k: dict(v) for k, v in sk.items()}, 'usgs_koken_tum': dict(ku),
                  'yalniz_usgs': len(yu), 'yalniz_usgs_mag_x_tur': {f'{a} {b}': v for (a, b), v in sorted(yu_tab.items())},
                  'olasi_cift_kayit_iscgem_olayi': len(cift), 'olasi_cift_kayit_ornek': [{'iscgem_eventid': G[i][4], 'usgs': [U[ui][6] for _, ui in aday_g[i][:4]]} for i in cift[:5]],
@@ -156,10 +157,25 @@ def calistir(yol, cikti):
     for u in U:
         for k in set(re.findall(r'[a-z]+', (u[7] or '').lower())): onek[k] += 1
     tur = collections.Counter(u[9] for u in U)
+    # Ek 1 — kimliğe dayalı çift kayıt denetimi
+    ana = set(g[4] for g in G); kim_u = collections.defaultdict(list); coklu = []
+    for ui, u in enumerate(U):
+        k = set(int(x) for x in re.findall(r'(?:^|,)iscgem(\d+)(?=,|$)', (u[7] or '').lower()))
+        for n in k: kim_u[n].append(u[6])
+        if len(k & ana) > 1: coklu.append({'usgs': u[6], 'iscgem_ana_kimlikleri': sorted(k & ana)})
+    ayni_kimlik_cok_usgs = {n: v for n, v in kim_u.items() if n in ana and len(v) > 1}
+    kimliksiz = [g for g in G if g[4] not in kim_u]
+    sup = [x for x in kim_u if x not in ana]
+    ek1 = {'iscgem_ana_kimligi_birden_cok_usgs_kaydinda': len(ayni_kimlik_cok_usgs), 'ornek_a': dict(list(ayni_kimlik_cok_usgs.items())[:5]),
+           'tek_usgs_kaydinda_birden_cok_ana_kimlik': len(coklu), 'ornek_b': coklu[:5],
+           'kimligi_hicbir_usgs_kaydinda_gecmeyen_ana_olay': len(kimliksiz), 'kimliksiz_donem': dict(collections.Counter(next(a for lo, hi, a in DONEM if lo <= g[5] < hi) for g in kimliksiz)),
+           'ornek_c': [{'eventid': g[4], 't': datetime.fromtimestamp(g[0] / 1000, timezone.utc).isoformat()[:19], 'lat': g[1], 'lon': g[2], 'mw': g[3]} for g in kimliksiz[:8]],
+           'usgs_ids_icinde_ana_disi_iscgem_kimligi': len(sup)}
     out = {'onkayit': 'analysis/kuresel_katalog/OLCUM_2_ONKAYIT.md', 'iscgem_meta': {k: gm[k] for k in ('surum', 'girdi_sha256')}, 'usgs_meta': um,
            'usgs_net_dagilimi': dict(netler.most_common()), 'usgs_ids_katalog_onekleri': dict(onek.most_common(40)), 'usgs_olay_turleri': dict(tur.most_common()),
-           'donemler': R, 'sure_s': round(time.time() - t0, 1)}
+           'ek1_kimlik_cift_denetimi': ek1, 'donemler': R, 'sure_s': round(time.time() - t0, 1)}
     json.dump(out, open(cikti, 'w'), ensure_ascii=False, indent=1)
+    print('Ek 1:', {k: v for k, v in ek1.items() if not k.startswith('ornek')})
     for k, v in R.items(): print(k, 'ISC-GEM', v['iscgem_olay'], v['iscgem_sinif'], '| USGS', v['usgs_olay'], 'yalnız USGS', v['yalniz_usgs'], '| kimlik', v['kimlik_denetimi'])
 
 # ── İç denetim (yapay veri) ─────────────────────────────────────────────────────────────────────────────────
