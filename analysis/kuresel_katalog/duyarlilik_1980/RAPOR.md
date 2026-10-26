@@ -76,8 +76,18 @@ Tam b(Mc) eğrisi (4,8–6,5; V dahil): `sonuc.json`.
 | Mc = 5,5 sabit | +0,055 | +0,052 – +0,059 | 0 / 2 000 | — |
 | Mc = 6,0 sabit | +0,020 | +0,016 – +0,024 | 0 / 2 000 | — |
 
+**Teknik ayrıntı (yeniden üretilebilirlik):**
+- **Yeniden örnekleme birimi:** Tek tek olaylar. Her tekrarda T'nin 53 085 olayından, yerine koyarak 53 085 olay çekildi. Küme, bölge ya da zaman bloğu kullanılmadı. Olaylar arası bağımlılık (artçı şoklar, zamansal kümelenme) bu yüzden modellenmedi; aralık bu varsayım altında geçerli.
+- **D'nin karşılığı:** Çekilen olaylardan doğrudan Mw'li olanlar (`Mw_yontem = dogrudan` ve M0 kaynağı gcmt veya bibliog).
+- **Büyüklükler:** Bir kez 0,1 sınıfına yuvarlandı (`bGridRound`); tekrarlarda yeniden yuvarlama yok.
+- **Mc kuralı ("ayrı kestirim" kipi):** Her tekrarda T ve D için ayrı ayrı `computeMcSrc` ile hesaplandı: 0,1'lik sınıflarda en kalabalık sınıf + 0,2 (maksimum eğrilik + Woessner ve Wiemer 2005 düzeltmesi). Sabit kiplerde Mc = 5,5 veya 6,0.
+- **b:** `computeBvalue`, Aki–Utsu, ΔM = 0,1.
+- **Aralık:** 2,5 ve 97,5 yüzdelikleri (yüzdelik bootstrap).
+- **Rastgele sayı üreteci:** mulberry32, tohum 20261026.
+- **Yeniden üretim:** Depo kökünde `node analysis/kuresel_katalog/duyarlilik_1980/b_vekil_1980.js` (yaklaşık 4 dk). Aynı girdi dosyasıyla `sonuc.json` aynen yeniden üretilir; girdi SHA-256'sı dosyada.
+
 **Yorum:**
-- **Fark örnekleme gürültüsü değil.** İki b-değerinin kendi aralıkları geniş olsa da fark dar bir aralıkta kalıyor; aynı olaylar iki örneklemde ortak.
+- **Fark, bu tasarım ve bu Mc eşikleri altında istatistiksel olarak kararlı.** İki b-değerinin kendi aralıkları geniş olsa da fark dar bir aralıkta kalıyor; aynı olaylar iki örneklemde ortak.
 - **Mc kestirimi kararlı.** D'nin Mc'si tekrarların %97'sinde 5,3. Bu yüzden fark Mc kestirimindeki oynamadan gelmiyor.
 - **Bootstrap neyi ölçmez:** Bu aralık yalnız örnekleme belirsizliğidir. Vekil Mw değerlerinde sistematik bir sapma varsa bu aralığa yansımaz. Seçim yanlılığı ile vekil sapması bu analizle ayrılamaz (§3, madde 4).
 
@@ -94,10 +104,16 @@ Tam b(Mc) eğrisi (4,8–6,5; V dahil): `sonuc.json`.
   - mb: Mw = exp(−4,664 + 0,859 mb) + 4,555
   - Kaynak: s. 41–42.
 - **Döngüsellik uyarısı:** ISC-GEM'in vekil Mw'leri bu bağıntılarla hesaplanmıştır. `iscgem2015` bağıntısının (ya da benzer Ms/mb bağıntılarının) başarımı ISC-GEM'in vekil Mw'sine karşı ölçülürse sonuç kendini doğrular. Bağıntı sınamasında yalnız doğrudan Mw grubu kullanılmalı (bkz. ASAMA_2_RAPOR §4).
-- **Ajans farkı:** Bağıntılar ISC-GEM'in yeniden hesapladığı (IASPEI standardı) Ms/mb için türetilmiştir. USGS, EMSC ya da Türkiye ajanslarının mb/Ms'sine uygulanması bir varsayımdır (`index.html`'deki not ile aynı).
+- **Arayüzde bulunmak doğrulanmış olmak demek değil:** `iscgem2015`, `lolli2014` ve `scordilis2006` gibi bağıntıların EQ-Live'da seçilebilir olması, bunların bağımsız olarak doğrulandığını göstermez.
+- **Ajans farkı:** Bağıntılar ISC-GEM'in yeniden hesapladığı (IASPEI standardı) Ms/mb için türetilmiştir. USGS, EMSC ya da Türkiye ajanslarının mb/Ms'sine uygulanması bir varsayımdır (`index.html`'deki not ile aynı). Bu aktarım varsayımı ayrıca ve bağımsız olarak sınanmalıdır; burada sınanmadı.
 
 ## 8. Karara etkisi
 - **b-değeri:** Önceki öneri (varsayılan b-değerinde tüm ISC-GEM Mw; vekil oranı gösterilerek) değişmez.
   - 1980 sonrasında "yalnız doğrudan Mw" seçeneği b-değerini 0,01–0,06 düşürüyor.
   - Bu fark %95 aralık genişliğiyle aynı büyüklükte ya da ondan büyük. Seçenek kullanılırsa bu etki uyarıda belirtilmeli.
 - **Bağıntı sınaması:** Dönüşüm bağıntılarının sınanmasında referans küme yine yalnız doğrudan Mw. Bu analiz o kullanımı etkilemez.
+
+## 9. Durum
+**Duyarlılık analizi tamamlandı ve kapatıldı (2026-10-26).**
+- Yeni hesaplama ya da arayüz değişikliği önerilmiyor.
+- `main`, canlı site, `data/mw_iscgem.json` ve Türkiye kataloğu değişmedi.
