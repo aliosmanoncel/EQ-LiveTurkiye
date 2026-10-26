@@ -21,7 +21,7 @@ KOK = os.path.dirname(os.path.abspath(__file__))
 GIRDI = os.path.join(KOK, 'out', 'iscgem_v12.1_ana.json.gz')
 CIKTI = os.path.join(KOK, 'uretim', 'iscgem_global.json')
 SEMA = 'eq-live/kuresel-katalog/1'
-ALANLAR = ['id', 't', 'lat', 'lon', 'dep', 'M', 'M_tur', 'M_unc', 'M_q', 'Mw_yontem', 'loc_q', 'dep_unc', 'dep_q']
+ALANLAR = ['id', 't', 'lat', 'lon', 'dep', 'M', 'M_tur', 'M_unc', 'M_q', 'Mw_yontem', 'Mw_M0_kaynak', 'loc_q', 'dep_unc', 'dep_q']
 YONTEM = {'d': 'dogrudan', 'p': 'vekil'}
 TANIM = {
     'id': "Katman önekli olay kimliği: 'iscgem:<ISC-GEM eventid>'",
@@ -33,6 +33,7 @@ TANIM = {
     'M_unc': 'Büyüklük belirsizliği (kaynaktaki unc_mw)',
     'M_q': 'Büyüklük kalite sınıfı A/B/C (kaynaktaki q_mw)',
     'Mw_yontem': "Mw'nin elde edilişi: 'dogrudan' = sismik momentten (s_mw = d); 'vekil' = ISC-GEM'in Ms/mb'den ampirik bağıntıyla hesapladığı Mw (s_mw = p). Mw olmayan türlerde null.",
+    'Mw_M0_kaynak': "Doğrudan Mw'de sismik momentin (M0) kaynağı: 'gcmt' (GCMT projesi) veya 'bibliog' (literatür; kaynakçası isc.ac.uk/iscgem/mw_bibliography.php). Kaynaktaki mo_auth; yoksa null. Vekil Mw'de her zaman null.",
     'loc_q': 'Konum kalite sınıfı A/B/C (kaynaktaki q_loc)', 'dep_q': 'Derinlik kalite sınıfı A/B/C (kaynaktaki q_dep)'}
 
 def sha(b): return hashlib.sha256(b).hexdigest()
@@ -44,7 +45,7 @@ def donustur(d):
     olaylar = []
     for e in d['olaylar']:
         olaylar.append(['iscgem:%d' % e[I['eventid']], e[I['t']], e[I['lat']], e[I['lon']], e[I['dep']], e[I['mw']], 'Mw',
-                        e[I['mw_unc']], e[I['mw_q']], YONTEM.get(e[I['mw_s']]) if e[I['mw_s']] is not None else None,
+                        e[I['mw_unc']], e[I['mw_q']], YONTEM.get(e[I['mw_s']]) if e[I['mw_s']] is not None else None, e[I['mo_auth']],
                         e[I['loc_q']], e[I['dep_unc']], e[I['dep_q']]])
     return olaylar
 
@@ -54,7 +55,7 @@ def meta_yap(d, girdi_sha, olaylar):
             'aciklama': 'ISC-GEM v12.1 ana katalogu, 1904–2021, küresel. Ek katalog (Supplement) ve USGS kayıtları bu dosyada YOK.',
             'kaynak': m['kaynak'], 'surum': m['surum'], 'telif': m['telif'], 'lisans': 'CC BY-SA 3.0 (unported), http://creativecommons.org/licenses/by-sa/3.0/',
             'atif': m['atif'], 'lisans_dosyasi': 'analysis/kuresel_katalog/uretim/LISANS_ISC-GEM_kuresel.txt',
-            'degisiklikler': 'Ana katalogdan yalnız konum, derinlik, Mw ve kalite alanları alındı; alan adları değiştirildi; s_mw kodu (d/p) Mw_yontem olarak yazıldı. Değer değiştirilmedi.',
+            'degisiklikler': 'Ana katalogdan yalnız konum, derinlik, Mw ve kalite alanları alındı; alan adları değiştirildi; s_mw kodu (d/p) Mw_yontem, mo_auth Mw_M0_kaynak olarak yazıldı. Değer değiştirilmedi.',
             'uretici': 'analysis/kuresel_katalog/iscgem_global_uret.py', 'girdi': {'dosya': 'analysis/kuresel_katalog/out/iscgem_v12.1_ana.json.gz', 'sha256': girdi_sha},
             'ham_girdi_sha256': m['girdi_sha256'], 'eksik_deger': 'null (tahminle doldurulmaz)',
             'olay_sayisi': len(olaylar), 'ilk': olaylar[0][1], 'son': olaylar[-1][1],
@@ -82,15 +83,18 @@ def dogrula():
     chk(all(len(o) == len(ALANLAR) for o in O), 'her olayda tüm alanlar')
     es = {'id': lambda e: 'iscgem:%d' % e[I['eventid']], 't': lambda e: e[I['t']], 'lat': lambda e: e[I['lat']], 'lon': lambda e: e[I['lon']],
           'dep': lambda e: e[I['dep']], 'M': lambda e: e[I['mw']], 'M_unc': lambda e: e[I['mw_unc']], 'M_q': lambda e: e[I['mw_q']],
-          'loc_q': lambda e: e[I['loc_q']], 'dep_unc': lambda e: e[I['dep_unc']], 'dep_q': lambda e: e[I['dep_q']]}
+          'Mw_M0_kaynak': lambda e: e[I['mo_auth']], 'loc_q': lambda e: e[I['loc_q']], 'dep_unc': lambda e: e[I['dep_unc']], 'dep_q': lambda e: e[I['dep_q']]}
     for a, f in es.items():
         fark = sum(1 for e, o in zip(E, O) if f(e) != o[J[a]] or type(f(e)) is not type(o[J[a]]))
         chk(fark == 0, f'{a}: çıkarımla birebir aynı (fark {fark})')
     chk(all(o[J['M_tur']] == 'Mw' for o in O), "M_tur her olayda 'Mw'")
     yk = collections.Counter((e[I['mw_s']], o[J['Mw_yontem']]) for e, o in zip(E, O))
     chk(set(yk) <= {('d', 'dogrudan'), ('p', 'vekil')}, f'Mw_yontem eşlemesi d→dogrudan, p→vekil: {dict((f"{k[0]}→{k[1]}", v) for k, v in yk.items())}')
+    mk = collections.Counter((o[J['Mw_yontem']], o[J['Mw_M0_kaynak']]) for o in O)
+    chk(all(k[1] is None for k in mk if k[0] == 'vekil') and set(k[1] for k in mk if k[0] == 'dogrudan') <= {'gcmt', 'bibliog', None},
+        f"Mw_M0_kaynak tutarlı (vekilde hep null): {dict((f'{k[0]}/{k[1]}', v) for k, v in sorted(mk.items(), key=str))}")
     nul = {a: sum(1 for o in O if o[J[a]] is None) for a in ALANLAR}
-    nul0 = {a: sum(1 for e in E if e[I[a]] is None) for a in ['t', 'lat', 'lon', 'dep', 'dep_unc', 'mw', 'mw_unc', 'mw_q', 'mw_s', 'loc_q', 'dep_q']}
+    nul0 = {a: sum(1 for e in E if e[I[a]] is None) for a in ['t', 'lat', 'lon', 'dep', 'dep_unc', 'mw', 'mw_unc', 'mw_q', 'mw_s', 'loc_q', 'dep_q', 'mo_auth']}
     chk(sum(nul.values()) == sum(nul0.values()), f'null sayısı çıkarımla aynı ({sum(nul.values())}); tahminle doldurulan yok')
     chk(len(set(o[0] for o in O)) == len(O), 'kimlikler tekil')
     chk(all(O[i][1] <= O[i + 1][1] for i in range(len(O) - 1)), 'zamana göre sıralı')
@@ -100,6 +104,8 @@ def dogrula():
     chk(not (eki & set(o[0] for o in O)), f'ek katalog olayı yok (ek katalog {len(eki)} kimlik, kesişim 0)')
     chk(g['meta']['lisans'].startswith('CC BY-SA 3.0') and 'D808B825' in g['meta']['atif'] and os.path.exists(os.path.join(KOK, 'uretim', 'LISANS_ISC-GEM_kuresel.txt')), 'lisans, atıf ve lisans dosyası')
     ozet = {'olay': len(O), 'Mw_yontem': dict(collections.Counter(o[J['Mw_yontem']] for o in O)), 'M_q': dict(collections.Counter(o[J['M_q']] for o in O)),
+            'Mw_grubu': {'1_dogrudan_M0_kaynakli': sum(v for k, v in mk.items() if k[0] == 'dogrudan' and k[1]), '2_vekil': sum(v for k, v in mk.items() if k[0] == 'vekil'),
+                         '3_dogrudan_M0_kaynagi_yok': [o[0] for o in O if o[J['Mw_yontem']] == 'dogrudan' and o[J['Mw_M0_kaynak']] is None]},
             'vekil_orani_doneme_gore': {}, 'sha256': sha(ham), 'bayt': len(ham), 'bayt_gzip': len(gzip.compress(ham, mtime=0))}
     for a, b in [(1904, 1964), (1964, 1980), (1980, 2022)]:
         x = [o for o in O if a <= int(o[1][:4]) < b]; ozet['vekil_orani_doneme_gore'][f'{a}–{b - 1}'] = {'N': len(x), 'vekil': sum(o[J['Mw_yontem']] == 'vekil' for o in x)}

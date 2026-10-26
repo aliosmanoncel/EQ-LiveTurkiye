@@ -13,7 +13,9 @@ Kullanım:
 Şema: {"meta": {...}, "alanlar": [...], "olaylar": [[...], ...]}; her olay alanlar sırasıyla bir dizi.
 Eksik değer: null (CSV'de boş). Değerler tahminle DOLDURULMAZ.
 Alanlar: t (ISO-8601 UTC), lat, lon, dep (km), dep_unc, mw, mw_unc, mw_q (A/B/C), mw_s (d = doğrudan M0, p = vekil),
-         loc_q (A/B/C), dep_q, eventid (ISC-GEM olay kimliği, tam sayı).
+         loc_q (A/B/C), dep_q, eventid (ISC-GEM olay kimliği, tam sayı),
+         mo_auth (doğrudan M0'ın kaynağı: gcmt | bibliog; yoksa null — 2026-10-26 eklendi, CSV başlığı: 'mo author').
+CSV başlığındaki tanım: 'Mw, Mw uncertainty (unc), quality (q:A(highest)/B/C), source(s:p-proxy, d-direct computation)'.
 """
 import csv, gzip, hashlib, json, math, sys, collections, os
 
@@ -23,7 +25,7 @@ BEKLENEN = {   # 2026-10-21 kaydı (analysis/homog_faz1/out/LISANS_ISC-GEM.txt, 
     'isc-gem-suppl.csv': '1ea390ab6fc319746e7799bf08ea543d2e747dea64f5ba937ac61b481b0f21bf'}
 SUTUN = ['date', 'lat', 'lon', 'smajax', 'sminax', 'strike', 'q_loc', 'depth', 'unc_dep', 'q_dep', 'mw', 'unc_mw', 'q_mw', 's_mw', 'mo', 'fac',
          'mo_auth', 'mpp', 'mpr', 'mrr', 'mrt', 'mtp', 'mtt', 'str1', 'dip1', 'rake1', 'str2', 'dip2', 'rake2', 'type', 'eventid']
-ALANLAR = ['t', 'lat', 'lon', 'dep', 'dep_unc', 'mw', 'mw_unc', 'mw_q', 'mw_s', 'loc_q', 'dep_q', 'eventid']
+ALANLAR = ['t', 'lat', 'lon', 'dep', 'dep_unc', 'mw', 'mw_unc', 'mw_q', 'mw_s', 'loc_q', 'dep_q', 'eventid', 'mo_auth']
 ZORUNLU = ['t', 'lat', 'lon', 'mw', 'eventid']
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out')
 
@@ -44,7 +46,7 @@ def oku(p):
         d = dict(zip(SUTUN, r))
         t = d['date'].replace(' ', 'T') + 'Z' if d['date'] else None
         olaylar.append([t, num(d['lat']), num(d['lon']), num(d['depth']), num(d['unc_dep']), num(d['mw']), num(d['unc_mw']),
-                        d['q_mw'] or None, d['s_mw'] or None, d['q_loc'] or None, d['q_dep'] or None, int(d['eventid']) if d['eventid'] else None])
+                        d['q_mw'] or None, d['s_mw'] or None, d['q_loc'] or None, d['q_dep'] or None, int(d['eventid']) if d['eventid'] else None, d['mo_auth'] or None])
     return surum, olaylar, hatalar
 
 def dogrula(ad, olaylar):

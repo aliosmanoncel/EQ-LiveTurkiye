@@ -33,7 +33,8 @@
    "mw_s": 0,
    "loc_q": 0,
    "dep_q": 0,
-   "eventid": 0
+   "eventid": 0,
+   "mo_auth": 22932
   },
   "zorunlu_alan_eksik": {
    "t": 0,
@@ -157,7 +158,8 @@
    "mw_s": 6046,
    "loc_q": 0,
    "dep_q": 0,
-   "eventid": 0
+   "eventid": 0,
+   "mo_auth": 9832
   },
   "zorunlu_alan_eksik": {
    "t": 0,
@@ -268,15 +270,15 @@
  "cikti": [
   {
    "dosya": "iscgem_v12.1_ana.json.gz",
-   "bayt_gz": 1837236,
-   "bayt_json": 6349314,
-   "sha256_gz": "b7e2297d7aab8b8ef1d8f02cc3db21c7767d9af554f1dd0608749b991bd4a24d"
+   "bayt_gz": 1857522,
+   "bayt_json": 6827112,
+   "sha256_gz": "89c1a3700566ef8013b6f9baba96bfc5a576aadd2adefe7b7cf7d442517ae49c"
   },
   {
    "dosya": "iscgem_v12.1_ek.json.gz",
-   "bayt_gz": 234351,
-   "bayt_json": 844884,
-   "sha256_gz": "a084af5626c2f36dd63b78fabbb8677df352d936590b46d7859d15f7514790be"
+   "bayt_gz": 235982,
+   "bayt_json": 894074,
+   "sha256_gz": "31cb62892edad43646b432e718cde2c63bb3d45136c07f3becf24a1d23b31536"
   }
  ]
 }
