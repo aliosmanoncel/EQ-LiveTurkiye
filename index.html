@@ -9754,6 +9754,7 @@ function exportRegionCSV() {
 document.querySelectorAll('.tbtn[data-h]').forEach(b=>b.addEventListener('click',function(){
   document.querySelectorAll('.tbtn[data-h]').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.tbtn[data-hist]').forEach(x=>x.classList.remove('active'));
+  activeHistWindows = []; // 2026-10-26: vurgusu kalkan tarihsel pencereler seçim listesinde kalmasın (aksi hâlde sonraki tarihsel seçime görünmeden eklenirdi)
   this.classList.add('active');
   historicalMode = false; // Tarihsel Katalog modundan çıkılıyor
   updateRegionCtrlForMode();
