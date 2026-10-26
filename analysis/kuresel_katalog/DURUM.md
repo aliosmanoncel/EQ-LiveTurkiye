@@ -21,7 +21,13 @@ Dal: `kuresel-katalog-olcum`. `main`, canlı site, arayüz, `data/mw_iscgem.json
 
 **Açık konular** (yeni bir karar gerektirir; şu an iş yok):
 - Arayüz hazırlığının `main`'e birleştirilmesi ve canlıya alınması (karar bekliyor).
-- Tarihsel pencere seçimi hatası ayrı dalda düzeltildi (`tarihsel-pencere-secimi`, `analysis/tarihsel_pencere/RAPOR.md`); bu dala birleştirildi; `main`'e birleştirme karar bekliyor.
+- Tarihsel pencere seçimi hatası: ayrı dalda düzeltildi (`tarihsel-pencere-secimi`, `analysis/tarihsel_pencere/RAPOR.md`) ve kullanıcı onayıyla **`main`'e birleştirildi** (2026-10-26, 0d893be). Birleştirme sonrası denetimler:
+  - kabul testi 9/9;
+  - `main` iş akışları geçti;
+  - `pages-build-deployment` başarılı.
+
+  **Canlı sitede tarayıcı kontrolü yapılamadı:** Chrome uzantısı bağlı değildi ve github.io bu ortamın ağ izin listesinde yok. Bu kontrol açık.
+- Küresel ISC-GEM penceresi (bu dal): bilimsel doğrulama (Di Giacomo vd. 2015a tam metni) tamamlanana kadar **bekletiliyor**; `main`'e birleştirilmedi.
 - Di Giacomo vd. (2015a) tam metniyle `iscgem2015` bağıntısının katsayı ve geçerlilik aralığı doğrulaması (bilimsel, arayüzden bağımsız).
 - USGS ek katmanının üretimi (önce lisans doğrulaması).
 - Bağıntıların ISC-GEM dışı ajans büyüklüklerine aktarımının bağımsız sınanması.
