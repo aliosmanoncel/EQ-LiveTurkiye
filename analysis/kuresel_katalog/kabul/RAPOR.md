@@ -57,9 +57,21 @@
 
 ## 3. Bilinen sınırlar ve mevcut sorunlar (bu değişiklikle gelmedi; düzeltilmedi)
 - **Global moddaki analizler:** Global modda tehlike/risk/b-değeri **haritaları** yoktur (mevcut not). Zaman–büyüklük grafiği, Mc ve b özetleri yüklü olaylar üzerinden çalışır. Varsayılan b-değeri kümesi tüm ISC-GEM Mw'dir (yöntem kararı, `duyarlilik_1980/RAPOR.md`). "Yalnız doğrudan Mw" seçeneği bu hazırlıkta **eklenmedi**.
-- **Mevcut hata:** Canlı zaman düğmesine (ör. "1 Ay") basılınca tarihsel düğmelerin vurgusu kalkıyor, ama `activeHistWindows` listesi temizlenmiyor. Sonra bir tarihsel pencere seçilirse, vurgusu kalkmış eski pencereler de birleşime giriyor. Türkiye pencerelerinde de aynı. Ayrı bir düzeltme olarak önerilir.
+- **Mevcut hata — ayrı olarak düzeltildi (2026-10-26):** Canlı zaman düğmesine (ör. "1 Ay") basılınca tarihsel düğmelerin vurgusu kalkıyor, ama `activeHistWindows` listesi temizlenmiyordu. Sonra bir tarihsel pencere seçilirse, vurgusu kalkmış eski pencereler de birleşime giriyordu.
+  - Düzeltme, `main`'den açılan ayrı `tarihsel-pencere-secimi` dalında yapıldı; ayrıntı `analysis/tarihsel_pencere/RAPOR.md`.
+  - Bu dala birleştirildi (8284067). Böylece `main`'den yeni veri güncellemeleri de bu dala geldi.
 - **USGS ek katmanı:** Bu hazırlıkta yok (`USGS_KATMANI_TASARIM.md`).
 
-## 4. Birleştirme ve yayın öncesi karar gerekenler
-- Bu hâliyle `main`'e birleştirilsin mi? Birleştirme GitHub Pages ile canlıya çıkar ve `data/iscgem_global.json` (8,3 MB) depoya ve sitenin dosyalarına girer.
-- Yukarıdaki mevcut hata, birleştirmeden önce mi sonra mı düzeltilsin?
+## 4. Birleşik yeniden test (düzeltme + küresel pencere, 8284067; karşılaştırma tabanı güncel `main`)
+- **Küresel kabul testi:** 21/21 geçti. Türkiye pencereleri ve TR ISC-GEM katmanı güncel `main` ile birebir aynı.
+- **Pencere seçimi kabul testi:** 9/9 geçti. Hata `main`'de yeniden üretildi, birleşik dalda giderildi; gerileme senaryoları aynı.
+- **Birim testleri:** 13 dosya geçti. `test_fit_range.js` öncekiyle aynı nedenle çalışmıyor; bu değişikliklerle ilgisi yok.
+- **GitHub iş akışları:** Her iki dalda geçti: b güven aralığı, ISC-GEM katmanı, GK74.
+- **Kapsam sınırı:** Geçen testler belirtilen davranışları doğrular. İncelenmemiş her olası durumun (ör. canlı veri akışı, harita karoları, mobil yerleşim) sorunsuz olduğunu kanıtlamaz.
+
+## 5. Birleştirme ve yayın öncesi karar gerekenler
+- **İki ayrı değişiklik:**
+  - (a) `tarihsel-pencere-secimi`: tek satırlık hata düzeltmesi; `main`'e bağımsız olarak birleştirilebilir.
+  - (b) `kuresel-katalog-olcum`: küresel ISC-GEM penceresi; (a)'yı içerir.
+- **Birleştirmenin sonucu:** Birleştirme GitHub Pages ile canlıya çıkar. (b) için `data/iscgem_global.json` (8,3 MB) sitenin dosyalarına girer.
+- **Bilimsel doğrulama ayrıca sürüyor:** Di Giacomo vd. (2015a) tam metniyle vekil Mw bağıntılarının katsayı ve geçerlilik aralıklarının doğrulanması. Bu doğrulama (b)'nin arayüz davranışını etkilemez; `iscgem2015` dönüşüm seçeneğini ilgilendirir.
