@@ -18,7 +18,7 @@ YIL0, YIL1, MINMAG = 1904, 2021, 4.0
 # (yıl alt, yıl üst hariç, ΔT dakika, ΔR km) — OLCUM_2_ONKAYIT.md
 PENCERE = [(1904, 1940, 200, 250), (1940, 1963, 10, 200), (1963, 1990, 2, 150), (1990, 2022, 0.5, 100)]
 DONEM = [(1904, 1971, '1904–1970'), (1971, 1998, '1971–1997'), (1998, 2022, '1998–2021')]
-MAGBIN = [(4.0, 5.0, '4,0–5,0'), (5.0, 5.5, '5,0–5,5'), (5.5, 6.0, '5,5–6,0'), (6.0, 99, '≥6,0')]
+MAGBIN = [(-99, 4.0, '<4,0'), (4.0, 5.0, '4,0–5,0'), (5.0, 5.5, '5,0–5,5'), (5.5, 6.0, '5,5–6,0'), (6.0, 99, '≥6,0')]
 
 def ms(iso): return datetime.fromisoformat(iso.replace('Z', '+00:00')).timestamp() * 1000
 def donem(y): return next(a for lo, hi, a in DONEM if lo <= y < hi)
@@ -196,6 +196,9 @@ def sina():
 if __name__ == '__main__':
     k = sys.argv[1] if len(sys.argv) > 1 else ''
     if k == 'indir': indir(sys.argv[2])
-    elif k == 'esle': calistir(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else os.path.join(DIZIN, 'out', 'olcum2_sonuc.json'))
+    elif k == 'esle':
+        try: calistir(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else os.path.join(DIZIN, 'out', 'olcum2_sonuc.json'))
+        except Exception:   # Actions günlükleri okunamayabilir: hata izi dala yazılsın
+            import traceback; open(os.path.join(DIZIN, 'out', 'olcum2_hata.txt'), 'w').write(traceback.format_exc()); raise
     elif k == 'sina': sina()
     else: sys.exit(__doc__)

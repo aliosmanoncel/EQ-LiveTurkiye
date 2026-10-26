@@ -34,15 +34,18 @@ jobs:
       - name: Eşleştir ve raporla
         run: python analysis/kuresel_katalog/olcum2_usgs.py esle "$RUNNER_TEMP/usgs_1904_2021_m4.json.gz" analysis/kuresel_katalog/out/olcum2_sonuc.json
       - name: USGS önbelleğini eser olarak sakla (30 gün)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: usgs_1904_2021_m4
           path: ${{ runner.temp }}/usgs_1904_2021_m4.json.gz
           retention-days: 30
-      - name: Sonucu dala yaz
+      - name: Sonucu (ya da hata izini) dala yaz
+        if: always()
         run: |
           git config user.name  "eq-bot"
           git config user.email "eq-bot@users.noreply.github.com"
-          git add analysis/kuresel_katalog/out/olcum2_sonuc.json
+          git add analysis/kuresel_katalog/out/olcum2_sonuc.json analysis/kuresel_katalog/out/olcum2_hata.txt 2>/dev/null || true
+          git add -A analysis/kuresel_katalog/out/
           git commit -m "Ölçüm 2 sonucu (Actions, $(date -u '+%Y-%m-%d %H:%M') UTC, çalıştırma ${GITHUB_RUN_ID})" || echo "değişiklik yok"
           git pull --rebase -q origin kuresel-katalog-olcum && git push origin HEAD:kuresel-katalog-olcum
