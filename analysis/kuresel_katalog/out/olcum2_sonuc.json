@@ -14,8 +14,8 @@
    1904,
    2021
   ],
-  "sorgu_baslangic_utc": "2026-10-26T15:18:56.244655+00:00",
-  "sorgu_bitis_utc": "2026-10-26T15:25:34.844576+00:00",
+  "sorgu_baslangic_utc": "2026-10-26T15:27:25.646717+00:00",
+  "sorgu_bitis_utc": "2026-10-26T15:34:14.378730+00:00",
   "parca_sayisi": 118,
   "count_eksik_indirilen": [],
   "ham_olay": 474109,
@@ -123,8 +123,119 @@
   "landslide": 1,
   "collapse": 1
  },
+ "ek1_kimlik_cift_denetimi": {
+  "iscgem_ana_kimligi_birden_cok_usgs_kaydinda": 0,
+  "ornek_a": {},
+  "tek_usgs_kaydinda_birden_cok_ana_kimlik": 2,
+  "ornek_b": [
+   {
+    "usgs": "ak009697xs3z",
+    "iscgem_ana_kimlikleri": [
+     13679072,
+     17593429
+    ]
+   },
+   {
+    "usgs": "usp000jwjn",
+    "iscgem_ana_kimlikleri": [
+     602005586,
+     607215270
+    ]
+   }
+  ],
+  "kimligi_hicbir_usgs_kaydinda_gecmeyen_ana_olay": 26,
+  "kimliksiz_donem": {
+   "1904–1970": 2,
+   "1971–1997": 8,
+   "1998–2021": 16
+  },
+  "ornek_c": [
+   {
+    "eventid": 906166,
+    "t": "1932-05-26T16:09:50",
+    "lat": -25.181,
+    "lon": 178.889,
+    "mw": 7.6
+   },
+   {
+    "eventid": 876749,
+    "t": "1961-06-11T12:31:27",
+    "lat": 27.877,
+    "lon": 54.548,
+    "mw": 5.73
+   },
+   {
+    "eventid": 705809,
+    "t": "1976-11-11T10:54:12",
+    "lat": 0.229,
+    "lon": 126.155,
+    "mw": 5.53
+   },
+   {
+    "eventid": 701557,
+    "t": "1977-03-23T13:45:09",
+    "lat": 27.479,
+    "lon": 56.268,
+    "mw": 5.13
+   },
+   {
+    "eventid": 669030,
+    "t": "1979-03-29T07:07:18",
+    "lat": 32.468,
+    "lon": 97.176,
+    "mw": 5.77
+   },
+   {
+    "eventid": 636379,
+    "t": "1980-11-30T07:42:22",
+    "lat": 40.836,
+    "lon": 15.401,
+    "mw": 5.19
+   },
+   {
+    "eventid": 575517,
+    "t": "1983-05-04T07:28:39",
+    "lat": 36.255,
+    "lon": -120.351,
+    "mw": 5.12
+   },
+   {
+    "eventid": 540011,
+    "t": "1984-11-26T16:21:50",
+    "lat": 37.34,
+    "lon": -118.714,
+    "mw": 5.13
+   }
+  ],
+  "usgs_ids_icinde_ana_disi_iscgem_kimligi": 911
+ },
  "donemler": {
   "1904–1970": {
+   "yalniz_usgs_net": {
+    "ci": 1549,
+    "iscgemsup": 1483,
+    "ushis": 845,
+    "hv": 135,
+    "official": 63,
+    "cdmg": 14,
+    "eqh": 9,
+    "uw": 9,
+    "uu": 9,
+    "nc": 6,
+    "snm": 5,
+    "se": 5,
+    "flag": 3,
+    "ott": 3,
+    "wes": 2,
+    "nn": 1,
+    "mb": 1,
+    "usgs": 1
+   },
+   "yalniz_usgs_koken": {
+    "iscgem_tercihli": 1483,
+    "iscgem_katkisi_yok": 2613,
+    "iscgem_katkili": 47
+   },
    "iscgem_olay": 13609,
    "usgs_olay": 17868,
    "iscgem_sinif": {
@@ -235,6 +346,25 @@
    }
   },
   "1971–1997": {
+   "yalniz_usgs_net": {
+    "us": 118231,
+    "nc": 865,
+    "ci": 718,
+    "ak": 628,
+    "hv": 411,
+    "uw": 374,
+    "iscgemsup": 277,
+    "uu": 24,
+    "ushis": 21,
+    "nm": 14,
+    "se": 9,
+    "gcmt": 5
+   },
+   "yalniz_usgs_koken": {
+    "iscgem_katkisi_yok": 119159,
+    "iscgem_tercihli": 277,
+    "iscgem_katkili": 2141
+   },
    "iscgem_olay": 23690,
    "usgs_olay": 145410,
    "iscgem_sinif": {
@@ -358,6 +488,32 @@
    }
   },
   "1998–2021": {
+   "yalniz_usgs_net": {
+    "us": 269876,
+    "ak": 2014,
+    "ci": 634,
+    "nc": 364,
+    "pr": 278,
+    "hv": 191,
+    "nn": 172,
+    "gcmt": 114,
+    "uu": 37,
+    "uw": 37,
+    "tx": 15,
+    "nm": 13,
+    "se": 8,
+    "rusms": 5,
+    "aacse": 4,
+    "ok": 4,
+    "ld": 3,
+    "mb": 3,
+    "av": 1,
+    "ew": 1
+   },
+   "yalniz_usgs_koken": {
+    "iscgem_katkisi_yok": 273720,
+    "iscgem_katkili": 54
+   },
    "iscgem_olay": 36860,
    "usgs_olay": 310831,
    "iscgem_sinif": {
@@ -479,5 +635,5 @@
    }
   }
  },
- "sure_s": 8.6
+ "sure_s": 5.6
 }
