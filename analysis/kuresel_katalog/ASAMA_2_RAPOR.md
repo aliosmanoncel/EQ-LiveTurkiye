@@ -67,5 +67,34 @@
 
 Dolayısıyla 1980 öncesinin Mw değerleri büyük ölçüde vekildir. EQ-Live'daki yerel ve küresel bağıntı karşılaştırmalarında ISC-GEM'i bağımsız bir doğrudan Mw referansı olarak kullanmak yalnız grup 1 için geçerlidir. Grup 2 kullanılırsa, karşılaştırılan bağıntı ISC-GEM'in kendi Ms/mb → Mw bağıntısıyla karşılaştırılmış olur.
 
-## 5. Açık karar
-Varsayılan analizlerde (ör. b-değeri) ISC-GEM vekil Mw'si kabul edilsin mi, yoksa yalnız bir seçenek olarak mı kalsın? Dosya iki kullanıma da izin veriyor; bu aşamada hiçbir analiz değiştirilmedi.
+## 5. Vekil Mw ve b-değeri: önerinin sınanması (2026-10-26)
+**Öneri (ChatGPT):** Varsayılan b-değerinde yalnız doğrudan Mw kullanılsın, vekil Mw seçenek olarak kalsın.
+
+**Sınanan varsayım:** Doğrudan Mw alt kümesi, Mc üstünde tam bir örneklem ise b-değeri için yansız olur. Bu yalnız doğrudan Mw'nin varlığı büyüklükten bağımsızsa geçerlidir.
+
+**Sayım:** Doğrudan Mw (M0 kaynağı belli) / tüm olaylar, ISC-GEM Mw'ye göre. Yalnız sayım; b-değeri hesaplanmadı.
+
+| Dönem | <5,5 | 5,5–6,0 | 6,0–6,5 | 6,5–7,0 | 7,0–7,5 | ≥7,5 |
+|---|---|---|---|---|---|---|
+| 1904–1963 | %7 (18/257) | %1 (40/4 053) | %3 (117/3 510) | %10 (122/1 165) | %25 (107/422) | %61 (132/218) |
+| 1964–1975 | %4 (90/2 294) | %7 (298/4 076) | %30 (329/1 090) | %56 (184/331) | %73 (77/105) | %94 (44/47) |
+| 1976–1979 | %38 (574/1 491) | %43 (663/1 535) | %86 (277/323) | %97 (105/108) | %100 (34/34) | %93 (14/15) |
+| 1980–2021 | %92 (31 573/34 369) | %85 (11 233/13 274) | %94 (3 585/3 797) | %97 (1 105/1 135) | %99 (344/346) | %99 (162/164) |
+
+**Sonuç:**
+- **1976 öncesi:** Doğrudan Mw'nin varlığı büyüklükle güçlü biçimde artıyor (1904–1963'te %1'den %61'e). Bunun nedeni, literatür momentinin büyük depremler için aranmış olması (Lee ve Engdahl 2015) ve GCMT'nin 1976'da başlaması. Bu dönemde "yalnız doğrudan Mw" büyüklüğe bağlı bir seçimdir. Frekans–büyüklük dağılımında küçük depremleri sistematik olarak eksiltir ve b-değerini aşağı çeker. Bu nedenle varsayılan b-değeri için uygun değildir.
+- **1980–2021:** Oran %85–99, ancak 5,5–6,0 aralığında daha düşük (%85). Seçim etkisi küçük ama sıfır değil.
+- **Kullanım ayrımı:**
+  - Dönüşüm bağıntılarını bağımsız referansa karşı sınamak için doğru grup yalnız doğrudan Mw'dir. Bu kullanımda tamlık gerekmez; öneri burada geçerli.
+  - b-değeri için tamlık gerekir. Vekilleri dışlamak, dönüşüm kaynaklı belirsizlikten daha büyük bir seçim yanlılığı getirir.
+
+**Önerilen ilke (uygulanmadı; arayüz değişikliği yok):**
+
+| Kullanım | Varsayılan küme | Seçenek |
+|---|---|---|
+| Dönüşüm bağıntılarının sınanması | Yalnız doğrudan Mw (GCMT ve literatür, kaynak korunarak) | — |
+| b-değeri, Mc | ISC-GEM ana katalogun tüm Mw değerleri (kaynağın homojen Mw'si; vekiller dahil) ve sonuçta vekil oranı gösterilir | "Yalnız doğrudan Mw": yalnız 1976 sonrası pencerelerde, seçim uyarısıyla |
+| Yöntemi belirsiz Mw (1 olay) | Bağıntı sınamasında dışarıda | — |
+
+- **Değişmeyenler:** `iscgem_global.json` alanları ve sınıflama aynı kalır. Vekil değerler silinmez ve değiştirilmez.
+- **Ek bir değerlendirme gerekirse:** Vekil Mw'nin b-değerine etkisi (örneklem sayısı, Mc, aralık; 1980 sonrası doğrudan ve tüm küme karşılaştırması) ayrı bir analiz olarak önerilecek. Bu aşamada yapılmadı.
