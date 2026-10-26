@@ -1,0 +1,22 @@
+name: Küresel katalog — Aşama 2 doğrulama
+on:
+  push:
+    branches: [kuresel-katalog-olcum]
+    paths: ['analysis/kuresel_katalog/iscgem_global_uret.py', 'analysis/kuresel_katalog/uretim/**', '.github/workflows/kuresel-asama2.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dogrula:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Depodaki dosyayı doğrula
+        run: python analysis/kuresel_katalog/iscgem_global_uret.py dogrula
+      - name: Yeniden üret ve depodakiyle bayt bayt karşılaştır
+        run: |
+          cp analysis/kuresel_katalog/uretim/iscgem_global.json "$RUNNER_TEMP/depo.json"
+          python analysis/kuresel_katalog/iscgem_global_uret.py uret
+          cmp "$RUNNER_TEMP/depo.json" analysis/kuresel_katalog/uretim/iscgem_global.json && echo "bayt bayt aynı"

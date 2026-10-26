@@ -1,0 +1,9 @@
+uretim/iscgem_global.json, ISC-GEM Global Instrumental Earthquake Catalogue v12.1 (released 2025-11-26) verisinden türetilmiştir.
+Lisans: CC BY-SA 3.0 (unported), http://creativecommons.org/licenses/by-sa/3.0/
+Telif: Copyright (C) 2025 International Seismological Centre and GEM Foundation
+Atıf (veri): International Seismological Centre (2025), ISC-GEM Earthquake Catalogue, https://doi.org/10.31905/D808B825 (kullanılan sürüm: v12.1, 2025-11-26; atıf biçimi isc.ac.uk/iscgem/citing.php, erişim 2026-10-21)
+Atıf (makaleler): Storchak vd. (2013) SRL doi:10.1785/0220130034; Storchak vd. (2015) PEPI doi:10.1016/j.pepi.2014.06.009; Di Giacomo vd. (2018) ESSD doi:10.5194/essd-10-1877-2018; Bondár vd. (2015) PEPI doi:10.1016/j.pepi.2014.06.002 (konum); Di Giacomo vd. (2015a) PEPI doi:10.1016/j.pepi.2014.06.005 (büyüklük)
+Yapılan değişiklikler: Yalnız ana katalog (ek katalog dahil değil); yalnız zaman, konum, derinlik, Mw ve kalite/belirsizlik alanları; alan adları değiştirildi; s_mw kodu (d/p) "Mw_yontem" (dogrudan/vekil) olarak yazıldı. Hiçbir sayısal değer değiştirilmedi, dönüştürülmedi veya tahminle doldurulmadı.
+Bu türetilmiş dosya da CC BY-SA 3.0 ile paylaşılır. Bu lisans yalnız yukarıdaki veri dosyası için geçerlidir; deponun diğer içeriğini kapsamaz.
+Kaynak dosyalar (depoya konmadı): isc-gem.zip sha256 92a52fb933594f0c99f76c96c16fb6a04a360980283e7e22483b587f502949c5; isc-gem-cat.csv sha256 b4e63841e8a6527f1fa6a0ea823b83cfc5b053ab1c7d8746446e34645592cc8d
+Ara çıkarım (depoda): analysis/kuresel_katalog/out/iscgem_v12.1_ana.json.gz (aynı lisans).
