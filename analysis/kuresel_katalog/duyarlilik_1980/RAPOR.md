@@ -56,7 +56,47 @@ Tam b(Mc) eğrisi (4,8–6,5; V dahil): `sonuc.json`.
    - Maksimum eğrilikle bulunan küresel Mc (5,3–5,4), ISC-GEM'in 2019 öncesinde bölgeye göre tekdüze olmadığını belirttiği Mw 5,0–5,5 aralığında (Di Giacomo vd. 2018). Bu Mc'ler küresel tamlık olarak kabul edilmemeli.
    - Mc ≥ 5,5'te T'nin b-değeri 1,02–1,05, D'ninki 0,98–1,03. Fark 0,013–0,056.
 
-## 4. Karara etkisi
+## 4. İç tutarlılık denetimi (`sonuc.json` → `tutarlilik`; hepsi geçti, aksi hâlde betik durur)
+- **Alt küme ilişkileri:** D ⊂ T ve V ⊂ T; D ile V ayrık; T = D + V + belirsiz (1 olay, `iscgem:7704315`).
+- **Kapsam:** Üç örneklemde yıl aralığı 1980–2021. Coğrafi filtre yok; üçü de küresel.
+- **N değerleri:** §1'deki N'ler her örneklemin kendi Mc'siyle sayıldı: T, Mc 5,4'te 26 025; D, Mc 5,3'te 28 858.
+  - N(D) > N(T) görünmesinin nedeni eşiklerin farklı olması.
+  - Aynı Mc'de, 4,8–6,5 aralığındaki her değerde N(D) ≤ N(T).
+
+## 5. b farkının belirsizliği: eşleştirilmiş bootstrap
+**Neden ayrı aralıkları karşılaştırmak yetmez:** T ve D iç içe kümeler. İki aralığın örtüşüp örtüşmemesi farkın belirsizliğini göstermez.
+
+**Yöntem** (`sonuc.json` → `bootstrap`):
+- 2 000 tekrar, tohum 20261026.
+- Her tekrarda T'nin olayları yerine koyarak çekildi. D'nin karşılığı, çekilen olaylardan doğrudan Mw'li olanlardır. Böylece aynı olay iki örneklemde birlikte değişiyor.
+
+| Kip | b_T − b_D ortanca | %95 bootstrap aralığı | Fark ≤ 0 olan tekrar | Mc dağılımı |
+|---|---|---|---|---|
+| Mc her tekrarda iki örneklem için ayrı kestirilir | +0,040 | +0,034 – +0,046 | 0 / 2 000 | T: 5,4 (2 000); D: 5,3 (1 932), 5,4 (66), 5,2 (2) |
+| Mc = 5,5 sabit | +0,055 | +0,052 – +0,059 | 0 / 2 000 | — |
+| Mc = 6,0 sabit | +0,020 | +0,016 – +0,024 | 0 / 2 000 | — |
+
+**Yorum:**
+- **Fark örnekleme gürültüsü değil.** İki b-değerinin kendi aralıkları geniş olsa da fark dar bir aralıkta kalıyor; aynı olaylar iki örneklemde ortak.
+- **Mc kestirimi kararlı.** D'nin Mc'si tekrarların %97'sinde 5,3. Bu yüzden fark Mc kestirimindeki oynamadan gelmiyor.
+- **Bootstrap neyi ölçmez:** Bu aralık yalnız örnekleme belirsizliğidir. Vekil Mw değerlerinde sistematik bir sapma varsa bu aralığa yansımaz. Seçim yanlılığı ile vekil sapması bu analizle ayrılamaz (§3, madde 4).
+
+## 6. Desteklenen karar ve sınırı
+- **b-değeri ve Mc:** Varsayılan örneklem ISC-GEM'in tüm Mw değerleri olur; doğrudan ve vekil Mw oranları raporlanır.
+- **Bağıntı sınaması:** Dönüşüm bağıntılarının performans değerlendirmesinde doğrudan moment kaynaklı Mw ayrı referans grubudur.
+- **Yalnız doğrudan Mw ile b-değeri:** Duyarlılık analizi olarak sunulur. Seçim yanlılığı açıklanır; 1980–2021'de b'yi 0,02–0,06 düşürüyor.
+- **Sınır:** Bu sonuçlar tüm Mw değerlerinin her durumda daha doğru b-değeri verdiğini kanıtlamaz. Vekil Mw'deki olası sistematik sapma ile doğrudan alt kümedeki seçim yanlılığı birbirinden ayrılmış değildir.
+
+## 7. Bağıntı sorusu: Di Giacomo vd. (2015) EQ-Live'a eklenmeli mi?
+- **İletilen PDF bağıntı içermiyor.** Dosya ISC-GEM dizisinin I. makalesi: Di Giacomo vd. (2015b), PEPI 239:14–24, doi:10.1016/j.pepi.2014.06.003, erken bültenlerden veri toplama. Bu makalede vekil Mw bağıntısı verilmiyor. Bağıntıdan yalnız bir yerde söz ediliyor: ön seçimde (kesme büyüklüğü) Bormann vd. (2009) bağıntılarının kullanıldığı belirtiliyor.
+- **Asıl bağıntılar III. makalede ve EQ-Live'da zaten var.** III. makale: Di Giacomo vd. (2015a), PEPI 239:33–47, doi:10.1016/j.pepi.2014.06.005. Üstel Ms → Mw ve mb → Mw bağıntıları 2026-10-11'den beri `MAG_CONVERSIONS.iscgem2015` olarak "duyarlılık analizi" etiketiyle seçilebiliyor. Kayıtlı katsayılar:
+  - Ms: Mw = exp(−0,222 + 0,233 Ms) + 2,863
+  - mb: Mw = exp(−4,664 + 0,859 mb) + 4,555
+  - Kaynak: s. 41–42.
+- **Döngüsellik uyarısı:** ISC-GEM'in vekil Mw'leri bu bağıntılarla hesaplanmıştır. `iscgem2015` bağıntısının (ya da benzer Ms/mb bağıntılarının) başarımı ISC-GEM'in vekil Mw'sine karşı ölçülürse sonuç kendini doğrular. Bağıntı sınamasında yalnız doğrudan Mw grubu kullanılmalı (bkz. ASAMA_2_RAPOR §4).
+- **Ajans farkı:** Bağıntılar ISC-GEM'in yeniden hesapladığı (IASPEI standardı) Ms/mb için türetilmiştir. USGS, EMSC ya da Türkiye ajanslarının mb/Ms'sine uygulanması bir varsayımdır (`index.html`'deki not ile aynı).
+
+## 8. Karara etkisi
 - **b-değeri:** Önceki öneri (varsayılan b-değerinde tüm ISC-GEM Mw; vekil oranı gösterilerek) değişmez.
   - 1980 sonrasında "yalnız doğrudan Mw" seçeneği b-değerini 0,01–0,06 düşürüyor.
   - Bu fark %95 aralık genişliğiyle aynı büyüklükte ya da ondan büyük. Seçenek kullanılırsa bu etki uyarıda belirtilmeli.

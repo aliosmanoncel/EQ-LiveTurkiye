@@ -651,5 +651,115 @@
  },
  "belirsiz_grup": [
   "iscgem:7704315"
- ]
+ ],
+ "tutarlilik": {
+  "D_alt_kume_T": true,
+  "V_alt_kume_T": true,
+  "D_V_ayrik": true,
+  "T_eq_D_V_belirsiz": true,
+  "yil_araliklari": {
+   "T": [
+    1980,
+    2021
+   ],
+   "D": [
+    1980,
+    2021
+   ],
+   "V": [
+    1980,
+    2021
+   ]
+  },
+  "cografi_filtre": "yok (küresel; üç örneklemde aynı)",
+  "N_kendi_Mc": {
+   "T": [
+    5.4,
+    26025,
+    26025
+   ],
+   "D": [
+    5.3,
+    28858,
+    28858
+   ]
+  },
+  "her_Mc_icin_N_D_le_N_T": true,
+  "aciklama": "N(D, Mc 5,3) = 28 858 > N(T, Mc 5,4) = 26 025, çünkü eşikler farklı; aynı Mc'de her zaman N(D) ≤ N(T)."
+ },
+ "bootstrap": {
+  "tekrar": 2000,
+  "tohum": 20261026,
+  "yontem": "olay düzeyinde yerine koyarak; D_rep ⊂ T_rep",
+  "sonuc": {
+   "Mc ayrı ayrı yeniden kestirilir": {
+    "fark_ortanca": 0.04,
+    "fark_95": [
+     0.034,
+     0.046
+    ],
+    "fark_sifir_alti_orani": 0,
+    "bT_95": [
+     1.012,
+     1.037
+    ],
+    "bD_95": [
+     0.973,
+     0.996
+    ],
+    "McT_dagilim": {
+     "5.4": 2000
+    },
+    "McD_dagilim": {
+     "5.2": 2,
+     "5.3": 1932,
+     "5.4": 66
+    }
+   },
+   "Mc = 5,5 sabit": {
+    "fark_ortanca": 0.055,
+    "fark_95": [
+     0.052,
+     0.059
+    ],
+    "fark_sifir_alti_orani": 0,
+    "bT_95": [
+     1.026,
+     1.054
+    ],
+    "bD_95": [
+     0.971,
+     0.998
+    ],
+    "McT_dagilim": {
+     "5.5": 2000
+    },
+    "McD_dagilim": {
+     "5.5": 2000
+    }
+   },
+   "Mc = 6,0 sabit": {
+    "fark_ortanca": 0.02,
+    "fark_95": [
+     0.016,
+     0.024
+    ],
+    "fark_sifir_alti_orani": 0,
+    "bT_95": [
+     1.006,
+     1.057
+    ],
+    "bD_95": [
+     0.986,
+     1.038
+    ],
+    "McT_dagilim": {
+     "6.0": 2000
+    },
+    "McD_dagilim": {
+     "6.0": 2000
+    }
+   }
+  }
+ }
 }
