@@ -187,7 +187,7 @@ Aynı bölge ve pencerede (T = 27 yıl; gözlenen M ≥ 6: 13 olay, M ≥ 7: 1 o
 1. §4.4'teki Weichert uyumsuzluğu (A) iyimser test basamağından kaynaklanıyor. Yıllık Mc 1985–1989'da hâlâ 4,7–4,8; basamak ise M ≥ 4,0 diyor. Bu yüzden b aşağı yanlı çıkıyor.
 2. Veriye ya da üst veriye dayanan tamlıkla (B, C, D) öngörü gözlenenle uyumlu. Bu uyum aynı veriyle yapılmış bir iç tutarlılık denetimi; M ≥ 7'de tek gözlem var.
 3. **B ile D aynı sonucu veriyor.** Tek basamaklı Weichert, aynı eşikteki tek Mc ile aynı veri alt kümesini kullanır. Dolayısıyla A, B ve E arasındaki farklar "Weichert mi, tek Mc mi" farkı değil, tamlık eşiği ve dönem seçimi farkıdır. ChatGPT'nin yöntem koşulu (aynı pencere, eşik ve oran tanımı) bu ayrımı mümkün kıldı.
-4. Weichert'in kendine özgü katkısı, C'de olduğu gibi tamlığı farklı dönemleri birleştirmesidir. Burada C, D'ye göre daha fazla olay kullanıyor (N = 930'a karşı 685), ama M ≥ 6 öngörüsü aynı (11,2). Bu bölge ve pencerede birleştirmenin oran üzerindeki etkisi küçük; b'nin belirsizliği daralıyor.
+4. Weichert'in kendine özgü katkısı, C'de olduğu gibi tamlığı farklı dönemleri birleştirmesidir. Burada C, D'ye göre daha fazla olay kullanıyor (N = 930'a karşı 685), ama M ≥ 6 öngörüsü aynı (11,2). Bu bölge ve pencerede birleştirmenin M ≥ 6 oranı üzerindeki etkisi küçük; b farklı çıkıyor (1,118'e karşı 1,191). Belirsizlik aralıklarına etkisi burada ölçülmedi.
 5. Bu bir bölge ve bir pencere için geçerli bir sonuçtur. Genelleme için başka bölge ve pencerelerde, tercihen bağımsız bir sınama dönemiyle (ör. 1971–1997'de kur, 1998–2026'da sına) tekrar edilmeli.
 
 ## 5. Literatür ile karşılaştırma
