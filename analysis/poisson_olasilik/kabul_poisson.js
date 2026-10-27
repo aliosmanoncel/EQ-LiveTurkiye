@@ -66,6 +66,8 @@ const ADIM = [   // [ad, işlem]
   ['weichert_gk74kapali', async p => p.evaluate(async () => { await __gk(false); })],
   ['weichert_mx75_M7', async p => p.evaluate(() => { __set('grMx', '7.5'); })],
   ['weichert_mx75_M8', async p => p.evaluate(() => { __set('grPM', '8'); })],
+  // Tamlık denetimi: pencerenin ilk yarısı boşsa uyarı (seçili pencere 1971–1997 iken 1900'den başlatılmış gibi; yalnız test için)
+  ['tekMc_ilkYariBos', async p => p.evaluate(() => { __cs(false); __set('grMx', ''); __set('grPM', '7'); regionWindowStart = new Date('1900-01-01T00:00:00Z'); renderTimeMag([...events, ...liveEvents]); })],
 ];
 const GORUNTU = { tekMc_gk74kapali: 'poisson_tekMc_gk74kapali.png', tekMc_gk74acik: 'poisson_tekMc_gk74acik.png', weichert_gk74kapali: 'poisson_weichert.png', weichert_mx75_M8: 'poisson_weichert_mx.png' };
 (async () => {
@@ -85,7 +87,7 @@ const GORUNTU = { tekMc_gk74kapali: 'poisson_tekMc_gk74kapali.png', tekMc_gk74ac
   }
   const O = S.once, Y = S.sonra;
   // (1) mevcut çıktılar değişmedi
-  for (const [k] of ADIM) {
+  for (const [k] of ADIM.filter(([k]) => k !== 'tekMc_ilkYariBos')) {
     // Beklenen tek metin farkı: tek Mc panelinde a'nın tanımı (Ham modda değer aynı, yalnız tanım eklendi)
     const ETIKET = ' (log₁₀N = a − bM; N: dönem toplamı)', yM = Y[k].metin.replace(ETIKET, '');
     const sv = O[k].svg === Y[k].svg, mt = O[k].metin === yM;
@@ -108,6 +110,12 @@ const GORUNTU = { tekMc_gk74kapali: 'poisson_tekMc_gk74kapali.png', tekMc_gk74ac
     ok(q && q.path === 'weichert' && same && y.pois.includes(`P = %${pct(P(lam, q.t))}`),
       `(2) ${k}: λ(≥${q.M}) = ${lam === 0 ? '0' : lam.toExponential(3)}/yıl = panel en iyi tahmin eğrisi (lastGrFit.fnBest)${q.mx !== null ? `, Mx = ${q.mx}` : ''}; P = %${pct(P(lam, q.t))} ekranda; b = ${q.b.toFixed(3)}, m₀ = ${q.m0}`);
   }
+  // Tarihsel pencere (tarihsel-pencere-T düzeltmesiyle): tek Mc T = seçili pencere
+  ok(Math.abs(Y.tekMc_gk74kapali.pois_n.T - 27) < 0.01 && /T = 27\.0 yıl/.test(Y.tekMc_gk74kapali.pois), `(2) Tek Mc T = ${Y.tekMc_gk74kapali.pois_n.T.toFixed(3)} yıl = seçili pencere ISC 1971–1997 (düzeltme öncesi 126,7)`);
+  { const w = s => (s.match(/ilk yarısında belirgin az \(([^)]*)\)/) || [null, null])[1];
+    const a = Y.tekMc_gk74kapali, z = Y.tekMc_ilkYariBos;
+    ok(/ilk yarısında belirgin az \(0 \/ /.test(z.pois), `(2) İlk yarı boş (T 1900'den): tamlık uyarısı "${w(z.pois)}"`);
+    console.log(`     Seçili pencerede (1971–1997) tamlık denetimi: ${w(a.pois) ? 'uyarı "' + w(a.pois) + '" (ISC 1971–1984 dönemi M ≥ Mc = 3,7 için eksik)' : 'uyarı yok'}`); }
   // (3) girdiler
   ok(Y.tekMc_gk74kapali.pois_n.M === 7 && Y.tekMc_gk74kapali.pois_n.t === 50, '(3) Varsayılan M ≥ 7, t = 50 yıl');
   ok(Y.tekMc_M6_t75.pois_n.M === 6 && Y.tekMc_M6_t75.pois_n.t === 75 && /pm=6/.test(Y.tekMc_M6_t75.url) && /pt=75/.test(Y.tekMc_M6_t75.url), `(3) M = 6, t = 75 girdisi uygulandı ve URL'ye yazıldı (${Y.tekMc_M6_t75.url.match(/p[mt]=[^&]*/g).join(', ')})`);

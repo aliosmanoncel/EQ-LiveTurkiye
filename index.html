@@ -3691,7 +3691,7 @@ function renderGutenbergRichter(evList, Mc) {
       const { M: pM, t: pT } = grPoisInputs(), g = lastGrSimple, aT = g.a - Math.log10(Tp);
       const lam = grLambdaSimple(g.n, Tp, g.b, g.mc, pM), ci = grPoissonBootSimple(g.n, Tp, g.b, g.mc, tmMagDM, pM, pT);
       const warns = [];
-      if (!(typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect)) warns.push('GK74 artçı ayıklama kapalı: Poisson modeli bağımsız ana şokları varsayar; artçılar oranı ve olasılığı olduğundan yüksek gösterebilir');
+      if (!(typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect)) warns.push('GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)');
       const hs = grHalfSplitTest(evList.filter(e => (e.mw ?? e.mag) >= g.mc - 1e-9).map(e => +new Date(e.time)).filter(Number.isFinite), tP0, tP1);
       if (hs.n >= 10 && hs.p < GR_POIS.halfAlpha) warns.push(`M ≥ Mc olayları dönemin ilk yarısında belirgin az (${hs.n1} / ${hs.n2}; tek yönlü binom p = ${hs.p < 1e-4 ? hs.p.toExponential(1) : hs.p.toFixed(4)}): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın`);
       lastGrPois = { path: 'tekMc', lam, ci, M: pM, t: pT, T: Tp, n: g.n, b: g.b, mc: g.mc, warns: warns.slice() };
@@ -6069,7 +6069,7 @@ function renderGutenbergRichterCS(cs) {
     const lamOf = f => grLambdaWeichert(rateGE(f.rate0, f.beta, Mx, clsBest), f.beta, m0, pM, Mx);
     const lam = lamOf(wf), ci = grPoissonBootWeichert(clsBest, wf, lamOf, pT), aW = Math.log10(rate0Best) + wf.b * m0;
     const warns = [];
-    if (!(typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect)) warns.push('GK74 artçı ayıklama kapalı: Poisson modeli bağımsız ana şokları varsayar; artçılar oranı ve olasılığı olduğundan yüksek gösterebilir');
+    if (!(typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect)) warns.push('GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)');
     if (fitOn && (pM < m0 - 1e-9)) warns.push(`M ≥ ${pM} fit aralığının (M ${m0.toFixed(1)}–${mTopFit.toFixed(1)}) altında`);
     lastGrPois = { path: 'weichert', lam, ci, M: pM, t: pT, mx: Mx, m0, rate0: rate0Best, b: wf.b, warns: warns.slice() };
     poisHtml = grPoissonHtml({ eq: Mx === null ? `log₁₀λ(≥M) = ${aW.toFixed(2)} − ${wf.b.toFixed(2)}·M (Weichert; λ: yıllık oran)` : `λ(≥M) = λ₀·[e^(−β(M−m₀)) − e^(−β(Mx−m₀))]/[1 − e^(−β(Mx−m₀))], Mx = ${Mx} (kesik G–R; Mx'ten uzakta log₁₀λ ≈ ${aW.toFixed(2)} − ${wf.b.toFixed(2)}·M)`,

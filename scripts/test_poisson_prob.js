@@ -22,6 +22,8 @@ const X = ctx;
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else fail++; console.log((c ? '  ok  ' : '  !!  ') + m); };
 const near = (a, b, tol) => Math.abs(a - b) <= tol;
+// Kapsama oranının kendi %95 aralığı (Wilson): k / R deneme
+const wilson = (k, R) => { const z = 1.96, p = k / R, d = 1 + z * z / R, c = (p + z * z / (2 * R)) / d, h = z * Math.sqrt(p * (1 - p) / R + z * z / (4 * R * R)) / d; return `%${(100 * p).toFixed(1)} [%${(100 * (c - h)).toFixed(1)}–%${(100 * (c + h)).toFixed(1)}]`; };
 
 console.log('\n1. Analitik');
 ok(near(X.grPoissonP(0.01, 50), 1 - Math.exp(-0.5), 1e-15), `λ = 0,01/yıl, t = 50 → P = ${X.grPoissonP(0.01, 50).toFixed(6)} (1 − e^−0,5 = 0,393469)`);
@@ -60,7 +62,7 @@ console.log('\n3. Sentetik katalog — tek Mc (λ0 = 2/yıl, M ≥ 3,0; b = 1; T
   }
   const mLog = est.reduce((a, v) => a + v, 0) / R, mP = pe.reduce((a, v) => a + v, 0) / R;
   console.log(`     gerçek λ(≥6) = ${lamTrue.toExponential(3)}/yıl, P(50) = ${pTrue.toFixed(4)}; kestirim: ortalama log10 λ = ${mLog.toFixed(3)} (gerçek ${Math.log10(lamTrue).toFixed(3)}), ortalama P = ${mP.toFixed(4)}`);
-  console.log(`     bootstrap %95 kapsaması (${R} katalog): λ ${(100 * cov / R).toFixed(1)}%, P ${(100 * covP / R).toFixed(1)}%`);
+  console.log(`     bootstrap %95 kapsaması (${R} katalog, her biri B = 400; köşeli parantez: kapsama oranının Wilson %95 aralığı): λ ${wilson(cov, R)}, P ${wilson(covP, R)}`);
   ok(Math.abs(mLog - Math.log10(lamTrue)) < 0.05, 'λ(≥6) log ölçekte yansız (|fark| < 0,05)');
   ok(cov / R >= 0.90 && cov / R <= 0.99 && covP / R >= 0.90 && covP / R <= 0.99, 'bootstrap aralığı nominal %95 kapsamaya yakın (%90–99)');
   // Yalnız b'nin ±1,96σ aralığı (sayım belirsizliği yok): M = 6'da (3 birim dışdeğerleme) b baskındır; Mc'de (M = 3,0) b aralığı tek noktaya çöker, yalnız sayım belirsizliği kalır.
@@ -72,7 +74,7 @@ console.log('\n3. Sentetik katalog — tek Mc (λ0 = 2/yıl, M ≥ 3,0; b = 1; T
     if (l6 <= lamTrue && lamTrue <= h6) covB6++; if (l35 <= lamTrue2 && lamTrue2 <= h35) covB35++;
     const ci = X.grPoissonBootSimple(n, T, bh, Mc, dm, M2, t, { B: 400, seed: 3000 + r }); if (ci.lamLo <= lamTrue2 && lamTrue2 <= ci.lamHi) covBoot35++;
   }
-  console.log(`     yalnız b aralığı kapsaması: M ≥ 6 → ${(100 * covB6 / R).toFixed(1)}% (b baskın); M ≥ 3,0 (= Mc) → ${(100 * covB35 / R).toFixed(1)}%; ortak bootstrap M ≥ 3,0 → ${(100 * covBoot35 / R).toFixed(1)}%`);
+  console.log(`     yalnız b aralığı kapsaması: M ≥ 6 → ${wilson(covB6, R)} (b baskın); M ≥ 3,0 (= Mc) → ${wilson(covB35, R)}; ortak bootstrap M ≥ 3,0 → ${wilson(covBoot35, R)}`);
   ok(covB35 / R < 0.85 && covBoot35 / R >= 0.90, 'Mc düzeyinde yalnız b aralığı sayım belirsizliğini kaçırır; sayım bileşenli bootstrap nominale yakın (ChatGPT notu: b aralığı tek başına yetmez)'); }
 
 console.log('\n4. Sentetik katalog — Weichert, değişken tamlık (M ≥ 3: son 30 yıl; M ≥ 4: 80 yıl; M ≥ 5: 200 yıl; λ(≥3) = 5/yıl; b = 1)');
@@ -88,7 +90,7 @@ console.log('\n4. Sentetik katalog — Weichert, değişken tamlık (M ≥ 3: so
     est.push(Math.log10(lam)); if (ci.lamLo <= lamTrue && lamTrue <= ci.lamHi) cov++; if (ci.pLo <= pTrue && pTrue <= ci.pHi) covP++;
   }
   const mLog = est.reduce((a, v) => a + v, 0) / est.length;
-  console.log(`     gerçek λ(≥6,5) = ${lamTrue.toExponential(3)}/yıl, P(50) = ${pTrue.toFixed(4)}; ortalama log10 λ = ${mLog.toFixed(3)} (gerçek ${Math.log10(lamTrue).toFixed(3)}); kapsama λ ${(100 * cov / R).toFixed(1)}%, P ${(100 * covP / R).toFixed(1)}%`);
+  console.log(`     gerçek λ(≥6,5) = ${lamTrue.toExponential(3)}/yıl, P(50) = ${pTrue.toFixed(4)}; ortalama log10 λ = ${mLog.toFixed(3)} (gerçek ${Math.log10(lamTrue).toFixed(3)}); kapsama (${R} katalog, B = 400) λ ${wilson(cov, R)}, P ${wilson(covP, R)}`);
   ok(Math.abs(mLog - Math.log10(lamTrue)) < 0.05, 'Weichert λ(≥6,5) log ölçekte yansız');
   ok(cov / R >= 0.90 && cov / R <= 0.99 && covP / R >= 0.90 && covP / R <= 0.99, 'Weichert bootstrap aralığı nominal %95 kapsamaya yakın (%90–99)'); }
 
