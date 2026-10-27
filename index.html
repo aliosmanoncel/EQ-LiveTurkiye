@@ -7386,6 +7386,10 @@ function filterHistoricalWindow(cat, epicaCache, startYear, endYear, epicaOnlySr
 // 1971-1997 / 1998-2026) birden fazlası aynı anda seçiliyken çift saymadan
 // birleştirilebilir, 2026-09-13.
 let activeHistWindows = [];
+// 2026-10-27: seçili tarihsel pencerelerin zaman aralığı (bölge analizi T'si için). Önceden bölge sorgusu tüm kataloğun
+// starttime/endtime değerini (1900 → katalog sonu) alıyordu; T, Weichert dönem sonları, oran/yoğunluk ve karşılaştırma şişiyordu.
+// parts: seçili pencereler [başlangıç, bitiş] (ms); contiguous: pencereler arasında boşluk yok (≤ 1 gün).
+let histSelWindow = null;
 
 async function toggleHistoricalWindow(btn, startYear, endYear, epicaOnlySrc) {
   const key = `${startYear}|${endYear || ''}|${epicaOnlySrc || ''}`;
@@ -7408,6 +7412,7 @@ async function rebuildHistoricalView() {
   document.querySelectorAll('.tbtn[data-h]').forEach(x => x.classList.remove('active'));
 
   if (activeHistWindows.length === 0) {
+    histSelWindow = null;
     historicalMode = false;
     updateRegionCtrlForMode();
     events = [];
@@ -7472,6 +7477,16 @@ async function rebuildHistoricalView() {
     }
 
     if (all.length === 0) throw new Error('Seçili pencere(ler)de veri yok');
+    { // Seçili pencere(ler)in aralığı: açık uçlu pencere katalog sonunda (cat.endtime) biter, şimdiki zamanda değil
+      const parts = [];
+      const lastT = all.reduce((m, e) => Math.max(m, +e.time), -Infinity);
+      const catEnd = cat.endtime ? Math.max(+new Date(cat.endtime), lastT) : lastT;
+      if (globWin) parts.push([+new Date(`${globWin.startYear}-01-01T00:00:00Z`), +new Date(`${globWin.endYear}-12-31T23:59:59.999Z`)]);
+      for (const w of trWins) parts.push([+new Date(`${w.startYear}-01-01T00:00:00Z`), w.endYear ? +new Date(`${w.endYear}-12-31T23:59:59.999Z`) : catEnd]);
+      parts.sort((x, y) => x[0] - y[0]);
+      let contiguous = true; for (let i = 1; i < parts.length; i++) if (parts[i][0] - parts[i - 1][1] > 864e5) contiguous = false;
+      histSelWindow = { start: new Date(parts[0][0]), end: new Date(Math.max(...parts.map(q => q[1]))), parts, contiguous };
+    }
 
     events = all;
     minMag = 0; // eşiği tarihsel katalog belirliyor (bkz. completeness), sabit bir minMag dayatmıyoruz
@@ -8379,7 +8394,7 @@ function renderRegionInfo() {
   const depMin = document.getElementById('regionDepMin').value;
   const depMax = document.getElementById('regionDepMax').value;
   const winLabel = historicalMode
-    ? `Tarihsel Katalog (${regionWindowStart ? regionWindowStart.getFullYear() : '—'}–${regionWindowEnd ? regionWindowEnd.getFullYear() : '—'})`
+    ? `Tarihsel Katalog (${regionWindowStart ? regionWindowStart.getUTCFullYear() : '—'}–${regionWindowEnd ? regionWindowEnd.getUTCFullYear() : '—'})`
     : regionSource === 'hk_local'
     ? `HK Yerel Katalog (${regionWindowStart ? regionWindowStart.getFullYear() : '—'}–${regionWindowEnd ? regionWindowEnd.getFullYear() : '—'})`
     : regionSource === 'hk_historical'
@@ -8607,10 +8622,11 @@ async function fetchRegionEventsFromHistorical(bounds) {
   regionLayer.addTo(map);
   regionCapped = false; // yerel filtreleme sınırsız
   regionOrderUsed = 'time'; // yanlılık yok — TÜM eşleşenler alındı, "en büyük" bloğu tetiklenmez
-  regionWindowStart = historicalCache ? new Date(historicalCache.starttime) : null;
-  regionWindowEnd   = historicalCache ? new Date(historicalCache.endtime)   : null;
+  // 2026-10-27: analiz penceresi = seçili tarihsel pencere(ler) (önceden tüm katalog: 1900 → katalog sonu)
+  regionWindowStart = histSelWindow ? histSelWindow.start : historicalCache ? new Date(historicalCache.starttime) : null;
+  regionWindowEnd   = histSelWindow ? histSelWindow.end   : historicalCache ? new Date(historicalCache.endtime)   : null;
   const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
-  setStatus(`Bölgede ${evs.length} deprem — Tarihsel Katalog TAMAMI, limit yok${sampleNote}`);
+  setStatus(`Bölgede ${evs.length} deprem — Tarihsel Katalog TAMAMI, limit yok${sampleNote}` + (histSelWindow && !histSelWindow.contiguous ? ' ⚠ Seçili pencereler bitişik değil: T, aradaki boşluğu da içerir' : ''), histSelWindow && !histSelWindow.contiguous);
   renderRegionInfo();
   if (tmAnyOpen()) renderTimeMag(regionEvents);
 }
