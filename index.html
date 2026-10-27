@@ -8514,6 +8514,7 @@ async function polygonFinish() {
   polygonPoints = [];
   regionIsPolygon = true;
   regionRect = L.polygon(pts, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+  { const btnDecluster = document.getElementById('btnRegionDecluster'); if (btnDecluster) btnDecluster.style.display = ''; }   // 2026-10-27: Bölge Analizi poligonunda da GK74 düğmesi
   await fetchRegionEvents(regionRect.getBounds());
 }
 
@@ -8555,6 +8556,7 @@ async function regionMouseUp() {
   document.getElementById('btnRegionSelect').classList.remove('active');
   const b = regionRect.getBounds();
   if (b.getNorth() === b.getSouth() || b.getEast() === b.getWest()) { regionDeselect(); return; } // tıklama, sürükleme değil
+  { const btnDecluster = document.getElementById('btnRegionDecluster'); if (btnDecluster) btnDecluster.style.display = ''; }   // 2026-10-27: Bölge Analizi dikdörtgeninde de GK74 düğmesi (Araştırma Bölgesi/daire yollarıyla aynı)
   await fetchRegionEvents(b);
 }
 map.on('mousedown', regionMouseDown);
@@ -9229,6 +9231,7 @@ function restoreRegionFromURL() {
     regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
     fetchRegionEvents(bounds);
   }
+  { const btnDecluster = document.getElementById('btnRegionDecluster'); if (btnDecluster) btnDecluster.style.display = ''; }   // 2026-10-27: linkle açılan bölgede (daire/poligon/dikdörtgen) de GK74 düğmesi
   // Linkle paylaşılan bölge varsa paneli otomatik aç — aksi halde sonuçlar
   // (regionInfo/CSV) kapalı panelin arkasında görünmez kalır.
   const body = document.getElementById('rcBody');
