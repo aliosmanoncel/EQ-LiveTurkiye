@@ -883,6 +883,13 @@
     <button class="tbtn" data-hist="1003" data-hist-end="1899" data-hist-src="SHARE-CET" onclick="toggleHistoricalWindow(this,1003,1899,'SHARE-CET')" title="Yalnızca SHARE-CET (doğu/orta Anadolu-Kafkasya, tek kaynak) · Soysal ve ark. (1981) → Io-Ms (Kalafat ve ark. 2007) → Mw (Zare 2012) dönüşüm zinciri — EPICA'dan FARKLI metodoloji · birden fazla pencere aynı anda seçilebilir">SHARE-CET 1003–1899</button>
   </div>
   <div id="histHint" style="font-size:10px;color:#888;margin-top:2px;letter-spacing:0.3px"></div>
+  <!-- Küresel ISC-GEM v12.1 penceresi (HAZIRLIK, kuresel-katalog-olcum dalı, 2026-10-26). Yalnız Global/EMSC modunda görünür,
+       varsayılan KAPALI. data/iscgem_global.json (ana katalog, 1904–2021). Aynı tarihsel hat (rebuildHistoricalView) kullanılır;
+       seçili değilken Türkiye pencereleri ve TR ISC-GEM katmanı birebir eskisi gibi çalışır. -->
+  <div class="global-only" id="histIscgemGlobalRow" style="display:flex;gap:4px;align-items:center;margin-top:2px">
+    <span style="font-size:.72rem;color:#888;white-space:nowrap">Tarihsel (küresel):</span>
+    <button class="tbtn" data-hist="1904" data-hist-end="2021" data-hist-src="ISCGEM-GLOBAL" onclick="toggleHistoricalWindow(this,1904,2021,'ISCGEM-GLOBAL')" title="ISC-GEM v12.1 ana katalog · küresel · 1904–2021 · DENEYSEL, varsayılan KAPALI. KAPSAM: büyük depremler kataloğudur (seçim eşiği yaklaşık Mw 5,5; 1918–1959'da Ms ≥ 6¼, 1904–1917'de Ms ≥ 7,5; Mw 5,0–5,5 kapsamı 2019 öncesinde bölgeye göre tekdüze değil) — tüm büyüklükleri içeren tam bir küresel katalog DEĞİLDİR. Mw kaynakta verildiği gibidir (dönüşüm uygulanmaz); her olayda doğrudan (GCMT/literatür M0) ya da vekil (Ms/mb'den, Di Giacomo vd. 2015a) ayrımı korunur ve seçili kümede oran gösterilir. ISC-GEM ek katalogu ve USGS kayıtları dahil değildir. © International Seismological Centre ve GEM Vakfı; CC BY-SA 3.0; doi:10.31905/D808B825. Veri: data/iscgem_global.json, data/LISANS_ISC-GEM_kuresel.txt.">ISC-GEM 1904–2021 <span style="color:#666">(deneysel)</span></button>
+  </div>
   <label class="tr-only" id="histIscgemRow" style="font-size:.72rem;color:#9ca3af;display:flex;align-items:center;gap:5px;cursor:pointer;margin-top:2px" title="DENEYSEL, varsayılan KAPALI (homog-uretim-aday, 2026-10-21). Açıkken tarihsel katalogda ISC-GEM v12.1 (© International Seismological Centre ve GEM Vakfı; CC BY-SA 3.0; doi:10.31905/d808b825; Di Giacomo vd. 2018) ile eşleşen 1.144 olayın büyüklüğü ISC-GEM Mw olur (1963 öncesinde zaman/konum da ISC-GEM'den) ve EQ-Live'da karşılığı olmayan 273 olay (1904–1962) eklenir. Kaynak önceliği: mw_authority.json → ISC-GEM → katalog. ISC-GEM karşılığı olmayan olaylar değişmez. Kapalıyken sonuçlar birebir eskisiyle aynıdır. Veri: data/mw_iscgem.json, data/iscgem_ek_1904_1962.json, data/LISANS_ISC-GEM.txt."><input type="checkbox" id="histIscgem" onchange="onHistIscgemChange()"> ISC-GEM v12.1 Mw katmanı <span style="color:#666">(deneysel · varsayılan kapalı)</span></label>
 
   <div class="sep"></div>
@@ -1446,6 +1453,11 @@ function setScope(scope) {
   if (srcSelEl) srcSelEl.value = src;
   const activeH = document.querySelector('.tbtn[data-h].active');
   if (activeH) loadData(src, +activeH.dataset.h);
+  if (!isGlobal && typeof activeHistWindows !== 'undefined' && activeHistWindows.some(w => w.epicaOnlySrc === 'ISCGEM-GLOBAL')) {   // 2026-10-26: küresel ISC-GEM penceresi Türkiye modunda gizli kalmasın
+    activeHistWindows = activeHistWindows.filter(w => w.epicaOnlySrc !== 'ISCGEM-GLOBAL');
+    document.querySelectorAll('.tbtn[data-hist-src="ISCGEM-GLOBAL"]').forEach(x => x.classList.remove('active'));
+    rebuildHistoricalView();
+  }
 }
 
 /* URL ile paylaşılabilir görünüm: ?lat=..&lng=..&zoom=.. varsa haritayı oraya
@@ -7281,6 +7293,48 @@ async function iscgemCatalog(base) {
   return cat;
 }
 function onHistIscgemChange() { gk74Cache = null; if (historicalMode) rebuildHistoricalView(); }
+// ── Küresel ISC-GEM v12.1 penceresi (HAZIRLIK, 2026-10-26; varsayılan KAPALI) ──
+// data/iscgem_global.json (şema eq-live/kuresel-katalog/1; analysis/kuresel_katalog/ASAMA_2_RAPOR.md). Değerler kaynaktaki gibi:
+// mtype 'mw' (Magnitude Conversion seçicisi bağıntı uygulamaz), msrc 'iscgem_direct' | 'iscgem_proxy' (Mw_yontem), mw_m0: gcmt | bibliog | null.
+// Yalnız bu pencere seçiliyken yüklenir; eq_historical.json ve TR ISC-GEM katmanı (iscgemApply) kullanılmaz.
+const ISCGEM_GLOBAL_KEY = 'ISCGEM-GLOBAL';
+let iscgemGlobalCache = null, iscgemGlobalPending = null;
+// ISC-GEM'de yer adı yok; boş bırakılırsa arayüzdeki yedek etiketler ('Türkiye', 'EMSC Region') yanlış yer gösterir → koordinat + kimlik
+function iscgemGlobalPlace(lat, lon, id) {
+  const f = (v, p, n) => `${Math.abs(v).toFixed(2).replace('.', ',')}°${v >= 0 ? p : n}`;
+  return `${f(lat, 'K', 'G')} ${f(lon, 'D', 'B')} · ${String(id).replace('iscgem:', 'ISC-GEM ')}`;
+}
+function iscgemGlobalEvents(d) {
+  const I = Object.fromEntries(d.alanlar.map((a, i) => [a, i]));
+  return d.olaylar.map(o => ({
+    lat: o[I.lat], lon: o[I.lon], dep: o[I.dep], mag: o[I.M], mw: o[I.M], mtype: 'mw',
+    place: iscgemGlobalPlace(o[I.lat], o[I.lon], o[I.id]), province: '', district: '', src: 'ISC-GEM', time: new Date(o[I.t]), id: o[I.id],
+    msrc: o[I.Mw_yontem] === 'vekil' ? 'iscgem_proxy' : 'iscgem_direct', mw_method: o[I.Mw_yontem], mw_m0: o[I.Mw_M0_kaynak], mw_q: o[I.M_q], mw_unc: o[I.M_unc]
+  }));
+}
+async function loadIscgemGlobal() {
+  if (iscgemGlobalCache) return iscgemGlobalCache;
+  if (iscgemGlobalPending) return iscgemGlobalPending;
+  iscgemGlobalPending = (async () => {
+    try {
+      const r = await fetchTimeout('data/iscgem_global.json', {}, 30000);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const d = await r.json();
+      if (!d.meta || d.meta.sema !== 'eq-live/kuresel-katalog/1') throw new Error('beklenmeyen şema');
+      iscgemGlobalCache = { meta: d.meta, events: iscgemGlobalEvents(d) };
+    } catch (err) { iscgemGlobalCache = null; throw err; }
+    finally { iscgemGlobalPending = null; }
+    return iscgemGlobalCache;
+  })();
+  return iscgemGlobalPending;
+}
+function iscgemGlobalHint(evs) {
+  const nD = evs.filter(e => e.msrc === 'iscgem_direct' && e.mw_m0).length, nV = evs.filter(e => e.msrc === 'iscgem_proxy').length, nU = evs.length - nD - nV;
+  const pct = x => evs.length ? (100 * x / evs.length).toFixed(0) : '0';
+  return `🌍 ISC-GEM v12.1 küresel (deneysel): ${evs.length} olay · Mw: doğrudan ${nD} (%${pct(nD)}), vekil ${nV} (%${pct(nV)})` + (nU ? `, yöntemi belirsiz ${nU}` : '') +
+    ` — KAPSAM: büyük depremler kataloğu (seçim eşiği ≈ Mw 5,5; erken dönemde daha yüksek; Mw 5,0–5,5 kapsamı 2019 öncesinde bölgeye göre tekdüze değil); tüm büyüklükleri içeren tam bir katalog değildir. Vekil Mw, ISC-GEM'in Ms/mb'den hesapladığı değerdir (Di Giacomo vd. 2015a). ` +
+    `ISC-GEM © ISC ve GEM Vakfı, CC BY-SA 3.0, doi:10.31905/D808B825`;
+}
 let historicalCache = null; // { events, completeness, starttime, endtime, source } — ISC+EMSC, 1900-2026, bir kez indirilir
 let epicaCache       = null; // EPICA v1.1 + SHARE-CET, 1003-1899, bir kez indirilir (sadece startYear<=1899 seçilince)
 
@@ -7373,17 +7427,28 @@ async function rebuildHistoricalView() {
 
   setStatus('Tarihsel katalog yükleniyor (14MB, ilk seferde biraz sürebilir)…');
   try {
-    if (!historicalCache) {
+    const trWins = activeHistWindows.filter(w => w.epicaOnlySrc !== ISCGEM_GLOBAL_KEY);   // küresel ISC-GEM penceresi ayrı yüklenir (2026-10-26)
+    const globWin = activeHistWindows.find(w => w.epicaOnlySrc === ISCGEM_GLOBAL_KEY);
+    if (trWins.length && !historicalCache) {
       const res = await fetchTimeout('data/eq_historical.json', {}, 30000);
       if (stale()) return;
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       historicalCache = await res.json();
       if (stale()) return;
     }
-    const cat = iscgemWanted() ? await iscgemCatalog(historicalCache) : historicalCache;
+    let catSel = { completeness: [], source: 'ISC-GEM', endtime: '2021-12-31' };   // yalnız küresel pencere seçiliyse
+    if (trWins.length) {
+      const cat = iscgemWanted() ? await iscgemCatalog(historicalCache) : historicalCache;
+      catSel = cat;
+    }
+    const cat = catSel;
     if (stale()) return;
+    let globEvents = null;
+    if (globWin) { const g = await loadIscgemGlobal(); if (stale()) return;
+      const gs = new Date(`${globWin.startYear}-01-01T00:00:00Z`), ge = new Date(`${globWin.endYear}-12-31T23:59:59.999Z`);
+      globEvents = g.events.filter(e => e.time >= gs && e.time <= ge && e.mag > 0); }
 
-    const needsEpica = activeHistWindows.some(w => w.startYear <= 1899);
+    const needsEpica = trWins.some(w => w.startYear <= 1899);
     if (needsEpica && !epicaCache) {
       const res2 = await fetchTimeout('data/epica_europe_historical.json', {}, 20000);
       if (stale()) return;
@@ -7392,7 +7457,12 @@ async function rebuildHistoricalView() {
 
     let all = [];
     let overallStart = null, overallEnd = null, anyOpenEnded = false, usedEpicaAny = false;
-    for (const w of activeHistWindows) {
+    if (globWin) {
+      all = all.concat(globEvents);
+      const gs = new Date(`${globWin.startYear}-01-01T00:00:00Z`), ge = new Date(`${globWin.endYear}-12-31T23:59:59.999Z`);
+      overallStart = gs; overallEnd = ge;
+    }
+    for (const w of trWins) {
       const win = filterHistoricalWindow(cat, epicaCache, w.startYear, w.endYear, w.epicaOnlySrc);
       all = all.concat(win.events);
       if (win.usedEpica) usedEpicaAny = true;
@@ -7419,7 +7489,8 @@ async function rebuildHistoricalView() {
     const hint = document.getElementById('histHint');
     if (hint) {
       const compLine = (cat.completeness || []).map(c => `${c.period}: Mc≈${c.Mc}`).join(' · ');
-      let text = `Katalog completeness (${cat.source || 'ISC+EMSC'}): ${compLine} — bu, aşağıdaki hesaplanan Mc ile AYNI şey değildir`;
+      let text = trWins.length ? `Katalog completeness (${cat.source || 'ISC+EMSC'}): ${compLine} — bu, aşağıdaki hesaplanan Mc ile AYNI şey değildir` : '';
+      if (globWin) text = (text ? text + ' · ' : '') + iscgemGlobalHint(globEvents);
       if (cat.iscgem) text += ` · ⚗ ISC-GEM v12.1 katmanı AÇIK (deneysel): ${cat.iscgem.nTransfer} Mw aktarımı (${cat.iscgem.nPosition}'inde 1963 öncesi zaman/konum), ${cat.iscgem.nAuth} olayda mw_authority önceliği, ${cat.iscgem.nAdded} ek olay (1904–1962) — ISC-GEM © ISC ve GEM Vakfı, CC BY-SA 3.0, doi:10.31905/d808b825`;
       if (usedEpicaAny) {
         text += ` ⚠ 1003–1899 dönemi FARKLI bir Mw dönüşüm zinciri kullanır ve derinlik bilgisi içermez — ` +
