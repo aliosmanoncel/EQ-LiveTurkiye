@@ -106,6 +106,16 @@
    "4.0"
   ]
  ],
+ "erken_basamaklar": [
+  [
+   "1960-01-01",
+   "4.5"
+  ],
+  [
+   "1985-01-01",
+   "4.0"
+  ]
+ ],
  "sonuc": {
   "once": {
    "isc71_97": {
@@ -146,6 +156,24 @@
      "rate0": 25.204861806265733,
      "m0": 4,
      "lam7": 0.09671739418993122
+    },
+    "wErken": {
+     "donem": [
+      [
+       "1960-01-01",
+       "1985-01-01",
+       4.5
+      ],
+      [
+       "1985-01-01",
+       "2026-09-14",
+       4
+      ]
+     ],
+     "b": 0.8620149800660194,
+     "rate0": 23.363436754965846,
+     "m0": 4,
+     "lam7": 0.06060267405173505
     }
    },
    "isc71_97_emsc": {
@@ -293,6 +321,24 @@
      "T": 27.000684462665095
     },
     "w": {
+     "donem": [
+      [
+       "1971-01-01",
+       "1985-01-01",
+       4.5
+      ],
+      [
+       "1985-01-01",
+       "1997-12-31",
+       4
+      ]
+     ],
+     "b": 0.9471409446445233,
+     "rate0": 67.2545421271037,
+     "m0": 4,
+     "lam7": 0.0968944242342017
+    },
+    "wErken": {
      "donem": [
       [
        "1971-01-01",
@@ -481,12 +527,13 @@
   "GEÇTİ (3) Tek Mc b, a, N, Mc önce = sonra (T'ye bağlı değil) — ör. ISC 1971–1997: b = 0.773, N(≥Mc) = 2200",
   "GEÇTİ (3) ISC 1971–1997 Weichert: λ(≥m₀) arttı (boş 1998–2026 yılları artık sayılmıyor)",
   "GEÇTİ (3) 1971–2026 (bitişik, katalog sonuna kadar): Weichert dönemleri aynı; b 1.085466 → 1.085463 (göreli fark < 1e-4: pencere sonu katalog tarihinin 00:00'ı yerine seçili penceredeki son olay zamanı — birkaç saat)",
+  "GEÇTİ (2) İlk basamak pencere başından önce (1960): dönem 1971'de kırpılıyor, sonuç 1971 basamağıyla aynı (b = 0.947); önce ilk dönem 1960-01-01→1985-01-01, b = 0.862",
   "GEÇTİ (4) Daire bölge, Oran modu: T = 27.001 yıl (önce 126.7)",
   "GEÇTİ (5) Canlı mod: tarihsel pencere yok, histSelWindow = null (canlı yol değişmedi)",
   "GEÇTİ Sayfa hatası yok (önce 0, sonra 0)"
  ],
  "ozet": {
-  "pass": 18,
+  "pass": 19,
   "fail": 0
  }
 }

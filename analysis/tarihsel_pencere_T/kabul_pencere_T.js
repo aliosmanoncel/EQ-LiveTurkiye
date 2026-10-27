@@ -59,6 +59,7 @@ window.__oran = () => { csEnabled = false; onCsChange(true); setGrNormMode('rate
 window.__cmp = () => { CMP = []; cmpAdd(); const c = CMP[CMP.length - 1]; const r = { t0: new Date(c.t0).toISOString(), t1: new Date(c.t1).toISOString(), T: (c.t1 - c.t0) / (365.25 * 864e5) }; CMP = []; return r; };
 `;
 const STEPS_TR = [['1971-01-01', '4.5'], ['1985-01-01', '4.0']];
+const STEPS_ERKEN = [['1960-01-01', '4.5'], ['1985-01-01', '4.0']];   // ilk basamak pencere başından (1971) önce: dönem pencere başında kırpılmalı
 const SEN = {   // ad: [pencereler, bölge]
   isc71_97:      [[[1971, 1997]], ['r', 36, 26, 42, 45]],
   isc71_97_emsc: [[[1971, 1997], [1998]], ['r', 36, 26, 42, 45]],
@@ -81,6 +82,7 @@ const SEN = {   // ad: [pencereler, bölge]
       const r = await p.evaluate(() => __oku());
       r.tek = await p.evaluate(() => __tekMc()); r.cmp = await p.evaluate(() => __cmp());
       if (k === 'isc71_97' || k === 'isc71_97_emsc') r.w = await p.evaluate(s => __weichert(s), STEPS_TR);
+      if (k === 'isc71_97') r.wErken = await p.evaluate(s => __weichert(s), STEPS_ERKEN);
       if (k === 'daire71_97') r.oran = await p.evaluate(() => __oran());
       S[ad][k] = r; hat.push(...hatalar); await ctx.close();
     }
@@ -115,12 +117,15 @@ const SEN = {   // ad: [pencereler, bölge]
     console.log(`     Weichert ${k}: b ${o.b.toFixed(3)} → ${y.b.toFixed(3)}; λ(≥${y.m0}) ${o.rate0.toFixed(2)} → ${y.rate0.toFixed(2)}/yıl; λ(≥7) ${o.lam7.toExponential(3)} → ${y.lam7.toExponential(3)}/yıl`); }
   ok(Y.isc71_97.w.rate0 > O.isc71_97.w.rate0, '(3) ISC 1971–1997 Weichert: λ(≥m₀) arttı (boş 1998–2026 yılları artık sayılmıyor)');
   ok(JSON.stringify(Y.isc71_97_emsc.w.donem) === JSON.stringify(O.isc71_97_emsc.w.donem) && approx(Y.isc71_97_emsc.w.b, O.isc71_97_emsc.w.b, 1e-4) && approx(Y.isc71_97_emsc.w.rate0 / O.isc71_97_emsc.w.rate0, 1, 1e-4), `(3) 1971–2026 (bitişik, katalog sonuna kadar): Weichert dönemleri aynı; b ${O.isc71_97_emsc.w.b.toFixed(6)} → ${Y.isc71_97_emsc.w.b.toFixed(6)} (göreli fark < 1e-4: pencere sonu katalog tarihinin 00:00'ı yerine seçili penceredeki son olay zamanı — birkaç saat)`);
+  { const o = O.isc71_97.wErken, y = Y.isc71_97.wErken;
+    ok(y.donem[0][0] === '1971-01-01' && JSON.stringify(y.donem) === JSON.stringify(s1.w.donem) && Math.abs(y.b - s1.w.b) < 1e-12,
+      `(2) İlk basamak pencere başından önce (1960): dönem 1971'de kırpılıyor, sonuç 1971 basamağıyla aynı (b = ${y.b.toFixed(3)}); önce ilk dönem ${o.donem[0].slice(0, 2).join('→')}, b = ${o.b.toFixed(3)}`); }
   // (4) Oran modu
   ok(Y.daire71_97.oran.mode === 'rate' && approx(Y.daire71_97.oran.years, 27, 0.01), `(4) Daire bölge, Oran modu: T = ${Y.daire71_97.oran.years.toFixed(3)} yıl (önce ${O.daire71_97.oran.years ? O.daire71_97.oran.years.toFixed(1) : '—'})`);
   // (5) canlı mod
   ok(!Y.canli.hist && Y.canli.sel === null, '(5) Canlı mod: tarihsel pencere yok, histSelWindow = null (canlı yol değişmedi)');
   ok(!O.hatalar.length && !Y.hatalar.length, `Sayfa hatası yok (önce ${O.hatalar.length}, sonra ${Y.hatalar.length})` + (Y.hatalar.length ? ': ' + Y.hatalar.join(' | ') : ''));
-  fs.writeFileSync(path.join(__dirname, 'kabul_sonuc.json'), JSON.stringify({ senaryolar: SEN, weichert_basamaklari: STEPS_TR, sonuc: S, denetimler: kayit, ozet: { pass, fail } }, null, 1));
+  fs.writeFileSync(path.join(__dirname, 'kabul_sonuc.json'), JSON.stringify({ senaryolar: SEN, weichert_basamaklari: STEPS_TR, erken_basamaklar: STEPS_ERKEN, sonuc: S, denetimler: kayit, ozet: { pass, fail } }, null, 1));
   console.log(`\n${fail ? 'KALDI' : 'GEÇTİ'}: ${pass} geçti, ${fail} kaldı`);
   await br.close(); srv.close(); process.exit(fail ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });

@@ -32,7 +32,7 @@ Değişiklik `index.html`'de, yaklaşık 20 satır.
 - Pencere etiketinde yıl UTC ile yazılıyor. Önceden yerel saat (UTC+3) yüzünden 1997-12-31 23:59 UTC, "1998" görünüyordu.
 - Hesap yöntemlerine (Aki–Utsu, Weichert, Mc, GK74) dokunulmadı. Yalnız T'nin kaynağı değişti.
 
-## 3. Kabul testi: `kabul_pencere_T.js`, 18/18 geçti (önce = main 543ac56)
+## 3. Kabul testi: `kabul_pencere_T.js`, 19/19 geçti (önce = main 543ac56)
 
 | Senaryo | Önce: pencere (T) | Sonra: pencere (T) | N |
 |---|---|---|---|
@@ -63,8 +63,15 @@ Weichert sonuçları; basamaklar 1971 M ≥ 4,5 ve 1985 M ≥ 4,0, bölge 36–4
 |---|---|---|---|
 | ISC 1971–1997 | 0,805 → **0,947** | 25,20 → **67,25** | 0,0967 → 0,0969 |
 | ISC 1971–1997 + EMSC 1998– | 1,0855 → 1,0855 | 105,11 → 105,11 | 0,0582 → 0,0582 |
+| ISC 1971–1997, ilk basamak 1960 (pencere başından önce) | 0,862 → **0,947** (dönem 1960 → 1971'de kırpılıyor; 1971 basamağıyla aynı sonuç) | | |
 
-Pencere verinin sonuna kadar uzanıyorsa (ikinci satır) sonuç değişmiyor. Yalnızca pencere sonu birkaç saat kayıyor, bu da göreli olarak 1e−4'ün altında bir fark. Hata yalnızca pencere katalog sonundan önce bittiğinde, ya da başlangıçtan önce boş yıllar sayıldığında sonuçları değiştiriyordu.
+Pencere verinin sonuna kadar uzanıyorsa (ikinci satır) tamlık dönemleri aynı kalıyor; yalnızca pencere sonu birkaç saat kayıyor. Ölçülen farklar:
+- b: 1,0854657 → 1,0854634 (göreli 2e−6);
+- λ(≥4): 105,1139 → 105,1116 (göreli 2e−5).
+
+Bu kaymanın nedeni şu: pencere sonu artık katalog tarihinin 00:00'ı değil, seçili penceredeki son olayın zamanı (2026-09-14, aynı gün). Bu, o günün olaylarını da gözlem süresine katan daha doğru bir tanım.
+
+Üçüncü satır, düzeltmenin ikinci bir etkisini gösteriyor: tamlık basamağı seçili pencereden önce başlıyorsa, eski kod pencere öncesindeki boş yılları da T'ye katıyordu. Hata yalnızca pencere katalog sonundan önce bittiğinde, ya da başlangıçtan önce boş yıllar sayıldığında sonuçları değiştiriyordu.
 
 **Gerileme testleri:**
 - Birim testleri 14/14 geçti.
