@@ -1,6 +1,6 @@
 # GK74 düğmesi: Bölge Analizi dikdörtgen, poligon ve linkle açılan bölgeler (2026-10-27)
 
-**Dal:** `gk74-bolge-dugmesi` (`main`'den). `main`'e birleştirilmedi, canlıya gönderilmedi; birleştirme kullanıcı kararına bağlı.
+**Dal:** `gk74-bolge-dugmesi` (`main`'den). **2026-10-27'de kullanıcı onayıyla `main`'e birleştirildi** (ff5d754; `test-fit-range-onarim` ile birlikte).
 
 ## Sorun
 GK74 artçı ayıklama düğmesi yalnız Araştırma Bölgesi ve daire yollarında görünür yapılıyordu. Bölge Analizi'nin kendi çizim yollarında hiç görünmüyordu:
@@ -46,3 +46,17 @@ GK74 hesabı bölgenin şekline bakmaz; seçili bölgedeki olaylar (`regionEvent
 **GitHub iş akışları** (0b00312): GK74 eşdeğerliği (Python = JS), b güven aralığı ve ISC-GEM katmanı geçti.
 
 **Kapsam dışı:** Canlı EMSC/USGS sorguları ve harita karoları sınanmadı (ağ kapalı); değişiklik bu yollara dokunmuyor.
+
+## Birleştirme ve canlı kontrol (2026-10-27)
+- **Birleştirme öncesi:** `main` (1290b05) dal açıldığından beri değişmemişti; çakışma yoktu; `index.html` farkı yalnız 3 satırdı.
+- **Birleşik `main`'de testler:**
+  - Kabul testi 16/16.
+  - Birim testleri 14/14 dosya; onarılan `test_fit_range.js` 37/37 dahil.
+- **Gönderme sonrası:** İş akışları (GK74 eşdeğerliği, b güven aralığı, ISC-GEM katmanı) ve Pages yayını başarılı.
+- **Canlı site** (masaüstü uygulamasındaki tarayıcı, ISC 1971–1997):
+  - Dikdörtgen 921 → 557.
+  - Bölge Analizi poligonu 489 → 295; Araştırma Bölgesi'nden aynı poligon 489 → 295.
+  - Daire 274 → 194; bağlam kutucuğu yalnız dairede etkin.
+  - Canlı EMSC sorgusuyla çizilen poligonda da düğme görünüyor (385 olay).
+  - Yerel testle birebir aynı.
+- **Gizli panel notu:** Panel gizliyken düğmenin kendisi tarayıcı çizim karesini beklediği için tetiklenemedi. Bu yüzden canlı kontrolde aynı hesap fonksiyonu (`applyGk74Filter`) doğrudan çağrıldı. Düğme tıklaması yerel kabul testinde sınanmıştı.
