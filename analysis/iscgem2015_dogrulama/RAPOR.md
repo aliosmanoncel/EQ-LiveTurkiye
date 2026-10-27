@@ -1,7 +1,7 @@
 # `iscgem2015` bağıntısının kaynak makaleyle doğrulanması (2026-10-27)
 
 **Kaynak:** Di Giacomo, D., Bondár, I., Storchak, D. A., Engdahl, E. R., Bormann, P. & Harris, J. (2015). ISC-GEM: Global Instrumental Earthquake Catalogue (1900–2009), III. Re-computed MS and mb, proxy MW, final magnitude composition and completeness assessment. *Phys. Earth Planet. Inter.* 239, 33–47. doi:10.1016/j.pepi.2014.06.005.
-- Tam metin kullanıcının Zotero arşivinden alındı.
+- Tam metin kullanıcının Zotero arşivinden alındı. Sayfa numaraları dergi sayfasıdır ve her alıntı sayfa sayfa metin aramasıyla doğrulandı.
 - Metin çıkarımında eksi işaretleri bozuluyordu (yazı tipi eşlemesi). Bu yüzden eşitlikler sayfa görüntüsünden okundu: `es1_s40.png`, `es2_s42.png`.
 
 **İncelenen kod:** `index.html`, `MAG_CONVERSIONS.iscgem2015` ve `MS_DEPTH_LIMIT.iscgem2015`. Kodda değişiklik yapılmadı.
@@ -16,11 +16,11 @@
 | Eş. (1) Ms → Mw | Mw = e^(−0,222 + 0,233·Ms) + 2,863 (s. 40) | `Math.exp(-0.222 + 0.233*m) + 2.863` | ✔ birebir |
 | Eş. (2) mb → Mw | Mw = exp(−4,664 + 0,859·mb) + 4,555 (s. 42) | `Math.exp(-4.664 + 0.859*m) + 4.555` | ✔ birebir |
 | Model biçimi | Üstel, My = e^(a + b·Mx) + c, doğrusal olmayan en küçük kareler; GCMT Mw'ye karşı (s. 40) | Aynı biçim | ✔ |
-| Ms derinlik koşulu | Ms yalnız derinlik − derinlik belirsizliği ≤ 60 km için yeniden hesaplandı (s. 36) | h ≤ 60 km (σh yok; daha katı) | ✔ (kodda doğru belgelenmiş) |
-| mb derinlik | mb derin depremler için de kullanılır; Ms yoksa vekil kaynağı mb'dir (s. 42) | mb tüm derinlikler | ✔ |
-| Öncelik | Vekil yalnız doğrudan Mw yoksa (s. 41); mb yalnız Ms yoksa (s. 42) | Mw türündeki olaylar dönüştürülmez | ✔ |
+| Ms derinlik koşulu | Ms yalnız derinlik − derinlik belirsizliği ≤ 60 km için yeniden hesaplandı (s. 35) | h ≤ 60 km (σh yok; daha katı) | ✔ (kodda doğru belgelenmiş) |
+| mb derinlik | mb derin depremler için de kullanılır; Ms yoksa vekil kaynağı mb'dir (s. 41) | mb tüm derinlikler | ✔ |
+| Öncelik | Vekil yalnız doğrudan Mw yoksa; mb yalnız Ms yoksa (s. 41) | Mw türündeki olaylar dönüştürülmez | ✔ |
 | Ms üst sınırı | Ms 8–8,5 arasında yalnız 4 olay kullanıldı; Ms doygunluğu, 1960 Valdivia'nın vekili belirgin biçimde düşük (s. 41) | Ms ≤ 8,5 | ✔ |
-| mb üst sınırı | Şekil 14: üstel model ile medyan eğrisi 4,6 < mb < 6,5 aralığında iyi uyumlu (s. 42); mb Mw 6 üstünde doygun | mb ≤ 6,5 | ✔ |
+| mb üst sınırı | Şekil 14: üstel model medyan eğrisiyle 4,6 < mb < 6,5'te iyi uyumlu. mb vekili "özellikle mb 6,8 üstünde" dikkatle kullanılmalı; ISC-GEM mb vekilini 6,5 < mb < 6,8'de yalnız 13 olayda kullanmış (s. 42) | mb ≤ 6,5 | ✔ (makaleden temkinli) |
 
 **Ek bilgi (kodda yok, kayda değer):**
 - Katsayıların standart hataları: Eş. (1) için a, b, c = 0,043, 0,004, 0,056; Eş. (2) için 0,085, 0,012, 0,017.
@@ -34,7 +34,7 @@
 1. **Sayfa atfı.** Kodda "(s. 41–42)" yazıyor. Doğrusu: Eş. (1) **s. 40**, Eş. (2) **s. 42**.
 2. **Alt sınırların kaynağı.** `validRange` metni "mb: 3,5–6,5 · Ms: 3,0–8,5" aralıklarını geçerlilik aralığı gibi veriyor. Oysa:
    - **Ms 3,0 ve mb 3,5 alt sınırları makalede yok.** Bunlar EQ-Live'ın tercihi; gerekçesi kodda yazılı: yalnız M ≥ 5 dönüştürülürse 4,95–5,2 arasında boşluk oluşuyor.
-   - **Makaledeki "M < 5 için dikkat" uyarısı** Ms modeli için yazılmış (s. 41).
+   - **Makaledeki "M < 5 için dikkat" uyarısı** Ms modeli için yazılmış (s. 41). mb modeli için makalenin uyarısı üst uçtadır (mb > 6,8; s. 42).
    - **mb için makalenin verdiği aralık** iyi uyum aralığı 4,6 < mb < 6,5 (Şekil 14).
    - **Önerilen metin:** "Makale: Ms modeli M < 5'te dikkatle kullanılmalı (s. 41); mb modeli 4,6 < mb < 6,5'te medyana iyi uyumlu (Şekil 14). Alt sınırlar Ms 3,0 / mb 3,5 EQ-Live tercihidir (makalede yok)."
 
