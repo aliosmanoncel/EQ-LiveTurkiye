@@ -159,7 +159,36 @@ Fark kısmen yöntemden kaynaklanıyor olabilir, ama nedeni önceden varsayılma
 - Geniş ve tektonik olarak karışık bir bölgede, büyük M'de G–R'nin doğrusal olmaması da (eğrilik, kuyruk) etkili olabilir.
 - 27 yıllık pencere kısa.
 
-Bu soru (dönemsel tamlıkla birleştirmenin tek Mc'ye göre oranı ne kadar değiştirdiği ve bunun gözlenen sayılarla uyumu) doğrulanmış tamlık basamaklarıyla, daha uzun pencerede ve bölgelere ayrılarak ayrıca incelenmelidir.
+Bu soru (dönemsel tamlıkla birleştirmenin tek Mc'ye göre oranı ne kadar değiştirdiği ve bunun gözlenen sayılarla uyumu) doğrulanmış tamlık basamaklarıyla, daha uzun pencerede ve bölgelere ayrılarak ayrıca incelenmelidir. §4.5 bu soruya ilk yanıtı veriyor: uyumsuzluğun kaynağı test basamaklarıydı.
+
+### 4.5 Tamlık modeli duyarlılığı (`tamlik_karsilastirma.js`; sonuç `tamlik_karsilastirma.json`)
+
+Aynı bölge ve pencerede (T = 27 yıl; gözlenen M ≥ 6: 13 olay, M ≥ 7: 1 olay) beş tamlık seçimi denendi.
+
+**Gerekçe verisi:**
+- **Katalog üst verisi** (`data/eq_historical.json`): 1960–1998 için Mc = 4,5 (ISC).
+- **Yıllık Mc** (uygulamanın `computeMc`'si, yalnız ≥ 50 olaylı yıllar):
+
+| 1971 | 1976 | 1983 | 1984 | 1986 | 1988 | 1990 | 1991 | 1992–95 | 1996 | 1997 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 4,9 | 5,0 | 4,8 | 4,2 | 4,8 | 4,7 | 3,9 | 3,8 | 3,7 | 3,8 | 3,7 |
+
+1972–1982 yıllarının çoğunda 50'den az olay olduğu için Mc hesaplanamadı. "Otomatik öner" bu tablodan şu basamakları üretiyor: 1971 M ≥ 5,0; 1984 M ≥ 4,2; 1986 M ≥ 4,8; 1990 M ≥ 3,9. Bu basamaklar tekdüze değil (1984 → 1986'da eşik artıyor).
+
+| Seçim | b | M ≥ 6 beklenen (p) | M ≥ 7 beklenen (p) |
+|---|---|---|---|
+| A: Weichert, test basamakları (1971 M ≥ 4,5; 1985 M ≥ 4,0; doğrulanmamış) | 0,947 | 23,2 (0,032) | 2,62 (0,53) |
+| B: Weichert, katalog üst verisi (1971 M ≥ 4,5) | 1,192 | 11,2 (0,66) | 0,72 (1,00) |
+| C: Weichert, Otomatik öner (4 basamak) | 1,118 | 11,2 (0,67) | 0,85 (1,00) |
+| D: Tek Mc = 4,5 (elle) | 1,191 | 11,2 (0,67) | 0,72 (1,00) |
+| E: Tek Mc otomatik (Mc = 3,7; tamlık uyarısı var) | 0,773 | 36,6 (1e−5) | 6,17 (0,030) |
+
+**Sonuçlar:**
+1. §4.4'teki Weichert uyumsuzluğu (A) iyimser test basamağından kaynaklanıyor. Yıllık Mc 1985–1989'da hâlâ 4,7–4,8; basamak ise M ≥ 4,0 diyor. Bu yüzden b aşağı yanlı çıkıyor.
+2. Veriye ya da üst veriye dayanan tamlıkla (B, C, D) öngörü gözlenenle uyumlu. Bu uyum aynı veriyle yapılmış bir iç tutarlılık denetimi; M ≥ 7'de tek gözlem var.
+3. **B ile D aynı sonucu veriyor.** Tek basamaklı Weichert, aynı eşikteki tek Mc ile aynı veri alt kümesini kullanır. Dolayısıyla A, B ve E arasındaki farklar "Weichert mi, tek Mc mi" farkı değil, tamlık eşiği ve dönem seçimi farkıdır. ChatGPT'nin yöntem koşulu (aynı pencere, eşik ve oran tanımı) bu ayrımı mümkün kıldı.
+4. Weichert'in kendine özgü katkısı, C'de olduğu gibi tamlığı farklı dönemleri birleştirmesidir. Burada C, D'ye göre daha fazla olay kullanıyor (N = 930'a karşı 685), ama M ≥ 6 öngörüsü aynı (11,2). Bu bölge ve pencerede birleştirmenin oran üzerindeki etkisi küçük; b'nin belirsizliği daralıyor.
+5. Bu bir bölge ve bir pencere için geçerli bir sonuçtur. Genelleme için başka bölge ve pencerelerde, tercihen bağımsız bir sınama dönemiyle (ör. 1971–1997'de kur, 1998–2026'da sına) tekrar edilmeli.
 
 ## 5. Literatür ile karşılaştırma
 
