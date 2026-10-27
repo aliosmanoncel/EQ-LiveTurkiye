@@ -1,0 +1,271 @@
+{
+ "poligon": [
+  [
+   38,
+   27
+  ],
+  [
+   39.5,
+   28
+  ],
+  [
+   40,
+   30
+  ],
+  [
+   39,
+   31.5
+  ],
+  [
+   37.5,
+   30.5
+  ],
+  [
+   37,
+   28.5
+  ]
+ ],
+ "link": {
+  "link_dikdortgen": "?rminlat=37&rmaxlat=40&rminlon=26&rmaxlon=30",
+  "link_poligon": "?rminlat=37&rmaxlat=40&rminlon=27&rmaxlon=31.5&rpoly=38,27;39.5,28;40,30;39,31.5;37.5,30.5;37,28.5",
+  "link_daire": "?rminlat=37.4&rmaxlat=39.6&rminlon=27.1&rmaxlon=29.9&rcirc=38.5,28.5,120"
+ },
+ "sonuc": {
+  "once": {
+   "dikdortgen": {
+    "dugme": false,
+    "ctxDevreDisi": true,
+    "sekil": "dikdörtgen",
+    "kose": null,
+    "baglamDestegi": false,
+    "gk": {
+     "n": 921,
+     "ana": 557,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 921 → 557 ana şok"
+    }
+   },
+   "bolge_poligon": {
+    "dugme": false,
+    "ctxDevreDisi": true,
+    "sekil": "poligon",
+    "kose": 6,
+    "baglamDestegi": false,
+    "gk": {
+     "n": 489,
+     "ana": 295,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 489 → 295 ana şok"
+    }
+   },
+   "arastirma_poligon": {
+    "dugme": true,
+    "ctxDevreDisi": true,
+    "sekil": "poligon",
+    "kose": 6,
+    "baglamDestegi": false,
+    "gk": {
+     "n": 489,
+     "ana": 295,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 489 → 295 ana şok"
+    }
+   },
+   "arastirma_daire": {
+    "dugme": true,
+    "ctxDevreDisi": false,
+    "sekil": "daire",
+    "kose": null,
+    "baglamDestegi": true,
+    "gk": {
+     "n": 274,
+     "ana": 194,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 274 → 194 ana şok"
+    },
+    "gkBaglam": {
+     "n": 274,
+     "ana": 190,
+     "baglam": true,
+     "metin": "⏳ GK74 ÇALIŞIYOR… (bağlam olayları yükleniyor)"
+    }
+   },
+   "link_dikdortgen": {
+    "dugme": false,
+    "ctxDevreDisi": true,
+    "sekil": "dikdörtgen",
+    "kose": null,
+    "baglamDestegi": false,
+    "acilista_dugme": false,
+    "gk": {
+     "n": 921,
+     "ana": 557,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 921 → 557 ana şok"
+    }
+   },
+   "link_poligon": {
+    "dugme": false,
+    "ctxDevreDisi": true,
+    "sekil": "poligon",
+    "kose": 6,
+    "baglamDestegi": false,
+    "acilista_dugme": false,
+    "gk": {
+     "n": 489,
+     "ana": 295,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 489 → 295 ana şok"
+    }
+   },
+   "link_daire": {
+    "dugme": false,
+    "ctxDevreDisi": false,
+    "sekil": "daire",
+    "kose": null,
+    "baglamDestegi": true,
+    "acilista_dugme": false,
+    "gk": {
+     "n": 274,
+     "ana": 194,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 274 → 194 ana şok"
+    }
+   },
+   "iscgem": {
+    "n": 74159,
+    "ipucu": "🌍 ISC-GEM v12.1 küresel (deneysel): 74159 olay · Mw: doğrudan 51227 (%69), vekil 22931 (%31), yöntemi belirsiz 1 — KAPSAM: büyük depremler kataloğu (seçim eşiği ≈ Mw 5,5; erken dönemde daha yüksek; Mw 5,0–5,5 kapsamı 2019 öncesinde bölgeye göre tekdüze değil); tüm büyüklükleri içeren tam bir katalog değildir. Vekil Mw, ISC-GEM'in Ms/mb'den hesapladığı değerdir (Di Giacomo vd. 2015a). ISC-GEM © ISC ve GEM Vakfı, CC BY-SA 3.0, doi:10.31905/D808B825"
+   },
+   "hatalar": []
+  },
+  "sonra": {
+   "dikdortgen": {
+    "dugme": true,
+    "ctxDevreDisi": true,
+    "sekil": "dikdörtgen",
+    "kose": null,
+    "baglamDestegi": false,
+    "gk": {
+     "n": 921,
+     "ana": 557,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 921 → 557 ana şok"
+    }
+   },
+   "bolge_poligon": {
+    "dugme": true,
+    "ctxDevreDisi": true,
+    "sekil": "poligon",
+    "kose": 6,
+    "baglamDestegi": false,
+    "gk": {
+     "n": 489,
+     "ana": 295,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 489 → 295 ana şok"
+    }
+   },
+   "arastirma_poligon": {
+    "dugme": true,
+    "ctxDevreDisi": true,
+    "sekil": "poligon",
+    "kose": 6,
+    "baglamDestegi": false,
+    "gk": {
+     "n": 489,
+     "ana": 295,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 489 → 295 ana şok"
+    }
+   },
+   "arastirma_daire": {
+    "dugme": true,
+    "ctxDevreDisi": false,
+    "sekil": "daire",
+    "kose": null,
+    "baglamDestegi": true,
+    "gk": {
+     "n": 274,
+     "ana": 194,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 274 → 194 ana şok"
+    },
+    "gkBaglam": {
+     "n": 274,
+     "ana": 190,
+     "baglam": true,
+     "metin": "⏳ GK74 ÇALIŞIYOR… (bağlam olayları yükleniyor)"
+    }
+   },
+   "link_dikdortgen": {
+    "dugme": true,
+    "ctxDevreDisi": true,
+    "sekil": "dikdörtgen",
+    "kose": null,
+    "baglamDestegi": false,
+    "acilista_dugme": true,
+    "gk": {
+     "n": 921,
+     "ana": 557,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 921 → 557 ana şok"
+    }
+   },
+   "link_poligon": {
+    "dugme": true,
+    "ctxDevreDisi": true,
+    "sekil": "poligon",
+    "kose": 6,
+    "baglamDestegi": false,
+    "acilista_dugme": true,
+    "gk": {
+     "n": 489,
+     "ana": 295,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 489 → 295 ana şok"
+    }
+   },
+   "link_daire": {
+    "dugme": true,
+    "ctxDevreDisi": false,
+    "sekil": "daire",
+    "kose": null,
+    "baglamDestegi": true,
+    "acilista_dugme": true,
+    "gk": {
+     "n": 274,
+     "ana": 194,
+     "baglam": false,
+     "metin": "✅ GK74 AÇIK · 274 → 194 ana şok"
+    }
+   },
+   "iscgem": {
+    "n": 74159,
+    "ipucu": "🌍 ISC-GEM v12.1 küresel (deneysel): 74159 olay · Mw: doğrudan 51227 (%69), vekil 22931 (%31), yöntemi belirsiz 1 — KAPSAM: büyük depremler kataloğu (seçim eşiği ≈ Mw 5,5; erken dönemde daha yüksek; Mw 5,0–5,5 kapsamı 2019 öncesinde bölgeye göre tekdüze değil); tüm büyüklükleri içeren tam bir katalog değildir. Vekil Mw, ISC-GEM'in Ms/mb'den hesapladığı değerdir (Di Giacomo vd. 2015a). ISC-GEM © ISC ve GEM Vakfı, CC BY-SA 3.0, doi:10.31905/D808B825"
+   },
+   "hatalar": []
+  }
+ },
+ "denetimler": [
+  "GEÇTİ (1) Bölge Analizi dikdörtgen: düğme görünür (önce gizli)",
+  "GEÇTİ (1) Bölge Analizi poligon (6 köşe): düğme görünür (önce gizli)",
+  "GEÇTİ (1) link_dikdortgen: düğme açılışta ve sorgudan sonra görünür (önce açılışta gizli; şekil dikdörtgen)",
+  "GEÇTİ (1) link_poligon: düğme açılışta ve sorgudan sonra görünür (önce açılışta gizli; şekil poligon)",
+  "GEÇTİ (1) link_daire: düğme açılışta ve sorgudan sonra görünür (önce açılışta gizli; şekil daire)",
+  "GEÇTİ (2) Aynı poligon: Bölge Analizi 489 olay → 295 ana şok; Araştırma Bölgesi 489 → 295",
+  "GEÇTİ Dikdörtgende GK74 çalışıyor: 921 → 557 (bağlamsız)",
+  "GEÇTİ (3) Daire önce = sonra: 274 → 194 (bağlamsız), 190 (bağlamlı); bağlam kutucuğu etkin",
+  "GEÇTİ (3) Bağlamlı GK74 kutucuğu dikdörtgen ve poligonda devre dışı; bağlam kullanılmadı",
+  "GEÇTİ (3) Link: bağlam kutucuğu dairede etkin, poligon/dikdörtgende devre dışı",
+  "GEÇTİ (3) regionCtxSupported(): yalnız dairede true; dikdörtgen/poligonda GK74 bağlam kullanmadı",
+  "GEÇTİ Link poligonu da aynı sonucu verdi: 489 → 295",
+  "GEÇTİ Araştırma Bölgesi poligonu önce = sonra (489 → 295)",
+  "GEÇTİ Bölge sorgusu olay sayıları önce = sonra (dikdörtgen 921, poligon 489) — yalnız düğme değişti",
+  "GEÇTİ Küresel ISC-GEM penceresi önce = sonra (74159 olay)",
+  "GEÇTİ Sayfa hatası yok (önce 0, sonra 0)"
+ ],
+ "ozet": {
+  "pass": 16,
+  "fail": 0
+ }
+}
