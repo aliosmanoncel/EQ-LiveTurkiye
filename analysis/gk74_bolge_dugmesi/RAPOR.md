@@ -42,4 +42,7 @@ GK74 hesabı bölgenin şekline bakmaz; seçili bölgedeki olaylar (`regionEvent
 
 İlk denemede bağlam kutucuğu durumu bu ağ kısıtı yüzünden güncellenmemişti; kod hatası değil.
 
+**Birim testleri** (`scripts/test_*.js`): 13 dosya geçti. `test_fit_range.js` öncekiyle aynı nedenle çalışmıyor; bu değişiklikle ilgisi yok.
+**GitHub iş akışları** (0b00312): GK74 eşdeğerliği (Python = JS), b güven aralığı ve ISC-GEM katmanı geçti.
+
 **Kapsam dışı:** Canlı EMSC/USGS sorguları ve harita karoları sınanmadı (ağ kapalı); değişiklik bu yollara dokunmuyor.
