@@ -1,6 +1,12 @@
-# Poisson aşılma olasılığı — doğrulama raporu (2026-10-27, güncelleme 2)
+# Poisson aşılma olasılığı — doğrulama raporu (2026-10-27, güncelleme 3)
 
 **Dal:** `bolge-karsilastirma-a-etiketi`. Bu dal, tarihsel pencere düzeltmesini (`tarihsel-pencere-T`, 17ca240) içerir. `main`'e birleştirilmedi, canlıya yayımlanmadı.
+
+**Güncelleme 3'te eklenenler:**
+- Panele gözlenen–öngörülen satırı (kesin Poisson p ve Garwood aralığı).
+- Tamlık uyarısında etkinin metinle açıklanması.
+- Kabul testi 42/42, birim testleri 23 denetim.
+- Ayrıntılar §4'te.
 
 **Güncelleme 2'de değişenler:**
 - Tarihsel pencere düzeltmesi dala birleştirildi.
@@ -37,7 +43,7 @@
 
 ## 2. Birim testleri: `scripts/test_*.js`, 15/15
 
-Yeni test `test_poisson_prob.js` (15 denetim).
+Yeni test `test_poisson_prob.js` (23 denetim; §6'sı §4.2'de).
 
 **Analitik ve tutarlılık:**
 - λ = 0,01 ve t = 50 → P = 0,393469 (= 1 − e^−0,5).
@@ -69,7 +75,7 @@ Yeni test `test_poisson_prob.js` (15 denetim).
 
 Kapsam sınırı: Bu deneylerde model doğrudur. Yani G–R, Poisson, bilinen tamlık ve hatasız büyüklük varsayılıyor. Gerçek kataloglardaki tamlık hatası, büyüklük hatası ve kümelenme bu kapsamaya dahil değildir (§4).
 
-## 3. Tarayıcı kabul testi: `kabul_poisson.js`, 32/32
+## 3. Tarayıcı kabul testi: `kabul_poisson.js`, 42/42 ((6) maddeleri §4.3'te)
 
 - Senaryo: Türkiye modu, ISC 1971–1997, dikdörtgen 36–42° K / 26–45° D.
 - Önce: `tarihsel-pencere-T` (main + pencere düzeltmesi). Sonra: bu dal.
@@ -92,23 +98,68 @@ Ekran görüntüleri:
 - `poisson_weichert.png`
 - `poisson_weichert_mx.png`
 
-## 4. Gözlenen ve öngörülen sayılar (aynı senaryo, T = 27 yıl)
+## 4. Gözlenen–öngörülen karşılaştırması (güncelleme 3: panele eklendi)
 
-| | Gözlenen (1971–1997) | Tek Mc (Mc = 3,7, b = 0,77) | Weichert (b = 0,947) |
-|---|---|---|---|
-| N(M ≥ 6) / yıl | 13 olay → 0,48 | 1,36 | — |
-| N(M ≥ 7) / yıl | 1 olay (1976 Çaldıran, Mw 7,0) → 0,037 [Poisson %95: 0,0009–0,21] | 0,23 [0,18–0,29] | 0,097 |
-| P(50 yıl, M ≥ 7) | — | %100,0 | %99,2 |
+### 4.1 Panelde ne gösteriliyor
 
-**Tek Mc yolu bu katalogda büyük M oranını açıkça abartıyor.** M ≥ 6 için öngörü gözlenenin yaklaşık 2,8 katı. Nedenleri:
-- Katalog Mc = 3,7'de 1971–1997 boyunca tam değil. Tamlık uyarısı bunu gösteriyor: ilk yarıda 498 / 1702 olay, p = 1,6e−153.
-- Bu yüzden b = 0,77 düşük çıkıyor.
+Panelde şu satır görünüyor:
 
-Panel bu durumda uyarı verip Weichert'i öneriyor. Ancak öngörülen değer yine de ekranda görünüyor.
+> Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): N_gözl(M≥M) olay / T(M) yıl → λ_gözl [%95 kesin Poisson] · beklenen λT · iki yönlü kesin Poisson p
 
-Weichert öngörüsü (0,097/yıl) tek olayın Poisson aralığı içinde kalıyor. Yine de bu aralık çok geniş; 27 yıllık bir pencere M ≥ 7 oranını sınamaya yetmez.
+**Karşılaştırma koşulu:** Tek Mc ile Weichert yalnızca aynı M eşiği, aynı pencere ve aynı oran tanımıyla karşılaştırılır.
 
-Öneri (karar sizde): Poisson satırına "gözlenen N(≥M) ile öngörülen λT" karşılaştırmasını ve bunun Poisson p değerini eklemek. Ayrıca tek Mc tamlık uyarısı varken P değerini soluk göstermek ya da gizlemek. Bu, ChatGPT'nin "yanlış oranı doğruymuş gibi sunmamalı" koşulunu veri düzeyinde de karşılar.
+**Tanımlar:**
+- **Tek Mc:** Pencere boyunca M ≥ M sınıfındaki olaylar sayılır; T, seçili pencerenin süresidir.
+- **Weichert:** Yalnızca M'nin tam gözlendiği dönemlerdeki (eşik ≤ M) olaylar sayılır; T(M) = `csObsYears(M)`. Panelin Weichert olabilirliğinde kullandığı süre budur. M tüm basamak eşiklerinin üstündeyse T(M) pencerenin tamamına eşit olur ve iki yöntem aynı N_gözl ve aynı T ile karşılaştırılır (M ≥ 6 ve M ≥ 7 için 13 ve 1 olay, 27,0 yıl).
+- **p:** İki yönlü kesin Poisson testi. Küçük kuyruk iki ile çarpılır, en çok 1. Model λ'sı doğruysa, gözlenen sayının beklenenden en az bu kadar uzak çıkma olasılığını verir.
+- **λ_gözl aralığı:** Garwood (1936) kesin aralığı.
+
+**Gösterim kuralları:**
+- p < 0,05 ise uyarı çıkar: "Gözlenen sayı modelle uyumsuz … λ, Tr ve P güvenilir değildir".
+- N_gözl < 5 ise not düşülür: "sınamanın gücü düşük; uyum modelin doğru olduğunu göstermez".
+- Tek Mc tamlık uyarısı varsa P'nin yanına "(tamlık uyarısı: yorumlamayın)" yazılır. Uyarı metni etkiyi de açıklar: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur, Mc'den büyük M'ye uzatılan λ ve P yukarı yanlı olabilir, N(≥Mc)/T ise düşük kalır. P soluklaştırılmadı; neden metinle yazılıyor.
+
+**Sınır:** Aynı katalog hem modeli kurmak hem sınamak için kullanılıyor. Bu yüzden denetim bir iç tutarlılık denetimidir, bağımsız doğrulama değildir. Uyum, modelin doğru olduğunu kanıtlamaz.
+
+### 4.2 Birim testleri (`test_poisson_prob.js` §6)
+
+| Denetim | Sonuç |
+|---|---|
+| P(X ≤ 1 \| μ = 6,17) analitik e^−μ(1+μ) | 0,014994, aynı |
+| Garwood, N = 1 | [0,025318; 5,571643] olay, tabloyla aynı |
+| Garwood, N = 0 üst sınır | −ln 0,025 = 3,688879 |
+| N = 9700, μ = 10⁴: doğrudan toplamla karşılaştırma | göreli fark < 1e−8 |
+| Testin boyutu: doğru modelde p < 0,05 oranı (4000 deneme) | μ = 0,5: %1,1; μ = 3: %1,2; μ = 30: %4,3; μ = 300: %4,7. Hiçbiri %5'i aşmıyor; kesin test tutucu |
+| Sentetik, başı eksik katalog (gerçek b = 1; ilk 30 yılda M < 4 olayların %90'ı kayıp; 200 katalog): tek Mc b | 0,848 |
+| Aynı katalog, reddetme oranı | M ≥ 5 (≈ 24 olay): tek Mc %11,5, Weichert %1,5. M ≥ 6 (≈ 2,4 olay): tek Mc %4,0, Weichert %0,0 |
+
+**Sentetik testin dersi:** Denetimin gücü sınırlı. Eksik tamlıkta N(≥Mc) düşük kalıyor ve b de düşük çıkıyor. Bu iki yanlılık orta büyüklüklerde birbirini kısmen götürüyor; M ≥ 5'te öngörülen/gerçek oranı yalnızca ≈ 1,2. Yanlılık büyük M'de büyüyor, ama orada da olay sayısı azalıyor. Bu yüzden denetim bir tarama aracıdır: reddetmesi bir sorunun işaretidir, reddetmemesi sorunun yokluğunu göstermez.
+
+### 4.3 Kabul testi (`kabul_poisson.js` (6)): 42/42
+
+Türkiye, ISC 1971–1997, dikdörtgen 36–42° K / 26–45° D, T = 27,0 yıl.
+
+| Eşik | N_gözl | Tek Mc (Mc 3,7, b 0,77): beklenen λT | p | Weichert (b 0,947): beklenen λT | p |
+|---|---|---|---|---|---|
+| M ≥ 6 | 13 | 36,6 | 1,3e−5 | 23,2 | 0,032 |
+| M ≥ 7 | 1 (1976 Çaldıran) | 6,17 | 0,030 | 2,62 | 0,53 (N < 5, düşük güç) |
+| M ≥ 8, Mx = 7,5 | 0 | — | — | 0 | 1 |
+
+Ekranda gösterilen her değer (N_gözl, λT, p) bağımsız bir hesapla aynı çıktı.
+
+### 4.4 Yorum
+
+Bu bulgu kesin bir hüküm değildir.
+
+- **Tek Mc**, M ≥ 6 ve M ≥ 7'de gözlenenle uyumsuz: gözlenenin 2,8 ve 6,2 katı, p ≤ 0,03. Tamlık uyarısı da aynı yönü gösteriyor: ilk yarıda 498 / 1702 olay, p = 1,6e−153.
+- **Weichert** de M ≥ 6'da gözlenenden yüksek (23,2'ye karşı 13; p = 0,032). M ≥ 7'deki uyum ise tek gözlem nedeniyle bilgi taşımıyor.
+
+Fark kısmen yöntemden kaynaklanıyor olabilir, ama nedeni önceden varsayılmamalı. Olası açıklamalar:
+- Bu testte kullanılan tamlık basamakları (1971 M ≥ 4,5; 1985 M ≥ 4,0) **test amaçlı seçildi, doğrulanmış bir Türkiye tamlık modeli değil.** Basamaklar iyimserse b hâlâ aşağı yanlı olabilir.
+- Geniş ve tektonik olarak karışık bir bölgede, büyük M'de G–R'nin doğrusal olmaması da (eğrilik, kuyruk) etkili olabilir.
+- 27 yıllık pencere kısa.
+
+Bu soru (dönemsel tamlıkla birleştirmenin tek Mc'ye göre oranı ne kadar değiştirdiği ve bunun gözlenen sayılarla uyumu) doğrulanmış tamlık basamaklarıyla, daha uzun pencerede ve bölgelere ayrılarak ayrıca incelenmelidir.
 
 ## 5. Literatür ile karşılaştırma
 

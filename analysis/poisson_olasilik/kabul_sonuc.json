@@ -2,7 +2,7 @@
  "senaryo": "Türkiye modu, ISC 1971–1997, dikdörtgen 36–42 K / 26–45 D; Weichert basamakları 1971 M≥4,5, 1985 M≥4,0",
  "sonuc": {
   "tekMc_gk74kapali": {
-   "poisson": "log₁₀[N(≥M)/T] = 4.77 − 0.77·M (T = 27.0 yıl)Poisson: λ(M≥7) = 2,28e-1/yıl · ortalama tekrarlanma Tr = 4,38 yıl [3,45–5,53] · 50 yılda en az bir M≥7 olasılığı P = %100,0 [%100,0–%100,0] (tek Mc = 3.7, N(≥Mc) = 2200, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir) · ⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
+   "poisson": "log₁₀[N(≥M)/T] = 4.77 − 0.77·M (T = 27.0 yıl)Poisson: λ(M≥7) = 2,28e-1/yıl · ortalama tekrarlanma Tr = 4,38 yıl [3,45–5,53] · 50 yılda en az bir M≥7 olasılığı P = %100,0 [%100,0–%100,0] (tamlık uyarısı: yorumlamayın, aşağıya bakın) (tek Mc = 3.7, N(≥Mc) = 2200, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥7) = 1 olay / 27,0 yıl → λgözl = 3,70e-2/yıl [%95 kesin Poisson: 9,38e-4–2,06e-1] · beklenen λT = 6,17 olay · iki yönlü kesin Poisson p = 0,030 (Ngözl < 5: sınamanın gücü düşük; uyum modelin doğru olduğunu göstermez)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ Gözlenen sayı modelle uyumsuz (M ≥ 7: gözlenen 1, beklenen 6,17; p = 0,030): bu M için λ, Tr ve P güvenilir değildir · ⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir) · ⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
    "sayisal": {
     "path": "tekMc",
     "lam": 0.2284840847583624,
@@ -23,12 +23,24 @@
     "mc": 3.7,
     "warns": [
      "GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
-     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
-    ]
+     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
+    ],
+    "obs": {
+     "nObs": 1,
+     "mu": 6.169226677301371,
+     "Tobs": 27.000684462665095,
+     "lamObs": 0.037036098154576015,
+     "lo": 0.0009376728215648083,
+     "hi": 0.20635193150913717,
+     "pLow": 0.015004143482862053,
+     "pHigh": 0.9979071461737474,
+     "p": 0.030008286965724107
+    },
+    "compWarn": true
    }
   },
   "tekMc_M6_t75": {
-   "poisson": "log₁₀[N(≥M)/T] = 4.77 − 0.77·M (T = 27.0 yıl)Poisson: λ(M≥6) = 1,36e+0/yıl · ortalama tekrarlanma Tr = 0,737 yıl [0,623–0,868] · 75 yılda en az bir M≥6 olasılığı P = %100,0 [%100,0–%100,0] (tek Mc = 3.7, N(≥Mc) = 2200, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir) · ⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
+   "poisson": "log₁₀[N(≥M)/T] = 4.77 − 0.77·M (T = 27.0 yıl)Poisson: λ(M≥6) = 1,36e+0/yıl · ortalama tekrarlanma Tr = 0,737 yıl [0,623–0,868] · 75 yılda en az bir M≥6 olasılığı P = %100,0 [%100,0–%100,0] (tamlık uyarısı: yorumlamayın, aşağıya bakın) (tek Mc = 3.7, N(≥Mc) = 2200, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥6) = 13 olay / 27,0 yıl → λgözl = 4,81e-1/yıl [%95 kesin Poisson: 2,56e-1–8,23e-1] · beklenen λT = 36,6 olay · iki yönlü kesin Poisson p = 1,3e-5%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ Gözlenen sayı modelle uyumsuz (M ≥ 6: gözlenen 13, beklenen 36,6; p = 1,3e-5): bu M için λ, Tr ve P güvenilir değildir · ⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir) · ⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
    "sayisal": {
     "path": "tekMc",
     "lam": 1.3559618012514218,
@@ -49,12 +61,24 @@
     "mc": 3.7,
     "warns": [
      "GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
-     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
-    ]
+     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
+    ],
+    "obs": {
+     "nObs": 13,
+     "mu": 36.61189673901664,
+     "Tobs": 27.000684462665095,
+     "lamObs": 0.4814692760094882,
+     "lo": 0.25636211187815405,
+     "hi": 0.8233271252400689,
+     "pLow": 0.0000065163976478155305,
+     "pHigh": 0.9999977736679436,
+     "p": 0.000013032795295631061
+    },
+    "compWarn": true
    }
   },
   "tekMc_M8_5": {
-   "poisson": "log₁₀[N(≥M)/T] = 4.77 − 0.77·M (T = 27.0 yıl)Poisson: λ(M≥8.5) = 1,58e-2/yıl · ortalama tekrarlanma Tr = 63,3 yıl [44,9–88,1] · 50 yılda en az bir M≥8.5 olasılığı P = %54,6 [%43,3–%67,1] (tek Mc = 3.7, N(≥Mc) = 2200, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ M ≥ 8.5 gözlenen en büyük büyüklüğün (7.0) üstünde: sonuç ekstrapolasyondur; kesilmesiz G–R büyük M için oranı olduğundan yüksek verebilir · ⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir) · ⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
+   "poisson": "log₁₀[N(≥M)/T] = 4.77 − 0.77·M (T = 27.0 yıl)Poisson: λ(M≥8.5) = 1,58e-2/yıl · ortalama tekrarlanma Tr = 63,3 yıl [44,9–88,1] · 50 yılda en az bir M≥8.5 olasılığı P = %54,6 [%43,3–%67,1] (tamlık uyarısı: yorumlamayın, aşağıya bakın) (tek Mc = 3.7, N(≥Mc) = 2200, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥8.5) = 0 olay / 27,0 yıl → λgözl = 0,00e+0/yıl [%95 kesin Poisson: 0,00e+0–1,37e-1] · beklenen λT = 0,427 olay · iki yönlü kesin Poisson p = 1,000 (Ngözl < 5: sınamanın gücü düşük; uyum modelin doğru olduğunu göstermez)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ M ≥ 8.5 gözlenen en büyük büyüklüğün (7.0) üstünde: sonuç ekstrapolasyondur; kesilmesiz G–R büyük M için oranı olduğundan yüksek verebilir · ⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir) · ⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
    "sayisal": {
     "path": "tekMc",
     "lam": 0.015804061208211824,
@@ -75,12 +99,24 @@
     "mc": 3.7,
     "warns": [
      "GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
-     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
-    ]
+     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (498 / 1702; tek yönlü binom p = 1.6e-153): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
+    ],
+    "obs": {
+     "nObs": 0,
+     "mu": 0.42672046991157314,
+     "Tobs": 27.000684462665095,
+     "lamObs": 0,
+     "lo": 0,
+     "hi": 0.1366217015430175,
+     "pLow": 0.6526459609155203,
+     "pHigh": 1,
+     "p": 1
+    },
+    "compWarn": true
    }
   },
   "tekMc_gk74acik": {
-   "poisson": "log₁₀[N(≥M)/T] = 4.20 − 0.69·M (T = 27.0 yıl)Poisson: λ(M≥7) = 2,27e-1/yıl · ortalama tekrarlanma Tr = 4,41 yıl [3,21–6,10] · 50 yılda en az bir M≥7 olasılığı P = %100,0 [%100,0–%100,0] (tek Mc = 3.7, N(≥Mc) = 1171, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (293 / 878; tek yönlü binom p = 1.6e-68): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
+   "poisson": "log₁₀[N(≥M)/T] = 4.20 − 0.69·M (T = 27.0 yıl)Poisson: λ(M≥7) = 2,27e-1/yıl · ortalama tekrarlanma Tr = 4,41 yıl [3,21–6,10] · 50 yılda en az bir M≥7 olasılığı P = %100,0 [%100,0–%100,0] (tamlık uyarısı: yorumlamayın, aşağıya bakın) (tek Mc = 3.7, N(≥Mc) = 1171, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥7) = 1 olay / 27,0 yıl → λgözl = 3,70e-2/yıl [%95 kesin Poisson: 9,38e-4–2,06e-1] · beklenen λT = 6,13 olay · iki yönlü kesin Poisson p = 0,031 (Ngözl < 5: sınamanın gücü düşük; uyum modelin doğru olduğunu göstermez)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ Gözlenen sayı modelle uyumsuz (M ≥ 7: gözlenen 1, beklenen 6,13; p = 0,031): bu M için λ, Tr ve P güvenilir değildir · ⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (293 / 878; tek yönlü binom p = 1.6e-68): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
    "sayisal": {
     "path": "tekMc",
     "lam": 0.22692074890004182,
@@ -100,12 +136,24 @@
     "b": 0.6913054282725549,
     "mc": 3.7,
     "warns": [
-     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (293 / 878; tek yönlü binom p = 1.6e-68): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
-    ]
+     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (293 / 878; tek yönlü binom p = 1.6e-68): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
+    ],
+    "obs": {
+     "nObs": 1,
+     "mu": 6.127015539081687,
+     "Tobs": 27.000684462665095,
+     "lamObs": 0.037036098154576015,
+     "lo": 0.0009376728215648083,
+     "hi": 0.20635193150913717,
+     "pLow": 0.015558892011528158,
+     "pHigh": 0.9978169134154108,
+     "p": 0.031117784023056316
+    },
+    "compWarn": true
    }
   },
   "weichert_gk74acik": {
-   "poisson": "log₁₀λ(≥M) = 5.13 − 0.89·M (Weichert; λ: yıllık oran)Poisson: λ(M≥7) = 8,33e-2/yıl · ortalama tekrarlanma Tr = 12,0 yıl [7,90–19,1] · 50 yılda en az bir M≥7 olasılığı P = %98,4 [%92,7–%99,8] (Weichert (1980), tamlık basamaklarıyla; m₀ = 4.0, λ(≥m₀) = 38.28/yıl)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).",
+   "poisson": "log₁₀λ(≥M) = 5.13 − 0.89·M (Weichert; λ: yıllık oran)Poisson: λ(M≥7) = 8,33e-2/yıl · ortalama tekrarlanma Tr = 12,0 yıl [7,90–19,1] · 50 yılda en az bir M≥7 olasılığı P = %98,4 [%92,7–%99,8] (Weichert (1980), tamlık basamaklarıyla; m₀ = 4.0, λ(≥m₀) = 38.28/yıl)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥7) = 1 olay / 27,0 yıl → λgözl = 3,70e-2/yıl [%95 kesin Poisson: 9,38e-4–2,06e-1] · beklenen λT = 2,25 olay · iki yönlü kesin Poisson p = 0,685 (Ngözl < 5: sınamanın gücü düşük; uyum modelin doğru olduğunu göstermez)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).",
    "sayisal": {
     "path": "weichert",
     "lam": 0.08330743428849824,
@@ -124,11 +172,22 @@
     "m0": 4,
     "rate0": 38.28310572450633,
     "b": 0.8874411345109191,
-    "warns": []
+    "warns": [],
+    "obs": {
+     "nObs": 1,
+     "mu": 2.2493577466179477,
+     "Tobs": 27.000684462665095,
+     "lamObs": 0.037036098154576015,
+     "lo": 0.0009376728215648083,
+     "hi": 0.20635193150913717,
+     "pLow": 0.3426998162687531,
+     "pHigh": 0.8945330606870087,
+     "p": 0.6853996325375062
+    }
    }
   },
   "weichert_gk74kapali": {
-   "poisson": "log₁₀λ(≥M) = 5.62 − 0.95·M (Weichert; λ: yıllık oran)Poisson: λ(M≥7) = 9,69e-2/yıl · ortalama tekrarlanma Tr = 10,3 yıl [7,42–14,4] · 50 yılda en az bir M≥7 olasılığı P = %99,2 [%96,9–%99,9] (Weichert (1980), tamlık basamaklarıyla; m₀ = 4.0, λ(≥m₀) = 67.25/yıl)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
+   "poisson": "log₁₀λ(≥M) = 5.62 − 0.95·M (Weichert; λ: yıllık oran)Poisson: λ(M≥7) = 9,69e-2/yıl · ortalama tekrarlanma Tr = 10,3 yıl [7,42–14,4] · 50 yılda en az bir M≥7 olasılığı P = %99,2 [%96,9–%99,9] (Weichert (1980), tamlık basamaklarıyla; m₀ = 4.0, λ(≥m₀) = 67.25/yıl)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥7) = 1 olay / 27,0 yıl → λgözl = 3,70e-2/yıl [%95 kesin Poisson: 9,38e-4–2,06e-1] · beklenen λT = 2,62 olay · iki yönlü kesin Poisson p = 0,529 (Ngözl < 5: sınamanın gücü düşük; uyum modelin doğru olduğunu göstermez)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
    "sayisal": {
     "path": "weichert",
     "lam": 0.0968944242342017,
@@ -149,11 +208,22 @@
     "b": 0.9471409446445233,
     "warns": [
      "GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)"
-    ]
+    ],
+    "obs": {
+     "nObs": 1,
+     "mu": 2.6162157749392905,
+     "Tobs": 27.000684462665095,
+     "lamObs": 0.037036098154576015,
+     "lo": 0.0009376728215648083,
+     "hi": 0.20635193150913717,
+     "pLow": 0.2642690246540832,
+     "pHigh": 0.9269211128148126,
+     "p": 0.5285380493081664
+    }
    }
   },
   "weichert_mx75_M7": {
-   "poisson": "λ(≥M) = λ₀·[e^(−β(M−m₀)) − e^(−β(Mx−m₀))]/[1 − e^(−β(Mx−m₀))], Mx = 7.5 (kesik G–R; Mx'ten uzakta log₁₀λ ≈ 5.64 − 0.95·M)Poisson: λ(M≥7) = 6,25e-2/yıl · ortalama tekrarlanma Tr = 16,0 yıl [11,9–21,9] · 50 yılda en az bir M≥7 olasılığı P = %95,6 [%89,8–%98,5] (Weichert (1980), tamlık basamaklarıyla; m₀ = 4.0, λ(≥m₀) = 67.33/yıl)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
+   "poisson": "λ(≥M) = λ₀·[e^(−β(M−m₀)) − e^(−β(Mx−m₀))]/[1 − e^(−β(Mx−m₀))], Mx = 7.5 (kesik G–R; Mx'ten uzakta log₁₀λ ≈ 5.64 − 0.95·M)Poisson: λ(M≥7) = 6,25e-2/yıl · ortalama tekrarlanma Tr = 16,0 yıl [11,9–21,9] · 50 yılda en az bir M≥7 olasılığı P = %95,6 [%89,8–%98,5] (Weichert (1980), tamlık basamaklarıyla; m₀ = 4.0, λ(≥m₀) = 67.33/yıl)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥7) = 1 olay / 27,0 yıl → λgözl = 3,70e-2/yıl [%95 kesin Poisson: 9,38e-4–2,06e-1] · beklenen λT = 1,69 olay · iki yönlü kesin Poisson p = 0,994 (Ngözl < 5: sınamanın gücü düşük; uyum modelin doğru olduğunu göstermez)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
    "sayisal": {
     "path": "weichert",
     "lam": 0.062496562461143025,
@@ -174,11 +244,22 @@
     "b": 0.9519623118917053,
     "warns": [
      "GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)"
-    ]
+    ],
+    "obs": {
+     "nObs": 1,
+     "mu": 1.6874499630145632,
+     "Tobs": 27.000684462665095,
+     "lamObs": 0.037036098154576015,
+     "lo": 0.0009376728215648083,
+     "hi": 0.20635193150913717,
+     "pLow": 0.4971531317609299,
+     "pHigh": 0.8150093439495103,
+     "p": 0.9943062635218598
+    }
    }
   },
   "weichert_mx75_M8": {
-   "poisson": "λ(≥M) = λ₀·[e^(−β(M−m₀)) − e^(−β(Mx−m₀))]/[1 − e^(−β(Mx−m₀))], Mx = 7.5 (kesik G–R; Mx'ten uzakta log₁₀λ ≈ 5.64 − 0.95·M)Poisson: λ(M≥8) = 0,00e+0/yıl · ortalama tekrarlanma Tr = — yıl · 50 yılda en az bir M≥8 olasılığı P = %0,0 [%0,0–%0,0] (Weichert (1980), tamlık basamaklarıyla; m₀ = 4.0, λ(≥m₀) = 67.33/yıl)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ M ≥ Mx (7.5): kesik G–R modelinde oran 0 · ⚠ M ≥ 8 gözlenen en büyük büyüklüğün (7.0) üstünde: sonuç ekstrapolasyondur · ⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
+   "poisson": "λ(≥M) = λ₀·[e^(−β(M−m₀)) − e^(−β(Mx−m₀))]/[1 − e^(−β(Mx−m₀))], Mx = 7.5 (kesik G–R; Mx'ten uzakta log₁₀λ ≈ 5.64 − 0.95·M)Poisson: λ(M≥8) = 0,00e+0/yıl · ortalama tekrarlanma Tr = — yıl · 50 yılda en az bir M≥8 olasılığı P = %0,0 [%0,0–%0,0] (Weichert (1980), tamlık basamaklarıyla; m₀ = 4.0, λ(≥m₀) = 67.33/yıl)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥8) = 0 olay / 27,0 yıl → λgözl = 0,00e+0/yıl [%95 kesin Poisson: 0,00e+0–1,37e-1] · beklenen λT = 0,00 olay · iki yönlü kesin Poisson p = 1,000 (Ngözl < 5: sınamanın gücü düşük; uyum modelin doğru olduğunu göstermez)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ M ≥ Mx (7.5): kesik G–R modelinde oran 0 · ⚠ M ≥ 8 gözlenen en büyük büyüklüğün (7.0) üstünde: sonuç ekstrapolasyondur · ⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
    "sayisal": {
     "path": "weichert",
     "lam": 0,
@@ -199,11 +280,58 @@
     "b": 0.9519623118917053,
     "warns": [
      "GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)"
-    ]
+    ],
+    "obs": {
+     "nObs": 0,
+     "mu": 0,
+     "Tobs": 27.000684462665095,
+     "lamObs": 0,
+     "lo": 0,
+     "hi": 0.1366217015430175,
+     "pLow": 1,
+     "pHigh": 1,
+     "p": 1
+    }
+   }
+  },
+  "weichert_M6": {
+   "poisson": "log₁₀λ(≥M) = 5.62 − 0.95·M (Weichert; λ: yıllık oran)Poisson: λ(M≥6) = 8,58e-1/yıl · ortalama tekrarlanma Tr = 1,17 yıl [0,941–1,46] · 50 yılda en az bir M≥6 olasılığı P = %100,0 [%100,0–%100,0] (Weichert (1980), tamlık basamaklarıyla; m₀ = 4.0, λ(≥m₀) = 67.25/yıl)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥6) = 13 olay / 27,0 yıl → λgözl = 4,81e-1/yıl [%95 kesin Poisson: 2,56e-1–8,23e-1] · beklenen λT = 23,2 olay · iki yönlü kesin Poisson p = 0,032%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ Gözlenen sayı modelle uyumsuz (M ≥ 6: gözlenen 13, beklenen 23,2; p = 0,032): bu M için λ, Tr ve P güvenilir değildir · ⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
+   "sayisal": {
+    "path": "weichert",
+    "lam": 0.857906051066541,
+    "ci": {
+     "B": 1000,
+     "nFail": 0,
+     "seed": 20261027,
+     "lamLo": 0.6842262511023334,
+     "lamHi": 1.0622532775138163,
+     "pLo": 0.9999999999999987,
+     "pHi": 1
+    },
+    "M": 6,
+    "t": 50,
+    "mx": null,
+    "m0": 4,
+    "rate0": 67.2545421271037,
+    "b": 0.9471409446445233,
+    "warns": [
+     "GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)"
+    ],
+    "obs": {
+     "nObs": 13,
+     "mu": 23.164050583458724,
+     "Tobs": 27.000684462665095,
+     "lamObs": 0.4814692760094882,
+     "lo": 0.25636211187815405,
+     "hi": 0.8233271252400689,
+     "pLow": 0.016113158065418798,
+     "pHigh": 0.9916187894420501,
+     "p": 0.032226316130837596
+    }
    }
   },
   "tekMc_ilkYariBos": {
-   "poisson": "log₁₀[N(≥M)/T] = 4.21 − 0.77·M (T = 98.0 yıl)Poisson: λ(M≥7) = 6,30e-2/yıl · ortalama tekrarlanma Tr = 15,9 yıl [12,5–20,1] · 50 yılda en az bir M≥7 olasılığı P = %95,7 [%91,7–%98,2] (tek Mc = 3.7, N(≥Mc) = 2200, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir) · ⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (0 / 2200; tek yönlü binom p = 0.0e+0): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
+   "poisson": "log₁₀[N(≥M)/T] = 4.21 − 0.77·M (T = 98.0 yıl)Poisson: λ(M≥7) = 6,30e-2/yıl · ortalama tekrarlanma Tr = 15,9 yıl [12,5–20,1] · 50 yılda en az bir M≥7 olasılığı P = %95,7 [%91,7–%98,2] (tamlık uyarısı: yorumlamayın, aşağıya bakın) (tek Mc = 3.7, N(≥Mc) = 2200, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir)Gözlenen–öngörülen (aynı veri; iç tutarlılık denetimi): Ngözl(M≥7) = 1 olay / 98,0 yıl → λgözl = 1,02e-2/yıl [%95 kesin Poisson: 2,58e-4–5,69e-2] · beklenen λT = 6,17 olay · iki yönlü kesin Poisson p = 0,030 (Ngözl < 5: sınamanın gücü düşük; uyum modelin doğru olduğunu göstermez)%95 aralık: parametrik bootstrap (B = 1000, tohum 20261027); Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).⚠ Gözlenen sayı modelle uyumsuz (M ≥ 7: gözlenen 1, beklenen 6,17; p = 0,030): bu M için λ, Tr ve P güvenilir değildir · ⚠ GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir) · ⚠ M ≥ Mc olayları dönemin ilk yarısında belirgin az (0 / 2200; tek yönlü binom p = 0.0e+0): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın",
    "sayisal": {
     "path": "tekMc",
     "lam": 0.06295217198092011,
@@ -224,8 +352,20 @@
     "mc": 3.7,
     "warns": [
      "GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)",
-     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (0 / 2200; tek yönlü binom p = 0.0e+0): katalog T boyunca Mc'de tam görünmüyor; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
-    ]
+     "M ≥ Mc olayları dönemin ilk yarısında belirgin az (0 / 2200; tek yönlü binom p = 0.0e+0): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın"
+    ],
+    "obs": {
+     "nObs": 1,
+     "mu": 6.1692266773013715,
+     "Tobs": 97.99863107457475,
+     "lamObs": 0.01020422417165218,
+     "lo": 0.0002583485882065228,
+     "hi": 0.05685429816565292,
+     "pLow": 0.015004143482862053,
+     "pHigh": 0.9979071461737474,
+     "p": 0.030008286965724107
+    },
+    "compWarn": true
    }
   }
  },
@@ -242,6 +382,7 @@
   "GEÇTİ (1) weichert_gk74kapali: G–R grafiği önce = sonra (aynı), Poisson satırı ve a tanımı dışındaki metin önce = sonra (aynı)",
   "GEÇTİ (1) weichert_mx75_M7: G–R grafiği önce = sonra (aynı), Poisson satırı ve a tanımı dışındaki metin önce = sonra (aynı)",
   "GEÇTİ (1) weichert_mx75_M8: G–R grafiği önce = sonra (aynı), Poisson satırı ve a tanımı dışındaki metin önce = sonra (aynı)",
+  "GEÇTİ (1) weichert_M6: G–R grafiği önce = sonra (aynı), Poisson satırı ve a tanımı dışındaki metin önce = sonra (aynı)",
   "GEÇTİ (1) Önce Poisson satırı yok; sonra var",
   "GEÇTİ (2) tekMc_gk74kapali: λ(≥7) = 2.285e-1/yıl = N(≥Mc)/T·10^(−b(M−Mc)) [N=2200, T=27.00, b=0.773, Mc=3.7] (göreli fark 2.2e-16); Tr = 4.38 yıl; 50 yılda P = %100,0 ekranda; %95 [1.81e-1, 2.90e-1] λ'yı içeriyor",
   "GEÇTİ (2) tekMc_M6_t75: λ(≥6) = 1.356e+0/yıl = N(≥Mc)/T·10^(−b(M−Mc)) [N=2200, T=27.00, b=0.773, Mc=3.7] (göreli fark 0.0e+0); Tr = 0.737 yıl; 75 yılda P = %100,0 ekranda; %95 [1.15e+0, 1.60e+0] λ'yı içeriyor",
@@ -253,6 +394,15 @@
   "GEÇTİ (2) weichert_mx75_M8: λ(≥8) = 0/yıl = panel en iyi tahmin eğrisi (lastGrFit.fnBest), Mx = 7.5; P = %0,0 ekranda; b = 0.952, m₀ = 4",
   "GEÇTİ (2) Tek Mc T = 27.001 yıl = seçili pencere ISC 1971–1997 (düzeltme öncesi 126,7)",
   "GEÇTİ (2) İlk yarı boş (T 1900'den): tamlık uyarısı \"0 / 2200; tek yönlü binom p = 0.0e+0\"",
+  "GEÇTİ (6) tekMc_gk74kapali: N_gözl(M≥7) = 1 / 27.00 yıl; beklenen λT = 6.17; p = 0.0300 (bağımsız hesap 0.0300); λ_gözl %95 [9.38e-4, 2.06e-1]",
+  "GEÇTİ (6) tekMc_M6_t75: N_gözl(M≥6) = 13 / 27.00 yıl; beklenen λT = 36.6; p = 0.0000130 (bağımsız hesap 0.0000130); λ_gözl %95 [2.56e-1, 8.23e-1]",
+  "GEÇTİ (6) weichert_gk74kapali: N_gözl(M≥7) = 1 / 27.00 yıl; beklenen λT = 2.62; p = 0.529 (bağımsız hesap 0.529); λ_gözl %95 [9.38e-4, 2.06e-1]",
+  "GEÇTİ (6) weichert_mx75_M8: N_gözl(M≥8) = 0 / 27.00 yıl; beklenen λT = 0.00; p = 1.00 (bağımsız hesap 1.00); λ_gözl %95 [0.00e+0, 1.37e-1]",
+  "GEÇTİ (6) weichert_M6: N_gözl(M≥6) = 13 / 27.00 yıl; beklenen λT = 23.2; p = 0.0322 (bağımsız hesap 0.0322); λ_gözl %95 [2.56e-1, 8.23e-1]",
+  "GEÇTİ (6) Tek Mc M ≥ 7: p = 0.030 → \"modelle uyumsuz\" uyarısı; Weichert M ≥ 7: p = 0.529 → uyarı yok",
+  "GEÇTİ (6) N_gözl < 5: \"sınamanın gücü düşük\" notu",
+  "GEÇTİ (6) Tamlık uyarısı varken P yanında \"yorumlamayın\" etiketi ve etkinin açıklaması (b aşağı, büyük M için λ ve P yukarı yanlı olabilir)",
+  "GEÇTİ (6) Metin: aynı veri — iç tutarlılık denetimi, bağımsız doğrulama değil",
   "GEÇTİ (3) Varsayılan M ≥ 7, t = 50 yıl",
   "GEÇTİ (3) M = 6, t = 75 girdisi uygulandı ve URL'ye yazıldı (pm=6, pt=75)",
   "GEÇTİ (3) λ(≥6) > λ(≥7)",
@@ -264,7 +414,7 @@
   "GEÇTİ Sayfa hatası yok (önce 0, sonra 0)"
  ],
  "ozet": {
-  "pass": 32,
+  "pass": 42,
   "fail": 0
  }
 }

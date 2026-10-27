@@ -7,6 +7,8 @@
 //   3. Sentetik katalog (tek Mc): bilinen λ0 ve b = 1 → λ(≥6) ve P(50 yıl) yansız geri üretilir; bootstrap %95 aralığı kapsaması ≈ %95.
 //   4. Sentetik katalog (Weichert, değişken tamlık): aynı denetimler.
 //   5. Tamlık denetimi (binom, tek yönlü): kesin değer ve iki senaryo.
+//   6. Gözlenen–öngörülen: kesin Poisson kuyrukları ve Garwood aralığı (analitik), testin boyutu (doğru modelde p < 0,05 oranı ≤ %5),
+//      sentetik başı eksik katalogda tek Mc yanlılığının yakalanması, Weichert'in aynı katalogda uyumlu kalması.
 // Kullanım (depo kökünde): node scripts/test_poisson_prob.js [index.html]
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -17,7 +19,7 @@ const line = re => { const m = src.match(re); if (!m) throw new Error('bulunamad
 const ctx = {}; vm.createContext(ctx);
 vm.runInContext([line(/^const GR_QC = [^\n]*$/m), line(/^const GR_POIS = [^\n]*$/m), line(/^const LANCZOS_C = \[[\s\S]*?\];$/m),
   ...['mulberry32', 'logGamma', 'poissonSample', 'bGridRound', 'computeBvalue', 'weichertFit', 'weichertExpected',
-      'grPoissonP', 'grLambdaSimple', 'grLambdaWeichert', 'grPctl', 'grPoissonBootSimple', 'grPoissonBootWeichert', 'grHalfSplitTest'].map(fn)].join('\n'), ctx);
+      'grPoissonP', 'grLambdaSimple', 'grLambdaWeichert', 'grPctl', 'grPoissonBootSimple', 'grPoissonBootWeichert', 'grHalfSplitTest', 'grGammaP', 'grGammaPInv', 'grObsVsExp'].map(fn)].join('\n'), ctx);
 const X = ctx;
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else fail++; console.log((c ? '  ok  ' : '  !!  ') + m); };
@@ -100,5 +102,41 @@ console.log('\n5. Tamlık denetimi (binom, tek yönlü)');
   const rnd = X.mulberry32(9), uni = Array.from({ length: 400 }, () => rnd() * 100), front = Array.from({ length: 400 }, () => (rnd() < 0.25 ? rnd() * 50 : 50 + rnd() * 50));
   const hu = X.grHalfSplitTest(uni, 0, 100), hf = X.grHalfSplitTest(front, 0, 100);
   ok(hu.p > 0.01 && hf.p < 1e-6, `tekdüze katalog p = ${hu.p.toFixed(3)} (uyarı yok); başı eksik katalog (ilk yarı %25) p = ${hf.p.toExponential(1)} (uyarı)`); }
+
+console.log('\n6. Gözlenen–öngörülen (kesin Poisson)');
+{ // Analitik: P(X ≤ 1 | μ) = e^−μ(1 + μ); Garwood N = 1: [χ²(0,025; 2)/2, χ²(0,975; 4)/2] = [0,025318, 5,571643]; N = 0 üst: −ln 0,025 = 3,688879
+  const mu = 6.17, r = X.grObsVsExp(1, mu, 27), pl = Math.exp(-mu) * (1 + mu);
+  ok(near(r.pLow, pl, 1e-12) && near(r.p, 2 * pl, 1e-12), `N = 1, μ = 6,17: P(X ≤ 1) = ${r.pLow.toFixed(6)} (analitik ${pl.toFixed(6)}); iki yönlü p = ${r.p.toFixed(4)}`);
+  ok(near(r.lo * 27, 0.025318, 1e-5) && near(r.hi * 27, 5.571643, 1e-5), `Garwood %95, N = 1: [${(r.lo * 27).toFixed(6)}, ${(r.hi * 27).toFixed(6)}] olay (tablo 0,025318–5,571643)`);
+  const z = X.grObsVsExp(0, 2, 10); ok(z.lo === 0 && near(z.hi * 10, 3.688879, 1e-5) && near(z.p, Math.min(1, 2 * Math.exp(-2)), 1e-12), `N = 0: üst sınır ${(z.hi * 10).toFixed(6)} (−ln 0,025), p = 2e^−2`);
+  // Büyük N: doğrudan log-toplamla karşılaştırma
+  const lpois = (k, m) => -m + k * Math.log(m) - X.logGamma(k + 1);
+  let cdf = 0; for (let k = 0; k <= 9700; k++) cdf += Math.exp(lpois(k, 10000));
+  const b = X.grObsVsExp(9700, 10000, 1); ok(Math.abs(b.pLow / cdf - 1) < 1e-8, `N = 9700, μ = 10⁴: P(X ≤ N) = ${b.pLow.toExponential(4)} (doğrudan toplam ${cdf.toExponential(4)})`);
+  const m0 = X.grObsVsExp(0, 0, 5), m1 = X.grObsVsExp(2, 0, 5); ok(m0.p === 1 && m1.p === 0, 'μ = 0 (M ≥ Mx): N = 0 → p = 1; N > 0 → p = 0 (model gözlemle çelişir)'); }
+{ // Boyut: doğru modelde p < 0,05 oranı ≤ %5 (kesin test tutucudur)
+  const rnd = X.mulberry32(31), R = 4000, out = [];
+  for (const mu of [0.5, 3, 30, 300]) { let rej = 0; for (let i = 0; i < R; i++) if (X.grObsVsExp(X.poissonSample(mu, rnd), mu, 1).p < 0.05) rej++; out.push([mu, rej / R]); }
+  console.log(`     doğru modelde reddetme oranı (α = 0,05, ${R} deneme): ${out.map(([m, r]) => `μ = ${m}: %${(100 * r).toFixed(1)}`).join('; ')}`);
+  ok(out.every(([, r]) => r <= 0.05 + 0.011), 'testin boyutu nominali aşmıyor (≤ %5 + Monte Carlo payı)'); }
+{ // Sentetik başı eksik katalog: gerçek b = 1, λ(≥3) = 40/yıl, T = 60 yıl; ilk 30 yılda M < 4,0 olayların %90'ı kayıp (yalnız M ≥ 4 tam)
+  // Denetimin gücü beklenen sayıya bağlıdır: M ≥ 5 (beklenen ≈ 24 olay) ve M ≥ 6 (≈ 2,4 olay) ayrı raporlanır.
+  const DM = 0.1, b = 1, beta = b * Math.LN10, lam0 = 40, T = 60, Mc = 3.0, R = 200, rnd = X.mulberry32(2026), Ms = [5.0, 6.0];
+  const rejS = { 5: 0, 6: 0 }, rejW = { 5: 0, 6: 0 }; let bS = 0, nW = 0;
+  for (let r = 0; r < R; r++) {
+    const ev = []; const n = X.poissonSample(lam0 * T, rnd);
+    for (let i = 0; i < n; i++) { const t = rnd() * T, m = X.bGridRound(Mc - DM / 2 - Math.log(1 - rnd()) / beta, Mc, DM); if (t < 30 && m < 4 - 1e-9 && rnd() < 0.9) continue; ev.push({ t, m }); }
+    const mg = ev.map(e => e.m), bh = X.computeBvalue(mg, Mc, DM), nA = mg.filter(m => m >= Mc - 1e-9).length; bS += bh;
+    const counts = {}; ev.forEach(e => { const k = Math.floor((e.m + 1e-9) / DM); if (k < 40 && e.t < 30) return; counts[k] = (counts[k] || 0) + 1; });
+    const cls = []; for (let k = 30; k < 90; k++) { const lo = +(k * DM).toFixed(2); cls.push({ m: lo + DM / 2, lo, T: lo >= 4 - 1e-9 ? 60 : 30, n: counts[k] || 0 }); }
+    const wf = X.weichertFit(cls); if (wf) nW++;
+    for (const M of Ms) { const nObs = mg.filter(m => m >= M - 1e-9).length;
+      if (X.grObsVsExp(nObs, X.grLambdaSimple(nA, T, bh, Mc, M) * T, T).p < 0.05) rejS[M]++;
+      if (wf && X.grObsVsExp(nObs, X.grLambdaWeichert(wf.rate0, wf.beta, 3.0, M, null) * T, T).p < 0.05) rejW[M]++; }
+  }
+  const f = (k, n) => `%${(100 * k / n).toFixed(1)}`;
+  console.log(`     başı eksik katalog (${R}): tek Mc ortalama b = ${(bS / R).toFixed(3)} (gerçek 1). Gözlenen–öngörülen p < 0,05 oranı — M ≥ 5 (beklenen ≈ 24 olay): tek Mc ${f(rejS[5], R)}, Weichert ${f(rejW[5], nW)}; M ≥ 6 (≈ 2,4 olay): tek Mc ${f(rejS[6], R)}, Weichert ${f(rejW[6], nW)}`);
+  ok(bS / R < 0.95 && rejS[5] / R > rejW[5] / nW && rejW[5] / nW <= 0.08, 'eksik tamlıkta tek Mc b aşağı yanlı; denetim tek Mc\'yi Weichert\'ten daha sık reddediyor, Weichert reddi nominal düzeyde. Güç düşük: düşük N(≥Mc) ile düşük b orta M\'de kısmen birbirini götürür (M ≥ 5\'te öngörü/gerçek ≈ 1,2); denetim bir tarama aracıdır, yanlılığın yokluğunu kanıtlamaz');
+  ok(rejS[6] / R < rejS[5] / R, 'az olayda (M ≥ 6) denetimin gücü düşük: uyum, modelin doğru olduğu anlamına gelmez'); }
 
 console.log(`\n${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);

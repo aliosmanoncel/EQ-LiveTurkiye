@@ -9,6 +9,7 @@
 //   (3) Girdiler: M ve t değişince değerler güncellenir, URL'ye yazılır (pm, pt); varsayılan M ≥ 7, t = 50.
 //   (4) Uyarılar: GK74 kapalıyken uyarı var, açıkken yok; M > gözlenen en büyük → ekstrapolasyon uyarısı; Mx girildi ve M ≥ Mx → λ = 0 ve uyarı.
 //   (5) Bölge bütünü / tahmin değildir notu ve belirsizlik kapsamı (dahil/dahil değil) metinde.
+//   (6) Gözlenen–öngörülen: N_gözl, beklenen λT ve kesin Poisson p bağımsız hesapla aynı; p < 0,05'te uyarı; N_gözl < 5 notu; tamlık uyarısında P etiketi.
 // Ekran görüntüleri: poisson_tekMc_gk74kapali.png, poisson_tekMc_gk74acik.png, poisson_weichert.png, poisson_weichert_mx.png
 // Kullanım (depo kökünde): LEAFLET_DIR=<node_modules> node analysis/poisson_olasilik/kabul_poisson.js <önceki_index.html>
 'use strict';
@@ -66,6 +67,7 @@ const ADIM = [   // [ad, işlem]
   ['weichert_gk74kapali', async p => p.evaluate(async () => { await __gk(false); })],
   ['weichert_mx75_M7', async p => p.evaluate(() => { __set('grMx', '7.5'); })],
   ['weichert_mx75_M8', async p => p.evaluate(() => { __set('grPM', '8'); })],
+  ['weichert_M6', async p => p.evaluate(() => { __set('grMx', ''); __set('grPM', '6'); })],
   // Tamlık denetimi: pencerenin ilk yarısı boşsa uyarı (seçili pencere 1971–1997 iken 1900'den başlatılmış gibi; yalnız test için)
   ['tekMc_ilkYariBos', async p => p.evaluate(() => { __cs(false); __set('grMx', ''); __set('grPM', '7'); regionWindowStart = new Date('1900-01-01T00:00:00Z'); renderTimeMag([...events, ...liveEvents]); })],
 ];
@@ -116,6 +118,21 @@ const GORUNTU = { tekMc_gk74kapali: 'poisson_tekMc_gk74kapali.png', tekMc_gk74ac
     const a = Y.tekMc_gk74kapali, z = Y.tekMc_ilkYariBos;
     ok(/ilk yarısında belirgin az \(0 \/ /.test(z.pois), `(2) İlk yarı boş (T 1900'den): tamlık uyarısı "${w(z.pois)}"`);
     console.log(`     Seçili pencerede (1971–1997) tamlık denetimi: ${w(a.pois) ? 'uyarı "' + w(a.pois) + '" (ISC 1971–1984 dönemi M ≥ Mc = 3,7 için eksik)' : 'uyarı yok'}`); }
+  // Gözlenen–öngörülen: N_obs, μ = λT(M), kesin Poisson p bağımsız yeniden hesapla; uyarı ve tamlık etiketi
+  { const pois = (k, m) => Math.exp(-m + k * Math.log(m) - lg(k + 1)), lg = x => { let s = 0; for (let i = 2; i < x; i++) s += Math.log(i); return s; };
+    const cdf = (k, m) => { let c = 0; for (let i = 0; i <= k; i++) c += pois(i, m); return c; };
+    const p2 = (n, m) => m === 0 ? (n === 0 ? 1 : 0) : Math.min(1, 2 * Math.min(cdf(n, m), n === 0 ? 1 : 1 - cdf(n - 1, m)));
+    for (const k of ['tekMc_gk74kapali', 'tekMc_M6_t75', 'weichert_gk74kapali', 'weichert_mx75_M8', 'weichert_M6']) {
+      const q = Y[k].pois_n, o = q.obs, T = q.path === 'tekMc' ? q.T : o.Tobs, mu = q.lam * T, pr = p2(o.nObs, mu);
+      ok(o && Math.abs(o.mu - mu) <= 1e-9 * Math.max(1, mu) && Math.abs(o.p - pr) < 1e-9 && Y[k].pois.includes(`= ${o.nObs} olay`),
+        `(6) ${k}: N_gözl(M≥${q.M}) = ${o.nObs} / ${o.Tobs.toFixed(2)} yıl; beklenen λT = ${mu.toPrecision(3)}; p = ${o.p.toPrecision(3)} (bağımsız hesap ${pr.toPrecision(3)}); λ_gözl %95 [${o.lo.toExponential(2)}, ${o.hi.toExponential(2)}]`);
+    }
+    const a = Y.tekMc_gk74kapali, w = Y.weichert_gk74kapali;
+    ok(a.pois_n.obs.p < 0.05 && /Gözlenen sayı modelle uyumsuz/.test(a.pois) && w.pois_n.obs.p >= 0.05 && !/modelle uyumsuz/.test(w.pois),
+      `(6) Tek Mc M ≥ 7: p = ${a.pois_n.obs.p.toFixed(3)} → "modelle uyumsuz" uyarısı; Weichert M ≥ 7: p = ${w.pois_n.obs.p.toFixed(3)} → uyarı yok`);
+    ok(/N<sub>gözl<\/sub> &lt; 5|sınamanın gücü düşük/.test(a.pois) && /sınamanın gücü düşük/.test(w.pois), '(6) N_gözl < 5: "sınamanın gücü düşük" notu');
+    ok(a.pois_n.compWarn && /tamlık uyarısı: yorumlamayın/.test(a.pois) && /b aşağı yanlı olur/.test(a.pois), '(6) Tamlık uyarısı varken P yanında "yorumlamayın" etiketi ve etkinin açıklaması (b aşağı, büyük M için λ ve P yukarı yanlı olabilir)');
+    ok(/iç tutarlılık denetimi/.test(a.pois), '(6) Metin: aynı veri — iç tutarlılık denetimi, bağımsız doğrulama değil'); }
   // (3) girdiler
   ok(Y.tekMc_gk74kapali.pois_n.M === 7 && Y.tekMc_gk74kapali.pois_n.t === 50, '(3) Varsayılan M ≥ 7, t = 50 yıl');
   ok(Y.tekMc_M6_t75.pois_n.M === 6 && Y.tekMc_M6_t75.pois_n.t === 75 && /pm=6/.test(Y.tekMc_M6_t75.url) && /pt=75/.test(Y.tekMc_M6_t75.url), `(3) M = 6, t = 75 girdisi uygulandı ve URL'ye yazıldı (${Y.tekMc_M6_t75.url.match(/p[mt]=[^&]*/g).join(', ')})`);
