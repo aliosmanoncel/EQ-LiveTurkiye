@@ -1,0 +1,492 @@
+{
+ "senaryolar": {
+  "isc71_97": [
+   [
+    [
+     1971,
+     1997
+    ]
+   ],
+   [
+    "r",
+    36,
+    26,
+    42,
+    45
+   ]
+  ],
+  "isc71_97_emsc": [
+   [
+    [
+     1971,
+     1997
+    ],
+    [
+     1998
+    ]
+   ],
+   [
+    "r",
+    36,
+    26,
+    42,
+    45
+   ]
+  ],
+  "emsc98": [
+   [
+    [
+     1998
+    ]
+   ],
+   [
+    "r",
+    36,
+    26,
+    42,
+    45
+   ]
+  ],
+  "bosluklu": [
+   [
+    [
+     1900,
+     1970
+    ],
+    [
+     1998
+    ]
+   ],
+   [
+    "r",
+    36,
+    26,
+    42,
+    45
+   ]
+  ],
+  "daire71_97": [
+   [
+    [
+     1971,
+     1997
+    ]
+   ],
+   [
+    "c",
+    38.5,
+    28.5,
+    150
+   ]
+  ],
+  "iscgem_kuresel": [
+   [
+    [
+     1904,
+     2021,
+     "ISCGEM-GLOBAL"
+    ]
+   ],
+   [
+    "r",
+    30,
+    20,
+    45,
+    50
+   ]
+  ]
+ },
+ "weichert_basamaklari": [
+  [
+   "1971-01-01",
+   "4.5"
+  ],
+  [
+   "1985-01-01",
+   "4.0"
+  ]
+ ],
+ "sonuc": {
+  "once": {
+   "isc71_97": {
+    "ws": "1900-01-01T00:00:00.000Z",
+    "we": "2026-09-14T00:00:00.000Z",
+    "T": 126.69952087611225,
+    "n": 3328,
+    "tmin": "1971-01-02T01:25:36.905Z",
+    "tmax": "1997-12-31T15:40:27.600Z",
+    "durum": "Bölgede 3328 deprem — Tarihsel Katalog TAMAMI, limit yok (görsel: 3000 örnekleniyor)",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1900–2026) (01 Oca 1900 01:56 – 14 Eyl 2026 03:00)Gösterilen: 02 Oca 1971 03:25 – 31 Ara 1997 17:40 (3328 deprem)Bölge: 36.00,26.00 – 42.00,45.00Auto-Mc = 3.7 (Maximum Curvature) · b = 0.77 [0.74–0.81] ⁱ (%95) · N(M≥Mc) = 2200",
+    "sel": null,
+    "tek": {
+     "b": 0.7733915008799881,
+     "a": 6.203971234078162,
+     "n": 2200,
+     "mc": 3.7
+    },
+    "cmp": {
+     "t0": "1900-01-01T00:00:00.000Z",
+     "t1": "2026-09-14T00:00:00.000Z",
+     "T": 126.69952087611225
+    },
+    "w": {
+     "donem": [
+      [
+       "1971-01-01",
+       "1985-01-01",
+       4.5
+      ],
+      [
+       "1985-01-01",
+       "2026-09-14",
+       4
+      ]
+     ],
+     "b": 0.8053265778660835,
+     "rate0": 25.204861806265733,
+     "m0": 4,
+     "lam7": 0.09671739418993122
+    }
+   },
+   "isc71_97_emsc": {
+    "ws": "1900-01-01T00:00:00.000Z",
+    "we": "2026-09-14T00:00:00.000Z",
+    "T": 126.69952087611225,
+    "n": 51912,
+    "tmin": "1971-01-02T01:25:36.905Z",
+    "tmax": "2026-09-11T07:48:57.810Z",
+    "durum": "Bölgede 51912 deprem — Tarihsel Katalog TAMAMI, limit yok (görsel: 3000 örnekleniyor)",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1900–2026) (01 Oca 1900 01:56 – 14 Eyl 2026 03:00)Gösterilen: 02 Oca 1971 03:25 – 11 Eyl 2026 10:48 (51912 deprem)Bölge: 36.00,26.00 – 42.00,45.00Auto-Mc = 3.2 (Maximum Curvature) · b = 1.01 [1.00–1.03] ⁱ (%95) · N(M≥Mc) = 30644",
+    "sel": null,
+    "tek": {
+     "b": 1.0091539228266915,
+     "a": 7.715638006713051,
+     "n": 30644,
+     "mc": 3.2
+    },
+    "cmp": {
+     "t0": "1900-01-01T00:00:00.000Z",
+     "t1": "2026-09-14T00:00:00.000Z",
+     "T": 126.69952087611225
+    },
+    "w": {
+     "donem": [
+      [
+       "1971-01-01",
+       "1985-01-01",
+       4.5
+      ],
+      [
+       "1985-01-01",
+       "2026-09-14",
+       4
+      ]
+     ],
+     "b": 1.085465725467685,
+     "rate0": 105.113871146466,
+     "m0": 4,
+     "lam7": 0.0582455639024085
+    }
+   },
+   "emsc98": {
+    "ws": "1900-01-01T00:00:00.000Z",
+    "we": "2026-09-14T00:00:00.000Z",
+    "T": 126.69952087611225,
+    "n": 48584,
+    "tmin": "1998-01-01T02:45:46.600Z",
+    "tmax": "2026-09-11T07:48:57.810Z",
+    "durum": "Bölgede 48584 deprem — Tarihsel Katalog TAMAMI, limit yok (görsel: 3000 örnekleniyor)",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1900–2026) (01 Oca 1900 01:56 – 14 Eyl 2026 03:00)Gösterilen: 01 Oca 1998 04:45 – 11 Eyl 2026 10:48 (48584 deprem)Bölge: 36.00,26.00 – 42.00,45.00Auto-Mc = 3.2 (Maximum Curvature) · b = 1.14 [1.13–1.16] (%95) · N(M≥Mc) = 27346",
+    "sel": null,
+    "tek": {
+     "b": 1.1367955606948117,
+     "a": 8.074639603687249,
+     "n": 27346,
+     "mc": 3.2
+    },
+    "cmp": {
+     "t0": "1900-01-01T00:00:00.000Z",
+     "t1": "2026-09-14T00:00:00.000Z",
+     "T": 126.69952087611225
+    }
+   },
+   "bosluklu": {
+    "ws": "1900-01-01T00:00:00.000Z",
+    "we": "2026-09-14T00:00:00.000Z",
+    "T": 126.69952087611225,
+    "n": 48921,
+    "tmin": "1905-12-04T05:08:34.550Z",
+    "tmax": "2026-09-11T07:48:57.810Z",
+    "durum": "Bölgede 48921 deprem — Tarihsel Katalog TAMAMI, limit yok (görsel: 3000 örnekleniyor)",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1900–2026) (01 Oca 1900 01:56 – 14 Eyl 2026 03:00)Gösterilen: 04 Ara 1905 07:05 – 11 Eyl 2026 10:48 (48921 deprem)Bölge: 36.00,26.00 – 42.00,45.00Auto-Mc = 3.2 (Maximum Curvature) · b = 1.08 [1.07–1.10] ⁱ (%95) · N(M≥Mc) = 27683",
+    "sel": null,
+    "tek": {
+     "b": 1.079104601596419,
+     "a": 7.89534787783136,
+     "n": 27683,
+     "mc": 3.2
+    },
+    "cmp": {
+     "t0": "1900-01-01T00:00:00.000Z",
+     "t1": "2026-09-14T00:00:00.000Z",
+     "T": 126.69952087611225
+    }
+   },
+   "daire71_97": {
+    "ws": "1900-01-01T00:00:00.000Z",
+    "we": "2026-09-14T00:00:00.000Z",
+    "T": 126.69952087611225,
+    "n": 506,
+    "tmin": "1971-02-15T06:19:55.450Z",
+    "tmax": "1997-12-17T22:18:06.200Z",
+    "durum": "Bölgede 506 deprem — Tarihsel Katalog TAMAMI, limit yok",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1900–2026) (01 Oca 1900 01:56 – 14 Eyl 2026 03:00)Gösterilen: 15 Şub 1971 08:19 – 18 Ara 1997 00:18 (506 deprem)Bölge: 37.15,26.78 – 39.85,30.22 (daire, merkez 38.500,28.500, R=150km — sınırlar kapsayan dikdörtgen)Auto-Mc = 3.7 (Maximum Curvature) · b = 0.80 [0.71–0.90] ⁱ (%95) · N(M≥Mc) = 268 · Aktivite Yoğunluğu = 29.92/10⁶km²/yıl",
+    "sel": null,
+    "tek": {
+     "b": 0.8010386865111606,
+     "a": 5.391977934120083,
+     "n": 268,
+     "mc": 3.7
+    },
+    "cmp": {
+     "t0": "1900-01-01T00:00:00.000Z",
+     "t1": "2026-09-14T00:00:00.000Z",
+     "T": 126.69952087611225
+    },
+    "oran": {
+     "years": 126.69952087611225,
+     "mode": "rate"
+    }
+   },
+   "iscgem_kuresel": {
+    "hataBolge": "page.evaluate: TypeError: Cannot read properties of null (reading 'toLocaleDateString')"
+   },
+   "canli": {
+    "hist": false,
+    "sel": "yok"
+   },
+   "hatalar": []
+  },
+  "sonra": {
+   "isc71_97": {
+    "ws": "1971-01-01T00:00:00.000Z",
+    "we": "1997-12-31T23:59:59.999Z",
+    "T": 27.000684462665095,
+    "n": 3328,
+    "tmin": "1971-01-02T01:25:36.905Z",
+    "tmax": "1997-12-31T15:40:27.600Z",
+    "durum": "Bölgede 3328 deprem — Tarihsel Katalog TAMAMI, limit yok (görsel: 3000 örnekleniyor)",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1971–1997) (01 Oca 1971 02:00 – 01 Oca 1998 01:59)Gösterilen: 02 Oca 1971 03:25 – 31 Ara 1997 17:40 (3328 deprem)Bölge: 36.00,26.00 – 42.00,45.00Auto-Mc = 3.7 (Maximum Curvature) · b = 0.77 [0.74–0.81] ⁱ (%95) · N(M≥Mc) = 2200",
+    "sel": {
+     "contiguous": true,
+     "parca": 1
+    },
+    "tek": {
+     "b": 0.7733915008799881,
+     "a": 6.203971234078162,
+     "n": 2200,
+     "mc": 3.7
+    },
+    "cmp": {
+     "t0": "1971-01-01T00:00:00.000Z",
+     "t1": "1997-12-31T23:59:59.999Z",
+     "T": 27.000684462665095
+    },
+    "w": {
+     "donem": [
+      [
+       "1971-01-01",
+       "1985-01-01",
+       4.5
+      ],
+      [
+       "1985-01-01",
+       "1997-12-31",
+       4
+      ]
+     ],
+     "b": 0.9471409446445233,
+     "rate0": 67.2545421271037,
+     "m0": 4,
+     "lam7": 0.0968944242342017
+    }
+   },
+   "isc71_97_emsc": {
+    "ws": "1971-01-01T00:00:00.000Z",
+    "we": "2026-09-14T08:42:45.280Z",
+    "T": 55.70256816994955,
+    "n": 51912,
+    "tmin": "1971-01-02T01:25:36.905Z",
+    "tmax": "2026-09-11T07:48:57.810Z",
+    "durum": "Bölgede 51912 deprem — Tarihsel Katalog TAMAMI, limit yok (görsel: 3000 örnekleniyor)",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1971–2026) (01 Oca 1971 02:00 – 14 Eyl 2026 11:42)Gösterilen: 02 Oca 1971 03:25 – 11 Eyl 2026 10:48 (51912 deprem)Bölge: 36.00,26.00 – 42.00,45.00Auto-Mc = 3.2 (Maximum Curvature) · b = 1.01 [1.00–1.03] ⁱ (%95) · N(M≥Mc) = 30644",
+    "sel": {
+     "contiguous": true,
+     "parca": 2
+    },
+    "tek": {
+     "b": 1.0091539228266915,
+     "a": 7.715638006713051,
+     "n": 30644,
+     "mc": 3.2
+    },
+    "cmp": {
+     "t0": "1971-01-01T00:00:00.000Z",
+     "t1": "2026-09-14T08:42:45.280Z",
+     "T": 55.70256816994955
+    },
+    "w": {
+     "donem": [
+      [
+       "1971-01-01",
+       "1985-01-01",
+       4.5
+      ],
+      [
+       "1985-01-01",
+       "2026-09-14",
+       4
+      ]
+     ],
+     "b": 1.0854634024067167,
+     "rate0": 105.11156109495438,
+     "m0": 4,
+     "lam7": 0.05824521852110055
+    }
+   },
+   "emsc98": {
+    "ws": "1998-01-01T00:00:00.000Z",
+    "we": "2026-09-14T08:42:45.280Z",
+    "T": 28.70188370725277,
+    "n": 48584,
+    "tmin": "1998-01-01T02:45:46.600Z",
+    "tmax": "2026-09-11T07:48:57.810Z",
+    "durum": "Bölgede 48584 deprem — Tarihsel Katalog TAMAMI, limit yok (görsel: 3000 örnekleniyor)",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1998–2026) (01 Oca 1998 02:00 – 14 Eyl 2026 11:42)Gösterilen: 01 Oca 1998 04:45 – 11 Eyl 2026 10:48 (48584 deprem)Bölge: 36.00,26.00 – 42.00,45.00Auto-Mc = 3.2 (Maximum Curvature) · b = 1.14 [1.13–1.16] (%95) · N(M≥Mc) = 27346",
+    "sel": {
+     "contiguous": true,
+     "parca": 1
+    },
+    "tek": {
+     "b": 1.1367955606948117,
+     "a": 8.074639603687249,
+     "n": 27346,
+     "mc": 3.2
+    },
+    "cmp": {
+     "t0": "1998-01-01T00:00:00.000Z",
+     "t1": "2026-09-14T08:42:45.280Z",
+     "T": 28.70188370725277
+    }
+   },
+   "bosluklu": {
+    "ws": "1900-01-01T00:00:00.000Z",
+    "we": "2026-09-14T08:42:45.280Z",
+    "T": 126.7005147818592,
+    "n": 48921,
+    "tmin": "1905-12-04T05:08:34.550Z",
+    "tmax": "2026-09-11T07:48:57.810Z",
+    "durum": "Bölgede 48921 deprem — Tarihsel Katalog TAMAMI, limit yok (görsel: 3000 örnekleniyor) ⚠ Seçili pencereler bitişik değil: T, aradaki boşluğu da içerir",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1900–2026) (01 Oca 1900 01:56 – 14 Eyl 2026 11:42)Gösterilen: 04 Ara 1905 07:05 – 11 Eyl 2026 10:48 (48921 deprem)Bölge: 36.00,26.00 – 42.00,45.00Auto-Mc = 3.2 (Maximum Curvature) · b = 1.08 [1.07–1.10] ⁱ (%95) · N(M≥Mc) = 27683",
+    "sel": {
+     "contiguous": false,
+     "parca": 2
+    },
+    "tek": {
+     "b": 1.079104601596419,
+     "a": 7.89534787783136,
+     "n": 27683,
+     "mc": 3.2
+    },
+    "cmp": {
+     "t0": "1900-01-01T00:00:00.000Z",
+     "t1": "2026-09-14T08:42:45.280Z",
+     "T": 126.7005147818592
+    }
+   },
+   "daire71_97": {
+    "ws": "1971-01-01T00:00:00.000Z",
+    "we": "1997-12-31T23:59:59.999Z",
+    "T": 27.000684462665095,
+    "n": 506,
+    "tmin": "1971-02-15T06:19:55.450Z",
+    "tmax": "1997-12-17T22:18:06.200Z",
+    "durum": "Bölgede 506 deprem — Tarihsel Katalog TAMAMI, limit yok",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1971–1997) (01 Oca 1971 02:00 – 01 Oca 1998 01:59)Gösterilen: 15 Şub 1971 08:19 – 18 Ara 1997 00:18 (506 deprem)Bölge: 37.15,26.78 – 39.85,30.22 (daire, merkez 38.500,28.500, R=150km — sınırlar kapsayan dikdörtgen)Auto-Mc = 3.7 (Maximum Curvature) · b = 0.80 [0.71–0.90] ⁱ (%95) · N(M≥Mc) = 268 · Aktivite Yoğunluğu = 140.42/10⁶km²/yıl",
+    "sel": {
+     "contiguous": true,
+     "parca": 1
+    },
+    "tek": {
+     "b": 0.8010386865111606,
+     "a": 5.391977934120083,
+     "n": 268,
+     "mc": 3.7
+    },
+    "cmp": {
+     "t0": "1971-01-01T00:00:00.000Z",
+     "t1": "1997-12-31T23:59:59.999Z",
+     "T": 27.000684462665095
+    },
+    "oran": {
+     "years": 27.000684462665095,
+     "mode": "rate"
+    }
+   },
+   "iscgem_kuresel": {
+    "ws": "1904-01-01T00:00:00.000Z",
+    "we": "2021-12-31T23:59:59.999Z",
+    "T": 118.00136892536187,
+    "n": 2169,
+    "tmin": "1904-04-04T10:02:34.560Z",
+    "tmax": "2021-12-29T16:47:08.610Z",
+    "durum": "Bölgede 2169 deprem — Tarihsel Katalog TAMAMI, limit yok",
+    "bilgi": "Kaynak: Tarihsel Katalog (ISC+EMSC, statik)Pencere: Tarihsel Katalog (1904–2021) (01 Oca 1904 01:56 – 01 Oca 2022 02:59)Gösterilen: 04 Nis 1904 11:59 – 29 Ara 2021 19:47 (2169 deprem)Bölge: 30.00,20.00 – 45.00,50.00Auto-Mc = 5.4 (Maximum Curvature) · b = 0.98 [0.93–1.04] ⁱ (%95) · N(M≥Mc) = 1259",
+    "sel": {
+     "contiguous": true,
+     "parca": 1
+    },
+    "tek": {
+     "b": 0.9796233140127639,
+     "a": 8.389991625776787,
+     "n": 1259,
+     "mc": 5.4
+    },
+    "cmp": {
+     "t0": "1904-01-01T00:00:00.000Z",
+     "t1": "2021-12-31T23:59:59.999Z",
+     "T": 118.00136892536187
+    }
+   },
+   "canli": {
+    "hist": false,
+    "sel": null
+   },
+   "hatalar": []
+  }
+ },
+ "denetimler": [
+  "GEÇTİ (1)(2) ISC 1971–1997: pencere 1971-01-01 → 1997-12-31T23:59:59, T = 27.001 yıl (önce 126.7)",
+  "GEÇTİ (1) Weichert dönemleri: 1971-01-01→1985-01-01→4.5, 1985-01-01→1997-12-31→4 (önce son dönem 1985-01-01→2026-09-14)",
+  "GEÇTİ (1)(4) Bölge karşılaştırması t0–t1 = 1971-01-01 → 1997-12-31, T = 27.001 (önce 126.7)",
+  "GEÇTİ (1) Bölge bilgi satırı: \"Pencere: Tarihsel Katalog (1971–1997)\" (önce \"Pencere: Tarihsel Katalog (1900–2026)\")",
+  "GEÇTİ (4) Daire bölge bilgi satırı Aktivite Yoğunluğu 29.92 → 140.42 /10⁶km²/yıl; oran 4.693 = T_önce/T_sonra 4.692 (N ve A aynı)",
+  "GEÇTİ (2) Tüm senaryolarda olaylar [pencere başı, pencere sonu] içinde",
+  "GEÇTİ (2) Olay sayıları önce = sonra (yalnız T değişti): isc71_97 3328, isc71_97_emsc 51912, emsc98 48584, bosluklu 48921, daire71_97 506, iscgem_kuresel 2169",
+  "GEÇTİ (2) Açık uçlu EMSC 1998–: katalog sonunda biter (2026-09-14, şimdiki zaman değil); başlangıç 1900 → 1998",
+  "GEÇTİ (2) Bitişik pencereler (1971–1997 + 1998–): tek aralık 1971 → katalog sonu, uyarı yok",
+  "GEÇTİ (2) Bitişik olmayan pencereler (1900–1970 + 1998–): uyarı \"⚠ Seçili pencereler bitişik değil: T, aradaki boşluğu da içerir\"",
+  "GEÇTİ (2) Küresel ISC-GEM 1904–2021: pencere 1904-01-01 → 2021-12-31 — önce: bölge sorgusu hata veriyordu (page.evaluate: TypeError: Cannot read properties of null (reading 'toLocaleDateString'))",
+  "GEÇTİ (2) Küresel ISC-GEM penceresinde bölge sorgusu çalışıyor (N = 2169; G–R tek Mc b = 0.980)",
+  "GEÇTİ (3) Tek Mc b, a, N, Mc önce = sonra (T'ye bağlı değil) — ör. ISC 1971–1997: b = 0.773, N(≥Mc) = 2200",
+  "GEÇTİ (3) ISC 1971–1997 Weichert: λ(≥m₀) arttı (boş 1998–2026 yılları artık sayılmıyor)",
+  "GEÇTİ (3) 1971–2026 (bitişik, katalog sonuna kadar): Weichert dönemleri aynı; b 1.085466 → 1.085463 (göreli fark < 1e-4: pencere sonu katalog tarihinin 00:00'ı yerine seçili penceredeki son olay zamanı — birkaç saat)",
+  "GEÇTİ (4) Daire bölge, Oran modu: T = 27.001 yıl (önce 126.7)",
+  "GEÇTİ (5) Canlı mod: tarihsel pencere yok, histSelWindow = null (canlı yol değişmedi)",
+  "GEÇTİ Sayfa hatası yok (önce 0, sonra 0)"
+ ],
+ "ozet": {
+  "pass": 18,
+  "fail": 0
+ }
+}
