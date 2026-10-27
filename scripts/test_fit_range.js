@@ -2,24 +2,40 @@
 // Fonksiyonlar ve renderGutenbergRichterCS'in sınıflama/fit bloğu doğrudan index.html'den okunur; kopya tutulmaz.
 // "Eski yol" karşılaştırması için HEAD (git) sürümündeki aynı blok da okunur: fit kapalıyken sonuç birebir aynı olmalı.
 // Kullanım (depo kökünde): node scripts/test_fit_range.js [index.html]
-// TODO (2026-10-17): betik şu an çalışmıyor — csBvalueTimeSeries imzası (cs, fit, step) olarak değişti, cutS ise eski
-// 'function csBvalueTimeSeries(cs)' başlığını arıyor. Ayrı görev: kesme işaretlerini ve çağrıları yeni imzaya uyarlayın.
+// 2026-10-27 onarım: csBvalueTimeSeries imzası (cs, fit, step, nWin) olunca betik fonksiyonu bulamıyordu (2026-10-17'den beri çalışmıyordu).
+//   Fonksiyon artık imzadan bağımsız kesilir; kullandığı bWinStart/bTimeAnchor bağlama eklenir. Yöntemde değişiklik yok.
+// "Eski yol" referansı: varsayılan HEAD. Depo tarihçesi tek commit'e sıkıştırıldığı için fit öncesi sürüm yok; HEAD çalışma ağacıyla
+//   aynıysa 3. bölüm ve b(t) eşitliği yalnız TUTARLILIK denetimidir (çıktıda belirtilir). Başka referans: FIT_REF=<commit> veya
+//   FIT_REF_FILE=<dosya>.
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm'), cp = require('child_process');
 const load = f => fs.readFileSync(f, 'utf8').replace(/\r\n/g, '\n');
 const src = load(process.argv[2] || path.join(__dirname, '..', 'index.html'));
-let srcOld = null; try { srcOld = cp.execSync('git show HEAD:index.html', { cwd: path.join(__dirname, '..'), maxBuffer: 1 << 26 }).toString().replace(/\r\n/g, '\n'); } catch (e) {}
+let srcOld = null, refName = process.env.FIT_REF_FILE || ('git ' + (process.env.FIT_REF || 'HEAD'));
+try { srcOld = process.env.FIT_REF_FILE ? load(process.env.FIT_REF_FILE)
+  : cp.execSync(`git show ${process.env.FIT_REF || 'HEAD'}:index.html`, { cwd: path.join(__dirname, '..'), maxBuffer: 1 << 26 }).toString().replace(/\r\n/g, '\n'); } catch (e) {}
+const refSame = srcOld !== null && srcOld === src;
 const cutS = (S, a, b) => { const i = S.indexOf(a), j = S.indexOf(b, i); if (i < 0 || j < 0) throw new Error('bulunamadı: ' + a); return S.slice(i, j); };
 
 function mkCtx(S) {
   const inputs = {}; const ctx = { __inputs: inputs, document: { getElementById: id => ({ value: inputs[id] ?? '' }) } }; vm.createContext(ctx);
   vm.runInContext(S.match(/^const CS_QC = \{[^\n]*\};$/m)[0].replace('const CS_QC', 'var CS_QC'), ctx);
-  vm.runInContext(cutS(S, 'function computeMc(evList)', '// Aki (1965) MLE b-değeri'), ctx);
+  // Mc zinciri: 2026-10-18'den beri computeMc → computeMcScale → mcScale/computeMcSrc (Mc–ızgara düzeltmesi). Bloğun tamamı kesilir;
+  // dönüşüm tablosu boş (bu testte dönüşüm yok → mcScale eski sonucu verir), test_b_grid.js / test_iscgem_overlay.js ile aynı yöntem.
+  if (S.includes('const MC_DM = 0.1;')) vm.runInContext('var MAG_CONVERSIONS = {};\n' + cutS(S, 'const MC_DM = 0.1;', '// Aki (1965) MLE b-değeri').replace('const MC_DM', 'var MC_DM'), ctx);
+  else vm.runInContext(cutS(S, 'function computeMc(evList)', '// Aki (1965) MLE b-değeri'), ctx);
   vm.runInContext(cutS(S, 'function bConfidence95(b, n)', '// Kayan pencere b-değeri'), ctx);
   vm.runInContext('var regionRect=null, regionWindowStart=null, regionWindowEnd=null, regionCapped=false, regionOrderUsed=null;', ctx);
   vm.runInContext(cutS(S, 'let csEnabled = false;', 'let lastGrFit = null;').replace('let csEnabled', 'var csEnabled').replace('let csSteps', 'var csSteps'), ctx);
-  if (S.includes('function csBvalueTimeSeries(cs, fit)')) vm.runInContext(cutS(S, 'function csBvalueTimeSeries(cs, fit)', '// ── Fit aralığı arayüzü'), ctx);
-  else vm.runInContext(cutS(S, 'function csBvalueTimeSeries(cs)', '// GR — basamaklı tamlık'), ctx);   // HEAD (eski imza)
+  // b(t) serisi: imzadan bağımsız kesim (eski '(cs)', '(cs, fit)' ve güncel '(cs, fit, step, nWin)' imzaları); bitiş, ardından gelen ilk bölüm yorumu
+  { const i = S.indexOf('function csBvalueTimeSeries('); if (i < 0) throw new Error('bulunamadı: function csBvalueTimeSeries(');
+    const ends = ['// ── Fit aralığı arayüzü', '// GR — basamaklı tamlık'].map(m => S.indexOf(m, i)).filter(j => j > 0);
+    if (!ends.length) throw new Error('csBvalueTimeSeries bitiş işareti bulunamadı');
+    // b(t) pencere yardımcıları (2026-10-11'den beri): bTimeAnchor, bWinStart, bWinTime — gövdeleriyle birlikte kesilir
+    const fnCut = nm => { const k = S.indexOf('\nfunction ' + nm + '('); if (k < 0) return ''; const e = S.slice(k + 1).search(/\n(?=[^\s}])/); return S.slice(k + 1, k + 2 + e); };
+    const ba = S.match(/^let bTimeAnchor = [^\n]*$/m);
+    vm.runInContext([ba ? ba[0].replace('let ', 'var ') : "var bTimeAnchor = 'mean';", 'var location = { search: "" };', fnCut('bWinStart'), fnCut('bWinTime')].join('\n'), ctx);
+    vm.runInContext(S.slice(i, Math.min(...ends)), ctx); }
   // Sınıflama + Weichert (renderGutenbergRichterCS, birebir kaynak): "Kesik birikimli eğri" yorumuna kadar
   const blk = cutS(S, '  const idx = m => Math.floor((m + 1e-9) / DM);', '  // Kesik birikimli eğri');
   vm.runInContext(`function __fit(items, cs, DM) {\n${blk}\n return { wf, m0, rate0: typeof rate0Best !== 'undefined' ? rate0Best : (wf ? wf.rate0 : null), clsBest,
@@ -91,7 +107,7 @@ console.log('\n2. Normalizasyon (beklenen sayımlar, gürültüsüz)');
   ok(Math.abs(sb.m - 1) < 0.02 && Math.abs(sg.m - 50) / 50 < 0.02, 'gürültüde b ve λ(≥M_min) yansız'); }
 
 // ── 3. Eski yol: fit kapalıyken HEAD ile birebir aynı ──
-console.log('\n3. Fit kapalı → eski sonuçla birebir eşitlik (HEAD index.html)');
+console.log(`\n3. Fit kapalı → referansla birebir eşitlik (${refName})` + (refSame ? ' — NOT: referans çalışma ağacıyla aynı; yalnız tutarlılık denetimi' : ''));
 if (!O) ok(false, 'HEAD okunamadı (git yok?)');
 else for (const [nm, steps, DM, extra] of [['kullanıcı basamakları, ΔM 0.1', USER_STEPS, 0.1, {}], ['doğru basamaklar, ΔM 0.2', TRUE_STEPS, 0.2, {}], ['Mx = 6.0', USER_STEPS, 0.1, { grMx: '6.0' }]]) {
   const evs = synth({ seed: 2024, trueMc: stepFn(TRUE_STEPS), round: true });
@@ -148,7 +164,7 @@ console.log('\n6. b(t) tahmincisi csAkiBRange + csFitItems');
   // b(t) serisi uçtan uca: fit kapalıyken eski seri ile birebir
   const evs = synth({ seed: 77, trueMc: stepFn(TRUE_STEPS), round: true }); fitWith(X, USER_STEPS, evs);
   const sOff = run(X, 'csBvalueTimeSeries(__cs, null)'), sOld = O ? (fitWith(O, USER_STEPS, evs), run(O, 'csBvalueTimeSeries(__cs)')) : null;
-  ok(sOld && sOff.series.length === sOld.series.length && sOff.series.every((p, i) => p.b === sOld.series[i].b && p.err === sOld.series[i].err), `b(t), fit kapalı: ${sOff.series.length} pencere HEAD ile birebir`);
+  ok(sOld && sOff.series.length === sOld.series.length && sOff.series.every((p, i) => p.b === sOld.series[i].b && p.err === sOld.series[i].err), `b(t), fit kapalı: ${sOff.series.length} pencere referansla (${refName}) birebir${refSame ? ' [tutarlılık]' : ''}`);
   const sOn = run(X, 'csBvalueTimeSeries(__cs, {on:true, lo:3.2, hi:null})');
   const mOff = stats(sOff.series.map(p => p.b)).m, mOn = stats(sOn.series.map(p => p.b)).m;
   console.log(`     b(t) ortalaması: tüm sınıflar ${mOff.toFixed(3)}, fit M ≥ 3.2 ${mOn.toFixed(3)} (gerçek 1.0; ${sOn.series.length} pencere)`);
@@ -175,6 +191,6 @@ console.log('\n8. grRProfile(mEnd) ve URL parametreleri');
   ok(a.mTo > 4.0 && b.mTo < 4.0 - 1e-9 && b.ok, `profil M_max'ta duruyor (${a.mTo.toFixed(1)} → ${b.mTo.toFixed(1)})`);
   ok(/\['fmin', 'grFitMin', ''\], \['fmax', 'grFitMax', ''\]/.test(src), 'URL: fmin / fmax parametreleri GR_URL_PARAMS içinde (paylaşılabilir, yeniden üretilebilir)');
   ok(/id="grFitMin"/.test(src) && /id="grFitMax"/.test(src) && /grFitSuggestApply\(\)/.test(src), 'UI: M_min, M_max alanları ve ⚙ Oto öner');
-  ok(/csBvalueTimeSeries\(cs, btFit\)/.test(src) && /grFitRangeCurrent\(\)/.test(src), 'b(t) ve G-R aynı karar kaynağını okuyor (grFitRangeCurrent)'); }
+  ok(/csBvalueTimeSeries\(cs, btFit[,)]/.test(src) && /grFitRangeCurrent\(\)/.test(src), 'b(t) ve G-R aynı karar kaynağını okuyor (grFitRangeCurrent)'); }
 
 console.log(`\nPASS ${pass} FAIL ${fail}`); process.exit(fail ? 1 : 0);
