@@ -1,6 +1,10 @@
-# a(t) paneli — pencere olay hızı (2026-10-31, güncelleme 3)
+# a(t) paneli — pencere olay hızı (2026-10-31, güncelleme 4)
 
-Dal: `a-zaman-paneli`, `main` 89cacdb'den açıldı. `main`'e birleştirilmedi; bilimsel inceleme bekliyor.
+Panel `main`'de (fbe343a, 31 Ekim). Güncelleme 4 (öz-ilişki düzeltmesi) ayrı dalda: `a-neff`, `main` 5274c46'dan açıldı, birleştirilmedi.
+
+**Güncelleme 4'te eklenenler** (`a-neff` dalı; ChatGPT önerisi 1):
+- Panelde ham r ve ham p korunuyor; yanlarına öz-ilişki (ρ_a, ρ_b), etkin örneklem n_eff ve düzeltilmiş p eklendi. Hepsi "keşifsel" etiketli.
+- Yöntem, varsayımlar, hata oranı ve güç §4.2'de.
 
 **Güncelleme 3'te eklenenler** (ChatGPT incelemesinin üç noktası):
 - **Aralık ifadesi:** "Kesin %95" yalnızca Poisson varsayımı altında geçerli. GK74 açıkken de kalan olayların bağımsız olduğu garanti edilmiyor (§1.2).
@@ -120,7 +124,65 @@ Etkin örneklem: n_eff = n(1 − ρ_a·ρ_b)/(1 + ρ_a·ρ_b) (Bartlett 1935; ik
 
 Paneldeki p bu yüzden keşifseldir.
 
-**Öneri (ayrı iş):** Panelde n_eff'i ve düzeltilmiş p'yi doğrudan göstermek ya da eğilimi çıkarılmış (birinci fark) serilerde korelasyon vermek. Bu bir hesap değişikliği olduğundan bu dala katılmadı.
+**Güncelleme 4:** n_eff ve düzeltilmiş p panele eklendi (§4.2). Eğilimi çıkarılmış (birinci fark) serilerde korelasyon hâlâ öneri olarak duruyor.
+
+### 4.2 Öz-ilişki düzeltmesi: yöntem, varsayımlar, güvenilirlik (güncelleme 4)
+
+**Tanım:**
+1. Örtüşmeyen pencereler: her ⌈n_pencere/adım⌉'ıncı pencere, yalnızca aynı Mc segmenti içinde.
+2. Bu pencerelerin a ve b serilerinden r = Pearson(b, a); ham p, n pencereyle Fisher z: z = atanh(r)·√(n − 3).
+3. Gecikme-1 öz-ilişki ρ_a ve ρ_b: aynı segmentteki ardışık çiftler (a_i, a_{i+1}) üzerinden Pearson; segmentler arası çift kurulmaz; en az 5 çift.
+4. Etkin örneklem (Bartlett 1935; iki öz-ilişkili seri arasındaki korelasyonun varyansı için):
+
+```
+n_eff = n · (1 − ρ_a·ρ_b) / (1 + ρ_a·ρ_b)
+```
+
+   ρ_a·ρ_b < 0 ise 0 alınır; n_eff hiçbir zaman n'yi aşmaz.
+5. Düzeltilmiş p: aynı Fisher z ile, √(n_eff − 3) kullanılarak. n_eff < 5 ise verilmez ("test edilemez").
+
+**Varsayımlar:**
+- İki seri de AR(1) benzeri öz-ilişki taşır; yalnızca gecikme-1 kullanılır. Daha uzun bellek varsa n_eff yüksek kalır ve p iyimser olur.
+- Seriler durağandır. Ortak eğilim (ör. tamlık değişimi) varsa ρ yüksek çıkar ve düzeltme bunu kısmen yakalar, ama eğilimin nedenini ayırmaz.
+- Fisher z normal yaklaşımıdır. Benzetimde t testiyle farkı ≤ 0,2 puan; ham p ile tutarlı olsun diye Fisher z seçildi.
+- ρ kısa serilerden kestirilir ve aşağı yanlıdır. Yanlılık düzeltmesi (ρ + (1+4ρ)/n) denendi; testi gereksiz tutucu yaptığı için uygulanmadı (hata oranı %0,4–2,5).
+
+**Hata oranı** (`test_a_window.js` test 8): iki bağımsız AR(1) serisi, yani gerçek korelasyon 0; 3000 tekrar, α = 0,05.
+
+| n | φ | ham test | düzeltilmiş test | test edilebilen |
+|---|---|---|---|---|
+| 13 | 0 | %5,1 | %4,2 | %100 |
+| 13 | 0,8 | %21,8 | %3,1 | %81 |
+| 22 | 0 | %5,6 | %5,1 | %100 |
+| 22 | 0,8 | %26,9 | %2,5 | %92 |
+| 50 | 0,8 | %31,7 | %3,2 | %100 |
+
+Düzeltilmiş test nominal düzeyi aşmıyor; ham test öz-ilişkide %32'ye kadar sahte anlamlılık üretiyor.
+
+**Güç** (gerçek korelasyon var; `neff_guc.js` benzetimi, 3000 tekrar):
+
+| n | φ | gerçek korelasyon | ham | düzeltilmiş |
+|---|---|---|---|---|
+| 13 | 0,5 | 0,5 | %45 | %32 |
+| 22 | 0,5 | 0,5 | %65 | %52 |
+| 22 | 0,8 | 0,5 | %64 | **%22** |
+| 22 | 0,8 | 0,8 | %97 | %70 |
+| 50 | 0,8 | 0,5 | %84 | %50 |
+
+(Ham testin "gücü", aynı zamanda yüksek sahte anlamlılık oranı demektir; doğrudan karşılaştırılamaz.)
+
+**Yorum:** Küçük n_eff'te düzeltilmiş test tutucu ve düşük güçlüdür. Türkiye 1971–1997'deki koşullarda (n = 22, ρ ≈ 0,75) orta düzey bir gerçek korelasyonu (0,5) yakalama olasılığı yaklaşık %22. Bu yüzden düzeltilmiş p'nin anlamlı çıkmaması (0,075) ilişkinin **olmadığını göstermez**; yalnızca bu veriyle **gösterilemediğini** söyler. Sonuç "keşifsel" etiketiyle sunulur.
+
+**Kabul testi** (`kabul_a.js`, önce = main 5274c46): **27/27**.
+- a(t) grafiği ve değerleri önce = sonra; b(t) ve G–R metni önce = sonra.
+- ρ_a, ρ_b ve n_eff bağımsız hesapla aynı.
+
+| Senaryo | r | ham p | ρ_a | ρ_b | n_eff | düzeltilmiş p |
+|---|---|---|---|---|---|---|
+| Türkiye 1971–1997, tek Mc | 0,79 | 3,1e−6 | 0,73 | 0,80 | 5,8 | **0,075** |
+| Aynı, basamaklı | 0,65 | 0,083 | 0,60 | 0,62 | 3,7 | test edilemez |
+| Marmara, GK74 kapalı | −0,05 | 0,86 | 0,51 | 0,62 | 6,8 | 0,92 |
+| Marmara, GK74 açık | 0,71 | 0,13 | 0,84 | 0,44 | 2,8 | test edilemez |
 
 ## 5. a–b ilişkisini karıştırabilecek etkenler
 
@@ -131,7 +193,7 @@ Paneldeki p bu yüzden keşifseldir.
 | Tamlık değişimi | Mc'nin altında kalan dönemde kaydedilen hız ve b birlikte düşer; yapay pozitif korelasyon oluşur | Uyarı metni; tamlık basamaklarıyla segmentlere bölme; Türkiye 1971–1997'de r 0,79 → 0,65 (anlamlı değil) |
 | Mc basamakları | Farklı eşiklerin hızları karşılaştırılamaz | Karışık pencere çizilmez; korelasyon segment içinde |
 | Artçı dizileri | Hız tepeleri oluşur; aralık dar kalır (test 7) | GK74 uyarısı; Marmara'da GK74 açılınca İzmit tepesi 3,76 → 1,50 |
-| Örtüşmeyen pencerelerin öz-ilişkisi | Eğilimler p'yi iyimser yapar (§4.1: Türkiye 3e−6 → ≈ 0,07) | p "keşifsel" etiketli; n_eff düzeltmesi önerildi |
+| Örtüşmeyen pencerelerin öz-ilişkisi | Eğilimler p'yi iyimser yapar (§4.1: Türkiye 3e−6 → 0,075) | Ham p ile birlikte n_eff ve düzeltilmiş p; "keşifsel" (§4.2) |
 | Büyüklük ölçeği / dönüşüm değişimi (ör. ISC → EMSC, Scordilis dönüşümü) | Ölçek değişirse Mc'deki hız ve b kayar; a(t) ve b(t) değişimleri doğrudan fiziksel değişim olarak yorumlanamaz | İleriki çalışma; Mc(t) şeridi ve büyüklük türü tanısıyla birlikte değerlendirilmeli |
 
 ## 6. Gözlemler (yorum değil)

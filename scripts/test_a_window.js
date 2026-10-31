@@ -7,6 +7,7 @@
 //   4. a_GR = a + b·Mc kimliği; sabit n'de a_GR ile b'nin ilişkisi (hız sabitken bile güçlü korelasyon) — a_GR neden ayrı gösterge değil.
 //   5. b–a korelasyonu: H0 altında (sabit hız, sabit b) örtüşmeyen pencerelerle p < 0,05 oranı ≈ %5; örtüşen pencerelerin r dağılımı daha geniş.
 //   6. Tamlık basamakları: Mc'si karışık pencere işaretlenir, a hesaplanmaz.
+//   8. Öz-ilişki düzeltmesi (Bartlett n_eff): analitik değer; bağımsız AR(1) çiftlerinde ham ve düzeltilmiş testin hata oranı.
 //   7. Kümelenme (artçı benzeri): %95 aralık Poisson varsayımına dayanır; kümelenmiş süreçte uzun dönem hızı kapsama oranı düşer (ölçülür).
 // Kullanım (depo kökünde): node scripts/test_a_window.js [index.html]
 'use strict';
@@ -15,7 +16,7 @@ const src = fs.readFileSync(process.argv[2] || path.join(__dirname, '..', 'index
 const fn = name => { const i = src.indexOf('\nfunction ' + name + '('); if (i < 0) throw new Error('bulunamadı: ' + name);
   const j = src.slice(i + 1).search(/\n(?=[^\s}])/); return src.slice(i + 1, i + 2 + j); };
 const ctx = {}; vm.createContext(ctx);
-vm.runInContext(['aWinFields', 'aChi2Q', 'aWinValue', 'aPearson', 'aSeriesFrom'].map(fn).join('\n'), ctx);
+vm.runInContext(['aWinFields', 'aChi2Q', 'aWinValue', 'aPearson', 'aSeriesFrom', 'aLag1', 'aNeffTest'].map(fn).join('\n'), ctx);
 const X = ctx;
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else fail++; console.log((c ? '  ok  ' : '  !!  ') + m); };
@@ -95,5 +96,23 @@ console.log('\n7. Kümelenme: %95 aralığın Poisson varsayımı (uzun dönem h
     out.push([ad, cov / tot, tot]); }
   console.log(`     uzun dönem λ'yı kapsama: ${out.map(([a, c, n]) => `${a} %${(100 * c).toFixed(1)} (${n} pencere)`).join('; ')}`);
   ok(Math.abs(out[0][1] - 0.95) < 0.02 && out[1][1] < out[0][1] - 0.05 && out[2][1] < out[1][1], 'kümelenme arttıkça kapsama düşer: aralık yalnız Poisson (bağımsız olay) varsayımında %95; artçılar ayıklanmadıysa dar kalır'); }
+
+console.log('\n8. Öz-ilişki düzeltmesi (Bartlett n_eff)');
+{ const t = X.aNeffTest(0.79, 22, 0.73, 0.80);
+  ok(Math.abs(t.neff - 22 * (1 - 0.584) / (1 + 0.584)) < 1e-9 && Math.abs(t.p - 0.074) < 0.002, `n = 22, ρ_a = 0,73, ρ_b = 0,80, r = 0,79: n_eff = ${t.neff.toFixed(2)}, p = ${t.p.toFixed(3)} (raporla aynı: 5,8 ve ≈ 0,07)`);
+  ok(X.aNeffTest(0.5, 10, -0.5, 0.6).neff === 10 && X.aNeffTest(0.65, 8, 0.6, 0.62).p === null && X.aNeffTest(0.5, 10, null, 0.5).p === null, 'ρ_a·ρ_b < 0 → n_eff = n (şişirilmez); n_eff < 5 → p verilmez; öz-ilişki yoksa p verilmez');
+  const segs = [[{ a: 1 }, { a: 2 }, { a: 3 }], [{ a: 5 }, { a: 4 }, { a: 6 }, { a: 8 }]], l = X.aLag1(segs, q => q.a), l4 = X.aLag1([[{ a: 1 }, { a: 2 }, { a: 3 }], [{ a: 5 }, { a: 4 }, { a: 6 }]], q => q.a);
+  ok(l && l.n === 5 && l4 === null, 'aLag1: çiftler yalnız segment içinde (2 + 3 = 5 çift); 4 çiftte hesaplanmaz');
+  // Bağımsız iki AR(1) serisi (gerçek korelasyon 0): α = 0,05'te reddetme oranı
+  const rnd = rng(21), g = () => Math.sqrt(-2 * Math.log(1 - rnd())) * Math.cos(2 * Math.PI * rnd());
+  const ar = (n, f) => { const x = [g() / Math.sqrt(1 - f * f)]; for (let i = 1; i < n; i++) x.push(f * x[i - 1] + g()); return x; };
+  const sonuc = [];
+  for (const [n, f] of [[13, 0], [13, 0.8], [22, 0], [22, 0.8], [50, 0.8]]) { let ham = 0, duz = 0, test = 0; const R = 3000;
+    for (let i = 0; i < R; i++) { const x = ar(n, f), y = ar(n, f), seg = [x.map((v, j) => ({ a: v, b: y[j] }))], r = X.aPearson(x, y);
+      const ra = X.aLag1(seg, q => q.a), rb = X.aLag1(seg, q => q.b), t2 = X.aNeffTest(r.r, n, ra ? ra.r : null, rb ? rb.r : null);
+      if (r.p < 0.05) ham++; if (t2.p !== null) { test++; if (t2.p < 0.05) duz++; } }
+    sonuc.push([n, f, ham / R, duz / R, test / R]); }
+  console.log('     bağımsız AR(1) çiftleri (3000 tekrar): ' + sonuc.map(([n, f, h, d, tt]) => `n = ${n}, φ = ${f}: ham %${(100 * h).toFixed(1)}, düzeltilmiş %${(100 * d).toFixed(1)} (test edilebilen %${(100 * tt).toFixed(0)})`).join('; '));
+  ok(sonuc.every(([, , , d]) => d <= 0.065) && sonuc.filter(([, f]) => f === 0.8).every(([, , h]) => h > 0.15), 'düzeltilmiş testin hata oranı ≤ %6,5; φ = 0,8\'de ham test %15\'in üstünde sahte anlamlılık üretiyor'); }
 
 console.log(`\n${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);

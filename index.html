@@ -2910,6 +2910,19 @@ function aPearson(x, y) {
   const erfc = v => { const t = 1 / (1 + 0.5 * Math.abs(v)), e = t * Math.exp(-v * v - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277))))))))); return v >= 0 ? e : 2 - e; };
   return { r, n, p: erfc(Math.abs(z) / Math.SQRT2) };
 }
+// Örtüşmeyen pencerelerin zamansal bağımlılığı (2026-10-31). Gecikme-1 öz-ilişki: aynı Mc segmentindeki ardışık örtüşmeyen pencere çiftleri
+// üzerinden Pearson (segmentler arası çift kurulmaz); en az 5 çift gerekir (aPearson ile aynı alt sınır). Etkin örneklem (Bartlett 1935; iki AR(1) serinin korelasyonu):
+// n_eff = n·(1 − ρ_a·ρ_b)/(1 + ρ_a·ρ_b), ρ_a·ρ_b < 0 ise 0 alınır (n_eff hiçbir zaman n'yi aşmaz). Düzeltilmiş p: Fisher z, √(n_eff − 3); n_eff < 5'te verilmez.
+function aLag1(segs, f) { const x = [], y = []; segs.forEach(v => { for (let i = 1; i < v.length; i++) { x.push(f(v[i - 1])); y.push(f(v[i])); } });
+  if (x.length < 5) return null; const r = aPearson(x, y); return r ? { r: r.r, n: x.length } : null; }
+function aNeffTest(r, n, rhoA, rhoB) {
+  if (rhoA === null || rhoB === null) return { neff: null, p: null, why: 'öz-ilişki için en az 5 ardışık örtüşmeyen pencere çifti gerekir' };
+  const rho = Math.max(0, rhoA * rhoB), neff = Math.min(n, n * (1 - rho) / (1 + rho));
+  if (neff < 5) return { neff, p: null, why: 'n_eff < 5: test edilemez' };
+  const z = Math.atanh(Math.max(-0.999999, Math.min(0.999999, r))) * Math.sqrt(neff - 3), v = Math.abs(z) / Math.SQRT2;
+  const t = 1 / (1 + 0.5 * v), e = t * Math.exp(-v * v - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+  return { neff, p: Math.min(1, e), why: null };
+}
 // a(t) noktaları: b(t) serisinden (aynı pencereler, aynı zaman damgası). Tamlık basamaklarında Mc'si karışık pencere (mcLo ≠ mcHi) çizilmez.
 function aSeriesFrom(series, NW, Mc, cs) {
   const Y = 365.25 * 864e5;
@@ -2953,14 +2966,18 @@ function renderAvalueTS(series, N, Mc, cs, t0, t1, NW, STEP) {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = body;
   // b–a ilişkisi. Ardışık pencereler ortak olay paylaşır (örtüşme NW − adım): bağımsızlık için yalnız örtüşmeyen pencereler (her ⌈NW/adım⌉'inci) kullanılır.
   // Tamlık basamaklarında yalnız aynı Mc segmenti içinde (farklı eşiklerin a'ları karşılaştırılamaz).
-  const k = Math.max(1, Math.ceil(NW / STEP)), xb = [], ya = []; segs.forEach(sg => { for (let i = 0; i < sg.p.length; i += k) { xb.push(sg.p[i].b); ya.push(sg.p[i].a); } });
+  const k = Math.max(1, Math.ceil(NW / STEP)), indSegs = segs.map(sg => sg.p.filter((q, i) => i % k === 0)), xb = [], ya = []; indSegs.forEach(v => v.forEach(q => { xb.push(q.b); ya.push(q.a); }));
   const rInd = aPearson(xb, ya), rAll = aPearson(ok.map(q => q.b), ok.map(q => q.a));
+  const acA = aLag1(indSegs, q => q.a), acB = aLag1(indSegs, q => q.b), nt = rInd ? aNeffTest(rInd.r, rInd.n, acA ? acA.r : null, acB ? acB.r : null) : null;
+  lastAts.corr = rInd ? { r: rInd.r, n: rInd.n, pHam: rInd.p, rhoA: acA ? acA.r : null, rhoB: acB ? acB.r : null, nCift: acA ? acA.n : 0, neff: nt.neff, pDuz: nt.p } : null;
+  const pf = v => v < 1e-3 ? v.toExponential(1).replace('.', ',') : v.toFixed(3).replace('.', ','), c2 = v => v.toFixed(2).replace('.', ',');
   const med = v => { const a = v.slice().sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
   const aMin = ok.reduce((m, q) => q.a < m.a ? q : m), aMax = ok.reduce((m, q) => q.a > m.a ? q : m);
   const decl = typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect;
   st.innerHTML = `<div style="font-size:.85em;color:#aaa"><span style="color:${COL}">●─</span> a = log₁₀(n/T) &nbsp; <span style="color:${COL};opacity:.5">▮</span> %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) ${nMixed ? `&nbsp; <span style="color:#f59e0b">╵</span> tamlık basamağı geçişindeki pencere (çizilmedi)` : ''}</div>` +
     `<div style="margin-top:2px">${ok.length} pencere (n = ${NW}, adım ${STEP}; b(t) ile aynı) · medyan T = ${med(ok.map(q => q.Tyr)).toPrecision(3)} yıl · a en düşük ${fmt(aMin.a)} (${dstr(aMin.t)}), en yüksek ${fmt(aMax.a)} (${dstr(aMax.t)})` +
-    (rInd ? ` &nbsp;|&nbsp; b–a korelasyonu: <b>r = ${rInd.r.toFixed(2).replace('.', ',')}</b> (örtüşmeyen ${rInd.n} pencere, p = ${rInd.p < 1e-3 ? rInd.p.toExponential(1).replace('.', ',') : rInd.p.toFixed(3).replace('.', ',')} — keşifsel: örtüşmeyen pencereler de zamanda bağımlı olabilir)` : ' &nbsp;|&nbsp; b–a korelasyonu: örtüşmeyen pencere sayısı yetersiz') +
+    (rInd ? ` &nbsp;|&nbsp; b–a korelasyonu (keşifsel): <b>r = ${c2(rInd.r)}</b> (örtüşmeyen ${rInd.n} pencere) · ham p = ${pf(rInd.p)} · ` +
+      `<span title="Örtüşmeyen pencereler de zamanda bağımlıdır. ρ: aynı Mc segmentindeki ardışık örtüşmeyen pencerelerin gecikme-1 öz-ilişkisi. n_eff = n(1 − ρ_a·ρ_b)/(1 + ρ_a·ρ_b) (Bartlett 1935); düzeltilmiş p: Fisher z, √(n_eff − 3). Benzetimde (bağımsız AR(1) çiftleri) düzeltilmiş testin hata oranı %2,6–5,5, ham testin %5–31. Küçük n_eff'te güç düşüktür.">öz-ilişki ρ<sub>a</sub> = ${acA ? c2(acA.r) : '—'}, ρ<sub>b</sub> = ${acB ? c2(acB.r) : '—'} → n<sub>eff</sub> = ${nt.neff !== null ? nt.neff.toFixed(1).replace('.', ',') : '—'} · düzeltilmiş p = <b>${nt.p !== null ? pf(nt.p) : '—'}</b>${nt.why ? ` (${nt.why})` : ''}</span>` : ' &nbsp;|&nbsp; b–a korelasyonu: örtüşmeyen pencere sayısı yetersiz') +
     (rAll ? ` <span style="color:#888">[tüm ${rAll.n} örtüşen pencere: r = ${rAll.r.toFixed(2).replace('.', ',')}; p verilmez — pencereler bağımsız değil]</span>` : '') + `</div>` +
     `<div style="color:#9ab0c5;margin-top:2px">Tanım: Öncel &amp; Wilson (2007, Eş. 3) N = n/T = 10<sup>a</sup>; n = ${NW} olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, <b>Mc'deki yıllık olay hızıdır</b> (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. ` +
       `Kesişim a<sub>GR</sub> = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. ` +

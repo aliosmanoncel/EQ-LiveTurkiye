@@ -4,7 +4,8 @@
 //             (C) Marmara (40–41,5° K / 26–31° D), EMSC 1998–2026, tek Mc (1999 İzmit ve Düzce artçıları dahil); (D) C + GK74 artçı ayıklama.
 // Denetimler: (1) b(t) grafiği ve metni, G–R metni önce = sonra; (2) a(t) pencere sayısı = b(t) pencere sayısı (karışık olanlar hariç),
 //   a = log₁₀(n/T) bağımsız hesapla aynı; (3) tamlık basamaklarında karışık pencere işaretli, segmentler Mc ile etiketli;
-//   (4) korelasyon yalnız örtüşmeyen pencerelerle p'li; tanım ve uyarı metinleri; (5) sayfa hatası yok. Ekran görüntüleri: a_tekMc.png, a_basamak.png, a_marmara.png
+//   (4) korelasyon yalnız örtüşmeyen pencerelerle p'li; tanım ve uyarı metinleri; (5) sayfa hatası yok;
+//   (6) öz-ilişki (ρ_a, ρ_b), n_eff ve düzeltilmiş p bağımsız hesapla aynı; ham p ve düzeltilmiş p birlikte metinde. Ekran görüntüleri: a_tekMc.png, a_basamak.png, a_marmara.png
 // Kullanım (depo kökünde): LEAFLET_DIR=<node_modules> node analysis/a_zaman/kabul_a.js <önceki_index.html>
 'use strict';
 const http = require('http'), fs = require('fs'), path = require('path');
@@ -41,7 +42,7 @@ window.__cs = steps => { csSteps = steps.map(([start, mc]) => ({ start, mc })); 
 window.__oku = () => ({ bSvg: document.getElementById('tmSvgB').innerHTML, bTxt: document.getElementById('tmStatsB').textContent, grTxt: document.getElementById('tmStatsGR').textContent,
   aTxt: document.getElementById('tmStatsA') ? document.getElementById('tmStatsA').textContent : null, aSvg: document.getElementById('tmSvgA') ? document.getElementById('tmSvgA').innerHTML : null,
   bN: lastBts ? lastBts.ser.length : null, bSer: lastBts ? lastBts.ser.map(q => ({ t: q.t, b: q.b, t0: q.t0, t1: q.t1 })) : null,
-  ats: typeof lastAts !== 'undefined' && lastAts ? { NW: lastAts.NW, step: lastAts.step, pts: lastAts.pts.map(q => ({ t: q.t, a: q.a, lo: q.lo, hi: q.hi, mc: q.mc, mixed: q.mixed, Tyr: q.Tyr, b: q.b })) } : null });
+  ats: typeof lastAts !== 'undefined' && lastAts ? { NW: lastAts.NW, step: lastAts.step, pts: lastAts.pts.map(q => ({ t: q.t, a: q.a, lo: q.lo, hi: q.hi, mc: q.mc, mixed: q.mixed, Tyr: q.Tyr, b: q.b })), corr: lastAts.corr || null } : null });
 `;
 const SEN = {
   tekMc:   { p: [1971, 1997], r: [36, 26, 42, 45], cs: null, png: 'a_tekMc.png' },
@@ -67,7 +68,8 @@ const SEN = {
   for (const k of Object.keys(SEN)) {
     const o = O[k], y = Y[k];
     ok(o.bSvg === y.bSvg && o.bTxt === y.bTxt && o.grTxt === y.grTxt, `(1) ${k}: b(t) grafiği, b(t) metni ve G–R metni önce = sonra`);
-    ok(o.aSvg === null && y.aSvg && y.aSvg.includes('<polyline'), `(1) ${k}: a(t) paneli önce yok, sonra çizildi`);
+    if (o.aSvg === null) ok(y.aSvg && y.aSvg.includes('<polyline'), `(1) ${k}: a(t) paneli önce yok, sonra çizildi`);
+    else ok(o.aSvg === y.aSvg && JSON.stringify(o.ats.pts) === JSON.stringify(y.ats.pts), `(1) ${k}: a(t) grafiği ve değerleri önce = sonra (yalnız korelasyon metni değişti)`);
     const pts = y.ats.pts, nOk = pts.filter(q => !q.mixed).length;
     ok(pts.length === y.bN, `(2) ${k}: a(t) pencere sayısı ${pts.length} = b(t) pencere sayısı ${y.bN} (çizilen ${nOk}, karışık ${pts.length - nOk})`);
     if (!SEN[k].cs) { let d = 0; y.bSer.forEach((q, i) => { const a = Math.log10(y.ats.NW / ((q.t1 - q.t0) / YR)); d = Math.max(d, Math.abs(a - pts[i].a)); });
@@ -81,7 +83,13 @@ const SEN = {
         const mx = x.reduce((a, c) => a + c, 0) / n, mz = z.reduce((a, c) => a + c, 0) / n; let sxz = 0, sxx = 0, szz = 0; for (let i = 0; i < n; i++) { sxz += (x[i] - mx) * (z[i] - mz); sxx += (x[i] - mx) ** 2; szz += (z[i] - mz) ** 2; } return { r: sxz / Math.sqrt(sxx * szz), n }; };
       const aA = ac(q => q.a), aB = ac(q => q.b); y.ac = { a: aA, b: aB };
       console.log(`     ${y === Y.tekMc ? 'tekMc' : y === Y.basamak ? 'basamak' : y === Y.marmara ? 'marmara' : 'marmara_gk74'}: örtüşmeyen pencerelerde gecikme-1 öz-ilişki: a ${aA ? aA.r.toFixed(2) + ' (' + aA.n + ' çift)' : '—'}, b ${aB ? aB.r.toFixed(2) + ' (' + aB.n + ' çift)' : '—'}`); }
-    const rm = y.aTxt.match(/r = (−?-?[\d,]+) \(örtüşmeyen (\d+) pencere, p = ([^)]+)\)/); console.log(`     ${k}: ${rm ? `r(b, a) = ${rm[1]}, örtüşmeyen ${rm[2]} pencere, p = ${rm[3]}` : 'korelasyon yok'}; a aralığı ${Math.min(...pts.filter(q => !q.mixed).map(q => q.a)).toFixed(2)}–${Math.max(...pts.filter(q => !q.mixed).map(q => q.a)).toFixed(2)}`);
+    { const c = y.ats.corr; if (c) {   // (6) n_eff ve düzeltilmiş p: test betiğindeki bağımsız öz-ilişki hesabıyla aynı mı; ham p korunuyor mu
+        const same = y.ac && y.ac.a && y.ac.b && Math.abs(c.rhoA - y.ac.a.r) < 1e-12 && Math.abs(c.rhoB - y.ac.b.r) < 1e-12;
+        const rho = Math.max(0, c.rhoA * c.rhoB), ne = Math.min(c.n, c.n * (1 - rho) / (1 + rho));
+        ok(same && Math.abs(c.neff - ne) < 1e-9 && /ham p = /.test(y.aTxt) && /düzeltilmiş p = /.test(y.aTxt) && /n\s*eff = /.test(y.aTxt),
+          `(6) ${k}: ρ_a = ${c.rhoA.toFixed(2)}, ρ_b = ${c.rhoB.toFixed(2)} (bağımsız hesapla aynı) → n_eff = ${c.neff.toFixed(1)}; ham p = ${c.pHam.toPrecision(2)}, düzeltilmiş p = ${c.pDuz === null ? '— (test edilemez)' : c.pDuz.toPrecision(2)}; ikisi de metinde`); }
+      else if (y.ac && (y.ac.a === null || y.ac.b === null)) ok(/düzeltilmiş p = —|örtüşmeyen pencere sayısı yetersiz/.test(y.aTxt), `(6) ${k}: öz-ilişki hesaplanamadı → düzeltilmiş p verilmedi`); }
+    const rm = y.aTxt.match(/r = (−?-?[\d,]+) \(örtüşmeyen (\d+) pencere\) · ham p = ([^·]+)·[^]*?düzeltilmiş p = ([^ (]+)/); console.log(`     ${k}: ${rm ? `r(b, a) = ${rm[1]}, örtüşmeyen ${rm[2]} pencere, ham p = ${rm[3].trim()}, düzeltilmiş p = ${rm[4]}` : 'korelasyon yok'}; a aralığı ${Math.min(...pts.filter(q => !q.mixed).map(q => q.a)).toFixed(2)}–${Math.max(...pts.filter(q => !q.mixed).map(q => q.a)).toFixed(2)}`);
   }
   { const y = Y.basamak, mixed = y.ats.pts.filter(q => q.mixed).length, mcs = [...new Set(y.ats.pts.filter(q => !q.mixed).map(q => q.mc))];
     ok(mixed > 0 && mcs.length === 2 && /Mc 5,0|Mc 5\.0/.test(y.aSvg) && /Mc 3,9|Mc 3\.9/.test(y.aSvg) && /tamlık basamağı geçişindeki pencere/.test(y.aTxt),
@@ -91,7 +99,7 @@ const SEN = {
     const izA = a.ats.pts.filter(q => q.t >= Date.UTC(1999, 7, 1) && q.t <= Date.UTC(2000, 11, 31)), izG = g.ats.pts.filter(q => q.t >= Date.UTC(1999, 7, 1) && q.t <= Date.UTC(2000, 11, 31));
     const mx = v => v.length ? Math.max(...v.map(q => q.a)) : null;
     ok(!/GK74 kapalı/.test(g.aTxt) && /GK74 artçı ayıklama açık/.test(g.aTxt) && g.ats.pts.length < a.ats.pts.length && mx(izG) !== null && mx(izG) < mx(izA) - 0.5,
-      `(4) Marmara GK74 açık: pencere ${a.ats.pts.length} → ${g.ats.pts.length}; 1999–2000 en yüksek a ${mx(izA).toFixed(2)} → ${mx(izG).toFixed(2)} (artçı tepesi büyük ölçüde kalkıyor); tüm seri en yüksek a ${ta.a.toFixed(2)} (${new Date(ta.t).toISOString().slice(0, 10)}) → ${tg.a.toFixed(2)} (${new Date(tg.t).toISOString().slice(0, 10)}); r(b, a) metni: ${(g.aTxt.match(/r = [^(]+\([^)]*\)/) || ['—'])[0]}`); }
+      `(4) Marmara GK74 açık: pencere ${a.ats.pts.length} → ${g.ats.pts.length}; 1999–2000 en yüksek a ${mx(izA).toFixed(2)} → ${mx(izG).toFixed(2)} (artçı tepesi büyük ölçüde kalkıyor); tüm seri en yüksek a ${ta.a.toFixed(2)} (${new Date(ta.t).toISOString().slice(0, 10)}) → ${tg.a.toFixed(2)} (${new Date(tg.t).toISOString().slice(0, 10)}); r(b, a) metni: ${(g.aTxt.match(/r = [^(]+\(örtüşmeyen[^)]*\)[^]*?düzeltilmiş p = [^ ]+/) || ['—'])[0]}`); }
   ok(!O.hatalar.length && !Y.hatalar.length, `(5) Sayfa hatası yok (önce ${O.hatalar.length}, sonra ${Y.hatalar.length})` + (Y.hatalar.length ? ': ' + Y.hatalar.join(' | ') : ''));
   const ozet = {}; for (const k of Object.keys(SEN)) ozet[k] = { metin: Y[k].aTxt, pencere: Y[k].ats.pts.length, gecikme1_oz_iliski: Y[k].ac || null };
   fs.writeFileSync(path.join(__dirname, 'kabul_sonuc.json'), JSON.stringify({ senaryolar: SEN, sonuc: ozet, denetimler: kayit, ozet: { pass, fail } }, null, 1));
