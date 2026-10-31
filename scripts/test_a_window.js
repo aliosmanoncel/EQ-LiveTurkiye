@@ -50,8 +50,8 @@ console.log('\n2. Sabit hız (λ = 20/yıl, b = 1, Mc = 3, 300 yıl; n = 100)');
   for (let r = 0; r < R; r++) { const s = seri(katalog(rnd, [[300, lam]], 1, 3), 100, 100, 3), a = X.aSeriesFrom(s, 100, 3, null);
     a.forEach(q => { tot++; bias += q.a - Math.log10(lam); if (q.lo <= Math.log10(lam) && Math.log10(lam) <= q.hi) cov++; }); }
   const se = Math.sqrt(0.95 * 0.05 / tot);
-  console.log(`     ${R} sentetik katalog (tohum 11), toplam ${tot} örtüşmeyen pencere (adım = n = 100): ortalama a − log₁₀λ = ${(bias / tot).toFixed(4)} (n/T tanımının beklenen yanlılığı log₁₀(100/99) = 0,0044); kapsama %${(100 * cov / tot).toFixed(1)} (± %${(196 * se).toFixed(1)})`);
-  ok(Math.abs(bias / tot - Math.log10(100 / 99)) < 0.01, 'a yansız (n/T tanımının küçük yanlılığı dışında)');
+  console.log(`     ${R} sentetik katalog (tohum 11), toplam ${tot} örtüşmeyen pencere (adım = n = 100): ortalama a − log₁₀λ = ${(bias / tot).toFixed(4)} (log ölçeğinde n/T'nin beklenen yanlılığı (ln n − ψ(n−1))/ln 10 = 0,0066; T ~ Gamma(n−1, λ)); kapsama %${(100 * cov / tot).toFixed(1)} (± %${(196 * se).toFixed(1)})`);
+  ok(Math.abs(bias / tot - 0.00656) < 0.005, 'a, beklenen küçük yanlılık (0,0066) dışında yansız');
   ok(Math.abs(cov / tot - 0.95) < 2.6 * se, '%95 aralık nominal kapsamada'); }
 
 console.log('\n3. Hız değişimi (100 yıl λ = 10, sonra 100 yıl λ = 20)');

@@ -88,6 +88,8 @@ const SEN = {
         const rho = Math.max(0, c.rhoA * c.rhoB), ne = Math.min(c.n, c.n * (1 - rho) / (1 + rho));
         ok(same && Math.abs(c.neff - ne) < 1e-9 && /ham p = /.test(y.aTxt) && /düzeltilmiş p = /.test(y.aTxt) && /n\s*eff = /.test(y.aTxt),
           `(6) ${k}: ρ_a = ${c.rhoA.toFixed(2)}, ρ_b = ${c.rhoB.toFixed(2)} (bağımsız hesapla aynı) → n_eff = ${c.neff.toFixed(1)}; ham p = ${c.pHam.toPrecision(2)}, düzeltilmiş p = ${c.pDuz === null ? '— (test edilemez)' : c.pDuz.toPrecision(2)}; ikisi de metinde`); }
+      if (c) { const uyar = /küçük n\s*eff \(< 10\)/.test(y.aTxt), bek = c.pDuz !== null && c.neff < 10;
+        ok(uyar === bek && !/<b>[^<]*düzeltilmiş p/.test(y.aSvg || '') , `(6) ${k}: küçük n_eff uyarısı ${bek ? 'gösteriliyor' : 'gerekmiyor ve yok'} (n_eff = ${c.neff.toFixed(1)}${c.pDuz === null ? ', p verilmedi' : ''})`); }
       else if (y.ac && (y.ac.a === null || y.ac.b === null)) ok(/düzeltilmiş p = —|örtüşmeyen pencere sayısı yetersiz/.test(y.aTxt), `(6) ${k}: öz-ilişki hesaplanamadı → düzeltilmiş p verilmedi`); }
     const rm = y.aTxt.match(/r = (−?-?[\d,]+) \(örtüşmeyen (\d+) pencere\) · ham p = ([^·]+)·[^]*?düzeltilmiş p = ([^ (]+)/); console.log(`     ${k}: ${rm ? `r(b, a) = ${rm[1]}, örtüşmeyen ${rm[2]} pencere, ham p = ${rm[3].trim()}, düzeltilmiş p = ${rm[4]}` : 'korelasyon yok'}; a aralığı ${Math.min(...pts.filter(q => !q.mixed).map(q => q.a)).toFixed(2)}–${Math.max(...pts.filter(q => !q.mixed).map(q => q.a)).toFixed(2)}`);
   }

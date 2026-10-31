@@ -54,7 +54,7 @@ a için aralık bu iki sınırın log₁₀'udur. n = 100'de aralığın yarı g
 
 **Hesap:** χ² nicelikleri Wilson–Hilferty (1931) yaklaşımıyla hesaplanır: χ²_p(k) ≈ k·(1 − 2/(9k) + z_p·√(2/(9k)))³. n = 20–200 aralığında kesin değerlere göre en büyük göreli hata 4,6e−4'tür (test 1).
 
-**Nokta değeri:** Yayındaki tanıma uymak için n/T kullanılır. Yansız kestirici (n−1)/T'dir; n = 100'de fark 0,0044 log birimi, aralık genişliğinin yaklaşık %5'i.
+**Nokta değeri:** Yayındaki tanıma uymak için n/T kullanılır. T ~ Gamma(n−1, λ) için en çok olabilirlik kestiricisi (n−1)/T, λ'nın yansız kestiricisi (n−2)/T'dir (E[1/T] = λ/(n−2)). log₁₀(n/T)'nin beklenen yanlılığı (ln n − ψ(n−1))/ln 10'dur; n = 100'de 0,0066 log birimi, yani %95 aralığın yarı genişliğinin (±0,087) yaklaşık %8'i. *(Denetim düzeltmesi, 31 Ekim: önceki sürümde "yansız kestirici (n−1)/T" ve beklenen yanlılık 0,0044 yazıyordu; ikisi de yanlıştı. Hesap değişmedi.)*
 
 **Geçerlilik sınırı:** Artçı kümelenmesinde olaylar bağımsız değildir. Pencereden pencereye değişim Poisson'dan büyük olur ve aralık dar kalır (test 7: orta kümelenmede kapsama %78, güçlü kümelenmede %58). Panel bunu yazar. GK74 açıkken artçıların büyük kısmı çıkar ve aralık varsayıma daha yakın olur. Ancak GK74 kalan olayların bağımsız olduğunu garanti etmez (arka plan kümelenmesi, ayıklama pencerelerinin sınırları). Bu yüzden aralık hiçbir durumda koşulsuz "kesin %95" olarak sunulmaz; her zaman "Poisson varsayımı altında" anlamında okunmalıdır.
 
@@ -79,7 +79,7 @@ Hepsi tohumlu üreteçle yapıldı, yani tekrarlanabilir. Köşeli parantezler, 
 | Test | Kurgu ve tekrar sayısı | Sonuç |
 |---|---|---|
 | 1. χ² nicelikleri | n = 20, 50, 100, 200; p = 0,025 ve 0,975; kesin değer seri ile | en büyük göreli hata 4,6e−4 |
-| 2. Yanlılık ve kapsama | λ = 20/yıl, b = 1, Mc = 3, 300 yıl; **40 katalog (tohum 11), 2387 örtüşmeyen pencere** | a − log₁₀λ = 0,0075 (beklenen 0,0044); **kapsama %95,3 [%94,4–%96,1]** |
+| 2. Yanlılık ve kapsama | λ = 20/yıl, b = 1, Mc = 3, 300 yıl; **40 katalog (tohum 11), 2387 örtüşmeyen pencere** | a − log₁₀λ = 0,0075 (beklenen 0,0066); **kapsama %95,3 [%94,4–%96,1]** |
 | 3. Hız değişimi | 100 yıl λ = 10, sonra 100 yıl λ = 20; 1 katalog (tohum 12), adım 10 | a sıçraması 0,276 (beklenen 0,301; tolerans 0,05) |
 | 4. a_GR ile b'nin bağı | sabit hız ve sabit b; 400 yıl, 1 katalog (tohum 13), adım 10 | r(b, a_GR) = 0,99; r(b, a) = 0,00 |
 | 5. Korelasyon testinin boyutu | H0: sabit hız, sabit b; **300 katalog (tohum 14)**, her biri ≈ 23 örtüşmeyen pencere | p < 0,05 oranı: örtüşmeyen %2,3; örtüşenler bağımsız sayılırsa %46 |
@@ -141,6 +141,8 @@ n_eff = n · (1 − ρ_a·ρ_b) / (1 + ρ_a·ρ_b)
    ρ_a·ρ_b < 0 ise 0 alınır; n_eff hiçbir zaman n'yi aşmaz.
 5. Düzeltilmiş p: aynı Fisher z ile, √(n_eff − 3) kullanılarak. n_eff < 5 ise verilmez ("test edilemez").
 
+**Gecikme sınırı:** Yalnızca gecikme 1 (k = 1) kullanılır. Bartlett'in genel biçimi n_eff = n / (1 + 2 Σ_k ρ_a(k)·ρ_b(k)) tüm gecikmeleri toplar; burada seri kısa olduğu için (n = 6–22) yüksek gecikmeler güvenilir kestirilemez. Bu yüzden AR(1) varsayılır: ρ(k) = ρ^k ise toplam (1 − ρ_aρ_b)/(1 + ρ_aρ_b) biçimini verir.
+
 **Varsayımlar:**
 - İki seri de AR(1) benzeri öz-ilişki taşır; yalnızca gecikme-1 kullanılır. Daha uzun bellek varsa n_eff yüksek kalır ve p iyimser olur.
 - Seriler durağandır. Ortak eğilim (ör. tamlık değişimi) varsa ρ yüksek çıkar ve düzeltme bunu kısmen yakalar, ama eğilimin nedenini ayırmaz.
@@ -170,6 +172,11 @@ Düzeltilmiş test nominal düzeyi aşmıyor; ham test öz-ilişkide %32'ye kada
 | 50 | 0,8 | 0,5 | %84 | %50 |
 
 (Ham testin "gücü", aynı zamanda yüksek sahte anlamlılık oranı demektir; doğrudan karşılaştırılamaz.)
+
+**Panelde gösterim (ChatGPT'nin üç güvencesi):**
+1. Formül, gecikme sınırı ve benzetim sonuçları, düzeltilmiş p'nin üzerine gelindiğinde açıklamada yazar.
+2. 5 ≤ n_eff < 10 ise turuncu uyarı çıkar: "küçük n_eff (< 10): testin gücü düşük — p > 0,05 ilişkinin yokluğunu göstermez". n_eff < 5 ise p verilmez ("test edilemez").
+3. Ham p ve düzeltilmiş p ayrı yazılır. Düzeltilmiş p ayrı renkte (gri-mavi), "öz-ilişki (gecikme 1)" etiketiyle gösterilir; hiçbiri kalın değil. Ham p'nin açıklamasında "düzeltilmiş p onun yerine geçmez; ikisi birlikte okunmalıdır" yazar.
 
 **Yorum:** Küçük n_eff'te düzeltilmiş test tutucu ve düşük güçlüdür. Türkiye 1971–1997'deki koşullarda (n = 22, ρ ≈ 0,75) orta düzey bir gerçek korelasyonu (0,5) yakalama olasılığı yaklaşık %22. Bu yüzden düzeltilmiş p'nin anlamlı çıkmaması (0,075) ilişkinin **olmadığını göstermez**; yalnızca bu veriyle **gösterilemediğini** söyler. Sonuç "keşifsel" etiketiyle sunulur.
 
