@@ -1,6 +1,6 @@
 # a(t) paneli — pencere olay hızı (2026-10-31, güncelleme 5)
 
-Panel `main`'de (fbe343a, 31 Ekim). Güncelleme 4 (öz-ilişki düzeltmesi) ayrı dalda: `a-neff`, `main` 5274c46'dan açıldı, birleştirilmedi.
+Panel `main`'de (fbe343a, 31 Ekim). Güncelleme 4–5 (öz-ilişki düzeltmesi) `a-neff` dalında geliştirildi ve **`main`'e birleştirildi: 54fbd0b (31 Ekim 23:44)**; canlıda doğrulandı (§8).
 
 **Güncelleme 5'te eklenenler** (ChatGPT incelemesi, 31 Ekim 23:15):
 - n_eff yönteminin sağlamlığı farklı öz-ilişki yapılarında ve kısa serilerde sınandı (§4.3).
@@ -128,7 +128,7 @@ Etkin örneklem: n_eff = n(1 − ρ_a·ρ_b)/(1 + ρ_a·ρ_b) (Bartlett 1935; ik
 
 **Sonuç:** Örtüşmeyen pencereler de belirgin biçimde öz-ilişkili; ρ = 0,44–0,84, yani yavaş değişen eğilimler var. Bağımsızlık varsayımıyla hesaplanan p iyimser kalıyor. Türkiye 1971–1997'deki p = 3e−6, düzeltmeyle ≈ 0,07'ye çıkıyor. Bu, §6'daki "tamlık kaynaklı yapay korelasyon" yorumuyla da tutarlı: iki seri birlikte bir eğilim izliyor.
 
-Paneldeki p bu yüzden keşifseldir.
+Paneldeki p bu yüzden keşifseldir. Düzeltilmiş p (0,075) de kesin bir bağımsızlık düzeltmesi değildir; AR(1) varsayımına bağlıdır ve ortak eğilimde iyimser kalabilir (§4.3).
 
 **Güncelleme 4:** n_eff ve düzeltilmiş p panele eklendi (§4.2). Eğilimi çıkarılmış (birinci fark) serilerde korelasyon hâlâ öneri olarak duruyor.
 
@@ -274,4 +274,27 @@ Bu sınırlar panel açıklamasına eklendi: "AR(1) dışındaki yapılarda düz
 | 4. Ham r, ham p, n_eff ve düzeltilmiş p ayrı ayrı | Panelde dördü ayrı yazılıyor; `lastAts.corr` alanları {r, pHam, rhoA, rhoB, neff, pDuz} ayrı. Kabul (6) denetliyor. |
 | 5. a(t), b(t), G–R ve katalog hesapları güncel `main`'e göre değişmedi | Kabul `kabul_a.js` (önce = origin/main 5274c46): **31/31**. Dört senaryoda a(t) grafiği ve değerleri, b(t) grafiği ve metni, G–R metni önce = sonra. Birim testleri 15/15. `data/` `main` ile aynı. `index.html` farkı +20/−2 satır, yalnızca `renderAvalueTS`'in korelasyon bölümü ve yeni yardımcı fonksiyonlar (`aLag1`, `aNeffTest`). |
 
-`main`'e birleştirilmedi, canlıya gönderilmedi; ayrı onay bekliyor.
+Bu bölüm birleştirme öncesi durumu kaydeder. Birleştirme sonrası durum §8'dedir.
+
+## 8. Birleştirme sonrası durum (2026-10-31 23:44)
+
+| Konu | Durum |
+|---|---|
+| Birleştirme | `a-neff` → `main`: **54fbd0b** (önceki `main` 5274c46). Değişiklikler artık `main`'de. |
+| Değişen dosyalar | 12: `index.html` (+20/−2, yalnızca a(t) korelasyon bölümü ve `aLag1`, `aNeffTest`), `scripts/test_a_window.js`, `analysis/a_zaman/*` |
+| `data/` | Değişmedi (`git diff origin/main..54fbd0b -- data` boş) |
+| Birleştirme öncesi testler (güncel `main` 5274c46'ya karşı) | Kabul `kabul_a.js` 31/31; birim 15/15 |
+| GitHub otomatik testleri (54fbd0b) | GK74 eşleşmesi (Python = JS), b güven aralığı, ISC-GEM katmanı: başarılı |
+| Pages yayını | Başarılı |
+| Canlı kontrol (Türkiye, ISC 1971–1997, dikdörtgen 36–42° K / 26–45° D) | a(t) 211 pencere = b(t) 211 pencere; r = 0,79 (örtüşmeyen 22); ham p = 3,1e−6; ρ_a = 0,73, ρ_b = 0,80; n_eff = 5,8; düzeltilmiş p = 0,075; "küçük n_eff" uyarısı görünüyor. Kabul testiyle birebir aynı. |
+
+**Yorum ilkesi (değişmedi):** Türkiye 1971–1997 için düzeltilmiş p = 0,075, keşifsel ve varsayımlara bağlı bir değerlendirmedir:
+- AR(1) varsayımına dayanır.
+- Uzun bellek ya da ortak eğilim varsa iyimser kalabilir (§4.3).
+- Testin gücü düşüktür (§4.2); p > 0,05 ilişkinin yokluğunu göstermez.
+
+**Sonraki işler** (ayrı dallarda, mevcut a(t), b(t), GK74 ve katalog hesapları değişmeden):
+1. Mc uyumsuzluğu uyarısı.
+2. Birinci fark (Δa–Δb) analizi.
+3. Poisson bağımsız dönem sınaması.
+4. ISC–EMSC araştırması: araştırma dalında.
