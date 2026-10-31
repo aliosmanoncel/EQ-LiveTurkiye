@@ -19,4 +19,6 @@ ok(near(r.b, 0.1, 0.005), `log-doğrusal Poisson regresyonu eğimi ${r.b.toFixed
 // Dağılım testi: sabit sayılar → var/ort 0; Poisson benzetimi → yaklaşık 1
 const ev = []; for (let y = 2000; y < 2010; y++) for (let i = 0; i < 50; i++) ev.push({ t: Date.UTC(y, 0, 1) + i * 864e5 * 7, m: 4.5 });
 const d0 = A.dagilim(ev, 2000, 2009, 4.0, 'm'); ok(d0.oran === 0 && d0.n === 10 && d0.ort === 50, 'dağılım: her yıl 50 olay → var/ort 0, n 10');
+// Holm: elle hesap (p = 0,01, 0,04, 0,03, 0,005; m = 4) → sıralı 0,005·4 = 0,02; 0,01·3 = 0,03; 0,03·2 = 0,06; 0,04·1 = 0,04 → maks. birikim 0,06
+const h = A.holm([0.01, 0.04, 0.03, 0.005]); ok([0.03, 0.06, 0.06, 0.02].every((v, i) => near(h[i], v, 1e-12)) && A.holm([0.9, 0.8]).every(v => v <= 1), `Holm düzeltmesi elle hesapla aynı (${h.map(v => v.toFixed(2)).join(', ')}); 1'de kesiliyor`);
 console.log(`\n${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);

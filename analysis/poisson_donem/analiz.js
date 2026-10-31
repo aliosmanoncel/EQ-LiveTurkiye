@@ -15,6 +15,12 @@
 //     (log-doğrusal uyum) Pearson χ²/sd, sd = n − 2. Eşikler Mc, 4,0, 4,5.
 //   • İkincil (katalog sınırı): Türkiye ISC → EMSC. (i) K = 1990–1997 (8 yıl), S = 1998–pencere sonu, M ≥ 4,0 ve 4,5;
 //     (ii) K = 1971–1997, M ≥ 5,0 ve 5,5 (ISC'nin 1970–80'lerdeki yıllık Mc'si 5,0'a çıktığı için 4,x eşikleri bu dönemde tam değil). Ham ve Scordilis.
+//   • Maruziyet: T = (bitiş − başlangıç)/365,25 gün. 'son' biten sınama dönemi pencere sonuna (katalogun son olayı) kadar gider; kısmi son yıl öngörü
+//     sınamasına maruziyet olarak girer. Dağılım testi ve Model 3 yalnız tam takvim yıllarını kullanır (kısmi yıl farklı maruziyetli bir sayımdır).
+// SONRADAN EKLENEN (2026-11-01, sonuçlar görüldükten sonra; testlerin kendisi değişmedi): çoklu test düzeltmesi. Tek bir birincil test önceden
+//   tanımlanmamıştı; bu yüzden 'birincil' seçilmez, önceden sabitlenen test ailelerine Holm (1979) adım-adım düzeltmesi uygulanır (FWER, bağımlılık
+//   varsayımı yok). Aileler: (a) Model 1, GK74, ham büyüklük, ml + md bölünmeleri × Türkiye + Marmara, M ≥ 4,0–6,0 (20 test); (b) aynı, Mc dahil
+//   (24 test); (c) dağılım testi, GK74, M ≥ 4,0 ve 4,5, aynı bölünme ve bölgelerin K ve S dönemleri (16 test). Ham p'ler değişmeden raporlanır.
 // Kullanım (depo kökünde): node analysis/poisson_donem/analiz.js <disa_aktar çıktısı.json>
 'use strict';
 const fs = require('fs'), path = require('path');
@@ -76,7 +82,10 @@ function dagilim(ev, y0, y1, M, key) {
   const c = yillik(ev, y0, y1, M, key), x = c.map(v => v[1]), n = x.length, m = x.reduce((a, v) => a + v, 0) / n, s2 = x.reduce((a, v) => a + (v - m) ** 2, 0) / (n - 1), D = (n - 1) * s2 / m;
   const reg = poisReg(c.map(v => v[0]), x), P = x.reduce((a, v, i) => { const mu = reg.mu(c[i][0]); return a + (v - mu) ** 2 / mu; }, 0);
   return { M, yillar: [y0, y1], n, ort: m, varyans: s2, oran: s2 / m, p: chi2Sf(D, n - 1), egimsizOran: P / (n - 2), pEgimsiz: chi2Sf(P, n - 2), min: Math.min(...x), max: Math.max(...x) }; }
-module.exports = { gammaP, chi2Sf, poisCdf, binom2, betaInvCP, poisReg, akiB, dagilim, yillik };
+function holm(p) {   // Holm (1979): sıralı p_(i)·(m − i + 1), birikimli maksimum, 1'de kesilir; giriş sırasıyla döner
+  const m = p.length, o = p.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]), q = new Array(m); let run = 0;
+  o.forEach(([v, i], r) => { run = Math.max(run, Math.min(1, v * (m - r))); q[i] = run; }); return q; }
+module.exports = { gammaP, chi2Sf, poisCdf, binom2, betaInvCP, poisReg, akiB, dagilim, yillik, holm };
 if (require.main === module) {
 const R = { girdi: V.uretim, kurallar: 'analiz.js başlığı', bolunmeler: {}, ana: {}, zaman: {}, dagilim: {}, bilesim: {}, ikincil: {} };
 // Bölünmeler. 'karisik' önceden seçilen bölünmedir; tür bileşimi denetimi (sınama sonuçlarına bakılmadan) EMSC'de 2010–2012 arasında MD → ML geçişini gösterdi
@@ -100,6 +109,16 @@ for (const [bk, B] of Object.entries(BOL)) { R.bolunmeler[bk] = B.ad;
     for (const key of ['m', 'ms']) { const k = key === 'm' ? 'ham' : 'scordilis';
       R.ikincil[`1990_1997|${g}|${k}`] = sinama(ev, [Y(1990), Y(1998)], S, 4.0, key, [4.0, 4.5], `ISC 1990–1997 → EMSC|${g}|${k}`);
       R.ikincil[`1971_1997|${g}|${k}`] = sinama(ev, [Y(1971), Y(1998)], S, 5.0, key, [5.0, 5.5], `ISC 1971–1997 → EMSC|${g}|${k}`); } } }
+// Çoklu test düzeltmesi (sonradan; bkz. başlık)
+R.coklu = {};
+{ const aile = (ad, ogeler) => { const q = holm(ogeler.map(o => o.p)); R.coklu[ad] = { m: ogeler.length, testler: ogeler.map((o, i) => ({ ...o, pHolm: q[i] })),
+    ham005: ogeler.filter(o => o.p < 0.05).length, holm005: q.filter(v => v < 0.05).length }; };
+  const m1 = (mcDahil) => { const L = []; for (const bk of ['ml', 'md']) for (const sen of ['tr_emsc', 'mar_emsc']) { const x = R.ana[`${bk}|${sen}|gk74`];
+    for (const e of x.esik) if (mcDahil || e.M >= 4.0 - 1e-9) L.push({ test: `${bk}|${sen}|gk74`, M: e.M, NK: e.NK, NS: e.NS, p: e.pBin }); } return L; };
+  aile('model1_gk74_M4_6', m1(false)); aile('model1_gk74_McDahil', m1(true));
+  const D = []; for (const bk of ['ml', 'md']) for (const sen of ['tr_emsc', 'mar_emsc']) for (const d of R.dagilim[`${bk}|${sen}|gk74`])
+    if (d.M >= 4.0 - 1e-9) D.push({ test: `${bk}|${sen}|gk74`, yillar: d.yillar, M: d.M, oran: d.oran, p: d.p });
+  aile('dagilim_gk74_M4_45', D); }
 fs.writeFileSync(path.join(__dirname, 'sonuc.json'), JSON.stringify(R, null, 1));
 // ── Özet ──
 const f = (v, d = 2) => v === null || v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(d), pp = v => v < 1e-4 ? v.toExponential(1) : v.toFixed(3);
@@ -112,5 +131,7 @@ Object.entries(R.zaman).forEach(([k, a]) => a.forEach(z => console.log(`  ${k.pa
 console.log('\n══ DAĞILIM TESTİ (tam yıllar; varyans/ortalama; χ²) ══');
 Object.entries(R.dagilim).forEach(([k, a]) => a.forEach(d => console.log(`  ${k.padEnd(16)} ${d.yillar.join('–')} M≥${d.M.toFixed(1)}: n=${d.n} ort ${f(d.ort, 1)} var/ort ${f(d.oran)} p=${pp(d.p)} | eğilimsiz Pearson/sd ${f(d.egimsizOran)} p=${pp(d.pEgimsiz)} | min–maks ${d.min}–${d.max}`)));
 console.log('\n══ İKİNCİL (katalog sınırı ISC → EMSC) ══'); Object.entries(R.ikincil).forEach(([k, x]) => tablo(k, x));
+console.log('\n══ ÇOKLU TEST (Holm; sonradan) ══'); Object.entries(R.coklu).forEach(([k, a]) => { console.log(`  ${k}: m = ${a.m}; ham p < 0,05: ${a.ham005}; Holm p < 0,05: ${a.holm005}`);
+  a.testler.filter(t => t.p < 0.1).forEach(t => console.log(`    ${t.test.padEnd(18)} ${t.yillar ? t.yillar.join('–') + ' ' : ''}M≥${t.M.toFixed(1)}: p = ${pp(t.p)} → Holm ${pp(t.pHolm)}`)); });
 
 }

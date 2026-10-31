@@ -11,7 +11,7 @@ Birinci sınama yalnızca öngörü başarısını değerlendirir; ikinci soruyu
 **Betikler:**
 - `disa_aktar.js`: uygulamanın kendi koduyla (bölge, GK74, dönüşüm, computeMc) olay listesini çıkarır. Çıktısı depoya eklenmez.
 - `analiz.js` → `sonuc.json`.
-- `oz_denetim.js`: istatistik fonksiyonlarının denetimi, 6/6.
+- `oz_denetim.js`: istatistik fonksiyonlarının denetimi, 7/7 (Holm eklendi).
 - `sonradan_2023.js`: sonradan yapılan duyarlılık hesabı (§4).
 
 ## 1. Tasarım ve önceden sabitlenen kurallar
@@ -27,6 +27,10 @@ Birinci sınama yalnızca öngörü başarısını değerlendirir; ikinci soruyu
 - **Model 2 — sabit hız, G–R uzatması:** λ(≥M) = N_K(≥Mc)/T_K·10^(−b̂(M−Mc)). Öngörü aralığı parametrik bootstrap ile (20 000 çekiliş, tohum 2026).
 - **Model 3 — zamanla değişen hız:** yıllık sayılarda log-doğrusal Poisson regresyonu. "Gerekçeli" sayılması için K içinde eğilim testi p < 0,05 olmalı. Başarı ölçütü: S'nin yıllık sayılarının Poisson log-skoru, Model 1 ile karşılaştırılarak.
 - **Dağılım testi:** tam yıllık sayılar, D = Σ(x − x̄)²/x̄ ~ χ²(n − 1). Ayrıca log-doğrusal eğilim çıkarılmış Pearson χ²/sd.
+
+**Maruziyet ve kısmi 2026 yılı:**
+- Maruziyet T = (bitiş − başlangıç)/365,25 gün. Açık uçlu sınama dönemi (ML: 2019–) pencere sonuna, yani katalogun son olayına (14 Eylül 2026) kadar gider: T_S = 7,70 yıl, T_K = 7,00 yıl. Kısmi 2026 yılı öngörü sınamasına bu maruziyetle girer; beklenen sayı λ̂·T_S olduğu için eksik yıl doğru ağırlıkta hesaba katılır.
+- Dağılım testi ve Model 3 yalnızca **tam takvim yıllarını** kullanır (ML: 2019–2025). Bu testler yıllık sayıların aynı dağılımdan geldiğini varsayar; 8,5 aylık bir sayım farklı maruziyetli olduğu için bu varsayımı bozar. Maruziyete göre ölçeklemek de dağılımın varyansını değiştirir, bu yüzden kısmi yıl dışarıda bırakıldı.
 
 **Bölgeler:** Türkiye kutusu (36–42° K / 26–45° D) ve Marmara (40–41,5° K / 26–31° D).
 
@@ -65,11 +69,34 @@ Hücrelerde: gözlenen / beklenen, hız oranı [%95], p.
 | M ≥ 6,0 | 10 / 2; 4,54; p = 0,041 | 2 / 0; p = 0,50 | 0 / 2; p = 0,25 | 0 / 1; p = 0,50 |
 
 **Okuma:**
-- **M ≥ 4,0 ve üstü, üç bölge–dönem birleşiminde** (Marmara ML, Türkiye MD, Marmara MD): 15 testin 14'ünde p > 0,05. Tek istisna Marmara MD, M ≥ 4,5 (p = 0,041). On beş testte beklenen yanlış alarm sayısı ≈ 0,75, yani bu sonuç şansla uyumlu. Sabit hızlı Poisson modeli bu üç durumda bağımsız dönemin sayılarını belirsizlik sınırları içinde öngörüyor.
+- **M ≥ 4,0 ve üstü, üç bölge–dönem birleşiminde** (Marmara ML, Türkiye MD, Marmara MD): 15 testin 14'ünde p > 0,05. Tek istisna Marmara MD, M ≥ 4,5 (p = 0,041; Holm düzeltmesiyle 0,66, §2.1). On beş testte beklenen yanlış alarm sayısı ≈ 0,75, yani bu sonuç şansla uyumlu. Sabit hızlı Poisson modeli bu üç durumda bağımsız dönemin sayılarını belirsizlik sınırları içinde öngörüyor.
 - **Türkiye ML döneminde** model M ≥ 4,0–5,5'te gözlenenin altında kalıyor (oran 1,2–5,5). Sınama dönemi Şubat 2023 Kahramanmaraş dizisini (Mw 7,8 ve 7,5) içeriyor.
 - **Sonradan yapılan duyarlılık hesabı** (`sonradan_2023.js`, önceden sabitlenmedi): 2023 yılı çıkarılınca GK74 ile M ≥ 4,0 / 4,5 / 5,0'da oran 1,08 / 1,14 / 1,35, p = 0,30 / 0,30 / 0,21, yani uyumlu. M ≥ 5,5'te uyumsuzluk sürüyor (3,8 beklenen, 18 gözlenen; p = 0,002); kurma döneminde yalnızca 4 olay var. Bu sonuç, 2023 dizisinin GK74 ile tam ayıklanamadığını (uzun kırılma) düşündürüyor, ama sonradan seçildiği için kanıt değil, yorumdur.
 - **M ≥ 3,2'de** her yerde büyük sapmalar var. Örneğin Türkiye MD'de sayı 1,92 katına çıkıyor ve dağılım testi de bu dönemde artan bir eğilim gösteriyor (§3). Bunlar ağın algılama değişimiyle uyumlu; Mc = 3,2 sınama için güvenilir bir eşik değil.
 - **Scordilis dönüşümü** sonuçları değiştirmiyor (ML Türkiye GK74 M ≥ 4,0: 1,22, p = 0,002). Homojen tür dönemleri içinde ölçek dönüşümü ikincil kalıyor.
+
+### 2.1 Çoklu test düzeltmesi (sonradan eklendi)
+
+Önceden tek bir birincil test tanımlanmamıştı; eşik listesi ve bölünmeler sabitti. Sonuçlar görüldükten sonra "asıl test şuydu" demek sonradan seçim olacağı için bunun yerine önceden sabitlenen test ailesine **Holm (1979)** adım-adım düzeltmesi uygulandı. Holm aile bazında hata oranını (FWER) korur ve testler arası bağımlılık varsayımı gerektirmez. Aynı bölge–dönemin eşikleri iç içe olduğu (M ≥ 4,5 olayları M ≥ 4,0'ın alt kümesi) ve pozitif bağımlı olduğu için düzeltme muhafazakârdır. Testlerin kendisi değişmedi; ham p'ler yukarıdaki tabloda olduğu gibi duruyor.
+
+**Aile:** Model 1, GK74, ham büyüklük, ML + MD bölünmesi × Türkiye + Marmara, M ≥ 4,0–6,0: **m = 20**. Duyarlılık için Mc (3,2) dahil: m = 24.
+
+| Test | Ham p | Holm (m = 20) | Holm (m = 24) |
+|---|---|---|---|
+| Türkiye ML, M ≥ 4,0 | 0,0026 | 0,0496 | 0,055 |
+| Türkiye ML, M ≥ 4,5 | 0,0041 | 0,074 | 0,083 |
+| Türkiye ML, M ≥ 5,0 | 0,018 | 0,31 | 0,35 |
+| **Türkiye ML, M ≥ 5,5** | **0,0004** | **0,008** | **0,009** |
+| Türkiye ML, M ≥ 6,0 | 0,041 | 0,66 | 0,74 |
+| Marmara MD, M ≥ 4,5 | 0,041 | 0,66 | 0,74 |
+| Marmara MD, M ≥ 5,0 | 0,062 | 0,87 | 0,94 |
+| Diğer 13 test | > 0,1 | 1 | 1 |
+
+**Okuma:**
+- Ham p < 0,05 olan 6 testten Holm sonrasında **açık biçimde** kalan yalnızca Türkiye ML, M ≥ 5,5. Bu, en az olayla kurulan test (N_K = 4) ve 2023 dizisinin en çok etkilediği eşik; dolayısıyla "en sağlam" sonuç aynı zamanda en dar tabanlı olandır.
+- Türkiye ML, M ≥ 4,0 sınırda: aile tanımına göre 0,0496 ya da 0,055. Bu fark bir karar dayanağı olmamalı; sonuç "sınırda" olarak okunmalı.
+- Marmara MD, M ≥ 4,5 (p = 0,041) düzeltmeden sonra açıkça anlamsız (0,66). §2'deki "şansla uyumlu" yorumu doğrulanıyor.
+- Türkiye ML'deki M ≥ 4,0–6,0 sapmalarının **yönü** tutarlı (hepsi oran > 1). Holm her testi ayrı değerlendirdiği için bu ortak yönü ödüllendirmez; örüntü kanıtı ayrıca §2'deki 2023 duyarlılık hesabına dayanıyor.
 
 **Model 2 (G–R uzatması):**
 - Marmara'da ve Türkiye MD'de GK74 ile çoğunlukla uyumlu (p 0,05–0,96).
@@ -77,7 +104,7 @@ Hücrelerde: gözlenen / beklenen, hız oranı [%95], p.
 
 ## 3. Poisson varsayımı: yıllık sayıların dağılımı
 
-Varyans/ortalama oranı ve p (χ², üst kuyruk). Yıl sayıları: ML dönemlerinde 7, MD dönemlerinde 6. **Bu kadar az yılla testin gücü düşük:** "Poisson'la uyumlu" sonucu, varsayımın doğru olduğunu göstermez.
+Varyans/ortalama oranı ve p (χ², üst kuyruk). Yalnızca tam takvim yılları (§1): ML dönemlerinde 7 (S için 2019–2025; kısmi 2026 dışarıda), MD dönemlerinde 6. **Bu kadar az yılla testin gücü düşük:** "Poisson'la uyumlu" sonucu, varsayımın doğru olduğunu göstermez.
 
 | Bölge, katalog | Dönem | M ≥ 4,0 | M ≥ 4,5 |
 |---|---|---|---|
@@ -94,6 +121,7 @@ Varyans/ortalama oranı ve p (χ², üst kuyruk). Yıl sayıları: ML dönemleri
 - **GK74 kapalıyken** her yerde güçlü aşırı saçılma var (varyans/ortalama 4–700). Bunun nedenleri artçı kümelenmesi, eğilim ve algılama değişimidir; yalnızca biri değil.
 - **GK74 açıkken, M ≥ 4,0–4,5'te**, büyük bir dizi içermeyen dönemlerde oran 0,6–2,2 ve p çoğunlukla > 0,05. Düşük güç sınırı içinde Poisson'la çelişmiyor.
 - **Büyük dizi içeren dönemlerde** GK74 sonrasında da güçlü aşırı saçılma kalıyor: Türkiye 2019–2025 (2023 Kahramanmaraş) ve Marmara 1998–2003 (1999 İzmit ve Düzce). GK74'ün sabit uzay–zaman pencereleri, uzun kırılmalı büyük depremlerin artçılarını tam ayıklayamıyor. Kalan olayların bağımsız olduğu garanti edilmez.
+- **Çoklu test (Holm, sonradan):** Aile GK74, M ≥ 4,0 ve 4,5, iki bölge × dört dönem, m = 16. Ham p < 0,05 olan dört test Holm sonrasında da anlamlı kalıyor: Türkiye 2019–2025 (M ≥ 4,0: 2e−7; M ≥ 4,5: 1e−5) ve Marmara 1998–2003 (M ≥ 4,0: 0,002; M ≥ 4,5: 2e−6). Sınırdaki Türkiye 1998–2003, M ≥ 4,0 (p = 0,050) düzeltmeyle 0,60'a çıkıyor. Büyük dizi dönemlerindeki aşırı saçılma bulgusu çoklu teste dayanıklı.
 - **Eğilim çıkarılmış Pearson χ²/sd** çoğu durumda ham orana yakın. Aşırı saçılmanın çoğu doğrusal eğilimle değil, tek yıllardaki sıçramalarla (diziler) açıklanıyor.
 
 ## 4. Zamanla değişen hız modeli (Model 3)
@@ -129,15 +157,15 @@ Sınırı kesen sınamada artış dönüşüme çok duyarlı. M ≥ 5,0'da Scord
 
 ## 6. Sonuçlar
 
-1. **Öngörü:** Homojen bir büyüklük türü dönemi içinde, GK74 açık ve M ≥ 4,0 iken sabit hızlı Poisson modeli, büyük dizi içermeyen bağımsız dönemlerin sayılarını belirsizlik sınırları içinde öngörüyor (üç bölge–dönemde 15 testin 14'ü). Sınama dönemi 2023 Kahramanmaraş gibi büyük bir dizi içerdiğinde model gözlenenin altında kalıyor; büyük bir kısmı GK74'ün bu diziyi tam ayıklayamamasıyla açıklanabiliyor (sonradan duyarlılık).
-2. **Poisson varsayımı:** GK74 açıkken M ≥ 4,0'da, büyük dizi içermeyen dönemlerde yıllık sayılar Poisson'la çelişmiyor (düşük güç: 6–7 yıl). Büyük dizi içeren dönemlerde GK74 sonrasında da aşırı saçılma var. Bu, a(t) raporundaki "kümelenmede güven aralıkları dar kalır" bulgusuyla tutarlı. EQ-Live'daki Poisson olasılıkları büyük dizi dönemlerini kapsayan pencerelerde iyimser kalabilir.
+1. **Öngörü:** Homojen bir büyüklük türü dönemi içinde, GK74 açık ve M ≥ 4,0 iken sabit hızlı Poisson modeli, büyük dizi içermeyen bağımsız dönemlerin sayılarını belirsizlik sınırları içinde öngörüyor (üç bölge–dönemde 15 testin 14'ü; Holm sonrasında 15'in 15'i). Sınama dönemi 2023 Kahramanmaraş gibi büyük bir dizi içerdiğinde model gözlenenin altında kalıyor; Holm sonrasında açıkça anlamlı kalan yalnızca M ≥ 5,5 (kurma döneminde 4 olay), M ≥ 4,0 sınırda. Sapmanın büyük bir kısmı GK74'ün bu diziyi tam ayıklayamamasıyla açıklanabiliyor (sonradan duyarlılık).
+2. **Poisson varsayımı:** GK74 açıkken M ≥ 4,0'da, büyük dizi içermeyen dönemlerde yıllık sayılar Poisson'la çelişmiyor (düşük güç: 6–7 yıl). Büyük dizi içeren dönemlerde GK74 sonrasında da aşırı saçılma var; bu bulgu Holm düzeltmesinden sonra da duruyor. Bu, a(t) raporundaki "kümelenmede güven aralıkları dar kalır" bulgusuyla tutarlı. EQ-Live'daki Poisson olasılıkları büyük dizi dönemlerini kapsayan pencerelerde iyimser kalabilir.
 3. **Katalog homojenliği:** EMSC'nin kendi içinde de 2010–2012'de MD → ML geçişi var. Dönemler arası karşılaştırmalarda (a(t), b(t), Poisson) bu geçiş, 1998 ISC → EMSC sınırı kadar önemli bir sınırlama. Mc uyarısı tür geçişini yakalamaz; ayrı bir "büyüklük türü geçişi" uyarısı düşünülebilir (öneri).
 4. **Model seçimi:** Kurma dönemindeki eğilimler ileriye taşınamıyor; zamanla değişen hız modelini tercih etmek için gerekçe yok. Tek b'li G–R uzatması karma türlü katalogda kendi kurma döneminde bile uymayabiliyor.
 
 ## 7. Sınırlar
 
 - Yalnızca iki bölge ve iki homojen dönem incelendi. ML dönemi bölünmesi (7 + 7,7 yıl) ve MD dönemi (6 + 6 yıl) kısa; büyük eşiklerde olay sayıları çok az.
-- Çoklu test: tüm tablolarda onlarca p değeri var. Tek tek anlamlılıklar keşifseldir; düzeltme uygulanmadı, yorum örüntülere dayanıyor.
+- Çoklu test: Holm düzeltmesi yalnızca iki önceden sabitlenen aileye (§2.1 Model 1, §3 dağılım) ve sonradan uygulandı; aile tanımı ve yöntem seçimi sonuçlar görüldükten sonra yapıldı. Model 2, Model 3, Scordilis, karışık bölünme ve ikincil sınamalar düzeltilmedi; bunlardaki tek tek anlamlılıklar keşifseldir. Holm iç içe eşiklerdeki pozitif bağımlılık nedeniyle muhafazakârdır.
 - Mc = 3,2 katalogun kesim sınırı olabilir; M ≥ 3,2 sonuçları algılama değişimine duyarlı.
 - 2023 duyarlılık hesabı sonradan yapıldı ve yalnızca yorum içindir.
 - GK74 tek ayıklama yöntemi olarak kullanıldı; uzun kırılmalı depremlerde yetersiz kaldığı görülüyor. Başka yöntemlerle (ör. Reasenberg, ETAS tabanlı) karşılaştırma bu çalışmanın kapsamı dışında.
