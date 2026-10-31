@@ -1,6 +1,12 @@
-# a(t) paneli — pencere olay hızı (2026-10-31, güncelleme 4)
+# a(t) paneli — pencere olay hızı (2026-10-31, güncelleme 5)
 
 Panel `main`'de (fbe343a, 31 Ekim). Güncelleme 4 (öz-ilişki düzeltmesi) ayrı dalda: `a-neff`, `main` 5274c46'dan açıldı, birleştirilmedi.
+
+**Güncelleme 5'te eklenenler** (ChatGPT incelemesi, 31 Ekim 23:15):
+- n_eff yönteminin sağlamlığı farklı öz-ilişki yapılarında ve kısa serilerde sınandı (§4.3).
+- Uzun bellek ve ortak eğilimde düzeltmenin yetersiz kaldığı panel açıklamasına eklendi (yalnızca metin).
+- Birinci fark (Δa–Δb) araştırması planlandı (§4.4); panelde uygulanmadı.
+- Taban denetimi: `a-neff`, güncel `main` 5274c46 üzerinde (5274c46, fbe343a'dan sonraki eq-bot veri commit'i). Kabul testleri bu tabana karşı yeniden çalıştırıldı.
 
 **Güncelleme 4'te eklenenler** (`a-neff` dalı; ChatGPT önerisi 1):
 - Panelde ham r ve ham p korunuyor; yanlarına öz-ilişki (ρ_a, ρ_b), etkin örneklem n_eff ve düzeltilmiş p eklendi. Hepsi "keşifsel" etiketli.
@@ -191,6 +197,53 @@ Düzeltilmiş test nominal düzeyi aşmıyor; ham test öz-ilişkide %32'ye kada
 | Marmara, GK74 kapalı | −0,05 | 0,86 | 0,51 | 0,62 | 6,8 | 0,92 |
 | Marmara, GK74 açık | 0,71 | 0,13 | 0,84 | 0,44 | 2,8 | test edilemez |
 
+### 4.3 n_eff düzeltmesinin sağlamlığı (`neff_saglamlik.js`, sonuç `neff_saglamlik.json`)
+
+H0: iki seri bağımsız. Her durumda 2000 tekrar, α = 0,05. "Test edilebilen": n_eff ≥ 5. ρ̂: ortalama kestirilen gecikme-1 öz-ilişki.
+
+| Yapı | n | Ham | Düzeltilmiş | Test edilebilen | ort. ρ̂ |
+|---|---|---|---|---|---|
+| AR(1), φ = 0,2 | 6 / 22 / 50 | %5,0 / 5,1 / 5,5 | %2,4 / 4,4 / 4,8 | %79 / 100 / 100 | −0,07 / 0,13 / 0,17 |
+| AR(1), φ = 0,5 | 6 / 22 / 50 | %7,0 / 11,8 / 11,3 | %2,7 / 5,5 / 4,5 | %76 / 100 / 100 | 0,06 / 0,39 / 0,45 |
+| AR(1), φ = 0,8 | 6 / 13 / 22 / 50 | %11,8 / 22,6 / 26,8 / 33,0 | %2,4 / 2,6 / 2,8 / 4,3 | %65 / 80 / 93 / 100 | 0,24 / 0,52 / 0,62 / 0,73 |
+| AR(1), φ = 0,95 | 6 / 22 / 50 | %14,5 / 43,0 / 54,5 | %1,9 / 1,2 / 1,4 | %56 / 62 / 78 | 0,31 / 0,75 / 0,86 |
+| MA(1), θ = 0,8 | 13 / 22 / 50 | %11,3 / 10,8 / 10,8 | %5,1 / 4,2 / 4,5 | %99–100 | 0,36–0,46 |
+| **AR(2) uzun bellek** (φ₁ 0,5, φ₂ 0,4) | 13 / 22 / 50 | %18,4 / 28,9 / 45,8 | **%5,3 / 8,9 / 16,7** | %94–100 | 0,32 / 0,48 / 0,67 |
+| Rastgele yürüyüş (durağan değil) | 13 / 22 / 50 | %36,1 / 44,8 / 66,3 | %1,9 / 0,8 / 0,5 | %48–55 | 0,63 / 0,77 / 0,90 |
+| **Ortak yönde eğilim** + AR(1) 0,5 | 13 / 22 / 50 | %17,5 / 24,7 / 37,5 | **%3,6 / 6,2 / 14,3** | %92–100 | 0,42 / 0,49 / 0,55 |
+
+Tüm satırlar (AR(1) için n = 6, 8, 10, 13, 22, 50 ve φ = 0,2, 0,5, 0,8, 0,9, 0,95) JSON dosyasında.
+
+**Sonuçlar:**
+1. **AR(1) ve MA(1)'de** düzeltilmiş test hiçbir koşulda %5,5'i aşmıyor; φ büyüdükçe tutucu oluyor (φ = 0,95'te %1–2).
+2. **Kısa serilerde ρ̂ aşağı yanlı:** φ = 0,8 iken n = 13'te 0,52, n = 6'da 0,24. Yine de düzeltilmiş test tutucu kalıyor, çünkü n_eff < 5 durumları "test edilemez" olarak ayrılıyor (φ ≥ 0,8 ve n ≤ 13'te serilerin %20–45'i).
+3. **Uzun bellek (AR(2)):** Gecikme-1 bağımlılığın tamamını yakalayamıyor; hata oranı n = 22'de %8,9, n = 50'de %16,7.
+4. **Ortak yönde eğilim:** Deterministik eğilim gecikme-1 öz-ilişkiye tam yansımıyor; hata oranı n = 22'de %6,2, n = 50'de %14,3. **Türkiye 1971–1997'de şüphelenilen durum (tamlık kaynaklı ortak eğilim) tam olarak budur.** Bu yüzden o örnekteki düzeltilmiş p = 0,075 bile iyimser olabilir.
+5. **Durağan olmayan seriler (rastgele yürüyüş):** Düzeltme çok tutucu; yaklaşık yarı serilerde test edilemiyor.
+
+Bu sınırlar panel açıklamasına eklendi: "AR(1) dışındaki yapılarda düzeltme yetersiz kalabilir: uzun bellek ve ortak eğilimde %6–17". p keşifsel olarak kalıyor. Monte Carlo sonuçları (§4.2, test 8) değişmeden korunuyor.
+
+### 4.4 Birinci fark (Δa–Δb) araştırması: plan (uygulanmadı)
+
+**Soru:** Ardışık örtüşmeyen pencerelerdeki değişimler birlikte hareket ediyor mu? Mevcut a–b korelasyonu ise uzun dönemli birlikte değişimi ölçer. İkisi aynı soruyu yanıtlamaz.
+
+**Tanım:**
+- Aynı Mc segmentindeki ardışık örtüşmeyen pencerelerde Δa_i = a_i − a_{i−1}, Δb_i = b_i − b_{i−1}.
+- r(Δb, Δa); segmentler arası fark alınmaz.
+
+**Beklenen istatistik davranışı:**
+- Fark almak deterministik eğilimi ve rastgele yürüyüşü giderir.
+- Ama beyaz gürültüde fark serisinde ρ ≈ −0,5 olan MA(1) yapısı oluşur. Bu yapı §4.3'te sorunsuz çıktı; aynı n_eff düzeltmesi uygulanabilir.
+- Bir gözlem kaybedilir (n − 1).
+- a ve b aynı pencerelerden gelir; pencere içi örnekleme hatası fark serisinde ortak bileşen oluşturabilir. Benzetimle denetlenmeli.
+
+**Doğrulama planı:**
+- §4.3'teki yapılar (özellikle ortak eğilim ve AR(2)) için Δ testinin hata oranı.
+- Gerçek bağlantılı seriler için güç.
+- Türkiye 1971–1997 ve Marmara örneklerinde ham ve Δ sonuçlarının yan yana raporlanması.
+
+**Sunum:** Mevcut hesapların üzerine yazılmaz. Ayrı bir araştırma dalında hesaplanır; panele eklenip eklenmeyeceği sonuçlara göre ayrıca karar verilir. Δ korelasyonu da nedensellik ya da fiziksel ilişki kanıtı değildir.
+
 ## 5. a–b ilişkisini karıştırabilecek etkenler
 
 | Etken | Etkisi | Panelde nasıl ele alınıyor |
@@ -210,3 +263,15 @@ Düzeltilmiş test nominal düzeyi aşmıyor; ham test öz-ilişkide %32'ye kada
 3. **Marmara, GK74 açık:** a, 2000'de yaklaşık 1,5'ten 2020'de yaklaşık 1,2'ye yavaşça iniyor. Nedeni bu çalışmada araştırılmadı. Olası nedenler: Mc(t) değişimi, GK74'ün büyük deprem sonrası uzun zaman pencereleri, büyüklük dönüşümü. Fiziksel bir sonuç olarak yorumlanmamalı.
 
 **Temel ilke:** a(t) üretim hızındaki değişimi, b(t) büyüklük dağılımındaki değişimi gösterir. İkisi aynı pencerelerden gelir; birlikte okunurken §5'teki etkenler ayrılmalıdır. İkisinin birlikte değişmesi, tek başına deprem tehlikesinin arttığı anlamına gelmez.
+
+## 7. `a-neff` birleştirme öncesi son kontrol (2026-10-31)
+
+| Kontrol (ChatGPT listesi) | Sonuç |
+|---|---|
+| 1. Güncel `main` ile karşılaştırma | Güncel `main` = 5274c46 = `a-neff`'in tabanı. fbe343a (a(t) birleştirmesi) 5274c46'nın atası. Dal güncel, taşıma gerekmedi; `git merge-tree` çakışma yok. |
+| 2. n_eff'in farklı öz-ilişki yapılarında ve kısa serilerde davranışı | §4.3. AR(1)/MA(1)'de ≤ %5,5; AR(2) uzun bellekte %8,9–16,7, ortak eğilimde %6,2–14,3 (yetersiz). Sınır panel açıklamasında. Mevcut Monte Carlo sonuçları korundu (§4.2). |
+| 3. Birinci fark analizi | §4.4'te ayrı araştırma olarak planlandı; mevcut hesaplar değişmedi. |
+| 4. Ham r, ham p, n_eff ve düzeltilmiş p ayrı ayrı | Panelde dördü ayrı yazılıyor; `lastAts.corr` alanları {r, pHam, rhoA, rhoB, neff, pDuz} ayrı. Kabul (6) denetliyor. |
+| 5. a(t), b(t), G–R ve katalog hesapları güncel `main`'e göre değişmedi | Kabul `kabul_a.js` (önce = origin/main 5274c46): **31/31**. Dört senaryoda a(t) grafiği ve değerleri, b(t) grafiği ve metni, G–R metni önce = sonra. Birim testleri 15/15. `data/` `main` ile aynı. `index.html` farkı +20/−2 satır, yalnızca `renderAvalueTS`'in korelasyon bölümü ve yeni yardımcı fonksiyonlar (`aLag1`, `aNeffTest`). |
+
+`main`'e birleştirilmedi, canlıya gönderilmedi; ayrı onay bekliyor.
