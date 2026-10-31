@@ -7,6 +7,7 @@
 //   basamak_test   ISC 1971–1997, basamaklar 1971 M ≥ 4,5 / 1985 M ≥ 4,0 (Poisson raporunda iyimser bulunan test basamakları)
 //   basamak_oto    ISC 1971–1997, "Otomatik öner" basamakları (5,0 / 4,2 / 4,8 / 3,9)
 //   marmara        Marmara, EMSC 1998–, otomatik Mc
+//   + GK74 açık, Mc 4,5, basamak + GK74, Kahramanmaraş (36,5–38,5° K / 35,5–39° D; 2023 artçıları) GK74 kapalı/açık: geçici/kalıcı ayrımı
 // Denetimler: (1) b(t) ve a(t) grafikleri, uyarı bloğu dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra (hesap değişmedi);
 //   (2) uyarı b(t)'de varsa a(t)'de kısa notu da var (ve tersi); (3) birlesik senaryosunda uyarı var; iyimser 1985 basamağı yıllık Mc ile yakalanıyor; (4) sayfa hatası yok.
 // Ekran görüntüsü: mc_uyari_birlesik.png
@@ -58,6 +59,13 @@ const SEN = {
   basamak_test:  { p: [[1971, 1997]], r: [36, 26, 42, 45], cs: [['1971-01-01', '4.5'], ['1985-01-01', '4.0']] },
   basamak_oto:   { p: [[1971, 1997]], r: [36, 26, 42, 45], cs: [['1971-01-01', '5.0'], ['1984-01-01', '4.2'], ['1986-01-01', '4.8'], ['1990-01-01', '3.9']] },
   marmara:       { p: [[1998, null]], r: [40, 26, 41.5, 31] },
+  // Geriye dönük uyumluluk (ChatGPT m. 3): GK74 açık, farklı Mc modları, basamaklar + GK74; geçici eksiklik (büyük artçı dizisi)
+  birlesik_gk74:     { p: [[1971, 1997], [1998, null]], r: [36, 26, 42, 45], gk: true },
+  isc71_97_mc45:     { p: [[1971, 1997]], r: [36, 26, 42, 45], mc: '4.5' },
+  marmara_gk74:      { p: [[1998, null]], r: [40, 26, 41.5, 31], gk: true },
+  basamak_test_gk74: { p: [[1971, 1997]], r: [36, 26, 42, 45], cs: [['1971-01-01', '4.5'], ['1985-01-01', '4.0']], gk: true },
+  kmaras:            { p: [[1998, null]], r: [36.5, 35.5, 38.5, 39] },
+  kmaras_gk74:       { p: [[1998, null]], r: [36.5, 35.5, 38.5, 39], gk: true },
 };
 (async () => {
   await new Promise(r => srv.listen(0, '127.0.0.1', r));
@@ -66,7 +74,7 @@ const SEN = {
     S[ad] = {}; const hat = [];
     for (const [k, c] of Object.entries(SEN)) {
       const { p, ctx, hatalar } = await sayfa(br, yol); await p.evaluate(KUR);
-      await p.evaluate(a => __kur(...a), [c.p, ...c.r]); if (c.mc) await p.evaluate(v => __mc(v), c.mc); if (c.cs) await p.evaluate(s => __cs(s), c.cs); await p.waitForTimeout(200);
+      await p.evaluate(a => __kur(...a), [c.p, ...c.r]); if (c.gk) await p.evaluate(async () => { await toggleRegionDecluster(); applyGk74Filter(regionEvents); renderTimeMag([...events, ...liveEvents]); }); if (c.mc) await p.evaluate(v => __mc(v), c.mc); if (c.cs) await p.evaluate(s => __cs(s), c.cs); await p.waitForTimeout(200);
       S[ad][k] = await p.evaluate(() => __oku());
       if (ad === 'sonra' && k === 'birlesik') { const el = await p.$('#tmStatsB'); await el.scrollIntoViewIfNeeded(); await el.screenshot({ path: path.join(__dirname, 'mc_uyari_birlesik.png') }); }
       hat.push(...hatalar); await ctx.close();
@@ -77,12 +85,14 @@ const SEN = {
   for (const k of Object.keys(SEN)) { const o = O[k], y = Y[k];
     ok(o.bSvg === y.bSvg && o.bTxt === y.bTxt && o.aSvg === y.aSvg && o.aTxt === y.aTxt && o.grTxt === y.grTxt, `(1) ${k}: b(t) ve a(t) grafikleri, uyarı dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra`);
     ok(!!y.uyariB === y.uyariA && (!!y.uyariB) === !!(y.durum && y.durum.on) && !o.uyariB, `(2) ${k}: uyarı ${y.uyariB ? 'VAR' : 'yok'} (b(t) ve a(t) tutarlı; önce yok)`);
-    const d = y.durum; console.log(`     ${k}: Mc = ${y.Mc}${y.csAktif ? ' (basamaklı)' : ''}; ` + (d ? (d.tur === 'tekMc' ? `Mc(t) ${d.mcMin?.toFixed(2)}–${d.mcMax?.toFixed(2)}, 'inc' %${(100 * d.frac).toFixed(0)}${d.on ? `, önerilen Mc ${d.oner}` : ''}` : d.tur === 'basamak' ? `dönemler: ${d.donemler.map(q => `eşik ${q.mc} < veri ${q.mcData}`).join('; ')}` : 'uyarı koşulu yok') : '—'));
+    const d = y.durum; console.log(`     ${k}: Mc = ${y.Mc}${y.csAktif ? ' (basamaklı)' : ''}${SEN[k].gk ? ', GK74' : ''}; tür ${d && d.on ? d.tur : '—'}; ` + (d && d.sureOran !== undefined ? `süre oranı %${(100 * d.sureOran).toFixed(1)}; ` : '') + (d ? ((d.tur === 'tekMc' || d.tur === 'gecici') ? `Mc(t) ${d.mcMin?.toFixed(2)}–${d.mcMax?.toFixed(2)}, 'inc' %${(100 * d.frac).toFixed(0)}${d.on ? `, önerilen Mc ${d.oner}` : ''}` : d.tur === 'basamak' ? `dönemler: ${d.donemler.map(q => `eşik ${q.mc} < veri ${q.mcData}`).join('; ')}` : 'uyarı koşulu yok') : '—'));
   }
   ok(Y.birlesik.durum && Y.birlesik.durum.on && /Katalog Tamlık Uyarısı/.test(Y.birlesik.uyariB), '(3) Birleşik ISC + EMSC, otomatik Mc: uyarı gösteriliyor');
   { const d = Y.basamak_test.durum, p85 = d && d.donemler.find(q => new Date(q.t0).getUTCFullYear() === 1985);
     ok(!!p85 && p85.neden.includes('yıllık') && p85.yillar.some(q => q.y === 1986) && p85.yillar.some(q => q.y === 1988) && /1986: 4,8/.test(Y.basamak_test.uyariB),
       `(3) İyimser test basamağı (1985 M ≥ 4,0) yıllık Mc ile yakalanıyor: ${p85 ? p85.yillar.map(q => q.y + ': ' + q.mc).join(', ') : '—'} (Poisson raporu §4.5 ile tutarlı)`); }
+  ok(Y.birlesik.durum.tur === 'tekMc' && Y.birlesik_gk74.durum.on && Y.birlesik_gk74.durum.tur === 'tekMc', '(3) Birleşik ISC + EMSC: kalıcı uyarı GK74 kapalı ve açıkken');
+  ok(Object.values(Y).filter(v => v && v.durum).every(v => !v.durum.on || ['tekMc', 'gecici', 'basamak'].includes(v.durum.tur)), '(3) Tüm senaryolarda uyarı türü tanımlı (kalıcı / geçici / basamak)');
   ok(!O.hatalar.length && !Y.hatalar.length, `(4) Sayfa hatası yok (önce ${O.hatalar.length}, sonra ${Y.hatalar.length})` + (Y.hatalar.length ? ': ' + Y.hatalar.join(' | ') : ''));
   const ozet = {}; for (const k of Object.keys(SEN)) ozet[k] = { Mc: Y[k].Mc, durum: Y[k].durum, uyari: Y[k].uyariB };
   fs.writeFileSync(path.join(__dirname, 'kabul_sonuc.json'), JSON.stringify({ senaryolar: SEN, sonuc: ozet, denetimler: kayit, ozet: { pass, fail } }, null, 1));

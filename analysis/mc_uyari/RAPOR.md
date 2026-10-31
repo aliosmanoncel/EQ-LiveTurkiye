@@ -1,6 +1,6 @@
-# Katalog tamlık (Mc uyumsuzluğu) uyarısı — doğrulama raporu (2026-11-01)
+# Katalog tamlık (Mc uyumsuzluğu) uyarısı — doğrulama raporu (2026-11-01, son inceleme sonrası)
 
-Dal: `mc-uyari`, `main` 54fbd0b'den açıldı. `main`'e birleştirilmedi; canlıya gönderilmedi.
+Dal: `mc-uyari`, `main` 54fbd0b'den açıldı; son incelemede güncel `main` (fd18abf) ile eşitlendi.
 
 **Gerekçe:** ISC–EMSC araştırması (`isc-emsc-olcek` dalı) varsayılan ayarlardaki 1998 b(t) sıçramasının büyük ölçüde tamlık (Mc) kaynaklı olduğunu gösterdi. Ancak ortak Mc ile bile anlamlı bir hız farkı kaldı (+0,14 log birimi). Uyarı, kullanıcıyı Mc farkına karşı uyarır. Ama ne değişimin kaybolmasını ne de kalmasını fiziksel bir sonuç olarak sunar.
 
@@ -53,9 +53,47 @@ Diğer birim testleri: 16/16 (yeni dosya dahil).
 
 Ekran görüntüsü: `mc_uyari_birlesik.png`
 
+## 2a. Son kod incelemesi (ChatGPT'nin üç noktası)
+
+**1. Hesaplama bütünlüğü.** Kod farkı satır satır okundu. Değişiklik yalnızca gösterim katmanında: `mcUyariDurum`, `mcUyariHtml` ve iki `innerHTML` başına eklenen uyarı. `lastBts`, b(t) serisi, `inc` tanımı, G–R ve a(t) hesapları değişmedi. Yıllık Mc yalnızca okuma yapar (`computeMc`). `data/` değişmedi. Kabul testi bunu 13 senaryoda doğruluyor (grafikler ve uyarı dışındaki metinler önce = sonra).
+
+**2. Yanlış uyarı riski (geçici ve kalıcı eksiklik).** İncelemede bir zayıflık bulundu ve düzeltildi.
+- Sorun: Tek Mc ölçütü pencere sayısına dayanıyordu. Artçı dizisi kısa sürede çok pencere ürettiğinden, büyük deprem sonrası birkaç aylık eksiklik "dönemlerin Mc'leri farklı" uyarısı verebilirdi.
+- Düzeltme: Süre ağırlığı eklendi. `inc` pencerelerinin [t0, t1] aralıklarının birleşimi, serinin süresinin en az %5'iyse **kalıcı uyarı**; değilse ayrı, daha hafif bir **geçici eksiklik notu** gösterilir ("dönemler arası kalıcı bir Mc farkı değildir").
+- Basamaklı moddaki Mc(t) ölçütü için de en az 2 takvim yılı koşulu eklendi.
+- Birim testleri bu ayrımı denetliyor: pencerelerin %20'si ama sürenin %0,1'i → geçici.
+
+**3. Geriye dönük uyumluluk.** Kabul testine altı senaryo eklendi: GK74 açık, Mc = 4,5, basamaklar + GK74 ve Kahramanmaraş (GK74 kapalı/açık).
+
+| Senaryo | Mc | Tür | Pencere oranı | Süre oranı |
+|---|---|---|---|---|
+| Birleşik ISC + EMSC | 3,2 | kalıcı | %20 | %53 |
+| Birleşik, GK74 açık | 3,2 | kalıcı | %18 | %54 |
+| ISC 1971–1997, Mc 4,5 | 4,5 | kalıcı | %85 | %87 |
+| EMSC 1998– | 3,2 | kalıcı | %11 | %9 |
+| Marmara, GK74 kapalı / açık | 3,2 | yok | %0 | %0 |
+| Basamaklar (test), GK74 kapalı | basamaklı | basamak | iki dönem (1971–1985: Mc(t) + yıllık; 1985–1997: yıllık) | |
+| Basamaklar (test), GK74 açık | basamaklı | basamak | yalnızca 1971–1985 | |
+| Kahramanmaraş (36,5–38,5° K / 35,5–39° D), GK74 kapalı | 3,2 | kalıcı | %40 | %40 |
+| Kahramanmaraş, GK74 açık | 3,2 | kalıcı | %23 | %30 |
+
+**Kahramanmaraş örneği (yıllık dağılım, GK74 kapalı):** `inc` pencereleri iki ayrı yerde:
+- 1999–2004'te neredeyse tümü: seyrek ağ döneminin kalıcı eksikliği. "Kalıcı" sınıflandırması bunun için doğru.
+- 2023'te 206 pencerenin 110'u: Şubat 2023 depremleri sonrası geçici eksiklik.
+
+Önerilen ortak Mc (4,5) 2023'teki geçici tepeden geliyor ve gereğinden tutucu. Uyarı metni bunu belirtiyor ("en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın"). Karma durumlarda önerilen eşik dikkatle okunmalı.
+
+**GK74 açıkken basamak denetimi:** Ayıklama yıllık olay sayısını düşürdüğü için 1986 ve 1988 "≥ 50 olay" koşulunu sağlamıyor. Bu yüzden iyimser 1985 basamağı GK74 açıkken yakalanmıyor. Yıllık ölçüt seyrek kataloglarda gücünü yitirir (aşağıdaki sınırlar).
+
+**Testler (son):**
+- Birim `test_mc_uyari.js` 16/16 (geçici/kalıcı ayrımı dahil); tüm birim testleri 16/16.
+- Kabul `kabul_mc.js` 31/31 (13 senaryo; önce = main fd18abf).
+
 ## 3. Sınırlar
 
 - Uyarı, verinin kendi Mc tahminlerine (maks. eğrilik +0,2) dayanır. Bu tahminler de belirsizdir; %5 ve 0,2 eşikleri uzlaşımsaldır.
-- En yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten gelebilir; önerilen eşik bu yüzden tutucu olabilir (metinde yazıyor).
+- En yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten gelebilir; önerilen eşik bu yüzden tutucu olabilir (metinde yazıyor; Kahramanmaraş örneği §2a).
+- Geçici/kalıcı ayrımı süre oranına (%5) dayanır. Kalıcı ve geçici eksikliğin karıştığı serilerde (Kahramanmaraş) asıl uyarı gösterilir; geçici kısım ayrıca etiketlenmez.
+- GK74 açıkken yıllık olay sayısı düştüğü için yıllık ölçüt bazı yılları değerlendiremez (basamak + GK74 senaryosu).
 - Yıllık ölçüt yalnızca ≥ 50 olaylı yılları kullanır; daha seyrek dönemleri değerlendiremez.
 - Uyarı, ölçek (MD gibi dönüştürülmeyen türler) ve algılama farklarını ölçmez; yalnızca metinle hatırlatır.

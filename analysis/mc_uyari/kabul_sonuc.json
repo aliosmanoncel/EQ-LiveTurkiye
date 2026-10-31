@@ -134,6 +134,109 @@
     41.5,
     31
    ]
+  },
+  "birlesik_gk74": {
+   "p": [
+    [
+     1971,
+     1997
+    ],
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ],
+   "gk": true
+  },
+  "isc71_97_mc45": {
+   "p": [
+    [
+     1971,
+     1997
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ],
+   "mc": "4.5"
+  },
+  "marmara_gk74": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    40,
+    26,
+    41.5,
+    31
+   ],
+   "gk": true
+  },
+  "basamak_test_gk74": {
+   "p": [
+    [
+     1971,
+     1997
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ],
+   "cs": [
+    [
+     "1971-01-01",
+     "4.5"
+    ],
+    [
+     "1985-01-01",
+     "4.0"
+    ]
+   ],
+   "gk": true
+  },
+  "kmaras": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36.5,
+    35.5,
+    38.5,
+    39
+   ]
+  },
+  "kmaras_gk74": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36.5,
+    35.5,
+    38.5,
+    39
+   ],
+   "gk": true
   }
  },
  "sonuc": {
@@ -143,6 +246,7 @@
     "on": true,
     "tur": "tekMc",
     "frac": 0.20392798690671032,
+    "sureOran": 0.5292306504307869,
     "nInc": 623,
     "n": 3055,
     "mcMin": 3.2,
@@ -150,7 +254,7 @@
     "Mc": 3.2,
     "oner": 4.8
    },
-   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,8 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %20 kadarı (623 / 3055) Mc(t) > Mc + 0,1 olan dönemlere düşüyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,8 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %20 kadarı (623 / 3055) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %53 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
   },
   "birlesik_mc40": {
    "Mc": 4,
@@ -158,6 +262,7 @@
     "on": true,
     "tur": "tekMc",
     "frac": 0.17219917012448133,
+    "sureOran": 0.3533187381146128,
     "nInc": 83,
     "n": 482,
     "mcMin": 3.2,
@@ -165,7 +270,7 @@
     "Mc": 4,
     "oner": 4.8
    },
-   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,8 arasında değişiyor; kullanılan Mc = 4,0. Pencerelerin yaklaşık %17 kadarı (83 / 482) Mc(t) > Mc + 0,1 olan dönemlere düşüyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,8 arasında değişiyor; kullanılan Mc = 4,0. Pencerelerin yaklaşık %17 kadarı (83 / 482) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %35 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
   },
   "isc71_97": {
    "Mc": 3.7,
@@ -173,6 +278,7 @@
     "on": true,
     "tur": "tekMc",
     "frac": 0.5876777251184834,
+    "sureOran": 0.7653719235818895,
     "nInc": 124,
     "n": 211,
     "mcMin": 3.7,
@@ -180,7 +286,7 @@
     "Mc": 3.7,
     "oner": 4.8
    },
-   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,7–4,8 arasında değişiyor; kullanılan Mc = 3,7. Pencerelerin yaklaşık %59 kadarı (124 / 211) Mc(t) > Mc + 0,1 olan dönemlere düşüyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,7–4,8 arasında değişiyor; kullanılan Mc = 3,7. Pencerelerin yaklaşık %59 kadarı (124 / 211) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %77 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
   },
   "emsc98": {
    "Mc": 3.2,
@@ -188,6 +294,7 @@
     "on": true,
     "tur": "tekMc",
     "frac": 0.11192660550458716,
+    "sureOran": 0.09399151323454503,
     "nInc": 305,
     "n": 2725,
     "mcMin": 3.2,
@@ -195,7 +302,7 @@
     "Mc": 3.2,
     "oner": 4.5
    },
-   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,5 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %11 kadarı (305 / 2725) Mc(t) > Mc + 0,1 olan dönemlere düşüyor. Ortak eşik için en az Mc ≈ 4,5 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,5 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %11 kadarı (305 / 2725) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %9 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,5 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
   },
   "basamak_test": {
    "Mc": 3.7,
@@ -296,10 +403,111 @@
    "durum": {
     "on": false,
     "frac": 0,
+    "sureOran": 0,
     "mcMin": 3.2,
     "mcMax": 3.2
    },
    "uyari": null
+  },
+  "birlesik_gk74": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "tur": "tekMc",
+    "frac": 0.17890625,
+    "sureOran": 0.5412386748702509,
+    "nInc": 229,
+    "n": 1280,
+    "mcMin": 3.2,
+    "mcMax": 4.8,
+    "Mc": 3.2,
+    "oner": 4.8
+   },
+   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,8 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %18 kadarı (229 / 1280) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %54 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  },
+  "isc71_97_mc45": {
+   "Mc": 4.5,
+   "durum": {
+    "on": true,
+    "tur": "tekMc",
+    "frac": 0.847457627118644,
+    "sureOran": 0.8716588335023374,
+    "nInc": 50,
+    "n": 59,
+    "mcMin": 3.7,
+    "mcMax": 4.8,
+    "Mc": 4.5,
+    "oner": 4.8
+   },
+   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,7–4,8 arasında değişiyor; kullanılan Mc = 4,5. Pencerelerin yaklaşık %85 kadarı (50 / 59) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %87 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  },
+  "marmara_gk74": {
+   "Mc": 3.2,
+   "durum": {
+    "on": false,
+    "frac": 0,
+    "sureOran": 0,
+    "mcMin": 3.2,
+    "mcMax": 3.3
+   },
+   "uyari": null
+  },
+  "basamak_test_gk74": {
+   "Mc": 3.7,
+   "durum": {
+    "on": true,
+    "tur": "basamak",
+    "donemler": [
+     {
+      "mc": 4.5,
+      "mcData": 4.7,
+      "t0": 31536000000,
+      "t1": 473385600000,
+      "mcTmax": 4.8,
+      "oran": 0.5,
+      "nPts": 8,
+      "ustT0": 397823284189.104,
+      "ustT1": 467486555709.928,
+      "yillar": [],
+      "neden": [
+       "Mc(t)"
+      ]
+     }
+    ]
+   },
+   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Basamak eşiği, o dönemin veriden kestirilen Mc'sinin belirgin biçimde altında: 1971–1984: eşik 4,5, Mc(t) 1982–1984 arasında 4,8'e kadar (dönemdeki Mc(t) noktalarının %50 kadarı eşik + 0,2'nin üstünde). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  },
+  "kmaras": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "tur": "tekMc",
+    "frac": 0.4005167958656331,
+    "sureOran": 0.39931406636406835,
+    "nInc": 155,
+    "n": 387,
+    "mcMin": 3.2,
+    "mcMax": 4.5,
+    "Mc": 3.2,
+    "oner": 4.5
+   },
+   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,5 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %40 kadarı (155 / 387) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %40 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,5 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  },
+  "kmaras_gk74": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "tur": "tekMc",
+    "frac": 0.23076923076923078,
+    "sureOran": 0.29525236669046145,
+    "nInc": 21,
+    "n": 91,
+    "mcMin": 3.2,
+    "mcMax": 3.5,
+    "Mc": 3.2,
+    "oner": 3.5
+   },
+   "uyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–3,5 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %23 kadarı (21 / 91) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %30 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 3,5 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
   }
  },
  "denetimler": [
@@ -317,12 +525,26 @@
   "GEÇTİ (2) basamak_oto: uyarı VAR (b(t) ve a(t) tutarlı; önce yok)",
   "GEÇTİ (1) marmara: b(t) ve a(t) grafikleri, uyarı dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra",
   "GEÇTİ (2) marmara: uyarı yok (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) birlesik_gk74: b(t) ve a(t) grafikleri, uyarı dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra",
+  "GEÇTİ (2) birlesik_gk74: uyarı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) isc71_97_mc45: b(t) ve a(t) grafikleri, uyarı dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra",
+  "GEÇTİ (2) isc71_97_mc45: uyarı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) marmara_gk74: b(t) ve a(t) grafikleri, uyarı dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra",
+  "GEÇTİ (2) marmara_gk74: uyarı yok (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) basamak_test_gk74: b(t) ve a(t) grafikleri, uyarı dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra",
+  "GEÇTİ (2) basamak_test_gk74: uyarı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) kmaras: b(t) ve a(t) grafikleri, uyarı dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra",
+  "GEÇTİ (2) kmaras: uyarı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) kmaras_gk74: b(t) ve a(t) grafikleri, uyarı dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra",
+  "GEÇTİ (2) kmaras_gk74: uyarı VAR (b(t) ve a(t) tutarlı; önce yok)",
   "GEÇTİ (3) Birleşik ISC + EMSC, otomatik Mc: uyarı gösteriliyor",
   "GEÇTİ (3) İyimser test basamağı (1985 M ≥ 4,0) yıllık Mc ile yakalanıyor: 1986: 4.8, 1988: 4.7 (Poisson raporu §4.5 ile tutarlı)",
+  "GEÇTİ (3) Birleşik ISC + EMSC: kalıcı uyarı GK74 kapalı ve açıkken",
+  "GEÇTİ (3) Tüm senaryolarda uyarı türü tanımlı (kalıcı / geçici / basamak)",
   "GEÇTİ (4) Sayfa hatası yok (önce 0, sonra 0)"
  ],
  "ozet": {
-  "pass": 17,
+  "pass": 31,
   "fail": 0
  }
 }

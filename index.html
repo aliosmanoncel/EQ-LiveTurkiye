@@ -2989,7 +2989,8 @@ function renderAvalueTS(series, N, Mc, cs, t0, t1, NW, STEP) {
 let lastAts = null;
 // Katalog tamlık (Mc uyumsuzluğu) uyarısı (2026-10-31). Hesap değiştirmez; b(t) panelinin mevcut ölçümlerini kullanır:
 //  • tek Mc: Mc(t) şeridi (kayan pencere veri Mc'si, maks. eğrilik +0,2) ve pencere başına 'inc' işareti (pencere süresinde veri Mc(t) > kullanılan Mc + 0,1).
-//    Uyarı: pencerelerin en az %5'i 'inc' ise. Önerilen ortak eşik: en yüksek veri Mc(t)'si (0,1'e yukarı yuvarlanmış).
+//    Uyarı: pencerelerin en az %5'i 'inc' ise. 'inc' pencereleri serinin süresinin de en az %5'ini kaplıyorsa kalıcı tamlık farkı (asıl uyarı),
+//    kaplamıyorsa geçici eksiklik notu (büyük deprem sonrası kısa süreli Mc yükselmesi). Önerilen ortak eşik: en yüksek veri Mc(t)'si (0,1'e yukarı).
 //  • tamlık basamakları: dönemin bütün verisinden Mc'si eşiğin CS_QC.mcGap (0,2) üstündeyse (renderCsDiag ile aynı ölçüt) YA DA dönem içindeki
 //    Mc(t) şeridinin en az 2 noktası ve %10'u eşik + 0,2'nin üstündeyse YA DA dönem içinde en az 2 yılın yıllık Mc'si (≥ 50 olaylı yıllar, csSuggest
 //    ile aynı ölçüt) eşik + 0,2'nin üstündeyse (seyrek dönemlerde 250 olaylık Mc(t) penceresi birkaç yılı kapsar; örn. 1985–1989'da yıllık Mc 4,7–4,8, eşik 4,0).
@@ -2999,7 +3000,7 @@ function mcUyariDurum(o) {
     (o.periods || []).forEach(p => {
       const butun = p.mcData !== null && p.mcData !== undefined && p.mc < p.mcData - o.gap - 1e-9;
       const pts = (o.mcSer || []).filter(m => m.t >= p.t0 && m.t < p.t1), ust = pts.filter(m => m.mc > +p.mc + o.gap + 1e-9);
-      const ici = pts.length >= 2 && ust.length >= 2 && ust.length / pts.length >= 0.1;
+      const ici = pts.length >= 2 && ust.length >= 2 && ust.length / pts.length >= 0.1 && new Set(ust.map(m => new Date(m.t).getUTCFullYear())).size >= 2;   // en az 2 takvim yılı: büyük deprem sonrası birkaç aylık geçici eksiklik tek başına yetmez
       // Yıllık Mc (≥ CS_QC.minEvents olaylı yıllar; csSuggest ile aynı ölçüt): dönem içinde en az 2 yıl eşik + gap üstünde
       const yy = (o.yillik || []).filter(q => q.t0 >= p.t0 - 864e5 && q.t1 <= p.t1 + 864e5 && q.mc > +p.mc + o.gap + 1e-9), yil = yy.length >= 2;
       if (butun || ici || yil) az.push({ mc: +p.mc, mcData: p.mcData ?? null, t0: p.t0, t1: p.t1, mcTmax: ust.length ? Math.max(...ust.map(m => m.mc)) : null, oran: pts.length ? ust.length / pts.length : 0, nPts: pts.length,
@@ -3010,15 +3011,28 @@ function mcUyariDurum(o) {
   }
   const ser = o.ser || [], mcs = (o.mcSer || []).map(m => m.mc).filter(Number.isFinite);
   if (!ser.length || mcs.length < 2 || !Number.isFinite(o.Mc)) return { on: false };
-  const nInc = ser.filter(q => q.inc).length, frac = nInc / ser.length, mcMin = Math.min(...mcs), mcMax = Math.max(...mcs);
-  return frac >= 0.05 ? { on: true, tur: 'tekMc', frac, nInc, n: ser.length, mcMin, mcMax, Mc: o.Mc, oner: Math.ceil(mcMax * 10 - 1e-9) / 10 } : { on: false, frac, mcMin, mcMax };
+  const inc = ser.filter(q => q.inc), nInc = inc.length, frac = nInc / ser.length, mcMin = Math.min(...mcs), mcMax = Math.max(...mcs);
+  // Süre ağırlığı: 'inc' pencerelerinin [t0, t1] aralıklarının birleşim uzunluğu / serinin toplam süresi. Pencereler olay sayısıyla tanımlı olduğundan
+  // artçı dizisinde kısa sürede çok pencere oluşur; pencere oranı yüksek ama süre oranı düşükse eksiklik geçicidir (büyük deprem sonrası), kalıcı değil.
+  const T0 = Math.min(...ser.map(q => q.t0)), T1 = Math.max(...ser.map(q => q.t1));
+  let birlesim = 0, a = null, b = null;
+  inc.map(q => [q.t0, q.t1]).sort((x, y) => x[0] - y[0]).forEach(([x, y]) => { if (a === null) { a = x; b = y; } else if (x <= b) b = Math.max(b, y); else { birlesim += b - a; a = x; b = y; } });
+  if (a !== null) birlesim += b - a;
+  const sureOran = T1 > T0 ? birlesim / (T1 - T0) : 0;
+  if (frac < 0.05) return { on: false, frac, sureOran, mcMin, mcMax };
+  const ortak = { frac, sureOran, nInc, n: ser.length, mcMin, mcMax, Mc: o.Mc, oner: Math.ceil(mcMax * 10 - 1e-9) / 10 };
+  return sureOran >= 0.05 ? { on: true, tur: 'tekMc', ...ortak } : { on: true, tur: 'gecici', ...ortak };
 }
 function mcUyariHtml(d, kisa) {
   if (!d || !d.on) return '';
   const f = v => v.toFixed(1).replace('.', ','), yil = t => new Date(t).getUTCFullYear();
+  if (d.tur === 'gecici') {
+    if (kisa) return `<div id="mcUyariA" style="color:#d4a24a;margin-bottom:3px">ⓘ <b>Geçici tamlık eksikliği:</b> kısa süreli Mc yükselmesi (büyük deprem sonrası olası); a(t)'deki kısa süreli değişimleri etkileyebilir (ayrıntı b(t) panelinde).</div>`;
+    return `<div id="mcUyariB" style="color:#d4a24a;border:1px solid #d4a24a55;border-radius:4px;padding:3px 6px;margin-bottom:4px">ⓘ <b>Geçici tamlık eksikliği.</b> Pencerelerin yaklaşık %${Math.round(100 * d.frac)} kadarı (${d.nInc} / ${d.n}) veri Mc(t) > Mc + 0,1 olan aralıklara düşüyor, ancak bu aralıklar serinin süresinin yalnızca %${Math.max(1, Math.round(100 * d.sureOran))} kadarını kaplıyor (en yüksek Mc(t) ${f(d.mcMax)}; kullanılan Mc ${f(d.Mc)}). Bu örüntü, büyük depremlerden hemen sonra küçük olayların kaydedilememesiyle uyumludur; dönemler arası kalıcı bir Mc farkı değildir. O aralıklardaki a(t) ve b(t) değerleri (kısa süreli hız tepeleri, düşük b) eksik kayıttan etkilenebilir; Mc(t) şeridine bakın.</div>`;
+  }
   if (kisa) return `<div id="mcUyariA" style="color:#f59e0b;margin-bottom:3px">⚠ <b>Katalog tamlık uyarısı:</b> dönemlerin Mc'leri farklı; a(t)'deki değişimler yapay olabilir (ayrıntı b(t) panelinde).</div>`;
   const neden = d.tur === 'tekMc'
-    ? `Veriden kestirilen Mc(t) ${f(d.mcMin)}–${f(d.mcMax)} arasında değişiyor; kullanılan Mc = ${f(d.Mc)}. Pencerelerin yaklaşık %${Math.round(100 * d.frac)} kadarı (${d.nInc} / ${d.n}) Mc(t) > Mc + 0,1 olan dönemlere düşüyor. Ortak eşik için en az Mc ≈ ${f(d.oner)} ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın).`
+    ? `Veriden kestirilen Mc(t) ${f(d.mcMin)}–${f(d.mcMax)} arasında değişiyor; kullanılan Mc = ${f(d.Mc)}. Pencerelerin yaklaşık %${Math.round(100 * d.frac)} kadarı (${d.nInc} / ${d.n}) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %${Math.round(100 * d.sureOran)} kadarını kaplıyor. Ortak eşik için en az Mc ≈ ${f(d.oner)} ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın).`
     : `Basamak eşiği, o dönemin veriden kestirilen Mc'sinin belirgin biçimde altında: ${d.donemler.map(p => `${yil(p.t0)}–${yil(p.t1 - 1)}: eşik ${f(p.mc)}` + (p.mcData !== null && p.mc < p.mcData - 0.2 - 1e-9 ? `, dönemin veri Mc'si ${f(p.mcData)}` : '') + (p.mcTmax !== null && p.neden.includes('Mc(t)') ? `, Mc(t) ${yil(p.ustT0)}–${yil(p.ustT1)} arasında ${f(p.mcTmax)}'e kadar (dönemdeki Mc(t) noktalarının %${Math.round(100 * p.oran)} kadarı eşik + 0,2'nin üstünde)` : '') + (p.yillar && p.yillar.length ? `, yıllık Mc ${p.yillar.map(q => `${q.y}: ${f(q.mc)}`).join(', ')}` : '')).join('; ')}.`;
   return `<div id="mcUyariB" style="color:#f59e0b;border:1px solid #f59e0b55;border-radius:4px;padding:3px 6px;margin-bottom:4px">⚠ <b>Katalog Tamlık Uyarısı.</b> Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. ${neden} ` +
     `<span style="color:#d4a24a">Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir.</span></div>`;
