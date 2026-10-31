@@ -72,8 +72,15 @@ const SEN = {
     ok(pts.length === y.bN, `(2) ${k}: a(t) pencere sayısı ${pts.length} = b(t) pencere sayısı ${y.bN} (çizilen ${nOk}, karışık ${pts.length - nOk})`);
     if (!SEN[k].cs) { let d = 0; y.bSer.forEach((q, i) => { const a = Math.log10(y.ats.NW / ((q.t1 - q.t0) / YR)); d = Math.max(d, Math.abs(a - pts[i].a)); });
       ok(d < 1e-12, `(2) ${k}: a = log₁₀(n/T) bağımsız hesapla aynı (en büyük fark ${d.toExponential(1)}); T medyan ${pts.map(q => q.Tyr).sort((a, b) => a - b)[Math.floor(pts.length / 2)].toPrecision(3)} yıl`); }
-    ok(/Mc'deki yıllık olay hızıdır/.test(y.aTxt) && /a\s*GR/.test(y.aTxt.replace(/<[^>]+>/g, '')) && /tahmini ya da öncü kanıtı değildir/.test(y.aTxt) && /b–a korelasyonu yapay olabilir/.test(y.aTxt) && /p verilmez — pencereler bağımsız değil/.test(y.aTxt),
+    ok(/Mc'deki yıllık olay hızıdır/.test(y.aTxt) && /a\s*GR/.test(y.aTxt.replace(/<[^>]+>/g, '')) && /tahmini ya da öncü kanıtı değildir/.test(y.aTxt) && /b–a korelasyonu yapay olabilir/.test(y.aTxt) && /p verilmez — pencereler bağımsız değil/.test(y.aTxt) && /keşifsel/.test(y.aTxt),
       `(4) ${k}: tanım (Mc'deki hız), a_GR uyarısı, örtüşen r için p verilmemesi ve "tahmin değildir" ve tamlık kaynaklı yapay korelasyon notları var`);
+    { // Örtüşmeyen pencerelerin bağımsızlığı: segment içinde her ⌈n/adım⌉'ıncı pencere; a ve b'nin gecikme-1 öz-ilişkisi
+      const k = Math.ceil(y.ats.NW / y.ats.step), seg = []; let cur = null; y.ats.pts.forEach(q => { if (q.mixed) { cur = null; return; } if (!cur || cur.mc !== q.mc) { cur = { mc: q.mc, p: [] }; seg.push(cur); } cur.p.push(q); });
+      const ind = []; seg.forEach(sg => { const v = sg.p.filter((q, i) => i % k === 0); if (v.length >= 3) ind.push(v); });
+      const ac = f => { const x = [], z = []; ind.forEach(v => { for (let i = 1; i < v.length; i++) { x.push(f(v[i - 1])); z.push(f(v[i])); } }); const n = x.length; if (n < 4) return null;
+        const mx = x.reduce((a, c) => a + c, 0) / n, mz = z.reduce((a, c) => a + c, 0) / n; let sxz = 0, sxx = 0, szz = 0; for (let i = 0; i < n; i++) { sxz += (x[i] - mx) * (z[i] - mz); sxx += (x[i] - mx) ** 2; szz += (z[i] - mz) ** 2; } return { r: sxz / Math.sqrt(sxx * szz), n }; };
+      const aA = ac(q => q.a), aB = ac(q => q.b); y.ac = { a: aA, b: aB };
+      console.log(`     ${y === Y.tekMc ? 'tekMc' : y === Y.basamak ? 'basamak' : y === Y.marmara ? 'marmara' : 'marmara_gk74'}: örtüşmeyen pencerelerde gecikme-1 öz-ilişki: a ${aA ? aA.r.toFixed(2) + ' (' + aA.n + ' çift)' : '—'}, b ${aB ? aB.r.toFixed(2) + ' (' + aB.n + ' çift)' : '—'}`); }
     const rm = y.aTxt.match(/r = (−?-?[\d,]+) \(örtüşmeyen (\d+) pencere, p = ([^)]+)\)/); console.log(`     ${k}: ${rm ? `r(b, a) = ${rm[1]}, örtüşmeyen ${rm[2]} pencere, p = ${rm[3]}` : 'korelasyon yok'}; a aralığı ${Math.min(...pts.filter(q => !q.mixed).map(q => q.a)).toFixed(2)}–${Math.max(...pts.filter(q => !q.mixed).map(q => q.a)).toFixed(2)}`);
   }
   { const y = Y.basamak, mixed = y.ats.pts.filter(q => q.mixed).length, mcs = [...new Set(y.ats.pts.filter(q => !q.mixed).map(q => q.mc))];
@@ -86,7 +93,7 @@ const SEN = {
     ok(!/GK74 kapalı/.test(g.aTxt) && /GK74 artçı ayıklama açık/.test(g.aTxt) && g.ats.pts.length < a.ats.pts.length && mx(izG) !== null && mx(izG) < mx(izA) - 0.5,
       `(4) Marmara GK74 açık: pencere ${a.ats.pts.length} → ${g.ats.pts.length}; 1999–2000 en yüksek a ${mx(izA).toFixed(2)} → ${mx(izG).toFixed(2)} (artçı tepesi büyük ölçüde kalkıyor); tüm seri en yüksek a ${ta.a.toFixed(2)} (${new Date(ta.t).toISOString().slice(0, 10)}) → ${tg.a.toFixed(2)} (${new Date(tg.t).toISOString().slice(0, 10)}); r(b, a) metni: ${(g.aTxt.match(/r = [^(]+\([^)]*\)/) || ['—'])[0]}`); }
   ok(!O.hatalar.length && !Y.hatalar.length, `(5) Sayfa hatası yok (önce ${O.hatalar.length}, sonra ${Y.hatalar.length})` + (Y.hatalar.length ? ': ' + Y.hatalar.join(' | ') : ''));
-  const ozet = {}; for (const k of Object.keys(SEN)) ozet[k] = { metin: Y[k].aTxt, pencere: Y[k].ats.pts.length };
+  const ozet = {}; for (const k of Object.keys(SEN)) ozet[k] = { metin: Y[k].aTxt, pencere: Y[k].ats.pts.length, gecikme1_oz_iliski: Y[k].ac || null };
   fs.writeFileSync(path.join(__dirname, 'kabul_sonuc.json'), JSON.stringify({ senaryolar: SEN, sonuc: ozet, denetimler: kayit, ozet: { pass, fail } }, null, 1));
   console.log(`\n${fail ? 'KALDI' : 'GEÇTİ'}: ${pass} geçti, ${fail} kaldı`);
   await br.close(); srv.close(); process.exit(fail ? 1 : 0);

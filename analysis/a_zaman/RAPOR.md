@@ -1,6 +1,11 @@
-# a(t) paneli — pencere olay hızı (2026-10-31, güncelleme 2)
+# a(t) paneli — pencere olay hızı (2026-10-31, güncelleme 3)
 
 Dal: `a-zaman-paneli`, `main` 89cacdb'den açıldı. `main`'e birleştirilmedi; bilimsel inceleme bekliyor.
+
+**Güncelleme 3'te eklenenler** (ChatGPT incelemesinin üç noktası):
+- **Aralık ifadesi:** "Kesin %95" yalnızca Poisson varsayımı altında geçerli. GK74 açıkken de kalan olayların bağımsız olduğu garanti edilmiyor (§1.2).
+- **Korelasyon:** p panelde "keşifsel" olarak etiketlendi. Örtüşmeyen pencerelerin gecikme-1 öz-ilişkisi ölçüldü ve Bartlett etkin örneklem düzeltmesi hesaplandı (§4.1). Bu yalnızca metin değişikliği; hesaplar aynı.
+- **Büyüklük ölçeği:** ileriki çalışmaya bırakıldı (§5).
 
 **Güncelleme 2'de eklenenler:**
 - %95 aralık yönteminin türetimi ve varsayımı (§1.2).
@@ -35,7 +40,7 @@ G–R kesişimi a_GR = a + b·Mc yalnızca nokta açıklamasında verilir; ayrı
 **Türetim:**
 1. Penceredeki n olay arasında n−1 bekleme süresi vardır. Bunlar bağımsızdır ve her biri Üstel(λ) dağılır.
 2. Toplamları T ~ Gamma(n−1, λ), dolayısıyla 2λT ~ χ²(2(n−1)).
-3. Buradan λ için kesin %95 aralığı:
+3. Buradan, Poisson varsayımı altında, λ için kesin %95 aralığı:
 
 ```
 λ ∈ [ χ²₀,₀₂₅(2(n−1)) / (2T) ,  χ²₀,₉₇₅(2(n−1)) / (2T) ]
@@ -47,12 +52,12 @@ a için aralık bu iki sınırın log₁₀'udur. n = 100'de aralığın yarı g
 
 **Nokta değeri:** Yayındaki tanıma uymak için n/T kullanılır. Yansız kestirici (n−1)/T'dir; n = 100'de fark 0,0044 log birimi, aralık genişliğinin yaklaşık %5'i.
 
-**Geçerlilik sınırı:** Artçı kümelenmesinde olaylar bağımsız değildir. Pencereden pencereye değişim Poisson'dan büyük olur ve aralık dar kalır (test 7: orta kümelenmede kapsama %78, güçlü kümelenmede %58). Panel bunu yazar. GK74 açıkken aralık daha anlamlıdır.
+**Geçerlilik sınırı:** Artçı kümelenmesinde olaylar bağımsız değildir. Pencereden pencereye değişim Poisson'dan büyük olur ve aralık dar kalır (test 7: orta kümelenmede kapsama %78, güçlü kümelenmede %58). Panel bunu yazar. GK74 açıkken artçıların büyük kısmı çıkar ve aralık varsayıma daha yakın olur. Ancak GK74 kalan olayların bağımsız olduğunu garanti etmez (arka plan kümelenmesi, ayıklama pencerelerinin sınırları). Bu yüzden aralık hiçbir durumda koşulsuz "kesin %95" olarak sunulmaz; her zaman "Poisson varsayımı altında" anlamında okunmalıdır.
 
 ### 1.3 Diğer kurallar
 
 - **Tamlık basamakları:** Mc'si karışık pencere (bir basamak geçişini içeren) çizilmez; eksende turuncu çentikle işaretlenir. Çizgi her Mc segmentinde kesilir ve segment Mc ile etiketlenir. Farklı Mc segmentlerinin a düzeyleri karşılaştırılamaz.
-- **b–a korelasyonu:** Yalnızca örtüşmeyen pencerelerle (her ⌈n/adım⌉'ıncı) Pearson r ve iki yönlü p (Fisher z) verilir; basamaklarda yalnızca aynı Mc segmenti içinde. Tüm örtüşen pencerelerin r'si bilgi olarak gösterilir, p verilmez (test 5).
+- **b–a korelasyonu:** Yalnızca örtüşmeyen pencerelerle (her ⌈n/adım⌉'ıncı) Pearson r ve iki yönlü p (Fisher z) verilir; basamaklarda yalnızca aynı Mc segmenti içinde. Tüm örtüşen pencerelerin r'si bilgi olarak gösterilir, p verilmez (test 5). p panelde **keşifsel** olarak etiketlenir: örtüşmeyen pencereler de zamanda bağımlı olabilir (§4.1).
 - **Metindeki uyarılar:** GK74 kapalıysa artçı tepeleri; tamlık değişirse yapay b–a korelasyonu; tahmin ya da öncü kanıtı değildir.
 
 ## 2. Değişiklik
@@ -79,7 +84,7 @@ Hepsi tohumlu üreteçle yapıldı, yani tekrarlanabilir. Köşeli parantezler, 
 
 Diğer birim testleri: 15/15 geçti (`test_fit_range.js` 37/37).
 
-## 4. Kabul testi (`kabul_a.js`, önce = main 89cacdb): 23/23
+## 4. Kabul testi (`kabul_a.js`, önce = main 89cacdb): 23/23 (p etiketinde "keşifsel" denetimi dahil)
 
 | Senaryo | Pencere | r(b, a), örtüşmeyen | a aralığı |
 |---|---|---|---|
@@ -98,6 +103,25 @@ Ekran görüntüleri:
 - `a_marmara.png`
 - `a_marmara_gk74.png`
 
+### 4.1 Örtüşmeyen pencerelerin bağımsızlığı
+
+ChatGPT'nin ikinci noktasını denetlemek için, aynı Mc segmentindeki ardışık örtüşmeyen pencerelerin a ve b serilerinde gecikme-1 öz-ilişkisi (ρ) ölçüldü (`kabul_a.js`, kabul_sonuc.json).
+
+Etkin örneklem: n_eff = n(1 − ρ_a·ρ_b)/(1 + ρ_a·ρ_b) (Bartlett 1935; iki öz-ilişkili seri arasındaki korelasyon için). Düzeltilmiş p, Fisher z ile n_eff kullanılarak hesaplandı.
+
+| Senaryo | n | ρ_a | ρ_b | r(b, a) | panel p (bağımsızlık varsayımı) | n_eff | düzeltilmiş p |
+|---|---|---|---|---|---|---|---|
+| Türkiye 1971–1997, tek Mc | 22 | 0,73 | 0,80 | 0,79 | 3e−6 | 5,8 | **≈ 0,07** |
+| Aynı, tamlık basamaklı | 8 | 0,60 | 0,62 | 0,65 | 0,083 | 3,7 | test edilemez (n_eff < 5) |
+| Marmara, GK74 kapalı | 13 | 0,51 | 0,62 | −0,05 | 0,86 | 6,8 | ≈ 0,92 |
+| Marmara, GK74 açık | 6 | 0,84 | 0,44 | 0,71 | 0,13 | 2,8 | test edilemez |
+
+**Sonuç:** Örtüşmeyen pencereler de belirgin biçimde öz-ilişkili; ρ = 0,44–0,84, yani yavaş değişen eğilimler var. Bağımsızlık varsayımıyla hesaplanan p iyimser kalıyor. Türkiye 1971–1997'deki p = 3e−6, düzeltmeyle ≈ 0,07'ye çıkıyor. Bu, §6'daki "tamlık kaynaklı yapay korelasyon" yorumuyla da tutarlı: iki seri birlikte bir eğilim izliyor.
+
+Paneldeki p bu yüzden keşifseldir.
+
+**Öneri (ayrı iş):** Panelde n_eff'i ve düzeltilmiş p'yi doğrudan göstermek ya da eğilimi çıkarılmış (birinci fark) serilerde korelasyon vermek. Bu bir hesap değişikliği olduğundan bu dala katılmadı.
+
 ## 5. a–b ilişkisini karıştırabilecek etkenler
 
 | Etken | Etkisi | Panelde nasıl ele alınıyor |
@@ -107,12 +131,13 @@ Ekran görüntüleri:
 | Tamlık değişimi | Mc'nin altında kalan dönemde kaydedilen hız ve b birlikte düşer; yapay pozitif korelasyon oluşur | Uyarı metni; tamlık basamaklarıyla segmentlere bölme; Türkiye 1971–1997'de r 0,79 → 0,65 (anlamlı değil) |
 | Mc basamakları | Farklı eşiklerin hızları karşılaştırılamaz | Karışık pencere çizilmez; korelasyon segment içinde |
 | Artçı dizileri | Hız tepeleri oluşur; aralık dar kalır (test 7) | GK74 uyarısı; Marmara'da GK74 açılınca İzmit tepesi 3,76 → 1,50 |
-| Büyüklük ölçeği / dönüşüm değişimi | Ölçek değişirse Mc'deki hız ve b kayar | Kapsam dışı; Mc(t) şeridi ve büyüklük türü tanısıyla birlikte değerlendirilmeli |
+| Örtüşmeyen pencerelerin öz-ilişkisi | Eğilimler p'yi iyimser yapar (§4.1: Türkiye 3e−6 → ≈ 0,07) | p "keşifsel" etiketli; n_eff düzeltmesi önerildi |
+| Büyüklük ölçeği / dönüşüm değişimi (ör. ISC → EMSC, Scordilis dönüşümü) | Ölçek değişirse Mc'deki hız ve b kayar; a(t) ve b(t) değişimleri doğrudan fiziksel değişim olarak yorumlanamaz | İleriki çalışma; Mc(t) şeridi ve büyüklük türü tanısıyla birlikte değerlendirilmeli |
 
 ## 6. Gözlemler (yorum değil)
 
 1. **Marmara 1999 İzmit:** GK74 kapalıyken belirgin bir hız tepesi görünüyor (a = 3,76; 18 Ağustos 1999). GK74 açıkken 1999–2000'deki en yüksek a 1,50; tepe büyük ölçüde artçılardan oluşuyor.
-2. **Türkiye 1971–1997:** Tek Mc'deki güçlü b–a korelasyonu (r = 0,79; p = 3e−6), tamlık basamaklarıyla zayıflıyor ve anlamlılığını yitiriyor (0,65; 8 pencere; p = 0,08). İstatistiksel olarak anlamlı görünen bir ilişki katalog özelliklerinden kaynaklanabilir.
+2. **Türkiye 1971–1997:** Tek Mc'deki güçlü b–a korelasyonu (r = 0,79; panelde p = 3e−6), öz-ilişki düzeltmesiyle anlamlılığını yitiriyor (n_eff ≈ 6, p ≈ 0,07). Tamlık basamaklarıyla da zayıflıyor (0,65; test edilemez). İstatistiksel olarak anlamlı görünen bir ilişki katalog özelliklerinden ve ortak eğilimden kaynaklanabilir.
 3. **Marmara, GK74 açık:** a, 2000'de yaklaşık 1,5'ten 2020'de yaklaşık 1,2'ye yavaşça iniyor. Nedeni bu çalışmada araştırılmadı. Olası nedenler: Mc(t) değişimi, GK74'ün büyük deprem sonrası uzun zaman pencereleri, büyüklük dönüşümü. Fiziksel bir sonuç olarak yorumlanmamalı.
 
-**Temel ilke:** a(t) üretim hızındaki değişimi, b(t) büyüklük dağılımındaki değişimi gösterir. İkisi aynı pencerelerden gelir; birlikte okunurken §5'teki etkenler ayrılmalıdır.
+**Temel ilke:** a(t) üretim hızındaki değişimi, b(t) büyüklük dağılımındaki değişimi gösterir. İkisi aynı pencerelerden gelir; birlikte okunurken §5'teki etkenler ayrılmalıdır. İkisinin birlikte değişmesi, tek başına deprem tehlikesinin arttığı anlamına gelmez.

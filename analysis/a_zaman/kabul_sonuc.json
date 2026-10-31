@@ -69,20 +69,60 @@
  },
  "sonuc": {
   "tekMc": {
-   "metin": "●─ a = log₁₀(n/T)   ▮ %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) 211 pencere (n = 100, adım 10; b(t) ile aynı) · medyan T = 0.947 yıl · a en düşük 1,34 (1974-01-27), en yüksek 3,83 (1996-07-22)  |  b–a korelasyonu: r = 0,79 (örtüşmeyen 22 pencere, p = 3,1e-6) [tüm 211 örtüşen pencere: r = 0,87; p verilmez — pencereler bağımsız değil]Tanım: Öncel & Wilson (2007, Eş. 3) N = n/T = 10a; n = 100 olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. Kesişim aGR = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. GK74 kapalı: artçı dizileri a(t)'de kısa süreli hız tepeleri olarak görünür. Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.",
-   "pencere": 211
+   "metin": "●─ a = log₁₀(n/T)   ▮ %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) 211 pencere (n = 100, adım 10; b(t) ile aynı) · medyan T = 0.947 yıl · a en düşük 1,34 (1974-01-27), en yüksek 3,83 (1996-07-22)  |  b–a korelasyonu: r = 0,79 (örtüşmeyen 22 pencere, p = 3,1e-6 — keşifsel: örtüşmeyen pencereler de zamanda bağımlı olabilir) [tüm 211 örtüşen pencere: r = 0,87; p verilmez — pencereler bağımsız değil]Tanım: Öncel & Wilson (2007, Eş. 3) N = n/T = 10a; n = 100 olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. Kesişim aGR = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. GK74 kapalı: artçı dizileri a(t)'de kısa süreli hız tepeleri olarak görünür. Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.",
+   "pencere": 211,
+   "gecikme1_oz_iliski": {
+    "a": {
+     "r": 0.7323405943471627,
+     "n": 21
+    },
+    "b": {
+     "r": 0.7974449141349891,
+     "n": 21
+    }
+   }
   },
   "basamak": {
-   "metin": "●─ a = log₁₀(n/T)   ▮ %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır)   ╵ tamlık basamağı geçişindeki pencere (çizilmedi)64 pencere (n = 100, adım 10; b(t) ile aynı) · medyan T = 1.12 yıl · a en düşük 0,74 (1979-10-16), en yüksek 3,14 (1996-07-28)  |  b–a korelasyonu: r = 0,65 (örtüşmeyen 8 pencere, p = 0,083) [tüm 64 örtüşen pencere: r = 0,80; p verilmez — pencereler bağımsız değil]Tanım: Öncel & Wilson (2007, Eş. 3) N = n/T = 10a; n = 100 olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. Kesişim aGR = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. Tamlık basamaklarında her segment kendi Mc'sindeki hızı gösterir; farklı Mc segmentlerinin a düzeyleri karşılaştırılamaz. GK74 kapalı: artçı dizileri a(t)'de kısa süreli hız tepeleri olarak görünür. Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.",
-   "pencere": 74
+   "metin": "●─ a = log₁₀(n/T)   ▮ %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır)   ╵ tamlık basamağı geçişindeki pencere (çizilmedi)64 pencere (n = 100, adım 10; b(t) ile aynı) · medyan T = 1.12 yıl · a en düşük 0,74 (1979-10-16), en yüksek 3,14 (1996-07-28)  |  b–a korelasyonu: r = 0,65 (örtüşmeyen 8 pencere, p = 0,083 — keşifsel: örtüşmeyen pencereler de zamanda bağımlı olabilir) [tüm 64 örtüşen pencere: r = 0,80; p verilmez — pencereler bağımsız değil]Tanım: Öncel & Wilson (2007, Eş. 3) N = n/T = 10a; n = 100 olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. Kesişim aGR = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. Tamlık basamaklarında her segment kendi Mc'sindeki hızı gösterir; farklı Mc segmentlerinin a düzeyleri karşılaştırılamaz. GK74 kapalı: artçı dizileri a(t)'de kısa süreli hız tepeleri olarak görünür. Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.",
+   "pencere": 74,
+   "gecikme1_oz_iliski": {
+    "a": {
+     "r": 0.5993506897827686,
+     "n": 6
+    },
+    "b": {
+     "r": 0.6196843714180537,
+     "n": 6
+    }
+   }
   },
   "marmara": {
-   "metin": "●─ a = log₁₀(n/T)   ▮ %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) 124 pencere (n = 100, adım 10; b(t) ile aynı) · medyan T = 2.42 yıl · a en düşük 1,36 (2016-03-23), en yüksek 3,76 (1999-08-18)  |  b–a korelasyonu: r = -0,05 (örtüşmeyen 13 pencere, p = 0,864) [tüm 124 örtüşen pencere: r = -0,16; p verilmez — pencereler bağımsız değil]Tanım: Öncel & Wilson (2007, Eş. 3) N = n/T = 10a; n = 100 olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. Kesişim aGR = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. GK74 kapalı: artçı dizileri a(t)'de kısa süreli hız tepeleri olarak görünür. Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.",
-   "pencere": 124
+   "metin": "●─ a = log₁₀(n/T)   ▮ %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) 124 pencere (n = 100, adım 10; b(t) ile aynı) · medyan T = 2.42 yıl · a en düşük 1,36 (2016-03-23), en yüksek 3,76 (1999-08-18)  |  b–a korelasyonu: r = -0,05 (örtüşmeyen 13 pencere, p = 0,864 — keşifsel: örtüşmeyen pencereler de zamanda bağımlı olabilir) [tüm 124 örtüşen pencere: r = -0,16; p verilmez — pencereler bağımsız değil]Tanım: Öncel & Wilson (2007, Eş. 3) N = n/T = 10a; n = 100 olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. Kesişim aGR = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. GK74 kapalı: artçı dizileri a(t)'de kısa süreli hız tepeleri olarak görünür. Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.",
+   "pencere": 124,
+   "gecikme1_oz_iliski": {
+    "a": {
+     "r": 0.5126277173328542,
+     "n": 12
+    },
+    "b": {
+     "r": 0.616723158361733,
+     "n": 12
+    }
+   }
   },
   "marmara_gk74": {
-   "metin": "●─ a = log₁₀(n/T)   ▮ %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) 53 pencere (n = 100, adım 10; b(t) ile aynı) · medyan T = 4.11 yıl · a en düşük 1,18 (2019-11-08), en yüksek 1,50 (2000-10-14)  |  b–a korelasyonu: r = 0,71 (örtüşmeyen 6 pencere, p = 0,125) [tüm 53 örtüşen pencere: r = 0,73; p verilmez — pencereler bağımsız değil]Tanım: Öncel & Wilson (2007, Eş. 3) N = n/T = 10a; n = 100 olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. Kesişim aGR = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. GK74 artçı ayıklama açık. Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.",
-   "pencere": 53
+   "metin": "●─ a = log₁₀(n/T)   ▮ %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) 53 pencere (n = 100, adım 10; b(t) ile aynı) · medyan T = 4.11 yıl · a en düşük 1,18 (2019-11-08), en yüksek 1,50 (2000-10-14)  |  b–a korelasyonu: r = 0,71 (örtüşmeyen 6 pencere, p = 0,125 — keşifsel: örtüşmeyen pencereler de zamanda bağımlı olabilir) [tüm 53 örtüşen pencere: r = 0,73; p verilmez — pencereler bağımsız değil]Tanım: Öncel & Wilson (2007, Eş. 3) N = n/T = 10a; n = 100 olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. Kesişim aGR = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. GK74 artçı ayıklama açık. Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.",
+   "pencere": 53,
+   "gecikme1_oz_iliski": {
+    "a": {
+     "r": 0.8416540853561483,
+     "n": 5
+    },
+    "b": {
+     "r": 0.43607569166484317,
+     "n": 5
+    }
+   }
   }
  },
  "denetimler": [
@@ -107,7 +147,7 @@
   "GEÇTİ (4) marmara_gk74: tanım (Mc'deki hız), a_GR uyarısı, örtüşen r için p verilmemesi ve \"tahmin değildir\" ve tamlık kaynaklı yapay korelasyon notları var",
   "GEÇTİ (3) Tamlık basamakları: 10 karışık pencere çizilmedi; segmentler Mc 5 / 3.9 etiketli; \"farklı Mc segmentleri karşılaştırılamaz\" notu",
   "GEÇTİ (4) GK74 kapalıyken artçı tepeleri uyarısı",
-  "GEÇTİ (4) Marmara GK74 açık: pencere 124 → 53; 1999–2000 en yüksek a 3.76 → 1.50 (artçı tepesi büyük ölçüde kalkıyor); tüm seri en yüksek a 3.76 (1999-08-18) → 1.50 (2000-10-14); r(b, a) metni: r = 0,71 (örtüşmeyen 6 pencere, p = 0,125)",
+  "GEÇTİ (4) Marmara GK74 açık: pencere 124 → 53; 1999–2000 en yüksek a 3.76 → 1.50 (artçı tepesi büyük ölçüde kalkıyor); tüm seri en yüksek a 3.76 (1999-08-18) → 1.50 (2000-10-14); r(b, a) metni: r = 0,71 (örtüşmeyen 6 pencere, p = 0,125 — keşifsel: örtüşmeyen pencereler de zamanda bağımlı olabilir)",
   "GEÇTİ (5) Sayfa hatası yok (önce 0, sonra 0)"
  ],
  "ozet": {
