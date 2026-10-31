@@ -1200,6 +1200,11 @@
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <svg id="tmSvgBz" viewBox="0 0 660 175" preserveAspectRatio="xMidYMid meet" style="display:none;margin:2px auto 6px;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
+    <div id="aTsBox" style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
+      <div class="tmTitle" style="font-size:.78rem;">📈 a(t): Pencere Olay Hızı log₁₀(n/T) <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007, Eş. 3: N = n/T = 10<sup>a</sup> — b(t) ile aynı pencereler ve zaman damgası)</span></div>
+      <svg id="tmSvgA" viewBox="0 0 660 210" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
+      <div class="tmStats" id="tmStatsA">—</div>
+    </div>
     <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
       <div class="tmTitle" style="font-size:.78rem;">⚡ Kümülatif Benioff Gerinim Ölçüsü Σ√E <span style="color:#666;font-weight:400;">(log E = 11,8 + 1,5M, erg; Gutenberg &amp; Richter 1956 — sabit eşik)</span><label class="pcFig" title="Akademik posterde Benioff şekli (Şekil 3b) yer alsın mı? Poster panelindeki “Bileşenler” ile aynı ayardır." style="font-size:.68rem;font-weight:400;color:#fbbf24;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" data-pc="pcBen" onchange="posterFigToggle(this)" style="vertical-align:middle;"> 🎓 posterde</label></div>
       <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
@@ -2880,8 +2885,93 @@ function renderBtZoom(bt) {
   g += `<text x="${PL}" y="${H - 2}" fill="#8a8f98" font-size="8">gri: ${nMix} pencere M${mw.m.toFixed(1)} dahil · mor: ${nPost} artçı penceresi · tarih: pencerenin son olayı</text>`;
   svg.innerHTML = g; svg.style.display = 'block';
 }
+// a(t) — pencere olay hızı (2026-10-31). Öncel & Wilson (2007, GJI 169, s. 262, Eş. 3): N = n/T = 10^a; n = pencere olay sayısı
+// (b(t) ile aynı pencereler), T = pencerenin ilk–son olay süresi. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); G–R'nin M = 0'daki
+// kesişimi değildir. Kesişim a_GR = log₁₀(n/T) + b·Mc, b ile matematiksel olarak bağlıdır (sabit n'de yalnız b'ye bağlı değişir).
+// Tamlık basamaklarında pencerenin Mc'si: w0/w1 pencere sınırları, mcLo/mcHi pencere içindeki en küçük/en büyük olay eşiği.
+function aWinFields(win) { let lo = Infinity, hi = -Infinity; for (const it of win) { if (it.mc < lo) lo = it.mc; if (it.mc > hi) hi = it.mc; }
+  return { w0: win[0].t, w1: win[win.length - 1].t, mcLo: lo, mcHi: hi }; }
+// χ² nicelikleri (Wilson–Hilferty 1931; k = 2(n−1) ≥ 38 için göreli hata < 1e−3)
+function aChi2Q(p, k) { const z = p > 0.5 ? 1.959963985 : -1.959963985, c = 2 / (9 * k); return k * Math.pow(1 - c + z * Math.sqrt(c), 3); }
+// Bir pencerenin a değeri ve %95 aralığı. Poisson sürecinde n olay arasındaki n−1 bekleme süresinin toplamı T ~ Gamma(n−1, λ):
+// λ ∈ [χ²₀,₀₂₅(2(n−1)), χ²₀,₉₇₅(2(n−1))] / (2T). Nokta değeri yayındaki tanımla n/T (n = 100'de (n−1)/T'den 0,0044 log birimi yüksek).
+function aWinValue(n, Tyr) {
+  if (!(Tyr > 0) || n < 3) return null;
+  const k = 2 * (n - 1);
+  return { a: Math.log10(n / Tyr), lo: Math.log10(aChi2Q(0.025, k) / (2 * Tyr)), hi: Math.log10(aChi2Q(0.975, k) / (2 * Tyr)) };
+}
+// Pearson r ve iki yönlü p (Fisher z yaklaşımı; n ≥ 5)
+function aPearson(x, y) {
+  const n = x.length; if (n < 5) return null;
+  const mx = x.reduce((a, v) => a + v, 0) / n, my = y.reduce((a, v) => a + v, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0; for (let i = 0; i < n; i++) { const dx = x[i] - mx, dy = y[i] - my; sxy += dx * dy; sxx += dx * dx; syy += dy * dy; }
+  if (!(sxx > 0 && syy > 0)) return null;
+  const r = sxy / Math.sqrt(sxx * syy), z = Math.atanh(Math.max(-0.999999, Math.min(0.999999, r))) * Math.sqrt(n - 3);
+  const erfc = v => { const t = 1 / (1 + 0.5 * Math.abs(v)), e = t * Math.exp(-v * v - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277))))))))); return v >= 0 ? e : 2 - e; };
+  return { r, n, p: erfc(Math.abs(z) / Math.SQRT2) };
+}
+// a(t) noktaları: b(t) serisinden (aynı pencereler, aynı zaman damgası). Tamlık basamaklarında Mc'si karışık pencere (mcLo ≠ mcHi) çizilmez.
+function aSeriesFrom(series, NW, Mc, cs) {
+  const Y = 365.25 * 864e5;
+  return series.map(s => {
+    const w0 = s.w0 ?? s.t0, w1 = s.w1 ?? s.t1, Tyr = Number.isFinite(w0) && Number.isFinite(w1) ? (w1 - w0) / Y : (s.span || 0) / Y;
+    const mc = cs ? (s.mcLo !== undefined && Math.abs(s.mcHi - s.mcLo) < 1e-9 ? s.mcLo : null) : Mc;
+    const v = aWinValue(NW, Tyr);
+    return v ? { t: s.t, b: s.b, Tyr, mc, mixed: cs ? mc === null : false, ...v, aGR: mc !== null ? v.a + s.b * mc : null } : null;
+  }).filter(Boolean);
+}
+function renderAvalueTS(series, N, Mc, cs, t0, t1, NW, STEP) {
+  const svg = document.getElementById('tmSvgA'), st = document.getElementById('tmStatsA');
+  if (!svg || !st) return;
+  const pts = aSeriesFrom(series, NW, Mc, cs), ok = pts.filter(q => !q.mixed);
+  lastAts = { NW, step: STEP, pts, cs: !!cs };
+  if (ok.length < 2) { svg.innerHTML = `<text x="330" y="60" fill="#666" font-size="11" text-anchor="middle">a(t): çizilecek pencere yok${pts.length ? ' (tüm pencereler tamlık basamağı geçişinde)' : ''}</text>`; st.textContent = '—'; return; }
+  const W = 660, H = 210, PAD_L = 40, PAD_R = 14, PAD_T = 10, PAD_B = 22, plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
+  let yMin = Math.min(...ok.map(q => q.lo)), yMax = Math.max(...ok.map(q => q.hi)); const pad = Math.max(0.05, (yMax - yMin) * 0.06); yMin -= pad; yMax += pad;
+  const x = t => PAD_L + Math.max(0, Math.min(1, (t - t0) / (t1 - t0))) * plotW, y = v => PAD_T + plotH - (v - yMin) / (yMax - yMin) * plotH;
+  const fmt = v => v.toFixed(2).replace('.', ','), dstr = t => new Date(t).toISOString().slice(0, 10);
+  // Segmentler: Mc değişince ya da karışık pencerede çizgi kesilir
+  const segs = []; let cur = null;
+  for (const q of pts) { if (q.mixed) { cur = null; continue; } if (!cur || Math.abs(cur.mc - q.mc) > 1e-9) { cur = { mc: q.mc, p: [] }; segs.push(cur); } cur.p.push(q); }
+  let body = '';
+  const span = yMax - yMin, stepY = span > 2 ? 0.5 : span > 0.8 ? 0.2 : 0.1;
+  for (let v = Math.ceil(yMin / stepY) * stepY; v <= yMax + 1e-9; v += stepY) body += `<line x1="${PAD_L}" y1="${y(v).toFixed(1)}" x2="${W - PAD_R}" y2="${y(v).toFixed(1)}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${PAD_L - 6}" y="${(y(v) + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${v.toFixed(stepY < 0.2 ? 1 : 1)}</text>`;
+  const ticks = timeAxisTicks(t0, t1);
+  ticks.forEach((tk, i) => { const xc = x(tk.t), an = i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle';
+    body += `<line x1="${xc.toFixed(1)}" y1="${PAD_T}" x2="${xc.toFixed(1)}" y2="${PAD_T + plotH}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${xc.toFixed(1)}" y="${H - 6}" fill="#888" font-size="9" text-anchor="${an}">${tk.label}</text>`; });
+  const COL = '#a3e635';
+  segs.forEach((sg, si) => {
+    if (sg.p.length >= 2) body += `<polygon points="${sg.p.map(q => `${x(q.t).toFixed(1)},${y(q.hi).toFixed(1)}`).concat(sg.p.slice().reverse().map(q => `${x(q.t).toFixed(1)},${y(q.lo).toFixed(1)}`)).join(' ')}" fill="${COL}" fill-opacity="0.12" stroke="none"/>`;
+    body += `<polyline points="${sg.p.map(q => `${x(q.t).toFixed(1)},${y(q.a).toFixed(1)}`).join(' ')}" fill="none" stroke="${COL}" stroke-width="1.3"/>`;
+    sg.p.forEach(q => { body += `<circle cx="${x(q.t).toFixed(1)}" cy="${y(q.a).toFixed(1)}" r="1.8" fill="${COL}"><title>${dstr(q.t)} · a = log₁₀(n/T) = ${fmt(q.a)} [%95 ${fmt(q.lo)}–${fmt(q.hi)}] · n/T = ${(NW / q.Tyr).toPrecision(3)}/yıl · T = ${q.Tyr.toPrecision(3)} yıl · Mc = ${fmtM(q.mc)} · b = ${q.b.toFixed(2)} · G–R kesişimi a_GR = a + b·Mc = ${fmt(q.aGR)}</title></circle>`; });
+    if (cs && segs.length > 1) body += `<text x="${(x(sg.p[0].t) + 2).toFixed(1)}" y="${PAD_T + 9 + (si % 2) * 9}" fill="#9ab0c5" font-size="8">Mc ${fmtM(sg.mc)}</text>`;
+  });
+  const nMixed = pts.length - ok.length;
+  if (nMixed) pts.filter(q => q.mixed).forEach(q => { body += `<line x1="${x(q.t).toFixed(1)}" y1="${PAD_T + plotH - 4}" x2="${x(q.t).toFixed(1)}" y2="${PAD_T + plotH}" stroke="#f59e0b" stroke-width="0.8"/>`; });
+  body += `<line x1="${PAD_L}" y1="${PAD_T + plotH}" x2="${W - PAD_R}" y2="${PAD_T + plotH}" stroke="#555"/><line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T + plotH}" stroke="#555"/>`;
+  body += `<text x="9" y="${(PAD_T + plotH / 2).toFixed(1)}" fill="#888" font-size="8" text-anchor="middle" transform="rotate(-90 9 ${(PAD_T + plotH / 2).toFixed(1)})">a = log₁₀(n/T), T: yıl</text>`;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = body;
+  // b–a ilişkisi. Ardışık pencereler ortak olay paylaşır (örtüşme NW − adım): bağımsızlık için yalnız örtüşmeyen pencereler (her ⌈NW/adım⌉'inci) kullanılır.
+  // Tamlık basamaklarında yalnız aynı Mc segmenti içinde (farklı eşiklerin a'ları karşılaştırılamaz).
+  const k = Math.max(1, Math.ceil(NW / STEP)), xb = [], ya = []; segs.forEach(sg => { for (let i = 0; i < sg.p.length; i += k) { xb.push(sg.p[i].b); ya.push(sg.p[i].a); } });
+  const rInd = aPearson(xb, ya), rAll = aPearson(ok.map(q => q.b), ok.map(q => q.a));
+  const med = v => { const a = v.slice().sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
+  const aMin = ok.reduce((m, q) => q.a < m.a ? q : m), aMax = ok.reduce((m, q) => q.a > m.a ? q : m);
+  const decl = typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect;
+  st.innerHTML = `<div style="font-size:.85em;color:#aaa"><span style="color:${COL}">●─</span> a = log₁₀(n/T) &nbsp; <span style="color:${COL};opacity:.5">▮</span> %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) ${nMixed ? `&nbsp; <span style="color:#f59e0b">╵</span> tamlık basamağı geçişindeki pencere (çizilmedi)` : ''}</div>` +
+    `<div style="margin-top:2px">${ok.length} pencere (n = ${NW}, adım ${STEP}; b(t) ile aynı) · medyan T = ${med(ok.map(q => q.Tyr)).toPrecision(3)} yıl · a en düşük ${fmt(aMin.a)} (${dstr(aMin.t)}), en yüksek ${fmt(aMax.a)} (${dstr(aMax.t)})` +
+    (rInd ? ` &nbsp;|&nbsp; b–a korelasyonu: <b>r = ${rInd.r.toFixed(2).replace('.', ',')}</b> (örtüşmeyen ${rInd.n} pencere, p = ${rInd.p < 1e-3 ? rInd.p.toExponential(1).replace('.', ',') : rInd.p.toFixed(3).replace('.', ',')} — keşifsel: örtüşmeyen pencereler de zamanda bağımlı olabilir)` : ' &nbsp;|&nbsp; b–a korelasyonu: örtüşmeyen pencere sayısı yetersiz') +
+    (rAll ? ` <span style="color:#888">[tüm ${rAll.n} örtüşen pencere: r = ${rAll.r.toFixed(2).replace('.', ',')}; p verilmez — pencereler bağımsız değil]</span>` : '') + `</div>` +
+    `<div style="color:#9ab0c5;margin-top:2px">Tanım: Öncel &amp; Wilson (2007, Eş. 3) N = n/T = 10<sup>a</sup>; n = ${NW} olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, <b>Mc'deki yıllık olay hızıdır</b> (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. ` +
+      `Kesişim a<sub>GR</sub> = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. ` +
+      (cs ? `Tamlık basamaklarında her segment kendi Mc'sindeki hızı gösterir; farklı Mc segmentlerinin a düzeyleri karşılaştırılamaz. ` : '') +
+      (decl ? 'GK74 artçı ayıklama açık. ' : '<span style="color:#f59e0b">GK74 kapalı: artçı dizileri a(t)\'de kısa süreli hız tepeleri olarak görünür.</span> ') +
+      `Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.</div>`;
+}
+let lastAts = null;
 function renderBvalueTS(evList, Mc, cs, o = {}) {
   const STEPB = o.step || btDefaultStep(), STORE = o.store !== false, NW = BT_WIN_N;
+  if (!o.svgId) { const sa = document.getElementById('tmSvgA'), ta = document.getElementById('tmStatsA'); if (sa) sa.innerHTML = ''; if (ta) ta.textContent = '—'; lastAts = null; }
   { const lw = document.getElementById('tmWinLbl'); if (lw) lw.textContent = String(NW); }
   const svgB   = document.getElementById(o.svgId || 'tmSvgB');
   const statsB = document.getElementById(o.statsId || 'tmStatsB');
@@ -3166,7 +3256,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
           (fixed.spanFixed && fixed.spanMain && fixed.spanFixed > 3 * fixed.spanMain
             ? `<div style="color:#f59e0b;margin-top:2px">⚠ Sabit-Mc serisinin zaman çözünürlüğü ana serinin ${Math.round(fixed.spanFixed / fixed.spanMain)} katı kaba: pencere süresinden kısa b değişimlerini yakalayamaz. Gri çizginin düz kalması, pembe seride görülen kısa süreli bir değişimi çürütmez; yalnızca gri seride de görülen değişimler tamlıktan bağımsız sayılabilir.</div>` : '')
         : ` &nbsp;|&nbsp; <span style="color:#d1d5db">Sabit Mc=${fixed.mc.toFixed(1)}: N=${fixed.N} &lt; 100 — karşılaştırma serisi üretilemedi</span>`) : '') +
-    `</div>`;
+    `</div>`;  if (!o.svgId) try { renderAvalueTS(series, N, Mc, cs, t0, t1, NW, STEPB); } catch (e) { console.warn('[a(t)]', e); }
 }
 
 const SUPERSCRIPT_DIGITS = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
@@ -5624,11 +5714,11 @@ function csBvalueTimeSeries(cs, fit, step = 10, nWin = (typeof BT_WIN_N !== 'und
     const win = items.slice(i, i + N_WIN);
     if (on) {
       const r = csAkiBRange(win, fit.hi);
-      if (r) series.push({ t: bWinTime(win, it => it.t), b: r.b, ...bCiFromSym(r.b, r.se !== null ? 1.96 * r.se : null), span: win[N_WIN - 1].t - win[0].t });   // çift kesik: Fisher, simetrik (χ² burada kesin değil)
+      if (r) series.push({ t: bWinTime(win, it => it.t), b: r.b, ...bCiFromSym(r.b, r.se !== null ? 1.96 * r.se : null), span: win[N_WIN - 1].t - win[0].t, ...aWinFields(win) });   // çift kesik: Fisher, simetrik (χ² burada kesin değil)
       continue;
     }
     const b = csAkiB(win);
-    if (b !== null) series.push({ t: bWinTime(win, it => it.t), b, ...bCiFields(b, N_WIN, win.map(it => it.m - it.mc), 0.1), span: win[N_WIN - 1].t - win[0].t });
+    if (b !== null) series.push({ t: bWinTime(win, it => it.t), b, ...bCiFields(b, N_WIN, win.map(it => it.m - it.mc), 0.1), span: win[N_WIN - 1].t - win[0].t, ...aWinFields(win) });
   }
   return { series, N: items.length };
 }
