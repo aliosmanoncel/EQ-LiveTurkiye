@@ -2974,7 +2974,7 @@ function renderAvalueTS(series, N, Mc, cs, t0, t1, NW, STEP) {
   const med = v => { const a = v.slice().sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
   const aMin = ok.reduce((m, q) => q.a < m.a ? q : m), aMax = ok.reduce((m, q) => q.a > m.a ? q : m);
   const decl = typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect;
-  st.innerHTML = `<div style="font-size:.85em;color:#aaa"><span style="color:${COL}">●─</span> a = log₁₀(n/T) &nbsp; <span style="color:${COL};opacity:.5">▮</span> %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) ${nMixed ? `&nbsp; <span style="color:#f59e0b">╵</span> tamlık basamağı geçişindeki pencere (çizilmedi)` : ''}</div>` +
+  st.innerHTML = mcUyariHtml(lastMcUyari, true) + `<div style="font-size:.85em;color:#aaa"><span style="color:${COL}">●─</span> a = log₁₀(n/T) &nbsp; <span style="color:${COL};opacity:.5">▮</span> %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) ${nMixed ? `&nbsp; <span style="color:#f59e0b">╵</span> tamlık basamağı geçişindeki pencere (çizilmedi)` : ''}</div>` +
     `<div style="margin-top:2px">${ok.length} pencere (n = ${NW}, adım ${STEP}; b(t) ile aynı) · medyan T = ${med(ok.map(q => q.Tyr)).toPrecision(3)} yıl · a en düşük ${fmt(aMin.a)} (${dstr(aMin.t)}), en yüksek ${fmt(aMax.a)} (${dstr(aMax.t)})` +
     (rInd ? ` &nbsp;|&nbsp; b–a korelasyonu (keşifsel): <b>r = ${c2(rInd.r)}</b> (örtüşmeyen ${rInd.n} pencere) · <span title="Ham p: örtüşmeyen pencereleri bağımsız sayar (Fisher z, √(n − 3)). Düzeltilmiş p onun yerine geçmez; ikisi birlikte okunmalıdır.">ham p = ${pf(rInd.p)}</span> · ` +
       `<span title="Örtüşmeyen pencereler de zamanda bağımlıdır. ρ: aynı Mc segmentindeki ardışık örtüşmeyen pencerelerin gecikme-1 öz-ilişkisi. n_eff = n(1 − ρ_a·ρ_b)/(1 + ρ_a·ρ_b) (Bartlett 1935); düzeltilmiş p: Fisher z, √(n_eff − 3). Benzetimde (bağımsız AR(1) çiftleri, test_a_window.js test 8) düzeltilmiş testin hata oranı %2,5–5,1, ham testin %5–32. AR(1) dışındaki yapılarda düzeltme yetersiz kalabilir: uzun bellek (AR(2)) ve iki seride ortak yönde eğilim varken hata oranı %6–17 (analysis/a_zaman/neff_saglamlik.js). Küçük n_eff'te güç düşüktür."><span style="color:#9ab0c5">öz-ilişki (gecikme 1) ρ<sub>a</sub> = ${acA ? c2(acA.r) : '—'}, ρ<sub>b</sub> = ${acB ? c2(acB.r) : '—'} → n<sub>eff</sub> = ${nt.neff !== null ? nt.neff.toFixed(1).replace('.', ',') : '—'} · düzeltilmiş p = ${nt.p !== null ? pf(nt.p) : '—'}${nt.why ? ` (${nt.why})` : ''}</span></span>` +
@@ -2987,9 +2987,46 @@ function renderAvalueTS(series, N, Mc, cs, t0, t1, NW, STEP) {
       `Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.</div>`;
 }
 let lastAts = null;
+// Katalog tamlık (Mc uyumsuzluğu) uyarısı (2026-10-31). Hesap değiştirmez; b(t) panelinin mevcut ölçümlerini kullanır:
+//  • tek Mc: Mc(t) şeridi (kayan pencere veri Mc'si, maks. eğrilik +0,2) ve pencere başına 'inc' işareti (pencere süresinde veri Mc(t) > kullanılan Mc + 0,1).
+//    Uyarı: pencerelerin en az %5'i 'inc' ise. Önerilen ortak eşik: en yüksek veri Mc(t)'si (0,1'e yukarı yuvarlanmış).
+//  • tamlık basamakları: dönemin bütün verisinden Mc'si eşiğin CS_QC.mcGap (0,2) üstündeyse (renderCsDiag ile aynı ölçüt) YA DA dönem içindeki
+//    Mc(t) şeridinin en az 2 noktası ve %10'u eşik + 0,2'nin üstündeyse YA DA dönem içinde en az 2 yılın yıllık Mc'si (≥ 50 olaylı yıllar, csSuggest
+//    ile aynı ölçüt) eşik + 0,2'nin üstündeyse (seyrek dönemlerde 250 olaylık Mc(t) penceresi birkaç yılı kapsar; örn. 1985–1989'da yıllık Mc 4,7–4,8, eşik 4,0).
+function mcUyariDurum(o) {
+  if (o.cs) {   // dönemin bütün verisinden Mc'si YA DA dönem içindeki Mc(t) şeridi (en az 2 nokta ve %10'u eşik + gap üstünde): dönem içi değişimi de yakalar
+    const az = [];
+    (o.periods || []).forEach(p => {
+      const butun = p.mcData !== null && p.mcData !== undefined && p.mc < p.mcData - o.gap - 1e-9;
+      const pts = (o.mcSer || []).filter(m => m.t >= p.t0 && m.t < p.t1), ust = pts.filter(m => m.mc > +p.mc + o.gap + 1e-9);
+      const ici = pts.length >= 2 && ust.length >= 2 && ust.length / pts.length >= 0.1;
+      // Yıllık Mc (≥ CS_QC.minEvents olaylı yıllar; csSuggest ile aynı ölçüt): dönem içinde en az 2 yıl eşik + gap üstünde
+      const yy = (o.yillik || []).filter(q => q.t0 >= p.t0 - 864e5 && q.t1 <= p.t1 + 864e5 && q.mc > +p.mc + o.gap + 1e-9), yil = yy.length >= 2;
+      if (butun || ici || yil) az.push({ mc: +p.mc, mcData: p.mcData ?? null, t0: p.t0, t1: p.t1, mcTmax: ust.length ? Math.max(...ust.map(m => m.mc)) : null, oran: pts.length ? ust.length / pts.length : 0, nPts: pts.length,
+        ustT0: ust.length ? Math.min(...ust.map(m => m.t)) : null, ustT1: ust.length ? Math.max(...ust.map(m => m.t)) : null, yillar: yil ? yy.map(q => ({ y: q.y, mc: q.mc, n: q.n })) : [],
+        neden: [butun ? 'dönem' : null, ici ? 'Mc(t)' : null, yil ? 'yıllık' : null].filter(Boolean) });
+    });
+    return az.length ? { on: true, tur: 'basamak', donemler: az } : { on: false };
+  }
+  const ser = o.ser || [], mcs = (o.mcSer || []).map(m => m.mc).filter(Number.isFinite);
+  if (!ser.length || mcs.length < 2 || !Number.isFinite(o.Mc)) return { on: false };
+  const nInc = ser.filter(q => q.inc).length, frac = nInc / ser.length, mcMin = Math.min(...mcs), mcMax = Math.max(...mcs);
+  return frac >= 0.05 ? { on: true, tur: 'tekMc', frac, nInc, n: ser.length, mcMin, mcMax, Mc: o.Mc, oner: Math.ceil(mcMax * 10 - 1e-9) / 10 } : { on: false, frac, mcMin, mcMax };
+}
+function mcUyariHtml(d, kisa) {
+  if (!d || !d.on) return '';
+  const f = v => v.toFixed(1).replace('.', ','), yil = t => new Date(t).getUTCFullYear();
+  if (kisa) return `<div id="mcUyariA" style="color:#f59e0b;margin-bottom:3px">⚠ <b>Katalog tamlık uyarısı:</b> dönemlerin Mc'leri farklı; a(t)'deki değişimler yapay olabilir (ayrıntı b(t) panelinde).</div>`;
+  const neden = d.tur === 'tekMc'
+    ? `Veriden kestirilen Mc(t) ${f(d.mcMin)}–${f(d.mcMax)} arasında değişiyor; kullanılan Mc = ${f(d.Mc)}. Pencerelerin yaklaşık %${Math.round(100 * d.frac)} kadarı (${d.nInc} / ${d.n}) Mc(t) > Mc + 0,1 olan dönemlere düşüyor. Ortak eşik için en az Mc ≈ ${f(d.oner)} ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın).`
+    : `Basamak eşiği, o dönemin veriden kestirilen Mc'sinin belirgin biçimde altında: ${d.donemler.map(p => `${yil(p.t0)}–${yil(p.t1 - 1)}: eşik ${f(p.mc)}` + (p.mcData !== null && p.mc < p.mcData - 0.2 - 1e-9 ? `, dönemin veri Mc'si ${f(p.mcData)}` : '') + (p.mcTmax !== null && p.neden.includes('Mc(t)') ? `, Mc(t) ${yil(p.ustT0)}–${yil(p.ustT1)} arasında ${f(p.mcTmax)}'e kadar (dönemdeki Mc(t) noktalarının %${Math.round(100 * p.oran)} kadarı eşik + 0,2'nin üstünde)` : '') + (p.yillar && p.yillar.length ? `, yıllık Mc ${p.yillar.map(q => `${q.y}: ${f(q.mc)}`).join(', ')}` : '')).join('; ')}.`;
+  return `<div id="mcUyariB" style="color:#f59e0b;border:1px solid #f59e0b55;border-radius:4px;padding:3px 6px;margin-bottom:4px">⚠ <b>Katalog Tamlık Uyarısı.</b> Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. ${neden} ` +
+    `<span style="color:#d4a24a">Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir.</span></div>`;
+}
+let lastMcUyari = null;
 function renderBvalueTS(evList, Mc, cs, o = {}) {
   const STEPB = o.step || btDefaultStep(), STORE = o.store !== false, NW = BT_WIN_N;
-  if (!o.svgId) { const sa = document.getElementById('tmSvgA'), ta = document.getElementById('tmStatsA'); if (sa) sa.innerHTML = ''; if (ta) ta.textContent = '—'; lastAts = null; }
+  if (!o.svgId) { const sa = document.getElementById('tmSvgA'), ta = document.getElementById('tmStatsA'); if (sa) sa.innerHTML = ''; if (ta) ta.textContent = '—'; lastAts = null; lastMcUyari = null; }
   { const lw = document.getElementById('tmWinLbl'); if (lw) lw.textContent = String(NW); }
   const svgB   = document.getElementById(o.svgId || 'tmSvgB');
   const statsB = document.getElementById(o.statsId || 'tmStatsB');
@@ -3245,13 +3282,18 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
               adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn, cls: clsCount, ser: series.map(q => { const t0 = q.t0 ?? (q.t - (q.span || 0)), t1 = q.t1 ?? (q.t + (q.span || 0));
                 return { t: q.t, b: q.b, err: q.err, lo: q.lo, hi: q.hi, ciM: q.ciM, t0, t1, inc: !cs && Number.isFinite(Mc) && mcSeries.some(m => m.t >= t0 && m.t <= t1 && m.mc > Mc + 0.1 + 1e-9) }; }), msWin };   // inc: pencere süresinde veri Mc(t) > kullanılan Mc + 0,1 (eksik kayıt kuşkusu)
   if (STORE) lastBts = btsObj;
+  let yillikMc = null;
+  if (cs) { const by = {}; evList.forEach(e => { const y = e.time.getUTCFullYear(); (by[y] = by[y] || []).push(e); });
+    yillikMc = Object.keys(by).map(Number).filter(y => by[y].length >= CS_QC.minEvents).map(y => ({ y, n: by[y].length, mc: computeMc(by[y]), t0: Date.UTC(y, 0, 1), t1: Date.UTC(y + 1, 0, 1) })).filter(q => q.mc !== null); }
+  const mcU = mcUyariDurum({ cs: !!cs, periods: cs ? cs.periods : null, gap: CS_QC.mcGap, ser: btsObj.ser, mcSer: mcSeries, Mc, yillik: yillikMc });
+  if (!o.svgId) lastMcUyari = mcU;
   if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB };
   try { renderBtZoom(btsObj); } catch (e) { console.warn('[btzoom]', e); }
   const lastErrStr = bLast.err !== null ? bCiTxt(bLast) : '';
   // Lejant iki seviyeye ayrıldı -- "grafik açıklaması" (renk/sembol anahtarı)
   // ile "istatistik özeti" aynı satırda karışmasın (2026-09-17, kullanıcı
   // geri bildirimi). Sayılar/mantık aynı, yalnızca sunum iki satıra bölündü.
-  statsB.innerHTML =
+  statsB.innerHTML = mcUyariHtml(mcU) +
     `<div style="font-size:.85em;color:#aaa">` +
       (lineOnly ? `<span style="color:#06b6d4">─</span> Ham b-değeri (ince çizgi) &nbsp; ` : AD.on ? `<span style="color:#06b6d4">●</span> Pencere b-değeri (gösterim adımı ${STEPD}) &nbsp; ` : `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; `) +
       (rawOn ? `<span style="color:#7dd3fc;opacity:.6">─</span> Ham b(t), adım ${STEPB} (denetim katmanı) &nbsp; ` : '') +
