@@ -7,6 +7,7 @@
 //   4. a_GR = a + b·Mc kimliği; sabit n'de a_GR ile b'nin ilişkisi (hız sabitken bile güçlü korelasyon) — a_GR neden ayrı gösterge değil.
 //   5. b–a korelasyonu: H0 altında (sabit hız, sabit b) örtüşmeyen pencerelerle p < 0,05 oranı ≈ %5; örtüşen pencerelerin r dağılımı daha geniş.
 //   6. Tamlık basamakları: Mc'si karışık pencere işaretlenir, a hesaplanmaz.
+//   7. Kümelenme (artçı benzeri): %95 aralık Poisson varsayımına dayanır; kümelenmiş süreçte uzun dönem hızı kapsama oranı düşer (ölçülür).
 // Kullanım (depo kökünde): node scripts/test_a_window.js [index.html]
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -48,7 +49,7 @@ console.log('\n2. Sabit hız (λ = 20/yıl, b = 1, Mc = 3, 300 yıl; n = 100)');
   for (let r = 0; r < R; r++) { const s = seri(katalog(rnd, [[300, lam]], 1, 3), 100, 100, 3), a = X.aSeriesFrom(s, 100, 3, null);
     a.forEach(q => { tot++; bias += q.a - Math.log10(lam); if (q.lo <= Math.log10(lam) && Math.log10(lam) <= q.hi) cov++; }); }
   const se = Math.sqrt(0.95 * 0.05 / tot);
-  console.log(`     ${tot} örtüşmeyen pencere: ortalama a − log₁₀λ = ${(bias / tot).toFixed(4)} (n/T tanımının beklenen yanlılığı log₁₀(100/99) = 0,0044); kapsama %${(100 * cov / tot).toFixed(1)} (± %${(196 * se).toFixed(1)})`);
+  console.log(`     ${R} sentetik katalog (tohum 11), toplam ${tot} örtüşmeyen pencere (adım = n = 100): ortalama a − log₁₀λ = ${(bias / tot).toFixed(4)} (n/T tanımının beklenen yanlılığı log₁₀(100/99) = 0,0044); kapsama %${(100 * cov / tot).toFixed(1)} (± %${(196 * se).toFixed(1)})`);
   ok(Math.abs(bias / tot - Math.log10(100 / 99)) < 0.01, 'a yansız (n/T tanımının küçük yanlılığı dışında)');
   ok(Math.abs(cov / tot - 0.95) < 2.6 * se, '%95 aralık nominal kapsamada'); }
 
@@ -81,5 +82,18 @@ console.log('\n6. Tamlık basamakları: karışık Mc penceresi');
   ok(f.mcLo === 4.0 && f.mcHi === 4.5 && f.w0 === 0 && f.w1 === 2, 'aWinFields: pencere sınırları ve Mc aralığı');
   const s = [{ t: 1, b: 1, w0: 0, w1: Y, mcLo: 4.5, mcHi: 4.5 }, { t: 2, b: 1, w0: 0, w1: Y, mcLo: 4.0, mcHi: 4.5 }], a = X.aSeriesFrom(s, 100, null, {});
   ok(a[0].mc === 4.5 && !a[0].mixed && a[1].mixed && a[1].mc === null && a[1].aGR === null, 'tek Mc penceresi çizilir; karışık pencere işaretlenir, a_GR hesaplanmaz'); }
+
+console.log('\n7. Kümelenme: %95 aralığın Poisson varsayımı (uzun dönem hızı λ = 20/yıl, 300 yıl, 40 katalog)');
+{ // Ana olaylar Poisson (μ), her birinin K ~ Poisson(m) artçısı, gecikme üstel (ortalama 0,02 yıl ≈ 7 gün). Uzun dönem hızı λ = μ(1 + m).
+  const kume = (rnd, mu, m, d) => { const ev = []; const pois = l => { let k = 0, p = Math.exp(-l), c = p, u = rnd(); while (u > c) { k++; p *= l / k; c += p; } return k; };
+    let t = 0; for (;;) { t += -Math.log(1 - rnd()) / mu; if (t >= d) break; ev.push(t); const K = pois(m); for (let j = 0; j < K; j++) { const ta = t - 0.02 * Math.log(1 - rnd()); if (ta < d) ev.push(ta); } }
+    return ev.sort((a, b) => a - b).map(x => ({ t: x * Y, m: 3 + Math.round(-Math.log(1 - rnd()) / Math.LN10 * 10) / 10, mc: 3 })); };
+  const out = [];
+  for (const [ad, mu, m] of [['kümelenmesiz (m = 0)', 20, 0], ['orta (m = 1)', 10, 1], ['güçlü (m = 4)', 4, 4]]) {
+    const rnd = rng(15), lam = mu * (1 + m); let cov = 0, tot = 0;
+    for (let r = 0; r < 40; r++) X.aSeriesFrom(seri(kume(rnd, mu, m, 300), 100, 100, 3), 100, 3, null).forEach(q => { tot++; if (q.lo <= Math.log10(lam) && Math.log10(lam) <= q.hi) cov++; });
+    out.push([ad, cov / tot, tot]); }
+  console.log(`     uzun dönem λ'yı kapsama: ${out.map(([a, c, n]) => `${a} %${(100 * c).toFixed(1)} (${n} pencere)`).join('; ')}`);
+  ok(Math.abs(out[0][1] - 0.95) < 0.02 && out[1][1] < out[0][1] - 0.05 && out[2][1] < out[1][1], 'kümelenme arttıkça kapsama düşer: aralık yalnız Poisson (bağımsız olay) varsayımında %95; artçılar ayıklanmadıysa dar kalır'); }
 
 console.log(`\n${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);

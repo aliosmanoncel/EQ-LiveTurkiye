@@ -1,7 +1,7 @@
 // Kabul testi (2026-10-31): a(t) paneli (Öncel & Wilson 2007, Eş. 3) b(t)'nin altında.
 // Önce = verilen index.html (main), sonra = depodaki index.html. Veri yerel, ağ gerekmez.
 // Senaryolar: (A) Türkiye, ISC 1971–1997, dikdörtgen 36–42° K / 26–45° D, tek Mc; (B) aynı bölge, tamlık basamakları 1971 M ≥ 5,0 / 1990 M ≥ 3,9;
-//             (C) Marmara (40–41,5° K / 26–31° D), EMSC 1998–2026, tek Mc (1999 İzmit ve Düzce artçıları dahil).
+//             (C) Marmara (40–41,5° K / 26–31° D), EMSC 1998–2026, tek Mc (1999 İzmit ve Düzce artçıları dahil); (D) C + GK74 artçı ayıklama.
 // Denetimler: (1) b(t) grafiği ve metni, G–R metni önce = sonra; (2) a(t) pencere sayısı = b(t) pencere sayısı (karışık olanlar hariç),
 //   a = log₁₀(n/T) bağımsız hesapla aynı; (3) tamlık basamaklarında karışık pencere işaretli, segmentler Mc ile etiketli;
 //   (4) korelasyon yalnız örtüşmeyen pencerelerle p'li; tanım ve uyarı metinleri; (5) sayfa hatası yok. Ekran görüntüleri: a_tekMc.png, a_basamak.png, a_marmara.png
@@ -47,6 +47,7 @@ const SEN = {
   tekMc:   { p: [1971, 1997], r: [36, 26, 42, 45], cs: null, png: 'a_tekMc.png' },
   basamak: { p: [1971, 1997], r: [36, 26, 42, 45], cs: [['1971-01-01', '5.0'], ['1990-01-01', '3.9']], png: 'a_basamak.png' },
   marmara: { p: [1998, null], r: [40, 26, 41.5, 31], cs: null, png: 'a_marmara.png' },
+  marmara_gk74: { p: [1998, null], r: [40, 26, 41.5, 31], cs: null, gk: true, png: 'a_marmara_gk74.png' },
 };
 (async () => {
   await new Promise(r => srv.listen(0, '127.0.0.1', r));
@@ -55,7 +56,7 @@ const SEN = {
     S[ad] = {}; const hat = [];
     for (const [k, c] of Object.entries(SEN)) {
       const { p, ctx, hatalar } = await sayfa(br, yol); await p.evaluate(KUR);
-      await p.evaluate(a => __kur(...a), [c.p, ...c.r]); if (c.cs) await p.evaluate(s => __cs(s), c.cs); await p.waitForTimeout(200);
+      await p.evaluate(a => __kur(...a), [c.p, ...c.r]); if (c.cs) await p.evaluate(s => __cs(s), c.cs); if (c.gk) await p.evaluate(async () => { await toggleRegionDecluster(); applyGk74Filter(regionEvents); renderTimeMag([...events, ...liveEvents]); }); await p.waitForTimeout(200);
       S[ad][k] = await p.evaluate(() => __oku());
       if (ad === 'sonra') { const box = await p.$('#aTsBox'); await box.scrollIntoViewIfNeeded(); await box.screenshot({ path: path.join(__dirname, c.png) }); }
       hat.push(...hatalar); await ctx.close();
@@ -79,6 +80,11 @@ const SEN = {
     ok(mixed > 0 && mcs.length === 2 && /Mc 5,0|Mc 5\.0/.test(y.aSvg) && /Mc 3,9|Mc 3\.9/.test(y.aSvg) && /tamlık basamağı geçişindeki pencere/.test(y.aTxt),
       `(3) Tamlık basamakları: ${mixed} karışık pencere çizilmedi; segmentler Mc ${mcs.join(' / ')} etiketli; "farklı Mc segmentleri karşılaştırılamaz" notu`); }
   ok(/GK74 kapalı/.test(Y.marmara.aTxt), '(4) GK74 kapalıyken artçı tepeleri uyarısı');
+  { const a = Y.marmara, g = Y.marmara_gk74, top = v => v.ats.pts.reduce((m, q) => q.a > m.a ? q : m), ta = top(a), tg = top(g);
+    const izA = a.ats.pts.filter(q => q.t >= Date.UTC(1999, 7, 1) && q.t <= Date.UTC(2000, 11, 31)), izG = g.ats.pts.filter(q => q.t >= Date.UTC(1999, 7, 1) && q.t <= Date.UTC(2000, 11, 31));
+    const mx = v => v.length ? Math.max(...v.map(q => q.a)) : null;
+    ok(!/GK74 kapalı/.test(g.aTxt) && /GK74 artçı ayıklama açık/.test(g.aTxt) && g.ats.pts.length < a.ats.pts.length && mx(izG) !== null && mx(izG) < mx(izA) - 0.5,
+      `(4) Marmara GK74 açık: pencere ${a.ats.pts.length} → ${g.ats.pts.length}; 1999–2000 en yüksek a ${mx(izA).toFixed(2)} → ${mx(izG).toFixed(2)} (artçı tepesi büyük ölçüde kalkıyor); tüm seri en yüksek a ${ta.a.toFixed(2)} (${new Date(ta.t).toISOString().slice(0, 10)}) → ${tg.a.toFixed(2)} (${new Date(tg.t).toISOString().slice(0, 10)}); r(b, a) metni: ${(g.aTxt.match(/r = [^(]+\([^)]*\)/) || ['—'])[0]}`); }
   ok(!O.hatalar.length && !Y.hatalar.length, `(5) Sayfa hatası yok (önce ${O.hatalar.length}, sonra ${Y.hatalar.length})` + (Y.hatalar.length ? ': ' + Y.hatalar.join(' | ') : ''));
   const ozet = {}; for (const k of Object.keys(SEN)) ozet[k] = { metin: Y[k].aTxt, pencere: Y[k].ats.pts.length };
   fs.writeFileSync(path.join(__dirname, 'kabul_sonuc.json'), JSON.stringify({ senaryolar: SEN, sonuc: ozet, denetimler: kayit, ozet: { pass, fail } }, null, 1));

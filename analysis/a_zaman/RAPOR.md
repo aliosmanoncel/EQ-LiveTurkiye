@@ -1,10 +1,20 @@
-# a(t) paneli — pencere olay hızı (2026-10-31)
+# a(t) paneli — pencere olay hızı (2026-10-31, güncelleme 2)
 
-Dal: `a-zaman-paneli`, `main` 89cacdb'den açıldı. `main`'e birleştirilmedi.
+Dal: `a-zaman-paneli`, `main` 89cacdb'den açıldı. `main`'e birleştirilmedi; bilimsel inceleme bekliyor.
 
-## 1. Tanım
+**Güncelleme 2'de eklenenler:**
+- %95 aralık yönteminin türetimi ve varsayımı (§1.2).
+- Sentetik testlerin tekrar sayıları ve kapsama oranlarının kendi aralıkları (§3).
+- Kümelenmenin aralık kapsamasına etkisi (test 7).
+- Marmara'da GK74 açık/kapalı karşılaştırması (§4).
+- a–b ilişkisini karıştırabilecek etkenler tablosu (§5).
+- Panelin aralık açıklamasına "bağımsız olay varsayımı — artçı kümelenmesinde dar kalır" eklendi.
 
-Panel, b(t)'nin hemen altında yer alır ve b(t) ile aynı pencereleri kullanır: n = 100 olay, aynı adım, aynı zaman damgası.
+## 1. Tanım ve yöntem
+
+### 1.1 a(t)
+
+Panel, b(t)'nin altında yer alır ve b(t) ile aynı pencereleri kullanır: n = 100 olay (M ≥ Mc), aynı adım, aynı zaman damgası.
 
 Öncel & Wilson (2007, GJI 169, s. 262, Eş. 3):
 
@@ -12,80 +22,97 @@ Panel, b(t)'nin hemen altında yer alır ve b(t) ile aynı pencereleri kullanır
 N = n/T = 10^a      →      a = log₁₀(n/T)
 ```
 
-- n: pencerenin olay sayısı (M ≥ Mc).
 - T: pencerenin ilk ile son olayı arasındaki süre (yıl).
-- Bu a, **Mc'deki yıllık olay hızıdır**, yani log₁₀ λ(≥Mc).
-- G–R bağıntısının M = 0'daki kesişimi değildir.
-- Bütün katalog için hesaplanan G–R a değeriyle doğrudan karşılaştırılmaz, çünkü o değer seçilen döneme ve Mc'ye bağlıdır.
+- a, **Mc'deki yıllık olay hızıdır** (log₁₀ λ(≥Mc)); G–R bağıntısının M = 0'daki kesişimi değildir.
+- Bütün katalog için hesaplanan G–R a değeriyle doğrudan karşılaştırılmaz; o değer seçilen döneme ve Mc'ye bağlıdır.
 
-**%95 aralık:** Poisson sürecinde n olay arasındaki n−1 bekleme süresinin toplamı T ~ Gamma(n−1, λ) dağılır. Buradan:
+G–R kesişimi a_GR = a + b·Mc yalnızca nokta açıklamasında verilir; ayrı eğri olarak çizilmez (§3, test 4). Öncel & Wilson (2007) Şekil 10'daki a değerleri (7,32; 7,09; 7,94) sayıya dayalı kesişimlerdir: log₁₀ n + b·Mc. Örneğin log₁₀ 170 + 1,75 × 2,9 = 7,31.
+
+### 1.2 %95 güven aralığı
+
+**Varsayım:** Pencere içinde olaylar sabit hızlı bir Poisson süreci oluşturur; yani olaylar bağımsızdır.
+
+**Türetim:**
+1. Penceredeki n olay arasında n−1 bekleme süresi vardır. Bunlar bağımsızdır ve her biri Üstel(λ) dağılır.
+2. Toplamları T ~ Gamma(n−1, λ), dolayısıyla 2λT ~ χ²(2(n−1)).
+3. Buradan λ için kesin %95 aralığı:
 
 ```
-λ ∈ [χ²₀,₀₂₅(2(n−1)), χ²₀,₉₇₅(2(n−1))] / (2T)
+λ ∈ [ χ²₀,₀₂₅(2(n−1)) / (2T) ,  χ²₀,₉₇₅(2(n−1)) / (2T) ]
 ```
 
-χ² nicelikleri Wilson–Hilferty (1931) yaklaşımıyla hesaplanır; göreli hata < 5e−4. Nokta değeri yayındaki tanıma uyar ve n/T'dir. n = 100'de bu, (n−1)/T'den 0,0044 log birimi yüksektir.
+a için aralık bu iki sınırın log₁₀'udur. n = 100'de aralığın yarı genişliği yaklaşık ±0,087 log birimidir.
 
-**G–R kesişimi a_GR = a + b·Mc:** Yalnızca nokta açıklamasında verilir. Ayrı bir eğri olarak çizilmez, çünkü sabit n'de yapısal olarak b'ye bağlıdır (§3, test 4). Öncel & Wilson (2007) Şekil 10'daki a değerleri (7,32; 7,09; 7,94) sayıya dayalı kesişimlerdir: log₁₀ n + b·Mc. Örneğin log₁₀ 170 + 1,75 × 2,9 = 7,31.
+**Hesap:** χ² nicelikleri Wilson–Hilferty (1931) yaklaşımıyla hesaplanır: χ²_p(k) ≈ k·(1 − 2/(9k) + z_p·√(2/(9k)))³. n = 20–200 aralığında kesin değerlere göre en büyük göreli hata 4,6e−4'tür (test 1).
 
-**Tamlık basamakları etkinken:**
-- Her pencerenin olay eşikleri karşılaştırılır.
-- Mc'si karışık olan pencere (bir basamak geçişini içeren) çizilmez; eksende turuncu çentikle işaretlenir.
-- Çizgi her Mc segmentinde kesilir ve segment Mc ile etiketlenir.
-- Farklı Mc segmentlerinin a düzeyleri karşılaştırılamaz.
+**Nokta değeri:** Yayındaki tanıma uymak için n/T kullanılır. Yansız kestirici (n−1)/T'dir; n = 100'de fark 0,0044 log birimi, aralık genişliğinin yaklaşık %5'i.
 
-**b–a korelasyonu:**
-- Yalnızca örtüşmeyen pencerelerle (her ⌈n/adım⌉'ıncı pencere) Pearson r ve p (Fisher z) verilir.
-- Tamlık basamaklarında korelasyon yalnızca aynı Mc segmenti içinde hesaplanır.
-- Tüm örtüşen pencerelerin r'si bilgi olarak gösterilir, ama p verilmez (§3, test 5).
+**Geçerlilik sınırı:** Artçı kümelenmesinde olaylar bağımsız değildir. Pencereden pencereye değişim Poisson'dan büyük olur ve aralık dar kalır (test 7: orta kümelenmede kapsama %78, güçlü kümelenmede %58). Panel bunu yazar. GK74 açıkken aralık daha anlamlıdır.
 
-**Metinde yazan uyarılar:**
-- GK74 kapalıysa artçı dizileri kısa süreli hız tepeleri olarak görünür.
-- Tamlık zamanla değişiyorsa b–a korelasyonu yapay olabilir.
-- a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.
+### 1.3 Diğer kurallar
+
+- **Tamlık basamakları:** Mc'si karışık pencere (bir basamak geçişini içeren) çizilmez; eksende turuncu çentikle işaretlenir. Çizgi her Mc segmentinde kesilir ve segment Mc ile etiketlenir. Farklı Mc segmentlerinin a düzeyleri karşılaştırılamaz.
+- **b–a korelasyonu:** Yalnızca örtüşmeyen pencerelerle (her ⌈n/adım⌉'ıncı) Pearson r ve iki yönlü p (Fisher z) verilir; basamaklarda yalnızca aynı Mc segmenti içinde. Tüm örtüşen pencerelerin r'si bilgi olarak gösterilir, p verilmez (test 5).
+- **Metindeki uyarılar:** GK74 kapalıysa artçı tepeleri; tamlık değişirse yapay b–a korelasyonu; tahmin ya da öncü kanıtı değildir.
 
 ## 2. Değişiklik
 
-- `index.html`'de 96 satır değişti.
+- `index.html`'de yaklaşık 96 satır değişti.
 - Yeni fonksiyonlar: `aWinFields`, `aChi2Q`, `aWinValue`, `aPearson`, `aSeriesFrom`, `renderAvalueTS`.
 - Yeni panel: `#aTsBox`.
-- `csBvalueTimeSeries` serisine pencere sınırları ve Mc aralığı eklendi (`w0`, `w1`, `mcLo`, `mcHi`; yeni alan adları). Mevcut `t0/t1` ve b hesapları değişmedi.
-- `scripts/test_fit_range.js`: yeni yardımcı fonksiyon, `csBvalueTimeSeries`'in yanında kesilecekler listesine eklendi.
+- `csBvalueTimeSeries` serisine yeni alanlar eklendi (`w0`, `w1`, `mcLo`, `mcHi`). Mevcut `t0/t1` ve b hesapları değişmedi.
+- `scripts/test_fit_range.js`: yeni yardımcı fonksiyon, kesilecekler listesine eklendi.
 
-## 3. Birim testleri (`scripts/test_a_window.js`): 10/10
+## 3. Birim testleri (`scripts/test_a_window.js`): 11/11
 
-| Denetim | Sonuç |
-|---|---|
-| 1. χ² nicelikleri (n = 20–200) | en büyük göreli hata 4,6e−4 |
-| 2. Sabit hız (λ = 20/yıl; 2387 örtüşmeyen pencere): a − log₁₀λ | 0,0075 (beklenen 0,0044) |
-| 2. Aynı deney: %95 kapsama | %95,3 (± 0,9) |
-| 3. Hızın iki katına çıkması | a sıçraması 0,276 (beklenen 0,301) |
-| 4. Sabit hız ve sabit b'de r(b, a_GR) | 0,99: yapısal bağ |
-| 4. Aynı deneyde r(b, a) | 0,00 |
-| 5. H0 altında p < 0,05 oranı: örtüşmeyen pencerelerle | %2,3 |
-| 5. Aynı, örtüşen pencereler bağımsızmış gibi sayılırsa | %46: sahte anlamlılık |
-| 6. Karışık Mc penceresinin işaretlenmesi | geçti |
+Hepsi tohumlu üreteçle yapıldı, yani tekrarlanabilir. Köşeli parantezler, kapsama oranının kendi %95 aralığıdır (binom).
+
+| Test | Kurgu ve tekrar sayısı | Sonuç |
+|---|---|---|
+| 1. χ² nicelikleri | n = 20, 50, 100, 200; p = 0,025 ve 0,975; kesin değer seri ile | en büyük göreli hata 4,6e−4 |
+| 2. Yanlılık ve kapsama | λ = 20/yıl, b = 1, Mc = 3, 300 yıl; **40 katalog (tohum 11), 2387 örtüşmeyen pencere** | a − log₁₀λ = 0,0075 (beklenen 0,0044); **kapsama %95,3 [%94,4–%96,1]** |
+| 3. Hız değişimi | 100 yıl λ = 10, sonra 100 yıl λ = 20; 1 katalog (tohum 12), adım 10 | a sıçraması 0,276 (beklenen 0,301; tolerans 0,05) |
+| 4. a_GR ile b'nin bağı | sabit hız ve sabit b; 400 yıl, 1 katalog (tohum 13), adım 10 | r(b, a_GR) = 0,99; r(b, a) = 0,00 |
+| 5. Korelasyon testinin boyutu | H0: sabit hız, sabit b; **300 katalog (tohum 14)**, her biri ≈ 23 örtüşmeyen pencere | p < 0,05 oranı: örtüşmeyen %2,3; örtüşenler bağımsız sayılırsa %46 |
+| 6. Karışık Mc penceresi | yapay pencereler | işaretleniyor, a_GR hesaplanmıyor |
+| 7. Kümelenme | uzun dönem λ = 20/yıl, 300 yıl, **her durumda 40 katalog (tohum 15), ≈ 2380 pencere**; ana olay Poisson(μ), artçı sayısı Poisson(m), gecikme üstel (≈ 7 gün) | kapsama: m = 0 %95,1; m = 1 **%77,8**; m = 4 **%58,2** |
 
 Diğer birim testleri: 15/15 geçti (`test_fit_range.js` 37/37).
 
-## 4. Kabul testi (`kabul_a.js`, önce = main 89cacdb): 17/17
+## 4. Kabul testi (`kabul_a.js`, önce = main 89cacdb): 23/23
 
 | Senaryo | Pencere | r(b, a), örtüşmeyen | a aralığı |
 |---|---|---|---|
 | Türkiye, ISC 1971–1997, tek Mc (3,7) | 211 | 0,79 (22 pencere, p = 3e−6) | 1,34–3,83 |
 | Aynı bölge, basamaklar 1971 M ≥ 5,0 / 1990 M ≥ 3,9 | 74 (10 karışık, çizilmedi) | 0,65 (8 pencere, p = 0,083) | 0,74–3,14 |
-| Marmara, EMSC 1998–2026, tek Mc | 124 | −0,05 (13 pencere, p = 0,86) | 1,36–3,76 |
+| Marmara, EMSC 1998–2026, tek Mc, GK74 kapalı | 124 | −0,05 (13 pencere, p = 0,86) | 1,36–3,76 |
+| Marmara, aynı, **GK74 açık** | 53 | 0,71 (6 pencere, p = 0,13) | 1,18–1,50 |
 
-- b(t) grafiği, b(t) metni ve G–R metni üç senaryoda da önce = sonra.
+- Dört senaryoda b(t) grafiği, b(t) metni ve G–R metni önce = sonra.
 - a(t) değerleri bağımsız yeniden hesapla aynı (fark ≤ 4e−16).
 - Sayfa hatası 0.
-
-**Yorum notları:**
-- **Türkiye 1971–1997 tek Mc:** Güçlü pozitif korelasyon (0,79) büyük olasılıkla tamlıktan kaynaklanıyor. Mc = 3,7 dönemin başında tam değil; ağ geliştikçe hem kaydedilen hız hem b birlikte artar. Basamaklı seride korelasyon zayıflıyor ve anlamlı değil (8 pencere). Bu nedenle panele "yapay korelasyon" uyarısı eklendi.
-- **Marmara:** 1999 İzmit artçı dizisi belirgin bir hız tepesi olarak görünüyor (a = 3,76; 18 Ağustos 1999; GK74 kapalı).
-- Öncel & Wilson (2007) b ile log N korelasyonunu örtüşen 8 noktalık pencerelerde raporlamıştı (r = −0,62 ve +0,85, s. 263). Burada ise p yalnızca örtüşmeyen pencerelerle veriliyor; test 5 bunun gerekçesi.
 
 Ekran görüntüleri:
 - `a_tekMc.png`
 - `a_basamak.png`
 - `a_marmara.png`
+- `a_marmara_gk74.png`
+
+## 5. a–b ilişkisini karıştırabilecek etkenler
+
+| Etken | Etkisi | Panelde nasıl ele alınıyor |
+|---|---|---|
+| Aynı olaylardan hesaplama | a ve b aynı 100 olaydan gelir. Sabit n'de G–R kesişimi a_GR yapısal olarak b'ye bağlıdır (test 4). | Çizilen a = log₁₀(n/T), b'den yapısal olarak bağımsız (test 4: r = 0,00); a_GR yalnızca açıklamada |
+| Örtüşen pencereler | Ardışık pencereler 90 olay paylaşır; bağımsız sayılırsa sahte anlamlılık çıkar (test 5: %46) | p yalnızca örtüşmeyen pencerelerle |
+| Tamlık değişimi | Mc'nin altında kalan dönemde kaydedilen hız ve b birlikte düşer; yapay pozitif korelasyon oluşur | Uyarı metni; tamlık basamaklarıyla segmentlere bölme; Türkiye 1971–1997'de r 0,79 → 0,65 (anlamlı değil) |
+| Mc basamakları | Farklı eşiklerin hızları karşılaştırılamaz | Karışık pencere çizilmez; korelasyon segment içinde |
+| Artçı dizileri | Hız tepeleri oluşur; aralık dar kalır (test 7) | GK74 uyarısı; Marmara'da GK74 açılınca İzmit tepesi 3,76 → 1,50 |
+| Büyüklük ölçeği / dönüşüm değişimi | Ölçek değişirse Mc'deki hız ve b kayar | Kapsam dışı; Mc(t) şeridi ve büyüklük türü tanısıyla birlikte değerlendirilmeli |
+
+## 6. Gözlemler (yorum değil)
+
+1. **Marmara 1999 İzmit:** GK74 kapalıyken belirgin bir hız tepesi görünüyor (a = 3,76; 18 Ağustos 1999). GK74 açıkken 1999–2000'deki en yüksek a 1,50; tepe büyük ölçüde artçılardan oluşuyor.
+2. **Türkiye 1971–1997:** Tek Mc'deki güçlü b–a korelasyonu (r = 0,79; p = 3e−6), tamlık basamaklarıyla zayıflıyor ve anlamlılığını yitiriyor (0,65; 8 pencere; p = 0,08). İstatistiksel olarak anlamlı görünen bir ilişki katalog özelliklerinden kaynaklanabilir.
+3. **Marmara, GK74 açık:** a, 2000'de yaklaşık 1,5'ten 2020'de yaklaşık 1,2'ye yavaşça iniyor. Nedeni bu çalışmada araştırılmadı. Olası nedenler: Mc(t) değişimi, GK74'ün büyük deprem sonrası uzun zaman pencereleri, büyüklük dönüşümü. Fiziksel bir sonuç olarak yorumlanmamalı.
+
+**Temel ilke:** a(t) üretim hızındaki değişimi, b(t) büyüklük dağılımındaki değişimi gösterir. İkisi aynı pencerelerden gelir; birlikte okunurken §5'teki etkenler ayrılmalıdır.
