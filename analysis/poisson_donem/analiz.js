@@ -20,7 +20,8 @@
 // SONRADAN EKLENEN (2026-11-01, sonuçlar görüldükten sonra; testlerin kendisi değişmedi): çoklu test düzeltmesi. Tek bir birincil test önceden
 //   tanımlanmamıştı; bu yüzden 'birincil' seçilmez, önceden sabitlenen test ailelerine Holm (1979) adım-adım düzeltmesi uygulanır (FWER, bağımlılık
 //   varsayımı yok). Aileler: (a) Model 1, GK74, ham büyüklük, ml + md bölünmeleri × Türkiye + Marmara, M ≥ 4,0–6,0 (20 test); (b) aynı, Mc dahil
-//   (24 test); (c) dağılım testi, GK74, M ≥ 4,0 ve 4,5, aynı bölünme ve bölgelerin K ve S dönemleri (16 test). Ham p'ler değişmeden raporlanır.
+//   (24 test); (c) dağılım testi, GK74, M ≥ 4,0 ve 4,5, aynı bölünme ve bölgelerin K ve S dönemleri (16 test); (d) duyarlılık: (a) + (c) tek aile
+//   (36 test). Ham p'ler değişmeden raporlanır.
 // Kullanım (depo kökünde): node analysis/poisson_donem/analiz.js <disa_aktar çıktısı.json>
 'use strict';
 const fs = require('fs'), path = require('path');
@@ -118,7 +119,9 @@ R.coklu = {};
   aile('model1_gk74_M4_6', m1(false)); aile('model1_gk74_McDahil', m1(true));
   const D = []; for (const bk of ['ml', 'md']) for (const sen of ['tr_emsc', 'mar_emsc']) for (const d of R.dagilim[`${bk}|${sen}|gk74`])
     if (d.M >= 4.0 - 1e-9) D.push({ test: `${bk}|${sen}|gk74`, yillar: d.yillar, M: d.M, oran: d.oran, p: d.p });
-  aile('dagilim_gk74_M4_45', D); }
+  aile('dagilim_gk74_M4_45', D);
+  // Duyarlılık: iki aile tek bir genel iddiayı ('GK74 + sabit hız Poisson, M ≥ 4 için yeterli') birlikte destekliyorsa → tek aile, m = 36
+  aile('birlesik_model1_dagilim', [...m1(false).map(o => ({ ...o, aile: 'model1' })), ...D.map(o => ({ ...o, aile: 'dagilim' }))]); }
 fs.writeFileSync(path.join(__dirname, 'sonuc.json'), JSON.stringify(R, null, 1));
 // ── Özet ──
 const f = (v, d = 2) => v === null || v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(d), pp = v => v < 1e-4 ? v.toExponential(1) : v.toFixed(3);
