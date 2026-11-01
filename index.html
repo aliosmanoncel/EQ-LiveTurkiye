@@ -8238,6 +8238,10 @@ let regionEvents = [];      // ham EMSC olayları (Mc/b istatistiği için)
 let regionCapped  = false;  // son sorgu limite takıldı mı
 let regionOrderUsed = 'time';
 let regionWindowStart = null, regionWindowEnd = null;
+// Canlı sorguda analiz penceresinin sonu (2026-11-01): tarih kutusuna ileri bir gün girilse de T şimdiyi aşmaz. Sorgu endT ile yapılır
+// (sonuç zaten şimdiye kadardır); yalnızca T (a, λ, tekrarlanma, olasılık) için kullanılan pencere sonu sınırlanır. Tamlık hesabı (csBuild) aynı
+// sınırı zaten uyguluyordu.
+function regionClampEnd(endT, now) { return endT && now && +endT > +now ? new Date(+now) : endT; }
 let regionIsPolygon = false; // true ise regionRect aslında bir L.Polygon — fetchRegionEvents ek point-in-polygon filtresi uygular
 let regionSource = 'emsc';   // 'emsc' | 'usgs' | 'afad' — Bölge Analizi'nin KENDİ kaynak seçimi, üstteki genel Kaynak (srcSel/src) ile bağımsız (bkz. DATA FLOW NOTE)
 // Circle bölge modu — regionIsPolygon'a PARALEL, birbirini dışlayan bir bayrak (ikisi aynı anda true olmaz).
@@ -9184,7 +9188,7 @@ async function fetchRegionEventsLive(bounds, provider) {
     regionCapped = chunked ? chunked.info.anyCapped : rawCount >= limit; // ham bbox sonucu limite takıldıysa, poligon-sonrası sayı küçük olsa bile uyar
     regionOrderUsed = chunked ? 'chunked' : orderby;  // 'chunked': parçalı, time-asc; kesilme yeri başta değil parça içinde
     regionWindowStart = s;
-    regionWindowEnd = endT;
+    regionWindowEnd = regionClampEnd(endT, now);   // 2026-11-01: ileri bitiş tarihi T'ye gelecek süre eklemesin (λ = n/T)
     const orderLabel = orderby === 'magnitude' ? 'en büyük' : 'en yeni';
     const shapeLabel = regionIsPolygon ? `poligon (${evs.length}/${rawCount} bbox içinde)` : regionIsCircle ? `daire (${evs.length}/${rawCount} bbox içinde)` : `${evs.length}`;
     const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` · görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor` : '';
