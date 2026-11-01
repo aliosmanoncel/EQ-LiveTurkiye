@@ -57,10 +57,11 @@ for (const B of K.bolgeler) {
     `(4) N(≥Mc) = ${s.n}, T = ${s.T.toFixed(3)} yıl, b = ${s.b.toFixed(4)}, a = ${s.a.toFixed(4)} (${B.a_birim}), Mmax,gözl. = ${s.Mmax}`);
   // (5) sonuçlar
   if (!B.sonuc) { uy('(5) kayıtta sonuç tablosu yok'); continue; }
-  const p = ctx.cmpProb(r, s); let uyan = 0, ilk = null;
+  const est = (A.b_kestiricisi && A.b_kestiricisi.secili) || 'aki', p = ctx.cmpProb(r, s, est);
+  if (B.b_Bender !== undefined) ok(esit(s.bB, B.b_Bender) && esit(p.b, B.b_olasilikta), `(4) b kestiricisi (olasılıkta): ${est}; b_Bender = ${s.bB.toFixed(4)}, olasılıkta kullanılan b = ${p.b.toFixed(4)} — kayıttakiyle aynı`); let uyan = 0, ilk = null;
   for (const c of B.sonuc) { const q = p.cell(c.M, c.t), ayni = esit(q.lam, c.lambda) && esit(q.P, c.P) && esit(q.lo, c.alt95) && esit(q.hi, c.ust95) && esit(q.l16, c.y16) && esit(q.h84, c.y84) && esit(q.tr, c.Tr_yil) && esit(q.trT, c.Tr_T) && q.exC === c.ekstrapolasyon && q.ex === c.M_gt_Mmax_gozl;
     if (ayni) uyan++; else if (!ilk) ilk = `M ≥ ${c.M}, t = ${c.t}: P ${q.P} / ${c.P}, %95 [${q.lo}, ${q.hi}] / [${c.alt95}, ${c.ust95}]`; }
-  ok(uyan === B.sonuc.length && p.bt.B === B.bootstrap.B && p.bt.nFail === B.bootstrap.kurulamayan, `(5) ${B.sonuc.length} hücrenin ${uyan}'i aynı (λ, P, %95, 16.–84., Tr, Tr/T, sınıf); B = ${p.bt.B}, tohum ${p.bt.seed}${ilk ? ' — ilk fark: ' + ilk : ''}`);
+  ok(uyan === B.sonuc.length && p.bt.B === B.bootstrap.B && p.bt.nFail === B.bootstrap.kurulamayan, `(5) ${B.sonuc.length} hücrenin ${uyan}'i aynı (λ, P, %95, 16.–84., Tr, Tr/T, sınıf); B = ${p.bt.B}, tohum ${p.bt.seed}, b: ${est}${ilk ? ' — ilk fark: ' + ilk : ''}`);
   const c7 = B.sonuc.find(c => c.M === 7 && c.t === 50); if (c7) console.log(`     örnek: P(≥7; 50 yıl) = %${(100 * c7.P).toFixed(2)} [%95 ${(100 * c7.alt95).toFixed(2)}–${(100 * c7.ust95).toFixed(2)}], Tr = ${c7.Tr_yil.toFixed(1)} yıl (${c7.ekstrapolasyon})`);
 }
 console.log(`\n${fail ? 'KALDI' : 'GEÇTİ'}: ${pass} geçti, ${fail} kaldı, ${uyari} uyarı`); process.exit(fail ? 1 : 0);

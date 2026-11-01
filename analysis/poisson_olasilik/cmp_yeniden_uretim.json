@@ -1,20 +1,21 @@
 {
  "sema": "eqlive-poisson-olasilik-repro/1",
- "olusturma": "2026-11-01T20:36:44.629Z",
+ "olusturma": "2026-11-01T21:03:52.807Z",
  "yazilim": {
   "uygulama": "EQ-Live Türkiye",
   "modul": "poisson-olasilik 2026-11-01 (aşama 4)",
   "depo": "https://github.com/aliosmanoncel/EQ-LiveTurkiye",
-  "index_html_git_blob_sha1": "c753c1400995dc91de8fe9a8967c720e4b0c1c59",
+  "index_html_git_blob_sha1": "576507144cf00ac2192341159c5bab1e76f49cf7",
   "commit": null,
   "commit_kaynagi": "GitHub API erişilemedi: commit blob SHA ile bulunur",
-  "dogrulama": "git log --all --format=%H --find-object=c753c1400995dc91de8fe9a8967c720e4b0c1c59 -- index.html",
+  "dogrulama": "git log --all --format=%H --find-object=576507144cf00ac2192341159c5bab1e76f49cf7 -- index.html",
   "tarayici": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36"
  },
  "model": {
   "tur": "Zamandan bağımsız (sabit oranlı) Poisson; kesilmesiz Gutenberg–Richter; tek tamlık eşiği Mc; bölgenin tamamı için",
   "P": "P(≥M; t) = 1 − exp(−λ(≥M)·t)  (−expm1)",
-  "lambda": "λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc))",
+  "lambda": "λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc)); b = olasılıkta kullanılan kestirici (ayarlar.b_kestiricisi)",
+  "b_Bender": "Bender (1983) Ek A7, Mmax = ∞: b = log10(1 + ΔM/(M̄ − Mc))/ΔM (Mc ilk sınıfın merkezi)",
   "b": "Aki (1965) en çok olabilirlik, ΔM/2 düzeltmesi (Utsu 1965): b = log10(e)/(M̄ − Mc + ΔM/2)",
   "a": "a = log10(N(≥Mc)/(T·u)) + b·Mc; u birim çarpanı (a_birim)",
   "T": "(t1 − t0)/(365,25 gün)",
@@ -27,6 +28,15 @@
   }
  },
  "ayarlar": {
+  "b_kestiricisi": {
+   "secili": "aki",
+   "ad": "Aki–Utsu (referans)",
+   "referans": "aki",
+   "secenekler": [
+    "aki",
+    "bender"
+   ]
+  },
   "b_izgara_kipi": "sinif",
   "b_aralik_yontemi": "chi2",
   "birim": "1e4",
@@ -89,7 +99,7 @@
      "donusum": "none"
     },
     "gk74_surum": "gk74-ctx-frozen-2026-10-06",
-    "kayit_zamani": "2026-11-01T20:35:04.162Z",
+    "kayit_zamani": "2026-11-01T21:02:13.882Z",
     "blob": {
      "data/eq_historical.json": "879a89b948e6ca4b47eaf5b23bd3e9993452eee4"
     }
@@ -118,6 +128,8 @@
    "N_tum": 48584,
    "N_geMc": 27346,
    "b": 1.1367955606948117,
+   "b_Bender": 1.143353882158822,
+   "b_olasilikta": 1.1367955606948117,
    "sigma_b": 0.006874410533203424,
    "a": 4.577349070958964,
    "a_birim": "1e4",
@@ -137,8 +149,8 @@
    },
    "girdi_buyukluk_sha256": "cb051cde0c79562fdef2015894456fe4dd6955eebc3f0871e858c01026748af1",
    "girdi_buyukluk_kodlama": "artan sıralı, 2 ondalık, virgülle ayrılmış (reproMagsStr)",
-   "url": "http://127.0.0.1:36509/",
-   "eklenme": "2026-11-01T20:35:04.161Z",
+   "url": "http://127.0.0.1:43765/",
+   "eklenme": "2026-11-01T21:02:13.882Z",
    "girdi_buyukluklar": [
     3,
     3,
@@ -48729,7 +48741,8 @@
     "B": 2000,
     "kurulamayan": 0,
     "tohum": 20261027,
-    "ornekleyici": "NegBin (Gamma–Poisson)"
+    "ornekleyici": "NegBin (Gamma–Poisson)",
+    "b_kestiricisi": "aki"
    },
    "sonuc": [
     {
@@ -48933,7 +48946,7 @@
      "donusum": "none"
     },
     "gk74_surum": "gk74-ctx-frozen-2026-10-06",
-    "kayit_zamani": "2026-11-01T20:35:49.818Z",
+    "kayit_zamani": "2026-11-01T21:02:58.134Z",
     "blob": {
      "data/eq_historical.json": "879a89b948e6ca4b47eaf5b23bd3e9993452eee4"
     }
@@ -48962,6 +48975,8 @@
    "N_tum": 1283,
    "N_geMc": 624,
    "b": 1.0007376540163455,
+   "b_Bender": 1.005201292398758,
+   "b_olasilikta": 1.0007376540163455,
    "sigma_b": 0.04006156824521786,
    "a": 3.6929947833814496,
    "a_birim": "1e4",
@@ -48979,8 +48994,8 @@
    },
    "girdi_buyukluk_sha256": "212cf258b5a7b13504c524e06bbe084d7356bd652120954422482dd8e92b265d",
    "girdi_buyukluk_kodlama": "artan sıralı, 2 ondalık, virgülle ayrılmış (reproMagsStr)",
-   "url": "http://127.0.0.1:36509/",
-   "eklenme": "2026-11-01T20:35:49.818Z",
+   "url": "http://127.0.0.1:43765/",
+   "eklenme": "2026-11-01T21:02:58.134Z",
    "girdi_buyukluklar": [
     3,
     3.2,
@@ -50270,7 +50285,8 @@
     "B": 2000,
     "kurulamayan": 0,
     "tohum": 20261027,
-    "ornekleyici": "NegBin (Gamma–Poisson)"
+    "ornekleyici": "NegBin (Gamma–Poisson)",
+    "b_kestiricisi": "aki"
    },
    "sonuc": [
     {
@@ -50474,7 +50490,7 @@
      "donusum": "none"
     },
     "gk74_surum": "gk74-ctx-frozen-2026-10-06",
-    "kayit_zamani": "2026-11-01T20:36:34.732Z",
+    "kayit_zamani": "2026-11-01T21:03:42.950Z",
     "blob": {
      "data/eq_historical.json": "879a89b948e6ca4b47eaf5b23bd3e9993452eee4"
     }
@@ -50503,6 +50519,8 @@
    "N_tum": 7987,
    "N_geMc": 5007,
    "b": 0.9904181052080725,
+   "b_Bender": 0.994744361475533,
+   "b_olasilikta": 0.9904181052080725,
    "sigma_b": 0.013996832811908536,
    "a": 4.323952409425922,
    "a_birim": "1e4",
@@ -50522,8 +50540,8 @@
    },
    "girdi_buyukluk_sha256": "ae355a71a019afae0c8ef42bee47d6bd910609b1fa3e72b96c0dbe910f1fbcf7",
    "girdi_buyukluk_kodlama": "artan sıralı, 2 ondalık, virgülle ayrılmış (reproMagsStr)",
-   "url": "http://127.0.0.1:36509/",
-   "eklenme": "2026-11-01T20:36:34.732Z",
+   "url": "http://127.0.0.1:43765/",
+   "eklenme": "2026-11-01T21:03:42.950Z",
    "girdi_buyukluklar": [
     3,
     3,
@@ -58517,7 +58535,8 @@
     "B": 2000,
     "kurulamayan": 0,
     "tohum": 20261027,
-    "ornekleyici": "NegBin (Gamma–Poisson)"
+    "ornekleyici": "NegBin (Gamma–Poisson)",
+    "b_kestiricisi": "aki"
    },
    "sonuc": [
     {

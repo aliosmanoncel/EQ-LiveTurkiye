@@ -2626,6 +2626,15 @@ function computeMcSrc(evList) {
 // basılmış, ancak bu ln(10) ile log10(e)=1/ln(10) karışıklığı (dizgi hatası) —
 // makalenin kendi raporladığı b=1.87 sonucu yalnızca 0.4343 sabitiyle tutarlı.
 // dm: büyüklük ızgara aralığı (varsayılan 0,1); dönüştürülmüş büyüklüklerde mcScale().dm (2026-10-18)
+// Bender (1983, BSSA 73(3), Ek Denk. A7 / Denk. 10, Mmax = ∞): gruplanmış (ΔM) büyüklüklerde kesin en çok olabilirlik. Mc = ilk sınıfın MERKEZİ
+// (Bender'in m_min'i = Mc − ΔM/2): q/(1 − q) = K̄ = (M̄ − Mc)/ΔM, q = 10^(−bΔM) ⇒ b = log₁₀(1 + ΔM/(M̄ − Mc))/ΔM. ΔM → 0'da Aki'ye iner.
+// 2026-11-01: ALTERNATİF kestirici; referans computeBvalue (Aki–Utsu) değişmedi. Karşılaştırma: analysis/b_kestirici/RAPOR.md.
+function bBenderK(Kb, dm) { return Kb > 0 ? Math.log10(1 + 1 / Kb) / dm : null; }
+function computeBvalueBender(mags, Mc, dm = 0.1) {
+  const sub = mags.filter(m => m >= Mc - 1e-9);
+  if (sub.length < 10) return null;
+  return bBenderK((sub.reduce((a, b) => a + b, 0) / sub.length - Mc) / dm, dm);
+}
 function computeBvalue(mags, Mc, dm = 0.1) {
   const sub = mags.filter(m => m >= Mc - 1e-9);
   if (sub.length < 10) return null;
@@ -3646,18 +3655,18 @@ async function cmpReproRecord(S, PR, opt) {
     const kat = r.kat ? { ...r.kat, blob: r.kat.blob || await reproKatBlobs(r.kat) } : { tur: 'bilinmiyor (aşama 4 öncesi eklenmiş kayıt)', kaynak: r.src };
     bolgeler.push({ panel: String.fromCharCode(97 + i), ad: r.name, katalog: kat, bolge: { tanim: r.shape, geometri: r.geom || null, alan_km2: r.area, merkez_enlem: r.cLat },
       donem: { t0: new Date(r.t0).toISOString(), t1: new Date(r.t1).toISOString(), t0_ms: r.t0, t1_ms: r.t1, T_yil: s.T }, Mc: r.Mc, dM: r.dm || 0.1,
-      N_tum: r.mags.length, N_geMc: s.n, b: s.b, sigma_b: s.sb, a: s.a, a_birim: unit, birim_carpani_u: s.u, Mmax_gozl: s.Mmax, gk74: r.gk74 ?? null, mc_uyari: r.mcU ?? null, tur_uyari: r.turU ?? null,
+      N_tum: r.mags.length, N_geMc: s.n, b: s.b, b_Bender: s.bB, b_olasilikta: p ? p.b : null, sigma_b: s.sb, a: s.a, a_birim: unit, birim_carpani_u: s.u, Mmax_gozl: s.Mmax, gk74: r.gk74 ?? null, mc_uyari: r.mcU ?? null, tur_uyari: r.turU ?? null,
       buyukluk_turleri: r.types, girdi_buyukluk_sha256: await reproSha256(ms), girdi_buyukluk_kodlama: 'artan sıralı, 2 ondalık, virgülle ayrılmış (reproMagsStr)', url: r.url, eklenme: r.added || null,
       ...(opt.buyukluksuz ? {} : { girdi_buyukluklar: r.mags }),
-      bootstrap: p ? { B: p.bt.B, kurulamayan: p.bt.nFail, tohum: p.bt.seed, ornekleyici: p.bt.sampler } : null,
+      bootstrap: p ? { B: p.bt.B, kurulamayan: p.bt.nFail, tohum: p.bt.seed, ornekleyici: p.bt.sampler, b_kestiricisi: p.est } : null,
       sonuc: !p || opt.sonucsuz ? null : CMP_PROB.M.flatMap(M => tAll.map(t => { const c = p.cell(M, t); return { M, t, lambda: c.lam, P: c.P, alt95: c.lo, ust95: c.hi, y16: c.l16, y84: c.h84, Tr_yil: c.tr, Tr_T: c.trT, ekstrapolasyon: c.exC, M_gt_Mmax_gozl: c.ex }; })),
       sinir_buyuklukleri: s.b ? { Tr_esit_T: cmpProbMk(s.n, s.b, r.Mc, 1), Tr_esit_kT: cmpProbMk(s.n, s.b, r.Mc, CMP_PROB.exK), k: CMP_PROB.exK } : null }); }
   return { sema: REPRO.sema, olusturma: new Date().toISOString(), yazilim: sw,
     model: { tur: 'Zamandan bağımsız (sabit oranlı) Poisson; kesilmesiz Gutenberg–Richter; tek tamlık eşiği Mc; bölgenin tamamı için', P: 'P(≥M; t) = 1 − exp(−λ(≥M)·t)  (−expm1)',
-      lambda: 'λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc))', b: 'Aki (1965) en çok olabilirlik, ΔM/2 düzeltmesi (Utsu 1965): b = log10(e)/(M̄ − Mc + ΔM/2)', a: 'a = log10(N(≥Mc)/(T·u)) + b·Mc; u birim çarpanı (a_birim)',
+      lambda: 'λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc)); b = olasılıkta kullanılan kestirici (ayarlar.b_kestiricisi)', b_Bender: 'Bender (1983) Ek A7, Mmax = ∞: b = log10(1 + ΔM/(M̄ − Mc))/ΔM (Mc ilk sınıfın merkezi)', b: 'Aki (1965) en çok olabilirlik, ΔM/2 düzeltmesi (Utsu 1965): b = log10(e)/(M̄ − Mc + ΔM/2)', a: 'a = log10(N(≥Mc)/(T·u)) + b·Mc; u birim çarpanı (a_birim)',
       T: '(t1 − t0)/(365,25 gün)', Tr: 'Tr = 1/λ(≥M)', ekstrapolasyon: `Tr ≤ T gözlem; T < Tr ≤ ${CMP_PROB.exK}T uzatma; Tr > ${CMP_PROB.exK}T yüksek`,
       Mmax: { varsayim: 'yok — kesilmesiz G–R (üst sınır uygulanmaz)', kaynak: 'uygulanmadı', not: 'Mmax_gozl yalnız ekstrapolasyon işareti (M > Mmax,gözl.) için kullanılır; kesik G–R (Kijko–Sellevoll) aşama 5, plan.' } },
-    ayarlar: { b_izgara_kipi: typeof B_GRID_MODE !== 'undefined' ? B_GRID_MODE : null, b_aralik_yontemi: typeof B_CI_METHOD !== 'undefined' ? B_CI_METHOD : null, birim: unit,
+    ayarlar: { b_kestiricisi: { secili: CMP_B_EST, ad: CMP_B_EST_AD[CMP_B_EST].tr, referans: 'aki', secenekler: ['aki', 'bender'] }, b_izgara_kipi: typeof B_GRID_MODE !== 'undefined' ? B_GRID_MODE : null, b_aralik_yontemi: typeof B_CI_METHOD !== 'undefined' ? B_CI_METHOD : null, birim: unit,
       olasilik: { M: CMP_PROB.M, t_tablo: CMP_PROB.t, t_sekil: CMP_PROB.tFig, exK: CMP_PROB.exK, egri_adimi_dM: CMP_FIG.dM, bant: cmpProbFigBand === '68' ? '16.–84. yüzdelik' : '%95 (2,5.–97,5. yüzdelik)' },
       bootstrap: { B: GR_POIS.B, tohum: GR_POIS.seed, ornekleyici: 'grBootDraws: n* ~ Poisson(n); S | n* ~ NegBin(n*, 1 − 10^(−bΔM)) = Poisson(Gamma(n*, q/(1 − q))); b* = log10e/(ΔM·S/n* + ΔM/2); n* < 10 reddedilir',
         rng: 'mulberry32 (tohum), her bölge için tohumdan yeniden başlar', poisson: `Knuth (μ < ${GR_QC.poissonKnuthMax}) / PTRS (Hörmann 1993)`, gamma: 'Marsaglia ve Tsang (2000)', yuzdelik: 'grPctl: doğrusal ara değerleme, (n − 1)·q', kanit: 'analysis/poisson_olasilik/NEGBIN_esdegerlik.md' } },
@@ -3683,7 +3692,8 @@ function cmpStats(r) {
   const cnt = M => r.mags.filter(m => m >= M - 1e-9).length, Mmax = Math.max(...r.mags);
   const tr6 = a !== null ? 1 / (Math.pow(10, a - 6 * b) * u) : null;
   const ci = b ? bCiFields(b, n, sub.map(m => m - r.Mc), r.dm || 0.1) : null;   // 2026-10-25: %95 aralık (normal kipte gösterilmez, eski ± σ kalır)
-  return { T, u, n, b, sb, ci, gridOff: gM.nOff, a, N5: cnt(5), N6: cnt(6), Mmax, tr6, lam5: T > 0 ? cnt(5) / (T * u) : null, unit, small: n < 50, extrap: Mmax < 6 };
+  const bB = r.Mc === null ? null : computeBvalueBender(mg, r.Mc, r.dm || 0.1);   // 2026-11-01: alternatif kestirici (yalnız olasılık modülü ve karşılaştırma satırı)
+  return { T, u, n, b, bB, sb, ci, gridOff: gM.nOff, a, N5: cnt(5), N6: cnt(6), Mmax, tr6, lam5: T > 0 ? cnt(5) / (T * u) : null, unit, small: n < 50, extrap: Mmax < 6 };
 }
 // ══ Poisson aşılma olasılığı — bölge karşılaştırması (2026-11-01; analysis/poisson_olasilik/PLAN_olasilik_modulu.md) ══════════════════════════
 // Model: λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc)) — tablodaki "M≥6 tekrarlanma" (tr6 = 1/λ(≥6)) ile aynı model: kesilmesiz G–R, Aki–Utsu b, tek Mc,
@@ -3696,17 +3706,22 @@ const CMP_PROB = { M: [5, 6, 7], t: [10, 50, 100], tFig: [10, 25, 50, 100], exK:
 // beklenen olay sayısı μ = λT = T/Tr ile tanımlıdır: 'gozlem' Tr ≤ T (μ ≥ 1; gözlem süresiyle karşılaştırılabilir), 'uzatma' T < Tr ≤ exK·T
 // (G–R gözlem süresinin ötesine uzatılıyor), 'yuksek' Tr > exK·T (μ < 1/exK; yüksek ekstrapolasyon belirsizliği). exK = 10 (bir büyüklük mertebesi)
 // bir uzlaşımdır, literatürde sabit bir eşik yoktur (PLAN §11). Sınır büyüklükleri kapalı biçimde: Tr = k·T ⇔ M = Mc + (log₁₀N + log₁₀k)/b.
-function cmpProbBoot(n, T, b, Mc, dm) {
-  const key = [n, T, b, Mc, dm, GR_POIS.B].join('|'); if (cmpProbCache.has(key)) return cmpProbCache.get(key);
-  const o = grBootDraws(n, b, Mc, dm, GR_POIS.B, GR_POIS.seed); if (cmpProbCache.size > 20) cmpProbCache.clear(); cmpProbCache.set(key, o); return o;
+// b kestiricisi (2026-11-01, kullanıcı kararı): Aki–Utsu referans ve varsayılan; Bender (1983) seçilebilir alternatif. Seçim olasılık tablosunu,
+// Tr/T sınıfını, yayın şeklini ve yeniden üretim kaydını belirler; katalog, Mc, dönem, N değişmez. Mevcut b satırları (Aki–Utsu) değişmez.
+let CMP_B_EST = (() => { try { return new URLSearchParams(location.search).get('best') === 'bender' ? 'bender' : 'aki'; } catch (e) { return 'aki'; } })();
+const CMP_B_EST_AD = { aki: { tr: 'Aki–Utsu (referans)', en: 'Aki–Utsu (reference)', kisa: 'Aki–Utsu' }, bender: { tr: 'Bender (1983)', en: 'Bender (1983)', kisa: 'Bender' } };
+function cmpProbBoot(n, T, b, Mc, dm, est) {
+  const key = [n, T, b, Mc, dm, GR_POIS.B, est || 'aki'].join('|'); if (cmpProbCache.has(key)) return cmpProbCache.get(key);
+  const o = grBootDraws(n, b, Mc, dm, GR_POIS.B, GR_POIS.seed, est); if (cmpProbCache.size > 20) cmpProbCache.clear(); cmpProbCache.set(key, o); return o;
 }
 function cmpProbAt(D, T, Mc, M, t, qs) { const P = D.map(([ns, bs]) => grPoissonP(grLambdaSimple(ns, T, bs, Mc, M), t)); return qs.map(q => grPctl(P, q)); }
-function cmpProb(r, s) {
-  if (!s || !s.b || !(s.T > 0) || r.Mc === null || !(s.n >= 10)) return null;
-  const bt = cmpProbBoot(s.n, s.T, s.b, r.Mc, r.dm || 0.1);
-  const cell = (M, t) => { const lam = grLambdaSimple(s.n, s.T, s.b, r.Mc, M), [lo, l16, h84, hi] = cmpProbAt(bt.D, s.T, r.Mc, M, t, [0.025, 0.16, 0.84, 0.975]);
+function cmpProb(r, s, est) {
+  est = est || CMP_B_EST; const b0 = s ? (est === 'bender' ? s.bB : s.b) : null;
+  if (!s || !b0 || !(s.T > 0) || r.Mc === null || !(s.n >= 10)) return null;
+  const bt = cmpProbBoot(s.n, s.T, b0, r.Mc, r.dm || 0.1, est);
+  const cell = (M, t) => { const lam = grLambdaSimple(s.n, s.T, b0, r.Mc, M), [lo, l16, h84, hi] = cmpProbAt(bt.D, s.T, r.Mc, M, t, [0.025, 0.16, 0.84, 0.975]);
     return { M, t, lam, P: grPoissonP(lam, t), lo, l16, h84, hi, ex: M > s.Mmax + 1e-9, ...cmpProbExtrap(lam, s.T) }; };
-  return { cell, bt };
+  return { cell, bt, est, b: b0 };
 }
 function cmpProbExtrap(lam, T) {   // { tr, trT, exC }: Tr = 1/λ, Tr/T, sınıf ('gozlem' | 'uzatma' | 'yuksek')
   if (!(lam > 0) || !(T > 0)) return { tr: null, trT: null, exC: null };
@@ -3728,7 +3743,8 @@ function cmpProbWarn(r, s) {
   else if (r.turU === undefined) y('tür geçişi bilinmiyor (eski kayıt)', '#94a3b8');
   const nT = Object.values(r.types || {}).reduce((a, v) => a + v, 0), mb = nT ? (r.types.mb || 0) / nT : 0;
   if (mb >= 0.5) y(`mb %${Math.round(100 * mb)}: mb doygunluğu nedeniyle M ≥ 6 eksik sayılabilir`);
-  if (s && s.b && s.T > 0 && r.Mc !== null) for (const Mp of CMP_PROB.M) { const e = cmpProbExtrap(grLambdaSimple(s.n, s.T, s.b, r.Mc, Mp), s.T); if (e.exC === 'gozlem' || !e.exC) continue;
+  const bW = s ? (CMP_B_EST === 'bender' ? s.bB : s.b) : null;
+  if (s && bW && s.T > 0 && r.Mc !== null) for (const Mp of CMP_PROB.M) { const e = cmpProbExtrap(grLambdaSimple(s.n, s.T, bW, r.Mc, Mp), s.T); if (e.exC === 'gozlem' || !e.exC) continue;
     const k = CMP_EX[e.exC]; y(`${k.sym} M≥${Mp}: Tr ≈ ${cmpTr(e.tr)} yıl, T = ${s.T.toFixed(1).replace('.', ',')} yıl (Tr/T = ${cmpTrT(e.trT)}) — ${k.tr.slice(k.tr.indexOf(':') + 2)}`, k.col); }
   if (s && Number.isFinite(s.Mmax) && s.Mmax < Math.max(...CMP_PROB.M)) y(`ᵉ M > gözlenen Mmax (${s.Mmax.toFixed(1)}): ekstrapolasyon`);
   return w.join('<br>');
@@ -3786,9 +3802,13 @@ function cmpRender() {
       return P === null ? '—' : `<span title="P: iki b'nin aynı olduğu hipotezi altında olasılık; P &lt; 0,05 → b farkı anlamlı (%95). Küçük N'de anlamsız sonuç 'fark yok' demek değildir: güç düşüktür." style="color:${P < 0.05 ? '#fbbf24' : '#cbd5e1'}">${P < 0.001 ? '&lt; 0,001' : P.toFixed(3).replace('.', ',')}${P < 0.05 ? ' (anlamlı)' : ''}</span>`; }]] : []),
     ['Mmax', (r, s) => f(s.Mmax, 1)], ['N(≥5) / N(≥6)', (r, s) => `${s.N5} / ${s.N6}`], [`λ(≥5) ${uLab}`, (r, s) => ex(s.lam5)],
     ['M≥6 tekrarlanma (yıl, tüm bölge)', (r, s) => s.tr6 ? ex(s.tr6) + (s.extrap ? ' (ekstrapolasyon)' : '') : '—'],
-    ...CMP_PROB.M.map(Mp => [`P(≥${Mp}; t), % [%95] — Poisson, tüm bölge`, (r, s, i) => { const p = PR[i]; if (!p) return '—';
+    [`b [%95 bootstrap] — ${CMP_B_EST_AD.aki.tr} / ${CMP_B_EST_AD.bender.tr}`, (r, s) => { const A = cmpProb(r, s, 'aki'), Bn = cmpProb(r, s, 'bender'); if (!A || !Bn) return '—';
+      const ci = p => { const v = p.bt.D.map(d => d[1]); return `${p.b.toFixed(3)} [${grPctl(v, 0.025).toFixed(3)}–${grPctl(v, 0.975).toFixed(3)}]`; }, w = (est, txt) => est === CMP_B_EST ? `<b>${txt}</b>` : txt;
+      const p7 = p => { const c = p.cell(7, 50); return `${cmpPc(c.P)} [${cmpRng(c.lo, c.hi)}]`; };
+      return `<span style="white-space:nowrap">${w('aki', 'Aki–Utsu: ' + ci(A))}</span><br><span style="white-space:nowrap">${w('bender', 'Bender: ' + ci(Bn))}</span><br><span style="white-space:nowrap;color:#94a3b8">P(≥7; 50 yıl): ${w('aki', p7(A))} / ${w('bender', p7(Bn))}</span>`; }],
+    ...CMP_PROB.M.map(Mp => [`P(≥${Mp}; t), % [%95] — Poisson, tüm bölge, b: ${CMP_B_EST_AD[CMP_B_EST].kisa}`, (r, s, i) => { const p = PR[i]; if (!p) return '—';
       return CMP_PROB.t.map(t => { const c = p.cell(Mp, t); const k = CMP_EX[c.exC]; return `<span style="white-space:nowrap${c.ex ? ';font-style:italic' : ''}" title="λ(≥${Mp}) = ${c.lam.toExponential(3)} /yıl; Tr = ${cmpTr(c.tr)} yıl, Tr/T = ${c.trT.toFixed(2).replace('.', ',')}; 16.–84. yüzdelik: ${cmpRng(c.l16, c.h84)}">${t} yıl: <b>${cmpPc(c.P)}</b> [${cmpRng(c.lo, c.hi)}]${c.ex ? ' ᵉ' : ''}${k ? ` <span style="color:${k.col}">${k.sym}</span>` : ''}</span>`; }).join('<br>'); }]),
-    ['Tr(≥M) / T — ekstrapolasyon (Tr = 1/λ)', (r, s, i) => { const p = PR[i]; if (!p) return '—';
+    [`Tr(≥M) / T — ekstrapolasyon (Tr = 1/λ), b: ${CMP_B_EST_AD[CMP_B_EST].kisa}`, (r, s, i) => { const p = PR[i]; if (!p) return '—';
       return CMP_PROB.M.map(Mp => { const c = p.cell(Mp, CMP_PROB.t[0]), k = CMP_EX[c.exC]; return `<span style="white-space:nowrap">M≥${Mp}: ${cmpTr(c.tr)} yıl (Tr/T = ${c.trT < 0.1 ? '&lt; 0,1' : cmpTrT(c.trT)})${k ? ` <span style="color:${k.col}">${k.sym}</span>` : ''}</span>`; }).join('<br>'); }],
     ['Olasılık uyarıları', (r, s) => cmpProbWarn(r, s)],
     ['GNSS istasyonu (MIDAS)', (r, s, i) => M[i].geo !== null ? `${M[i].nSt} (rms ${f(M[i].st.rms, 1)} mm/yıl)` : `${M[i].nSt ?? '—'}${M[i].geoWhy ? ` <span style="color:#f59e0b">${M[i].geoWhy}</span>` : ''}`],
@@ -3802,7 +3822,7 @@ function cmpRender() {
   tbl.innerHTML = `<table style="border-collapse:collapse;width:100%;font-size:.95em;margin-top:4px;"><tr><th ${th}></th>${CMP.map((r, i) => `<th ${th}><span style="color:${CMP_COL[i]}">■</span> ${r.name.replace(/</g, '&lt;')}</th>`).join('')}</tr>` +
     rows.map(([k, fn]) => `<tr><td ${td} style="color:#94a3b8">${k}</td>${CMP.map((r, i) => `<td ${td}>${fn(r, S[i], i)}</td>`).join('')}</tr>`).join('') + '</table>' +
     `<div style="color:#666;margin-top:3px;">Oranlar ${uLab} biriminde (Ambraseys 2006 yaklaşımı); a, ${aLab} doğrusunun M = 0'daki kesişimidir (Ambraseys 2006, Eş. 3: log(N/y·a) = α − β·M), olay sayısı değildir. Moment oranları tüm bölge içindir: jeodezik Savage & Simpson (1997), H = ${cmpParams().H} km, μ = ${cmpParams().mu / 1e9} GPa; sismik Kostrov (1974) toplamı ve kesik G–R (Hyndman & Weichert 1983); kenetlenme = sismik ÷ jeodezik (Sparacino vd. 2022). Kısa katalog süresi kenetlenmeyi olduğundan düşük gösterebilir. a, Mc'deki gözlenen orandan; tekrarlanma süresi G–R doğrusundan, tüm bölge alanı için. Retrospektif; tehlike değerlendirmesi değildir.</div>` +
-    `<div style="color:#94a3b8;margin-top:3px;"><b>Poisson modeli: sabit oranlı, zamandan bağımsız istatistiksel olasılık. Deprem tahmini değildir.</b> P(≥M; t) = 1 − e^(−λt), λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc)): tekrarlanma süresiyle aynı model (kesilmesiz G–R, tek Mc), bölgenin tamamı için (ör. Alkan vd. 2025). [%95]: a ve b'nin ortak parametrik bootstrap'ı (${[...new Set(PR.filter(Boolean).map(p => p.bt.B))].length > 1 ? 'tekrar sayısı bölgeye göre: ' + CMP.map((r, i) => PR[i] ? `${r.name.replace(/</g, '&lt;')} ${PR[i].bt.B}` : null).filter(Boolean).join(', ') : (PR.find(Boolean) ? PR.find(Boolean).bt.B : GR_POIS.B) + ' tekrar'}, tohum ${GR_POIS.seed}); imleç üzerinde 16.–84. yüzdelik. Ekstrapolasyon, Tr = 1/λ(≥M) ile katalog süresi T karşılaştırılarak: işaretsiz Tr ≤ T (gözlem süresiyle karşılaştırılabilir); † T < Tr ≤ ${CMP_PROB.exK}T (G–R gözlem süresinin ötesine uzatıldı); ‡ Tr > ${CMP_PROB.exK}T (yüksek ekstrapolasyon belirsizliği). ${CMP_PROB.exK}T sınırı evrensel bir bilimsel eşik değil, ekstrapolasyon belirsizliğini sınıflandırmak için kullanılan operasyonel bir ölçüttür. ᵉ, italik: M gözlenen en büyük büyüklüğün üstünde. Olay bağımsızlığı varsayılır; GK74 bunu garanti etmez.</div>`;
+    `<div style="color:#94a3b8;margin-top:3px;"><b>Poisson modeli: sabit oranlı, zamandan bağımsız istatistiksel olasılık. Deprem tahmini değildir.</b> P(≥M; t) = 1 − e^(−λt), λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc)): tekrarlanma süresiyle aynı model (kesilmesiz G–R, tek Mc), bölgenin tamamı için (ör. Alkan vd. 2025). b kestiricisi (olasılık satırları ve şekil): <b>${CMP_B_EST_AD[CMP_B_EST].tr}</b>; üstteki b satırları Aki–Utsu (referans), yan yana satır iki kestiriciyi aynı katalog, Mc ve dönemle verir (Bender 1983, gruplanmış veri en çok olabilirlik). [%95]: a ve b'nin ortak parametrik bootstrap'ı (${[...new Set(PR.filter(Boolean).map(p => p.bt.B))].length > 1 ? 'tekrar sayısı bölgeye göre: ' + CMP.map((r, i) => PR[i] ? `${r.name.replace(/</g, '&lt;')} ${PR[i].bt.B}` : null).filter(Boolean).join(', ') : (PR.find(Boolean) ? PR.find(Boolean).bt.B : GR_POIS.B) + ' tekrar'}, tohum ${GR_POIS.seed}); imleç üzerinde 16.–84. yüzdelik. Ekstrapolasyon, Tr = 1/λ(≥M) ile katalog süresi T karşılaştırılarak: işaretsiz Tr ≤ T (gözlem süresiyle karşılaştırılabilir); † T < Tr ≤ ${CMP_PROB.exK}T (G–R gözlem süresinin ötesine uzatıldı); ‡ Tr > ${CMP_PROB.exK}T (yüksek ekstrapolasyon belirsizliği). ${CMP_PROB.exK}T sınırı evrensel bir bilimsel eşik değil, ekstrapolasyon belirsizliğini sınıflandırmak için kullanılan operasyonel bir ölçüttür. ᵉ, italik: M gözlenen en büyük büyüklüğün üstünde. Olay bağımsızlığı varsayılır; GK74 bunu garanti etmez.</div>`;
   try { cmpProbFigRender(S, PR); } catch (e) { console.warn('[cmpProbFig]', e); }   // yayın şekli (olasılık eğrileri); hata tabloyu etkilemez
 }
 // ══ Yayın şekli: Poisson aşılma olasılığı eğrileri (2026-11-01) ═══════════════════════════════════════════════════════════════════════════════
@@ -3861,7 +3881,7 @@ function cmpProbFigSvg(S, PR, o) {
     g += `<rect x="${x0}" y="${top}" width="${pw.toFixed(2)}" height="${plotH}" fill="none" stroke="#000" stroke-width="0.6"/>`;
     // başlık: panel harfi ve bölge; parametre satırı
     g += `<text x="${x0}" y="${top - 16}" font-size="9" font-weight="bold">(${String.fromCharCode(97 + i)}) ${esc(r.name)}</text>`;
-    g += s && s.b ? `<text x="${x0}" y="${top - 5}" font-size="7" fill="#333">M<tspan font-size="5.5" dy="1.5">c</tspan><tspan dy="-1.5"> = ${num(r.Mc, 1)}, b = ${num(s.b, 2)}, N = ${s.n}, T = ${num(s.T, 1)} ${L('yıl', 'yr')}</tspan></text>` : `<text x="${x0}" y="${top - 5}" font-size="7" fill="#b91c1c">${L('yetersiz veri', 'insufficient data')}</text>`;
+    g += s && s.b ? `<text x="${x0}" y="${top - 5}" font-size="7" fill="#333">M<tspan font-size="5.5" dy="1.5">c</tspan><tspan dy="-1.5"> = ${num(r.Mc, 1)}, b${p && p.est === 'bender' ? ' (Bender)' : ''} = ${num(p ? p.b : s.b, 2)}, N = ${s.n}, T = ${num(s.T, 1)} ${L('yıl', 'yr')}</tspan></text>` : `<text x="${x0}" y="${top - 5}" font-size="7" fill="#b91c1c">${L('yetersiz veri', 'insufficient data')}</text>`;
     if (!p) return;
     const C = cmpProbCurves(r, s, p), clipId = `cpf${i}`;
     g += `<clipPath id="${clipId}"><rect x="${x0}" y="${top}" width="${pw.toFixed(2)}" height="${plotH}"/></clipPath><g clip-path="url(#${clipId})">`;
@@ -3893,8 +3913,8 @@ function cmpProbFigCaption(S, PR, en, band) {
   const L = (tr, e) => en ? e : tr, num = (v, d) => en ? v.toFixed(d) : v.toFixed(d).replace('.', ','), B = PR.find(p => p) ? PR.find(p => p).bt : null;
   const reg = CMP.map((r, i) => `(${String.fromCharCode(97 + i)}) ${r.name} [${r.src}; ${new Date(r.t0).toISOString().slice(0, 10)} – ${new Date(r.t1).toISOString().slice(0, 10)}; A = ${Math.round(r.area || 0).toLocaleString(en ? 'en-US' : 'tr-TR')} km²; GK74 ${r.gk74 === true ? L('açık', 'on') : r.gk74 === false ? L('kapalı', 'off') : L('bilinmiyor', 'unknown')}]`).join('; ');
   const ts = CMP_PROB.tFig.join(', ').replace(/, (\d+)$/, L(' ve $1', ' and $1'));
-  return L(`Şekil. Zamandan bağımsız Poisson modeline göre t = ${ts} yıl içinde büyüklüğü ≥ M olan en az bir deprem olma olasılığı, P(≥M; t) = 1 − exp[−λ(≥M)·t], bölgenin tamamı için: ${reg}. λ(≥M) = (N(≥Mc)/T)·10^[−b(M − Mc)]; b Aki–Utsu en çok olabilirlik kestirimi, Mc tek tamlık eşiği. Gölgeli alanlar: a ve b'nin ortak parametrik bootstrap'ından ${bTr}${B ? ` (${cmpProbBTxt(PR, false)}, tohum ${B.seed})` : ''}. Kesikli çizgiler: gözlenen en büyük büyüklüğün üstünde ekstrapolasyon. Düz dikey çizgi: ortalama tekrarlanma süresi Tr = 1/λ(≥M) katalog süresi T'ye eşit (M = Mc + log₁₀N/b); sağında G–R gözlem süresinin ötesine uzatılır. Gri alan: Tr > ${CMP_PROB.exK}T, yüksek ekstrapolasyon belirsizliği. ${CMP_PROB.exK}T sınırı evrensel olarak kabul edilmiş bir bilimsel eşik değil, gözlem süresinin ötesine yapılan ekstrapolasyonun belirsizliğini sınıflandırmak için kullanılan operasyonel bir değerlendirme ölçütüdür. Model sabit oranlı ve olay bağımsızlığı varsayar (GK74 bunu garanti etmez); deprem tahmini değildir. Kaynak: EQ-Live Türkiye.`,
-    `Figure. Probability of at least one earthquake with magnitude ≥ M within t = ${ts} years under a time-independent Poisson model, P(≥M; t) = 1 − exp[−λ(≥M)·t], for the whole of each region: ${reg}. λ(≥M) = (N(≥Mc)/T)·10^[−b(M − Mc)]; b is the Aki–Utsu maximum-likelihood estimate and Mc a single completeness magnitude. Shaded bands: ${bEn} from a joint parametric bootstrap of a and b${B ? ` (${cmpProbBTxt(PR, true)}, seed ${B.seed})` : ''}. Dashed lines: extrapolation beyond the largest observed magnitude. Solid vertical line: magnitude at which the mean recurrence interval Tr = 1/λ(≥M) equals the catalogue duration T (M = Mc + log₁₀N/b); to its right the G–R relation is extended beyond the observation period. Grey area: Tr > ${CMP_PROB.exK}T, high extrapolation uncertainty. The ${CMP_PROB.exK}T bound is not a universally accepted scientific threshold but an operational criterion for classifying the uncertainty of extrapolation beyond the observation period. The model assumes a constant rate and independent events (GK74 declustering does not guarantee independence); it is not an earthquake forecast. Source: EQ-Live Türkiye.`);
+  return L(`Şekil. Zamandan bağımsız Poisson modeline göre t = ${ts} yıl içinde büyüklüğü ≥ M olan en az bir deprem olma olasılığı, P(≥M; t) = 1 − exp[−λ(≥M)·t], bölgenin tamamı için: ${reg}. λ(≥M) = (N(≥Mc)/T)·10^[−b(M − Mc)]; ${B && B.est === 'bender' ? 'b Bender (1983) gruplanmış büyüklük verisi için en çok olabilirlik kestirimi (referans Aki–Utsu değerleri tabloda)' : 'b Aki–Utsu en çok olabilirlik kestirimi'}, Mc tek tamlık eşiği. Gölgeli alanlar: a ve b'nin ortak parametrik bootstrap'ından ${bTr}${B ? ` (${cmpProbBTxt(PR, false)}, tohum ${B.seed})` : ''}. Kesikli çizgiler: gözlenen en büyük büyüklüğün üstünde ekstrapolasyon. Düz dikey çizgi: ortalama tekrarlanma süresi Tr = 1/λ(≥M) katalog süresi T'ye eşit (M = Mc + log₁₀N/b); sağında G–R gözlem süresinin ötesine uzatılır. Gri alan: Tr > ${CMP_PROB.exK}T, yüksek ekstrapolasyon belirsizliği. ${CMP_PROB.exK}T sınırı evrensel olarak kabul edilmiş bir bilimsel eşik değil, gözlem süresinin ötesine yapılan ekstrapolasyonun belirsizliğini sınıflandırmak için kullanılan operasyonel bir değerlendirme ölçütüdür. Model sabit oranlı ve olay bağımsızlığı varsayar (GK74 bunu garanti etmez); deprem tahmini değildir. Kaynak: EQ-Live Türkiye.`,
+    `Figure. Probability of at least one earthquake with magnitude ≥ M within t = ${ts} years under a time-independent Poisson model, P(≥M; t) = 1 − exp[−λ(≥M)·t], for the whole of each region: ${reg}. λ(≥M) = (N(≥Mc)/T)·10^[−b(M − Mc)]; ${B && B.est === 'bender' ? 'b is the Bender (1983) maximum-likelihood estimate for magnitude-grouped data (reference Aki–Utsu values in the table)' : 'b is the Aki–Utsu maximum-likelihood estimate'} and Mc a single completeness magnitude. Shaded bands: ${bEn} from a joint parametric bootstrap of a and b${B ? ` (${cmpProbBTxt(PR, true)}, seed ${B.seed})` : ''}. Dashed lines: extrapolation beyond the largest observed magnitude. Solid vertical line: magnitude at which the mean recurrence interval Tr = 1/λ(≥M) equals the catalogue duration T (M = Mc + log₁₀N/b); to its right the G–R relation is extended beyond the observation period. Grey area: Tr > ${CMP_PROB.exK}T, high extrapolation uncertainty. The ${CMP_PROB.exK}T bound is not a universally accepted scientific threshold but an operational criterion for classifying the uncertainty of extrapolation beyond the observation period. The model assumes a constant rate and independent events (GK74 declustering does not guarantee independence); it is not an earthquake forecast. Source: EQ-Live Türkiye.`);
 }
 let cmpProbFigLast = null;
 function cmpProbFigRender(S, PR) {
@@ -3906,7 +3926,7 @@ function cmpProbFigRender(S, PR) {
   el.style.display = 'block';
   el.innerHTML = `<div style="color:#94a3b8;font-size:.8em;margin-bottom:3px">📈 ${'Yayın şekli: Poisson aşılma olasılığı — düzen Alkan vd. (2025); eksen ve belirsizlik gösterimi Khodaverdian vd. (2016, BSSA) ve Murru vd. (2016, JGR); çift sütun 174 mm'}</div>`
     + `<div id="cmpProbFigSvg" style="background:#fff;border-radius:4px;padding:4px;overflow-x:auto">${svgEn}</div>`
-    + `<div style="margin-top:4px"><span style="color:#94a3b8;font-size:.78em;margin-right:4px">Bant:</span><button ${btn} onclick="cmpProbFigBand='95';cmpRender()" ${cmpProbFigBand === '95' ? 'disabled' : ''}>%95</button><button ${btn} onclick="cmpProbFigBand='68';cmpRender()" ${cmpProbFigBand === '68' ? 'disabled' : ''}>16.–84. yüzdelik</button> · <button ${btn} onclick="cmpProbFigDownload('svg','en')">SVG (EN)</button><button ${btn} onclick="cmpProbFigDownload('png','en')">PNG 600 dpi (EN)</button>`
+    + `<div style="margin-top:4px"><span style="color:#94a3b8;font-size:.78em;margin-right:4px">b kestiricisi:</span><button ${btn} onclick="CMP_B_EST='aki';cmpRender()" ${CMP_B_EST === 'aki' ? 'disabled' : ''}>Aki–Utsu (referans)</button><button ${btn} onclick="CMP_B_EST='bender';cmpRender()" ${CMP_B_EST === 'bender' ? 'disabled' : ''} title="Bender (1983): gruplanmış (ΔM) büyüklükler için kesin en çok olabilirlik; analysis/b_kestirici/RAPOR.md">Bender (1983)</button> · <span style="color:#94a3b8;font-size:.78em;margin-right:4px">Bant:</span><button ${btn} onclick="cmpProbFigBand='95';cmpRender()" ${cmpProbFigBand === '95' ? 'disabled' : ''}>%95</button><button ${btn} onclick="cmpProbFigBand='68';cmpRender()" ${cmpProbFigBand === '68' ? 'disabled' : ''}>16.–84. yüzdelik</button> · <button ${btn} onclick="cmpProbFigDownload('svg','en')">SVG (EN)</button><button ${btn} onclick="cmpProbFigDownload('png','en')">PNG 600 dpi (EN)</button>`
     + `<button ${btn} onclick="cmpProbFigDownload('svg','tr')">SVG (TR)</button><button ${btn} onclick="cmpProbFigDownload('png','tr')">PNG 600 dpi (TR)</button> · <button ${btn} onclick="cmpProbFigDownload('json','en')" title="Şekli ve tabloyu yeniden üretmek için gereken bütün girdiler, ayarlar, katalog ve yazılım kimlikleri (analysis/poisson_olasilik/yeniden_uret.js)">Yeniden üretim (JSON)</button></div>`
     + `<details style="margin-top:4px;color:#94a3b8;font-size:.78em"><summary style="cursor:pointer">${'Şekil altyazısı (EN / TR)'}</summary><p id="cmpProbCapEn" style="user-select:all">${cmpProbFigLast.capEn.replace(/</g, '&lt;')}</p><p id="cmpProbCapTr" style="user-select:all">${cmpProbFigLast.capTr.replace(/</g, '&lt;')}</p></details>`;
 }
@@ -3997,8 +4017,8 @@ function cmpExportCSV() {
   if (!CMP.length) return;
   const S = CMP.map(cmpStats), q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const head = ['ad', 'katalog', 'bolge', 't0', 't1', 'T_yil', 'A_km2', 'birim', 'N', 'Mc', 'N_geMc', 'b', 'sigma_b', 'a', 'Mmax', 'N_ge5', 'N_ge6', 'lambda_ge5', 'Tr_M6_yil', 'gnss_n', 'e1_per_yr', 'e2_per_yr', 'M0dot_geod_Nm_yr', 'M0dot_geod_sd', 'M0dot_kostrov_Nm_yr', 'M0dot_truncGR_Nm_yr', 'Mmax_used', 'coupling_kostrov', 'coupling_truncGR', 'H_km', 'mu_GPa', 'url'].concat(B_CI_METHOD === 'normal' ? [] : ['b_alt95', 'b_ust95', 'b_aralik_yontemi'])
-    .concat(CMP_PROB.M.flatMap(Mp => CMP_PROB.t.flatMap(t => [`P_M${Mp}_t${t}`, `P_M${Mp}_t${t}_alt95`, `P_M${Mp}_t${t}_ust95`])), ['Mmax_ekstrapolasyon_esigi', 'P_bootstrap_B', 'P_bootstrap_tohum', 'gk74', 'mc_uyari', 'tur_uyari'], CMP_PROB.M.flatMap(Mp => [`Tr_M${Mp}_yil`, `Tr_T_M${Mp}`, `ekstrapolasyon_M${Mp}`]), ['M_Tr_esit_T', 'M_Tr_esit_kT', 'ekstrapolasyon_k']);   // aşama 2: Tr/T sınıfı   // 2026-11-01: olasılık sütunları sona   // 2026-10-25: yeni sütunlar sona eklenir (eski sütun sırası korunur)
-  const lines = [head.join(',')].concat(CMP.map((r, i) => { const s = S[i]; return [q(r.name), q(r.src), q(r.shape), new Date(r.t0).toISOString(), new Date(r.t1).toISOString(), s.T.toFixed(2), r.area ? r.area.toFixed(0) : '', s.unit, r.mags.length, r.Mc, s.n, s.b ? s.b.toFixed(3) : '', s.sb ? s.sb.toFixed(3) : '', s.a !== null ? s.a.toFixed(3) : '', s.Mmax, s.N5, s.N6, s.lam5 ?? '', s.tr6 ?? '', ...(m => [m.nSt ?? '', m.st && m.st.ok ? m.st.e1 : '', m.st && m.st.ok ? m.st.e2 : '', m.geo ?? '', m.geoSd ?? '', m.kostrov ?? '', m.trGR ?? '', m.mmaxUsed ?? '', m.cKos ?? '', m.cGR ?? '', m.pa.H, m.pa.mu / 1e9])(cmpMoment(r, s)), q(r.url)].concat(B_CI_METHOD === 'normal' ? [] : [s.ci ? s.ci.lo.toFixed(3) : '', s.ci && Number.isFinite(s.ci.hi) ? s.ci.hi.toFixed(3) : (s.ci ? 'inf' : ''), s.ci ? s.ci.ciM : '']).concat((p => CMP_PROB.M.flatMap(Mp => CMP_PROB.t.flatMap(t => { if (!p) return ['', '', '']; const c = p.cell(Mp, t); return [c.P, c.lo, c.hi].map(v => Number.isFinite(v) ? v.toFixed(5) : ''); })).concat([s.Mmax, p ? p.bt.B : '', p ? p.bt.seed : '', r.gk74 ?? '', q(r.mcU ?? ''), q(r.turU ?? '')], CMP_PROB.M.flatMap(Mp => { if (!p) return ['', '', '']; const c = p.cell(Mp, CMP_PROB.t[0]); return [c.tr !== null ? c.tr.toFixed(2) : '', c.trT !== null ? c.trT.toFixed(4) : '', c.exC ?? '']; }), (f => [f(1), f(CMP_PROB.exK), CMP_PROB.exK])(k => { const v = s.b ? cmpProbMk(s.n, s.b, r.Mc, k) : null; return v !== null ? v.toFixed(3) : ''; })))(cmpProb(r, s))).join(','); }));
+    .concat(CMP_PROB.M.flatMap(Mp => CMP_PROB.t.flatMap(t => [`P_M${Mp}_t${t}`, `P_M${Mp}_t${t}_alt95`, `P_M${Mp}_t${t}_ust95`])), ['Mmax_ekstrapolasyon_esigi', 'P_bootstrap_B', 'P_bootstrap_tohum', 'gk74', 'mc_uyari', 'tur_uyari'], CMP_PROB.M.flatMap(Mp => [`Tr_M${Mp}_yil`, `Tr_T_M${Mp}`, `ekstrapolasyon_M${Mp}`]), ['M_Tr_esit_T', 'M_Tr_esit_kT', 'ekstrapolasyon_k'], ['olasilik_b_kestiricisi', 'b_Bender', 'b_AU_boot_alt95', 'b_AU_boot_ust95', 'b_Bender_boot_alt95', 'b_Bender_boot_ust95']);   // aşama 2: Tr/T sınıfı   // 2026-11-01: olasılık sütunları sona   // 2026-10-25: yeni sütunlar sona eklenir (eski sütun sırası korunur)
+  const lines = [head.join(',')].concat(CMP.map((r, i) => { const s = S[i]; return [q(r.name), q(r.src), q(r.shape), new Date(r.t0).toISOString(), new Date(r.t1).toISOString(), s.T.toFixed(2), r.area ? r.area.toFixed(0) : '', s.unit, r.mags.length, r.Mc, s.n, s.b ? s.b.toFixed(3) : '', s.sb ? s.sb.toFixed(3) : '', s.a !== null ? s.a.toFixed(3) : '', s.Mmax, s.N5, s.N6, s.lam5 ?? '', s.tr6 ?? '', ...(m => [m.nSt ?? '', m.st && m.st.ok ? m.st.e1 : '', m.st && m.st.ok ? m.st.e2 : '', m.geo ?? '', m.geoSd ?? '', m.kostrov ?? '', m.trGR ?? '', m.mmaxUsed ?? '', m.cKos ?? '', m.cGR ?? '', m.pa.H, m.pa.mu / 1e9])(cmpMoment(r, s)), q(r.url)].concat(B_CI_METHOD === 'normal' ? [] : [s.ci ? s.ci.lo.toFixed(3) : '', s.ci && Number.isFinite(s.ci.hi) ? s.ci.hi.toFixed(3) : (s.ci ? 'inf' : ''), s.ci ? s.ci.ciM : '']).concat((p => CMP_PROB.M.flatMap(Mp => CMP_PROB.t.flatMap(t => { if (!p) return ['', '', '']; const c = p.cell(Mp, t); return [c.P, c.lo, c.hi].map(v => Number.isFinite(v) ? v.toFixed(5) : ''); })).concat([s.Mmax, p ? p.bt.B : '', p ? p.bt.seed : '', r.gk74 ?? '', q(r.mcU ?? ''), q(r.turU ?? '')], CMP_PROB.M.flatMap(Mp => { if (!p) return ['', '', '']; const c = p.cell(Mp, CMP_PROB.t[0]); return [c.tr !== null ? c.tr.toFixed(2) : '', c.trT !== null ? c.trT.toFixed(4) : '', c.exC ?? '']; }), (f => [f(1), f(CMP_PROB.exK), CMP_PROB.exK])(k => { const v = p && p.b ? cmpProbMk(s.n, p.b, r.Mc, k) : null; return v !== null ? v.toFixed(3) : ''; }), [CMP_B_EST, s.bB !== null && s.bB !== undefined ? s.bB.toFixed(4) : ''], ...['aki', 'bender'].map(e => { const pe = cmpProb(r, s, e); if (!pe) return ['', '']; const v = pe.bt.D.map(d => d[1]); return [grPctl(v, 0.025).toFixed(4), grPctl(v, 0.975).toFixed(4)]; }).flat()))(cmpProb(r, s))).join(','); }));
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv' })); a.download = 'EQ-Live-bolge-karsilastirma.csv'; a.click();
 }
 
@@ -5930,14 +5950,15 @@ function gammaSample(k, rnd) {   // Gamma(k, 1), k ≥ 1: Marsaglia & Tsang (200
   for (;;) { let x, v; do { x = Math.sqrt(-2 * Math.log(1 - rnd())) * Math.cos(2 * Math.PI * rnd()); v = 1 + c * x; } while (v <= 0);
     v = v * v * v; const u = 1 - rnd(); if (u < 1 - 0.0331 * x * x * x * x || Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v; }
 }
-function grBootDraws(n, b, Mc, dm, B, seed) {   // { B, nFail, seed, sampler, D: [[n*, b*], ...] } — G–R paneli, dönem raporu ve bölge karşılaştırması ortak
-  const rnd = mulberry32(seed), q = Math.pow(10, -b * dm), th = q / (1 - q), D = []; let nFail = 0;
+function grBootDraws(n, b, Mc, dm, B, seed, est) {   // { B, nFail, seed, sampler, est, D: [[n*, b*], ...] } — G–R paneli, dönem raporu ve bölge karşılaştırması ortak
+  // est: 'aki' (varsayılan, referans) ya da 'bender' — b̂ hangi kestiriciyle bulunduysa çekilişler o b̂'den üretilir ve b* aynı kestiriciyle yeniden kestirilir.
+  const rnd = mulberry32(seed), q = Math.pow(10, -b * dm), th = q / (1 - q), D = [], ben = est === 'bender'; let nFail = 0;
   for (let r = 0; r < B; r++) {
     const ns = poissonSample(n, rnd); if (ns < 10) { nFail++; continue; }   // computeBvalue N < 10'da null döndürür (eski şemayla aynı ret)
     const S = poissonSample(gammaSample(ns, rnd) * th, rnd);
-    D.push([ns, Math.LOG10E / (dm * S / ns + dm / 2)]);
+    D.push([ns, ben ? bBenderK(S / ns, dm) : Math.LOG10E / (dm * S / ns + dm / 2)]);
   }
-  return { B, nFail, seed, sampler: 'NegBin (Gamma–Poisson)', D };
+  return { B, nFail, seed, sampler: 'NegBin (Gamma–Poisson)', est: ben ? 'bender' : 'aki', D };
 }
 function grPoissonBootSimple(n, T, b, Mc, dm, M, t, opt) {
   const o = Object.assign({ B: GR_POIS.B, seed: GR_POIS.seed }, opt || {}), bt = grBootDraws(n, b, Mc, dm, o.B, o.seed), P = [], Lm = [];

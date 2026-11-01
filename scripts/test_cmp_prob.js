@@ -16,6 +16,8 @@
 //       Ayrıntılı dağılım karşılaştırması: analysis/poisson_olasilik/negbin_karsilastirma.js.
 //   (j) Aşama 4: büyüklük kodlaması (sıra bağımsız, 2 ondalık), git blob SHA-1 (git hash-object ile aynı), SVG metadata (CDATA kaçışı, girdi
 //       büyüklükleri ve sonuçlar özet dışında). Uçtan uca yeniden üretim: kabul testi (9) + analysis/poisson_olasilik/yeniden_uret.js.
+//   (k) b kestiricisi seçimi: varsayılan Aki–Utsu ve sonuçlar öncekiyle birebir; Bender formülü (Ek A7) ve ΔM → 0 limiti; Bender seçilince
+//       aynı n, T, Mc ile yalnız b değişir, çekilişler Bender'le yeniden kestirilir; altyazı ve şekil başlığı kestiriciyi belirtir.
 //   (a') Doymamış değerde tutarlılık: P(≥7; 10 yıl) = 1 − e^(−10·λ(≥7)), %0–100 arasında.
 // Kullanım (depo kökünde): node scripts/test_cmp_prob.js [index.html]
 'use strict';
@@ -27,7 +29,7 @@ const line = re => { const m = src.match(re); if (!m) throw new Error('bulunamad
 const ctx = { document: { getElementById: () => ({ value: '1e4' }) }, B_CI_METHOD: 'normal', B_GRID_MODE: 'sinif' }; vm.createContext(ctx);   // B_GRID_MODE: uygulamanın varsayılanı (URL ?bgrid=ham yoksa)
 vm.runInContext([line(/^const GR_POIS = [^\n]*$/m), line(/^const GR_QC = [^\n]*$/m), line(/^const CMP_PROB = [^\n]*$/m), line(/^const CMP_MAX = [^\n]*$/m),
   ...['mulberry32', 'logGamma', 'poissonSample', 'bGridRound', 'bGridVals', 'computeBvalue', 'bConfidence95', 'bCiFields', 'grPoissonP', 'grLambdaSimple', 'grPctl',
-      'bGridOffCount', 'gammaSample', 'grBootDraws', 'grPoissonBootSimple', 'cmpStats', 'cmpProbBoot', 'cmpProbAt', 'cmpProb', 'cmpProbWarn', 'cmpProbExtrap', 'cmpProbMk', 'cmpTr', 'cmpTrT', 'reproMagsStr', 'reproHex', 'reproSvgMeta', 'cmpPc', 'cmpRng', 'cmpProbCurves', 'cmpProbFigRange', 'cmpProbFigSvg', 'cmpProbBTxt', 'cmpProbFigCaption'].map(fn), line(/^const CMP_FIG = [^\n]*$/m), line(/^const CMP_EX = \{[\s\S]*?\} \};$/m), src.match(/^async function reproGitBlobSha1\([^\n]*$/m)[0], 'var cmpProbFigRangeV = { lo: 4, hi: 8 };', "var cmpProbFigBand = '95';"].join('\n').replace(/^var CMP_PROB = (.*), cmpProbCache = new Map\(\);$/m, 'var CMP_PROB = $1; var cmpProbCache = new Map();'), ctx);
+      'bGridOffCount', 'gammaSample', 'grBootDraws', 'grPoissonBootSimple', 'cmpStats', 'cmpProbBoot', 'cmpProbAt', 'cmpProb', 'cmpProbWarn', 'cmpProbExtrap', 'cmpProbMk', 'cmpTr', 'cmpTrT', 'reproMagsStr', 'reproHex', 'reproSvgMeta', 'cmpPc', 'cmpRng', 'cmpProbCurves', 'cmpProbFigRange', 'cmpProbFigSvg', 'cmpProbBTxt', 'cmpProbFigCaption'].map(fn), line(/^const CMP_FIG = [^\n]*$/m), line(/^let CMP_B_EST = [^\n]*$/m).replace(/^let /, 'var '), line(/^const CMP_B_EST_AD = [^\n]*$/m), fn('bBenderK'), fn('computeBvalueBender'), line(/^const CMP_EX = \{[\s\S]*?\} \};$/m), src.match(/^async function reproGitBlobSha1\([^\n]*$/m)[0], 'var cmpProbFigRangeV = { lo: 4, hi: 8 };', "var cmpProbFigBand = '95';"].join('\n').replace(/^var CMP_PROB = (.*), cmpProbCache = new Map\(\);$/m, 'var CMP_PROB = $1; var cmpProbCache = new Map();'), ctx);
 vm.runInContext(src.match(/^const LANCZOS_C = \[[\s\S]*?\];$/m)[0].replace(/^const /, 'var '), ctx);
 const X = ctx; let pass = 0, fail = 0; const ok = (c, m) => { c ? pass++ : fail++; console.log((c ? '  ok  ' : '  !!  ') + m); };
 const YIL = 365.25 * 864e5;
@@ -112,6 +114,18 @@ function kayit(seed, T, lam0, b, Mc, extra) { const r = X.mulberry32(seed), n = 
   ok(Math.abs(m - m0) < 4 * Math.sqrt(v0 / K) && Math.abs(v / v0 - 1) < 0.04, `(i) S | n* = ${ns}: Gamma–Poisson ortalama ${m.toFixed(2)} (NegBin ${m0.toFixed(2)}), varyans ${v.toFixed(1)} (NegBin ${v0.toFixed(1)})`);
   const gs = []; const r2 = X.mulberry32(3); for (let k = 0; k < 40000; k++) gs.push(X.gammaSample(12.5, r2)); const gm = gs.reduce((a, x) => a + x, 0) / gs.length, gv = gs.reduce((a, x) => a + (x - gm) ** 2, 0) / (gs.length - 1);
   ok(Math.abs(gm - 12.5) < 4 * Math.sqrt(12.5 / 40000) && Math.abs(gv / 12.5 - 1) < 0.04, `(i) gammaSample(12,5): ortalama ${gm.toFixed(3)}, varyans ${gv.toFixed(2)} (beklenen 12,5 / 12,5)`); }
+{ // (k) b kestiricisi
+  const r = kayit(7, 40, 30, 1.0, 4.0), s = X.cmpStats(r), Kb = (s.n ? r.mags.filter(m => m >= 4 - 1e-9).reduce((a, v) => a + v, 0) / s.n - 4 : 0) / 0.1;
+  ok(X.CMP_B_EST === 'aki' && X.cmpProb(r, s).est === 'aki' && X.cmpProb(r, s).b === s.b, '(k) varsayılan kestirici Aki–Utsu; olasılıkta kullanılan b = cmpStats b (referans)');
+  ok(Math.abs(s.bB - Math.log10(1 + 1 / Kb) / 0.1) < 1e-12 && Math.abs(X.bBenderK(1 / (Math.pow(10, 0.114) - 1), 0.1) - 1.14) < 1e-12, `(k) Bender (Ek A7): b_B = log10(1 + 1/K̄)/ΔM = ${s.bB.toFixed(4)} (AU ${s.b.toFixed(4)}); q/(1 − q) = K̄ tersinir (b = 1,14)`);
+  { const K = 3.0, d = 1e-5; ok(Math.abs(X.bBenderK(K * 0.1 / d, d) - Math.LOG10E / (K * 0.1)) < 1e-4, '(k) ΔM → 0: Bender, Aki (1965) log10e/(M̄ − Mc) değerine iner'); }
+  const pa = X.cmpProb(r, s, 'aki'), pb = X.cmpProb(r, s, 'bender'), ca = pa.cell(7, 10), cb = pb.cell(7, 10), lamB = s.n / s.T * Math.pow(10, -s.bB * 3);
+  ok(pb.est === 'bender' && pb.b === s.bB && Math.abs(cb.lam - lamB) < 1e-12 * lamB && pb.bt.est === 'bender' && pb.bt.B === pa.bt.B && pb.bt.D[0][0] === pa.bt.D[0][0] && pb.bt.D.every(d => d[1] > 0) && ca.P !== cb.P,
+    `(k) Bender seçilince aynı n, T, Mc; λ(≥7) = n/T·10^(−b_B·3); bootstrap Bender'le (aynı tohum, B); P(≥7; 10) AU ${(100 * ca.P).toFixed(2)} / Bender ${(100 * cb.P).toFixed(2)}`);
+  const d0 = X.grBootDraws(500, 1.0, 4, 0.1, 200, 5), d1 = X.grBootDraws(500, 1.0, 4, 0.1, 200, 5, 'aki'); ok(JSON.stringify(d0.D) === JSON.stringify(d1.D) && d0.est === 'aki', '(k) grBootDraws varsayılanı değişmedi (est verilmeden = aki)');
+  X.CMP = [Object.assign(r, { name: 'A', src: 'test', gk74: true })]; X.CMP_B_EST = 'bender'; const S1 = [s], P1 = [X.cmpProb(r, s)], sv = X.cmpProbFigSvg(S1, P1, { en: true }), cp = X.cmpProbFigCaption(S1, P1, true), ct = X.cmpProbFigCaption(S1, P1, false);
+  ok(/b \(Bender\) = /.test(sv) && /Bender \(1983\) maximum-likelihood estimate for magnitude-grouped data/.test(cp) && /Bender \(1983\) gruplanmış büyüklük/.test(ct), '(k) Bender seçiliyken şekil başlığı ve altyazı (EN/TR) kestiriciyi belirtiyor');
+  X.CMP_B_EST = 'aki'; ok(/b is the Aki–Utsu maximum-likelihood estimate/.test(X.cmpProbFigCaption(S1, [X.cmpProb(r, s)], true)), '(k) Aki–Utsu seçiliyken altyazı önceki metin'); }
 (async () => { // (j) yeniden üretim yardımcıları
   ok(X.reproMagsStr([4.1, 3.25, 5]) === '3.25,4.10,5.00' && X.reproMagsStr([5, 4.1, 3.25]) === X.reproMagsStr([3.25, 5, 4.1]), '(j) girdi büyüklüğü kodlaması: artan sıralı, 2 ondalık, sıra bağımsız');
   ctx.crypto = globalThis.crypto; ctx.TextEncoder = TextEncoder;

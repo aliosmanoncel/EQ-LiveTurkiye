@@ -7,7 +7,10 @@
 //   şekli değiştiriyor; altyazı. (7) Aşama 2: '±1σ' yok; Tr/T satırı bağımsız hesapla aynı ve sınıflar (†, ‡) doğru; Marmara M≥7 ‡;
 //   şekilde Tr = T çizgisi ve Tr > 10T zemini. (8) Aşama 3: NegBin örnekleyici, üç bölgede B = 2000; sağlamlık B = 5000 ile %95 sınır farkları
 //   (yüzde puan) raporlanır; G–R panelinin bootstrap'ı ile karşılaştırma tablosu aynı çekilişleri kullanır. (9) Aşama 4: SVG <metadata> zorunlu
-//   alanları içeriyor; 'Yeniden üretim (JSON)' indiriliyor ve yeniden_uret.js bu dosyadan bütün sayıları birebir yeniden üretiyor. (5) PNG 600 dpi indirme: boyut 4108 × (H/72·600) px. (6) Sayfa hatası yok.
+//   alanları içeriyor; 'Yeniden üretim (JSON)' indiriliyor ve yeniden_uret.js bu dosyadan bütün sayıları birebir yeniden üretiyor.
+//   (10) b kestiricisi seçimi: varsayılan Aki–Utsu ile olasılık satırları önceki sürümle (ONCEKI_SONUC) birebir; yan yana satır; Bender seçilince
+//   hücreler bağımsız hesapla (b_B, aynı n, T, Mc) aynı, şekil/altyazı/JSON/SVG kestiriciyi kaydediyor, yeniden_uret.js Bender kaydını da üretiyor;
+//   Aki–Utsu'ya dönünce tablo ilk hâliyle aynı. (5) PNG 600 dpi indirme: boyut 4108 × (H/72·600) px. (6) Sayfa hatası yok.
 // Ekran görüntüleri: cmp_tablo.png, cmp_sekil_95.png, cmp_sekil_68.png; indirilen dosyalar: cmp_sekil_EN.svg, cmp_sekil_EN_600dpi.png
 // Kullanım (depo kökünde): LEAFLET_DIR=<node_modules> node analysis/poisson_olasilik/kabul_cmp_prob.js <önceki_index.html>
 'use strict';
@@ -74,6 +77,12 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
         const b2 = hucre(2000), b5 = hucre(5000); GR_POIS.B = 2000; cmpProbCache.clear();
         const gr = CMP.map((r, i) => { const g = grPoissonBootSimple(S[i].n, S[i].T, S[i].b, r.Mc, r.dm || 0.1, 7, 50), c = cmpProb(r, S[i]).cell(7, 50); return { lo: g.pLo, hi: g.pHi, clo: c.lo, chi: c.hi, B: g.B }; });
         return { b2, b5, gr }; });
+      R.bender = await p.evaluate(async () => { const t0 = __tablo(); CMP_B_EST = 'bender'; cmpRender(); const t1 = __tablo(), fig = document.getElementById('cmpProbFigSvg').innerHTML, cap = cmpProbFigLast.capEn,
+          kayit = CMP.map((r, i) => { const s = cmpStats(r); return { n: s.n, T: s.T, Mc: r.Mc, bB: s.bB, b: s.b }; }); return { t0, t1, fig, cap, kayit }; });
+      { const [dJ2] = await Promise.all([p.waitForEvent('download'), p.evaluate(() => cmpProbFigDownload('json', 'en'))]); await dJ2.saveAs(path.join(__dirname, 'cmp_yeniden_uretim_bender.json'));
+        const [dS2] = await Promise.all([p.waitForEvent('download'), p.evaluate(() => cmpProbFigDownload('svg', 'en'))]); await dS2.saveAs(path.join(__dirname, 'cmp_sekil_EN_bender.svg')); }
+      const fB = await p.$('#cmpProbFigSvg'); await fB.screenshot({ path: path.join(__dirname, 'cmp_sekil_95_bender.png') });
+      R.benderGeri = await p.evaluate(() => { CMP_B_EST = 'aki'; cmpRender(); return __tablo(); });
       R.dipnot = await p.evaluate(() => document.getElementById('cmpTable').innerText);
       R.dugme = await p.evaluate(() => [...document.querySelectorAll('#cmpProbFig button')].map(b => b.textContent).join(' | '));
       R.fig68 = await p.evaluate(() => { cmpProbFigBand = '68'; cmpRender(); return document.getElementById('cmpProbFigSvg').innerHTML; });
@@ -86,7 +95,7 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
   // (1) önce = sonra
   const eskiSat = Object.keys(O.tablo), degisen = eskiSat.filter(k => JSON.stringify(O.tablo[k]) !== JSON.stringify(Y.tablo[k]));
   ok(eskiSat.length > 10 && degisen.length === 0, `(1) main'deki ${eskiSat.length} tablo satırının hepsi aynı değerlerle duruyor${degisen.length ? ' — değişen: ' + degisen.join(', ') : ''}`);
-  const yeni = Object.keys(Y.tablo).filter(k => !(k in O.tablo)); ok(yeni.length === 5 && yeni.filter(k => /^P\(≥[567]; t\)/.test(k)).length === 3 && yeni.includes('Olasılık uyarıları') && yeni.some(k => /^Tr\(≥M\) \/ T/.test(k)), `(1) yalnız 5 yeni satır: ${yeni.join(' | ')}`);
+  const yeni = Object.keys(Y.tablo).filter(k => !(k in O.tablo)); ok(yeni.length === 6 && yeni.filter(k => /^P\(≥[567]; t\)/.test(k)).length === 3 && yeni.includes('Olasılık uyarıları') && yeni.some(k => /^Tr\(≥M\) \/ T/.test(k)) && yeni.some(k => /^b \[%95 bootstrap\]/.test(k)), `(1) yalnız 6 yeni satır: ${yeni.join(' | ')}`);
   ok(O.cmpSvg === Y.cmpSvg, '(1) karşılaştırma grafiği (cmpSvg) aynı');
   ok(O.grSvg === Y.grSvg && O.grTxt === Y.grTxt, '(1) G–R grafiği ve metni (Poisson satırı dışında) aynı');
   ok(O.bSvg === Y.bSvg && O.bTxt === Y.bTxt && O.aSvg === Y.aSvg && O.aTxt === Y.aTxt, '(1) b(t) ve a(t) grafikleri ve metinleri aynı');
@@ -138,6 +147,21 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
     const { execFileSync } = require('child_process'); let out = '', kod = 0; try { out = execFileSync(process.execPath, [path.join(__dirname, 'yeniden_uret.js'), path.join(__dirname, 'cmp_yeniden_uretim.json')], { encoding: 'utf8' }); } catch (e) { out = String(e.stdout || ''); kod = e.status; }
     const son = out.trim().split('\n').pop(); R.yeniden = out;
     ok(kod === 0 && /GEÇTİ: \d+ geçti, 0 kaldı/.test(son) && (out.match(/\(5\) 12 hücrenin 12'i aynı/g) || []).length === 3, `(9) yeniden_uret.js kayıttan bütün sayıları birebir yeniden üretti: ${son}`); }
+  // (10) b kestiricisi seçimi
+  { const ON = process.env.ONCEKI_SONUC ? JSON.parse(fs.readFileSync(process.env.ONCEKI_SONUC, 'utf8')).tablo : null, sat = (T, re) => T[Object.keys(T).find(k => re.test(k))];
+    if (ON) { const es = [5, 6, 7].every(M => JSON.stringify(sat(Y.tablo, new RegExp(`^P\\(≥${M}; t\\)`))) === JSON.stringify(sat(ON, new RegExp(`^P\\(≥${M}; t\\)`)))) && JSON.stringify(sat(Y.tablo, /^Tr\(≥M\)/)) === JSON.stringify(sat(ON, /^Tr\(≥M\)/)) && JSON.stringify(Y.tablo['Olasılık uyarıları']) === JSON.stringify(ON['Olasılık uyarıları']);
+      ok(es, '(10) varsayılan (Aki–Utsu): P(≥5/6/7; t), Tr/T ve uyarı satırları önceki sürümle birebir aynı'); }
+    const yy = sat(Y.tablo, /^b \[%95 bootstrap\]/), BB = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'b_kestirici', 'bender_karsilastirma.json'), 'utf8')).bolgeler;
+    ok(yy && yy.every((c, i) => c.includes(`Aki–Utsu: ${BB[i].b_AU.toFixed(3)} [${BB[i].boot.AU.lo.toFixed(3)}–${BB[i].boot.AU.hi.toFixed(3)}]`) && c.includes(`Bender: ${BB[i].b_Bender.toFixed(3)} [${BB[i].boot.Bender.lo.toFixed(3)}–${BB[i].boot.Bender.hi.toFixed(3)}]`)),
+      `(10) yan yana satır: b ve %95 aralık iki kestiriciyle; ayrı analizle (b_kestirici) aynı — ${yy ? yy.map(c => c.split('P(≥7')[0]).join(' | ') : '—'}`);
+    const pc = v => v > 0.999 ? '> 99,9' : v < 0.001 ? '< 0,1' : (100 * v).toFixed(1).replace('.', ','), Bt = R.bender.t1; let uy = 0, top = 0;
+    R.bender.kayit.forEach((k, i) => { for (const M of [5, 6, 7]) { const h = sat(Bt, new RegExp(`^P\\(≥${M}; t\\)`))[i]; for (const t of [10, 50, 100]) { top++; if (h.includes(`${t} yıl: ${pc(-Math.expm1(-k.n / k.T * Math.pow(10, -k.bB * (M - k.Mc)) * t))}`)) uy++; } } });
+    ok(uy === top && Object.keys(Bt).some(k => /^P\(≥7; t\).*b: Bender$/.test(k)) && /b \(Bender\) = /.test(R.bender.fig) && /Bender \(1983\) maximum-likelihood estimate/.test(R.bender.cap), `(10) Bender seçili: ${top} hücrenin ${uy}'i bağımsız hesapla (b_B, aynı n, T, Mc) aynı; satır etiketi, şekil başlığı ve altyazı kestiriciyi belirtiyor`);
+    const JB = JSON.parse(fs.readFileSync(path.join(__dirname, 'cmp_yeniden_uretim_bender.json'), 'utf8')), sv = fs.readFileSync(path.join(__dirname, 'cmp_sekil_EN_bender.svg'), 'utf8');
+    const { execFileSync } = require('child_process'); let out = '', kod = 0; try { out = execFileSync(process.execPath, [path.join(__dirname, 'yeniden_uret.js'), path.join(__dirname, 'cmp_yeniden_uretim_bender.json')], { encoding: 'utf8' }); } catch (e) { out = String(e.stdout || ''); kod = e.status; }
+    ok(JB.ayarlar.b_kestiricisi.secili === 'bender' && JB.bolgeler.every(b => b.bootstrap.b_kestiricisi === 'bender' && b.b_olasilikta === b.b_Bender) && /"secili": "bender"/.test(sv) && kod === 0 && (out.match(/12 hücrenin 12'i aynı/g) || []).length === 3,
+      `(10) JSON ve SVG metadata kestiriciyi kaydediyor (secili: bender); yeniden_uret.js Bender kaydını birebir üretti: ${out.trim().split('\n').pop()}`);
+    ok(JSON.stringify(R.benderGeri) === JSON.stringify(R.bender.t0), '(10) Aki–Utsu\'ya dönünce tablo ilk hâliyle birebir aynı'); }
   // (5) indirilen dosyalar
   const svgD = fs.readFileSync(path.join(__dirname, 'cmp_sekil_EN.svg'), 'utf8'), png = fs.readFileSync(path.join(__dirname, 'cmp_sekil_EN_600dpi.png'));
   const Wp = png.readUInt32BE(16), Hp = png.readUInt32BE(20), m = svgD.match(/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/);
