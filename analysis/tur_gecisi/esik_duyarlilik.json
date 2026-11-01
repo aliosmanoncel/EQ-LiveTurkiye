@@ -1,0 +1,5775 @@
+{
+ "girdi": "2026-10-31T22:42:59.638Z",
+ "varsayilan": {
+  "minN": 20,
+  "pay": 0.6,
+  "minNOner": 10,
+  "minYilOner": 5,
+  "payAralik": [
+   0.5,
+   0.6,
+   0.7
+  ],
+  "yetersizOran": 0.5
+ },
+ "senaryolar": {
+  "tr": {
+   "sen": "tr_emsc",
+   "gk": 0,
+   "Mc": 3.2,
+   "n": 27346,
+   "yilTum": 29,
+   "sonuc": [
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    }
+   ]
+  },
+  "tr_gk74": {
+   "sen": "tr_emsc",
+   "gk": 1,
+   "Mc": 3.2,
+   "n": 11207,
+   "yilTum": 29,
+   "sonuc": [
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2011,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 28,
+        "nKarisik": 9
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 0,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 28 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2012,
+       "karisik": [
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2012; karışık: 2011). Baskın tür dönemleri: MD 1998–2010, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2012,
+       "karisik": [
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2012; karışık: 2011). Baskın tür dönemleri: MD 1998–2010, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2012,
+       "karisik": [
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2012; karışık: 2011). Baskın tür dönemleri: MD 1998–2010, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2012,
+       "karisik": [
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2012; karışık: 2011). Baskın tür dönemleri: MD 1998–2010, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2012,
+       "karisik": [
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2012; karışık: 2011). Baskın tür dönemleri: MD 1998–2010, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2010,
+       "yIlk": 2012,
+       "karisik": [
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2010
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 28,
+        "nKarisik": 9
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 1,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2012; karışık: 2011). Baskın tür dönemleri: MD 1998–2010, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 28 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2012,
+       "karisik": [
+        2010,
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2012; karışık: 2010, 2011). Baskın tür dönemleri: MD 1998–2009, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2012,
+       "karisik": [
+        2010,
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2012; karışık: 2010, 2011). Baskın tür dönemleri: MD 1998–2009, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2012,
+       "karisik": [
+        2010,
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2012; karışık: 2010, 2011). Baskın tür dönemleri: MD 1998–2009, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2012,
+       "karisik": [
+        2010,
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2012; karışık: 2010, 2011). Baskın tür dönemleri: MD 1998–2009, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2012,
+       "karisik": [
+        2010,
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 10
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2012; karışık: 2010, 2011). Baskın tür dönemleri: MD 1998–2009, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2012,
+       "karisik": [
+        2010,
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 28,
+        "nKarisik": 9
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 28
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 24
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2012; karışık: 2010, 2011). Baskın tür dönemleri: MD 1998–2009, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 28 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    }
+   ]
+  },
+  "tr_mc35": {
+   "sen": "tr_emsc",
+   "gk": 0,
+   "Mc": 3.5,
+   "n": 11961,
+   "yilTum": 29,
+   "sonuc": [
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2010,
+       "karisik": [
+        2008,
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2010,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2010; karışık: 2008, 2009). Baskın tür dönemleri: MD 1998–2007, ML 2010–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2010,
+       "karisik": [
+        2008,
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2010,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2010; karışık: 2008, 2009). Baskın tür dönemleri: MD 1998–2007, ML 2010–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2010,
+       "karisik": [
+        2008,
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2010,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2010; karışık: 2008, 2009). Baskın tür dönemleri: MD 1998–2007, ML 2010–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2010,
+       "karisik": [
+        2008,
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2010,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2010; karışık: 2008, 2009). Baskın tür dönemleri: MD 1998–2007, ML 2010–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2010,
+       "karisik": [
+        2008,
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2010,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2010; karışık: 2008, 2009). Baskın tür dönemleri: MD 1998–2007, ML 2010–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2010,
+       "karisik": [
+        2008,
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2010,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 2,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2010; karışık: 2008, 2009). Baskın tür dönemleri: MD 1998–2007, ML 2010–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2005,
+       "yIlk": 2011,
+       "karisik": [
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2005
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 5,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2005, ilk ML yılı 2011; karışık: 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2005, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2005,
+       "yIlk": 2011,
+       "karisik": [
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2005
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 5,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2005, ilk ML yılı 2011; karışık: 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2005, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2005,
+       "yIlk": 2011,
+       "karisik": [
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2005
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 5,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2005, ilk ML yılı 2011; karışık: 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2005, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2005,
+       "yIlk": 2011,
+       "karisik": [
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2005
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 5,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2005, ilk ML yılı 2011; karışık: 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2005, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2005,
+       "yIlk": 2011,
+       "karisik": [
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2005
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 5,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2005, ilk ML yılı 2011; karışık: 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2005, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2005,
+       "yIlk": 2011,
+       "karisik": [
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2005
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 5,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2005, ilk ML yılı 2011; karışık: 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2005, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2004,
+       "yIlk": 2011,
+       "karisik": [
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2004
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 8,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2004, ilk ML yılı 2011; karışık: 2005, 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2004, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2004,
+       "yIlk": 2011,
+       "karisik": [
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2004
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 8,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2004, ilk ML yılı 2011; karışık: 2005, 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2004, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2004,
+       "yIlk": 2011,
+       "karisik": [
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2004
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 8,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2004, ilk ML yılı 2011; karışık: 2005, 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2004, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2004,
+       "yIlk": 2011,
+       "karisik": [
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2004
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 8,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2004, ilk ML yılı 2011; karışık: 2005, 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2004, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2004,
+       "yIlk": 2011,
+       "karisik": [
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2004
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 8,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2004, ilk ML yılı 2011; karışık: 2005, 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2004, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2004,
+       "yIlk": 2011,
+       "karisik": [
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2004
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.7,
+      "Mhi": 4.1,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": 4.1,
+        "tur": "mb",
+        "nYil": 29,
+        "nKarisik": 12
+       },
+       {
+        "pay": 0.6,
+        "M": 3.8,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 22
+       },
+       {
+        "pay": 0.7,
+        "M": 3.7,
+        "tur": "ML",
+        "nYil": 29,
+        "nKarisik": 26
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 29,
+     "nYetersiz": 0,
+     "yilDegerlendirilen": 29,
+     "yilKarisik": 8,
+     "yilYetersiz": 0,
+     "yetersizYillar": [],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2004, ilk ML yılı 2011; karışık: 2005, 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2004, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    }
+   ]
+  },
+  "mar": {
+   "sen": "mar_emsc",
+   "gk": 0,
+   "Mc": 3.2,
+   "n": 1335,
+   "yilTum": 29,
+   "sonuc": [
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 28,
+     "nYetersiz": 1,
+     "yilDegerlendirilen": 28,
+     "yilKarisik": 1,
+     "yilYetersiz": 1,
+     "yetersizYillar": [
+      2021
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2026 (değerlendirilen yıl 28 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 28,
+     "nYetersiz": 1,
+     "yilDegerlendirilen": 28,
+     "yilKarisik": 1,
+     "yilYetersiz": 1,
+     "yetersizYillar": [
+      2021
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2026 (değerlendirilen yıl 28 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 24,
+     "nYetersiz": 5,
+     "yilDegerlendirilen": 24,
+     "yilKarisik": 1,
+     "yilYetersiz": 5,
+     "yetersizYillar": [
+      2017,
+      2018,
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2025 (değerlendirilen yıl 24 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 5,
+        "nKarisik": 3
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 24,
+     "nYetersiz": 5,
+     "yilDegerlendirilen": 24,
+     "yilKarisik": 1,
+     "yilYetersiz": 5,
+     "yetersizYillar": [
+      2017,
+      2018,
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2025 (değerlendirilen yıl 24 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 5 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2013,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1999,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2013,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 12,
+     "nYetersiz": 17,
+     "yilDegerlendirilen": 12,
+     "yilKarisik": 0,
+     "yilYetersiz": 17,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2013). Baskın tür dönemleri: MD 1999–2009, ML 2013–2025 (değerlendirilen yıl 12 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2013,
+       "karisik": []
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1999,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2013,
+       "y1": 2025
+      }
+     ],
+     "oner": null,
+     "yilTum": 29,
+     "nDeg": 12,
+     "nYetersiz": 17,
+     "yilDegerlendirilen": 12,
+     "yilKarisik": 0,
+     "yilYetersiz": 17,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2013). Baskın tür dönemleri: MD 1999–2009, ML 2013–2025 (değerlendirilen yıl 12 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği bir eşik bulunamadı; karşılaştırmayı tek tür dönemi içinde yapın. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2011,
+       "karisik": [
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 28,
+     "nYetersiz": 1,
+     "yilDegerlendirilen": 28,
+     "yilKarisik": 4,
+     "yilYetersiz": 1,
+     "yetersizYillar": [
+      2021
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2011; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2011–2026 (değerlendirilen yıl 28 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2011,
+       "karisik": [
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 28,
+     "nYetersiz": 1,
+     "yilDegerlendirilen": 28,
+     "yilKarisik": 4,
+     "yilYetersiz": 1,
+     "yetersizYillar": [
+      2021
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2011; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2011–2026 (değerlendirilen yıl 28 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2011,
+       "karisik": [
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 24,
+     "nYetersiz": 5,
+     "yilDegerlendirilen": 24,
+     "yilKarisik": 4,
+     "yilYetersiz": 5,
+     "yetersizYillar": [
+      2017,
+      2018,
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2011; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2011–2025 (değerlendirilen yıl 24 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2011,
+       "karisik": [
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 5,
+        "nKarisik": 3
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 24,
+     "nYetersiz": 5,
+     "yilDegerlendirilen": 24,
+     "yilKarisik": 4,
+     "yilYetersiz": 5,
+     "yetersizYillar": [
+      2017,
+      2018,
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2011; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2011–2025 (değerlendirilen yıl 24 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 5 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2013,
+       "karisik": [
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1999,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2013,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 12,
+     "nYetersiz": 17,
+     "yilDegerlendirilen": 12,
+     "yilKarisik": 2,
+     "yilYetersiz": 17,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2013; karışık: 2009). Baskın tür dönemleri: MD 1999–2008, ML 2013–2025 (değerlendirilen yıl 12 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2013,
+       "karisik": [
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1999,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2013,
+       "y1": 2025
+      }
+     ],
+     "oner": null,
+     "yilTum": 29,
+     "nDeg": 12,
+     "nYetersiz": 17,
+     "yilDegerlendirilen": 12,
+     "yilKarisik": 2,
+     "yilYetersiz": 17,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2013; karışık: 2009). Baskın tür dönemleri: MD 1999–2008, ML 2013–2025 (değerlendirilen yıl 12 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği bir eşik bulunamadı; karşılaştırmayı tek tür dönemi içinde yapın. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2011,
+       "karisik": [
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 28,
+     "nYetersiz": 1,
+     "yilDegerlendirilen": 28,
+     "yilKarisik": 6,
+     "yilYetersiz": 1,
+     "yetersizYillar": [
+      2021
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2011; karışık: 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2007, ML 2011–2026 (değerlendirilen yıl 28 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2011,
+       "karisik": [
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2026
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 28,
+     "nYetersiz": 1,
+     "yilDegerlendirilen": 28,
+     "yilKarisik": 6,
+     "yilYetersiz": 1,
+     "yetersizYillar": [
+      2021
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2011; karışık: 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2007, ML 2011–2026 (değerlendirilen yıl 28 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2011,
+       "karisik": [
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 24,
+     "nYetersiz": 5,
+     "yilDegerlendirilen": 24,
+     "yilKarisik": 6,
+     "yilYetersiz": 5,
+     "yetersizYillar": [
+      2017,
+      2018,
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2011; karışık: 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2007, ML 2011–2025 (değerlendirilen yıl 24 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2011,
+       "karisik": [
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 5,
+        "nKarisik": 3
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 24,
+     "nYetersiz": 5,
+     "yilDegerlendirilen": 24,
+     "yilKarisik": 6,
+     "yilYetersiz": 5,
+     "yetersizYillar": [
+      2017,
+      2018,
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2011; karışık: 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2007, ML 2011–2025 (değerlendirilen yıl 24 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 5 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2005,
+       "yIlk": 2013,
+       "karisik": [
+        2008,
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1999,
+       "y1": 2005
+      },
+      {
+       "tur": "ML",
+       "y0": 2013,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 17,
+        "nKarisik": 11
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 12,
+     "nYetersiz": 17,
+     "yilDegerlendirilen": 12,
+     "yilKarisik": 3,
+     "yilYetersiz": 17,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2005, ilk ML yılı 2013; karışık: 2008, 2009). Baskın tür dönemleri: MD 1999–2005, ML 2013–2025 (değerlendirilen yıl 12 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 30,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2005,
+       "yIlk": 2013,
+       "karisik": [
+        2008,
+        2009
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1999,
+       "y1": 2005
+      },
+      {
+       "tur": "ML",
+       "y0": 2013,
+       "y1": 2025
+      }
+     ],
+     "oner": null,
+     "yilTum": 29,
+     "nDeg": 12,
+     "nYetersiz": 17,
+     "yilDegerlendirilen": 12,
+     "yilKarisik": 3,
+     "yilYetersiz": 17,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2005, ilk ML yılı 2013; karışık: 2008, 2009). Baskın tür dönemleri: MD 1999–2005, ML 2013–2025 (değerlendirilen yıl 12 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği bir eşik bulunamadı; karşılaştırmayı tek tür dönemi içinde yapın. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 30 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    }
+   ]
+  },
+  "mar_gk74": {
+   "sen": "mar_emsc",
+   "gk": 1,
+   "Mc": 3.2,
+   "n": 624,
+   "yilTum": 29,
+   "sonuc": [
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 11,
+        "nKarisik": 7
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 26,
+     "nYetersiz": 3,
+     "yilDegerlendirilen": 26,
+     "yilKarisik": 1,
+     "yilYetersiz": 3,
+     "yetersizYillar": [
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2025 (değerlendirilen yıl 26 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2011,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 11,
+        "nKarisik": 7
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 26,
+     "nYetersiz": 3,
+     "yilDegerlendirilen": 26,
+     "yilKarisik": 1,
+     "yilYetersiz": 3,
+     "yetersizYillar": [
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2011; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2011–2025 (değerlendirilen yıl 26 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2012,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2023
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 11,
+        "nKarisik": 7
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 17,
+     "nYetersiz": 12,
+     "yilDegerlendirilen": 17,
+     "yilKarisik": 1,
+     "yilYetersiz": 12,
+     "yetersizYillar": [
+      2006,
+      2011,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2012; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2012–2023 (değerlendirilen yıl 17 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2009,
+       "yIlk": 2012,
+       "karisik": [
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2009
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2023
+      }
+     ],
+     "oner": {
+      "Mlo": 3.3,
+      "Mhi": 3.3,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": 3.3,
+        "tur": "ML",
+        "nYil": 6,
+        "nKarisik": 3
+       },
+       {
+        "pay": 0.7,
+        "M": 3.3,
+        "tur": "ML",
+        "nYil": 6,
+        "nKarisik": 3
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 17,
+     "nYetersiz": 12,
+     "yilDegerlendirilen": 17,
+     "yilKarisik": 1,
+     "yilYetersiz": 12,
+     "yetersizYillar": [
+      2006,
+      2011,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2009, ilk ML yılı 2012; karışık: 2010). Baskın tür dönemleri: MD 1998–2009, ML 2012–2023 (değerlendirilen yıl 17 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,3 (%50: bulunamadı; %60: 3,3, 6 yıl; %70: 3,3, 6 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 10,
+     "on": false,
+     "degerlendirilemedi": true,
+     "yilTum": 29,
+     "nDeg": 6,
+     "nYetersiz": 23,
+     "yilDegerlendirilen": 6,
+     "yilKarisik": 0,
+     "yilYetersiz": 23,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2004,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "ⓘ Büyüklük türü geçişi değerlendirilemedi. Pencerenin 29 takvim yılından 23 tanesi analiz koşulunu sağlamıyor (M ≥ 3,2 olaylardan yıllık en az 30); değerlendirilebilen yıl sayısı 6. Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez."
+    },
+    {
+     "pay": 0.5,
+     "minN": 30,
+     "minNOner": 30,
+     "on": false,
+     "degerlendirilemedi": true,
+     "yilTum": 29,
+     "nDeg": 6,
+     "nYetersiz": 23,
+     "yilDegerlendirilen": 6,
+     "yilKarisik": 0,
+     "yilYetersiz": 23,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2004,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "ⓘ Büyüklük türü geçişi değerlendirilemedi. Pencerenin 29 takvim yılından 23 tanesi analiz koşulunu sağlamıyor (M ≥ 3,2 olaylardan yıllık en az 30); değerlendirilebilen yıl sayısı 6. Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2011,
+       "karisik": [
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 11,
+        "nKarisik": 7
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 26,
+     "nYetersiz": 3,
+     "yilDegerlendirilen": 26,
+     "yilKarisik": 3,
+     "yilYetersiz": 3,
+     "yetersizYillar": [
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2011; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2011–2025 (değerlendirilen yıl 26 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2011,
+       "karisik": [
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2011,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 11,
+        "nKarisik": 7
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 26,
+     "nYetersiz": 3,
+     "yilDegerlendirilen": 26,
+     "yilKarisik": 3,
+     "yilYetersiz": 3,
+     "yetersizYillar": [
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2011; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2011–2025 (değerlendirilen yıl 26 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2012,
+       "karisik": [
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2023
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 11,
+        "nKarisik": 7
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 17,
+     "nYetersiz": 12,
+     "yilDegerlendirilen": 17,
+     "yilKarisik": 2,
+     "yilYetersiz": 12,
+     "yetersizYillar": [
+      2006,
+      2011,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2012; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2012–2023 (değerlendirilen yıl 17 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2008,
+       "yIlk": 2012,
+       "karisik": [
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2008
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2023
+      }
+     ],
+     "oner": {
+      "Mlo": 3.3,
+      "Mhi": 3.3,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": 3.3,
+        "tur": "ML",
+        "nYil": 6,
+        "nKarisik": 3
+       },
+       {
+        "pay": 0.7,
+        "M": 3.3,
+        "tur": "ML",
+        "nYil": 6,
+        "nKarisik": 3
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 17,
+     "nYetersiz": 12,
+     "yilDegerlendirilen": 17,
+     "yilKarisik": 2,
+     "yilYetersiz": 12,
+     "yetersizYillar": [
+      2006,
+      2011,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2012; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2012–2023 (değerlendirilen yıl 17 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,3 (%50: bulunamadı; %60: 3,3, 6 yıl; %70: 3,3, 6 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 10,
+     "on": false,
+     "degerlendirilemedi": true,
+     "yilTum": 29,
+     "nDeg": 6,
+     "nYetersiz": 23,
+     "yilDegerlendirilen": 6,
+     "yilKarisik": 1,
+     "yilYetersiz": 23,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2004,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "ⓘ Büyüklük türü geçişi değerlendirilemedi. Pencerenin 29 takvim yılından 23 tanesi analiz koşulunu sağlamıyor (M ≥ 3,2 olaylardan yıllık en az 30); değerlendirilebilen yıl sayısı 6. Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez."
+    },
+    {
+     "pay": 0.6,
+     "minN": 30,
+     "minNOner": 30,
+     "on": false,
+     "degerlendirilemedi": true,
+     "yilTum": 29,
+     "nDeg": 6,
+     "nYetersiz": 23,
+     "yilDegerlendirilen": 6,
+     "yilKarisik": 1,
+     "yilYetersiz": 23,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2004,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "ⓘ Büyüklük türü geçişi değerlendirilemedi. Pencerenin 29 takvim yılından 23 tanesi analiz koşulunu sağlamıyor (M ≥ 3,2 olaylardan yıllık en az 30); değerlendirilebilen yıl sayısı 6. Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2012,
+       "karisik": [
+        2008,
+        2009,
+        2010,
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 11,
+        "nKarisik": 7
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 26,
+     "nYetersiz": 3,
+     "yilDegerlendirilen": 26,
+     "yilKarisik": 7,
+     "yilYetersiz": 3,
+     "yetersizYillar": [
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2012; karışık: 2008, 2009, 2010, 2011). Baskın tür dönemleri: MD 1998–2007, ML 2012–2025 (değerlendirilen yıl 26 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 10,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2012,
+       "karisik": [
+        2008,
+        2009,
+        2010,
+        2011
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2025
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 11,
+        "nKarisik": 7
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 26,
+     "nYetersiz": 3,
+     "yilDegerlendirilen": 26,
+     "yilKarisik": 7,
+     "yilYetersiz": 3,
+     "yetersizYillar": [
+      2020,
+      2021,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2012; karışık: 2008, 2009, 2010, 2011). Baskın tür dönemleri: MD 1998–2007, ML 2012–2025 (değerlendirilen yıl 26 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 10,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2012,
+       "karisik": [
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2023
+      }
+     ],
+     "oner": {
+      "Mlo": 3.6,
+      "Mhi": 3.6,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": null
+       },
+       {
+        "pay": 0.7,
+        "M": 3.6,
+        "tur": "ML",
+        "nYil": 11,
+        "nKarisik": 7
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 17,
+     "nYetersiz": 12,
+     "yilDegerlendirilen": 17,
+     "yilKarisik": 4,
+     "yilYetersiz": 12,
+     "yetersizYillar": [
+      2006,
+      2011,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2012; karışık: 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2007, ML 2012–2023 (değerlendirilen yıl 17 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 20,
+     "minNOner": 20,
+     "on": true,
+     "gecisler": [
+      {
+       "a": "MD",
+       "b": "ML",
+       "ySon": 2007,
+       "yIlk": 2012,
+       "karisik": [
+        2008,
+        2009,
+        2010
+       ]
+      }
+     ],
+     "donemler": [
+      {
+       "tur": "MD",
+       "y0": 1998,
+       "y1": 2007
+      },
+      {
+       "tur": "ML",
+       "y0": 2012,
+       "y1": 2023
+      }
+     ],
+     "oner": {
+      "Mlo": 3.3,
+      "Mhi": 3.3,
+      "aralik": [
+       {
+        "pay": 0.5,
+        "M": null
+       },
+       {
+        "pay": 0.6,
+        "M": 3.3,
+        "tur": "ML",
+        "nYil": 6,
+        "nKarisik": 3
+       },
+       {
+        "pay": 0.7,
+        "M": 3.3,
+        "tur": "ML",
+        "nYil": 6,
+        "nKarisik": 3
+       }
+      ]
+     },
+     "yilTum": 29,
+     "nDeg": 17,
+     "nYetersiz": 12,
+     "yilDegerlendirilen": 17,
+     "yilKarisik": 4,
+     "yilYetersiz": 12,
+     "yetersizYillar": [
+      2006,
+      2011,
+      2015,
+      2016,
+      2017,
+      2018,
+      2020,
+      2021,
+      2022,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2007, ilk ML yılı 2012; karışık: 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2007, ML 2012–2023 (değerlendirilen yıl 17 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,3 (%50: bulunamadı; %60: 3,3, 6 yıl; %70: 3,3, 6 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 20 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 10,
+     "on": false,
+     "degerlendirilemedi": true,
+     "yilTum": 29,
+     "nDeg": 6,
+     "nYetersiz": 23,
+     "yilDegerlendirilen": 6,
+     "yilKarisik": 3,
+     "yilYetersiz": 23,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2004,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "ⓘ Büyüklük türü geçişi değerlendirilemedi. Pencerenin 29 takvim yılından 23 tanesi analiz koşulunu sağlamıyor (M ≥ 3,2 olaylardan yıllık en az 30); değerlendirilebilen yıl sayısı 6. Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez."
+    },
+    {
+     "pay": 0.7,
+     "minN": 30,
+     "minNOner": 30,
+     "on": false,
+     "degerlendirilemedi": true,
+     "yilTum": 29,
+     "nDeg": 6,
+     "nYetersiz": 23,
+     "yilDegerlendirilen": 6,
+     "yilKarisik": 3,
+     "yilYetersiz": 23,
+     "yetersizYillar": [
+      1998,
+      2001,
+      2002,
+      2004,
+      2006,
+      2007,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+     ],
+     "metin": "ⓘ Büyüklük türü geçişi değerlendirilemedi. Pencerenin 29 takvim yılından 23 tanesi analiz koşulunu sağlamıyor (M ≥ 3,2 olaylardan yıllık en az 30); değerlendirilebilen yıl sayısı 6. Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez."
+    }
+   ]
+  }
+ },
+ "dogrulama": {
+  "tr": {
+   "kabul": "emsc98",
+   "ayni": true
+  },
+  "tr_gk74": {
+   "kabul": "emsc98_gk74",
+   "ayni": true
+  },
+  "tr_mc35": {
+   "kabul": "emsc98_mc35",
+   "ayni": true
+  },
+  "mar": {
+   "kabul": "marmara",
+   "ayni": true
+  },
+  "mar_gk74": {
+   "kabul": "marmara_gk74",
+   "ayni": true
+  }
+ }
+}

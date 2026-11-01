@@ -1,0 +1,3025 @@
+{
+ "senaryolar": {
+  "emsc98": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ]
+  },
+  "emsc98_gk74": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ],
+   "gk": true
+  },
+  "emsc98_mc35": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ],
+   "mc": "3.5"
+  },
+  "emsc98_mc40": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ],
+   "mc": "4.0"
+  },
+  "marmara": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    40,
+    26,
+    41.5,
+    31
+   ]
+  },
+  "marmara_gk74": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    40,
+    26,
+    41.5,
+    31
+   ],
+   "gk": true
+  },
+  "marmara_gk74_mc40": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    40,
+    26,
+    41.5,
+    31
+   ],
+   "gk": true,
+   "mc": "4.0"
+  },
+  "birlesik": {
+   "p": [
+    [
+     1971,
+     1997
+    ],
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ]
+  },
+  "birlesik_cs": {
+   "p": [
+    [
+     1971,
+     1997
+    ],
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ],
+   "cs": [
+    [
+     "1971-01-01",
+     "4.5"
+    ],
+    [
+     "1998-01-01",
+     "3.5"
+    ]
+   ]
+  },
+  "isc71_97": {
+   "p": [
+    [
+     1971,
+     1997
+    ]
+   ],
+   "r": [
+    36,
+    26,
+    42,
+    45
+   ]
+  },
+  "kmaras": {
+   "p": [
+    [
+     1998,
+     null
+    ]
+   ],
+   "r": [
+    36.5,
+    35.5,
+    38.5,
+    39
+   ]
+  }
+ },
+ "sonuc": {
+  "emsc98": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "yillar": [
+     {
+      "y": 1998,
+      "n": 396,
+      "tur": "MD",
+      "pay": 0.7954545454545454,
+      "enCok": "MD"
+     },
+     {
+      "y": 1999,
+      "n": 1124,
+      "tur": "MD",
+      "pay": 0.8398576512455516,
+      "enCok": "MD"
+     },
+     {
+      "y": 2000,
+      "n": 752,
+      "tur": "MD",
+      "pay": 0.8736702127659575,
+      "enCok": "MD"
+     },
+     {
+      "y": 2001,
+      "n": 474,
+      "tur": "MD",
+      "pay": 0.810126582278481,
+      "enCok": "MD"
+     },
+     {
+      "y": 2002,
+      "n": 629,
+      "tur": "MD",
+      "pay": 0.8871224165341812,
+      "enCok": "MD"
+     },
+     {
+      "y": 2003,
+      "n": 1213,
+      "tur": "MD",
+      "pay": 0.9414674361088211,
+      "enCok": "MD"
+     },
+     {
+      "y": 2004,
+      "n": 1265,
+      "tur": "MD",
+      "pay": 0.9027667984189723,
+      "enCok": "MD"
+     },
+     {
+      "y": 2005,
+      "n": 1811,
+      "tur": "MD",
+      "pay": 0.8890115958034235,
+      "enCok": "MD"
+     },
+     {
+      "y": 2006,
+      "n": 902,
+      "tur": "MD",
+      "pay": 0.8470066518847007,
+      "enCok": "MD"
+     },
+     {
+      "y": 2007,
+      "n": 1381,
+      "tur": "MD",
+      "pay": 0.8211440984793628,
+      "enCok": "MD"
+     },
+     {
+      "y": 2008,
+      "n": 1279,
+      "tur": "MD",
+      "pay": 0.7959343236903831,
+      "enCok": "MD"
+     },
+     {
+      "y": 2009,
+      "n": 1134,
+      "tur": "MD",
+      "pay": 0.7328042328042328,
+      "enCok": "MD"
+     },
+     {
+      "y": 2010,
+      "n": 811,
+      "tur": "MD",
+      "pay": 0.6436498150431565,
+      "enCok": "MD"
+     },
+     {
+      "y": 2011,
+      "n": 2175,
+      "tur": "ML",
+      "pay": 0.7498850574712643,
+      "enCok": "ML"
+     },
+     {
+      "y": 2012,
+      "n": 1083,
+      "tur": "ML",
+      "pay": 0.9316712834718375,
+      "enCok": "ML"
+     },
+     {
+      "y": 2013,
+      "n": 575,
+      "tur": "ML",
+      "pay": 0.9165217391304348,
+      "enCok": "ML"
+     },
+     {
+      "y": 2014,
+      "n": 435,
+      "tur": "ML",
+      "pay": 0.8574712643678161,
+      "enCok": "ML"
+     },
+     {
+      "y": 2015,
+      "n": 452,
+      "tur": "ML",
+      "pay": 0.7654867256637168,
+      "enCok": "ML"
+     },
+     {
+      "y": 2016,
+      "n": 395,
+      "tur": "ML",
+      "pay": 0.8911392405063291,
+      "enCok": "ML"
+     },
+     {
+      "y": 2017,
+      "n": 947,
+      "tur": "ML",
+      "pay": 0.9070749736008448,
+      "enCok": "ML"
+     },
+     {
+      "y": 2018,
+      "n": 362,
+      "tur": "ML",
+      "pay": 0.861878453038674,
+      "enCok": "ML"
+     },
+     {
+      "y": 2019,
+      "n": 500,
+      "tur": "ML",
+      "pay": 0.858,
+      "enCok": "ML"
+     },
+     {
+      "y": 2020,
+      "n": 1089,
+      "tur": "ML",
+      "pay": 0.9035812672176309,
+      "enCok": "ML"
+     },
+     {
+      "y": 2021,
+      "n": 684,
+      "tur": "ML",
+      "pay": 0.8523391812865497,
+      "enCok": "ML"
+     },
+     {
+      "y": 2022,
+      "n": 435,
+      "tur": "ML",
+      "pay": 0.8482758620689655,
+      "enCok": "ML"
+     },
+     {
+      "y": 2023,
+      "n": 2905,
+      "tur": "ML",
+      "pay": 0.8395869191049914,
+      "enCok": "ML"
+     },
+     {
+      "y": 2024,
+      "n": 618,
+      "tur": "ML",
+      "pay": 0.8527508090614887,
+      "enCok": "ML"
+     },
+     {
+      "y": 2025,
+      "n": 1148,
+      "tur": "ML",
+      "pay": 0.8867595818815331,
+      "enCok": "ML"
+     },
+     {
+      "y": 2026,
+      "n": 372,
+      "tur": "ML",
+      "pay": 0.8897849462365591,
+      "enCok": "ML"
+     }
+    ],
+    "donemler": [
+     {
+      "tur": "MD",
+      "y0": 1998,
+      "y1": 2010,
+      "n": 13171
+     },
+     {
+      "tur": "ML",
+      "y0": 2011,
+      "y1": 2026,
+      "n": 14175
+     }
+    ],
+    "gecisler": [
+     {
+      "a": "MD",
+      "b": "ML",
+      "ySon": 2010,
+      "yIlk": 2011,
+      "karisik": []
+     }
+    ],
+    "oner": {
+     "Mlo": 3.7,
+     "Mhi": 4.1,
+     "aralik": [
+      {
+       "pay": 0.5,
+       "M": 4.1,
+       "tur": "mb",
+       "nYil": 29,
+       "nKarisik": 12
+      },
+      {
+       "pay": 0.6,
+       "M": 3.8,
+       "tur": "ML",
+       "nYil": 29,
+       "nKarisik": 22
+      },
+      {
+       "pay": 0.7,
+       "M": 3.7,
+       "tur": "ML",
+       "nYil": 29,
+       "nKarisik": 26
+      }
+     ]
+    },
+    "yilTum": 29,
+    "nDeg": 29,
+    "nYetersiz": 0,
+    "minN": 20,
+    "M0": 3.2
+   },
+   "uyari": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: MD 1998–2010, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.",
+   "yetersiz": null,
+   "mcUyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,5 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %11 kadarı (305 / 2725) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %9 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,5 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  },
+  "emsc98_gk74": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "yillar": [
+     {
+      "y": 1998,
+      "n": 269,
+      "tur": "MD",
+      "pay": 0.79182156133829,
+      "enCok": "MD"
+     },
+     {
+      "y": 1999,
+      "n": 380,
+      "tur": "MD",
+      "pay": 0.781578947368421,
+      "enCok": "MD"
+     },
+     {
+      "y": 2000,
+      "n": 356,
+      "tur": "MD",
+      "pay": 0.8286516853932584,
+      "enCok": "MD"
+     },
+     {
+      "y": 2001,
+      "n": 336,
+      "tur": "MD",
+      "pay": 0.7738095238095238,
+      "enCok": "MD"
+     },
+     {
+      "y": 2002,
+      "n": 340,
+      "tur": "MD",
+      "pay": 0.85,
+      "enCok": "MD"
+     },
+     {
+      "y": 2003,
+      "n": 419,
+      "tur": "MD",
+      "pay": 0.8926014319809069,
+      "enCok": "MD"
+     },
+     {
+      "y": 2004,
+      "n": 549,
+      "tur": "MD",
+      "pay": 0.8743169398907104,
+      "enCok": "MD"
+     },
+     {
+      "y": 2005,
+      "n": 657,
+      "tur": "MD",
+      "pay": 0.8691019786910198,
+      "enCok": "MD"
+     },
+     {
+      "y": 2006,
+      "n": 609,
+      "tur": "MD",
+      "pay": 0.8226600985221675,
+      "enCok": "MD"
+     },
+     {
+      "y": 2007,
+      "n": 730,
+      "tur": "MD",
+      "pay": 0.7835616438356164,
+      "enCok": "MD"
+     },
+     {
+      "y": 2008,
+      "n": 727,
+      "tur": "MD",
+      "pay": 0.7730398899587345,
+      "enCok": "MD"
+     },
+     {
+      "y": 2009,
+      "n": 758,
+      "tur": "MD",
+      "pay": 0.7005277044854882,
+      "enCok": "MD"
+     },
+     {
+      "y": 2010,
+      "n": 571,
+      "tur": "MD",
+      "pay": 0.6357267950963222,
+      "enCok": "MD"
+     },
+     {
+      "y": 2011,
+      "n": 455,
+      "tur": null,
+      "pay": 0.589010989010989,
+      "enCok": "ML"
+     },
+     {
+      "y": 2012,
+      "n": 405,
+      "tur": "ML",
+      "pay": 0.9061728395061729,
+      "enCok": "ML"
+     },
+     {
+      "y": 2013,
+      "n": 342,
+      "tur": "ML",
+      "pay": 0.8976608187134503,
+      "enCok": "ML"
+     },
+     {
+      "y": 2014,
+      "n": 278,
+      "tur": "ML",
+      "pay": 0.8381294964028777,
+      "enCok": "ML"
+     },
+     {
+      "y": 2015,
+      "n": 298,
+      "tur": "ML",
+      "pay": 0.7281879194630873,
+      "enCok": "ML"
+     },
+     {
+      "y": 2016,
+      "n": 263,
+      "tur": "ML",
+      "pay": 0.8631178707224335,
+      "enCok": "ML"
+     },
+     {
+      "y": 2017,
+      "n": 267,
+      "tur": "ML",
+      "pay": 0.8314606741573034,
+      "enCok": "ML"
+     },
+     {
+      "y": 2018,
+      "n": 213,
+      "tur": "ML",
+      "pay": 0.8309859154929577,
+      "enCok": "ML"
+     },
+     {
+      "y": 2019,
+      "n": 252,
+      "tur": "ML",
+      "pay": 0.8174603174603174,
+      "enCok": "ML"
+     },
+     {
+      "y": 2020,
+      "n": 211,
+      "tur": "ML",
+      "pay": 0.8341232227488151,
+      "enCok": "ML"
+     },
+     {
+      "y": 2021,
+      "n": 200,
+      "tur": "ML",
+      "pay": 0.76,
+      "enCok": "ML"
+     },
+     {
+      "y": 2022,
+      "n": 234,
+      "tur": "ML",
+      "pay": 0.8290598290598291,
+      "enCok": "ML"
+     },
+     {
+      "y": 2023,
+      "n": 382,
+      "tur": "ML",
+      "pay": 0.756544502617801,
+      "enCok": "ML"
+     },
+     {
+      "y": 2024,
+      "n": 268,
+      "tur": "ML",
+      "pay": 0.7947761194029851,
+      "enCok": "ML"
+     },
+     {
+      "y": 2025,
+      "n": 271,
+      "tur": "ML",
+      "pay": 0.8191881918819188,
+      "enCok": "ML"
+     },
+     {
+      "y": 2026,
+      "n": 167,
+      "tur": "ML",
+      "pay": 0.8562874251497006,
+      "enCok": "ML"
+     }
+    ],
+    "donemler": [
+     {
+      "tur": "MD",
+      "y0": 1998,
+      "y1": 2010,
+      "n": 6701
+     },
+     {
+      "tur": "ML",
+      "y0": 2012,
+      "y1": 2026,
+      "n": 4051
+     }
+    ],
+    "gecisler": [
+     {
+      "a": "MD",
+      "b": "ML",
+      "ySon": 2010,
+      "yIlk": 2012,
+      "karisik": [
+       2011
+      ]
+     }
+    ],
+    "oner": {
+     "Mlo": 3.6,
+     "Mhi": 4.1,
+     "aralik": [
+      {
+       "pay": 0.5,
+       "M": 4.1,
+       "tur": "mb",
+       "nYil": 29,
+       "nKarisik": 10
+      },
+      {
+       "pay": 0.6,
+       "M": 3.8,
+       "tur": "ML",
+       "nYil": 29,
+       "nKarisik": 28
+      },
+      {
+       "pay": 0.7,
+       "M": 3.6,
+       "tur": "ML",
+       "nYil": 29,
+       "nKarisik": 24
+      }
+     ]
+    },
+    "yilTum": 29,
+    "nDeg": 29,
+    "nYetersiz": 0,
+    "minN": 20,
+    "M0": 3.2
+   },
+   "uyari": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2012; karışık: 2011). Baskın tür dönemleri: MD 1998–2010, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,6, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.",
+   "yetersiz": null,
+   "mcUyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,0 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %6 kadarı (63 / 1111) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %13 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,0 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  },
+  "emsc98_mc35": {
+   "Mc": 3.5,
+   "durum": {
+    "on": true,
+    "yillar": [
+     {
+      "y": 1998,
+      "n": 260,
+      "tur": "MD",
+      "pay": 0.7038461538461539,
+      "enCok": "MD"
+     },
+     {
+      "y": 1999,
+      "n": 577,
+      "tur": "MD",
+      "pay": 0.7053726169844021,
+      "enCok": "MD"
+     },
+     {
+      "y": 2000,
+      "n": 349,
+      "tur": "MD",
+      "pay": 0.7679083094555874,
+      "enCok": "MD"
+     },
+     {
+      "y": 2001,
+      "n": 243,
+      "tur": "MD",
+      "pay": 0.6666666666666666,
+      "enCok": "MD"
+     },
+     {
+      "y": 2002,
+      "n": 279,
+      "tur": "MD",
+      "pay": 0.7491039426523297,
+      "enCok": "MD"
+     },
+     {
+      "y": 2003,
+      "n": 442,
+      "tur": "MD",
+      "pay": 0.8416289592760181,
+      "enCok": "MD"
+     },
+     {
+      "y": 2004,
+      "n": 424,
+      "tur": "MD",
+      "pay": 0.7547169811320755,
+      "enCok": "MD"
+     },
+     {
+      "y": 2005,
+      "n": 560,
+      "tur": "MD",
+      "pay": 0.6892857142857143,
+      "enCok": "MD"
+     },
+     {
+      "y": 2006,
+      "n": 270,
+      "tur": null,
+      "pay": 0.5814814814814815,
+      "enCok": "MD"
+     },
+     {
+      "y": 2007,
+      "n": 428,
+      "tur": null,
+      "pay": 0.5911214953271028,
+      "enCok": "MD"
+     },
+     {
+      "y": 2008,
+      "n": 353,
+      "tur": null,
+      "pay": 0.49291784702549574,
+      "enCok": "MD"
+     },
+     {
+      "y": 2009,
+      "n": 318,
+      "tur": null,
+      "pay": 0.44339622641509435,
+      "enCok": "MD"
+     },
+     {
+      "y": 2010,
+      "n": 245,
+      "tur": null,
+      "pay": 0.5714285714285714,
+      "enCok": "ML"
+     },
+     {
+      "y": 2011,
+      "n": 945,
+      "tur": "ML",
+      "pay": 0.746031746031746,
+      "enCok": "ML"
+     },
+     {
+      "y": 2012,
+      "n": 489,
+      "tur": "ML",
+      "pay": 0.8588957055214724,
+      "enCok": "ML"
+     },
+     {
+      "y": 2013,
+      "n": 254,
+      "tur": "ML",
+      "pay": 0.8110236220472441,
+      "enCok": "ML"
+     },
+     {
+      "y": 2014,
+      "n": 246,
+      "tur": "ML",
+      "pay": 0.7682926829268293,
+      "enCok": "ML"
+     },
+     {
+      "y": 2015,
+      "n": 244,
+      "tur": "ML",
+      "pay": 0.6147540983606558,
+      "enCok": "ML"
+     },
+     {
+      "y": 2016,
+      "n": 208,
+      "tur": "ML",
+      "pay": 0.7980769230769231,
+      "enCok": "ML"
+     },
+     {
+      "y": 2017,
+      "n": 484,
+      "tur": "ML",
+      "pay": 0.8264462809917356,
+      "enCok": "ML"
+     },
+     {
+      "y": 2018,
+      "n": 179,
+      "tur": "ML",
+      "pay": 0.7486033519553073,
+      "enCok": "ML"
+     },
+     {
+      "y": 2019,
+      "n": 259,
+      "tur": "ML",
+      "pay": 0.7606177606177607,
+      "enCok": "ML"
+     },
+     {
+      "y": 2020,
+      "n": 601,
+      "tur": "ML",
+      "pay": 0.8302828618968386,
+      "enCok": "ML"
+     },
+     {
+      "y": 2021,
+      "n": 387,
+      "tur": "ML",
+      "pay": 0.7390180878552972,
+      "enCok": "ML"
+     },
+     {
+      "y": 2022,
+      "n": 228,
+      "tur": "ML",
+      "pay": 0.7149122807017544,
+      "enCok": "ML"
+     },
+     {
+      "y": 2023,
+      "n": 1640,
+      "tur": "ML",
+      "pay": 0.7445121951219512,
+      "enCok": "ML"
+     },
+     {
+      "y": 2024,
+      "n": 318,
+      "tur": "ML",
+      "pay": 0.720125786163522,
+      "enCok": "ML"
+     },
+     {
+      "y": 2025,
+      "n": 543,
+      "tur": "ML",
+      "pay": 0.7642725598526704,
+      "enCok": "ML"
+     },
+     {
+      "y": 2026,
+      "n": 188,
+      "tur": "ML",
+      "pay": 0.8031914893617021,
+      "enCok": "ML"
+     }
+    ],
+    "donemler": [
+     {
+      "tur": "MD",
+      "y0": 1998,
+      "y1": 2005,
+      "n": 3134
+     },
+     {
+      "tur": "ML",
+      "y0": 2011,
+      "y1": 2026,
+      "n": 7213
+     }
+    ],
+    "gecisler": [
+     {
+      "a": "MD",
+      "b": "ML",
+      "ySon": 2005,
+      "yIlk": 2011,
+      "karisik": [
+       2006,
+       2007,
+       2008,
+       2009,
+       2010
+      ]
+     }
+    ],
+    "oner": {
+     "Mlo": 3.7,
+     "Mhi": 4.1,
+     "aralik": [
+      {
+       "pay": 0.5,
+       "M": 4.1,
+       "tur": "mb",
+       "nYil": 29,
+       "nKarisik": 12
+      },
+      {
+       "pay": 0.6,
+       "M": 3.8,
+       "tur": "ML",
+       "nYil": 29,
+       "nKarisik": 22
+      },
+      {
+       "pay": 0.7,
+       "M": 3.7,
+       "tur": "ML",
+       "nYil": 29,
+       "nKarisik": 26
+      }
+     ]
+    },
+    "yilTum": 29,
+    "nDeg": 29,
+    "nYetersiz": 0,
+    "minN": 20,
+    "M0": 3.5
+   },
+   "uyari": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2005, ilk ML yılı 2011; karışık: 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: MD 1998–2005, ML 2011–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,7–4,1 (%50: 4,1, 29 yıl; %60: 3,8, 29 yıl; %70: 3,7, 29 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.",
+   "yetersiz": null,
+   "mcUyari": null
+  },
+  "emsc98_mc40": {
+   "Mc": 4,
+   "durum": {
+    "on": false,
+    "degerlendirilemedi": false,
+    "yillar": [
+     {
+      "y": 1998,
+      "n": 60,
+      "tur": "mb",
+      "pay": 0.65,
+      "enCok": "mb"
+     },
+     {
+      "y": 1999,
+      "n": 175,
+      "tur": "mb",
+      "pay": 0.6857142857142857,
+      "enCok": "mb"
+     },
+     {
+      "y": 2000,
+      "n": 68,
+      "tur": "mb",
+      "pay": 0.6470588235294118,
+      "enCok": "mb"
+     },
+     {
+      "y": 2001,
+      "n": 65,
+      "tur": null,
+      "pay": 0.49230769230769234,
+      "enCok": "mb"
+     },
+     {
+      "y": 2002,
+      "n": 64,
+      "tur": null,
+      "pay": 0.5625,
+      "enCok": "mb"
+     },
+     {
+      "y": 2003,
+      "n": 86,
+      "tur": null,
+      "pay": 0.5697674418604651,
+      "enCok": "mb"
+     },
+     {
+      "y": 2004,
+      "n": 100,
+      "tur": "mb",
+      "pay": 0.72,
+      "enCok": "mb"
+     },
+     {
+      "y": 2005,
+      "n": 122,
+      "tur": null,
+      "pay": 0.5573770491803278,
+      "enCok": "mb"
+     },
+     {
+      "y": 2006,
+      "n": 54,
+      "tur": "mb",
+      "pay": 0.6481481481481481,
+      "enCok": "mb"
+     },
+     {
+      "y": 2007,
+      "n": 92,
+      "tur": "mb",
+      "pay": 0.6739130434782609,
+      "enCok": "mb"
+     },
+     {
+      "y": 2008,
+      "n": 77,
+      "tur": "mb",
+      "pay": 0.6493506493506493,
+      "enCok": "mb"
+     },
+     {
+      "y": 2009,
+      "n": 43,
+      "tur": "mb",
+      "pay": 0.6744186046511628,
+      "enCok": "mb"
+     },
+     {
+      "y": 2010,
+      "n": 68,
+      "tur": null,
+      "pay": 0.45588235294117646,
+      "enCok": "mb"
+     },
+     {
+      "y": 2011,
+      "n": 293,
+      "tur": "mb",
+      "pay": 0.6552901023890785,
+      "enCok": "mb"
+     },
+     {
+      "y": 2012,
+      "n": 152,
+      "tur": null,
+      "pay": 0.5526315789473685,
+      "enCok": "ML"
+     },
+     {
+      "y": 2013,
+      "n": 70,
+      "tur": null,
+      "pay": 0.37142857142857144,
+      "enCok": "mb"
+     },
+     {
+      "y": 2014,
+      "n": 84,
+      "tur": null,
+      "pay": 0.5,
+      "enCok": "ML"
+     },
+     {
+      "y": 2015,
+      "n": 79,
+      "tur": null,
+      "pay": 0.379746835443038,
+      "enCok": "ML"
+     },
+     {
+      "y": 2016,
+      "n": 58,
+      "tur": null,
+      "pay": 0.4482758620689655,
+      "enCok": "ML"
+     },
+     {
+      "y": 2017,
+      "n": 157,
+      "tur": null,
+      "pay": 0.5031847133757962,
+      "enCok": "ML"
+     },
+     {
+      "y": 2018,
+      "n": 62,
+      "tur": "mb",
+      "pay": 0.6129032258064516,
+      "enCok": "mb"
+     },
+     {
+      "y": 2019,
+      "n": 97,
+      "tur": null,
+      "pay": 0.5051546391752577,
+      "enCok": "mb"
+     },
+     {
+      "y": 2020,
+      "n": 213,
+      "tur": null,
+      "pay": 0.5305164319248826,
+      "enCok": "ML"
+     },
+     {
+      "y": 2021,
+      "n": 157,
+      "tur": null,
+      "pay": 0.4840764331210191,
+      "enCok": "mb"
+     },
+     {
+      "y": 2022,
+      "n": 91,
+      "tur": null,
+      "pay": 0.45054945054945056,
+      "enCok": "mb"
+     },
+     {
+      "y": 2023,
+      "n": 662,
+      "tur": null,
+      "pay": 0.45468277945619334,
+      "enCok": "mb"
+     },
+     {
+      "y": 2024,
+      "n": 117,
+      "tur": null,
+      "pay": 0.4188034188034188,
+      "enCok": "mb"
+     },
+     {
+      "y": 2025,
+      "n": 189,
+      "tur": null,
+      "pay": 0.4021164021164021,
+      "enCok": "ML"
+     },
+     {
+      "y": 2026,
+      "n": 60,
+      "tur": null,
+      "pay": 0.4666666666666667,
+      "enCok": "ML"
+     }
+    ],
+    "yilTum": 29,
+    "nDeg": 29,
+    "nYetersiz": 0,
+    "minN": 20,
+    "M0": 4
+   },
+   "uyari": null,
+   "yetersiz": null,
+   "mcUyari": null
+  },
+  "marmara": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "yillar": [
+     {
+      "y": 1998,
+      "n": 23,
+      "tur": "MD",
+      "pay": 0.9130434782608695,
+      "enCok": "MD"
+     },
+     {
+      "y": 1999,
+      "n": 356,
+      "tur": "MD",
+      "pay": 0.7808988764044944,
+      "enCok": "MD"
+     },
+     {
+      "y": 2000,
+      "n": 76,
+      "tur": "MD",
+      "pay": 0.8947368421052632,
+      "enCok": "MD"
+     },
+     {
+      "y": 2001,
+      "n": 24,
+      "tur": "MD",
+      "pay": 0.875,
+      "enCok": "MD"
+     },
+     {
+      "y": 2002,
+      "n": 27,
+      "tur": "MD",
+      "pay": 0.9629629629629629,
+      "enCok": "MD"
+     },
+     {
+      "y": 2003,
+      "n": 62,
+      "tur": "MD",
+      "pay": 0.8709677419354839,
+      "enCok": "MD"
+     },
+     {
+      "y": 2004,
+      "n": 44,
+      "tur": null,
+      "pay": 0.5681818181818182,
+      "enCok": "MD"
+     },
+     {
+      "y": 2005,
+      "n": 38,
+      "tur": "MD",
+      "pay": 0.9473684210526315,
+      "enCok": "MD"
+     },
+     {
+      "y": 2006,
+      "n": 24,
+      "tur": null,
+      "pay": 0.5833333333333334,
+      "enCok": "MD"
+     },
+     {
+      "y": 2007,
+      "n": 24,
+      "tur": "MD",
+      "pay": 0.875,
+      "enCok": "MD"
+     },
+     {
+      "y": 2008,
+      "n": 44,
+      "tur": "MD",
+      "pay": 0.6590909090909091,
+      "enCok": "MD"
+     },
+     {
+      "y": 2009,
+      "n": 42,
+      "tur": null,
+      "pay": 0.5714285714285714,
+      "enCok": "MD"
+     },
+     {
+      "y": 2010,
+      "n": 26,
+      "tur": null,
+      "pay": 0.4230769230769231,
+      "enCok": "ML"
+     },
+     {
+      "y": 2011,
+      "n": 29,
+      "tur": "ML",
+      "pay": 0.7586206896551724,
+      "enCok": "ML"
+     },
+     {
+      "y": 2012,
+      "n": 29,
+      "tur": "ML",
+      "pay": 0.9310344827586207,
+      "enCok": "ML"
+     },
+     {
+      "y": 2013,
+      "n": 35,
+      "tur": "ML",
+      "pay": 0.8857142857142857,
+      "enCok": "ML"
+     },
+     {
+      "y": 2014,
+      "n": 58,
+      "tur": "ML",
+      "pay": 0.8448275862068966,
+      "enCok": "ML"
+     },
+     {
+      "y": 2015,
+      "n": 26,
+      "tur": "ML",
+      "pay": 0.6153846153846154,
+      "enCok": "ML"
+     },
+     {
+      "y": 2016,
+      "n": 27,
+      "tur": "ML",
+      "pay": 0.8888888888888888,
+      "enCok": "ML"
+     },
+     {
+      "y": 2019,
+      "n": 60,
+      "tur": "ML",
+      "pay": 0.8666666666666667,
+      "enCok": "ML"
+     },
+     {
+      "y": 2022,
+      "n": 26,
+      "tur": "ML",
+      "pay": 0.8076923076923077,
+      "enCok": "ML"
+     },
+     {
+      "y": 2023,
+      "n": 39,
+      "tur": "ML",
+      "pay": 0.9487179487179487,
+      "enCok": "ML"
+     },
+     {
+      "y": 2024,
+      "n": 29,
+      "tur": "ML",
+      "pay": 0.896551724137931,
+      "enCok": "ML"
+     },
+     {
+      "y": 2025,
+      "n": 97,
+      "tur": "ML",
+      "pay": 0.845360824742268,
+      "enCok": "ML"
+     }
+    ],
+    "donemler": [
+     {
+      "tur": "MD",
+      "y0": 1998,
+      "y1": 2008,
+      "n": 674
+     },
+     {
+      "tur": "ML",
+      "y0": 2011,
+      "y1": 2025,
+      "n": 455
+     }
+    ],
+    "gecisler": [
+     {
+      "a": "MD",
+      "b": "ML",
+      "ySon": 2008,
+      "yIlk": 2011,
+      "karisik": [
+       2009,
+       2010
+      ]
+     }
+    ],
+    "oner": {
+     "Mlo": 3.6,
+     "Mhi": 3.6,
+     "aralik": [
+      {
+       "pay": 0.5,
+       "M": null
+      },
+      {
+       "pay": 0.6,
+       "M": null
+      },
+      {
+       "pay": 0.7,
+       "M": 3.6,
+       "tur": "ML",
+       "nYil": 17,
+       "nKarisik": 11
+      }
+     ]
+    },
+    "yilTum": 29,
+    "nDeg": 24,
+    "nYetersiz": 5,
+    "minN": 20,
+    "M0": 3.2
+   },
+   "uyari": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2011; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2011–2025 (değerlendirilen yıl 24 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 17 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.",
+   "yetersiz": null,
+   "mcUyari": null
+  },
+  "marmara_gk74": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "yillar": [
+     {
+      "y": 1998,
+      "n": 21,
+      "tur": "MD",
+      "pay": 0.9047619047619048,
+      "enCok": "MD"
+     },
+     {
+      "y": 1999,
+      "n": 40,
+      "tur": "MD",
+      "pay": 0.65,
+      "enCok": "MD"
+     },
+     {
+      "y": 2000,
+      "n": 30,
+      "tur": "MD",
+      "pay": 0.9333333333333333,
+      "enCok": "MD"
+     },
+     {
+      "y": 2001,
+      "n": 20,
+      "tur": "MD",
+      "pay": 0.85,
+      "enCok": "MD"
+     },
+     {
+      "y": 2002,
+      "n": 22,
+      "tur": "MD",
+      "pay": 0.9545454545454546,
+      "enCok": "MD"
+     },
+     {
+      "y": 2003,
+      "n": 31,
+      "tur": "MD",
+      "pay": 0.8064516129032258,
+      "enCok": "MD"
+     },
+     {
+      "y": 2004,
+      "n": 23,
+      "tur": "MD",
+      "pay": 0.782608695652174,
+      "enCok": "MD"
+     },
+     {
+      "y": 2005,
+      "n": 33,
+      "tur": "MD",
+      "pay": 0.9393939393939394,
+      "enCok": "MD"
+     },
+     {
+      "y": 2007,
+      "n": 24,
+      "tur": "MD",
+      "pay": 0.875,
+      "enCok": "MD"
+     },
+     {
+      "y": 2008,
+      "n": 33,
+      "tur": "MD",
+      "pay": 0.6363636363636364,
+      "enCok": "MD"
+     },
+     {
+      "y": 2009,
+      "n": 31,
+      "tur": null,
+      "pay": 0.5806451612903226,
+      "enCok": "MD"
+     },
+     {
+      "y": 2010,
+      "n": 24,
+      "tur": null,
+      "pay": 0.4166666666666667,
+      "enCok": "MD"
+     },
+     {
+      "y": 2012,
+      "n": 24,
+      "tur": "ML",
+      "pay": 0.9166666666666666,
+      "enCok": "ML"
+     },
+     {
+      "y": 2013,
+      "n": 28,
+      "tur": "ML",
+      "pay": 0.8571428571428571,
+      "enCok": "ML"
+     },
+     {
+      "y": 2014,
+      "n": 21,
+      "tur": "ML",
+      "pay": 0.7619047619047619,
+      "enCok": "ML"
+     },
+     {
+      "y": 2019,
+      "n": 28,
+      "tur": "ML",
+      "pay": 0.7857142857142857,
+      "enCok": "ML"
+     },
+     {
+      "y": 2023,
+      "n": 20,
+      "tur": "ML",
+      "pay": 0.9,
+      "enCok": "ML"
+     }
+    ],
+    "donemler": [
+     {
+      "tur": "MD",
+      "y0": 1998,
+      "y1": 2008,
+      "n": 277
+     },
+     {
+      "tur": "ML",
+      "y0": 2012,
+      "y1": 2023,
+      "n": 121
+     }
+    ],
+    "gecisler": [
+     {
+      "a": "MD",
+      "b": "ML",
+      "ySon": 2008,
+      "yIlk": 2012,
+      "karisik": [
+       2009,
+       2010
+      ]
+     }
+    ],
+    "oner": {
+     "Mlo": 3.6,
+     "Mhi": 3.6,
+     "aralik": [
+      {
+       "pay": 0.5,
+       "M": null
+      },
+      {
+       "pay": 0.6,
+       "M": null
+      },
+      {
+       "pay": 0.7,
+       "M": 3.6,
+       "tur": "ML",
+       "nYil": 11,
+       "nKarisik": 7
+      }
+     ]
+    },
+    "yilTum": 29,
+    "nDeg": 17,
+    "nYetersiz": 12,
+    "minN": 20,
+    "M0": 3.2
+   },
+   "uyari": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2008, ilk ML yılı 2012; karışık: 2009, 2010). Baskın tür dönemleri: MD 1998–2008, ML 2012–2023 (değerlendirilen yıl 17 / 29). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,6 (%50: bulunamadı; %60: bulunamadı; %70: 3,6, 11 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.",
+   "yetersiz": null,
+   "mcUyari": null
+  },
+  "marmara_gk74_mc40": {
+   "Mc": 4,
+   "durum": {
+    "on": false,
+    "degerlendirilemedi": true,
+    "yillar": [],
+    "yilTum": 27,
+    "nDeg": 0,
+    "nYetersiz": 27,
+    "minN": 20,
+    "M0": 4
+   },
+   "uyari": null,
+   "yetersiz": "ⓘ Büyüklük türü geçişi değerlendirilemedi. Pencerenin 27 takvim yılından 27 tanesi analiz koşulunu sağlamıyor (M ≥ 4,0 olaylardan yıllık en az 20); değerlendirilebilen yıl sayısı 0. Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez.",
+   "mcUyari": null
+  },
+  "birlesik": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "yillar": [
+     {
+      "y": 1971,
+      "n": 86,
+      "tur": "mb",
+      "pay": 0.9418604651162791,
+      "enCok": "mb"
+     },
+     {
+      "y": 1972,
+      "n": 20,
+      "tur": "mb",
+      "pay": 0.9,
+      "enCok": "mb"
+     },
+     {
+      "y": 1975,
+      "n": 38,
+      "tur": "mb",
+      "pay": 0.868421052631579,
+      "enCok": "mb"
+     },
+     {
+      "y": 1976,
+      "n": 51,
+      "tur": "mb",
+      "pay": 0.9411764705882353,
+      "enCok": "mb"
+     },
+     {
+      "y": 1977,
+      "n": 27,
+      "tur": "mb",
+      "pay": 0.7777777777777778,
+      "enCok": "mb"
+     },
+     {
+      "y": 1978,
+      "n": 26,
+      "tur": null,
+      "pay": 0.5769230769230769,
+      "enCok": "mb"
+     },
+     {
+      "y": 1979,
+      "n": 20,
+      "tur": null,
+      "pay": 0.45,
+      "enCok": "mb"
+     },
+     {
+      "y": 1980,
+      "n": 28,
+      "tur": "mb",
+      "pay": 0.8214285714285714,
+      "enCok": "mb"
+     },
+     {
+      "y": 1981,
+      "n": 32,
+      "tur": "mb",
+      "pay": 0.8125,
+      "enCok": "mb"
+     },
+     {
+      "y": 1982,
+      "n": 49,
+      "tur": "mb",
+      "pay": 0.8367346938775511,
+      "enCok": "mb"
+     },
+     {
+      "y": 1983,
+      "n": 72,
+      "tur": "mb",
+      "pay": 0.7361111111111112,
+      "enCok": "mb"
+     },
+     {
+      "y": 1984,
+      "n": 58,
+      "tur": "mb",
+      "pay": 0.6206896551724138,
+      "enCok": "mb"
+     },
+     {
+      "y": 1985,
+      "n": 45,
+      "tur": "mb",
+      "pay": 0.7333333333333333,
+      "enCok": "mb"
+     },
+     {
+      "y": 1986,
+      "n": 56,
+      "tur": "mb",
+      "pay": 0.7142857142857143,
+      "enCok": "mb"
+     },
+     {
+      "y": 1987,
+      "n": 45,
+      "tur": "mb",
+      "pay": 0.8888888888888888,
+      "enCok": "mb"
+     },
+     {
+      "y": 1988,
+      "n": 60,
+      "tur": "mb",
+      "pay": 0.7833333333333333,
+      "enCok": "mb"
+     },
+     {
+      "y": 1989,
+      "n": 49,
+      "tur": "mb",
+      "pay": 0.6530612244897959,
+      "enCok": "mb"
+     },
+     {
+      "y": 1990,
+      "n": 290,
+      "tur": null,
+      "pay": 0.5413793103448276,
+      "enCok": "MD"
+     },
+     {
+      "y": 1991,
+      "n": 205,
+      "tur": null,
+      "pay": 0.45365853658536587,
+      "enCok": "MD"
+     },
+     {
+      "y": 1992,
+      "n": 179,
+      "tur": "ML",
+      "pay": 0.7150837988826816,
+      "enCok": "ML"
+     },
+     {
+      "y": 1993,
+      "n": 135,
+      "tur": null,
+      "pay": 0.4222222222222222,
+      "enCok": "ML"
+     },
+     {
+      "y": 1994,
+      "n": 165,
+      "tur": null,
+      "pay": 0.509090909090909,
+      "enCok": "MD"
+     },
+     {
+      "y": 1995,
+      "n": 291,
+      "tur": "MD",
+      "pay": 0.6701030927835051,
+      "enCok": "MD"
+     },
+     {
+      "y": 1996,
+      "n": 763,
+      "tur": "MD",
+      "pay": 0.7038007863695938,
+      "enCok": "MD"
+     },
+     {
+      "y": 1997,
+      "n": 489,
+      "tur": null,
+      "pay": 0.5378323108384458,
+      "enCok": "MD"
+     },
+     {
+      "y": 1998,
+      "n": 396,
+      "tur": "MD",
+      "pay": 0.7954545454545454,
+      "enCok": "MD"
+     },
+     {
+      "y": 1999,
+      "n": 1124,
+      "tur": "MD",
+      "pay": 0.8398576512455516,
+      "enCok": "MD"
+     },
+     {
+      "y": 2000,
+      "n": 752,
+      "tur": "MD",
+      "pay": 0.8736702127659575,
+      "enCok": "MD"
+     },
+     {
+      "y": 2001,
+      "n": 474,
+      "tur": "MD",
+      "pay": 0.810126582278481,
+      "enCok": "MD"
+     },
+     {
+      "y": 2002,
+      "n": 629,
+      "tur": "MD",
+      "pay": 0.8871224165341812,
+      "enCok": "MD"
+     },
+     {
+      "y": 2003,
+      "n": 1213,
+      "tur": "MD",
+      "pay": 0.9414674361088211,
+      "enCok": "MD"
+     },
+     {
+      "y": 2004,
+      "n": 1265,
+      "tur": "MD",
+      "pay": 0.9027667984189723,
+      "enCok": "MD"
+     },
+     {
+      "y": 2005,
+      "n": 1811,
+      "tur": "MD",
+      "pay": 0.8890115958034235,
+      "enCok": "MD"
+     },
+     {
+      "y": 2006,
+      "n": 902,
+      "tur": "MD",
+      "pay": 0.8470066518847007,
+      "enCok": "MD"
+     },
+     {
+      "y": 2007,
+      "n": 1381,
+      "tur": "MD",
+      "pay": 0.8211440984793628,
+      "enCok": "MD"
+     },
+     {
+      "y": 2008,
+      "n": 1279,
+      "tur": "MD",
+      "pay": 0.7959343236903831,
+      "enCok": "MD"
+     },
+     {
+      "y": 2009,
+      "n": 1134,
+      "tur": "MD",
+      "pay": 0.7328042328042328,
+      "enCok": "MD"
+     },
+     {
+      "y": 2010,
+      "n": 811,
+      "tur": "MD",
+      "pay": 0.6436498150431565,
+      "enCok": "MD"
+     },
+     {
+      "y": 2011,
+      "n": 2175,
+      "tur": "ML",
+      "pay": 0.7498850574712643,
+      "enCok": "ML"
+     },
+     {
+      "y": 2012,
+      "n": 1083,
+      "tur": "ML",
+      "pay": 0.9316712834718375,
+      "enCok": "ML"
+     },
+     {
+      "y": 2013,
+      "n": 575,
+      "tur": "ML",
+      "pay": 0.9165217391304348,
+      "enCok": "ML"
+     },
+     {
+      "y": 2014,
+      "n": 435,
+      "tur": "ML",
+      "pay": 0.8574712643678161,
+      "enCok": "ML"
+     },
+     {
+      "y": 2015,
+      "n": 452,
+      "tur": "ML",
+      "pay": 0.7654867256637168,
+      "enCok": "ML"
+     },
+     {
+      "y": 2016,
+      "n": 395,
+      "tur": "ML",
+      "pay": 0.8911392405063291,
+      "enCok": "ML"
+     },
+     {
+      "y": 2017,
+      "n": 947,
+      "tur": "ML",
+      "pay": 0.9070749736008448,
+      "enCok": "ML"
+     },
+     {
+      "y": 2018,
+      "n": 362,
+      "tur": "ML",
+      "pay": 0.861878453038674,
+      "enCok": "ML"
+     },
+     {
+      "y": 2019,
+      "n": 500,
+      "tur": "ML",
+      "pay": 0.858,
+      "enCok": "ML"
+     },
+     {
+      "y": 2020,
+      "n": 1089,
+      "tur": "ML",
+      "pay": 0.9035812672176309,
+      "enCok": "ML"
+     },
+     {
+      "y": 2021,
+      "n": 684,
+      "tur": "ML",
+      "pay": 0.8523391812865497,
+      "enCok": "ML"
+     },
+     {
+      "y": 2022,
+      "n": 435,
+      "tur": "ML",
+      "pay": 0.8482758620689655,
+      "enCok": "ML"
+     },
+     {
+      "y": 2023,
+      "n": 2905,
+      "tur": "ML",
+      "pay": 0.8395869191049914,
+      "enCok": "ML"
+     },
+     {
+      "y": 2024,
+      "n": 618,
+      "tur": "ML",
+      "pay": 0.8527508090614887,
+      "enCok": "ML"
+     },
+     {
+      "y": 2025,
+      "n": 1148,
+      "tur": "ML",
+      "pay": 0.8867595818815331,
+      "enCok": "ML"
+     },
+     {
+      "y": 2026,
+      "n": 372,
+      "tur": "ML",
+      "pay": 0.8897849462365591,
+      "enCok": "ML"
+     }
+    ],
+    "donemler": [
+     {
+      "tur": "mb",
+      "y0": 1971,
+      "y1": 1989,
+      "n": 716
+     },
+     {
+      "tur": "ML",
+      "y0": 1992,
+      "y1": 1992,
+      "n": 179
+     },
+     {
+      "tur": "MD",
+      "y0": 1995,
+      "y1": 2010,
+      "n": 14225
+     },
+     {
+      "tur": "ML",
+      "y0": 2011,
+      "y1": 2026,
+      "n": 14175
+     }
+    ],
+    "gecisler": [
+     {
+      "a": "mb",
+      "b": "ML",
+      "ySon": 1989,
+      "yIlk": 1992,
+      "karisik": [
+       1990,
+       1991
+      ]
+     },
+     {
+      "a": "ML",
+      "b": "MD",
+      "ySon": 1992,
+      "yIlk": 1995,
+      "karisik": [
+       1993,
+       1994
+      ]
+     },
+     {
+      "a": "MD",
+      "b": "ML",
+      "ySon": 2010,
+      "yIlk": 2011,
+      "karisik": []
+     }
+    ],
+    "oner": {
+     "Mlo": 3.9,
+     "Mhi": 4.1,
+     "aralik": [
+      {
+       "pay": 0.5,
+       "M": 4.1,
+       "tur": "mb",
+       "nYil": 55,
+       "nKarisik": 15
+      },
+      {
+       "pay": 0.6,
+       "M": 4,
+       "tur": "mb",
+       "nYil": 55,
+       "nKarisik": 26
+      },
+      {
+       "pay": 0.7,
+       "M": 3.9,
+       "tur": "mb",
+       "nYil": 55,
+       "nKarisik": 41
+      }
+     ]
+    },
+    "yilTum": 56,
+    "nDeg": 54,
+    "nYetersiz": 2,
+    "minN": 20,
+    "M0": 3.2
+   },
+   "uyari": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: mb → ML (son mb yılı 1989, ilk ML yılı 1992; karışık: 1990, 1991); ML → MD (son ML yılı 1992, ilk MD yılı 1995; karışık: 1993, 1994); MD → ML (son MD yılı 2010, ilk ML yılı 2011). Baskın tür dönemleri: mb 1971–1989, ML 1992, MD 1995–2010, ML 2011–2026 (değerlendirilen yıl 54 / 56). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,9–4,1 (%50: 4,1, 55 yıl; %60: 4,0, 55 yıl; %70: 3,9, 55 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.",
+   "yetersiz": null,
+   "mcUyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,8 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %20 kadarı (623 / 3055) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %53 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  },
+  "birlesik_cs": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "yillar": [
+     {
+      "y": 1971,
+      "n": 86,
+      "tur": "mb",
+      "pay": 0.9418604651162791,
+      "enCok": "mb"
+     },
+     {
+      "y": 1972,
+      "n": 20,
+      "tur": "mb",
+      "pay": 0.9,
+      "enCok": "mb"
+     },
+     {
+      "y": 1975,
+      "n": 38,
+      "tur": "mb",
+      "pay": 0.868421052631579,
+      "enCok": "mb"
+     },
+     {
+      "y": 1976,
+      "n": 51,
+      "tur": "mb",
+      "pay": 0.9411764705882353,
+      "enCok": "mb"
+     },
+     {
+      "y": 1977,
+      "n": 27,
+      "tur": "mb",
+      "pay": 0.7777777777777778,
+      "enCok": "mb"
+     },
+     {
+      "y": 1978,
+      "n": 20,
+      "tur": "mb",
+      "pay": 0.75,
+      "enCok": "mb"
+     },
+     {
+      "y": 1982,
+      "n": 24,
+      "tur": "mb",
+      "pay": 0.9583333333333334,
+      "enCok": "mb"
+     },
+     {
+      "y": 1983,
+      "n": 47,
+      "tur": "mb",
+      "pay": 0.8723404255319149,
+      "enCok": "mb"
+     },
+     {
+      "y": 1984,
+      "n": 31,
+      "tur": "mb",
+      "pay": 0.8387096774193549,
+      "enCok": "mb"
+     },
+     {
+      "y": 1985,
+      "n": 25,
+      "tur": "mb",
+      "pay": 0.88,
+      "enCok": "mb"
+     },
+     {
+      "y": 1986,
+      "n": 28,
+      "tur": "mb",
+      "pay": 0.75,
+      "enCok": "mb"
+     },
+     {
+      "y": 1987,
+      "n": 22,
+      "tur": "mb",
+      "pay": 0.9090909090909091,
+      "enCok": "mb"
+     },
+     {
+      "y": 1988,
+      "n": 35,
+      "tur": "mb",
+      "pay": 0.8571428571428571,
+      "enCok": "mb"
+     },
+     {
+      "y": 1989,
+      "n": 25,
+      "tur": "mb",
+      "pay": 0.64,
+      "enCok": "mb"
+     },
+     {
+      "y": 1991,
+      "n": 23,
+      "tur": "mb",
+      "pay": 0.6086956521739131,
+      "enCok": "mb"
+     },
+     {
+      "y": 1996,
+      "n": 21,
+      "tur": null,
+      "pay": 0.38095238095238093,
+      "enCok": "mb"
+     },
+     {
+      "y": 1998,
+      "n": 260,
+      "tur": "MD",
+      "pay": 0.7038461538461539,
+      "enCok": "MD"
+     },
+     {
+      "y": 1999,
+      "n": 577,
+      "tur": "MD",
+      "pay": 0.7053726169844021,
+      "enCok": "MD"
+     },
+     {
+      "y": 2000,
+      "n": 349,
+      "tur": "MD",
+      "pay": 0.7679083094555874,
+      "enCok": "MD"
+     },
+     {
+      "y": 2001,
+      "n": 243,
+      "tur": "MD",
+      "pay": 0.6666666666666666,
+      "enCok": "MD"
+     },
+     {
+      "y": 2002,
+      "n": 279,
+      "tur": "MD",
+      "pay": 0.7491039426523297,
+      "enCok": "MD"
+     },
+     {
+      "y": 2003,
+      "n": 442,
+      "tur": "MD",
+      "pay": 0.8416289592760181,
+      "enCok": "MD"
+     },
+     {
+      "y": 2004,
+      "n": 424,
+      "tur": "MD",
+      "pay": 0.7547169811320755,
+      "enCok": "MD"
+     },
+     {
+      "y": 2005,
+      "n": 560,
+      "tur": "MD",
+      "pay": 0.6892857142857143,
+      "enCok": "MD"
+     },
+     {
+      "y": 2006,
+      "n": 270,
+      "tur": null,
+      "pay": 0.5814814814814815,
+      "enCok": "MD"
+     },
+     {
+      "y": 2007,
+      "n": 428,
+      "tur": null,
+      "pay": 0.5911214953271028,
+      "enCok": "MD"
+     },
+     {
+      "y": 2008,
+      "n": 353,
+      "tur": null,
+      "pay": 0.49291784702549574,
+      "enCok": "MD"
+     },
+     {
+      "y": 2009,
+      "n": 318,
+      "tur": null,
+      "pay": 0.44339622641509435,
+      "enCok": "MD"
+     },
+     {
+      "y": 2010,
+      "n": 245,
+      "tur": null,
+      "pay": 0.5714285714285714,
+      "enCok": "ML"
+     },
+     {
+      "y": 2011,
+      "n": 945,
+      "tur": "ML",
+      "pay": 0.746031746031746,
+      "enCok": "ML"
+     },
+     {
+      "y": 2012,
+      "n": 489,
+      "tur": "ML",
+      "pay": 0.8588957055214724,
+      "enCok": "ML"
+     },
+     {
+      "y": 2013,
+      "n": 254,
+      "tur": "ML",
+      "pay": 0.8110236220472441,
+      "enCok": "ML"
+     },
+     {
+      "y": 2014,
+      "n": 246,
+      "tur": "ML",
+      "pay": 0.7682926829268293,
+      "enCok": "ML"
+     },
+     {
+      "y": 2015,
+      "n": 244,
+      "tur": "ML",
+      "pay": 0.6147540983606558,
+      "enCok": "ML"
+     },
+     {
+      "y": 2016,
+      "n": 208,
+      "tur": "ML",
+      "pay": 0.7980769230769231,
+      "enCok": "ML"
+     },
+     {
+      "y": 2017,
+      "n": 484,
+      "tur": "ML",
+      "pay": 0.8264462809917356,
+      "enCok": "ML"
+     },
+     {
+      "y": 2018,
+      "n": 179,
+      "tur": "ML",
+      "pay": 0.7486033519553073,
+      "enCok": "ML"
+     },
+     {
+      "y": 2019,
+      "n": 259,
+      "tur": "ML",
+      "pay": 0.7606177606177607,
+      "enCok": "ML"
+     },
+     {
+      "y": 2020,
+      "n": 601,
+      "tur": "ML",
+      "pay": 0.8302828618968386,
+      "enCok": "ML"
+     },
+     {
+      "y": 2021,
+      "n": 387,
+      "tur": "ML",
+      "pay": 0.7390180878552972,
+      "enCok": "ML"
+     },
+     {
+      "y": 2022,
+      "n": 228,
+      "tur": "ML",
+      "pay": 0.7149122807017544,
+      "enCok": "ML"
+     },
+     {
+      "y": 2023,
+      "n": 1640,
+      "tur": "ML",
+      "pay": 0.7445121951219512,
+      "enCok": "ML"
+     },
+     {
+      "y": 2024,
+      "n": 318,
+      "tur": "ML",
+      "pay": 0.720125786163522,
+      "enCok": "ML"
+     },
+     {
+      "y": 2025,
+      "n": 543,
+      "tur": "ML",
+      "pay": 0.7642725598526704,
+      "enCok": "ML"
+     },
+     {
+      "y": 2026,
+      "n": 188,
+      "tur": "ML",
+      "pay": 0.8031914893617021,
+      "enCok": "ML"
+     }
+    ],
+    "donemler": [
+     {
+      "tur": "mb",
+      "y0": 1971,
+      "y1": 1991,
+      "n": 502
+     },
+     {
+      "tur": "MD",
+      "y0": 1998,
+      "y1": 2005,
+      "n": 3134
+     },
+     {
+      "tur": "ML",
+      "y0": 2011,
+      "y1": 2026,
+      "n": 7213
+     }
+    ],
+    "gecisler": [
+     {
+      "a": "mb",
+      "b": "MD",
+      "ySon": 1991,
+      "yIlk": 1998,
+      "karisik": [
+       1996
+      ]
+     },
+     {
+      "a": "MD",
+      "b": "ML",
+      "ySon": 2005,
+      "yIlk": 2011,
+      "karisik": [
+       2006,
+       2007,
+       2008,
+       2009,
+       2010
+      ]
+     }
+    ],
+    "oner": {
+     "Mlo": 3.9,
+     "Mhi": 3.9,
+     "aralik": [
+      {
+       "pay": 0.5,
+       "M": null
+      },
+      {
+       "pay": 0.6,
+       "M": null
+      },
+      {
+       "pay": 0.7,
+       "M": 3.9,
+       "tur": "mb",
+       "nYil": 55,
+       "nKarisik": 37
+      }
+     ]
+    },
+    "yilTum": 56,
+    "nDeg": 45,
+    "nYetersiz": 11,
+    "minN": 20,
+    "M0": 3.5
+   },
+   "uyari": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,5) baskın büyüklük türü pencere içinde değişiyor: mb → MD (son mb yılı 1991, ilk MD yılı 1998; karışık: 1996); MD → ML (son MD yılı 2005, ilk ML yılı 2011; karışık: 2006, 2007, 2008, 2009, 2010). Baskın tür dönemleri: mb 1971–1991, MD 1998–2005, ML 2011–2026 (değerlendirilen yıl 45 / 56). Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,9 (%50: bulunamadı; %60: bulunamadı; %70: 3,9, 55 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.",
+   "yetersiz": null,
+   "mcUyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Basamak eşiği, o dönemin veriden kestirilen Mc'sinin belirgin biçimde altında: 1971–1997: eşik 4,5, yıllık Mc 1971: 4,9, 1976: 5,0, 1983: 4,8, 1986: 4,8. Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  },
+  "isc71_97": {
+   "Mc": 3.7,
+   "durum": {
+    "on": false,
+    "degerlendirilemedi": false,
+    "yillar": [
+     {
+      "y": 1971,
+      "n": 86,
+      "tur": "mb",
+      "pay": 0.9418604651162791,
+      "enCok": "mb"
+     },
+     {
+      "y": 1972,
+      "n": 20,
+      "tur": "mb",
+      "pay": 0.9,
+      "enCok": "mb"
+     },
+     {
+      "y": 1975,
+      "n": 38,
+      "tur": "mb",
+      "pay": 0.868421052631579,
+      "enCok": "mb"
+     },
+     {
+      "y": 1976,
+      "n": 51,
+      "tur": "mb",
+      "pay": 0.9411764705882353,
+      "enCok": "mb"
+     },
+     {
+      "y": 1977,
+      "n": 27,
+      "tur": "mb",
+      "pay": 0.7777777777777778,
+      "enCok": "mb"
+     },
+     {
+      "y": 1978,
+      "n": 26,
+      "tur": null,
+      "pay": 0.5769230769230769,
+      "enCok": "mb"
+     },
+     {
+      "y": 1979,
+      "n": 20,
+      "tur": null,
+      "pay": 0.45,
+      "enCok": "mb"
+     },
+     {
+      "y": 1980,
+      "n": 28,
+      "tur": "mb",
+      "pay": 0.8214285714285714,
+      "enCok": "mb"
+     },
+     {
+      "y": 1981,
+      "n": 32,
+      "tur": "mb",
+      "pay": 0.8125,
+      "enCok": "mb"
+     },
+     {
+      "y": 1982,
+      "n": 49,
+      "tur": "mb",
+      "pay": 0.8367346938775511,
+      "enCok": "mb"
+     },
+     {
+      "y": 1983,
+      "n": 72,
+      "tur": "mb",
+      "pay": 0.7361111111111112,
+      "enCok": "mb"
+     },
+     {
+      "y": 1984,
+      "n": 57,
+      "tur": "mb",
+      "pay": 0.631578947368421,
+      "enCok": "mb"
+     },
+     {
+      "y": 1985,
+      "n": 45,
+      "tur": "mb",
+      "pay": 0.7333333333333333,
+      "enCok": "mb"
+     },
+     {
+      "y": 1986,
+      "n": 56,
+      "tur": "mb",
+      "pay": 0.7142857142857143,
+      "enCok": "mb"
+     },
+     {
+      "y": 1987,
+      "n": 45,
+      "tur": "mb",
+      "pay": 0.8888888888888888,
+      "enCok": "mb"
+     },
+     {
+      "y": 1988,
+      "n": 60,
+      "tur": "mb",
+      "pay": 0.7833333333333333,
+      "enCok": "mb"
+     },
+     {
+      "y": 1989,
+      "n": 49,
+      "tur": "mb",
+      "pay": 0.6530612244897959,
+      "enCok": "mb"
+     },
+     {
+      "y": 1990,
+      "n": 186,
+      "tur": null,
+      "pay": 0.5698924731182796,
+      "enCok": "MD"
+     },
+     {
+      "y": 1991,
+      "n": 108,
+      "tur": null,
+      "pay": 0.35185185185185186,
+      "enCok": "MD"
+     },
+     {
+      "y": 1992,
+      "n": 86,
+      "tur": null,
+      "pay": 0.46511627906976744,
+      "enCok": "ML"
+     },
+     {
+      "y": 1993,
+      "n": 78,
+      "tur": null,
+      "pay": 0.41025641025641024,
+      "enCok": "mb"
+     },
+     {
+      "y": 1994,
+      "n": 89,
+      "tur": null,
+      "pay": 0.3146067415730337,
+      "enCok": "ML"
+     },
+     {
+      "y": 1995,
+      "n": 163,
+      "tur": null,
+      "pay": 0.4723926380368098,
+      "enCok": "MD"
+     },
+     {
+      "y": 1996,
+      "n": 444,
+      "tur": null,
+      "pay": 0.5900900900900901,
+      "enCok": "MD"
+     },
+     {
+      "y": 1997,
+      "n": 266,
+      "tur": null,
+      "pay": 0.39849624060150374,
+      "enCok": "MD"
+     }
+    ],
+    "yilTum": 27,
+    "nDeg": 25,
+    "nYetersiz": 2,
+    "minN": 20,
+    "M0": 3.7
+   },
+   "uyari": null,
+   "yetersiz": null,
+   "mcUyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,7–4,8 arasında değişiyor; kullanılan Mc = 3,7. Pencerelerin yaklaşık %59 kadarı (124 / 211) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %77 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,8 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  },
+  "kmaras": {
+   "Mc": 3.2,
+   "durum": {
+    "on": true,
+    "yillar": [
+     {
+      "y": 1998,
+      "n": 43,
+      "tur": "MD",
+      "pay": 0.7906976744186046,
+      "enCok": "MD"
+     },
+     {
+      "y": 1999,
+      "n": 22,
+      "tur": "MD",
+      "pay": 0.8636363636363636,
+      "enCok": "MD"
+     },
+     {
+      "y": 2000,
+      "n": 33,
+      "tur": "MD",
+      "pay": 0.8181818181818182,
+      "enCok": "MD"
+     },
+     {
+      "y": 2001,
+      "n": 32,
+      "tur": "MD",
+      "pay": 0.875,
+      "enCok": "MD"
+     },
+     {
+      "y": 2002,
+      "n": 41,
+      "tur": "MD",
+      "pay": 0.926829268292683,
+      "enCok": "MD"
+     },
+     {
+      "y": 2003,
+      "n": 88,
+      "tur": "MD",
+      "pay": 0.9545454545454546,
+      "enCok": "MD"
+     },
+     {
+      "y": 2004,
+      "n": 62,
+      "tur": "MD",
+      "pay": 0.9516129032258065,
+      "enCok": "MD"
+     },
+     {
+      "y": 2005,
+      "n": 80,
+      "tur": "MD",
+      "pay": 0.975,
+      "enCok": "MD"
+     },
+     {
+      "y": 2006,
+      "n": 57,
+      "tur": "MD",
+      "pay": 0.9298245614035088,
+      "enCok": "MD"
+     },
+     {
+      "y": 2007,
+      "n": 110,
+      "tur": "MD",
+      "pay": 0.9090909090909091,
+      "enCok": "MD"
+     },
+     {
+      "y": 2008,
+      "n": 98,
+      "tur": "MD",
+      "pay": 0.8367346938775511,
+      "enCok": "MD"
+     },
+     {
+      "y": 2009,
+      "n": 133,
+      "tur": "MD",
+      "pay": 0.7819548872180451,
+      "enCok": "MD"
+     },
+     {
+      "y": 2010,
+      "n": 71,
+      "tur": "MD",
+      "pay": 0.647887323943662,
+      "enCok": "MD"
+     },
+     {
+      "y": 2011,
+      "n": 41,
+      "tur": null,
+      "pay": 0.4878048780487805,
+      "enCok": "ML"
+     },
+     {
+      "y": 2012,
+      "n": 89,
+      "tur": "ML",
+      "pay": 0.8876404494382022,
+      "enCok": "ML"
+     },
+     {
+      "y": 2013,
+      "n": 63,
+      "tur": "ML",
+      "pay": 0.9523809523809523,
+      "enCok": "ML"
+     },
+     {
+      "y": 2014,
+      "n": 22,
+      "tur": "ML",
+      "pay": 0.8181818181818182,
+      "enCok": "ML"
+     },
+     {
+      "y": 2015,
+      "n": 34,
+      "tur": "ML",
+      "pay": 0.7941176470588235,
+      "enCok": "ML"
+     },
+     {
+      "y": 2016,
+      "n": 28,
+      "tur": "ML",
+      "pay": 0.8928571428571429,
+      "enCok": "ML"
+     },
+     {
+      "y": 2017,
+      "n": 67,
+      "tur": "ML",
+      "pay": 0.9701492537313433,
+      "enCok": "ML"
+     },
+     {
+      "y": 2018,
+      "n": 31,
+      "tur": "ML",
+      "pay": 0.8064516129032258,
+      "enCok": "ML"
+     },
+     {
+      "y": 2019,
+      "n": 31,
+      "tur": "ML",
+      "pay": 0.8387096774193549,
+      "enCok": "ML"
+     },
+     {
+      "y": 2020,
+      "n": 108,
+      "tur": "ML",
+      "pay": 0.8611111111111112,
+      "enCok": "ML"
+     },
+     {
+      "y": 2021,
+      "n": 30,
+      "tur": "ML",
+      "pay": 0.8666666666666667,
+      "enCok": "ML"
+     },
+     {
+      "y": 2022,
+      "n": 55,
+      "tur": "ML",
+      "pay": 0.8363636363636363,
+      "enCok": "ML"
+     },
+     {
+      "y": 2023,
+      "n": 2076,
+      "tur": "ML",
+      "pay": 0.8391136801541426,
+      "enCok": "ML"
+     },
+     {
+      "y": 2024,
+      "n": 245,
+      "tur": "ML",
+      "pay": 0.8857142857142857,
+      "enCok": "ML"
+     },
+     {
+      "y": 2025,
+      "n": 110,
+      "tur": "ML",
+      "pay": 0.9363636363636364,
+      "enCok": "ML"
+     },
+     {
+      "y": 2026,
+      "n": 68,
+      "tur": "ML",
+      "pay": 0.8235294117647058,
+      "enCok": "ML"
+     }
+    ],
+    "donemler": [
+     {
+      "tur": "MD",
+      "y0": 1998,
+      "y1": 2010,
+      "n": 870
+     },
+     {
+      "tur": "ML",
+      "y0": 2012,
+      "y1": 2026,
+      "n": 3057
+     }
+    ],
+    "gecisler": [
+     {
+      "a": "MD",
+      "b": "ML",
+      "ySon": 2010,
+      "yIlk": 2012,
+      "karisik": [
+       2011
+      ]
+     }
+    ],
+    "oner": {
+     "Mlo": 3.8,
+     "Mhi": 3.9,
+     "aralik": [
+      {
+       "pay": 0.5,
+       "M": null
+      },
+      {
+       "pay": 0.6,
+       "M": 3.9,
+       "tur": "ML",
+       "nYil": 12,
+       "nKarisik": 8
+      },
+      {
+       "pay": 0.7,
+       "M": 3.8,
+       "tur": "ML",
+       "nYil": 14,
+       "nKarisik": 11
+      }
+     ]
+    },
+    "yilTum": 29,
+    "nDeg": 29,
+    "nYetersiz": 0,
+    "minN": 20,
+    "M0": 3.2
+   },
+   "uyari": "⚠ Büyüklük Türü Geçişi. Analize giren olaylarda (M ≥ 3,2) baskın büyüklük türü pencere içinde değişiyor: MD → ML (son MD yılı 2010, ilk ML yılı 2012; karışık: 2011). Baskın tür dönemleri: MD 1998–2010, ML 2012–2026. Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ≈ M 3,8–3,9 (%50: bulunamadı; %60: 3,9, 12 yıl; %70: 3,8, 14 yıl); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. Öneri için en az 5 değerlendirilebilir yıl (yıllık en az 10 olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.",
+   "yetersiz": null,
+   "mcUyari": "⚠ Katalog Tamlık Uyarısı. Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. Veriden kestirilen Mc(t) 3,2–4,5 arasında değişiyor; kullanılan Mc = 3,2. Pencerelerin yaklaşık %40 kadarı (155 / 387) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %40 kadarını kaplıyor. Ortak eşik için en az Mc ≈ 4,5 ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın). Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir."
+  }
+ },
+ "denetimler": [
+  "GEÇTİ (1) emsc98: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) emsc98: Mc uyarısı önce = sonra (var)",
+  "GEÇTİ (3) emsc98: tür uyarısı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) emsc98_gk74: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) emsc98_gk74: Mc uyarısı önce = sonra (var)",
+  "GEÇTİ (3) emsc98_gk74: tür uyarısı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) emsc98_mc35: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) emsc98_mc35: Mc uyarısı önce = sonra (yok)",
+  "GEÇTİ (3) emsc98_mc35: tür uyarısı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) emsc98_mc40: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) emsc98_mc40: Mc uyarısı önce = sonra (yok)",
+  "GEÇTİ (3) emsc98_mc40: tür uyarısı yok (veri yeterli) (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) marmara: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) marmara: Mc uyarısı önce = sonra (yok)",
+  "GEÇTİ (3) marmara: tür uyarısı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) marmara_gk74: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) marmara_gk74: Mc uyarısı önce = sonra (yok)",
+  "GEÇTİ (3) marmara_gk74: tür uyarısı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) marmara_gk74_mc40: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) marmara_gk74_mc40: Mc uyarısı önce = sonra (yok)",
+  "GEÇTİ (3) marmara_gk74_mc40: tür uyarısı DEĞERLENDİRİLEMEDİ (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) birlesik: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) birlesik: Mc uyarısı önce = sonra (var)",
+  "GEÇTİ (3) birlesik: tür uyarısı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) birlesik_cs: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) birlesik_cs: Mc uyarısı önce = sonra (var)",
+  "GEÇTİ (3) birlesik_cs: tür uyarısı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) isc71_97: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) isc71_97: Mc uyarısı önce = sonra (var)",
+  "GEÇTİ (3) isc71_97: tür uyarısı yok (veri yeterli) (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (1) kmaras: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra",
+  "GEÇTİ (2) kmaras: Mc uyarısı önce = sonra (var)",
+  "GEÇTİ (3) kmaras: tür uyarısı VAR (b(t) ve a(t) tutarlı; önce yok)",
+  "GEÇTİ (4) Türkiye EMSC 1998–: MD → ML geçişi algılanıyor (2010 → 2011)",
+  "GEÇTİ (4) Kahramanmaraş: ML dönemi içinde tür geçişi yok (yalnız 2012 öncesi geçiş olabilir)",
+  "GEÇTİ (4) Marmara GK74 Mc 4,0 (seyrek): \"değerlendirilemedi\" notu gösteriliyor, \"uyarı yok\" değil",
+  "GEÇTİ (4) \"uyarı yok\" yalnız veri yeterliyken (yetersiz yıl ≤ %50, en az 2 değerlendirilebilir yıl)",
+  "GEÇTİ (4) Her öneri en az 5 değerlendirilebilir yıla dayanıyor",
+  "GEÇTİ (5) Sayfa hatası yok (önce 0, sonra 0)"
+ ],
+ "ozet": {
+  "pass": 39,
+  "fail": 0
+ }
+}
