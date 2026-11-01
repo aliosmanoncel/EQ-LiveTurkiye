@@ -1,0 +1,50 @@
+{
+ "sha1": {
+  "mindanao_psha.py": "43342f92f5fa659e178ef216c5f2b341f8657c1b",
+  "mindanao_logic_tree.py": "3c12c798b3f50e195068bfdd583888fdc5543295"
+ },
+ "seismo_report_commit": "cac09bf",
+ "diziler": {
+  "psha_x_im": [
+   200
+  ],
+  "psha_M_bins": [
+   17
+  ],
+  "psha_c1_med": [
+   200
+  ],
+  "psha_c1_1sig": [
+   200
+  ],
+  "psha_c1_2sig": [
+   200
+  ],
+  "psha_c2_med": [
+   200
+  ],
+  "psha_c_ftls": [
+   200
+  ],
+  "psha_c_comb": [
+   200
+  ],
+  "lt_branch_curves": [
+   27,
+   200
+  ],
+  "lt_branch_weights": [
+   27
+  ],
+  "lt_lam_mean": [
+   200
+  ],
+  "lt_frac_curves": [
+   5,
+   200
+  ],
+  "lt_x_im": [
+   200
+  ]
+ }
+}

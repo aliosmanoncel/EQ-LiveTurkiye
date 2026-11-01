@@ -1,0 +1,165 @@
+{
+ "amac": "Mevcut seismo-report Mindanao PSHA kodu ile OpenQuake hazardlib 3.26.2 hesap çekirdeğinin aynı girdilerle sayısal karşılaştırması (model doğrulaması değil)",
+ "kaynak_kod": {
+  "depo": "seismo-report (yerel, değiştirilmedi)",
+  "commit": "cac09bf",
+  "sha1": {
+   "mindanao_psha.py": "43342f92f5fa659e178ef216c5f2b341f8657c1b",
+   "mindanao_logic_tree.py": "3c12c798b3f50e195068bfdd583888fdc5543295"
+  }
+ },
+ "site": {
+  "ad": "General Santos City",
+  "Vs30_m_s": 360,
+  "zemin_terimi": "0,35·ln(760/Vs30) (kodda; Youngs 1988 yayınının parçası olduğu doğrulanmadı)"
+ },
+ "GMPE": {
+  "denklem": "ln PGA[g] = 19,16 + 1,045 M − 4,738 ln(R + 205,5 e^(0,0968 M)) + 0,54 Zt + zemin",
+  "sigma": "max(1,45 − 0,1 M; 0,35)",
+  "R": "rrup (nokta kırıkta hiposantral uzaklık)",
+  "kesme": "yok (kesilmemiş normal; OpenQuake truncation_level = 99)",
+  "etiket_kodda": "Youngs vd. (1988)",
+  "birincil_kaynak_dogrulamasi": "yapılamadı (RAPOR §3)",
+  "OpenQuake": "yerleşik karşılığı yok → kod_gmpe.MindanaoKodGMPE (birebir kopya)"
+ },
+ "kaynaklar": [
+  {
+   "ad": "Cotabato megathrust",
+   "R_km": 58.105507484230785,
+   "episantral_km": 46,
+   "derinlik_km": 35.5,
+   "b": 0.9,
+   "lam5_yil": 3.0,
+   "Mmin": 5.0,
+   "Mmax": 8.5,
+   "Zt": 0
+  },
+  {
+   "ad": "Davao fay zonu",
+   "R_km": 122.57650672131263,
+   "episantral_km": 120,
+   "derinlik_km": 25.0,
+   "b": 0.9,
+   "lam5_yil": 1.0,
+   "Mmin": 5.0,
+   "Mmax": 7.5,
+   "Zt": 0
+  },
+  {
+   "ad": "FTLS (artçı dizisi oranı)",
+   "R_km": 58.105507484230785,
+   "b": 0.635,
+   "lam5_yil": 226.21445846836724,
+   "Mmin": 5.0,
+   "Mmax": 7.8,
+   "Zt": 0
+  }
+ ],
+ "MFD": {
+  "tur": "kesik G–R, sınıf oranları kodun gr_occur/hazard_one aritmetiğiyle (OpenQuake EvenlyDiscretizedMFD olarak aynen)",
+  "dM": 0.2,
+  "sinif_merkezleri_psha": [
+   5.1,
+   5.3,
+   5.5,
+   5.7,
+   5.9,
+   6.1,
+   6.3,
+   6.5,
+   6.7,
+   6.9,
+   7.1,
+   7.3,
+   7.5,
+   7.7,
+   7.9,
+   8.1,
+   8.3
+  ]
+ },
+ "mantik_agaci": {
+  "B1_b": [
+   [
+    0.635,
+    0.6
+   ],
+   [
+    0.9,
+    0.3
+   ],
+   [
+    1.12,
+    0.1
+   ]
+  ],
+  "B2_GMPE": [
+   [
+    "Zt=0, eps=0",
+    0.7
+   ],
+   [
+    "Zt=0, eps=+0,5σ",
+    0.2
+   ],
+   [
+    "Zt=1",
+    0.1
+   ]
+  ],
+  "B3_Mmax": [
+   [
+    7.8,
+    0.5
+   ],
+   [
+    8.0,
+    0.3
+   ],
+   [
+    8.2,
+    0.2
+   ]
+  ],
+  "lam5": 3.0,
+  "R": "Cotabato",
+  "yuzdelik_yontemi": "IM düzeyinde ağırlıklı sıralama + doğrusal ara değer (kodla aynı)"
+ },
+ "IM_duzeyleri": {
+  "PGA_g": "logspace(log10 0,005; log10 3,0; 200)"
+ },
+ "zaman": {
+  "model": "Poisson",
+  "karsilastirma_suresi_yil": 50.0,
+  "tasarim": {
+   "%10/50": 0.0021072103131565254,
+   "%2/50": 0.0004040541463503893
+  }
+ },
+ "OpenQuake": {
+  "surum": {
+   "openquake.engine": "3.26.2",
+   "numpy": "2.5.4"
+  },
+  "hesap": "openquake.hazardlib.calc.hazard_curve.calc_hazard_curves (klasik PSHA çekirdeği); job.ini motor akışı ayrıca çalıştırılmadı",
+  "kaynak": "PointSource + PointMSR, düşey düzlem (ızgara etkisiz)",
+  "geometri_esitleme": {
+   "kod_R_km": {
+    "s1": 58.105507484230785,
+    "s2": 122.57650672131263
+   },
+   "oq_rrup_km": {
+    "s1": {
+     "min": 58.1055,
+     "maks": 58.1055
+    },
+    "s2": {
+     "min": 122.5765,
+     "maks": 122.5765
+    }
+   },
+   "site_lon": 0.4148808759574224,
+   "kaynak2_lat": 1.0813795319532065
+  }
+ }
+}
