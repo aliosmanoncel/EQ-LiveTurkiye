@@ -1306,6 +1306,7 @@
       <div id="cmpMsg" style="margin-top:3px;color:#f59e0b;"></div>
       <svg id="cmpSvg" viewBox="0 0 420 400" preserveAspectRatio="xMidYMid meet" style="display:none;margin:6px auto;width:100%;max-width:400px;height:auto"></svg>
       <div id="cmpTable" style="overflow-x:auto;"></div>
+      <div id="cmpProbFig" style="display:none;margin-top:8px;"></div>
     </div>
   </div>
   </div></div>
@@ -3579,6 +3580,10 @@ function cmpAdd() {
   const nm = document.getElementById('cmpName').value.trim() || (document.getElementById('posterRegion')?.value.trim()) || `Bölge ${CMP.length + 1}`;
   CMP.push({ name: nm, src: regionSourceLabel(), shape: regionShapeText(), area: regionAreaKm2(), cLat, t0, t1, Mc, dm,
     mags: ev.map(e => Math.round((e.mw ?? e.mag) * 100) / 100), types, url: location.href, added: new Date().toISOString(),
+    // 2026-11-01 (olasılık modülü): eklendiği andaki GK74 durumu ve yorum katmanı uyarıları; eski kayıtlarda yok → "bilinmiyor"
+    gk74: !!(typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect),
+    mcU: typeof lastMcUyari !== 'undefined' && lastMcUyari ? (lastMcUyari.on ? lastMcUyari.tur : null) : undefined,
+    turU: typeof lastTurUyari !== 'undefined' && lastTurUyari ? (lastTurUyari.on ? lastTurUyari.gecisler.map(g => `${g.a} → ${g.b} (${g.ySon}–${g.yIlk})`).join('; ') : lastTurUyari.degerlendirilemedi ? 'değerlendirilemedi' : null) : undefined,
     pts: ev.filter(e => isFinite(e.lat) && isFinite(e.lon)).map(e => [Math.round(e.lat * 1e3) / 1e3, Math.round(e.lon * 1e3) / 1e3, Math.round((e.mw ?? e.mag) * 100) / 100]),
     geom: !regionRect ? null : regionIsCircle && regionCircleCenter ? { k: 'c', lat: regionCircleCenter.lat, lon: regionCircleCenter.lon, R: regionCircleRadiusKm }
       : regionIsPolygon ? { k: 'p', ring: regionRect.getLatLngs()[0].map(ll => [ll.lat, ll.lng]) }
@@ -3600,10 +3605,52 @@ function cmpStats(r) {
   const ci = b ? bCiFields(b, n, sub.map(m => m - r.Mc), r.dm || 0.1) : null;   // 2026-10-25: %95 aralık (normal kipte gösterilmez, eski ± σ kalır)
   return { T, u, n, b, sb, ci, gridOff: gM.nOff, a, N5: cnt(5), N6: cnt(6), Mmax, tr6, lam5: T > 0 ? cnt(5) / (T * u) : null, unit, small: n < 50, extrap: Mmax < 6 };
 }
+// ══ Poisson aşılma olasılığı — bölge karşılaştırması (2026-11-01; analysis/poisson_olasilik/PLAN_olasilik_modulu.md) ══════════════════════════
+// Model: λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc)) — tablodaki "M≥6 tekrarlanma" (tr6 = 1/λ(≥6)) ile aynı model: kesilmesiz G–R, Aki–Utsu b, tek Mc,
+// bölgenin tamamı için. P(≥M; t) = 1 − e^(−λt) (grPoissonP). Zamandan bağımsız (sabit oranlı) Poisson; deprem tahmini değildir.
+// Belirsizlik: a ve b'nin ORTAK parametrik bootstrap'ı — grPoissonBootSimple ile aynı çekiliş şeması, tekrar sayısı ve tohum: n* ~ Poisson(n) (a'yı
+// taşır), büyüklükler Mc − ΔM/2'den b̂ ile üstel çekilip ΔM ızgarasına yuvarlanır, b* = computeBvalue (b'yi taşır). Her çekilişin (n*, b*) çifti
+// saklanır; tablo hücreleri ve olasılık eğrisinin tüm (M, t) noktaları aynı çekilişlerden hesaplanır.
+const CMP_PROB = { M: [5, 6, 7], t: [10, 50, 100], tFig: [10, 25, 50, 100] }, cmpProbCache = new Map();   // t: tablo; tFig: yayın şekli (Alkan vd. 2025, Şekil 10 düzeni)
+function cmpProbBoot(n, T, b, Mc, dm) {
+  const key = [n, T, b, Mc, dm].join('|'); if (cmpProbCache.has(key)) return cmpProbCache.get(key);
+  const B = Math.max(200, Math.min(GR_POIS.B, Math.floor(GR_POIS.maxDraws / Math.max(1, n)))), rnd = mulberry32(GR_POIS.seed), beta = b * Math.LN10, D = []; let nFail = 0;
+  for (let k = 0; k < B; k++) {
+    const ns = poissonSample(n, rnd); if (ns < 10) { nFail++; continue; }
+    const mg = new Array(ns); for (let i = 0; i < ns; i++) mg[i] = bGridRound(Mc - dm / 2 - Math.log(1 - rnd()) / beta, Mc, dm);
+    const bs = computeBvalue(mg, Mc, dm); if (!(bs > 0)) { nFail++; continue; } D.push([ns, bs]); }
+  const o = { B, nFail, seed: GR_POIS.seed, D }; if (cmpProbCache.size > 20) cmpProbCache.clear(); cmpProbCache.set(key, o); return o;
+}
+function cmpProbAt(D, T, Mc, M, t, qs) { const P = D.map(([ns, bs]) => grPoissonP(grLambdaSimple(ns, T, bs, Mc, M), t)); return qs.map(q => grPctl(P, q)); }
+function cmpProb(r, s) {
+  if (!s || !s.b || !(s.T > 0) || r.Mc === null || !(s.n >= 10)) return null;
+  const bt = cmpProbBoot(s.n, s.T, s.b, r.Mc, r.dm || 0.1);
+  const cell = (M, t) => { const lam = grLambdaSimple(s.n, s.T, s.b, r.Mc, M), [lo, l16, h84, hi] = cmpProbAt(bt.D, s.T, r.Mc, M, t, [0.025, 0.16, 0.84, 0.975]);
+    return { M, t, lam, P: grPoissonP(lam, t), lo, l16, h84, hi, ex: M > s.Mmax + 1e-9 }; };
+  return { cell, bt };
+}
+// Olasılık uyarıları (bölge başına): bağımsızlık (GK74), tamlık, büyüklük türü geçişi, mb doygunluğu, ekstrapolasyon
+function cmpProbWarn(r, s) {
+  const w = [], y = (t, c) => w.push(`<span style="color:${c || '#f59e0b'}">${t}</span>`);
+  if (r.gk74 === true) y('GK74 açık: bağımsızlık garanti değil; büyük dizi dönemlerinde olasılık iyimser kalabilir', '#d4a24a');
+  else if (r.gk74 === false) y('GK74 kapalı: artçılar dahil, olasılık büyük olasılıkla şişkin');
+  else y('GK74 durumu bilinmiyor (eski kayıt)', '#94a3b8');
+  if (r.mcU) y('tamlık (Mc) uyarısı var: oran ve b etkilenebilir');
+  else if (r.mcU === undefined) y('tamlık uyarısı bilinmiyor (eski kayıt)', '#94a3b8');
+  if (r.turU === 'değerlendirilemedi') y('büyüklük türü geçişi değerlendirilemedi', '#94a3b8');
+  else if (r.turU) y(`büyüklük türü geçişi: ${r.turU.replace(/</g, '&lt;')}`);
+  else if (r.turU === undefined) y('tür geçişi bilinmiyor (eski kayıt)', '#94a3b8');
+  const nT = Object.values(r.types || {}).reduce((a, v) => a + v, 0), mb = nT ? (r.types.mb || 0) / nT : 0;
+  if (mb >= 0.5) y(`mb %${Math.round(100 * mb)}: mb doygunluğu nedeniyle M ≥ 6 eksik sayılabilir`);
+  if (s && Number.isFinite(s.Mmax) && s.Mmax < Math.max(...CMP_PROB.M)) y(`ᵉ M > gözlenen Mmax (${s.Mmax.toFixed(1)}): ekstrapolasyon`);
+  return w.join('<br>');
+}
+function cmpRng(lo, hi) { const a = cmpPc(lo), b = cmpPc(hi); return a === b ? a : `${a} – ${b}`; }   // '–>' yazı tipinde ok (→) bağı oluşturmasın
+function cmpPc(v) { return v === null || v === undefined || !Number.isFinite(v) ? '—' : v > 0.999 ? '&gt; 99,9' : v < 0.001 ? '&lt; 0,1' : (100 * v).toFixed(1).replace('.', ','); }
 function cmpRender() {
   const svg = document.getElementById('cmpSvg'), tbl = document.getElementById('cmpTable'), msg = document.getElementById('cmpMsg');
   if (!svg || !tbl) return;
-  if (!CMP.length) { svg.style.display = 'none'; tbl.innerHTML = ''; if (msg) msg.textContent = ''; return; }
+  if (!CMP.length) { svg.style.display = 'none'; tbl.innerHTML = ''; if (msg) msg.textContent = ''; { const pf = document.getElementById('cmpProbFig'); if (pf) { pf.style.display = 'none'; pf.innerHTML = ''; } } return; }
   const S = CMP.map(cmpStats), unit = S[0].unit, uLab = unit === 'deg' ? '/yıl/kare derece' : unit === '1e4' ? '/yıl/10⁴ km²' : '/yıl';
   // 2026-10-27: a ve dikey eksen literatürdeki gösterimle (Ambraseys 2006, GJI 165, Eş. 3: log(N/y·a) = α − β·M) yazılır; hesap değişmedi
   const logLab = unit === 'none' ? 'log₁₀[N(≥M)/T]' : 'log₁₀[N(≥M)/(T·A)]', aLab = unit === 'none' ? 'log₁₀(N/T) = a − bM' : 'log₁₀(N/T·A) = a − bM',
@@ -3637,7 +3684,7 @@ function cmpRender() {
     `<text x="${(L + pw / 2).toFixed(1)}" y="${H - 1}" fill="#888" font-size="8" text-anchor="middle">Büyüklük M</text>`;
   svg.innerHTML = g; svg.style.display = 'block';
   // — tablo
-  gnssLoad(); const M = CMP.map((r, i) => cmpMoment(r, S[i]));
+  gnssLoad(); const M = CMP.map((r, i) => cmpMoment(r, S[i])), PR = CMP.map((r, i) => cmpProb(r, S[i]));
   { const gi = document.getElementById('cmpGnssInfo'); if (gi) gi.textContent = GNSS ? `GNSS: ${GNSS.meta.n_kept.toLocaleString('tr-TR')} istasyon, ${GNSS.meta.frame}, ${String(GNSS.meta.downloaded_utc).slice(0, 10)}` : 'GNSS: ' + GNSS_STATE; }
   const f = (v, d = 2) => v === null || v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(d);
   const ex = v => v === null || !Number.isFinite(v) ? '—' : v >= 1e4 || v < 0.01 ? v.toExponential(2) : v.toPrecision(3);
@@ -3649,6 +3696,9 @@ function cmpRender() {
       return P === null ? '—' : `<span title="P: iki b'nin aynı olduğu hipotezi altında olasılık; P &lt; 0,05 → b farkı anlamlı (%95). Küçük N'de anlamsız sonuç 'fark yok' demek değildir: güç düşüktür." style="color:${P < 0.05 ? '#fbbf24' : '#cbd5e1'}">${P < 0.001 ? '&lt; 0,001' : P.toFixed(3).replace('.', ',')}${P < 0.05 ? ' (anlamlı)' : ''}</span>`; }]] : []),
     ['Mmax', (r, s) => f(s.Mmax, 1)], ['N(≥5) / N(≥6)', (r, s) => `${s.N5} / ${s.N6}`], [`λ(≥5) ${uLab}`, (r, s) => ex(s.lam5)],
     ['M≥6 tekrarlanma (yıl, tüm bölge)', (r, s) => s.tr6 ? ex(s.tr6) + (s.extrap ? ' (ekstrapolasyon)' : '') : '—'],
+    ...CMP_PROB.M.map(Mp => [`P(≥${Mp}; t), % [%95] — Poisson, tüm bölge`, (r, s, i) => { const p = PR[i]; if (!p) return '—';
+      return CMP_PROB.t.map(t => { const c = p.cell(Mp, t); return `<span style="white-space:nowrap${c.ex ? ';font-style:italic' : ''}" title="λ(≥${Mp}) = ${c.lam.toExponential(3)} /yıl; %68: ${cmpRng(c.l16, c.h84)}">${t} yıl: <b>${cmpPc(c.P)}</b> [${cmpRng(c.lo, c.hi)}]${c.ex ? ' ᵉ' : ''}</span>`; }).join('<br>'); }]),
+    ['Olasılık uyarıları', (r, s) => cmpProbWarn(r, s)],
     ['GNSS istasyonu (MIDAS)', (r, s, i) => M[i].geo !== null ? `${M[i].nSt} (rms ${f(M[i].st.rms, 1)} mm/yıl)` : `${M[i].nSt ?? '—'}${M[i].geoWhy ? ` <span style="color:#f59e0b">${M[i].geoWhy}</span>` : ''}`],
     ['ε̇₁ / ε̇₂ (nstrain/yıl)', (r, s, i) => M[i].geo !== null ? `${f(M[i].st.e1 * 1e9, 1)} / ${f(M[i].st.e2 * 1e9, 1)}` : '—'],
     ['Ṁ₀ jeodezik (N·m/yıl)', (r, s, i) => M[i].geo !== null ? `${ex(M[i].geo)} ± ${ex(M[i].geoSd)}` : '—'],
@@ -3659,7 +3709,108 @@ function cmpRender() {
     ['', (r, s, i) => `<a href="${r.url.replace(/"/g, '&quot;')}" target="_blank" rel="noopener" style="color:#67e8f9">bağlantı</a> · <a href="#" onclick="cmpRemove(${i});return false;" style="color:#f87171">çıkar</a>`]];
   tbl.innerHTML = `<table style="border-collapse:collapse;width:100%;font-size:.95em;margin-top:4px;"><tr><th ${th}></th>${CMP.map((r, i) => `<th ${th}><span style="color:${CMP_COL[i]}">■</span> ${r.name.replace(/</g, '&lt;')}</th>`).join('')}</tr>` +
     rows.map(([k, fn]) => `<tr><td ${td} style="color:#94a3b8">${k}</td>${CMP.map((r, i) => `<td ${td}>${fn(r, S[i], i)}</td>`).join('')}</tr>`).join('') + '</table>' +
-    `<div style="color:#666;margin-top:3px;">Oranlar ${uLab} biriminde (Ambraseys 2006 yaklaşımı); a, ${aLab} doğrusunun M = 0'daki kesişimidir (Ambraseys 2006, Eş. 3: log(N/y·a) = α − β·M), olay sayısı değildir. Moment oranları tüm bölge içindir: jeodezik Savage & Simpson (1997), H = ${cmpParams().H} km, μ = ${cmpParams().mu / 1e9} GPa; sismik Kostrov (1974) toplamı ve kesik G–R (Hyndman & Weichert 1983); kenetlenme = sismik ÷ jeodezik (Sparacino vd. 2022). Kısa katalog süresi kenetlenmeyi olduğundan düşük gösterebilir. a, Mc'deki gözlenen orandan; tekrarlanma süresi G–R doğrusundan, tüm bölge alanı için. Retrospektif; tehlike değerlendirmesi değildir.</div>`;
+    `<div style="color:#666;margin-top:3px;">Oranlar ${uLab} biriminde (Ambraseys 2006 yaklaşımı); a, ${aLab} doğrusunun M = 0'daki kesişimidir (Ambraseys 2006, Eş. 3: log(N/y·a) = α − β·M), olay sayısı değildir. Moment oranları tüm bölge içindir: jeodezik Savage & Simpson (1997), H = ${cmpParams().H} km, μ = ${cmpParams().mu / 1e9} GPa; sismik Kostrov (1974) toplamı ve kesik G–R (Hyndman & Weichert 1983); kenetlenme = sismik ÷ jeodezik (Sparacino vd. 2022). Kısa katalog süresi kenetlenmeyi olduğundan düşük gösterebilir. a, Mc'deki gözlenen orandan; tekrarlanma süresi G–R doğrusundan, tüm bölge alanı için. Retrospektif; tehlike değerlendirmesi değildir.</div>` +
+    `<div style="color:#94a3b8;margin-top:3px;"><b>Poisson modeli: sabit oranlı, zamandan bağımsız istatistiksel olasılık. Deprem tahmini değildir.</b> P(≥M; t) = 1 − e^(−λt), λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc)): tekrarlanma süresiyle aynı model (kesilmesiz G–R, tek Mc), bölgenin tamamı için (ör. Alkan vd. 2025). [%95]: a ve b'nin ortak parametrik bootstrap'ı (${[...new Set(PR.filter(Boolean).map(p => p.bt.B))].length > 1 ? 'tekrar sayısı bölgeye göre: ' + CMP.map((r, i) => PR[i] ? `${r.name.replace(/</g, '&lt;')} ${PR[i].bt.B}` : null).filter(Boolean).join(', ') : (PR.find(Boolean) ? PR.find(Boolean).bt.B : GR_POIS.B) + ' tekrar'}, tohum ${GR_POIS.seed}); imleç üzerinde %68 aralığı. ᵉ, italik: M gözlenen en büyük büyüklüğün üstünde (ekstrapolasyon). Olay bağımsızlığı varsayılır; GK74 bunu garanti etmez.</div>`;
+  try { cmpProbFigRender(S, PR); } catch (e) { console.warn('[cmpProbFig]', e); }   // yayın şekli (olasılık eğrileri); hata tabloyu etkilemez
+}
+// ══ Yayın şekli: Poisson aşılma olasılığı eğrileri (2026-11-01) ═══════════════════════════════════════════════════════════════════════════════
+// Düzen: Alkan vd. (2025, Acta Geophysica 73, Şekil 10) — bölge başına panel, x = büyüklük, y = olasılık (%, log), süre başına eğri. Belirsizlik ve
+// eksen kapsamı üst düzey dergilerdeki gösterime göre: Khodaverdian vd. (2016, BSSA 106, Şekil 6; y log 10⁻⁴'e kadar, ±1σ) ve Murru vd. (2016,
+// JGR 121, Şekil 5; 16., 50., 84. yüzdelik). Bant: %95 (varsayılan) ya da 16–84 (±1σ), aynı bootstrap çekilişlerinden.
+// Dergi biçimi: beyaz zemin, Arial, 8–9 pt (SVG birimi = pt), çift sütun 174 mm (493 pt) ya da tek sütun 85 mm (241 pt) genişlik; renk körlüğüne
+// uygun Okabe–Ito paleti; %95 bant (a ve b'nin ortak parametrik bootstrap'ı, cmpProbBoot); M > gözlenen Mmax kesikli (ekstrapolasyon).
+// Eğriler tablo hücreleriyle aynı fonksiyondan (cmpProb().cell) gelir; her bölgenin eğrisi kendi Mc'sinden başlar (G–R yalnız M ≥ Mc'de geçerli).
+const CMP_FIG = { col: { 10: '#D55E00', 25: '#E69F00', 50: '#009E73', 100: '#0072B2' }, dM: 0.05, yMin: 0.01, yMax: 100, font: 'Arial, Helvetica, sans-serif' };
+let cmpProbFigBand = '95';   // '95' (2,5–97,5) ya da '68' (16–84, ±1σ)
+function cmpProbCurves(r, s, p) {   // { t: [{ M, P, lo, hi, ex }] }; ex: M > gözlenen Mmax
+  const out = {}; if (!p) return out;
+  const M0 = Math.ceil((r.Mc - 1e-9) / CMP_FIG.dM) * CMP_FIG.dM;
+  for (const t of CMP_PROB.tFig) { const a = []; for (let M = M0; M <= cmpProbFigRange().hi + 1e-9; M = Math.round((M + CMP_FIG.dM) * 1000) / 1000) a.push(p.cell(M, t)); out[t] = a; }
+  return out;
+}
+let cmpProbFigRangeV = { lo: 4, hi: 8 };
+function cmpProbFigRange() { return cmpProbFigRangeV; }
+function cmpProbFigSvg(S, PR, o) {
+  o = Object.assign({ en: true, width: null, band: cmpProbFigBand }, o || {});
+  const bLo = q => o.band === '68' ? q.l16 : q.lo, bHi = q => o.band === '68' ? q.h84 : q.hi;
+  const F = CMP_FIG, n = CMP.length, L = (tr, en) => o.en ? en : tr, num = (v, d) => o.en ? v.toFixed(d) : v.toFixed(d).replace('.', ',');
+  const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const mmaxAll = Math.max(...S.map(s => s.Mmax).filter(Number.isFinite));
+  cmpProbFigRangeV = { lo: Math.floor(Math.min(...CMP.map(r => r.Mc)) * 2) / 2, hi: Math.max(8, Math.min(9.5, Math.ceil(mmaxAll) + 1)) };
+  const R = cmpProbFigRange(), W = o.width || (n === 1 ? 241 : 493), padL = 34, padR = 6, gap = 10, top = 30, plotH = 150, bot = 30, H = top + plotH + bot;
+  const pw = (W - padL - padR - gap * (n - 1)) / n, y = P => { const v = Math.log10(Math.max(F.yMin, Math.min(F.yMax, 100 * P))); return top + plotH * (1 - (v - Math.log10(F.yMin)) / (Math.log10(F.yMax) - Math.log10(F.yMin))); };
+  let g = `<rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>`;
+  CMP.forEach((r, i) => { const s = S[i], p = PR[i], x0 = padL + i * (pw + gap), x = M => x0 + pw * (M - R.lo) / (R.hi - R.lo);
+    // ızgara ve çerçeve
+    for (let d = -2; d <= 2; d++) for (let k = 1; k <= 9; k++) { const v = k * Math.pow(10, d); if (v < F.yMin - 1e-12 || v > F.yMax + 1e-9) continue; const yy = y(v / 100).toFixed(2);
+      g += `<line x1="${x0}" x2="${(x0 + pw).toFixed(2)}" y1="${yy}" y2="${yy}" stroke="${k === 1 ? '#c8c8c8' : '#ececec'}" stroke-width="${k === 1 ? 0.5 : 0.35}"/>`; }
+    for (let M = Math.ceil(R.lo * 2) / 2; M <= R.hi + 1e-9; M += 0.5) { const xx = x(M).toFixed(2); g += `<line x1="${xx}" x2="${xx}" y1="${top}" y2="${top + plotH}" stroke="${Number.isInteger(M) ? '#c8c8c8' : '#ececec'}" stroke-width="${Number.isInteger(M) ? 0.5 : 0.35}"/>`;
+      if (Number.isInteger(M)) g += `<text x="${xx}" y="${top + plotH + 10}" font-size="8" text-anchor="middle">${M.toFixed(0)}</text>`; }
+    if (i === 0) for (const v of [0.01, 0.1, 1, 10, 100]) g += `<text x="${x0 - 3}" y="${(y(v / 100) + 2.8).toFixed(2)}" font-size="8" text-anchor="end">${o.en ? v : String(v).replace('.', ',')}</text>`;
+    g += `<rect x="${x0}" y="${top}" width="${pw.toFixed(2)}" height="${plotH}" fill="none" stroke="#000" stroke-width="0.6"/>`;
+    // başlık: panel harfi ve bölge; parametre satırı
+    g += `<text x="${x0}" y="${top - 16}" font-size="9" font-weight="bold">(${String.fromCharCode(97 + i)}) ${esc(r.name)}</text>`;
+    g += s && s.b ? `<text x="${x0}" y="${top - 5}" font-size="7" fill="#333">M<tspan font-size="5.5" dy="1.5">c</tspan><tspan dy="-1.5"> = ${num(r.Mc, 1)}, b = ${num(s.b, 2)}, N = ${s.n}, T = ${num(s.T, 1)} ${L('yıl', 'yr')}</tspan></text>` : `<text x="${x0}" y="${top - 5}" font-size="7" fill="#b91c1c">${L('yetersiz veri', 'insufficient data')}</text>`;
+    if (!p) return;
+    const C = cmpProbCurves(r, s, p), clipId = `cpf${i}`;
+    g += `<clipPath id="${clipId}"><rect x="${x0}" y="${top}" width="${pw.toFixed(2)}" height="${plotH}"/></clipPath><g clip-path="url(#${clipId})">`;
+    for (const t of CMP_PROB.tFig) { const a = C[t], c = F.col[t]; if (!a || !a.length) continue;
+      g += `<path d="${a.map((q, k) => `${k ? 'L' : 'M'}${x(q.M).toFixed(2)},${y(bHi(q)).toFixed(2)}`).join('')}${a.slice().reverse().map(q => `L${x(q.M).toFixed(2)},${y(bLo(q)).toFixed(2)}`).join('')}Z" fill="${c}" fill-opacity="0.14" stroke="none"/>`; }
+    for (const t of CMP_PROB.tFig) { const a = C[t], c = F.col[t]; if (!a || !a.length) continue;
+      const obs = a.filter(q => !q.ex), ext = a.filter((q, k) => q.ex || (a[k + 1] && a[k + 1].ex));
+      if (obs.length > 1) g += `<path d="${obs.map((q, k) => `${k ? 'L' : 'M'}${x(q.M).toFixed(2)},${y(q.P).toFixed(2)}`).join('')}" fill="none" stroke="${c}" stroke-width="1.1"/>`;
+      if (ext.length > 1) g += `<path d="${ext.map((q, k) => `${k ? 'L' : 'M'}${x(q.M).toFixed(2)},${y(q.P).toFixed(2)}`).join('')}" fill="none" stroke="${c}" stroke-width="1.1" stroke-dasharray="3 2"/>`; }
+    g += `</g>`;
+    if (Number.isFinite(s.Mmax) && s.Mmax < R.hi) { const xm = x(s.Mmax).toFixed(2); g += `<line x1="${xm}" x2="${xm}" y1="${top}" y2="${top + plotH}" stroke="#555" stroke-width="0.6" stroke-dasharray="1 1.5"/>`
+      + `<text transform="translate(${(+xm - 2).toFixed(2)} ${top + plotH - 3}) rotate(-90)" font-size="6.5" fill="#333">M<tspan font-size="5" dy="1.5">max,obs</tspan><tspan dy="-1.5"> = ${num(s.Mmax, 1)}</tspan></text>`; }
+  });
+  // eksen başlıkları ve lejant (ilk panelin sol altı: eğrilerin geçmediği bölge)
+  g += `<text x="${(padL + (W - padL - padR) / 2).toFixed(2)}" y="${H - 6}" font-size="9" text-anchor="middle">${L('Büyüklük', 'Magnitude')}, M</text>`;
+  g += `<text transform="translate(9 ${(top + plotH / 2).toFixed(2)}) rotate(-90)" font-size="9" text-anchor="middle">${L('Aşılma olasılığı (%)', 'Probability of exceedance (%)')}</text>`;
+  { const lx = padL + 5, ly = top + plotH - 6 - 9 * (CMP_PROB.tFig.length + 2); let lg = `<rect x="${lx - 3}" y="${ly - 7}" width="${o.en ? 104 : 110}" height="${9 * (CMP_PROB.tFig.length + 2) + 4}" fill="#fff" fill-opacity="0.9" stroke="#bbb" stroke-width="0.4"/>`;
+    CMP_PROB.tFig.forEach((t, k) => { const yy = ly + 9 * k; lg += `<line x1="${lx}" x2="${lx + 12}" y1="${yy - 2.5}" y2="${yy - 2.5}" stroke="${F.col[t]}" stroke-width="1.1"/><rect x="${lx + 14}" y="${yy - 5.5}" width="6" height="6" fill="${F.col[t]}" fill-opacity="0.14"/><text x="${lx + 23}" y="${yy}" font-size="7">t = ${t} ${L('yıl', 'yr')}</text>`; });
+    const yy = ly + 9 * CMP_PROB.tFig.length; lg += `<rect x="${lx}" y="${yy - 5.5 + 9}" width="12" height="6" fill="#000" fill-opacity="0.14"/><text x="${lx + 15}" y="${yy + 9}" font-size="7">${o.band === '68' ? L('16–84. yüzdelik (±1σ)', '16th–84th percentile (±1σ)') : L('%95 aralık', '95% interval')}</text>`; lg += `<line x1="${lx}" x2="${lx + 12}" y1="${yy - 2.5}" y2="${yy - 2.5}" stroke="#000" stroke-width="1" stroke-dasharray="3 2"/><text x="${lx + 15}" y="${yy}" font-size="7">${L('M > Mmax,gözl. (ekstrapolasyon)', 'M > Mmax,obs (extrapolated)')}</text>`;
+    g += lg; }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}pt" height="${H}pt" viewBox="0 0 ${W} ${H}" font-family="${F.font}" fill="#000">${g}</svg>`;
+}
+// Şekil altyazısı (EN ve TR): yöntem, parametreler, belirsizlik, sınırlar — derginin altyazı alanına doğrudan kopyalanabilir
+function cmpProbBTxt(PR, en) { const Bs = PR.map(p => p ? p.bt.B : null); const u = [...new Set(Bs.filter(v => v !== null))];
+  return u.length <= 1 ? `B = ${u[0]}` : 'B = ' + Bs.map((v, i) => v === null ? null : `${v} (${String.fromCharCode(97 + i)})`).filter(Boolean).join(', '); }
+function cmpProbFigCaption(S, PR, en, band) {
+  band = band || cmpProbFigBand; const bTr = band === '68' ? '16.–84. yüzdelik (±1σ) aralığı' : '%95 aralık', bEn = band === '68' ? '16th–84th percentile (±1σ) range' : '95% intervals';
+  const L = (tr, e) => en ? e : tr, num = (v, d) => en ? v.toFixed(d) : v.toFixed(d).replace('.', ','), B = PR.find(p => p) ? PR.find(p => p).bt : null;
+  const reg = CMP.map((r, i) => `(${String.fromCharCode(97 + i)}) ${r.name} [${r.src}; ${new Date(r.t0).toISOString().slice(0, 10)} – ${new Date(r.t1).toISOString().slice(0, 10)}; A = ${Math.round(r.area || 0).toLocaleString(en ? 'en-US' : 'tr-TR')} km²; GK74 ${r.gk74 === true ? L('açık', 'on') : r.gk74 === false ? L('kapalı', 'off') : L('bilinmiyor', 'unknown')}]`).join('; ');
+  const ts = CMP_PROB.tFig.join(', ').replace(/, (\d+)$/, L(' ve $1', ' and $1'));
+  return L(`Şekil. Zamandan bağımsız Poisson modeline göre t = ${ts} yıl içinde büyüklüğü ≥ M olan en az bir deprem olma olasılığı, P(≥M; t) = 1 − exp[−λ(≥M)·t], bölgenin tamamı için: ${reg}. λ(≥M) = (N(≥Mc)/T)·10^[−b(M − Mc)]; b Aki–Utsu en çok olabilirlik kestirimi, Mc tek tamlık eşiği. Gölgeli alanlar: a ve b'nin ortak parametrik bootstrap'ından ${bTr}${B ? ` (${cmpProbBTxt(PR, false)}, tohum ${B.seed})` : ''}. Kesikli çizgiler: gözlenen en büyük büyüklüğün üstünde ekstrapolasyon. Model sabit oranlı ve olay bağımsızlığı varsayar (GK74 bunu garanti etmez); deprem tahmini değildir. Kaynak: EQ-Live Türkiye.`,
+    `Figure. Probability of at least one earthquake with magnitude ≥ M within t = ${ts} years under a time-independent Poisson model, P(≥M; t) = 1 − exp[−λ(≥M)·t], for the whole of each region: ${reg}. λ(≥M) = (N(≥Mc)/T)·10^[−b(M − Mc)]; b is the Aki–Utsu maximum-likelihood estimate and Mc a single completeness magnitude. Shaded bands: ${bEn} from a joint parametric bootstrap of a and b${B ? ` (${cmpProbBTxt(PR, true)}, seed ${B.seed})` : ''}. Dashed lines: extrapolation beyond the largest observed magnitude. The model assumes a constant rate and independent events (GK74 declustering does not guarantee independence); it is not an earthquake forecast. Source: EQ-Live Türkiye.`);
+}
+let cmpProbFigLast = null;
+function cmpProbFigRender(S, PR) {
+  const el = document.getElementById('cmpProbFig'); if (!el) return;
+  if (!PR.some(p => p)) { el.style.display = 'none'; el.innerHTML = ''; cmpProbFigLast = null; return; }
+  const svgEn = cmpProbFigSvg(S, PR, { en: true }), svgTr = cmpProbFigSvg(S, PR, { en: false });
+  cmpProbFigLast = { svgEn, svgTr, capEn: cmpProbFigCaption(S, PR, true), capTr: cmpProbFigCaption(S, PR, false) };
+  const btn = 'style="background:none;border:1px solid #334;color:#9ab0c5;border-radius:4px;font-size:.78em;padding:1px 6px;cursor:pointer;margin-right:3px"';
+  el.style.display = 'block';
+  el.innerHTML = `<div style="color:#94a3b8;font-size:.8em;margin-bottom:3px">📈 ${'Yayın şekli: Poisson aşılma olasılığı — düzen Alkan vd. (2025); eksen ve belirsizlik gösterimi Khodaverdian vd. (2016, BSSA) ve Murru vd. (2016, JGR); çift sütun 174 mm'}</div>`
+    + `<div id="cmpProbFigSvg" style="background:#fff;border-radius:4px;padding:4px;overflow-x:auto">${svgEn}</div>`
+    + `<div style="margin-top:4px"><span style="color:#94a3b8;font-size:.78em;margin-right:4px">Bant:</span><button ${btn} onclick="cmpProbFigBand='95';cmpRender()" ${cmpProbFigBand === '95' ? 'disabled' : ''}>%95</button><button ${btn} onclick="cmpProbFigBand='68';cmpRender()" ${cmpProbFigBand === '68' ? 'disabled' : ''}>16–84 (±1σ)</button> · <button ${btn} onclick="cmpProbFigDownload('svg','en')">SVG (EN)</button><button ${btn} onclick="cmpProbFigDownload('png','en')">PNG 600 dpi (EN)</button>`
+    + `<button ${btn} onclick="cmpProbFigDownload('svg','tr')">SVG (TR)</button><button ${btn} onclick="cmpProbFigDownload('png','tr')">PNG 600 dpi (TR)</button></div>`
+    + `<details style="margin-top:4px;color:#94a3b8;font-size:.78em"><summary style="cursor:pointer">${'Şekil altyazısı (EN / TR)'}</summary><p id="cmpProbCapEn" style="user-select:all">${cmpProbFigLast.capEn.replace(/</g, '&lt;')}</p><p id="cmpProbCapTr" style="user-select:all">${cmpProbFigLast.capTr.replace(/</g, '&lt;')}</p></details>`;
+}
+// İndirme: SVG (vektörel, pt birimli) ya da PNG 600 dpi (genişlik pt/72·600 piksel; beyaz zemin)
+async function cmpProbFigDownload(fmt, lang) {
+  if (!cmpProbFigLast) return;
+  const svg = lang === 'tr' ? cmpProbFigLast.svgTr : cmpProbFigLast.svgEn, stamp = new Date().toISOString().slice(0, 10), base = `EQLive-Poisson-olasilik-${lang.toUpperCase()}-${stamp}`;
+  const save = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); };
+  const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + svg;
+  if (fmt === 'svg') return save(new Blob([xml], { type: 'image/svg+xml' }), base + '.svg');
+  const m = svg.match(/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/), Wpt = +m[1], Hpt = +m[2], k = 600 / 72, cv = document.createElement('canvas');
+  cv.width = Math.round(Wpt * k); cv.height = Math.round(Hpt * k);
+  const img = new Image(); img.src = URL.createObjectURL(new Blob([xml], { type: 'image/svg+xml' }));
+  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+  const ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(img.src);
+  cv.toBlob(b => save(b, base + '-600dpi.png'), 'image/png');
 }
 // ══ Aşama 2 (2026-10-20): jeodezik ve sismik moment oranı, sismik kenetlenme ═════════════════════════════
 // GNSS: NGL MIDAS (Blewitt vd. 2016), data/gnss_midas.json (haftalık GitHub Actions). Bölge içindeki istasyonlardan
@@ -3731,8 +3882,9 @@ function cmpRemove(i) { CMP.splice(i, 1); cmpSave(); cmpRender(); }
 function cmpExportCSV() {
   if (!CMP.length) return;
   const S = CMP.map(cmpStats), q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const head = ['ad', 'katalog', 'bolge', 't0', 't1', 'T_yil', 'A_km2', 'birim', 'N', 'Mc', 'N_geMc', 'b', 'sigma_b', 'a', 'Mmax', 'N_ge5', 'N_ge6', 'lambda_ge5', 'Tr_M6_yil', 'gnss_n', 'e1_per_yr', 'e2_per_yr', 'M0dot_geod_Nm_yr', 'M0dot_geod_sd', 'M0dot_kostrov_Nm_yr', 'M0dot_truncGR_Nm_yr', 'Mmax_used', 'coupling_kostrov', 'coupling_truncGR', 'H_km', 'mu_GPa', 'url'].concat(B_CI_METHOD === 'normal' ? [] : ['b_alt95', 'b_ust95', 'b_aralik_yontemi']);   // 2026-10-25: yeni sütunlar sona eklenir (eski sütun sırası korunur)
-  const lines = [head.join(',')].concat(CMP.map((r, i) => { const s = S[i]; return [q(r.name), q(r.src), q(r.shape), new Date(r.t0).toISOString(), new Date(r.t1).toISOString(), s.T.toFixed(2), r.area ? r.area.toFixed(0) : '', s.unit, r.mags.length, r.Mc, s.n, s.b ? s.b.toFixed(3) : '', s.sb ? s.sb.toFixed(3) : '', s.a !== null ? s.a.toFixed(3) : '', s.Mmax, s.N5, s.N6, s.lam5 ?? '', s.tr6 ?? '', ...(m => [m.nSt ?? '', m.st && m.st.ok ? m.st.e1 : '', m.st && m.st.ok ? m.st.e2 : '', m.geo ?? '', m.geoSd ?? '', m.kostrov ?? '', m.trGR ?? '', m.mmaxUsed ?? '', m.cKos ?? '', m.cGR ?? '', m.pa.H, m.pa.mu / 1e9])(cmpMoment(r, s)), q(r.url)].concat(B_CI_METHOD === 'normal' ? [] : [s.ci ? s.ci.lo.toFixed(3) : '', s.ci && Number.isFinite(s.ci.hi) ? s.ci.hi.toFixed(3) : (s.ci ? 'inf' : ''), s.ci ? s.ci.ciM : '']).join(','); }));
+  const head = ['ad', 'katalog', 'bolge', 't0', 't1', 'T_yil', 'A_km2', 'birim', 'N', 'Mc', 'N_geMc', 'b', 'sigma_b', 'a', 'Mmax', 'N_ge5', 'N_ge6', 'lambda_ge5', 'Tr_M6_yil', 'gnss_n', 'e1_per_yr', 'e2_per_yr', 'M0dot_geod_Nm_yr', 'M0dot_geod_sd', 'M0dot_kostrov_Nm_yr', 'M0dot_truncGR_Nm_yr', 'Mmax_used', 'coupling_kostrov', 'coupling_truncGR', 'H_km', 'mu_GPa', 'url'].concat(B_CI_METHOD === 'normal' ? [] : ['b_alt95', 'b_ust95', 'b_aralik_yontemi'])
+    .concat(CMP_PROB.M.flatMap(Mp => CMP_PROB.t.flatMap(t => [`P_M${Mp}_t${t}`, `P_M${Mp}_t${t}_alt95`, `P_M${Mp}_t${t}_ust95`])), ['Mmax_ekstrapolasyon_esigi', 'P_bootstrap_B', 'P_bootstrap_tohum', 'gk74', 'mc_uyari', 'tur_uyari']);   // 2026-11-01: olasılık sütunları sona   // 2026-10-25: yeni sütunlar sona eklenir (eski sütun sırası korunur)
+  const lines = [head.join(',')].concat(CMP.map((r, i) => { const s = S[i]; return [q(r.name), q(r.src), q(r.shape), new Date(r.t0).toISOString(), new Date(r.t1).toISOString(), s.T.toFixed(2), r.area ? r.area.toFixed(0) : '', s.unit, r.mags.length, r.Mc, s.n, s.b ? s.b.toFixed(3) : '', s.sb ? s.sb.toFixed(3) : '', s.a !== null ? s.a.toFixed(3) : '', s.Mmax, s.N5, s.N6, s.lam5 ?? '', s.tr6 ?? '', ...(m => [m.nSt ?? '', m.st && m.st.ok ? m.st.e1 : '', m.st && m.st.ok ? m.st.e2 : '', m.geo ?? '', m.geoSd ?? '', m.kostrov ?? '', m.trGR ?? '', m.mmaxUsed ?? '', m.cKos ?? '', m.cGR ?? '', m.pa.H, m.pa.mu / 1e9])(cmpMoment(r, s)), q(r.url)].concat(B_CI_METHOD === 'normal' ? [] : [s.ci ? s.ci.lo.toFixed(3) : '', s.ci && Number.isFinite(s.ci.hi) ? s.ci.hi.toFixed(3) : (s.ci ? 'inf' : ''), s.ci ? s.ci.ciM : '']).concat((p => CMP_PROB.M.flatMap(Mp => CMP_PROB.t.flatMap(t => { if (!p) return ['', '', '']; const c = p.cell(Mp, t); return [c.P, c.lo, c.hi].map(v => Number.isFinite(v) ? v.toFixed(5) : ''); })).concat([s.Mmax, p ? p.bt.B : '', p ? p.bt.seed : '', r.gk74 ?? '', q(r.mcU ?? ''), q(r.turU ?? '')]))(cmpProb(r, s))).join(','); }));
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv' })); a.download = 'EQ-Live-bolge-karsilastirma.csv'; a.click();
 }
 

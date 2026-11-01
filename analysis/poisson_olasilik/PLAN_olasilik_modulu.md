@@ -92,3 +92,55 @@ Not: Bu modül yalnızca zamandan bağımsız Poisson modelini kapsar. BPT ya da
 2. Karşılaştırmada kesik G–R (Mx) seçeneği istenir mi?
 3. Bant: %95 (2,5–97,5) mı, 16–84 mü, ikisi birden mi?
 4. Eğrinin süreleri: önerilen 10, 25, 50, 100 yıl; 30 yıl (Parsons, Murru) eklensin mi?
+
+---
+
+# Uygulama (2026-11-01, aşama 1–2)
+
+## 8. Kaynak denetimi: incelenmemiş iş
+Bu konuşmanın bağlamı dışında, aynı oturum kimliğiyle iki iş yapılmıştı: T düzeltmesi commit'i (5893054) ve commit edilmemiş bir tablo taslağı. İkisi de "henüz kod eklemeyin" ve "T düzeltmesi ayrı onayla" koşullarından önce yapılmıştı; incelenmemiş iş olarak ele alındı:
+- **5893054 (T ≤ şimdi):** İncelendi. Tek satır (`regionClampEnd`); `now` aynı fonksiyonda tanımlı; `scripts/test_window_end.js` 6/6. Mevcut değerleri değiştirir (Hong Kong: T 56,000 → 55,835 yıl, λ(≥6) +%0,30). Geçmişte biten pencereler değişmez. `main`'e geçişi ayrı onaya bağlı.
+- **Tablo taslağı:** İncelendi ve düzeltildi.
+  - Tablo süreleri onaylı 10/50/100 yıla, şekil süreleri 10/25/50/100 yıla getirildi.
+  - Yarım kalan birim testi tamamlandı: test eksik bağımlılıklar yüzünden çalışmıyordu; ayrıca doymamış bir değerle denetim eklendi.
+
+## 9. Literatür dayanağı ve şekil tasarımı
+| Öğe | Kaynak |
+|---|---|
+| Panel düzeni: bölge başına panel, x = M, y = olasılık (%, log), süre başına eğri | Alkan vd. (2025, Acta Geophysica 73, Şekil 10) |
+| y log ekseninin düşük olasılığa inmesi (%0,01) ve ±1σ belirsizlik | Khodaverdian vd. (2016, BSSA 106, Şekil 6) |
+| 16., 50. ve 84. yüzdelik gösterimi | Murru vd. (2016, JGR Solid Earth 121, Şekil 5) |
+
+**Dergi biçimi:**
+- Beyaz zemin; Arial, 7–9 pt (SVG birimi = pt).
+- Genişlik: çift sütun 174 mm (493 pt) ya da tek bölgede tek sütun 85 mm (241 pt).
+- Renk körlüğüne uygun Okabe–Ito paleti.
+- Bant: %95 (varsayılan) ya da 16–84 (±1σ).
+- M > gözlenen Mmax kesikli; Mmax dikey çizgiyle işaretli.
+- Dışa aktarma: SVG (vektörel, pt birimli) ve 600 dpi PNG.
+- İngilizce ve Türkçe altyazı: model, parametreler, bootstrap B ve tohum, bant, GK74 durumu, "deprem tahmini değildir".
+
+## 10. Doğrulama
+| Denetim | Sonuç |
+|---|---|
+| `scripts/test_cmp_prob.js` | 28/28 |
+| — Tutarlılık: P(≥6; t) = 1 − e^(−t/tr6); tablo hücresi = eğri noktası; G–R panelinin bootstrap'ıyla birebir aynı sınırlar | geçti |
+| — Monotonluk; sentetik kapsama (%96,5–97,5, 200 katalog) | geçti |
+| — Şekil: boyut, süreler, Mc'den başlama, ekstrapolasyon, bant seçeneği, altyazı | geçti |
+| Tüm birim testleri | 20/20 |
+| `kabul_cmp_prob.js`, önce = bugünkü değişikliklerden önceki dal (5893054); 3 bölge (Türkiye, Marmara GK74, Doğu Anadolu) | 16/16 |
+| — Mevcut 22 tablo satırı, cmpSvg, G–R, b(t), a(t) aynı; yalnız 4 yeni satır | geçti |
+| — 27 hücre bağımsız hesapla aynı | geçti |
+| — SVG indirme (493 pt) ve 600 dpi PNG (4108 × 1750 px) | geçti |
+| — Sayfa hatası yok | geçti |
+| `main`'e göre | 1c26bb3 (a etiketi) ve G–R Poisson satırı nedeniyle tablo etiketi ve G–R farklı; ikisi de daha önce kendi testleriyle kabul edildi |
+
+Ekran görüntüleri: `cmp_sekil_95.png`, `cmp_sekil_68.png`, `cmp_tablo.png`; indirilen örnekler: `cmp_sekil_EN.svg`, `cmp_sekil_EN_600dpi.png`.
+
+## 11. Karar bekleyen noktalar (güncel)
+1. **Bootstrap tekrar sayısı.** Mevcut şema (`grPoissonBootSimple`) olay başına çekiliş yapıyor ve toplam çekilişi 4·10⁶ ile sınırlıyor. Bu yüzden büyük kataloglarda B düşüyor: Türkiye N = 27 346 → B = 200. Yayın için B ≥ 1000 önerilir.
+   - Öneri: ΔM ızgarasında Mc üstü sınıf sayısı geometrik dağılır; n olayın toplamı negatif binomdur. Böylece b*'nin tam dağılımı olay başına çekiliş olmadan örneklenebilir; B = 2000 tüm bölgelerde ucuzlar.
+   - Bedel: G–R panelinin bootstrap'ıyla "aynı tohumla birebir aynı" eşitliği kalkar. Yerine dağılım eşdeğerliği testi (kapsama ve yüzdeliklerin istatistiksel uyumu) konur.
+2. **Kesik G–R (Kijko–Sellevoll, Mmax).** Khodaverdian vd. (2016) gibi PSHA çalışmalarında olasılık Mmax'ta sıfıra iner. Şu anki model kesilmesiz; Mmax üstü yalnızca kesikli çiziliyor. Seçenek olarak eklenebilir; Mmax'ın kendisi ayrı bir kestirim gerektirir.
+3. **Poster entegrasyonu.** Şekil şimdilik bağımsız (SVG/PNG). Akademik postere ayrı bir panel olarak eklenmesi ayrı iş.
+4. **5893054 (T düzeltmesi)** `main`'e bu işle birlikte mi, ayrı mı geçsin?

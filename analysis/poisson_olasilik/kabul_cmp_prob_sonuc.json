@@ -1,0 +1,194 @@
+{
+ "kayit": [
+  {
+   "name": "Türkiye",
+   "gk74": false,
+   "mcU": "tekMc",
+   "turU": "MD → ML (2010–2011)",
+   "n": 27346,
+   "T": 28.70188370725277,
+   "b": 1.1367955606948117,
+   "Mc": 3.2,
+   "tr6": 1.5997206868492326,
+   "Mmax": 7.8
+  },
+  {
+   "name": "Marmara",
+   "gk74": true,
+   "mcU": null,
+   "turU": "MD → ML (2008–2012)",
+   "n": 624,
+   "T": 28.70188370725277,
+   "b": 1.0007376540163455,
+   "Mc": 3.2,
+   "tr6": 29.160249933802806,
+   "Mmax": 6.3
+  },
+  {
+   "name": "Doğu Anadolu",
+   "gk74": false,
+   "mcU": "tekMc",
+   "turU": "MD → ML (2009–2012)",
+   "n": 5007,
+   "T": 28.70188370725277,
+   "b": 0.9904181052080725,
+   "Mc": 3.2,
+   "tr6": 3.400192488739337,
+   "Mmax": 7.8
+  }
+ ],
+ "tablo": {
+  "Katalog": [
+   "Tarihsel Katalog (ISC+EMSC, statik)",
+   "Tarihsel Katalog (ISC+EMSC, statik)",
+   "Tarihsel Katalog (ISC+EMSC, statik)"
+  ],
+  "Bölge": [
+   "dikdörtgen 36.00–42.00° K, 26.00–45.00° D",
+   "dikdörtgen 40.00–41.50° K, 26.00–31.00° D",
+   "dikdörtgen 36.50–39.00° K, 36.00–41.00° D"
+  ],
+  "Dönem": [
+   "1998-01-01 – 2026-09-14",
+   "1998-01-01 – 2026-09-14",
+   "1998-01-01 – 2026-09-14"
+  ],
+  "T (yıl)": [
+   "28.7",
+   "28.7",
+   "28.7"
+  ],
+  "A (km²)": [
+   "1.094.914",
+   "70.249",
+   "122.195"
+  ],
+  "N (tümü)": [
+   "48584",
+   "1283",
+   "7987"
+  ],
+  "Mc": [
+   "3.2",
+   "3.2",
+   "3.2"
+  ],
+  "N(≥Mc)": [
+   "27346",
+   "624",
+   "5007"
+  ],
+  "b [%95]": [
+   "1.14 [1.13–1.16]",
+   "1.00 [0.93–1.09]",
+   "0.99 [0.97–1.02]"
+  ],
+  "a [log₁₀(N/T·A) = a − bM; T: yıl, A: 10⁴ km²]": [
+   "4.58",
+   "3.69",
+   "4.32"
+  ],
+  "b farkı, 1. bölgeye göre (Utsu 1992, P)": [
+   "referans",
+   "0,002 (anlamlı)",
+   "< 0,001 (anlamlı)"
+  ],
+  "Mmax": [
+   "7.8",
+   "6.3",
+   "7.8"
+  ],
+  "N(≥5) / N(≥6)": [
+   "252 / 19",
+   "11 / 3",
+   "63 / 7"
+  ],
+  "λ(≥5) /yıl/10⁴ km²": [
+   "0.0802",
+   "0.0546",
+   "0.180"
+  ],
+  "M≥6 tekrarlanma (yıl, tüm bölge)": [
+   "1.60",
+   "29.2",
+   "3.40"
+  ],
+  "P(≥5; t), % [%95] — Poisson, tüm bölge": [
+   "10 yıl: > 99,9 [> 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
+   "10 yıl: 96,8 [91,5 – 99,2]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
+   "10 yıl: > 99,9 [> 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]"
+  ],
+  "P(≥6; t), % [%95] — Poisson, tüm bölge": [
+   "10 yıl: 99,8 [99,7 – > 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
+   "10 yıl: 29,0 [18,6 – 44,1]50 yıl: 82,0 [64,3 – 94,6]100 yıl: 96,8 [87,3 – 99,7]",
+   "10 yıl: 94,7 [92,0 – 97,3]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]"
+  ],
+  "P(≥7; t), % [%95] — Poisson, tüm bölge": [
+   "10 yıl: 36,6 [34,7 – 42,0]50 yıl: 89,8 [88,2 – 93,4]100 yıl: 99,0 [98,6 – 99,6]",
+   "10 yıl: 3,4 [1,7 – 6,8] ᵉ50 yıl: 15,7 [8,3 – 29,6] ᵉ100 yıl: 29,0 [15,9 – 50,4] ᵉ",
+   "10 yıl: 26,0 [21,7 – 32,6]50 yıl: 77,8 [70,6 – 86,1]100 yıl: 95,1 [91,3 – 98,1]"
+  ],
+  "Olasılık uyarıları": [
+   "GK74 kapalı: artçılar dahil, olasılık büyük olasılıkla şişkintamlık (Mc) uyarısı var: oran ve b etkilenebilirbüyüklük türü geçişi: MD → ML (2010–2011)",
+   "GK74 açık: bağımsızlık garanti değil; büyük dizi dönemlerinde olasılık iyimser kalabilirbüyüklük türü geçişi: MD → ML (2008–2012)ᵉ M > gözlenen Mmax (6.3): ekstrapolasyon",
+   "GK74 kapalı: artçılar dahil, olasılık büyük olasılıkla şişkintamlık (Mc) uyarısı var: oran ve b etkilenebilirbüyüklük türü geçişi: MD → ML (2009–2012)"
+  ],
+  "GNSS istasyonu (MIDAS)": [
+   "194 (rms 6.6 mm/yıl)",
+   "19 (rms 2.4 mm/yıl)",
+   "19 (rms 1.3 mm/yıl)"
+  ],
+  "ε̇₁ / ε̇₂ (nstrain/yıl)": [
+   "20.6 / -10.8",
+   "104.4 / -66.7",
+   "20.1 / -19.5"
+  ],
+  "Ṁ₀ jeodezik (N·m/yıl)": [
+   "2.03e+19 ± 1.66e+18",
+   "6.60e+18 ± 6.25e+17",
+   "2.21e+18 ± 3.35e+17"
+  ],
+  "Ṁ₀ sismik, Kostrov ΣM₀/T": [
+   "3.94e+19",
+   "3.32e+17",
+   "3.16e+19"
+  ],
+  "Ṁ₀ sismik, kesik G–R": [
+   "1.41e+19 (Mmax 7.8)",
+   "1.55e+17 (Mmax 6.3)",
+   "7.55e+18 (Mmax 7.8)"
+  ],
+  "Sismik kenetlenme (Kostrov / G–R)": [
+   "%194 / %70",
+   "%5 / %2",
+   "%1429 / %342"
+  ],
+  "Büyüklük türleri": [
+   "md %50, ml %44, mb %4",
+   "md %58, ml %35, mb %5",
+   "ml %60, md %32, mb %5"
+  ]
+ },
+ "denetimler": [
+  "GEÇTİ (1) main'deki 22 tablo satırının hepsi aynı değerlerle duruyor",
+  "GEÇTİ (1) yalnız 4 yeni satır: P(≥5; t), % [%95] — Poisson, tüm bölge | P(≥6; t), % [%95] — Poisson, tüm bölge | P(≥7; t), % [%95] — Poisson, tüm bölge | Olasılık uyarıları",
+  "GEÇTİ (1) karşılaştırma grafiği (cmpSvg) aynı",
+  "GEÇTİ (1) G–R grafiği ve metni (Poisson satırı dışında) aynı",
+  "GEÇTİ (1) b(t) ve a(t) grafikleri ve metinleri aynı",
+  "GEÇTİ (2) 27 hücrenin 27'i bağımsız hesapla aynı (P = 1 − e^(−λt), λ = n/T·10^(−b(M − Mc)))",
+  "GEÇTİ (2) P(≥6; t) = 1 − e^(−t/tr6): tablodaki tekrarlanma süresiyle tutarlı",
+  "GEÇTİ (3) GK74 durumu kayıtta ve uyarıda doğru (Türkiye kapalı, Marmara açık)",
+  "GEÇTİ (3) tamlık ve tür uyarı alanları kayıtlı (Türkiye: tür MD → ML (2010–2011); Marmara: tür MD → ML (2008–2012); Doğu Anadolu: tür MD → ML (2009–2012))",
+  "GEÇTİ (4) yayın şekli: 493 pt, 3 panel (a–c), 4 süre",
+  "GEÇTİ (4) bant düğmesi (16–84) şekli değiştiriyor",
+  "GEÇTİ (4) altyazı EN/TR, üç bölge",
+  "GEÇTİ (4) önce (main) yayın şekli yok",
+  "GEÇTİ (5) SVG indirildi (75 KB, vektörel, 493 × 210 pt)",
+  "GEÇTİ (5) PNG 600 dpi: 4108 × 1750 px (= 174 mm genişlik)",
+  "GEÇTİ (6) sayfa hatası yok (0)"
+ ],
+ "ozet": {
+  "pass": 16,
+  "fail": 0
+ }
+}
