@@ -74,6 +74,7 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
         const b2 = hucre(2000), b5 = hucre(5000); GR_POIS.B = 2000; cmpProbCache.clear();
         const gr = CMP.map((r, i) => { const g = grPoissonBootSimple(S[i].n, S[i].T, S[i].b, r.Mc, r.dm || 0.1, 7, 50), c = cmpProb(r, S[i]).cell(7, 50); return { lo: g.pLo, hi: g.pHi, clo: c.lo, chi: c.hi, B: g.B }; });
         return { b2, b5, gr }; });
+      R.dipnot = await p.evaluate(() => document.getElementById('cmpTable').innerText);
       R.dugme = await p.evaluate(() => [...document.querySelectorAll('#cmpProbFig button')].map(b => b.textContent).join(' | '));
       R.fig68 = await p.evaluate(() => { cmpProbFigBand = '68'; cmpRender(); return document.getElementById('cmpProbFigSvg').innerHTML; });
       const fEl2 = await p.$('#cmpProbFigSvg'); await fEl2.screenshot({ path: path.join(__dirname, 'cmp_sekil_68.png') });
@@ -114,6 +115,7 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
   { const k = R.kayit[1], tr7 = k.T / (k.n * Math.pow(10, -k.b * (7 - k.Mc))), u = Y.tablo['Olasılık uyarıları'][1];
     ok(tr7 / k.T > 10 && /‡ M≥7: Tr ≈ .* yüksek ekstrapolasyon belirsizliği/.test(u), `(7) Marmara M≥7: Tr ≈ ${tr7.toFixed(0)} yıl, T = ${k.T.toFixed(1)} yıl (Tr/T = ${(tr7 / k.T).toFixed(2)}) → ‡ belirgin uyarı`); }
   ok((F.match(/<tspan dy="-1\.5"> = T<\/tspan>/g) || []).length === 3 && /fill-opacity="0\.06"/.test(F) && /Grey area: Tr > 10T/.test(R.cap.en), '(7) şekil: her panelde Tr = T çizgisi, Tr > 10T gri zemin, lejant ve altyazı');
+  ok(/operational criterion/.test(R.cap.en) && /operasyonel bir değerlendirme ölçütüdür/.test(R.cap.tr) && /operasyonel bir ölçüttür/.test(JSON.stringify(R.dipnot || '')), '(7) 10T sınırı altyazıda (EN/TR) ve tablo dipnotunda operasyonel ölçüt olarak belirtiliyor');
   ok(R.cap && /not an earthquake forecast/.test(R.cap.en) && /deprem tahmini değildir/.test(R.cap.tr) && /\(c\) Doğu Anadolu/.test(R.cap.en), '(4) altyazı EN/TR, üç bölge');
   ok(!O.fig, '(4) önce (main) yayın şekli yok');
   // (8) aşama 3: NegBin, B = 2000, sağlamlık B = 5000

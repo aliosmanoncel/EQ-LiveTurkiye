@@ -1,14 +1,14 @@
 {
  "sema": "eqlive-poisson-olasilik-repro/1",
- "olusturma": "2026-11-01T20:14:25.795Z",
+ "olusturma": "2026-11-01T20:36:44.629Z",
  "yazilim": {
   "uygulama": "EQ-Live Türkiye",
   "modul": "poisson-olasilik 2026-11-01 (aşama 4)",
   "depo": "https://github.com/aliosmanoncel/EQ-LiveTurkiye",
-  "index_html_git_blob_sha1": "defddcac98356cf6c1b045f6be9bb25a1047694c",
+  "index_html_git_blob_sha1": "c753c1400995dc91de8fe9a8967c720e4b0c1c59",
   "commit": null,
   "commit_kaynagi": "GitHub API erişilemedi: commit blob SHA ile bulunur",
-  "dogrulama": "git log --all --format=%H --find-object=defddcac98356cf6c1b045f6be9bb25a1047694c -- index.html",
+  "dogrulama": "git log --all --format=%H --find-object=c753c1400995dc91de8fe9a8967c720e4b0c1c59 -- index.html",
   "tarayici": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36"
  },
  "model": {
@@ -89,7 +89,7 @@
      "donusum": "none"
     },
     "gk74_surum": "gk74-ctx-frozen-2026-10-06",
-    "kayit_zamani": "2026-11-01T20:12:47.224Z",
+    "kayit_zamani": "2026-11-01T20:35:04.162Z",
     "blob": {
      "data/eq_historical.json": "879a89b948e6ca4b47eaf5b23bd3e9993452eee4"
     }
@@ -137,8 +137,8 @@
    },
    "girdi_buyukluk_sha256": "cb051cde0c79562fdef2015894456fe4dd6955eebc3f0871e858c01026748af1",
    "girdi_buyukluk_kodlama": "artan sıralı, 2 ondalık, virgülle ayrılmış (reproMagsStr)",
-   "url": "http://127.0.0.1:41163/",
-   "eklenme": "2026-11-01T20:12:47.224Z",
+   "url": "http://127.0.0.1:36509/",
+   "eklenme": "2026-11-01T20:35:04.161Z",
    "girdi_buyukluklar": [
     3,
     3,
@@ -48933,7 +48933,7 @@
      "donusum": "none"
     },
     "gk74_surum": "gk74-ctx-frozen-2026-10-06",
-    "kayit_zamani": "2026-11-01T20:13:30.068Z",
+    "kayit_zamani": "2026-11-01T20:35:49.818Z",
     "blob": {
      "data/eq_historical.json": "879a89b948e6ca4b47eaf5b23bd3e9993452eee4"
     }
@@ -48979,8 +48979,8 @@
    },
    "girdi_buyukluk_sha256": "212cf258b5a7b13504c524e06bbe084d7356bd652120954422482dd8e92b265d",
    "girdi_buyukluk_kodlama": "artan sıralı, 2 ondalık, virgülle ayrılmış (reproMagsStr)",
-   "url": "http://127.0.0.1:41163/",
-   "eklenme": "2026-11-01T20:13:30.068Z",
+   "url": "http://127.0.0.1:36509/",
+   "eklenme": "2026-11-01T20:35:49.818Z",
    "girdi_buyukluklar": [
     3,
     3.2,
@@ -50474,7 +50474,7 @@
      "donusum": "none"
     },
     "gk74_surum": "gk74-ctx-frozen-2026-10-06",
-    "kayit_zamani": "2026-11-01T20:14:16.385Z",
+    "kayit_zamani": "2026-11-01T20:36:34.732Z",
     "blob": {
      "data/eq_historical.json": "879a89b948e6ca4b47eaf5b23bd3e9993452eee4"
     }
@@ -50522,8 +50522,8 @@
    },
    "girdi_buyukluk_sha256": "ae355a71a019afae0c8ef42bee47d6bd910609b1fa3e72b96c0dbe910f1fbcf7",
    "girdi_buyukluk_kodlama": "artan sıralı, 2 ondalık, virgülle ayrılmış (reproMagsStr)",
-   "url": "http://127.0.0.1:41163/",
-   "eklenme": "2026-11-01T20:14:16.384Z",
+   "url": "http://127.0.0.1:36509/",
+   "eklenme": "2026-11-01T20:36:34.732Z",
    "girdi_buyukluklar": [
     3,
     3,
