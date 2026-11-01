@@ -5,7 +5,8 @@
 //   b(t) ve a(t) grafikleri ve metinleri aynı. (2) Yeni satırlar: P(≥M; t) hücreleri cmpStats değerlerinden bağımsız hesapla aynı ve
 //   P(≥6; t) = 1 − e^(−t/tr6). (3) Uyarılar: GK74 durumu kayıtla tutarlı. (4) Yayın şekli: SVG var, 493 pt, 3 panel, 4 süre; bant düğmesi
 //   şekli değiştiriyor; altyazı. (7) Aşama 2: '±1σ' yok; Tr/T satırı bağımsız hesapla aynı ve sınıflar (†, ‡) doğru; Marmara M≥7 ‡;
-//   şekilde Tr = T çizgisi ve Tr > 10T zemini. (5) PNG 600 dpi indirme: boyut 4108 × (H/72·600) px. (6) Sayfa hatası yok.
+//   şekilde Tr = T çizgisi ve Tr > 10T zemini. (8) Aşama 3: NegBin örnekleyici, üç bölgede B = 2000; sağlamlık B = 5000 ile %95 sınır farkları
+//   (yüzde puan) raporlanır; G–R panelinin bootstrap'ı ile karşılaştırma tablosu aynı çekilişleri kullanır. (5) PNG 600 dpi indirme: boyut 4108 × (H/72·600) px. (6) Sayfa hatası yok.
 // Ekran görüntüleri: cmp_tablo.png, cmp_sekil_95.png, cmp_sekil_68.png; indirilen dosyalar: cmp_sekil_EN.svg, cmp_sekil_EN_600dpi.png
 // Kullanım (depo kökünde): LEAFLET_DIR=<node_modules> node analysis/poisson_olasilik/kabul_cmp_prob.js <önceki_index.html>
 'use strict';
@@ -67,6 +68,10 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
       const fEl = await p.$('#cmpProbFigSvg'); await fEl.scrollIntoViewIfNeeded(); await fEl.screenshot({ path: path.join(__dirname, 'cmp_sekil_95.png') });
       const [dS] = await Promise.all([p.waitForEvent('download'), p.evaluate(() => cmpProbFigDownload('svg', 'en'))]); await dS.saveAs(path.join(__dirname, 'cmp_sekil_EN.svg'));
       const [dP] = await Promise.all([p.waitForEvent('download'), p.evaluate(() => cmpProbFigDownload('png', 'en'))]); await dP.saveAs(path.join(__dirname, 'cmp_sekil_EN_600dpi.png'));
+      R.boot = await p.evaluate(() => { const S = CMP.map(cmpStats), hucre = B => { GR_POIS.B = B; cmpProbCache.clear(); const o = CMP.map((r, i) => { const pr = cmpProb(r, S[i]); return { B: pr.bt.B, nFail: pr.bt.nFail, sampler: pr.bt.sampler, c: [5, 6, 7].flatMap(M => [10, 50, 100].map(t => { const c = pr.cell(M, t); return { M, t, P: c.P, lo: c.lo, hi: c.hi }; })) }; }); return o; };
+        const b2 = hucre(2000), b5 = hucre(5000); GR_POIS.B = 2000; cmpProbCache.clear();
+        const gr = CMP.map((r, i) => { const g = grPoissonBootSimple(S[i].n, S[i].T, S[i].b, r.Mc, r.dm || 0.1, 7, 50), c = cmpProb(r, S[i]).cell(7, 50); return { lo: g.pLo, hi: g.pHi, clo: c.lo, chi: c.hi, B: g.B }; });
+        return { b2, b5, gr }; });
       R.dugme = await p.evaluate(() => [...document.querySelectorAll('#cmpProbFig button')].map(b => b.textContent).join(' | '));
       R.fig68 = await p.evaluate(() => { cmpProbFigBand = '68'; cmpRender(); return document.getElementById('cmpProbFigSvg').innerHTML; });
       const fEl2 = await p.$('#cmpProbFigSvg'); await fEl2.screenshot({ path: path.join(__dirname, 'cmp_sekil_68.png') });
@@ -109,13 +114,22 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
   ok((F.match(/<tspan dy="-1\.5"> = T<\/tspan>/g) || []).length === 3 && /fill-opacity="0\.06"/.test(F) && /Grey area: Tr > 10T/.test(R.cap.en), '(7) şekil: her panelde Tr = T çizgisi, Tr > 10T gri zemin, lejant ve altyazı');
   ok(R.cap && /not an earthquake forecast/.test(R.cap.en) && /deprem tahmini değildir/.test(R.cap.tr) && /\(c\) Doğu Anadolu/.test(R.cap.en), '(4) altyazı EN/TR, üç bölge');
   ok(!O.fig, '(4) önce (main) yayın şekli yok');
+  // (8) aşama 3: NegBin, B = 2000, sağlamlık B = 5000
+  { const { b2, b5, gr } = R.boot; let mx = 0, mxAt = ''; const sat = [];
+    b2.forEach((x, i) => x.c.forEach((c, j) => { const d = b5[i].c[j], dl = 100 * Math.max(Math.abs(c.lo - d.lo), Math.abs(c.hi - d.hi)); if (dl > mx) { mx = dl; mxAt = `${R.kayit[i].name} M≥${c.M}, t = ${c.t}`; }
+      if (c.M === 7 && c.t === 50) sat.push(`${R.kayit[i].name}: %95 [${(100 * c.lo).toFixed(2)}–${(100 * c.hi).toFixed(2)}] (B 2000) / [${(100 * d.lo).toFixed(2)}–${(100 * d.hi).toFixed(2)}] (B 5000)`); }));
+    R.sonuc_boot = { maks_fark_yp: mx, yer: mxAt, M7_t50: sat };
+    ok(b2.every(x => x.B === 2000 && x.sampler === 'NegBin (Gamma–Poisson)') && b5.every(x => x.B === 5000), `(8) üç bölgede B = 2000 (NegBin; Türkiye dahil, eski şemada 200); sağlamlık B = 5000 hesaplandı`);
+    ok(mx < 1.0, `(8) B = 2000 ile 5000 arasında %95 sınırlarının en büyük farkı ${mx.toFixed(3)} yüzde puan (${mxAt}); P(≥7; 50 yıl): ${sat.join('; ')}`);
+    ok(gr.every(g => g.lo === g.clo && g.hi === g.chi && g.B === 2000), '(8) G–R panelinin bootstrap\'ı (grPoissonBootSimple) ile karşılaştırma tablosu aynı çekilişler: P(≥7; 50 yıl) sınırları birebir aynı');
+  }
   // (5) indirilen dosyalar
   const svgD = fs.readFileSync(path.join(__dirname, 'cmp_sekil_EN.svg'), 'utf8'), png = fs.readFileSync(path.join(__dirname, 'cmp_sekil_EN_600dpi.png'));
   const Wp = png.readUInt32BE(16), Hp = png.readUInt32BE(20), m = svgD.match(/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/);
   ok(/^<\?xml/.test(svgD) && m && +m[1] === 493, `(5) SVG indirildi (${(svgD.length / 1024).toFixed(0)} KB, vektörel, 493 × ${m && m[2]} pt)`);
   ok(Wp === Math.round(493 * 600 / 72) && Hp === Math.round(+m[2] * 600 / 72), `(5) PNG 600 dpi: ${Wp} × ${Hp} px (= 174 mm genişlik)`);
   ok(!hat.length, `(6) sayfa hatası yok (${hat.length})` + (hat.length ? ': ' + hat.join(' | ') : ''));
-  fs.writeFileSync(path.join(__dirname, 'kabul_cmp_prob_sonuc.json'), JSON.stringify({ kayit: R.kayit, tablo: Y.tablo, denetimler: kayit, ozet: { pass, fail } }, null, 1));
+  fs.writeFileSync(path.join(__dirname, 'kabul_cmp_prob_sonuc.json'), JSON.stringify({ kayit: R.kayit, tablo: Y.tablo, bootstrap: R.sonuc_boot, denetimler: kayit, ozet: { pass, fail } }, null, 1));
   console.log(`\n${fail ? 'KALDI' : 'GEÇTİ'}: ${pass} geçti, ${fail} kaldı`);
   await br.close(); srv.close(); process.exit(fail ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });

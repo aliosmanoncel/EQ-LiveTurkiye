@@ -11,6 +11,9 @@
 //       SVG boyutu (çift sütun 493 pt, tek sütun 241 pt), eksen başlıkları, lejant; altyazı (B, tohum, 'not an earthquake forecast').
 //   (h) Aşama 2: bant etiketi '±1σ' içermez; ekstrapolasyon sınıfı Tr/T (≤ 1, ≤ exK, > exK), sınır büyüklükleri kapalı biçimle tutarlı,
 //       Marmara benzeri örnek (Tr(≥7)/T ≈ 10,1) 'yuksek'; uyarı, tablo işaretleri, şekil (Tr = T çizgisi, Tr > 10T zemini), altyazı, CSV sütunları.
+//   (i) Aşama 3 (NegBin örnekleyici): G–R paneli ve olasılık paneli aynı grBootDraws çekilişlerini kullanır; B = 2000 her n'de (Türkiye
+//       n = 27 346 dahil; eski şemada 200); S | n* için Gamma–Poisson ortalama ve varyansı NegBin'e eşit; b* > 0, reddedilen yalnız n* < 10.
+//       Ayrıntılı dağılım karşılaştırması: analysis/poisson_olasilik/negbin_karsilastirma.js.
 //   (a') Doymamış değerde tutarlılık: P(≥7; 10 yıl) = 1 − e^(−10·λ(≥7)), %0–100 arasında.
 // Kullanım (depo kökünde): node scripts/test_cmp_prob.js [index.html]
 'use strict';
@@ -22,7 +25,7 @@ const line = re => { const m = src.match(re); if (!m) throw new Error('bulunamad
 const ctx = { document: { getElementById: () => ({ value: '1e4' }) }, B_CI_METHOD: 'normal', B_GRID_MODE: 'sinif' }; vm.createContext(ctx);   // B_GRID_MODE: uygulamanın varsayılanı (URL ?bgrid=ham yoksa)
 vm.runInContext([line(/^const GR_POIS = [^\n]*$/m), line(/^const GR_QC = [^\n]*$/m), line(/^const CMP_PROB = [^\n]*$/m), line(/^const CMP_MAX = [^\n]*$/m),
   ...['mulberry32', 'logGamma', 'poissonSample', 'bGridRound', 'bGridVals', 'computeBvalue', 'bConfidence95', 'bCiFields', 'grPoissonP', 'grLambdaSimple', 'grPctl',
-      'bGridOffCount', 'grPoissonBootSimple', 'cmpStats', 'cmpProbBoot', 'cmpProbAt', 'cmpProb', 'cmpProbWarn', 'cmpProbExtrap', 'cmpProbMk', 'cmpTr', 'cmpTrT', 'cmpPc', 'cmpRng', 'cmpProbCurves', 'cmpProbFigRange', 'cmpProbFigSvg', 'cmpProbBTxt', 'cmpProbFigCaption'].map(fn), line(/^const CMP_FIG = [^\n]*$/m), line(/^const CMP_EX = \{[\s\S]*?\} \};$/m), 'var cmpProbFigRangeV = { lo: 4, hi: 8 };', "var cmpProbFigBand = '95';"].join('\n').replace(/^var CMP_PROB = (.*), cmpProbCache = new Map\(\);$/m, 'var CMP_PROB = $1; var cmpProbCache = new Map();'), ctx);
+      'bGridOffCount', 'gammaSample', 'grBootDraws', 'grPoissonBootSimple', 'cmpStats', 'cmpProbBoot', 'cmpProbAt', 'cmpProb', 'cmpProbWarn', 'cmpProbExtrap', 'cmpProbMk', 'cmpTr', 'cmpTrT', 'cmpPc', 'cmpRng', 'cmpProbCurves', 'cmpProbFigRange', 'cmpProbFigSvg', 'cmpProbBTxt', 'cmpProbFigCaption'].map(fn), line(/^const CMP_FIG = [^\n]*$/m), line(/^const CMP_EX = \{[\s\S]*?\} \};$/m), 'var cmpProbFigRangeV = { lo: 4, hi: 8 };', "var cmpProbFigBand = '95';"].join('\n').replace(/^var CMP_PROB = (.*), cmpProbCache = new Map\(\);$/m, 'var CMP_PROB = $1; var cmpProbCache = new Map();'), ctx);
 vm.runInContext(src.match(/^const LANCZOS_C = \[[\s\S]*?\];$/m)[0].replace(/^const /, 'var '), ctx);
 const X = ctx; let pass = 0, fail = 0; const ok = (c, m) => { c ? pass++ : fail++; console.log((c ? '  ok  ' : '  !!  ') + m); };
 const YIL = 365.25 * 864e5;
@@ -77,7 +80,7 @@ function kayit(seed, T, lam0, b, Mc, extra) { const r = X.mulberry32(seed), n = 
     ok(s68 !== svg && /16th–84th percentile</.test(s68) && /16\.–84\. yüzdelik</.test(s68tr) && /95% interval/.test(svg) && /16th–84th percentile range/.test(c68) && /16\.–84\. yüzdelik aralığı/.test(c68tr) && /95% intervals/.test(cap), 'bant seçeneği: %95 (varsayılan) ve 16.–84. yüzdelik; lejant ve altyazı bandı belirtiyor');
     ok(![svg, s68, s68tr, cap, c68, c68tr, capTr].some(t => /1σ|1 σ|sigma/i.test(t)), "(h) şekil ve altyazıda '±1σ' yok (bootstrap yüzdeliği σ olarak adlandırılmıyor)");
     ok(/>0\.01<\/text>/.test(svg), 'y ekseni %0,01\'e iniyor (Khodaverdian vd. 2016 gibi düşük olasılık kuyruğu)'); }
-  ok(/B = 1000, seed 20261027/.test(cap) && /not an earthquake forecast/.test(cap) && /GK74 on/.test(cap) && /GK74 off/.test(cap) && /deprem tahmini değildir/.test(capTr), 'altyazı: bootstrap B ve tohum, GK74 durumu, "tahmin değildir" (EN/TR)'); }
+  ok(/B = 2000, seed 20261027/.test(cap) && /not an earthquake forecast/.test(cap) && /GK74 on/.test(cap) && /GK74 off/.test(cap) && /deprem tahmini değildir/.test(capTr), 'altyazı: bootstrap B ve tohum, GK74 durumu, "tahmin değildir" (EN/TR)'); }
 { // (h) ekstrapolasyon sınıfı
   const K = X.CMP_PROB.exK, e = X.cmpProbExtrap;
   ok(K === 10 && e(1 / 20, 20).exC === 'gozlem' && e(1 / 20.0001, 20).exC === 'uzatma' && e(1 / 200, 20).exC === 'uzatma' && e(1 / 200.01, 20).exC === 'yuksek' && e(0, 20).exC === null, '(h) sınıflar: Tr ≤ T gözlem, T < Tr ≤ 10T uzatma, Tr > 10T yüksek (sınırlar dahil/hariç doğru)');
@@ -96,5 +99,16 @@ function kayit(seed, T, lam0, b, Mc, extra) { const r = X.mulberry32(seed), n = 
   const cT = PR[0].cell(+(m1 - 0.01).toFixed(3), 10), cU = PR[0].cell(+(m1 + 0.01).toFixed(3), 10), cY = PR[0].cell(+(mK + 0.01).toFixed(3), 10);
   ok(cT.exC === 'gozlem' && cU.exC === 'uzatma' && cY.exC === 'yuksek', '(h) hücre sınıfı şekildeki sınırlarla aynı (M_T − 0,01 gözlem, + 0,01 uzatma; M_10T + 0,01 yüksek)');
   ok(/Solid vertical line: magnitude at which the mean recurrence interval Tr = 1\/λ\(≥M\) equals the catalogue duration T/.test(cap) && /Grey area: Tr > 10T/.test(cap) && /Gri alan: Tr > 10T/.test(capTr), '(h) altyazı Tr = T ve Tr > 10T ölçütünü açıklıyor (EN/TR)'); }
+{ // (i) NegBin örnekleyici
+  const r = kayit(7, 40, 30, 1.0, 4.0), s = X.cmpStats(r), bt = X.cmpProbBoot(s.n, s.T, s.b, r.Mc, 0.1), g = X.grBootDraws(s.n, s.b, r.Mc, 0.1, X.GR_POIS.B, X.GR_POIS.seed);
+  ok(JSON.stringify(bt.D) === JSON.stringify(g.D) && bt.B === 2000 && bt.sampler === 'NegBin (Gamma–Poisson)', `(i) bölge karşılaştırması = G–R paneli: aynı grBootDraws çekilişleri (B = ${bt.B}, ${bt.sampler})`);
+  const big = X.grBootDraws(27346, 1.14, 3.2, 0.1, X.GR_POIS.B, X.GR_POIS.seed), gp = X.grPoissonBootSimple(27346, 28.6, 1.14, 3.2, 0.1, 6, 50);
+  ok(big.B === 2000 && big.D.length === 2000 && gp.B === 2000 && big.D.every(([n, b]) => n >= 10 && b > 0), '(i) Türkiye ölçeği (n = 27 346): B = 2000, tüm tekrarlar geçerli (eski şemada B = 200)');
+  ok(X.grBootDraws(5, 1, 4, 0.1, 500, 1).nFail === 500 - X.grBootDraws(5, 1, 4, 0.1, 500, 1).D.length && X.grBootDraws(12, 1, 4, 0.1, 500, 1).nFail > 0, '(i) reddedilen tekrar yalnız n* < 10 (eski şemayla aynı ölçüt)');
+  const ns = 40, q = Math.pow(10, -0.1), th = q / (1 - q), rnd = X.mulberry32(99), K = 40000, S = []; for (let k = 0; k < K; k++) S.push(X.poissonSample(X.gammaSample(ns, rnd) * th, rnd));
+  const m = S.reduce((a, v) => a + v, 0) / K, v = S.reduce((a, x) => a + (x - m) ** 2, 0) / (K - 1), m0 = ns * q / (1 - q), v0 = ns * q / (1 - q) ** 2;
+  ok(Math.abs(m - m0) < 4 * Math.sqrt(v0 / K) && Math.abs(v / v0 - 1) < 0.04, `(i) S | n* = ${ns}: Gamma–Poisson ortalama ${m.toFixed(2)} (NegBin ${m0.toFixed(2)}), varyans ${v.toFixed(1)} (NegBin ${v0.toFixed(1)})`);
+  const gs = []; const r2 = X.mulberry32(3); for (let k = 0; k < 40000; k++) gs.push(X.gammaSample(12.5, r2)); const gm = gs.reduce((a, x) => a + x, 0) / gs.length, gv = gs.reduce((a, x) => a + (x - gm) ** 2, 0) / (gs.length - 1);
+  ok(Math.abs(gm - 12.5) < 4 * Math.sqrt(12.5 / 40000) && Math.abs(gv / 12.5 - 1) < 0.04, `(i) gammaSample(12,5): ortalama ${gm.toFixed(3)}, varyans ${gv.toFixed(2)} (beklenen 12,5 / 12,5)`); }
 console.log(`
 ${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);

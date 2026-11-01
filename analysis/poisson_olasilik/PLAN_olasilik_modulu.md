@@ -160,3 +160,5 @@ Kararlar: (1) T düzeltmesi ayrı dal `pencere-sonu-T` (584cd6e); bu dalda `git 
 - Şekil: Tr = T büyüklüğünde düz dikey çizgi; Tr > 10T bölgesi gri zemin; lejant panellerin altına alındı (dikey işaretlerle çakışmasın); dikey işaret etiketleri ≥ 8 pt aralıklı yerleştirilir.
 - Kabul (üç bölge, EMSC 1998–): Marmara M≥7 Tr ≈ 292 yıl, T = 28,7 yıl, Tr/T = 10,2 → ‡; Marmara M≥6 Tr/T = 1,02 → †; Doğu Anadolu M≥7 Tr/T = 1,16 → †; Türkiye M≥7 Tr/T = 0,76 → işaretsiz.
 - Değişmeyen: λ, P ve bootstrap aralıkları (27/27 hücre bağımsız hesapla aynı); mevcut 22 tablo satırı, cmpSvg, G–R, b(t), a(t) önce = sonra.
+
+**Aşama 3 — uygulanan (NegBin örnekleyici):** `grBootDraws` (Gamma–Poisson ile S | n\* ~ NegBin), G–R paneli, dönem raporu ve bölge karşılaştırmasında ortak; B = 2000 (tüm n), sağlamlık `?bootB=5000`; Weichert bootstrap'ı B = 1000'de bırakıldı (`GR_POIS.Bw`, ayrı karar). Kanıt ve doğrulama: `NEGBIN_esdegerlik.md`, `negbin_karsilastirma.js`. Ek bulgu (önceden var, değiştirilmedi): gruplanmış büyüklükte Aki–Utsu sapması büyük n'de yüzdelik aralığını kaydırıyor (Türkiye ≈ 0,9 sd) — karar bekliyor.

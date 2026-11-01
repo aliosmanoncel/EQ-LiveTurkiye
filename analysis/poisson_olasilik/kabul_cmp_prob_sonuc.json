@@ -115,18 +115,18 @@
   ],
   "P(≥5; t), % [%95] — Poisson, tüm bölge": [
    "10 yıl: > 99,9 [> 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
-   "10 yıl: 96,8 [91,5 – 99,2]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
+   "10 yıl: 96,8 [91,3 – 99,2]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
    "10 yıl: > 99,9 [> 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]"
   ],
   "P(≥6; t), % [%95] — Poisson, tüm bölge": [
    "10 yıl: 99,8 [99,7 – > 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
-   "10 yıl: 29,0 [18,6 – 44,1] †50 yıl: 82,0 [64,3 – 94,6] †100 yıl: 96,8 [87,3 – 99,7] †",
+   "10 yıl: 29,0 [18,3 – 43,7] †50 yıl: 82,0 [63,5 – 94,3] †100 yıl: 96,8 [86,7 – 99,7] †",
    "10 yıl: 94,7 [92,0 – 97,3]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]"
   ],
   "P(≥7; t), % [%95] — Poisson, tüm bölge": [
-   "10 yıl: 36,6 [34,7 – 42,0]50 yıl: 89,8 [88,2 – 93,4]100 yıl: 99,0 [98,6 – 99,6]",
-   "10 yıl: 3,4 [1,7 – 6,8] ᵉ ‡50 yıl: 15,7 [8,3 – 29,6] ᵉ ‡100 yıl: 29,0 [15,9 – 50,4] ᵉ ‡",
-   "10 yıl: 26,0 [21,7 – 32,6] †50 yıl: 77,8 [70,6 – 86,1] †100 yıl: 95,1 [91,3 – 98,1] †"
+   "10 yıl: 36,6 [34,9 – 42,1]50 yıl: 89,8 [88,3 – 93,5]100 yıl: 99,0 [98,6 – 99,6]",
+   "10 yıl: 3,4 [1,7 – 6,7] ᵉ ‡50 yıl: 15,7 [8,1 – 29,2] ᵉ ‡100 yıl: 29,0 [15,5 – 49,8] ᵉ ‡",
+   "10 yıl: 26,0 [21,8 – 32,7] †50 yıl: 77,8 [70,7 – 86,2] †100 yıl: 95,1 [91,4 – 98,1] †"
   ],
   "Tr(≥M) / T — ekstrapolasyon (Tr = 1/λ)": [
    "M≥5: 0,1 yıl (Tr/T = < 0,1)M≥6: 1,6 yıl (Tr/T = < 0,1)M≥7: 22 yıl (Tr/T = 0,76)",
@@ -174,6 +174,15 @@
    "ml %60, md %32, mb %5"
   ]
  },
+ "bootstrap": {
+  "maks_fark_yp": 0.6544538385937881,
+  "yer": "Marmara M≥7, t = 100",
+  "M7_t50": [
+   "Türkiye: %95 [88.33–93.48] (B 2000) / [88.32–93.40] (B 5000)",
+   "Marmara: %95 [8.05–29.17] (B 2000) / [8.24–28.71] (B 5000)",
+   "Doğu Anadolu: %95 [70.74–86.19] (B 2000) / [70.58–86.01] (B 5000)"
+  ]
+ },
  "denetimler": [
   "GEÇTİ (1) main'deki 22 tablo satırının hepsi aynı değerlerle duruyor",
   "GEÇTİ (1) yalnız 5 yeni satır: P(≥5; t), % [%95] — Poisson, tüm bölge | P(≥6; t), % [%95] — Poisson, tüm bölge | P(≥7; t), % [%95] — Poisson, tüm bölge | Tr(≥M) / T — ekstrapolasyon (Tr = 1/λ) | Olasılık uyarıları",
@@ -192,12 +201,15 @@
   "GEÇTİ (7) şekil: her panelde Tr = T çizgisi, Tr > 10T gri zemin, lejant ve altyazı",
   "GEÇTİ (4) altyazı EN/TR, üç bölge",
   "GEÇTİ (4) önce (main) yayın şekli yok",
+  "GEÇTİ (8) üç bölgede B = 2000 (NegBin; Türkiye dahil, eski şemada 200); sağlamlık B = 5000 hesaplandı",
+  "GEÇTİ (8) B = 2000 ile 5000 arasında %95 sınırlarının en büyük farkı 0.654 yüzde puan (Marmara M≥7, t = 100); P(≥7; 50 yıl): Türkiye: %95 [88.33–93.48] (B 2000) / [88.32–93.40] (B 5000); Marmara: %95 [8.05–29.17] (B 2000) / [8.24–28.71] (B 5000); Doğu Anadolu: %95 [70.74–86.19] (B 2000) / [70.58–86.01] (B 5000)",
+  "GEÇTİ (8) G–R panelinin bootstrap'ı (grPoissonBootSimple) ile karşılaştırma tablosu aynı çekilişler: P(≥7; 50 yıl) sınırları birebir aynı",
   "GEÇTİ (5) SVG indirildi (77 KB, vektörel, 493 × 233 pt)",
   "GEÇTİ (5) PNG 600 dpi: 4108 × 1942 px (= 174 mm genişlik)",
   "GEÇTİ (6) sayfa hatası yok (0)"
  ],
  "ozet": {
-  "pass": 20,
+  "pass": 23,
   "fail": 0
  }
 }

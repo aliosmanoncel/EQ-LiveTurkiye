@@ -3608,7 +3608,7 @@ function cmpStats(r) {
 // ══ Poisson aşılma olasılığı — bölge karşılaştırması (2026-11-01; analysis/poisson_olasilik/PLAN_olasilik_modulu.md) ══════════════════════════
 // Model: λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc)) — tablodaki "M≥6 tekrarlanma" (tr6 = 1/λ(≥6)) ile aynı model: kesilmesiz G–R, Aki–Utsu b, tek Mc,
 // bölgenin tamamı için. P(≥M; t) = 1 − e^(−λt) (grPoissonP). Zamandan bağımsız (sabit oranlı) Poisson; deprem tahmini değildir.
-// Belirsizlik: a ve b'nin ORTAK parametrik bootstrap'ı — grPoissonBootSimple ile aynı çekiliş şeması, tekrar sayısı ve tohum: n* ~ Poisson(n) (a'yı
+// Belirsizlik: a ve b'nin ORTAK parametrik bootstrap'ı — grPoissonBootSimple ile aynı örnekleyici (grBootDraws, NegBin; aşama 3), tekrar sayısı ve tohum: n* ~ Poisson(n) (a'yı
 // taşır), büyüklükler Mc − ΔM/2'den b̂ ile üstel çekilip ΔM ızgarasına yuvarlanır, b* = computeBvalue (b'yi taşır). Her çekilişin (n*, b*) çifti
 // saklanır; tablo hücreleri ve olasılık eğrisinin tüm (M, t) noktaları aynı çekilişlerden hesaplanır.
 const CMP_PROB = { M: [5, 6, 7], t: [10, 50, 100], tFig: [10, 25, 50, 100], exK: 10 }, cmpProbCache = new Map();   // t: tablo; tFig: yayın şekli (Alkan vd. 2025, Şekil 10 düzeni)
@@ -3617,13 +3617,8 @@ const CMP_PROB = { M: [5, 6, 7], t: [10, 50, 100], tFig: [10, 25, 50, 100], exK:
 // (G–R gözlem süresinin ötesine uzatılıyor), 'yuksek' Tr > exK·T (μ < 1/exK; yüksek ekstrapolasyon belirsizliği). exK = 10 (bir büyüklük mertebesi)
 // bir uzlaşımdır, literatürde sabit bir eşik yoktur (PLAN §11). Sınır büyüklükleri kapalı biçimde: Tr = k·T ⇔ M = Mc + (log₁₀N + log₁₀k)/b.
 function cmpProbBoot(n, T, b, Mc, dm) {
-  const key = [n, T, b, Mc, dm].join('|'); if (cmpProbCache.has(key)) return cmpProbCache.get(key);
-  const B = Math.max(200, Math.min(GR_POIS.B, Math.floor(GR_POIS.maxDraws / Math.max(1, n)))), rnd = mulberry32(GR_POIS.seed), beta = b * Math.LN10, D = []; let nFail = 0;
-  for (let k = 0; k < B; k++) {
-    const ns = poissonSample(n, rnd); if (ns < 10) { nFail++; continue; }
-    const mg = new Array(ns); for (let i = 0; i < ns; i++) mg[i] = bGridRound(Mc - dm / 2 - Math.log(1 - rnd()) / beta, Mc, dm);
-    const bs = computeBvalue(mg, Mc, dm); if (!(bs > 0)) { nFail++; continue; } D.push([ns, bs]); }
-  const o = { B, nFail, seed: GR_POIS.seed, D }; if (cmpProbCache.size > 20) cmpProbCache.clear(); cmpProbCache.set(key, o); return o;
+  const key = [n, T, b, Mc, dm, GR_POIS.B].join('|'); if (cmpProbCache.has(key)) return cmpProbCache.get(key);
+  const o = grBootDraws(n, b, Mc, dm, GR_POIS.B, GR_POIS.seed); if (cmpProbCache.size > 20) cmpProbCache.clear(); cmpProbCache.set(key, o); return o;
 }
 function cmpProbAt(D, T, Mc, M, t, qs) { const P = D.map(([ns, bs]) => grPoissonP(grLambdaSimple(ns, T, bs, Mc, M), t)); return qs.map(q => grPctl(P, q)); }
 function cmpProb(r, s) {
@@ -5830,7 +5825,9 @@ function grGofPoisson(classes, wf, opt) {
 // Bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir); olaylar bağımsız (Poisson) varsayılır.
 // Belirsizlik: parametrik bootstrap — Poisson sayım + G–R (b) örnekleme belirsizliği birlikte, aynı kestiriciyle yeniden kestirilir.
 // Kapsam dışı (aralığa girmez): Mc / tamlık basamakları seçimi, Mx, büyüklük hataları ve dönüşüm bağıntısı, artçı ayıklama yöntemi.
-const GR_POIS = { B: 1000, seed: 20261027, mDef: 7, tDef: 50, maxDraws: 4e6, halfAlpha: 0.01 };
+// Tekrar sayısı (aşama 3, 2026-11-01): tek Mc bootstrap'ı (G–R paneli, dönem raporu, bölge karşılaştırması) B = 2000; sağlamlık denetimi için
+// URL ?bootB=5000. Weichert bootstrap'ı (grPoissonBootWeichert) Bw = 1000'de bırakıldı (ayrı karar). maxDraws artık kullanılmıyor (NegBin örnekleyici).
+const GR_POIS = { B: (() => { try { const v = +new URLSearchParams(location.search).get('bootB'); return v === 5000 ? 5000 : 2000; } catch (e) { return 2000; } })(), Bw: 1000, seed: 20261027, mDef: 7, tDef: 50, halfAlpha: 0.01 };
 function grPoissonP(lam, t) { return lam !== null && lam >= 0 && t > 0 ? -Math.expm1(-lam * t) : null; }
 // Tek Mc (Aki–Utsu): λ(≥M) = (n/T)·10^(−b(M − Mc)), kesilmesiz; M katalog büyüklük sınıfıdır (paneldeki N(≥M) ve G–R doğrusuyla aynı tanım)
 function grLambdaSimple(n, T, b, Mc, M) { return n > 0 && T > 0 && b > 0 ? (n / T) * Math.pow(10, -b * (M - Mc)) : null; }
@@ -5841,23 +5838,33 @@ function grLambdaWeichert(rate0, beta, m0, M, mx) {
   return M >= mx ? 0 : rate0 * (Math.exp(-beta * (M - m0)) - Math.exp(-beta * (mx - m0))) / (1 - Math.exp(-beta * (mx - m0)));
 }
 function grPctl(a, q) { const s = a.filter(Number.isFinite).sort((x, y) => x - y); if (!s.length) return null; const h = (s.length - 1) * q, i = Math.floor(h); return s[i] + (s[Math.min(i + 1, s.length - 1)] - s[i]) * (h - i); }
-// Bootstrap, tek Mc: n* ~ Poisson(n); büyüklükler Mc − ΔM/2'den üstel (β̂) çekilip ΔM ızgarasına yuvarlanır (Aki–Utsu varsayımı); b* = computeBvalue.
-// Büyük n'de tekrar sayısı, toplam çekiliş GR_POIS.maxDraws'u aşmayacak biçimde azaltılır (en az 200; raporlanır).
-function grPoissonBootSimple(n, T, b, Mc, dm, M, t, opt) {
-  const B = Math.max(200, Math.min(GR_POIS.B, Math.floor(GR_POIS.maxDraws / Math.max(1, n))));
-  const o = Object.assign({ B, seed: GR_POIS.seed }, opt || {}), rnd = mulberry32(o.seed), beta = b * Math.LN10, P = [], Lm = []; let nFail = 0;
-  for (let r = 0; r < o.B; r++) {
-    const ns = poissonSample(n, rnd); if (ns < 10) { nFail++; continue; }
-    const mg = new Array(ns); for (let i = 0; i < ns; i++) mg[i] = bGridRound(Mc - dm / 2 - Math.log(1 - rnd()) / beta, Mc, dm);
-    const lam = grLambdaSimple(ns, T, computeBvalue(mg, Mc, dm), Mc, M);
-    if (lam === null) { nFail++; continue; }
-    Lm.push(lam); P.push(grPoissonP(lam, t));
+// Bootstrap, tek Mc (aşama 3, 2026-11-01; kanıt: analysis/poisson_olasilik/NEGBIN_esdegerlik.md). Hedef dağılım öncekiyle AYNI:
+//   n* ~ Poisson(n); n* büyüklük Mc − ΔM/2 + Exp(β̂) çekilip ΔM ızgarasına (Mc'ye bağlı) yuvarlanır; b* = Aki–Utsu (computeBvalue).
+// Yuvarlanmış büyüklük Mc + ΔM·K, K ~ Geometrik(1 − q), q = 10^(−b̂ΔM); b* yalnız S = ΣK ve n*'a bağlıdır: b* = log₁₀e / (ΔM·S/n* + ΔM/2).
+// n* verildiğinde S ~ NegBin(n*, 1 − q) = Poisson(G), G ~ Gamma(n*, q/(1 − q)). Bu yüzden (n*, b*) — ve a* = log₁₀(n*/T) + b*Mc — ortak dağılımı
+// olay başına çekilişle aynıdır; yalnız rastgele sayı akışı farklıdır. Maliyet tekrar başına O(1): B her n'de GR_POIS.B (eski şemada büyük n'de 200'e düşüyordu).
+function gammaSample(k, rnd) {   // Gamma(k, 1), k ≥ 1: Marsaglia & Tsang (2000, ACM TOMS 26:363); normal sapma Box–Muller
+  const d = k - 1 / 3, c = 1 / Math.sqrt(9 * d);
+  for (;;) { let x, v; do { x = Math.sqrt(-2 * Math.log(1 - rnd())) * Math.cos(2 * Math.PI * rnd()); v = 1 + c * x; } while (v <= 0);
+    v = v * v * v; const u = 1 - rnd(); if (u < 1 - 0.0331 * x * x * x * x || Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v; }
+}
+function grBootDraws(n, b, Mc, dm, B, seed) {   // { B, nFail, seed, sampler, D: [[n*, b*], ...] } — G–R paneli, dönem raporu ve bölge karşılaştırması ortak
+  const rnd = mulberry32(seed), q = Math.pow(10, -b * dm), th = q / (1 - q), D = []; let nFail = 0;
+  for (let r = 0; r < B; r++) {
+    const ns = poissonSample(n, rnd); if (ns < 10) { nFail++; continue; }   // computeBvalue N < 10'da null döndürür (eski şemayla aynı ret)
+    const S = poissonSample(gammaSample(ns, rnd) * th, rnd);
+    D.push([ns, Math.LOG10E / (dm * S / ns + dm / 2)]);
   }
-  return { B: o.B, nFail, seed: o.seed, lamLo: grPctl(Lm, 0.025), lamHi: grPctl(Lm, 0.975), pLo: grPctl(P, 0.025), pHi: grPctl(P, 0.975) };
+  return { B, nFail, seed, sampler: 'NegBin (Gamma–Poisson)', D };
+}
+function grPoissonBootSimple(n, T, b, Mc, dm, M, t, opt) {
+  const o = Object.assign({ B: GR_POIS.B, seed: GR_POIS.seed }, opt || {}), bt = grBootDraws(n, b, Mc, dm, o.B, o.seed), P = [], Lm = [];
+  for (const [ns, bs] of bt.D) { const lam = grLambdaSimple(ns, T, bs, Mc, M); Lm.push(lam); P.push(grPoissonP(lam, t)); }
+  return { B: o.B, nFail: bt.nFail, seed: o.seed, sampler: bt.sampler, lamLo: grPctl(Lm, 0.025), lamHi: grPctl(Lm, 0.975), pLo: grPctl(P, 0.025), pHi: grPctl(P, 0.975) };
 }
 // Bootstrap, Weichert: n_i* ~ Poisson(μ_i), μ_i = weichertExpected (grGofPoisson ile aynı örnekleme); weichertFit yeniden; λ* = lamOf(fit*)
 function grPoissonBootWeichert(classes, wf, lamOf, t, opt) {
-  const o = Object.assign({ B: GR_POIS.B, seed: GR_POIS.seed }, opt || {}), C = classes.filter(c => c.T > 0), mus = weichertExpected(C, wf.beta);
+  const o = Object.assign({ B: GR_POIS.Bw, seed: GR_POIS.seed }, opt || {}), C = classes.filter(c => c.T > 0), mus = weichertExpected(C, wf.beta);
   const rnd = mulberry32(o.seed), P = [], Lm = []; let nFail = 0;
   for (let r = 0; r < o.B; r++) {
     const f = weichertFit(C.map((c, i) => ({ m: c.m, lo: c.lo, T: c.T, n: poissonSample(mus[i], rnd) })));

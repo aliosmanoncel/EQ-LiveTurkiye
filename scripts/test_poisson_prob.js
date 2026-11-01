@@ -19,7 +19,7 @@ const line = re => { const m = src.match(re); if (!m) throw new Error('bulunamad
 const ctx = {}; vm.createContext(ctx);
 vm.runInContext([line(/^const GR_QC = [^\n]*$/m), line(/^const GR_POIS = [^\n]*$/m), line(/^const LANCZOS_C = \[[\s\S]*?\];$/m),
   ...['mulberry32', 'logGamma', 'poissonSample', 'bGridRound', 'computeBvalue', 'weichertFit', 'weichertExpected',
-      'grPoissonP', 'grLambdaSimple', 'grLambdaWeichert', 'grPctl', 'grPoissonBootSimple', 'grPoissonBootWeichert', 'grHalfSplitTest', 'grGammaP', 'grGammaPInv', 'grObsVsExp'].map(fn)].join('\n'), ctx);
+      'grPoissonP', 'grLambdaSimple', 'grLambdaWeichert', 'grPctl', 'gammaSample', 'grBootDraws', 'grPoissonBootSimple', 'grPoissonBootWeichert', 'grHalfSplitTest', 'grGammaP', 'grGammaPInv', 'grObsVsExp'].map(fn)].join('\n'), ctx);
 const X = ctx;
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else fail++; console.log((c ? '  ok  ' : '  !!  ') + m); };
