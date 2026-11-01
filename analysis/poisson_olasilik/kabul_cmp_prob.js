@@ -4,7 +4,8 @@
 // Denetimler: (1) önce = sonra — main'deki tablo satırlarının hepsi aynı değerlerle duruyor; cmpSvg aynı; G–R paneli (Poisson satırı dışında),
 //   b(t) ve a(t) grafikleri ve metinleri aynı. (2) Yeni satırlar: P(≥M; t) hücreleri cmpStats değerlerinden bağımsız hesapla aynı ve
 //   P(≥6; t) = 1 − e^(−t/tr6). (3) Uyarılar: GK74 durumu kayıtla tutarlı. (4) Yayın şekli: SVG var, 493 pt, 3 panel, 4 süre; bant düğmesi
-//   şekli değiştiriyor; altyazı. (5) PNG 600 dpi indirme: boyut 4108 × (H/72·600) px. (6) Sayfa hatası yok.
+//   şekli değiştiriyor; altyazı. (7) Aşama 2: '±1σ' yok; Tr/T satırı bağımsız hesapla aynı ve sınıflar (†, ‡) doğru; Marmara M≥7 ‡;
+//   şekilde Tr = T çizgisi ve Tr > 10T zemini. (5) PNG 600 dpi indirme: boyut 4108 × (H/72·600) px. (6) Sayfa hatası yok.
 // Ekran görüntüleri: cmp_tablo.png, cmp_sekil_95.png, cmp_sekil_68.png; indirilen dosyalar: cmp_sekil_EN.svg, cmp_sekil_EN_600dpi.png
 // Kullanım (depo kökünde): LEAFLET_DIR=<node_modules> node analysis/poisson_olasilik/kabul_cmp_prob.js <önceki_index.html>
 'use strict';
@@ -66,6 +67,7 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
       const fEl = await p.$('#cmpProbFigSvg'); await fEl.scrollIntoViewIfNeeded(); await fEl.screenshot({ path: path.join(__dirname, 'cmp_sekil_95.png') });
       const [dS] = await Promise.all([p.waitForEvent('download'), p.evaluate(() => cmpProbFigDownload('svg', 'en'))]); await dS.saveAs(path.join(__dirname, 'cmp_sekil_EN.svg'));
       const [dP] = await Promise.all([p.waitForEvent('download'), p.evaluate(() => cmpProbFigDownload('png', 'en'))]); await dP.saveAs(path.join(__dirname, 'cmp_sekil_EN_600dpi.png'));
+      R.dugme = await p.evaluate(() => [...document.querySelectorAll('#cmpProbFig button')].map(b => b.textContent).join(' | '));
       R.fig68 = await p.evaluate(() => { cmpProbFigBand = '68'; cmpRender(); return document.getElementById('cmpProbFigSvg').innerHTML; });
       const fEl2 = await p.$('#cmpProbFigSvg'); await fEl2.screenshot({ path: path.join(__dirname, 'cmp_sekil_68.png') });
       await p.evaluate(() => { cmpProbFigBand = '95'; cmpRender(); });
@@ -76,7 +78,7 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
   // (1) önce = sonra
   const eskiSat = Object.keys(O.tablo), degisen = eskiSat.filter(k => JSON.stringify(O.tablo[k]) !== JSON.stringify(Y.tablo[k]));
   ok(eskiSat.length > 10 && degisen.length === 0, `(1) main'deki ${eskiSat.length} tablo satırının hepsi aynı değerlerle duruyor${degisen.length ? ' — değişen: ' + degisen.join(', ') : ''}`);
-  const yeni = Object.keys(Y.tablo).filter(k => !(k in O.tablo)); ok(yeni.length === 4 && yeni.filter(k => /^P\(≥[567]; t\)/.test(k)).length === 3 && yeni.includes('Olasılık uyarıları'), `(1) yalnız 4 yeni satır: ${yeni.join(' | ')}`);
+  const yeni = Object.keys(Y.tablo).filter(k => !(k in O.tablo)); ok(yeni.length === 5 && yeni.filter(k => /^P\(≥[567]; t\)/.test(k)).length === 3 && yeni.includes('Olasılık uyarıları') && yeni.some(k => /^Tr\(≥M\) \/ T/.test(k)), `(1) yalnız 5 yeni satır: ${yeni.join(' | ')}`);
   ok(O.cmpSvg === Y.cmpSvg, '(1) karşılaştırma grafiği (cmpSvg) aynı');
   ok(O.grSvg === Y.grSvg && O.grTxt === Y.grTxt, '(1) G–R grafiği ve metni (Poisson satırı dışında) aynı');
   ok(O.bSvg === Y.bSvg && O.bTxt === Y.bTxt && O.aSvg === Y.aSvg && O.aTxt === Y.aTxt, '(1) b(t) ve a(t) grafikleri ve metinleri aynı');
@@ -92,7 +94,19 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
   ok(R.kayit.every(k => k.turU !== undefined && k.mcU !== undefined), `(3) tamlık ve tür uyarı alanları kayıtlı (${R.kayit.map(k => `${k.name}: tür ${k.turU || 'yok'}`).join('; ')})`);
   // (4) şekil
   const F = Y.fig || ''; ok(/width="493pt"/.test(F) && (F.match(/font-weight="bold">\([abc]\)/g) || []).length === 3 && [10, 25, 50, 100].every(t => F.includes(`t = ${t} yr`)), '(4) yayın şekli: 493 pt, 3 panel (a–c), 4 süre');
-  ok(R.fig68 && R.fig68 !== F && /16th–84th percentile/.test(R.fig68), '(4) bant düğmesi (16–84) şekli değiştiriyor');
+  ok(R.fig68 && R.fig68 !== F && /16th–84th percentile</.test(R.fig68), '(4) bant düğmesi (16.–84. yüzdelik) şekli değiştiriyor');
+  // (7) aşama 2: etiket ve ekstrapolasyon sınıfı
+  const tumMetin = [F, R.fig68, R.cap.en, R.cap.tr, JSON.stringify(Y.tablo), R.dugme || ''].join(' ');
+  ok(!/±1σ|±1 σ/.test(tumMetin) && /16\.–84\. yüzdelik/.test(R.dugme || ''), `(7) şekil, altyazı, tablo ve düğmede '±1σ' yok (düğme: "${R.dugme}")`);
+  const trSat = Y.tablo[Object.keys(Y.tablo).find(z => /^Tr\(≥M\) \/ T/.test(z))], sinif = []; let trUy = 0, trTop = 0;
+  R.kayit.forEach((k, i) => { for (const M of [5, 6, 7]) { trTop++; const tr = k.T / (k.n * Math.pow(10, -k.b * (M - k.Mc))), q = tr / k.T, c = q <= 1 ? '' : q <= 10 ? '†' : '‡';
+    const trS = tr >= 100 ? Math.round(tr).toLocaleString('tr-TR') : tr.toFixed(tr >= 10 ? 0 : 1).replace('.', ','), satir = trSat[i].split(/(?=M≥)/).find(z => z.startsWith(`M≥${M}:`)) || '';
+    if (satir.startsWith(`M≥${M}: ${trS} yıl`) && (c ? satir.trim().endsWith(c) : !/[†‡]/.test(satir))) trUy++; sinif.push(`${k.name} M≥${M}: Tr ${trS} yıl, Tr/T ${q.toFixed(2)}${c ? ' ' + c : ''}`); } });
+  ok(trUy === trTop, `(7) Tr/T satırı: ${trTop} hücrenin ${trUy}'i bağımsız hesapla ve sınıfla aynı`);
+  console.log('     ' + sinif.join('\n     '));
+  { const k = R.kayit[1], tr7 = k.T / (k.n * Math.pow(10, -k.b * (7 - k.Mc))), u = Y.tablo['Olasılık uyarıları'][1];
+    ok(tr7 / k.T > 10 && /‡ M≥7: Tr ≈ .* yüksek ekstrapolasyon belirsizliği/.test(u), `(7) Marmara M≥7: Tr ≈ ${tr7.toFixed(0)} yıl, T = ${k.T.toFixed(1)} yıl (Tr/T = ${(tr7 / k.T).toFixed(2)}) → ‡ belirgin uyarı`); }
+  ok((F.match(/<tspan dy="-1\.5"> = T<\/tspan>/g) || []).length === 3 && /fill-opacity="0\.06"/.test(F) && /Grey area: Tr > 10T/.test(R.cap.en), '(7) şekil: her panelde Tr = T çizgisi, Tr > 10T gri zemin, lejant ve altyazı');
   ok(R.cap && /not an earthquake forecast/.test(R.cap.en) && /deprem tahmini değildir/.test(R.cap.tr) && /\(c\) Doğu Anadolu/.test(R.cap.en), '(4) altyazı EN/TR, üç bölge');
   ok(!O.fig, '(4) önce (main) yayın şekli yok');
   // (5) indirilen dosyalar

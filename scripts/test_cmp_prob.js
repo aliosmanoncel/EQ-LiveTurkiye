@@ -9,6 +9,8 @@
 //   (f) Uyarılar ve biçim: GK74 açık/kapalı/bilinmiyor, tür geçişi, mb doygunluğu, ekstrapolasyon; yüzde biçimi.
 //   (g) Yayın şekli: eğri noktaları tablo hücreleriyle aynı; eğri bölgenin Mc'sinden başlar; Mmax üstü ekstrapolasyon; süreler 10/25/50/100;
 //       SVG boyutu (çift sütun 493 pt, tek sütun 241 pt), eksen başlıkları, lejant; altyazı (B, tohum, 'not an earthquake forecast').
+//   (h) Aşama 2: bant etiketi '±1σ' içermez; ekstrapolasyon sınıfı Tr/T (≤ 1, ≤ exK, > exK), sınır büyüklükleri kapalı biçimle tutarlı,
+//       Marmara benzeri örnek (Tr(≥7)/T ≈ 10,1) 'yuksek'; uyarı, tablo işaretleri, şekil (Tr = T çizgisi, Tr > 10T zemini), altyazı, CSV sütunları.
 //   (a') Doymamış değerde tutarlılık: P(≥7; 10 yıl) = 1 − e^(−10·λ(≥7)), %0–100 arasında.
 // Kullanım (depo kökünde): node scripts/test_cmp_prob.js [index.html]
 'use strict';
@@ -20,7 +22,7 @@ const line = re => { const m = src.match(re); if (!m) throw new Error('bulunamad
 const ctx = { document: { getElementById: () => ({ value: '1e4' }) }, B_CI_METHOD: 'normal', B_GRID_MODE: 'sinif' }; vm.createContext(ctx);   // B_GRID_MODE: uygulamanın varsayılanı (URL ?bgrid=ham yoksa)
 vm.runInContext([line(/^const GR_POIS = [^\n]*$/m), line(/^const GR_QC = [^\n]*$/m), line(/^const CMP_PROB = [^\n]*$/m), line(/^const CMP_MAX = [^\n]*$/m),
   ...['mulberry32', 'logGamma', 'poissonSample', 'bGridRound', 'bGridVals', 'computeBvalue', 'bConfidence95', 'bCiFields', 'grPoissonP', 'grLambdaSimple', 'grPctl',
-      'bGridOffCount', 'grPoissonBootSimple', 'cmpStats', 'cmpProbBoot', 'cmpProbAt', 'cmpProb', 'cmpProbWarn', 'cmpPc', 'cmpRng', 'cmpProbCurves', 'cmpProbFigRange', 'cmpProbFigSvg', 'cmpProbBTxt', 'cmpProbFigCaption'].map(fn), line(/^const CMP_FIG = [^\n]*$/m), 'var cmpProbFigRangeV = { lo: 4, hi: 8 };', "var cmpProbFigBand = '95';"].join('\n').replace(/^var CMP_PROB = (.*), cmpProbCache = new Map\(\);$/m, 'var CMP_PROB = $1; var cmpProbCache = new Map();'), ctx);
+      'bGridOffCount', 'grPoissonBootSimple', 'cmpStats', 'cmpProbBoot', 'cmpProbAt', 'cmpProb', 'cmpProbWarn', 'cmpProbExtrap', 'cmpProbMk', 'cmpTr', 'cmpTrT', 'cmpPc', 'cmpRng', 'cmpProbCurves', 'cmpProbFigRange', 'cmpProbFigSvg', 'cmpProbBTxt', 'cmpProbFigCaption'].map(fn), line(/^const CMP_FIG = [^\n]*$/m), line(/^const CMP_EX = \{[\s\S]*?\} \};$/m), 'var cmpProbFigRangeV = { lo: 4, hi: 8 };', "var cmpProbFigBand = '95';"].join('\n').replace(/^var CMP_PROB = (.*), cmpProbCache = new Map\(\);$/m, 'var CMP_PROB = $1; var cmpProbCache = new Map();'), ctx);
 vm.runInContext(src.match(/^const LANCZOS_C = \[[\s\S]*?\];$/m)[0].replace(/^const /, 'var '), ctx);
 const X = ctx; let pass = 0, fail = 0; const ok = (c, m) => { c ? pass++ : fail++; console.log((c ? '  ok  ' : '  !!  ') + m); };
 const YIL = 365.25 * 864e5;
@@ -71,8 +73,28 @@ function kayit(seed, T, lam0, b, Mc, extra) { const r = X.mulberry32(seed), n = 
   X.CMP = [r1]; const S1 = [S[0]], one = X.cmpProbFigSvg(S1, [PR[0]], { en: true }); ok(/width="241pt"/.test(one), 'tek bölge: tek sütun 241 pt (85 mm)');
   X.CMP = [r1, r2]; const cap = X.cmpProbFigCaption(S, PR, true), capTr = X.cmpProbFigCaption(S, PR, false);
   { const s68 = X.cmpProbFigSvg(S, PR, { en: true, band: '68' }), c68 = X.cmpProbFigCaption(S, PR, true, '68');
-    ok(s68 !== svg && /16th–84th percentile \(±1σ\)/.test(s68) && /95% interval/.test(svg) && /16th–84th percentile/.test(c68) && /95% intervals/.test(cap), 'bant seçeneği: %95 (varsayılan) ve 16–84 (±1σ); lejant ve altyazı bandı belirtiyor');
+    const c68tr = X.cmpProbFigCaption(S, PR, false, '68'), s68tr = X.cmpProbFigSvg(S, PR, { en: false, band: '68' });
+    ok(s68 !== svg && /16th–84th percentile</.test(s68) && /16\.–84\. yüzdelik</.test(s68tr) && /95% interval/.test(svg) && /16th–84th percentile range/.test(c68) && /16\.–84\. yüzdelik aralığı/.test(c68tr) && /95% intervals/.test(cap), 'bant seçeneği: %95 (varsayılan) ve 16.–84. yüzdelik; lejant ve altyazı bandı belirtiyor');
+    ok(![svg, s68, s68tr, cap, c68, c68tr, capTr].some(t => /1σ|1 σ|sigma/i.test(t)), "(h) şekil ve altyazıda '±1σ' yok (bootstrap yüzdeliği σ olarak adlandırılmıyor)");
     ok(/>0\.01<\/text>/.test(svg), 'y ekseni %0,01\'e iniyor (Khodaverdian vd. 2016 gibi düşük olasılık kuyruğu)'); }
   ok(/B = 1000, seed 20261027/.test(cap) && /not an earthquake forecast/.test(cap) && /GK74 on/.test(cap) && /GK74 off/.test(cap) && /deprem tahmini değildir/.test(capTr), 'altyazı: bootstrap B ve tohum, GK74 durumu, "tahmin değildir" (EN/TR)'); }
+{ // (h) ekstrapolasyon sınıfı
+  const K = X.CMP_PROB.exK, e = X.cmpProbExtrap;
+  ok(K === 10 && e(1 / 20, 20).exC === 'gozlem' && e(1 / 20.0001, 20).exC === 'uzatma' && e(1 / 200, 20).exC === 'uzatma' && e(1 / 200.01, 20).exC === 'yuksek' && e(0, 20).exC === null, '(h) sınıflar: Tr ≤ T gözlem, T < Tr ≤ 10T uzatma, Tr > 10T yüksek (sınırlar dahil/hariç doğru)');
+  // kapalı biçim: M_k = Mc + (log N + log k)/b ⇒ Tr(≥M_k) = k·T
+  let kb = true; for (const [n, T, b, Mc] of [[27346, 28.6, 1.05, 3.2], [3000, 28.7, 1.0, 3.2], [150, 10, 0.8, 4.0]]) for (const k of [1, 10]) { const M = X.cmpProbMk(n, b, Mc, k), tr = 1 / X.grLambdaSimple(n, T, b, Mc, M); if (Math.abs(tr / (k * T) - 1) > 1e-12) kb = false; }
+  ok(kb, '(h) sınır büyüklükleri: Tr(≥Mc + (log₁₀N + log₁₀k)/b) = k·T (k = 1, 10; üç örnek)');
+  // Marmara benzeri: T = 28,7 yıl, Tr(≥7) ≈ 290 yıl → Tr/T ≈ 10,1 → yüksek
+  const T = 28.7, b = 1.0, Mc = 3.2, n = Math.round(T / 290 * Math.pow(10, b * (7 - Mc))), c = e(X.grLambdaSimple(n, T, b, Mc, 7), T);
+  ok(c.exC === 'yuksek' && Math.abs(c.tr - 290) < 2, `(h) Marmara benzeri (N = ${n}, b = 1, T = 28,7): Tr(≥7) = ${c.tr.toFixed(0)} yıl, Tr/T = ${c.trT.toFixed(2)} → yüksek`);
+  const r = Object.assign(kayit(7, 28.7, 0, 1.0, 3.2), { mags: Array.from({ length: n }, (_, i) => +(3.2 + (i % 30) * 0.1).toFixed(1)) }), w = X.cmpProbWarn(Object.assign(r, { gk74: true, mcU: null, turU: null }), { n, T, b, Mmax: 7.4 });
+  ok(/‡ M≥7: Tr ≈ 290 yıl, T = 28,7 yıl \(Tr\/T = 10,1\) — yüksek ekstrapolasyon belirsizliği/.test(w) && /† M≥6: Tr ≈ 29 yıl/.test(w) && !/M≥5: Tr/.test(w), '(h) uyarı satırı: M≥7 ‡ (Tr/T = 10,1), M≥6 † (Tr ≈ 29 yıl), M≥5 işaretsiz');
+  // şekil: Tr = T çizgisi ve Tr > 10T zemini; lejant
+  const r1 = Object.assign(kayit(11, 30, 20, 1.0, 4.0), { name: 'A', src: 'test', gk74: true }); X.CMP = [r1]; const S = [X.cmpStats(r1)], PR = [X.cmpProb(r1, S[0])], svg = X.cmpProbFigSvg(S, PR, { en: true }), cap = X.cmpProbFigCaption(S, PR, true), capTr = X.cmpProbFigCaption(S, PR, false);
+  const m1 = X.cmpProbMk(S[0].n, S[0].b, r1.Mc, 1), mK = X.cmpProbMk(S[0].n, S[0].b, r1.Mc, 10);
+  ok(m1 > r1.Mc && mK - m1 > 0.9 && /fill-opacity="0\.06"/.test(svg) && /<tspan dy="-1\.5"> = T<\/tspan>/.test(svg) && /= T \(catalogue duration\)/.test(svg) && /&gt; 10T<\/tspan>/.test(svg) && /&gt; 10T: high extrapolation uncertainty/.test(svg), `(h) şekil: Tr = T (M ${m1.toFixed(2)}) çizgisi ve Tr > 10T (M ${mK.toFixed(2)}) gri zemin, lejantta`);
+  const cT = PR[0].cell(+(m1 - 0.01).toFixed(3), 10), cU = PR[0].cell(+(m1 + 0.01).toFixed(3), 10), cY = PR[0].cell(+(mK + 0.01).toFixed(3), 10);
+  ok(cT.exC === 'gozlem' && cU.exC === 'uzatma' && cY.exC === 'yuksek', '(h) hücre sınıfı şekildeki sınırlarla aynı (M_T − 0,01 gözlem, + 0,01 uzatma; M_10T + 0,01 yüksek)');
+  ok(/Solid vertical line: magnitude at which the mean recurrence interval Tr = 1\/λ\(≥M\) equals the catalogue duration T/.test(cap) && /Grey area: Tr > 10T/.test(cap) && /Gri alan: Tr > 10T/.test(capTr), '(h) altyazı Tr = T ve Tr > 10T ölçütünü açıklıyor (EN/TR)'); }
 console.log(`
 ${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);

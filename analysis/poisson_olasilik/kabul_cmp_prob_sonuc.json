@@ -120,18 +120,23 @@
   ],
   "P(≥6; t), % [%95] — Poisson, tüm bölge": [
    "10 yıl: 99,8 [99,7 – > 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
-   "10 yıl: 29,0 [18,6 – 44,1]50 yıl: 82,0 [64,3 – 94,6]100 yıl: 96,8 [87,3 – 99,7]",
+   "10 yıl: 29,0 [18,6 – 44,1] †50 yıl: 82,0 [64,3 – 94,6] †100 yıl: 96,8 [87,3 – 99,7] †",
    "10 yıl: 94,7 [92,0 – 97,3]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]"
   ],
   "P(≥7; t), % [%95] — Poisson, tüm bölge": [
    "10 yıl: 36,6 [34,7 – 42,0]50 yıl: 89,8 [88,2 – 93,4]100 yıl: 99,0 [98,6 – 99,6]",
-   "10 yıl: 3,4 [1,7 – 6,8] ᵉ50 yıl: 15,7 [8,3 – 29,6] ᵉ100 yıl: 29,0 [15,9 – 50,4] ᵉ",
-   "10 yıl: 26,0 [21,7 – 32,6]50 yıl: 77,8 [70,6 – 86,1]100 yıl: 95,1 [91,3 – 98,1]"
+   "10 yıl: 3,4 [1,7 – 6,8] ᵉ ‡50 yıl: 15,7 [8,3 – 29,6] ᵉ ‡100 yıl: 29,0 [15,9 – 50,4] ᵉ ‡",
+   "10 yıl: 26,0 [21,7 – 32,6] †50 yıl: 77,8 [70,6 – 86,1] †100 yıl: 95,1 [91,3 – 98,1] †"
+  ],
+  "Tr(≥M) / T — ekstrapolasyon (Tr = 1/λ)": [
+   "M≥5: 0,1 yıl (Tr/T = < 0,1)M≥6: 1,6 yıl (Tr/T = < 0,1)M≥7: 22 yıl (Tr/T = 0,76)",
+   "M≥5: 2,9 yıl (Tr/T = 0,10)M≥6: 29 yıl (Tr/T = 1,02) †M≥7: 292 yıl (Tr/T = 10,2) ‡",
+   "M≥5: 0,3 yıl (Tr/T = < 0,1)M≥6: 3,4 yıl (Tr/T = 0,12)M≥7: 33 yıl (Tr/T = 1,16) †"
   ],
   "Olasılık uyarıları": [
    "GK74 kapalı: artçılar dahil, olasılık büyük olasılıkla şişkintamlık (Mc) uyarısı var: oran ve b etkilenebilirbüyüklük türü geçişi: MD → ML (2010–2011)",
-   "GK74 açık: bağımsızlık garanti değil; büyük dizi dönemlerinde olasılık iyimser kalabilirbüyüklük türü geçişi: MD → ML (2008–2012)ᵉ M > gözlenen Mmax (6.3): ekstrapolasyon",
-   "GK74 kapalı: artçılar dahil, olasılık büyük olasılıkla şişkintamlık (Mc) uyarısı var: oran ve b etkilenebilirbüyüklük türü geçişi: MD → ML (2009–2012)"
+   "GK74 açık: bağımsızlık garanti değil; büyük dizi dönemlerinde olasılık iyimser kalabilirbüyüklük türü geçişi: MD → ML (2008–2012)† M≥6: Tr ≈ 29 yıl, T = 28,7 yıl (Tr/T = 1,02) — G–R gözlem süresinin ötesine uzatıldı‡ M≥7: Tr ≈ 292 yıl, T = 28,7 yıl (Tr/T = 10,2) — yüksek ekstrapolasyon belirsizliğiᵉ M > gözlenen Mmax (6.3): ekstrapolasyon",
+   "GK74 kapalı: artçılar dahil, olasılık büyük olasılıkla şişkintamlık (Mc) uyarısı var: oran ve b etkilenebilirbüyüklük türü geçişi: MD → ML (2009–2012)† M≥7: Tr ≈ 33 yıl, T = 28,7 yıl (Tr/T = 1,16) — G–R gözlem süresinin ötesine uzatıldı"
   ],
   "GNSS istasyonu (MIDAS)": [
    "194 (rms 6.6 mm/yıl)",
@@ -171,7 +176,7 @@
  },
  "denetimler": [
   "GEÇTİ (1) main'deki 22 tablo satırının hepsi aynı değerlerle duruyor",
-  "GEÇTİ (1) yalnız 4 yeni satır: P(≥5; t), % [%95] — Poisson, tüm bölge | P(≥6; t), % [%95] — Poisson, tüm bölge | P(≥7; t), % [%95] — Poisson, tüm bölge | Olasılık uyarıları",
+  "GEÇTİ (1) yalnız 5 yeni satır: P(≥5; t), % [%95] — Poisson, tüm bölge | P(≥6; t), % [%95] — Poisson, tüm bölge | P(≥7; t), % [%95] — Poisson, tüm bölge | Tr(≥M) / T — ekstrapolasyon (Tr = 1/λ) | Olasılık uyarıları",
   "GEÇTİ (1) karşılaştırma grafiği (cmpSvg) aynı",
   "GEÇTİ (1) G–R grafiği ve metni (Poisson satırı dışında) aynı",
   "GEÇTİ (1) b(t) ve a(t) grafikleri ve metinleri aynı",
@@ -180,15 +185,19 @@
   "GEÇTİ (3) GK74 durumu kayıtta ve uyarıda doğru (Türkiye kapalı, Marmara açık)",
   "GEÇTİ (3) tamlık ve tür uyarı alanları kayıtlı (Türkiye: tür MD → ML (2010–2011); Marmara: tür MD → ML (2008–2012); Doğu Anadolu: tür MD → ML (2009–2012))",
   "GEÇTİ (4) yayın şekli: 493 pt, 3 panel (a–c), 4 süre",
-  "GEÇTİ (4) bant düğmesi (16–84) şekli değiştiriyor",
+  "GEÇTİ (4) bant düğmesi (16.–84. yüzdelik) şekli değiştiriyor",
+  "GEÇTİ (7) şekil, altyazı, tablo ve düğmede '±1σ' yok (düğme: \"%95 | 16.–84. yüzdelik | SVG (EN) | PNG 600 dpi (EN) | SVG (TR) | PNG 600 dpi (TR)\")",
+  "GEÇTİ (7) Tr/T satırı: 9 hücrenin 9'i bağımsız hesapla ve sınıfla aynı",
+  "GEÇTİ (7) Marmara M≥7: Tr ≈ 292 yıl, T = 28.7 yıl (Tr/T = 10.18) → ‡ belirgin uyarı",
+  "GEÇTİ (7) şekil: her panelde Tr = T çizgisi, Tr > 10T gri zemin, lejant ve altyazı",
   "GEÇTİ (4) altyazı EN/TR, üç bölge",
   "GEÇTİ (4) önce (main) yayın şekli yok",
-  "GEÇTİ (5) SVG indirildi (75 KB, vektörel, 493 × 210 pt)",
-  "GEÇTİ (5) PNG 600 dpi: 4108 × 1750 px (= 174 mm genişlik)",
+  "GEÇTİ (5) SVG indirildi (77 KB, vektörel, 493 × 233 pt)",
+  "GEÇTİ (5) PNG 600 dpi: 4108 × 1942 px (= 174 mm genişlik)",
   "GEÇTİ (6) sayfa hatası yok (0)"
  ],
  "ozet": {
-  "pass": 16,
+  "pass": 20,
   "fail": 0
  }
 }

@@ -144,3 +144,19 @@ Ekran görüntüleri: `cmp_sekil_95.png`, `cmp_sekil_68.png`, `cmp_tablo.png`; i
 2. **Kesik G–R (Kijko–Sellevoll, Mmax).** Khodaverdian vd. (2016) gibi PSHA çalışmalarında olasılık Mmax'ta sıfıra iner. Şu anki model kesilmesiz; Mmax üstü yalnızca kesikli çiziliyor. Seçenek olarak eklenebilir; Mmax'ın kendisi ayrı bir kestirim gerektirir.
 3. **Poster entegrasyonu.** Şekil şimdilik bağımsız (SVG/PNG). Akademik postere ayrı bir panel olarak eklenmesi ayrı iş.
 4. **5893054 (T düzeltmesi)** `main`'e bu işle birlikte mi, ayrı mı geçsin?
+
+## 12. Kararlar (2026-11-01, kullanıcı onayı) ve aşama 2 uygulaması
+Kararlar: (1) T düzeltmesi ayrı dal `pencere-sonu-T` (584cd6e); bu dalda `git revert` ile geri alındı (836bacb). (2) Bant etiketi ve ekstrapolasyon sınıfı — bu aşama. (3) NegBin örnekleyici, B = 2000 (sağlamlık 5000) — matematiksel eşdeğerlik kanıtı ve sentetik dağılım karşılaştırması şartıyla. (4) SVG metadata + JSON yeniden üretim kaydı. (5) Kesik G–R: Kijko–Sellevoll birincil, yalnız plan. (6) Poster: 1–5'ten sonra.
+
+**Aşama 2 — uygulanan:**
+- Bant: %95 (2,5.–97,5. yüzdelik) varsayılan; alternatif "16.–84. yüzdelik". "±1σ" etiketi kaldırıldı: bootstrap yüzdelikleri olasılık [0, 1]'de sınırlı ve log ölçekte çarpık olduğundan simetrik σ ile eşdeğer değildir.
+- Ekstrapolasyon sınıfı, Tr = 1/λ(≥M) ve katalog süresi T ile; katalogda beklenen olay sayısı μ = T/Tr:
+  - Tr ≤ T (μ ≥ 1): gözlem süresiyle karşılaştırılabilir (işaretsiz);
+  - T < Tr ≤ 10T: G–R gözlem süresinin ötesine uzatıldı (†);
+  - Tr > 10T (μ < 0,1): yüksek ekstrapolasyon belirsizliği (‡).
+  - Eşik 10 (`CMP_PROB.exK`) bir büyüklük mertebesi uzlaşımıdır; literatürde sabit bir eşik yoktur. Değiştirilebilir, değiştirilirse altyazı ve dipnot kendiliğinden güncellenir.
+- Sınır büyüklükleri kapalı biçimde: Tr(≥M) = k·T ⇔ M = Mc + (log₁₀N + log₁₀k)/b (birim testi (h)).
+- Tabloda yeni satır "Tr(≥M) / T — ekstrapolasyon"; P hücrelerinde † / ‡; uyarı satırında sınıf ve Tr/T; CSV'ye `Tr_M{M}_yil`, `Tr_T_M{M}`, `ekstrapolasyon_M{M}`, `M_Tr_esit_T`, `M_Tr_esit_kT`, `ekstrapolasyon_k` (sona eklendi).
+- Şekil: Tr = T büyüklüğünde düz dikey çizgi; Tr > 10T bölgesi gri zemin; lejant panellerin altına alındı (dikey işaretlerle çakışmasın); dikey işaret etiketleri ≥ 8 pt aralıklı yerleştirilir.
+- Kabul (üç bölge, EMSC 1998–): Marmara M≥7 Tr ≈ 292 yıl, T = 28,7 yıl, Tr/T = 10,2 → ‡; Marmara M≥6 Tr/T = 1,02 → †; Doğu Anadolu M≥7 Tr/T = 1,16 → †; Türkiye M≥7 Tr/T = 0,76 → işaretsiz.
+- Değişmeyen: λ, P ve bootstrap aralıkları (27/27 hücre bağımsız hesapla aynı); mevcut 22 tablo satırı, cmpSvg, G–R, b(t), a(t) önce = sonra.
