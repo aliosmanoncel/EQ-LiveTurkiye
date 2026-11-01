@@ -1,9 +1,16 @@
 """
 build_hazard_grid.py
-eq_annual.json verisinden basitleştirilmiş PGA tehlike grid'i üretir.
-Yöntem: Boore-Atkinson 2008 (BA08) GMPE basitleştirilmiş formu
-        Her grid noktasına 100 km içindeki tüm depremlerin
-        PGA katkısı toplanır (SRSS değil, maksimum seçilir).
+Deprem kataloğundan DETERMİNİSTİK bir PGA ısı haritası üretir (olasılıksal tehlike / PSHA DEĞİLDİR;
+aşılma olasılığı ya da tehlike eğrisi üretmez).
+Yöntem (kodun yaptığı, 2026-11-02 etiket düzeltmesi; hesap değişmedi):
+  - GMPE: Campbell (1981, BSSA 71, 2039–2070) PGA bağıntısı, ortalama (sapma terimi yok):
+    ln(PGA[g]) = −4,141 + 0,868·M − 1,09·ln(R + 0,0606·e^(0,700·M)).
+  - R: ızgara noktası ile episantr arasındaki yüzey (haversine) uzaklığı; derinlik ve fay boyutu kullanılmaz.
+    Campbell (1981) R'yi kırığa en yakın uzaklık olarak tanımlar; episantral uzaklık bir yaklaşıklıktır.
+  - Zemin: bağıntının ortalama koşulu; ayrı bir zemin (Vs30) terimi uygulanmaz.
+  - Her ızgara noktasında R ≤ R_MAX = 200 km ve M ≥ MW_MIN = 2,5 olan depremlerin PGA'larının EN BÜYÜĞÜ alınır (toplanmaz).
+  - Girdi: --input (varsayılan data/eq_annual.json); GitHub Actions (eq-update.yml) data/eq_month.json (son 30 gün) ile çalıştırır.
+    Büyüklük: e['mw'], yoksa e['mag'].
 
 Kullanım:
   python scripts/build_hazard_grid.py
@@ -135,8 +142,12 @@ def main():
 
     result = {
         'generated': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'source'   : 'EMSC eq_annual.json + BA08 simplified GMPE',
-        'method'   : 'PGA_max within 150 km, Vs30=760 m/s',
+        'source'   : f'{inp} + Campbell (1981) PGA GMPE (ortalama)',
+        'method'   : f'Deterministik: PGA_max, episantral R <= {R_MAX:.0f} km, M >= {MW_MIN}; zemin terimi yok; PSHA degil',
+        'gmpe'     : 'Campbell (1981) BSSA 71:2039-2070',
+        'r_max_km' : R_MAX,
+        'mw_min'   : MW_MIN,
+        'input'    : inp,
         'bounds'   : {'minlat': minlat, 'maxlat': maxlat, 'minlon': minlon, 'maxlon': maxlon},
         'step_deg' : step,
         'max_pga_g': round(max_pga, 5),

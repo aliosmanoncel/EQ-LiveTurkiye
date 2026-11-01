@@ -588,17 +588,13 @@
         <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">PGA · 475 yıl dönüş periyodu (%10/50yr)</div>
         <div style="height:12px;border-radius:3px;margin:4px 0 2px;background:linear-gradient(to right,#313695,#4575b4,#74add1,#fee090,#f46d43,#d73027,#a50026)"></div>
         <div style="display:flex;justify-content:space-between;color:#aaa;font-size:.68rem;margin-bottom:4px">
-          <span>0 g</span><span>0.05 g</span><span>0.10 g</span><span>≥0.12 g</span>
-        </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px">
-          <span style="background:#313695;color:#fff;font-size:.65rem;padding:1px 5px;border-radius:3px">&lt;0.02g Düşük</span>
-          <span style="background:#fee090;color:#333;font-size:.65rem;padding:1px 5px;border-radius:3px">0.05g Orta</span>
-          <span style="background:#d73027;color:#fff;font-size:.65rem;padding:1px 5px;border-radius:3px">&gt;0.10g Yüksek</span>
+          <span>0 g</span><span>0.08 g</span><span>0.16 g</span><span>0.22 g</span><span>0.28 g</span><span>≥0.40 g</span>
         </div>
         <div style="color:#666;font-size:.65rem;line-height:1.5">
-          Campbell (1981) GMPE · Vs30=760 m/s<br>
-          Kaynak: EMSC katalog (Mw≥4.5, 1998–2018)<br>
-          Yöntem: Delaunay triangülasyon · N≥75 filtresi
+          <b style="color:#94a3b8">Deterministik PGA ısı haritası — olasılıksal tehlike (PSHA) değildir.</b><br>
+          Her noktada son 30 günün depremlerinden (EMSC, M ≥ 2,5, episantral R ≤ 200 km) hesaplanan en büyük PGA.<br>
+          GMPE: Campbell (1981), ortalama; R episantral uzaklık; zemin terimi yok.<br>
+          Ara değer: Delaunay triangülasyonu (0,25° ızgara). Renk ölçeği 0–0,40 g.
         </div>
       </div>
     </div>
@@ -980,7 +976,7 @@
     <button class="tbtn"        id="btnTimeMag" onclick="openTimeMagMode('normal')" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag (normal)</button>
     <button class="tbtn"        id="btnBtWin" onclick="openTimeMagMode('ince')" title="Aynı Zaman–Magnitude penceresi, ince adım modunda: bütün araçlar ve ayarlar ortak; yalnız b(t) N = 100 pencereyle 10 yerine 1 olay kaydırılarak hesaplanır. Dışa aktarımlarda &quot;Adım 1 (İnce)&quot; yazar.">📈 Time-Mag (ince)</button>
     <button class="tbtn"        id="btnAftWin" onclick="toggleAftWin()" title="Artçı dizisi başına p (Omori–Utsu, Ogata 1983) ve b (Aki 1965) değerleri; tablodaki satıra tıklayınca TM-02 dizi analizi (M–t, b(t), p modeli; GK74 ya da M ≥ 7 için Kagan 2002)">📈 Time-Mag (artçı)</button>
-    <button class="tbtn tr-only"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
+    <button class="tbtn tr-only"        id="btnHazard" onclick="toggleLayer('hazard')" title="Deterministik PGA ısı haritası (PSHA değil): Campbell (1981) GMPE · EMSC son 30 gün, M ≥ 2,5, R ≤ 200 km">Hazard</button>
     <button class="tbtn tr-only"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
     <button class="tbtn tr-only"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
     <button class="tbtn tr-only"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 (Batı) + SHARE-CET (Doğu) Tarihsel Deprem Kataloğu · M≥4 · 1003-1899 · Rovida & Antonucci (2021) INGV + emidius.eu/SHEEC">Tarihsel</button>

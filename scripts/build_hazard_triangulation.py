@@ -82,7 +82,7 @@ def main():
 
     meta = {
         'generated'   : datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'method'      : 'Campbell (1981) GMPE · PGAmax · Delaunay triangülasyon',
+        'method'      : 'Deterministik (PSHA degil): Campbell (1981) GMPE · PGAmax (R <= 200 km, M >= 2.5) · Delaunay triangülasyon',
         'source_pts'  : len(grid),
         'valid_px'    : n_valid,
         'total_px'    : int(z.size),
