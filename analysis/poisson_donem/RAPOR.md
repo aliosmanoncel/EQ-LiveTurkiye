@@ -93,7 +93,12 @@ Hücrelerde: gözlenen / beklenen, hız oranı [%95], p.
 | Diğer 13 test | > 0,1 | 1 | 1 |
 
 **Okuma:**
-- Ham p < 0,05 olan 6 testten Holm sonrasında **açık biçimde** kalan yalnızca Türkiye ML, M ≥ 5,5. Bu, en az olayla kurulan test (N_K = 4) ve 2023 dizisinin en çok etkilediği eşik; dolayısıyla "en sağlam" sonuç aynı zamanda en dar tabanlı olandır.
+- Ham p < 0,05 olan 6 testten Holm sonrasında **açık biçimde** kalan yalnızca Türkiye ML, M ≥ 5,5. Bu, en az olayla kurulan test (N_K = 4) ve 2023 dizisinin en çok etkilediği eşik; dolayısıyla çoklu teste en dayanıklı sonuç aynı zamanda en dar tabanlı olandır (ayrıntı aşağıda).
+
+**M ≥ 5,5 sonucunun belirsizliği ve model duyarlılığı (Türkiye ML, GK74):**
+- **Geniş belirsizlik:** Hız oranı 5,45, ama %95 aralığı **1,9–21,6**. Kurma döneminde yalnızca 4 olay var (beklenen 4,4, gözlenen 24); hız kestiriminin kendisi çok belirsiz. Koşullu binom testi bu belirsizliği içerir, ama aralığın genişliği oranın büyüklüğünün kestirilemediğini gösteriyor.
+- **Model 2 ile karşılaştırma:** G–R uzatması (kurma döneminin M ≥ Mc olaylarının tamamı ve b̂ ile) beklenen sayıyı **16,6** (%95 öngörü aralığı **9–26**) veriyor; gözlenen 24, **p = 0,14**. Model 2 bu eşikte istatistiksel olarak anlamlı bir sapma göstermiyor.
+- **Yorum sınırı:** Model 1'deki anlamlılık, bütün modellerin aynı sonucu desteklediği biçiminde okunmamalı. Bulgu, model seçimine ve kurma dönemi örneklemine duyarlı. Model 2'nin p = 0,14 sonucu da Model 2'nin doğru olduğunu ya da iki modelin eşdeğer olduğunu göstermez: Model 2'nin tek b'li G–R varsayımı karma türlü katalogda kurma döneminin kendisinde bile her zaman uymuyor (§2, Model 2), ve p > 0,05 düşük güçte uyumun kanıtı değildir. Doğru okuma şu: M ≥ 5,5'te sapmanın büyüklüğü belirsiz ve yönü modelden modele aynı (gözlenen > beklenen), anlamlılığı ise modele bağlı.
 - Türkiye ML, M ≥ 4,0 sınırda: aile tanımına göre 0,0496 ya da 0,055. Bu fark bir karar dayanağı olmamalı; sonuç "sınırda" olarak okunmalı.
 - Marmara MD, M ≥ 4,5 (p = 0,041) düzeltmeden sonra açıkça anlamsız (0,66). §2'deki "şansla uyumlu" yorumu doğrulanıyor.
 - Türkiye ML'deki M ≥ 4,0–6,0 sapmalarının **yönü** tutarlı (hepsi oran > 1). Holm her testi ayrı değerlendirdiği için bu ortak yönü ödüllendirmez; örüntü kanıtı ayrıca §2'deki 2023 duyarlılık hesabına dayanıyor.
@@ -111,7 +116,7 @@ Hücrelerde: gözlenen / beklenen, hız oranı [%95], p.
 | Öngörü: Türkiye ML, M ≥ 4,5 | 0,0041 | 0,074 | 0,12 |
 | Diğer 31 test | ≥ 0,018 | ≥ 0,31 | ≥ 0,54 |
 
-- Birleşik ailede ham p < 0,05 olan 10 testten 5'i anlamlı kalıyor: büyük dizi dönemlerindeki dört aşırı saçılma bulgusu ve Türkiye ML, M ≥ 5,5 öngörü sapması. **Hangi aile tanımı seçilirse seçilsin bu beş sonuç değişmiyor**; sağlam bulgular bunlar.
+- Birleşik ailede ham p < 0,05 olan 10 testten 5'i anlamlı kalıyor: büyük dizi dönemlerindeki dört aşırı saçılma bulgusu ve Türkiye ML, M ≥ 5,5 öngörü sapması. **Hangi aile tanımı seçilirse seçilsin bu beş sonuç değişmiyor.** Bu, yalnızca çoklu test düzeltmesine dayanıklılıktır: dört aşırı saçılma bulgusu ayrıca model seçimine de bağlı değil, ama M ≥ 5,5 sonucu model seçimine duyarlı (yukarıda; Model 2'de p = 0,14).
 - Türkiye ML, M ≥ 4,0 öngörü sapması aile tanımına bağlı (0,0496 / 0,055 / 0,081). Bu sonuç anlamlı sayılmamalı; "tutarlı yönde ama düzeltmeye dayanıklı değil" olarak okunmalı.
 
 **Model 2 (G–R uzatması):**
@@ -173,7 +178,7 @@ Sınırı kesen sınamada artış dönüşüme çok duyarlı. M ≥ 5,0'da Scord
 
 ## 6. Sonuçlar
 
-1. **Öngörü:** Homojen bir büyüklük türü dönemi içinde, GK74 açık ve M ≥ 4,0 iken sabit hızlı Poisson modeli, büyük dizi içermeyen bağımsız dönemlerin sayılarını belirsizlik sınırları içinde öngörüyor (üç bölge–dönemde 15 testin 14'ü; Holm sonrasında 15'in 15'i). Sınama dönemi 2023 Kahramanmaraş gibi büyük bir dizi içerdiğinde model gözlenenin altında kalıyor; Holm sonrasında, hangi aile tanımı seçilirse seçilsin, anlamlı kalan yalnızca M ≥ 5,5 (kurma döneminde 4 olay); M ≥ 4,0 aile tanımına bağlı (0,05–0,08) ve anlamlı sayılmamalı. Sapmanın büyük bir kısmı GK74'ün bu diziyi tam ayıklayamamasıyla açıklanabiliyor (sonradan duyarlılık).
+1. **Öngörü:** Homojen bir büyüklük türü dönemi içinde, GK74 açık ve M ≥ 4,0 iken sabit hızlı Poisson modeli, büyük dizi içermeyen bağımsız dönemlerin sayılarını belirsizlik sınırları içinde öngörüyor (üç bölge–dönemde 15 testin 14'ü; Holm sonrasında 15'in 15'i). Sınama dönemi 2023 Kahramanmaraş gibi büyük bir dizi içerdiğinde model gözlenenin altında kalıyor; Holm sonrasında, hangi aile tanımı seçilirse seçilsin, anlamlı kalan yalnızca M ≥ 5,5 (Model 1); ancak bu sonuç kurma dönemindeki 4 olaya dayanıyor (hız oranı 5,45, %95 aralık 1,9–21,6) ve model seçimine duyarlı: G–R uzatmasıyla (Model 2) beklenen 16,6 [9–26], gözlenen 24, p = 0,14. Bu yüzden M ≥ 5,5 sapması kesin bir bulgu olarak değil, büyüklüğü belirsiz ve modele bağlı bir işaret olarak okunmalı. M ≥ 4,0 aile tanımına bağlı (0,05–0,08) ve anlamlı sayılmamalı. Sapmanın büyük bir kısmı GK74'ün bu diziyi tam ayıklayamamasıyla açıklanabiliyor (sonradan duyarlılık).
 2. **Poisson varsayımı:** GK74 açıkken M ≥ 4,0'da, büyük dizi içermeyen dönemlerde yıllık sayılar Poisson'la çelişmiyor (düşük güç: 6–7 yıl). Büyük dizi içeren dönemlerde GK74 sonrasında da aşırı saçılma var; bu bulgu Holm düzeltmesinden sonra da duruyor. Bu, a(t) raporundaki "kümelenmede güven aralıkları dar kalır" bulgusuyla tutarlı. EQ-Live'daki Poisson olasılıkları büyük dizi dönemlerini kapsayan pencerelerde iyimser kalabilir.
 3. **Katalog homojenliği:** EMSC'nin kendi içinde de 2010–2012'de MD → ML geçişi var. Dönemler arası karşılaştırmalarda (a(t), b(t), Poisson) bu geçiş, 1998 ISC → EMSC sınırı kadar önemli bir sınırlama. Mc uyarısı tür geçişini yakalamaz; ayrı bir "büyüklük türü geçişi" uyarısı düşünülebilir (öneri).
 4. **Model seçimi:** Kurma dönemindeki eğilimler ileriye taşınamıyor; zamanla değişen hız modelini tercih etmek için gerekçe yok. Tek b'li G–R uzatması karma türlü katalogda kendi kurma döneminde bile uymayabiliyor.
