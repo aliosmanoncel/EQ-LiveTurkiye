@@ -31,10 +31,10 @@ function mkCtx(S) {
   { const i = S.indexOf('function csBvalueTimeSeries('); if (i < 0) throw new Error('bulunamadı: function csBvalueTimeSeries(');
     const ends = ['// ── Fit aralığı arayüzü', '// GR — basamaklı tamlık'].map(m => S.indexOf(m, i)).filter(j => j > 0);
     if (!ends.length) throw new Error('csBvalueTimeSeries bitiş işareti bulunamadı');
-    // b(t) pencere yardımcıları (2026-10-11'den beri): bTimeAnchor, bWinStart, bWinTime — gövdeleriyle birlikte kesilir
+    // b(t) pencere yardımcıları (2026-10-11'den beri): bTimeAnchor, bWinStart, bWinTime (+ 2026-10-31 aWinFields) — gövdeleriyle birlikte kesilir
     const fnCut = nm => { const k = S.indexOf('\nfunction ' + nm + '('); if (k < 0) return ''; const e = S.slice(k + 1).search(/\n(?=[^\s}])/); return S.slice(k + 1, k + 2 + e); };
     const ba = S.match(/^let bTimeAnchor = [^\n]*$/m);
-    vm.runInContext([ba ? ba[0].replace('let ', 'var ') : "var bTimeAnchor = 'mean';", 'var location = { search: "" };', fnCut('bWinStart'), fnCut('bWinTime')].join('\n'), ctx);
+    vm.runInContext([ba ? ba[0].replace('let ', 'var ') : "var bTimeAnchor = 'mean';", 'var location = { search: "" };', fnCut('bWinStart'), fnCut('bWinTime'), fnCut('aWinFields')].join('\n'), ctx);   // aWinFields (2026-10-31): a(t) pencere alanları; yoksa boş
     vm.runInContext(S.slice(i, Math.min(...ends)), ctx); }
   // Sınıflama + Weichert (renderGutenbergRichterCS, birebir kaynak): "Kesik birikimli eğri" yorumuna kadar
   const blk = cutS(S, '  const idx = m => Math.floor((m + 1e-9) / DM);', '  // Kesik birikimli eğri');

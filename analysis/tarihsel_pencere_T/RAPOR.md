@@ -82,3 +82,15 @@ Bu kaymanın nedeni şu: pencere sonu artık katalog tarihinin 00:00'ı değil, 
 - Bu dalla birlikte tarihsel modda hesaplanan bütün yıllık oranlar ve yoğunluklar seçili pencereye göre değişir. Daha önce raporlanmış, katalog sonundan önce biten pencerelerle elde edilmiş oran/yoğunluk değerleri yeniden hesaplanmalıdır. Ham G–R, tek Mc b ve Mc etkilenmez.
 - Bitişik olmayan pencerelerde T hâlâ toplam aralıktır; durum satırı bunu uyarır. Parça süreleri `histSelWindow.parts` içinde tutuluyor, ama hesaplara henüz bağlanmadı (ayrı karar).
 - HK Yerel ve HK Tarihsel kataloglarında pencere seçimi yok. Bunlar katalog aralığını kullanmaya devam ediyor; değiştirilmedi.
+
+## 5. Birleştirme öncesi son test kaydı (2026-10-27 14:20, dal ucu e98c1cf)
+
+| Test | Sonuç |
+|---|---|
+| Birim testleri `scripts/test_*.js` (14 dosya; dal ucunda ayrı çalışma kopyasında) | 14/14 geçti |
+| Kabul `kabul_pencere_T.js` (önce = main 543ac56) | 19/19 geçti |
+| GK74 düğmesi kabul testi (gerileme) | 16/16 geçti |
+| Güncel `main` ile birleştirme | çakışma yok (`git merge-tree`); `index.html` farkı 24 satır |
+| Bu dalı içeren Poisson dalında (bdaa625) birim testleri | 15/15 geçti |
+
+`main` ve canlı site değişmedi. Birleştirme ayrı onay bekliyor.

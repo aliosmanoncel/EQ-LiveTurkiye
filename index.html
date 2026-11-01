@@ -1200,6 +1200,11 @@
     <svg id="tmSvgB" viewBox="0 0 660 350" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
     <svg id="tmSvgBz" viewBox="0 0 660 175" preserveAspectRatio="xMidYMid meet" style="display:none;margin:2px auto 6px;width:100%;height:auto;max-width:660px"></svg>
     <div class="tmStats" id="tmStatsB">—</div>
+    <div id="aTsBox" style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
+      <div class="tmTitle" style="font-size:.78rem;">📈 a(t): Pencere Olay Hızı log₁₀(n/T) <span style="color:#666;font-weight:400;">(Öncel &amp; Wilson 2007, Eş. 3: N = n/T = 10<sup>a</sup> — b(t) ile aynı pencereler ve zaman damgası)</span></div>
+      <svg id="tmSvgA" viewBox="0 0 660 210" preserveAspectRatio="xMidYMid meet" style="display:block;margin:6px auto;width:100%;height:auto;max-width:660px"></svg>
+      <div class="tmStats" id="tmStatsA">—</div>
+    </div>
     <div style="border-top:1px solid #2a2a2a;margin-top:10px;padding-top:8px;">
       <div class="tmTitle" style="font-size:.78rem;">⚡ Kümülatif Benioff Gerinim Ölçüsü Σ√E <span style="color:#666;font-weight:400;">(log E = 11,8 + 1,5M, erg; Gutenberg &amp; Richter 1956 — sabit eşik)</span><label class="pcFig" title="Akademik posterde Benioff şekli (Şekil 3b) yer alsın mı? Poster panelindeki “Bileşenler” ile aynı ayardır." style="font-size:.68rem;font-weight:400;color:#fbbf24;cursor:pointer;margin-left:6px;white-space:nowrap;"><input type="checkbox" data-pc="pcBen" onchange="posterFigToggle(this)" style="vertical-align:middle;"> 🎓 posterde</label></div>
       <div style="font-size:.7rem;color:#888;text-align:right;" title="İki dönem karşılaştırması için ayrım tarihi. Boş bırakılırsa son tamlık basamağının başlangıcı (ör. 2020-10-08) ya da katalog ortası kullanılır. Tarih veriye bakılarak seçildiyse p değerleri keşifseldir.">dönem ayrımı <input type="date" id="benSplit" onchange="if (tmAnyOpen()) renderTimeMag([...events, ...liveEvents])" style="background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;font-size:.95em;padding:0 3px;"></div>
@@ -2885,8 +2890,227 @@ function renderBtZoom(bt) {
   g += `<text x="${PL}" y="${H - 2}" fill="#8a8f98" font-size="8">gri: ${nMix} pencere M${mw.m.toFixed(1)} dahil · mor: ${nPost} artçı penceresi · tarih: pencerenin son olayı</text>`;
   svg.innerHTML = g; svg.style.display = 'block';
 }
+// a(t) — pencere olay hızı (2026-10-31). Öncel & Wilson (2007, GJI 169, s. 262, Eş. 3): N = n/T = 10^a; n = pencere olay sayısı
+// (b(t) ile aynı pencereler), T = pencerenin ilk–son olay süresi. Bu a, Mc'deki yıllık olay hızıdır (log₁₀ λ(≥Mc)); G–R'nin M = 0'daki
+// kesişimi değildir. Kesişim a_GR = log₁₀(n/T) + b·Mc, b ile matematiksel olarak bağlıdır (sabit n'de yalnız b'ye bağlı değişir).
+// Tamlık basamaklarında pencerenin Mc'si: w0/w1 pencere sınırları, mcLo/mcHi pencere içindeki en küçük/en büyük olay eşiği.
+function aWinFields(win) { let lo = Infinity, hi = -Infinity; for (const it of win) { if (it.mc < lo) lo = it.mc; if (it.mc > hi) hi = it.mc; }
+  return { w0: win[0].t, w1: win[win.length - 1].t, mcLo: lo, mcHi: hi }; }
+// χ² nicelikleri (Wilson–Hilferty 1931; k = 2(n−1) ≥ 38 için göreli hata < 1e−3)
+function aChi2Q(p, k) { const z = p > 0.5 ? 1.959963985 : -1.959963985, c = 2 / (9 * k); return k * Math.pow(1 - c + z * Math.sqrt(c), 3); }
+// Bir pencerenin a değeri ve %95 aralığı. Poisson sürecinde n olay arasındaki n−1 bekleme süresinin toplamı T ~ Gamma(n−1, λ):
+// λ ∈ [χ²₀,₀₂₅(2(n−1)), χ²₀,₉₇₅(2(n−1))] / (2T). Nokta değeri yayındaki tanımla n/T (n = 100'de (n−1)/T'den 0,0044 log birimi yüksek).
+function aWinValue(n, Tyr) {
+  if (!(Tyr > 0) || n < 3) return null;
+  const k = 2 * (n - 1);
+  return { a: Math.log10(n / Tyr), lo: Math.log10(aChi2Q(0.025, k) / (2 * Tyr)), hi: Math.log10(aChi2Q(0.975, k) / (2 * Tyr)) };
+}
+// Pearson r ve iki yönlü p (Fisher z yaklaşımı; n ≥ 5)
+function aPearson(x, y) {
+  const n = x.length; if (n < 5) return null;
+  const mx = x.reduce((a, v) => a + v, 0) / n, my = y.reduce((a, v) => a + v, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0; for (let i = 0; i < n; i++) { const dx = x[i] - mx, dy = y[i] - my; sxy += dx * dy; sxx += dx * dx; syy += dy * dy; }
+  if (!(sxx > 0 && syy > 0)) return null;
+  const r = sxy / Math.sqrt(sxx * syy), z = Math.atanh(Math.max(-0.999999, Math.min(0.999999, r))) * Math.sqrt(n - 3);
+  const erfc = v => { const t = 1 / (1 + 0.5 * Math.abs(v)), e = t * Math.exp(-v * v - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277))))))))); return v >= 0 ? e : 2 - e; };
+  return { r, n, p: erfc(Math.abs(z) / Math.SQRT2) };
+}
+// Örtüşmeyen pencerelerin zamansal bağımlılığı (2026-10-31). Gecikme-1 öz-ilişki: aynı Mc segmentindeki ardışık örtüşmeyen pencere çiftleri
+// üzerinden Pearson (segmentler arası çift kurulmaz); en az 5 çift gerekir (aPearson ile aynı alt sınır). Etkin örneklem (Bartlett 1935; iki AR(1) serinin korelasyonu):
+// n_eff = n·(1 − ρ_a·ρ_b)/(1 + ρ_a·ρ_b), ρ_a·ρ_b < 0 ise 0 alınır (n_eff hiçbir zaman n'yi aşmaz). Düzeltilmiş p: Fisher z, √(n_eff − 3); n_eff < 5'te verilmez.
+function aLag1(segs, f) { const x = [], y = []; segs.forEach(v => { for (let i = 1; i < v.length; i++) { x.push(f(v[i - 1])); y.push(f(v[i])); } });
+  if (x.length < 5) return null; const r = aPearson(x, y); return r ? { r: r.r, n: x.length } : null; }
+function aNeffTest(r, n, rhoA, rhoB) {
+  if (rhoA === null || rhoB === null) return { neff: null, p: null, why: 'öz-ilişki için en az 5 ardışık örtüşmeyen pencere çifti gerekir' };
+  const rho = Math.max(0, rhoA * rhoB), neff = Math.min(n, n * (1 - rho) / (1 + rho));
+  if (neff < 5) return { neff, p: null, why: 'n_eff < 5: test edilemez' };
+  const z = Math.atanh(Math.max(-0.999999, Math.min(0.999999, r))) * Math.sqrt(neff - 3), v = Math.abs(z) / Math.SQRT2;
+  const t = 1 / (1 + 0.5 * v), e = t * Math.exp(-v * v - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+  return { neff, p: Math.min(1, e), why: null };
+}
+// a(t) noktaları: b(t) serisinden (aynı pencereler, aynı zaman damgası). Tamlık basamaklarında Mc'si karışık pencere (mcLo ≠ mcHi) çizilmez.
+function aSeriesFrom(series, NW, Mc, cs) {
+  const Y = 365.25 * 864e5;
+  return series.map(s => {
+    const w0 = s.w0 ?? s.t0, w1 = s.w1 ?? s.t1, Tyr = Number.isFinite(w0) && Number.isFinite(w1) ? (w1 - w0) / Y : (s.span || 0) / Y;
+    const mc = cs ? (s.mcLo !== undefined && Math.abs(s.mcHi - s.mcLo) < 1e-9 ? s.mcLo : null) : Mc;
+    const v = aWinValue(NW, Tyr);
+    return v ? { t: s.t, b: s.b, Tyr, mc, mixed: cs ? mc === null : false, ...v, aGR: mc !== null ? v.a + s.b * mc : null } : null;
+  }).filter(Boolean);
+}
+function renderAvalueTS(series, N, Mc, cs, t0, t1, NW, STEP) {
+  const svg = document.getElementById('tmSvgA'), st = document.getElementById('tmStatsA');
+  if (!svg || !st) return;
+  const pts = aSeriesFrom(series, NW, Mc, cs), ok = pts.filter(q => !q.mixed);
+  lastAts = { NW, step: STEP, pts, cs: !!cs };
+  if (ok.length < 2) { svg.innerHTML = `<text x="330" y="60" fill="#666" font-size="11" text-anchor="middle">a(t): çizilecek pencere yok${pts.length ? ' (tüm pencereler tamlık basamağı geçişinde)' : ''}</text>`; st.textContent = '—'; return; }
+  const W = 660, H = 210, PAD_L = 40, PAD_R = 14, PAD_T = 10, PAD_B = 22, plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
+  let yMin = Math.min(...ok.map(q => q.lo)), yMax = Math.max(...ok.map(q => q.hi)); const pad = Math.max(0.05, (yMax - yMin) * 0.06); yMin -= pad; yMax += pad;
+  const x = t => PAD_L + Math.max(0, Math.min(1, (t - t0) / (t1 - t0))) * plotW, y = v => PAD_T + plotH - (v - yMin) / (yMax - yMin) * plotH;
+  const fmt = v => v.toFixed(2).replace('.', ','), dstr = t => new Date(t).toISOString().slice(0, 10);
+  // Segmentler: Mc değişince ya da karışık pencerede çizgi kesilir
+  const segs = []; let cur = null;
+  for (const q of pts) { if (q.mixed) { cur = null; continue; } if (!cur || Math.abs(cur.mc - q.mc) > 1e-9) { cur = { mc: q.mc, p: [] }; segs.push(cur); } cur.p.push(q); }
+  let body = '';
+  const span = yMax - yMin, stepY = span > 2 ? 0.5 : span > 0.8 ? 0.2 : 0.1;
+  for (let v = Math.ceil(yMin / stepY) * stepY; v <= yMax + 1e-9; v += stepY) body += `<line x1="${PAD_L}" y1="${y(v).toFixed(1)}" x2="${W - PAD_R}" y2="${y(v).toFixed(1)}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${PAD_L - 6}" y="${(y(v) + 3).toFixed(1)}" fill="#888" font-size="8" text-anchor="end">${v.toFixed(stepY < 0.2 ? 1 : 1)}</text>`;
+  const ticks = timeAxisTicks(t0, t1);
+  ticks.forEach((tk, i) => { const xc = x(tk.t), an = i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle';
+    body += `<line x1="${xc.toFixed(1)}" y1="${PAD_T}" x2="${xc.toFixed(1)}" y2="${PAD_T + plotH}" stroke="#2a2a2a" stroke-width="0.5"/><text x="${xc.toFixed(1)}" y="${H - 6}" fill="#888" font-size="9" text-anchor="${an}">${tk.label}</text>`; });
+  const COL = '#a3e635';
+  segs.forEach((sg, si) => {
+    if (sg.p.length >= 2) body += `<polygon points="${sg.p.map(q => `${x(q.t).toFixed(1)},${y(q.hi).toFixed(1)}`).concat(sg.p.slice().reverse().map(q => `${x(q.t).toFixed(1)},${y(q.lo).toFixed(1)}`)).join(' ')}" fill="${COL}" fill-opacity="0.12" stroke="none"/>`;
+    body += `<polyline points="${sg.p.map(q => `${x(q.t).toFixed(1)},${y(q.a).toFixed(1)}`).join(' ')}" fill="none" stroke="${COL}" stroke-width="1.3"/>`;
+    sg.p.forEach(q => { body += `<circle cx="${x(q.t).toFixed(1)}" cy="${y(q.a).toFixed(1)}" r="1.8" fill="${COL}"><title>${dstr(q.t)} · a = log₁₀(n/T) = ${fmt(q.a)} [%95 ${fmt(q.lo)}–${fmt(q.hi)}] · n/T = ${(NW / q.Tyr).toPrecision(3)}/yıl · T = ${q.Tyr.toPrecision(3)} yıl · Mc = ${fmtM(q.mc)} · b = ${q.b.toFixed(2)} · G–R kesişimi a_GR = a + b·Mc = ${fmt(q.aGR)}</title></circle>`; });
+    if (cs && segs.length > 1) body += `<text x="${(x(sg.p[0].t) + 2).toFixed(1)}" y="${PAD_T + 9 + (si % 2) * 9}" fill="#9ab0c5" font-size="8">Mc ${fmtM(sg.mc)}</text>`;
+  });
+  const nMixed = pts.length - ok.length;
+  if (nMixed) pts.filter(q => q.mixed).forEach(q => { body += `<line x1="${x(q.t).toFixed(1)}" y1="${PAD_T + plotH - 4}" x2="${x(q.t).toFixed(1)}" y2="${PAD_T + plotH}" stroke="#f59e0b" stroke-width="0.8"/>`; });
+  body += `<line x1="${PAD_L}" y1="${PAD_T + plotH}" x2="${W - PAD_R}" y2="${PAD_T + plotH}" stroke="#555"/><line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T + plotH}" stroke="#555"/>`;
+  body += `<text x="9" y="${(PAD_T + plotH / 2).toFixed(1)}" fill="#888" font-size="8" text-anchor="middle" transform="rotate(-90 9 ${(PAD_T + plotH / 2).toFixed(1)})">a = log₁₀(n/T), T: yıl</text>`;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = body;
+  // b–a ilişkisi. Ardışık pencereler ortak olay paylaşır (örtüşme NW − adım): bağımsızlık için yalnız örtüşmeyen pencereler (her ⌈NW/adım⌉'inci) kullanılır.
+  // Tamlık basamaklarında yalnız aynı Mc segmenti içinde (farklı eşiklerin a'ları karşılaştırılamaz).
+  const k = Math.max(1, Math.ceil(NW / STEP)), indSegs = segs.map(sg => sg.p.filter((q, i) => i % k === 0)), xb = [], ya = []; indSegs.forEach(v => v.forEach(q => { xb.push(q.b); ya.push(q.a); }));
+  const rInd = aPearson(xb, ya), rAll = aPearson(ok.map(q => q.b), ok.map(q => q.a));
+  const acA = aLag1(indSegs, q => q.a), acB = aLag1(indSegs, q => q.b), nt = rInd ? aNeffTest(rInd.r, rInd.n, acA ? acA.r : null, acB ? acB.r : null) : null;
+  lastAts.corr = rInd ? { r: rInd.r, n: rInd.n, pHam: rInd.p, rhoA: acA ? acA.r : null, rhoB: acB ? acB.r : null, nCift: acA ? acA.n : 0, neff: nt.neff, pDuz: nt.p } : null;
+  const pf = v => v < 1e-3 ? v.toExponential(1).replace('.', ',') : v.toFixed(3).replace('.', ','), c2 = v => v.toFixed(2).replace('.', ',');
+  const med = v => { const a = v.slice().sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
+  const aMin = ok.reduce((m, q) => q.a < m.a ? q : m), aMax = ok.reduce((m, q) => q.a > m.a ? q : m);
+  const decl = typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect;
+  st.innerHTML = mcUyariHtml(lastMcUyari, true) + turUyariHtmlG(lastTurUyari, true) + `<div style="font-size:.85em;color:#aaa"><span style="color:${COL}">●─</span> a = log₁₀(n/T) &nbsp; <span style="color:${COL};opacity:.5">▮</span> %95 aralık (T ~ Gamma(n−1, λ); bağımsız olay varsayımı — artçı kümelenmesinde dar kalır) ${nMixed ? `&nbsp; <span style="color:#f59e0b">╵</span> tamlık basamağı geçişindeki pencere (çizilmedi)` : ''}</div>` +
+    `<div style="margin-top:2px">${ok.length} pencere (n = ${NW}, adım ${STEP}; b(t) ile aynı) · medyan T = ${med(ok.map(q => q.Tyr)).toPrecision(3)} yıl · a en düşük ${fmt(aMin.a)} (${dstr(aMin.t)}), en yüksek ${fmt(aMax.a)} (${dstr(aMax.t)})` +
+    (rInd ? ` &nbsp;|&nbsp; b–a korelasyonu (keşifsel): <b>r = ${c2(rInd.r)}</b> (örtüşmeyen ${rInd.n} pencere) · <span title="Ham p: örtüşmeyen pencereleri bağımsız sayar (Fisher z, √(n − 3)). Düzeltilmiş p onun yerine geçmez; ikisi birlikte okunmalıdır.">ham p = ${pf(rInd.p)}</span> · ` +
+      `<span title="Örtüşmeyen pencereler de zamanda bağımlıdır. ρ: aynı Mc segmentindeki ardışık örtüşmeyen pencerelerin gecikme-1 öz-ilişkisi. n_eff = n(1 − ρ_a·ρ_b)/(1 + ρ_a·ρ_b) (Bartlett 1935); düzeltilmiş p: Fisher z, √(n_eff − 3). Benzetimde (bağımsız AR(1) çiftleri, test_a_window.js test 8) düzeltilmiş testin hata oranı %2,5–5,1, ham testin %5–32. AR(1) dışındaki yapılarda düzeltme yetersiz kalabilir: uzun bellek (AR(2)) ve iki seride ortak yönde eğilim varken hata oranı %6–17 (analysis/a_zaman/neff_saglamlik.js). Küçük n_eff'te güç düşüktür."><span style="color:#9ab0c5">öz-ilişki (gecikme 1) ρ<sub>a</sub> = ${acA ? c2(acA.r) : '—'}, ρ<sub>b</sub> = ${acB ? c2(acB.r) : '—'} → n<sub>eff</sub> = ${nt.neff !== null ? nt.neff.toFixed(1).replace('.', ',') : '—'} · düzeltilmiş p = ${nt.p !== null ? pf(nt.p) : '—'}${nt.why ? ` (${nt.why})` : ''}</span></span>` +
+      (nt.p !== null && nt.neff < 10 ? ` <span style="color:#f59e0b">⚠ küçük n<sub>eff</sub> (&lt; 10): testin gücü düşük — p &gt; 0,05 ilişkinin yokluğunu göstermez</span>` : '') + `` : ' &nbsp;|&nbsp; b–a korelasyonu: örtüşmeyen pencere sayısı yetersiz') +
+    (rAll ? ` <span style="color:#888">[tüm ${rAll.n} örtüşen pencere: r = ${rAll.r.toFixed(2).replace('.', ',')}; p verilmez — pencereler bağımsız değil]</span>` : '') + `</div>` +
+    `<div style="color:#9ab0c5;margin-top:2px">Tanım: Öncel &amp; Wilson (2007, Eş. 3) N = n/T = 10<sup>a</sup>; n = ${NW} olay (M ≥ Mc), T pencerenin ilk ile son olayı arasındaki süre. Bu a, <b>Mc'deki yıllık olay hızıdır</b> (log₁₀ λ(≥Mc)); bütün katalogun G–R a değeriyle (M = 0 kesişimi; dönem ve Mc'ye bağlı) doğrudan karşılaştırılmaz. ` +
+      `Kesişim a<sub>GR</sub> = a + b·Mc nokta açıklamasında verilir; sabit n'de b ile matematiksel olarak bağlıdır, ayrı bir etkinlik göstergesi olarak yorumlanmamalıdır. ` +
+      (cs ? `Tamlık basamaklarında her segment kendi Mc'sindeki hızı gösterir; farklı Mc segmentlerinin a düzeyleri karşılaştırılamaz. ` : '') +
+      (decl ? 'GK74 artçı ayıklama açık. ' : '<span style="color:#f59e0b">GK74 kapalı: artçı dizileri a(t)\'de kısa süreli hız tepeleri olarak görünür.</span> ') +
+      `Katalog tamlığı zamanla değişiyorsa (ağ gelişimi; Mc'nin altında kalan dönemler) kaydedilen hız ve b birlikte değişir: b–a korelasyonu yapay olabilir; Mc(t) şeridine ve tamlık basamaklarına bakın. a(t)'deki değişim tek başına deprem tahmini ya da öncü kanıtı değildir.</div>`;
+}
+let lastAts = null;
+// Katalog tamlık (Mc uyumsuzluğu) uyarısı (2026-10-31). Hesap değiştirmez; b(t) panelinin mevcut ölçümlerini kullanır:
+//  • tek Mc: Mc(t) şeridi (kayan pencere veri Mc'si, maks. eğrilik +0,2) ve pencere başına 'inc' işareti (pencere süresinde veri Mc(t) > kullanılan Mc + 0,1).
+//    Uyarı: pencerelerin en az %5'i 'inc' ise. 'inc' pencereleri serinin süresinin de en az %5'ini kaplıyorsa kalıcı tamlık farkı (asıl uyarı),
+//    kaplamıyorsa geçici eksiklik notu (büyük deprem sonrası kısa süreli Mc yükselmesi). Önerilen ortak eşik: en yüksek veri Mc(t)'si (0,1'e yukarı).
+//  • tamlık basamakları: dönemin bütün verisinden Mc'si eşiğin CS_QC.mcGap (0,2) üstündeyse (renderCsDiag ile aynı ölçüt) YA DA dönem içindeki
+//    Mc(t) şeridinin en az 2 noktası ve %10'u eşik + 0,2'nin üstündeyse YA DA dönem içinde en az 2 yılın yıllık Mc'si (≥ 50 olaylı yıllar, csSuggest
+//    ile aynı ölçüt) eşik + 0,2'nin üstündeyse (seyrek dönemlerde 250 olaylık Mc(t) penceresi birkaç yılı kapsar; örn. 1985–1989'da yıllık Mc 4,7–4,8, eşik 4,0).
+function mcUyariDurum(o) {
+  if (o.cs) {   // dönemin bütün verisinden Mc'si YA DA dönem içindeki Mc(t) şeridi (en az 2 nokta ve %10'u eşik + gap üstünde): dönem içi değişimi de yakalar
+    const az = [];
+    (o.periods || []).forEach(p => {
+      const butun = p.mcData !== null && p.mcData !== undefined && p.mc < p.mcData - o.gap - 1e-9;
+      const pts = (o.mcSer || []).filter(m => m.t >= p.t0 && m.t < p.t1), ust = pts.filter(m => m.mc > +p.mc + o.gap + 1e-9);
+      const ici = pts.length >= 2 && ust.length >= 2 && ust.length / pts.length >= 0.1 && new Set(ust.map(m => new Date(m.t).getUTCFullYear())).size >= 2;   // en az 2 takvim yılı: büyük deprem sonrası birkaç aylık geçici eksiklik tek başına yetmez
+      // Yıllık Mc (≥ CS_QC.minEvents olaylı yıllar; csSuggest ile aynı ölçüt): dönem içinde en az 2 yıl eşik + gap üstünde
+      const yy = (o.yillik || []).filter(q => q.t0 >= p.t0 - 864e5 && q.t1 <= p.t1 + 864e5 && q.mc > +p.mc + o.gap + 1e-9), yil = yy.length >= 2;
+      if (butun || ici || yil) az.push({ mc: +p.mc, mcData: p.mcData ?? null, t0: p.t0, t1: p.t1, mcTmax: ust.length ? Math.max(...ust.map(m => m.mc)) : null, oran: pts.length ? ust.length / pts.length : 0, nPts: pts.length,
+        ustT0: ust.length ? Math.min(...ust.map(m => m.t)) : null, ustT1: ust.length ? Math.max(...ust.map(m => m.t)) : null, yillar: yil ? yy.map(q => ({ y: q.y, mc: q.mc, n: q.n })) : [],
+        neden: [butun ? 'dönem' : null, ici ? 'Mc(t)' : null, yil ? 'yıllık' : null].filter(Boolean) });
+    });
+    return az.length ? { on: true, tur: 'basamak', donemler: az } : { on: false };
+  }
+  const ser = o.ser || [], mcs = (o.mcSer || []).map(m => m.mc).filter(Number.isFinite);
+  if (!ser.length || mcs.length < 2 || !Number.isFinite(o.Mc)) return { on: false };
+  const inc = ser.filter(q => q.inc), nInc = inc.length, frac = nInc / ser.length, mcMin = Math.min(...mcs), mcMax = Math.max(...mcs);
+  // Süre ağırlığı: 'inc' pencerelerinin [t0, t1] aralıklarının birleşim uzunluğu / serinin toplam süresi. Pencereler olay sayısıyla tanımlı olduğundan
+  // artçı dizisinde kısa sürede çok pencere oluşur; pencere oranı yüksek ama süre oranı düşükse eksiklik geçicidir (büyük deprem sonrası), kalıcı değil.
+  const T0 = Math.min(...ser.map(q => q.t0)), T1 = Math.max(...ser.map(q => q.t1));
+  let birlesim = 0, a = null, b = null;
+  inc.map(q => [q.t0, q.t1]).sort((x, y) => x[0] - y[0]).forEach(([x, y]) => { if (a === null) { a = x; b = y; } else if (x <= b) b = Math.max(b, y); else { birlesim += b - a; a = x; b = y; } });
+  if (a !== null) birlesim += b - a;
+  const sureOran = T1 > T0 ? birlesim / (T1 - T0) : 0;
+  if (frac < 0.05) return { on: false, frac, sureOran, mcMin, mcMax };
+  const ortak = { frac, sureOran, nInc, n: ser.length, mcMin, mcMax, Mc: o.Mc, oner: Math.ceil(mcMax * 10 - 1e-9) / 10 };
+  return sureOran >= 0.05 ? { on: true, tur: 'tekMc', ...ortak } : { on: true, tur: 'gecici', ...ortak };
+}
+function mcUyariHtml(d, kisa) {
+  if (!d || !d.on) return '';
+  const f = v => v.toFixed(1).replace('.', ','), yil = t => new Date(t).getUTCFullYear();
+  if (d.tur === 'gecici') {
+    if (kisa) return `<div id="mcUyariA" style="color:#d4a24a;margin-bottom:3px">ⓘ <b>Geçici tamlık eksikliği:</b> kısa süreli Mc yükselmesi (büyük deprem sonrası olası); a(t)'deki kısa süreli değişimleri etkileyebilir (ayrıntı b(t) panelinde).</div>`;
+    return `<div id="mcUyariB" style="color:#d4a24a;border:1px solid #d4a24a55;border-radius:4px;padding:3px 6px;margin-bottom:4px">ⓘ <b>Geçici tamlık eksikliği.</b> Pencerelerin yaklaşık %${Math.round(100 * d.frac)} kadarı (${d.nInc} / ${d.n}) veri Mc(t) > Mc + 0,1 olan aralıklara düşüyor, ancak bu aralıklar serinin süresinin yalnızca %${Math.max(1, Math.round(100 * d.sureOran))} kadarını kaplıyor (en yüksek Mc(t) ${f(d.mcMax)}; kullanılan Mc ${f(d.Mc)}). Bu örüntü, büyük depremlerden hemen sonra küçük olayların kaydedilememesiyle uyumludur; dönemler arası kalıcı bir Mc farkı değildir. O aralıklardaki a(t) ve b(t) değerleri (kısa süreli hız tepeleri, düşük b) eksik kayıttan etkilenebilir; Mc(t) şeridine bakın.</div>`;
+  }
+  if (kisa) return `<div id="mcUyariA" style="color:#f59e0b;margin-bottom:3px">⚠ <b>Katalog tamlık uyarısı:</b> dönemlerin Mc'leri farklı; a(t)'deki değişimler yapay olabilir (ayrıntı b(t) panelinde).</div>`;
+  const neden = d.tur === 'tekMc'
+    ? `Veriden kestirilen Mc(t) ${f(d.mcMin)}–${f(d.mcMax)} arasında değişiyor; kullanılan Mc = ${f(d.Mc)}. Pencerelerin yaklaşık %${Math.round(100 * d.frac)} kadarı (${d.nInc} / ${d.n}) Mc(t) > Mc + 0,1 olan dönemlere düşüyor; bu dönemler serinin süresinin %${Math.round(100 * d.sureOran)} kadarını kaplıyor. Ortak eşik için en az Mc ≈ ${f(d.oner)} ya da tamlık basamakları kullanılabilir (en yüksek Mc(t) büyük depremlerden sonraki geçici eksiklikten de gelebilir; Mc(t) şeridine bakın).`
+    : `Basamak eşiği, o dönemin veriden kestirilen Mc'sinin belirgin biçimde altında: ${d.donemler.map(p => `${yil(p.t0)}–${yil(p.t1 - 1)}: eşik ${f(p.mc)}` + (p.mcData !== null && p.mc < p.mcData - 0.2 - 1e-9 ? `, dönemin veri Mc'si ${f(p.mcData)}` : '') + (p.mcTmax !== null && p.neden.includes('Mc(t)') ? `, Mc(t) ${yil(p.ustT0)}–${yil(p.ustT1)} arasında ${f(p.mcTmax)}'e kadar (dönemdeki Mc(t) noktalarının %${Math.round(100 * p.oran)} kadarı eşik + 0,2'nin üstünde)` : '') + (p.yillar && p.yillar.length ? `, yıllık Mc ${p.yillar.map(q => `${q.y}: ${f(q.mc)}`).join(', ')}` : '')).join('; ')}.`;
+  return `<div id="mcUyariB" style="color:#f59e0b;border:1px solid #f59e0b55;border-radius:4px;padding:3px 6px;margin-bottom:4px">⚠ <b>Katalog Tamlık Uyarısı.</b> Karşılaştırılan dönemlerin tamlık magnitüdleri (Mc) farklıdır. Bu durum a(t) ve b(t) parametrelerinde yapay değişimlere neden olabilir. Dönemler arası karşılaştırma için ortak ve her iki dönemde de yeterli tamlığa sahip bir Mc eşiği kullanılmalıdır. ${neden} ` +
+    `<span style="color:#d4a24a">Ortak Mc ile değişimin kaybolması fiziksel bir değişimin olmadığını kanıtlamaz; değişimin kalması da fiziksel olduğunu göstermez: büyüklük ölçeği (ör. ISC → EMSC, MD) ve ağın algılama farkları ayrıca değerlendirilmelidir.</span></div>`;
+}
+// Büyüklük türü geçişi uyarısı (2026-11-01; yorum katmanı, hesap değiştirmez). Analize giren olaylarda (M ≥ Mc ya da basamak eşiği) her takvim
+// yılının baskın büyüklük türü (en az TUR_QC.minN olay, pay ≥ TUR_QC.pay) bulunur; pencere içinde iki farklı baskın tür varsa uyarı verilir.
+// Gerekçe (analysis/tur_gecisi/RAPOR.md): EMSC Türkiye verisinde 2011–2012'de MD → ML geçişi var (büyüklük yazarı da EMSC → ISK/DDA); MD döneminin
+// frekans–büyüklük dağılımı M < 4'te belirgin biçimde daha dik. Mc uyarısı bunu yakalamaz (Mc 3,2 her iki dönemde aynı). Etiket aynı kalan ajans
+// değişimleri (ör. ISC mb → EMSC mb) bu uyarıyla yakalanmaz.
+// Önerilen eşik (RAPOR §8–9): baskın tür geçişinin görülmediği en küçük eşik; her baskınlık payı (TUR_QC.payAralik) için ayrı aranır ve ARALIK olarak
+// verilir (pay seçimine duyarlı: Türkiye M 3,6–4,1). Koşullar: yıllık ≥ TUR_QC.minNOner olay, en az TUR_QC.minYilOner değerlendirilebilir yıl (asgari
+// raporlama kuralı; istatistiksel güvenilirlik ölçütü değil), ilk geçişin iki yanında yıl; karışık yıllar geçiş sayılmaz. Tamlık (Mc) eşiği DEĞİLDİR.
+// Değerlendirilemedi: geçiş bulunmadığında, takvim yıllarının TUR_QC.yetersizOran'dan fazlası yıllık TUR_QC.minN olay koşulunu sağlamıyorsa (ya da
+// 2'den az yıl değerlendirilebiliyorsa) 'uyarı yok' yerine 'değerlendirilemedi' notu gösterilir: uyarının olmaması geçiş olmadığı anlamına gelmez.
+const TUR_QC = { minN: 20, pay: 0.6, minNOner: 10, minYilOner: 5, payAralik: [0.5, 0.6, 0.7], yetersizOran: 0.5 };
+function turNorm(mt) { const t = String(mt || '?').toLowerCase(); return t === 'mb' ? 'mb' : t === 'ms' ? 'Ms' : t === 'ml' ? 'ML' : t === 'md' ? 'MD' : /^mw/.test(t) ? 'Mw' : 'diğer'; }
+// Yıl × tür sayacı; 'y' ve 'k' önceden hesaplanmışsa onları kullanır (turGecisDurum her olay için bir kez hesaplar)
+function turSayac(ol) { const by = {}; for (const e of ol) { const y = e.y ?? new Date(e.t).getUTCFullYear(), k = e.k ?? turNorm(e.mt), c = by[y] || (by[y] = {}); c[k] = (c[k] || 0) + 1; } return by; }
+function turYillikSay(by, minN, pay = TUR_QC.pay) {   // by: { yıl: { tür: n } } → [{ y, n, tur, pay }] (tur null: karışık); yalnız ≥ minN olaylı yıllar
+  return Object.keys(by).map(Number).sort((a, b) => a - b).map(y => { const c = by[y], n = Object.values(c).reduce((a, v) => a + v, 0), [k, v] = Object.entries(c).sort((p, q) => q[1] - p[1])[0];
+    return { y, n, tur: n >= minN && v / n >= pay ? k : null, pay: v / n, enCok: k }; }).filter(q => q.n >= minN); }
+function turYillik(ol, minN, pay = TUR_QC.pay) { return turYillikSay(turSayac(ol), minN, pay); }   // ol: [{ t (ms), mt }]
+function turGecisDurum(ol, mag, M0) {   // ol: analize giren olaylar [{ t, mt, m }]; mag: eşik önerisi aransın mı; M0: kullanılan eşik
+  // Performans ve sağlamlık (kod incelemesi, 2026-11-01): yıl ve tür her olay için bir kez; en küçük/en büyük yıl döngüyle (çok büyük dizilerde
+  // Math.max(...dizi) yığın taşması verir); öneri eşikleri büyüklüğe göre sıralı tek taramayla (eşik başına liste süzme yerine). Sonuçlar öncekiyle aynı.
+  const ev = ol.map(e => ({ y: new Date(e.t).getUTCFullYear(), k: turNorm(e.mt), m: e.m }));
+  const yy = turYillikSay(turSayac(ev), TUR_QC.minN), tip = yy.filter(q => q.tur);
+  let yMin = Infinity, yMax = -Infinity; for (const e of ev) { if (e.y < yMin) yMin = e.y; if (e.y > yMax) yMax = e.y; }
+  const yilTum = ev.length ? yMax - yMin + 1 : 0, kapsam = { yilTum, nDeg: yy.length, nYetersiz: yilTum - yy.length, minN: TUR_QC.minN, M0 };   // takvim yılı aralığı (olaysız yıllar da yetersiz)
+  if (new Set(tip.map(q => q.tur)).size < 2) {
+    const yetersiz = yy.length < 2 || kapsam.nYetersiz > TUR_QC.yetersizOran * yilTum;
+    return { on: false, degerlendirilemedi: yetersiz, yillar: yy, ...kapsam }; }
+  const donem = []; tip.forEach(q => { const d = donem[donem.length - 1]; if (d && d.tur === q.tur) { d.y1 = q.y; d.n += q.n; } else donem.push({ tur: q.tur, y0: q.y, y1: q.y, n: q.n }); });
+  const gecis = donem.slice(1).map((d, i) => ({ a: donem[i].tur, b: d.tur, ySon: donem[i].y1, yIlk: d.y0, karisik: yy.filter(q => !q.tur && q.y > donem[i].y1 && q.y < d.y0).map(q => q.y) }));
+  let oner = null; const g0 = gecis[0];
+  if (mag && Number.isFinite(M0)) {
+    // Eşik k (M = M0 + k/10, k = 1…20) için 'M ≥ eşik' olayların yıl × tür sayacı: büyükten küçüğe sıralı olaylar, eşikler yukarıdan aşağı birikimli
+    const srt = ev.filter(e => Number.isFinite(e.m)).sort((a, b) => b.m - a.m), sayac = [], cum = {}; let ix = 0;
+    for (let k = 20; k >= 1; k--) { const M = Math.round((M0 + k / 10) * 10) / 10;
+      for (; ix < srt.length && srt[ix].m >= M - 1e-9; ix++) { const e = srt[ix], c = cum[e.y] || (cum[e.y] = {}); c[e.k] = (c[e.k] || 0) + 1; }
+      sayac[k] = { M, by: Object.fromEntries(Object.entries(cum).map(([y, c]) => [y, { ...c }])) }; }
+    const aralik = TUR_QC.payAralik.map(pay => { for (let k = 1; k <= 20; k++) { const { M, by } = sayac[k], q = turYillikSay(by, TUR_QC.minNOner, pay);
+        const tq = [...new Set(q.filter(x => x.tur).map(x => x.tur))];   // karışık yıllar (hiçbir tür ≥ pay değil) geçiş sayılmaz — ana uyarıyla aynı ölçüt
+        if (q.length >= TUR_QC.minYilOner && q.some(x => x.y <= g0.ySon) && q.some(x => x.y >= g0.yIlk) && tq.length <= 1) return { pay, M, tur: tq[0] || null, nYil: q.length, nKarisik: q.filter(x => !x.tur).length }; }
+      return { pay, M: null }; });
+    const bul = aralik.filter(a => a.M !== null);
+    if (bul.length) oner = { Mlo: Math.min(...bul.map(a => a.M)), Mhi: Math.max(...bul.map(a => a.M)), aralik }; }
+  return { on: true, yillar: yy, donemler: donem, gecisler: gecis, oner, ...kapsam };
+}
+function turUyariHtml(d, kisa) {
+  if (!d) return '';
+  const f = v => v.toFixed(1).replace('.', ','), esik = Number.isFinite(d.M0) ? f(d.M0) : 'Mc';
+  if (!d.on) {
+    if (!d.degerlendirilemedi) return '';
+    if (kisa) return `<div id="turYetersizA" style="color:#9ca3af;margin-bottom:3px">ⓘ <b>Büyüklük türü geçişi değerlendirilemedi</b> (yetersiz veri; ayrıntı b(t) panelinde).</div>`;
+    return `<div id="turYetersizB" style="color:#9ca3af;border:1px solid #9ca3af55;border-radius:4px;padding:3px 6px;margin-bottom:4px">ⓘ <b>Büyüklük türü geçişi değerlendirilemedi.</b> ${d.yilTum ? `Pencerenin ${d.yilTum} takvim yılından ${d.nYetersiz} tanesi analiz koşulunu sağlamıyor (M ≥ ${esik} olaylardan yıllık en az ${d.minN}); değerlendirilebilen yıl sayısı ${d.nDeg}.` : `Analize giren olay yok (M ≥ ${esik}).`} Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez.</div>`; }
+  const g = d.gecisler.map(x => `${x.a} → ${x.b} (son ${x.a} yılı ${x.ySon}, ilk ${x.b} yılı ${x.yIlk}${x.karisik.length ? `; karışık: ${x.karisik.join(', ')}` : ''})`).join('; ');
+  if (kisa) return `<div id="turUyariA" style="color:#f59e0b;margin-bottom:3px">⚠ <b>Büyüklük türü geçişi:</b> ${g}; a(t)'deki değişimler ölçek farkından etkilenebilir (ayrıntı b(t) panelinde).</div>`;
+  const don = d.donemler.map(x => `${x.tur} ${x.y0 === x.y1 ? x.y0 : `${x.y0}–${x.y1}`}`).join(', '), yuzde = p => `%${Math.round(100 * p)}`;
+  const o = d.oner, oMetin = o
+    ? `Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ${o.Mlo === o.Mhi ? `≈ M ${f(o.Mlo)}` : `≈ M ${f(o.Mlo)}–${f(o.Mhi)}`} (${o.aralik.map(a => `${yuzde(a.pay)}: ${a.M !== null ? `${f(a.M)}, ${a.nYil} yıl` : 'bulunamadı'}`).join('; ')}); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. ` +
+      `Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. `
+    : `Baskın tür geçişinin görülmediği bir eşik bulunamadı; karşılaştırmayı tek tür dönemi içinde yapın. `;
+  return `<div id="turUyariB" style="color:#f59e0b;border:1px solid #f59e0b55;border-radius:4px;padding:3px 6px;margin-bottom:4px">⚠ <b>Büyüklük Türü Geçişi.</b> Analize giren olaylarda (M ≥ ${esik}) baskın büyüklük türü pencere içinde değişiyor: ${g}. Baskın tür dönemleri: ${don}${d.nYetersiz > 0 ? ` (değerlendirilen yıl ${d.nDeg} / ${d.yilTum})` : ''}. ` +
+    `Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. ` +
+    oMetin + `<span style="color:#d4a24a">Öneri için en az ${TUR_QC.minYilOner} değerlendirilebilir yıl (yıllık en az ${TUR_QC.minNOner} olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.</span></div>`;
+}
+function turUyariHtmlG(d, kisa) { try { return turUyariHtml(d, kisa); } catch (e) { console.warn('[turUyari]', e); return ''; } }   // güvenli sarmalayıcı
+let lastTurUyari = null;
+let lastMcUyari = null;
 function renderBvalueTS(evList, Mc, cs, o = {}) {
   const STEPB = o.step || btDefaultStep(), STORE = o.store !== false, NW = BT_WIN_N;
+  if (!o.svgId) { const sa = document.getElementById('tmSvgA'), ta = document.getElementById('tmStatsA'); if (sa) sa.innerHTML = ''; if (ta) ta.textContent = '—'; lastAts = null; lastMcUyari = null; lastTurUyari = null; }
   { const lw = document.getElementById('tmWinLbl'); if (lw) lw.textContent = String(NW); }
   const svgB   = document.getElementById(o.svgId || 'tmSvgB');
   const statsB = document.getElementById(o.statsId || 'tmStatsB');
@@ -3142,13 +3366,23 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
               adaptive: AD.on, dispStep: STEPD, nWinDisp: ser.length, raw: rawOn, cls: clsCount, ser: series.map(q => { const t0 = q.t0 ?? (q.t - (q.span || 0)), t1 = q.t1 ?? (q.t + (q.span || 0));
                 return { t: q.t, b: q.b, err: q.err, lo: q.lo, hi: q.hi, ciM: q.ciM, t0, t1, inc: !cs && Number.isFinite(Mc) && mcSeries.some(m => m.t >= t0 && m.t <= t1 && m.mc > Mc + 0.1 + 1e-9) }; }), msWin };   // inc: pencere süresinde veri Mc(t) > kullanılan Mc + 0,1 (eksik kayıt kuşkusu)
   if (STORE) lastBts = btsObj;
+  let yillikMc = null;
+  if (cs) { const by = {}; evList.forEach(e => { const y = e.time.getUTCFullYear(); (by[y] = by[y] || []).push(e); });
+    yillikMc = Object.keys(by).map(Number).filter(y => by[y].length >= CS_QC.minEvents).map(y => ({ y, n: by[y].length, mc: computeMc(by[y]), t0: Date.UTC(y, 0, 1), t1: Date.UTC(y + 1, 0, 1) })).filter(q => q.mc !== null); }
+  const mcU = mcUyariDurum({ cs: !!cs, periods: cs ? cs.periods : null, gap: CS_QC.mcGap, ser: btsObj.ser, mcSer: mcSeries, Mc, yillik: yillikMc });
+  if (!o.svgId) lastMcUyari = mcU;
+  let turOl = [];
+  try { turOl = cs ? cs.kept.map(k => ({ t: k.e.time.getTime(), mt: k.e.mtype, m: k.m })) : evList.filter(e => (e.mw ?? e.mag) >= Mc - 1e-9).map(e => ({ t: e.time.getTime(), mt: e.mtype, m: e.mw ?? e.mag })); } catch (e) { console.warn('[turUyari]', e); }   // cs.kept: { e, m, mc }
+  let turU = null;   // yorum katmanı: hata olursa uyarı düşer, b(t) paneli etkilenmez
+  try { turU = turGecisDurum(turOl, true, cs ? cs.periods.reduce((a, p) => Math.min(a, +p.mc), Infinity) : Mc); } catch (e) { console.warn('[turUyari]', e); }
+  if (!o.svgId) lastTurUyari = turU;
   if (o.storeInce) lastBtsInce = { ...btsObj, step: STEPB };
   try { renderBtZoom(btsObj); } catch (e) { console.warn('[btzoom]', e); }
   const lastErrStr = bLast.err !== null ? bCiTxt(bLast) : '';
   // Lejant iki seviyeye ayrıldı -- "grafik açıklaması" (renk/sembol anahtarı)
   // ile "istatistik özeti" aynı satırda karışmasın (2026-09-17, kullanıcı
   // geri bildirimi). Sayılar/mantık aynı, yalnızca sunum iki satıra bölündü.
-  statsB.innerHTML =
+  statsB.innerHTML = mcUyariHtml(mcU) + turUyariHtmlG(turU) +
     `<div style="font-size:.85em;color:#aaa">` +
       (lineOnly ? `<span style="color:#06b6d4">─</span> Ham b-değeri (ince çizgi) &nbsp; ` : AD.on ? `<span style="color:#06b6d4">●</span> Pencere b-değeri (gösterim adımı ${STEPD}) &nbsp; ` : `<span style="color:#06b6d4">●</span> Ham b-değeri &nbsp; `) +
       (rawOn ? `<span style="color:#7dd3fc;opacity:.6">─</span> Ham b(t), adım ${STEPB} (denetim katmanı) &nbsp; ` : '') +
@@ -3171,7 +3405,7 @@ function renderBvalueTS(evList, Mc, cs, o = {}) {
           (fixed.spanFixed && fixed.spanMain && fixed.spanFixed > 3 * fixed.spanMain
             ? `<div style="color:#f59e0b;margin-top:2px">⚠ Sabit-Mc serisinin zaman çözünürlüğü ana serinin ${Math.round(fixed.spanFixed / fixed.spanMain)} katı kaba: pencere süresinden kısa b değişimlerini yakalayamaz. Gri çizginin düz kalması, pembe seride görülen kısa süreli bir değişimi çürütmez; yalnızca gri seride de görülen değişimler tamlıktan bağımsız sayılabilir.</div>` : '')
         : ` &nbsp;|&nbsp; <span style="color:#d1d5db">Sabit Mc=${fixed.mc.toFixed(1)}: N=${fixed.N} &lt; 100 — karşılaştırma serisi üretilemedi</span>`) : '') +
-    `</div>`;
+    `</div>`;  if (!o.svgId) try { renderAvalueTS(series, N, Mc, cs, t0, t1, NW, STEPB); } catch (e) { console.warn('[a(t)]', e); }
 }
 
 const SUPERSCRIPT_DIGITS = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
@@ -5755,11 +5989,11 @@ function csBvalueTimeSeries(cs, fit, step = 10, nWin = (typeof BT_WIN_N !== 'und
     const win = items.slice(i, i + N_WIN);
     if (on) {
       const r = csAkiBRange(win, fit.hi);
-      if (r) series.push({ t: bWinTime(win, it => it.t), b: r.b, ...bCiFromSym(r.b, r.se !== null ? 1.96 * r.se : null), span: win[N_WIN - 1].t - win[0].t });   // çift kesik: Fisher, simetrik (χ² burada kesin değil)
+      if (r) series.push({ t: bWinTime(win, it => it.t), b: r.b, ...bCiFromSym(r.b, r.se !== null ? 1.96 * r.se : null), span: win[N_WIN - 1].t - win[0].t, ...aWinFields(win) });   // çift kesik: Fisher, simetrik (χ² burada kesin değil)
       continue;
     }
     const b = csAkiB(win);
-    if (b !== null) series.push({ t: bWinTime(win, it => it.t), b, ...bCiFields(b, N_WIN, win.map(it => it.m - it.mc), 0.1), span: win[N_WIN - 1].t - win[0].t });
+    if (b !== null) series.push({ t: bWinTime(win, it => it.t), b, ...bCiFields(b, N_WIN, win.map(it => it.m - it.mc), 0.1), span: win[N_WIN - 1].t - win[0].t, ...aWinFields(win) });
   }
   return { series, N: items.length };
 }
