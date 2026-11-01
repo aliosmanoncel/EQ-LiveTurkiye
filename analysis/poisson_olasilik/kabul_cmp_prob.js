@@ -6,7 +6,8 @@
 //   P(≥6; t) = 1 − e^(−t/tr6). (3) Uyarılar: GK74 durumu kayıtla tutarlı. (4) Yayın şekli: SVG var, 493 pt, 3 panel, 4 süre; bant düğmesi
 //   şekli değiştiriyor; altyazı. (7) Aşama 2: '±1σ' yok; Tr/T satırı bağımsız hesapla aynı ve sınıflar (†, ‡) doğru; Marmara M≥7 ‡;
 //   şekilde Tr = T çizgisi ve Tr > 10T zemini. (8) Aşama 3: NegBin örnekleyici, üç bölgede B = 2000; sağlamlık B = 5000 ile %95 sınır farkları
-//   (yüzde puan) raporlanır; G–R panelinin bootstrap'ı ile karşılaştırma tablosu aynı çekilişleri kullanır. (5) PNG 600 dpi indirme: boyut 4108 × (H/72·600) px. (6) Sayfa hatası yok.
+//   (yüzde puan) raporlanır; G–R panelinin bootstrap'ı ile karşılaştırma tablosu aynı çekilişleri kullanır. (9) Aşama 4: SVG <metadata> zorunlu
+//   alanları içeriyor; 'Yeniden üretim (JSON)' indiriliyor ve yeniden_uret.js bu dosyadan bütün sayıları birebir yeniden üretiyor. (5) PNG 600 dpi indirme: boyut 4108 × (H/72·600) px. (6) Sayfa hatası yok.
 // Ekran görüntüleri: cmp_tablo.png, cmp_sekil_95.png, cmp_sekil_68.png; indirilen dosyalar: cmp_sekil_EN.svg, cmp_sekil_EN_600dpi.png
 // Kullanım (depo kökünde): LEAFLET_DIR=<node_modules> node analysis/poisson_olasilik/kabul_cmp_prob.js <önceki_index.html>
 'use strict';
@@ -67,6 +68,7 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
       const tEl = await p.$('#cmpTable'); await tEl.scrollIntoViewIfNeeded(); await tEl.screenshot({ path: path.join(__dirname, 'cmp_tablo.png') });
       const fEl = await p.$('#cmpProbFigSvg'); await fEl.scrollIntoViewIfNeeded(); await fEl.screenshot({ path: path.join(__dirname, 'cmp_sekil_95.png') });
       const [dS] = await Promise.all([p.waitForEvent('download'), p.evaluate(() => cmpProbFigDownload('svg', 'en'))]); await dS.saveAs(path.join(__dirname, 'cmp_sekil_EN.svg'));
+      const [dJ] = await Promise.all([p.waitForEvent('download'), p.evaluate(() => cmpProbFigDownload('json', 'en'))]); await dJ.saveAs(path.join(__dirname, 'cmp_yeniden_uretim.json'));
       const [dP] = await Promise.all([p.waitForEvent('download'), p.evaluate(() => cmpProbFigDownload('png', 'en'))]); await dP.saveAs(path.join(__dirname, 'cmp_sekil_EN_600dpi.png'));
       R.boot = await p.evaluate(() => { const S = CMP.map(cmpStats), hucre = B => { GR_POIS.B = B; cmpProbCache.clear(); const o = CMP.map((r, i) => { const pr = cmpProb(r, S[i]); return { B: pr.bt.B, nFail: pr.bt.nFail, sampler: pr.bt.sampler, c: [5, 6, 7].flatMap(M => [10, 50, 100].map(t => { const c = pr.cell(M, t); return { M, t, P: c.P, lo: c.lo, hi: c.hi }; })) }; }); return o; };
         const b2 = hucre(2000), b5 = hucre(5000); GR_POIS.B = 2000; cmpProbCache.clear();
@@ -123,6 +125,17 @@ const BOLGE = [[36, 26, 42, 45, false, 'Türkiye'], [40, 26, 41.5, 31, true, 'Ma
     ok(mx < 1.0, `(8) B = 2000 ile 5000 arasında %95 sınırlarının en büyük farkı ${mx.toFixed(3)} yüzde puan (${mxAt}); P(≥7; 50 yıl): ${sat.join('; ')}`);
     ok(gr.every(g => g.lo === g.clo && g.hi === g.chi && g.B === 2000), '(8) G–R panelinin bootstrap\'ı (grPoissonBootSimple) ile karşılaştırma tablosu aynı çekilişler: P(≥7; 50 yıl) sınırları birebir aynı');
   }
+  // (9) aşama 4: yeniden üretim
+  { const sv = fs.readFileSync(path.join(__dirname, 'cmp_sekil_EN.svg'), 'utf8'), mm = sv.match(/<metadata id="eqlive-repro"><!\[CDATA\[([\s\S]*?)\]\]><\/metadata>/); let M = null; try { M = mm && JSON.parse(mm[1]); } catch (e) {}
+    const b0 = M && M.bolgeler[0], gerek = M && b0 && b0.katalog && b0.katalog.uretim && b0.katalog.dosyalar && b0.katalog.blob && b0.donem.T_yil > 0 && b0.Mc !== undefined && b0.a !== undefined && b0.b > 0 && b0.N_geMc > 0 && b0.bolge.geometri
+      && M.model.tur && M.model.Mmax && M.model.Mmax.varsayim && M.model.Mmax.kaynak && M.ayarlar.bootstrap.B === 2000 && M.ayarlar.bootstrap.tohum === 20261027 && M.yazilim.index_html_git_blob_sha1 && /<title>/.test(sv) && /<desc>Figure\./.test(sv);
+    ok(!!gerek && M.bolgeler.length === 3 && !('girdi_buyukluklar' in b0) && /^[0-9a-f]{64}$/.test(b0.girdi_buyukluk_sha256),
+      `(9) SVG <metadata>: katalog (${b0 ? b0.katalog.dosyalar.join(', ') + ', üretim ' + b0.katalog.uretim + ', blob ' + Object.values(b0.katalog.blob)[0].slice(0, 10) : '—'}), bölge ve dönem, Mc, a, b, N, T, model, B ve tohum, Mmax varsayımı ve kaynağı, yazılım blob ${M ? String(M.yazilim.index_html_git_blob_sha1).slice(0, 10) : '—'}; <title> ve <desc>`);
+    const J = JSON.parse(fs.readFileSync(path.join(__dirname, 'cmp_yeniden_uretim.json'), 'utf8'));
+    ok(J.bolgeler.length === 3 && J.bolgeler.every(b => b.girdi_buyukluklar && b.girdi_buyukluklar.length === b.N_tum && b.sonuc && b.sonuc.length === 3 * 4), `(9) JSON kaydı: 3 bölge, girdi büyüklükleri (${J.bolgeler.map(b => b.N_tum).join(' / ')}), 12 hücre/bölge (M 5–7 × t 10/25/50/100), ayarlar, model, yazılım (${(fs.statSync(path.join(__dirname, 'cmp_yeniden_uretim.json')).size / 1024).toFixed(0)} KB)`);
+    const { execFileSync } = require('child_process'); let out = '', kod = 0; try { out = execFileSync(process.execPath, [path.join(__dirname, 'yeniden_uret.js'), path.join(__dirname, 'cmp_yeniden_uretim.json')], { encoding: 'utf8' }); } catch (e) { out = String(e.stdout || ''); kod = e.status; }
+    const son = out.trim().split('\n').pop(); R.yeniden = out;
+    ok(kod === 0 && /GEÇTİ: \d+ geçti, 0 kaldı/.test(son) && (out.match(/\(5\) 12 hücrenin 12'i aynı/g) || []).length === 3, `(9) yeniden_uret.js kayıttan bütün sayıları birebir yeniden üretti: ${son}`); }
   // (5) indirilen dosyalar
   const svgD = fs.readFileSync(path.join(__dirname, 'cmp_sekil_EN.svg'), 'utf8'), png = fs.readFileSync(path.join(__dirname, 'cmp_sekil_EN_600dpi.png'));
   const Wp = png.readUInt32BE(16), Hp = png.readUInt32BE(20), m = svgD.match(/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/);

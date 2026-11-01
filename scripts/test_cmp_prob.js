@@ -14,6 +14,8 @@
 //   (i) Aşama 3 (NegBin örnekleyici): G–R paneli ve olasılık paneli aynı grBootDraws çekilişlerini kullanır; B = 2000 her n'de (Türkiye
 //       n = 27 346 dahil; eski şemada 200); S | n* için Gamma–Poisson ortalama ve varyansı NegBin'e eşit; b* > 0, reddedilen yalnız n* < 10.
 //       Ayrıntılı dağılım karşılaştırması: analysis/poisson_olasilik/negbin_karsilastirma.js.
+//   (j) Aşama 4: büyüklük kodlaması (sıra bağımsız, 2 ondalık), git blob SHA-1 (git hash-object ile aynı), SVG metadata (CDATA kaçışı, girdi
+//       büyüklükleri ve sonuçlar özet dışında). Uçtan uca yeniden üretim: kabul testi (9) + analysis/poisson_olasilik/yeniden_uret.js.
 //   (a') Doymamış değerde tutarlılık: P(≥7; 10 yıl) = 1 − e^(−10·λ(≥7)), %0–100 arasında.
 // Kullanım (depo kökünde): node scripts/test_cmp_prob.js [index.html]
 'use strict';
@@ -25,7 +27,7 @@ const line = re => { const m = src.match(re); if (!m) throw new Error('bulunamad
 const ctx = { document: { getElementById: () => ({ value: '1e4' }) }, B_CI_METHOD: 'normal', B_GRID_MODE: 'sinif' }; vm.createContext(ctx);   // B_GRID_MODE: uygulamanın varsayılanı (URL ?bgrid=ham yoksa)
 vm.runInContext([line(/^const GR_POIS = [^\n]*$/m), line(/^const GR_QC = [^\n]*$/m), line(/^const CMP_PROB = [^\n]*$/m), line(/^const CMP_MAX = [^\n]*$/m),
   ...['mulberry32', 'logGamma', 'poissonSample', 'bGridRound', 'bGridVals', 'computeBvalue', 'bConfidence95', 'bCiFields', 'grPoissonP', 'grLambdaSimple', 'grPctl',
-      'bGridOffCount', 'gammaSample', 'grBootDraws', 'grPoissonBootSimple', 'cmpStats', 'cmpProbBoot', 'cmpProbAt', 'cmpProb', 'cmpProbWarn', 'cmpProbExtrap', 'cmpProbMk', 'cmpTr', 'cmpTrT', 'cmpPc', 'cmpRng', 'cmpProbCurves', 'cmpProbFigRange', 'cmpProbFigSvg', 'cmpProbBTxt', 'cmpProbFigCaption'].map(fn), line(/^const CMP_FIG = [^\n]*$/m), line(/^const CMP_EX = \{[\s\S]*?\} \};$/m), 'var cmpProbFigRangeV = { lo: 4, hi: 8 };', "var cmpProbFigBand = '95';"].join('\n').replace(/^var CMP_PROB = (.*), cmpProbCache = new Map\(\);$/m, 'var CMP_PROB = $1; var cmpProbCache = new Map();'), ctx);
+      'bGridOffCount', 'gammaSample', 'grBootDraws', 'grPoissonBootSimple', 'cmpStats', 'cmpProbBoot', 'cmpProbAt', 'cmpProb', 'cmpProbWarn', 'cmpProbExtrap', 'cmpProbMk', 'cmpTr', 'cmpTrT', 'reproMagsStr', 'reproHex', 'reproSvgMeta', 'cmpPc', 'cmpRng', 'cmpProbCurves', 'cmpProbFigRange', 'cmpProbFigSvg', 'cmpProbBTxt', 'cmpProbFigCaption'].map(fn), line(/^const CMP_FIG = [^\n]*$/m), line(/^const CMP_EX = \{[\s\S]*?\} \};$/m), src.match(/^async function reproGitBlobSha1\([^\n]*$/m)[0], 'var cmpProbFigRangeV = { lo: 4, hi: 8 };', "var cmpProbFigBand = '95';"].join('\n').replace(/^var CMP_PROB = (.*), cmpProbCache = new Map\(\);$/m, 'var CMP_PROB = $1; var cmpProbCache = new Map();'), ctx);
 vm.runInContext(src.match(/^const LANCZOS_C = \[[\s\S]*?\];$/m)[0].replace(/^const /, 'var '), ctx);
 const X = ctx; let pass = 0, fail = 0; const ok = (c, m) => { c ? pass++ : fail++; console.log((c ? '  ok  ' : '  !!  ') + m); };
 const YIL = 365.25 * 864e5;
@@ -110,5 +112,13 @@ function kayit(seed, T, lam0, b, Mc, extra) { const r = X.mulberry32(seed), n = 
   ok(Math.abs(m - m0) < 4 * Math.sqrt(v0 / K) && Math.abs(v / v0 - 1) < 0.04, `(i) S | n* = ${ns}: Gamma–Poisson ortalama ${m.toFixed(2)} (NegBin ${m0.toFixed(2)}), varyans ${v.toFixed(1)} (NegBin ${v0.toFixed(1)})`);
   const gs = []; const r2 = X.mulberry32(3); for (let k = 0; k < 40000; k++) gs.push(X.gammaSample(12.5, r2)); const gm = gs.reduce((a, x) => a + x, 0) / gs.length, gv = gs.reduce((a, x) => a + (x - gm) ** 2, 0) / (gs.length - 1);
   ok(Math.abs(gm - 12.5) < 4 * Math.sqrt(12.5 / 40000) && Math.abs(gv / 12.5 - 1) < 0.04, `(i) gammaSample(12,5): ortalama ${gm.toFixed(3)}, varyans ${gv.toFixed(2)} (beklenen 12,5 / 12,5)`); }
-console.log(`
-${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);
+(async () => { // (j) yeniden üretim yardımcıları
+  ok(X.reproMagsStr([4.1, 3.25, 5]) === '3.25,4.10,5.00' && X.reproMagsStr([5, 4.1, 3.25]) === X.reproMagsStr([3.25, 5, 4.1]), '(j) girdi büyüklüğü kodlaması: artan sıralı, 2 ondalık, sıra bağımsız');
+  ctx.crypto = globalThis.crypto; ctx.TextEncoder = TextEncoder;
+  const buf = new TextEncoder().encode('test içerik\n'), g = await X.reproGitBlobSha1(buf.buffer), ref = require('child_process').execSync('git hash-object --stdin', { input: Buffer.from(buf) }).toString().trim();
+  ok(g === ref, `(j) git blob SHA-1 = git hash-object (${g.slice(0, 12)})`);
+  const rec = { sema: 's', yazilim: {}, bolgeler: [{ ad: 'a]]>b', girdi_buyukluklar: [1, 2], sonuc: [{}], b: 1 }] }, m = X.reproSvgMeta(rec, 'Figure. x < y');
+  const cd = m.match(/<!\[CDATA\[([\s\S]*)\]\]><\/metadata>/)[1].replace(/\]\]\]\]><!\[CDATA\[>/g, ']]>'), J = JSON.parse(cd);
+  ok(J.bolgeler[0].ad === 'a]]>b' && !('girdi_buyukluklar' in J.bolgeler[0]) && !('sonuc' in J.bolgeler[0]) && /<desc>Figure\. x &lt; y<\/desc>/.test(m), '(j) SVG metadata: CDATA kaçışı, özet (büyüklük listesi ve sonuçlar JSON\'da), <desc> kaçışı');
+  console.log(`
+${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0); })();

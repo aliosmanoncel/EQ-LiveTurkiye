@@ -195,7 +195,7 @@
   "GEÇTİ (3) tamlık ve tür uyarı alanları kayıtlı (Türkiye: tür MD → ML (2010–2011); Marmara: tür MD → ML (2008–2012); Doğu Anadolu: tür MD → ML (2009–2012))",
   "GEÇTİ (4) yayın şekli: 493 pt, 3 panel (a–c), 4 süre",
   "GEÇTİ (4) bant düğmesi (16.–84. yüzdelik) şekli değiştiriyor",
-  "GEÇTİ (7) şekil, altyazı, tablo ve düğmede '±1σ' yok (düğme: \"%95 | 16.–84. yüzdelik | SVG (EN) | PNG 600 dpi (EN) | SVG (TR) | PNG 600 dpi (TR)\")",
+  "GEÇTİ (7) şekil, altyazı, tablo ve düğmede '±1σ' yok (düğme: \"%95 | 16.–84. yüzdelik | SVG (EN) | PNG 600 dpi (EN) | SVG (TR) | PNG 600 dpi (TR) | Yeniden üretim (JSON)\")",
   "GEÇTİ (7) Tr/T satırı: 9 hücrenin 9'i bağımsız hesapla ve sınıfla aynı",
   "GEÇTİ (7) Marmara M≥7: Tr ≈ 292 yıl, T = 28.7 yıl (Tr/T = 10.18) → ‡ belirgin uyarı",
   "GEÇTİ (7) şekil: her panelde Tr = T çizgisi, Tr > 10T gri zemin, lejant ve altyazı",
@@ -204,12 +204,15 @@
   "GEÇTİ (8) üç bölgede B = 2000 (NegBin; Türkiye dahil, eski şemada 200); sağlamlık B = 5000 hesaplandı",
   "GEÇTİ (8) B = 2000 ile 5000 arasında %95 sınırlarının en büyük farkı 0.654 yüzde puan (Marmara M≥7, t = 100); P(≥7; 50 yıl): Türkiye: %95 [88.33–93.48] (B 2000) / [88.32–93.40] (B 5000); Marmara: %95 [8.05–29.17] (B 2000) / [8.24–28.71] (B 5000); Doğu Anadolu: %95 [70.74–86.19] (B 2000) / [70.58–86.01] (B 5000)",
   "GEÇTİ (8) G–R panelinin bootstrap'ı (grPoissonBootSimple) ile karşılaştırma tablosu aynı çekilişler: P(≥7; 50 yıl) sınırları birebir aynı",
-  "GEÇTİ (5) SVG indirildi (77 KB, vektörel, 493 × 233 pt)",
+  "GEÇTİ (9) SVG <metadata>: katalog (data/eq_historical.json, üretim 2026-09-14T13:10:40Z, blob 879a89b948), bölge ve dönem, Mc, a, b, N, T, model, B ve tohum, Mmax varsayımı ve kaynağı, yazılım blob defddcac98; <title> ve <desc>",
+  "GEÇTİ (9) JSON kaydı: 3 bölge, girdi büyüklükleri (48584 / 1283 / 7987), 12 hücre/bölge (M 5–7 × t 10/25/50/100), ayarlar, model, yazılım (499 KB)",
+  "GEÇTİ (9) yeniden_uret.js kayıttan bütün sayıları birebir yeniden üretti: GEÇTİ: 13 geçti, 0 kaldı, 0 uyarı",
+  "GEÇTİ (5) SVG indirildi (88 KB, vektörel, 493 × 233 pt)",
   "GEÇTİ (5) PNG 600 dpi: 4108 × 1942 px (= 174 mm genişlik)",
   "GEÇTİ (6) sayfa hatası yok (0)"
  ],
  "ozet": {
-  "pass": 23,
+  "pass": 26,
   "fail": 0
  }
 }
