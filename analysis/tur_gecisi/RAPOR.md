@@ -6,7 +6,8 @@
 - `disa_aktar.js`: uygulamanın kendi koduyla (bölge, GK74) olay listesini çıkarır. Poisson dalındaki betiğin kopyası; olaylara ham tür dizgisi (`mt`, büyük/küçük harf korunur), enlem ve boylam eklendi. Çıktısı depoya eklenmez.
 - `analiz.js` → `sonuc.json`. Kurallar ve sorular betiğin başlığında, sonuçlardan önce yazıldı (tür bileşimi görüldükten sonra; §7).
 - `kabul_tur.js`: Playwright kabul testi, 39/39 (§9 güncellemesinden sonra).
-- `scripts/test_tur_gecisi.js`: birim testi, 21/21 (§9 güncellemesinden sonra).
+- `scripts/test_tur_gecisi.js`: birim testi, 23/23 (§10 kod incelemesinden sonra).
+- `esdegerlik_denetimi.js`: kod incelemesi düzeltmelerinin önceki sürümle eşdeğerliği ve süre ölçümü (§10).
 - `esik_duyarlilik.js` → `esik_duyarlilik.json`: uyarı eşiklerinin duyarlılığı (§8), uygulamanın kendi koduyla.
 - `gorsel_esik.js`: 9 birleşimde tarayıcı görsel regresyonu, 58/58 (§9 güncellemesinden sonra); ekran görüntüleri `gorsel_*.png`.
 
@@ -202,4 +203,39 @@ Uyarının iki eşiği (baskın tür payı ve yıllık en az olay) 3 × 3 birle�
 | Tüm birim testleri (`scripts/test_*.js`, 17 dosya) | 17/17, hata yok |
 
 Ekran görüntüleri: `tur_uyari_emsc98.png` (varsayılan), `gorsel_tr_{50_10, 60_20, 70_30}.png`, `gorsel_mar_gk74_{50_10, 60_20, 70_30}.png` (70_30: "değerlendirilemedi" notu).
+
+## 10. Birleştirme öncesi kod incelemesi (2026-11-01)
+
+Dalın `index.html` farkı (`main`'e göre) satır satır incelendi. Değişiklik üç noktada mevcut koda dokunuyor; üçü de yalnızca **okuma ve metin ekleme**:
+- `renderBvalueTS`: analize giren olaylardan **yeni nesneler** üretilir (`turOl`); `evList`, `cs.kept` ve olay nesneleri değiştirilmez. Uyarı durumu `lastTurUyari`'ye yazılır.
+- b(t) istatistik metni: Mc uyarısından sonra tür uyarısı **eklenir**; mevcut metin aynı.
+- a(t) istatistik metni: kısa not **eklenir**; mevcut metin aynı.
+
+b(t), a(t), G–R, Mc ya da GK74 hesaplarına giden hiçbir değişken değiştirilmiyor. Kabul ve görsel testlerdeki önce/sonra eşitliği bunu doğruluyor.
+
+**Bulunan ve düzeltilen sorunlar:**
+
+| Sorun | Etki | Düzeltme | Doğrulama |
+|---|---|---|---|
+| `Math.max(...yıllar)`: tüm olayların yılları argüman olarak açılıyordu | Çok büyük pencerelerde yığın taşması. Node'da 367 704 olayda "Maximum call stack size exceeded"; tarayıcıda sınır daha düşük olabilir. Hata b(t) panelinin istatistik metnini düşürürdü. | En küçük ve en büyük yıl döngüyle | 369 000 olaylı birim testi hatasız |
+| Hata yalıtımı yoktu | Yorum katmanındaki herhangi bir hata ana paneli etkileyebilirdi | Hesap ve metin `try/catch` içinde (`turUyariHtmlG`); hata olursa uyarı düşer, konsola yazılır, panel çizilir | Bozuk girdide boş metin (birim testi) |
+| Öneri araması 3 pay × 20 eşikte listeyi yeniden süzüyor, her olay için her seferinde `Date` oluşturuyordu | Her b(t) çiziminde ~0,3 s ek gecikme (Türkiye ISC + EMSC, 30 bin olay) | Yıl ve tür olay başına bir kez; eşikler büyüklüğe göre sıralı tek taramayla | 108 durumun hepsinde önceki sürümle **birebir aynı** sonuç; toplam süre 6,5 s → 1,2 s (5,7×) |
+
+**Sınıflandırmanın denetimi (değerlendirilemedi / uyarı yok / uyarı):** Birim testleri dört durumu kapsıyor: oran %50'nin üstünde, tam %50 sınırı, tek değerlendirilebilir yıl ve olay yok. Kabul testi gerçek veride "uyarı yok" sonucunun yalnızca veri yeterliyken oluştuğunu denetliyor (11 senaryo). Görsel test, Marmara GK74'te yıllık 30 olay şartında notun göründüğünü doğruluyor.
+
+**Kurallar hakkında:** %50 yetersiz yıl oranı ve 5 yıl şartı **raporlama kurallarıdır**, doğrulanmış istatistiksel eşikler değil (§9). Arayüz metni 5 yıl şartını bu biçimde tanımlıyor ("asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir"). Uyarı bilimsel bir güvenilirlik güvencesi sunmuyor.
+
+**Güncel `main` ile:** Dal, Poisson birleştirmesinden sonraki güncel `main`'i (f8c9c20) içine aldı; çakışma olmadı. Tüm testler bunun üzerinde yeniden koşturuldu:
+
+| Denetim | Sonuç |
+|---|---|
+| Birim testi (`scripts/test_tur_gecisi.js`) | 23/23 |
+| Tüm birim testleri (`scripts/test_*.js`, 17 dosya) | 17/17 |
+| Kabul testi (`kabul_tur.js`; önce = güncel `main`) | 39/39 |
+| Eşik duyarlılığı: varsayılan birleşim = tarayıcı | 5/5 |
+| Görsel regresyon (`gorsel_esik.js`) | 58/58 |
+| Eşdeğerlik (`esdegerlik_denetimi.js`), önceki sürüm b8a6f81 ile | 108/108 aynı |
+| `data/` | `main` ile aynı |
+
+**Yayın notu:** GitHub Pages `main`'den yayın yapıyor. Bu dalın `main`'e birleştirilmesi, uyarının canlı sitede hemen görünmesi demek; birleştirme ile yayın ayrı adımlar değil.
 

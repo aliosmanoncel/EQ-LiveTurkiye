@@ -12,7 +12,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const src = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').replace(/\r\n/g, '\n');
 const fnCut = name => { const i = src.indexOf('\nfunction ' + name + '('); if (i < 0) throw new Error('bulunamadı: ' + name); const j = src.slice(i + 1).search(/\n(?=[^\s}])/); return src.slice(i + 1, i + 2 + j); };
 const qc = src.match(/\nconst TUR_QC = \{[^\n]*\};/); if (!qc) throw new Error('bulunamadı: TUR_QC');
-const X = {}; vm.createContext(X); vm.runInContext(qc[0].replace('const TUR_QC', 'var TUR_QC') + '\n' + ['turNorm', 'turYillik', 'turGecisDurum', 'turUyariHtml'].map(fnCut).join('\n'), X);
+const X = {}; vm.createContext(X); vm.runInContext(qc[0].replace('const TUR_QC', 'var TUR_QC') + '\n' + ['turNorm', 'turSayac', 'turYillikSay', 'turYillik', 'turGecisDurum', 'turUyariHtml', 'turUyariHtmlG'].map(fnCut).join('\n'), X);
 const VARSAYILAN = { ...X.TUR_QC };
 const V = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const SEN = { tr: ['tr_emsc', 0, 3.2], tr_gk74: ['tr_emsc', 1, 3.2], tr_mc35: ['tr_emsc', 0, 3.5], mar: ['mar_emsc', 0, 3.2], mar_gk74: ['mar_emsc', 1, 3.2] };

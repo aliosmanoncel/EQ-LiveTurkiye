@@ -1,13 +1,14 @@
 // Birim testleri: büyüklük türü geçişi uyarısı (2026-11-01). index.html'den TUR_QC, turNorm, turYillik, turGecisDurum, turUyariHtml okunur.
 // Denetimler: geçiş algılama (baskın tür ≥ %60, yıllık ≥ 20 olay), karışık yıllar, az olaylı yılların yok sayılması, A → B → A, önerilen eşik
 // (pay aralığı %50–70, en az 5 yıl, iki yanda yıl şartı), 'değerlendirilemedi' durumu, metin (tam / kısa / boş / yetersiz), tür adlarının birleştirilmesi.
-// 2026-11-01 güncelleme: öneri aralık olarak (RAPOR §9), 5 yıl asgari raporlama kuralı, yetersiz veride 'değerlendirilemedi'.
+// 2026-11-01 güncelleme: öneri aralık olarak (RAPOR §9), 5 yıl asgari raporlama kuralı, yetersiz veride 'değerlendirilemedi';
+// kod incelemesi: büyük girdide yığın taşması yok, güvenli sarmalayıcı (RAPOR §10).
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const src = fs.readFileSync(process.argv[2] || path.join(__dirname, '..', 'index.html'), 'utf8').replace(/\r\n/g, '\n');
 const fn = name => { const i = src.indexOf('\nfunction ' + name + '('); if (i < 0) throw new Error('bulunamadı: ' + name); const j = src.slice(i + 1).search(/\n(?=[^\s}])/); return src.slice(i + 1, i + 2 + j); };
 const qc = src.match(/\nconst TUR_QC = \{[^\n]*\};/); if (!qc) throw new Error('bulunamadı: TUR_QC');
-const X = {}; vm.createContext(X); vm.runInContext(qc[0].replace('const TUR_QC', 'var TUR_QC') + '\n' + ['turNorm', 'turYillik', 'turGecisDurum', 'turUyariHtml'].map(fn).join('\n'), X);
+const X = {}; vm.createContext(X); vm.runInContext(qc[0].replace('const TUR_QC', 'var TUR_QC') + '\n' + ['turNorm', 'turSayac', 'turYillikSay', 'turYillik', 'turGecisDurum', 'turUyariHtml', 'turUyariHtmlG'].map(fn).join('\n'), X);
 let pass = 0, fail = 0; const ok = (c, m) => { c ? pass++ : fail++; console.log((c ? '  ok  ' : '  !!  ') + m); };
 // Yapay katalog: yıl y için { tür: sayı } ve büyüklük m (aynı yıl içinde gün gün yayılır)
 const kat = spec => { const o = []; for (const [y, turler] of Object.entries(spec)) for (const [mt, n, m] of turler) for (let i = 0; i < n; i++) o.push({ t: Date.UTC(+y, 0, 1) + (i % 360) * 864e5, mt, m: m ?? 3.5 }); return o; };
@@ -54,4 +55,9 @@ ok(X.turNorm('ML') === 'ML' && X.turNorm('ml') === 'ML' && X.turNorm('mww') === 
   const s = {}; for (let y = 2004; y <= 2010; y++) s[y] = [['MD', 80, 3.4]]; for (let y = 2012; y <= 2018; y++) s[y] = [['ml', 80, 3.4], ['mb', 12, 4.3]];
   const d = X.turGecisDurum(kat(s), true, 3.2); ok(d.on && d.oner === null, 'eşiğin üstünde yalnız geçiş sonrası yıllar → öneri yok (eşdeğerlik sınanamaz)'); }
 { const d = X.turGecisDurum(kat({ 2010: [['MD', 30]], 2011: [['ML', 30]] }), false, 3.0); ok(d.on && d.oner === null, 'mag verilmezse öneri aranmaz'); }
+{ // Kod incelemesi (2026-11-01): çok büyük girdide yığın taşması yok (Math.max(...dizi) kaldırıldı); bozuk durumda güvenli sarmalayıcı boş metin döner
+  const s = {}; for (let y = 1990; y <= 2010; y++) s[y] = [['MD', 9000]]; for (let y = 2011; y <= 2030; y++) s[y] = [['ML', 9000]];
+  let d = null, hata = null; try { d = X.turGecisDurum(kat(s), true, 3.2); } catch (e) { hata = e.message; }
+  ok(!hata && d.on && d.gecisler[0].ySon === 2010 && d.gecisler[0].yIlk === 2011, `369 000 olay: hata yok${hata ? ' (' + hata + ')' : ''}, geçiş 2010 → 2011`);
+  ok(X.turUyariHtmlG({ on: true }) === '' && X.turUyariHtmlG(null) === '' && X.turUyariHtmlG(d) === X.turUyariHtml(d), 'güvenli sarmalayıcı: bozuk durumda boş metin, normalde turUyariHtml ile aynı'); }
 console.log(`\n${fail ? 'FAIL' : 'PASS'}: ${pass} geçti, ${fail} kaldı`); process.exit(fail ? 1 : 0);
