@@ -5,10 +5,10 @@
 **Betikler:**
 - `disa_aktar.js`: uygulamanın kendi koduyla (bölge, GK74) olay listesini çıkarır. Poisson dalındaki betiğin kopyası; olaylara ham tür dizgisi (`mt`, büyük/küçük harf korunur), enlem ve boylam eklendi. Çıktısı depoya eklenmez.
 - `analiz.js` → `sonuc.json`. Kurallar ve sorular betiğin başlığında, sonuçlardan önce yazıldı (tür bileşimi görüldükten sonra; §7).
-- `kabul_tur.js`: Playwright kabul testi, 33/33.
-- `scripts/test_tur_gecisi.js`: birim testi, 14/14.
+- `kabul_tur.js`: Playwright kabul testi, 39/39 (§9 güncellemesinden sonra).
+- `scripts/test_tur_gecisi.js`: birim testi, 21/21 (§9 güncellemesinden sonra).
 - `esik_duyarlilik.js` → `esik_duyarlilik.json`: uyarı eşiklerinin duyarlılığı (§8), uygulamanın kendi koduyla.
-- `gorsel_esik.js`: 9 birleşimde tarayıcı görsel regresyonu, 55/55; ekran görüntüleri `gorsel_*.png`.
+- `gorsel_esik.js`: 9 birleşimde tarayıcı görsel regresyonu, 58/58 (§9 güncellemesinden sonra); ekran görüntüleri `gorsel_*.png`.
 
 ## 1. Geçiş nerede ve nasıl?
 
@@ -71,7 +71,7 @@
 
 - **M < 3,9'da süreklilik yok.** Varsayılan Mc (3,2) ile 2011–2012'yi kesen b(t), a(t) ve hız serileri ölçek ve tür geçişini de yansıtıyor. Bu, fiziksel bir değişim olarak yorumlanmamalı. Örneğin b, Mc 3,0'da 1,45'ten 0,97'ye düşüyor.
 - **M ≥ 3,9'da** karışık katalog, durağan sismisite varsayımı altında geçişin iki yanında hız bakımından tutarlı. Bu, sürekliliğin kanıtı değil; geçişle tutarlı olmayan bir sıçrama bulunmadığı anlamına geliyor. Gerçek bir hız değişimi ile ölçek farkının birbirini dengelemesi de aynı sonucu verir.
-- Uyarının önerdiği eşik (baskın tür geçişinin görülmediği en küçük eşik) Türkiye'de M 3,8 çıkıyor (§6). Bu, hız eşleştirmesinin bulduğu 3,9 ile tutarlı. İki yöntem bağımsız: biri tür etiketlerine, öteki hızlara bakıyor.
+- Uyarının önerdiği eşik (baskın tür geçişinin görülmediği en küçük eşik) Türkiye'de baskınlık payına göre M 3,7–4,1 aralığında çıkıyor (varsayılan %60 payında 3,8; §6, §9). Hız eşleştirmesinin bulduğu 3,9 bu aralığın içinde. İki yöntem bağımsız: biri tür etiketlerine, öteki hızlara bakıyor.
 
 ## 5. Poisson dönem sınamalarıyla karşılaştırılabilirlik
 
@@ -84,23 +84,24 @@
 **Kural** (`turGecisDurum`, `index.html`):
 - Analize giren olaylarda (M ≥ Mc ya da basamak eşiği) her takvim yılının baskın büyüklük türü bulunur: yıllık en az 20 olay ve en sık türün payı ≥ %60. Bu koşulu sağlamayan yıllar "karışık" sayılır ve geçiş üretmez.
 - Pencere içinde iki farklı baskın tür varsa b(t) panelinde tam uyarı, a(t) panelinde kısa not gösterilir.
-- **Önerilen eşik:** baskın tür geçişinin görülmediği en küçük eşik. Koşullar: yıllık en az 10 olay, en az 3 değerlendirilebilir yıl ve ilk geçişin iki yanında yıl bulunması. Karışık yıl sayısı metinde verilir.
+- **Önerilen eşik:** baskın tür geçişinin görülmediği en küçük eşik; baskınlık payı %50, %60 ve %70 için ayrı aranır ve **aralık** olarak verilir. Koşullar: yıllık en az 10 olay, en az **5** değerlendirilebilir yıl (asgari raporlama kuralı) ve ilk geçişin iki yanında yıl bulunması. Karışık yıl sayısı metinde verilir. Bu bir tamlık eşiği değildir (§9).
 - Metin üç sınırı açıkça söylüyor: aynı baskın tür ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ISC → EMSC) yakalanmaz; Mc uyarısı tür farkını denetlemez.
 
-**Kabul testi** (`kabul_tur.js`, 33/33; önce = `main`, sonra = bu dal):
+**Kabul testi** (`kabul_tur.js`, 39/39; önce = `main`, sonra = bu dal; §9 güncellemesinden sonraki sonuçlar):
 
 | Senaryo | Uyarı | Geçiş | Önerilen eşik |
 |---|---|---|---|
-| Türkiye EMSC 1998– (Mc 3,2) | var | MD → ML (son MD 2010, ilk ML 2011) | M 3,8 |
-| aynı, GK74 | var | MD → ML (2010, 2012; 2011 karışık) | M 3,8 |
-| aynı, Mc 3,5 | var | MD → ML (2005, 2011; 2006–2010 karışık) | M 3,8 |
-| aynı, Mc 4,0 | **yok** | — (yıllar mb ya da karışık) | — |
-| Marmara EMSC 1998– | var | MD → ML (2008, 2011) | M 3,9 (4 yıl) |
-| Marmara, GK74 | var | MD → ML (2008, 2012) | — |
-| ISC 1971–1997 + EMSC 1998– | var | mb → ML → MD (1989–1995; ISC'de 1990'larda ML ve MD türlü olaylar, kaynağı incelenmedi), MD → ML (2010, 2011) | M 4,0 |
-| aynı, basamaklar 1971 M 4,5 / 1998 M 3,5 | var | mb → MD (1991, 1998), MD → ML (2005, 2011) | — |
-| ISC 1971–1997 (Mc 3,7) | yok | — (1990–1997 karışık) | — |
-| Kahramanmaraş 1998– | var | MD → ML (2010, 2012) | M 3,9 |
+| Türkiye EMSC 1998– (Mc 3,2) | var | MD → ML (son MD 2010, ilk ML 2011) | M 3,7–4,1 |
+| aynı, GK74 | var | MD → ML (2010, 2012; 2011 karışık) | M 3,6–4,1 |
+| aynı, Mc 3,5 | var | MD → ML (2005, 2011; 2006–2010 karışık) | M 3,7–4,1 |
+| aynı, Mc 4,0 | **yok** (veri yeterli) | — (yıllar mb ya da karışık) | — |
+| Marmara EMSC 1998– | var | MD → ML (2008, 2011) | M 3,6 (yalnız %70 payında, 17 yıl) |
+| Marmara, GK74 | var | MD → ML (2008, 2012) | M 3,6 (yalnız %70 payında, 11 yıl) |
+| Marmara, GK74, Mc 4,0 | **değerlendirilemedi** (27 / 27 yıl yetersiz) | — | — |
+| ISC 1971–1997 + EMSC 1998– | var | mb → ML → MD (1989–1995; ISC'de 1990'larda ML ve MD türlü olaylar, kaynağı incelenmedi), MD → ML (2010, 2011) | M 3,9–4,1 |
+| aynı, basamaklar 1971 M 4,5 / 1998 M 3,5 | var | mb → MD (1991, 1998), MD → ML (2005, 2011) | M 3,9 (yalnız %70) |
+| ISC 1971–1997 (Mc 3,7) | yok (veri yeterli) | — (1990–1997 karışık) | — |
+| Kahramanmaraş 1998– | var | MD → ML (2010, 2012) | M 3,8–3,9 |
 
 **Denetimler:**
 1. Tüm senaryolarda b(t) ve a(t) grafikleri, uyarılar dışındaki b(t)/a(t) metinleri ve G–R metni önce ile sonra arasında birebir aynı; hesap değişmedi.
@@ -111,7 +112,7 @@
 
 Ekran görüntüsü: `tur_uyari_emsc98.png`.
 
-**Birim testi** (`scripts/test_tur_gecisi.js`, 14/14): tür adlarının birleştirilmesi, geçiş ve karışık yıl, az olaylı yılların yok sayılması, A → B → A, önerilen eşik (karışık yıllar, iki yan şartı), metin (tam / kısa / boş).
+**Birim testi** (`scripts/test_tur_gecisi.js`, 21/21): tür adlarının birleştirilmesi, geçiş ve karışık yıl, az olaylı yılların yok sayılması, A → B → A, önerilen eşik (karışık yıllar, iki yan şartı), metin (tam / kısa / boş).
 
 ## 7. Sınırlar
 
@@ -122,6 +123,8 @@ Ekran görüntüsü: `tur_uyari_emsc98.png`.
 - **GK74 ve katalog yapısı** korunuyor: uyarı yalnızca analize giren olay listesini okuyor.
 
 ## 8. Eşik duyarlılığı (sonradan eklendi)
+
+> **Not:** Bu bölümdeki **öneri** sütunları ve "uyarı yok" satırları §9'daki değişiklikten **önceki** koda aittir (tek değerli öneri, en az 3 yıl, değerlendirilemedi notu yok). Geçiş algılama sonuçları (geçiş yılları, karışık yıllar) değişmedi. Güncel sonuçlar §9'da ve `esik_duyarlilik.json`'da.
 
 Uyarının iki eşiği (baskın tür payı ve yıllık en az olay) 3 × 3 birleşimle denendi: pay %50 / %60 / %70, yıllık olay 10 / 20 / 30. Önerilen eşik için yıllık en az olay (minNOner = 10) sabit tutuldu; ayrıca minNOner = minN ile de hesaplandı. Hesap uygulamanın kendi koduyla (`turGecisDurum`, `index.html`'den) yapıldı. Varsayılan birleşimin (%60 / 20) sonuçları, beş senaryonun hepsinde tarayıcıdaki kabul testiyle birebir aynı. Tam sonuçlar `esik_duyarlilik.json`'da.
 
@@ -169,4 +172,34 @@ Uyarının iki eşiği (baskın tür payı ve yıllık en az olay) 3 × 3 birle�
 2. **Öneri için en az 5 değerlendirilebilir yıl şartı koy** (şu an 3). Marmara'daki 4 yıllık öneriler bu şartla kalkar.
 3. **"Veri yetersiz" durumunu göster.** Yılların yarıdan fazlası yıllık olay eşiğinin altındaysa, uyarı yerine "tür geçişi değerlendirilemedi (n yıl yetersiz)" notu ver. Böylece uyarının olmaması "geçiş yok" diye okunmaz.
 4. **Varsayılanları (%60 / 20) koru.** Türkiye'de sonuçlar bu ayarda kararlı; değiştirmek için bir gerekçe bulunmadı.
+
+## 9. Uygulanan değişiklikler: öneri aralığı, 5 yıl kuralı, "değerlendirilemedi" (2026-11-01)
+
+§8.4'teki dört öneri uygulandı. Yalnızca uyarı metni ve öneri kuralı değişti; geçiş algılama kuralı ve varsayılan eşikler (%60 / 20) aynı.
+
+| Öneri | Uygulama (`index.html`, `TUR_QC` ve `turGecisDurum` / `turUyariHtml`) |
+|---|---|
+| 1. Önerilen eşik aralık olarak | Öneri her baskınlık payı için (`payAralik` = %50, %60, %70) ayrı aranır; metin "≈ M alt–üst (%50: …; %60: …; %70: …)" biçiminde. Bulunamayan paylar "bulunamadı" olarak yazılır. Metinde: "Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir." |
+| 2. En az 5 yıl | `minYilOner = 5` (önceden 3). Metinde: "bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir." |
+| 3. Değerlendirilemedi | Geçiş bulunmadığında, pencerenin takvim yıllarının yarıdan fazlası (`yetersizOran` = 0,5; olaysız yıllar da yetersiz sayılır) yıllık `minN` olay koşulunu sağlamıyorsa ya da 2'den az yıl değerlendirilebiliyorsa "uyarı yok" yerine gri bir **"değerlendirilemedi"** notu gösterilir (b(t)'de tam, a(t)'de kısa): "Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez." "Uyarı yok" yalnızca veri yeterliyken oluşur. Geçiş bulunduğunda bazı yıllar yetersizse uyarı metnine "değerlendirilen yıl n / N" eklenir. |
+| 4. Varsayılanlar | `minN = 20`, `pay = 0,6` korundu. |
+
+**Seçimlerin gerekçesi ve sınırı.** %50 yetersiz yıl oranı ve 5 yıl şartı, aşırı az gözleme dayanan sonuçları göstermemek için seçilmiş **asgari raporlama kurallarıdır**; istatistiksel bir güvenilirlik ölçütü ya da sınanmış bir eşik değildir. Geçiş bulunduğunda (pozitif bulgu) uyarı, yetersiz yıl oranından bağımsız olarak gösterilir.
+
+**Güncel sonuçlar:**
+- **Türkiye:** öneri ham M 3,7–4,1, GK74 M 3,6–4,1, Mc 3,5'te M 3,7–4,1 (%50: 4,1; %60: 3,8; %70: 3,6–3,7; her biri 29 yıl). Hız eşleştirmesinin bulduğu M ≈ 3,9 (§3) aralığın içinde.
+- **Marmara:** 4 yıla dayanan M 3,9 önerisi 5 yıl kuralıyla kalktı. Yalnızca %70 payında M 3,6 kalıyor (ham 17 yıl, GK74 11 yıl); %50 ve %60'ta "bulunamadı". GK74 ile yıllık 30 olay şartında (23 / 29 yıl yetersiz) ve GK74 + Mc 4,0'da (27 / 27 yıl yetersiz) artık "değerlendirilemedi" notu gösteriliyor; önceki sürümde bu durumlar sessizce "uyarı yok" idi.
+- **Duyarlılık notu:** Öneri için yıllık olay şartı (minNOner) 10 yerine minN'e eşitlenirse Marmara GK74'te öneri M 3,3'e iniyor (%50–70 / 20). Küçük kataloglarda öneri, değerlendirilebilir yıl kümesine duyarlı kalıyor; aralık gösterimi ve 5 yıl şartı bunu azaltıyor, ortadan kaldırmıyor.
+
+**Doğrulama** (değişiklik sonrası, hepsi `main` ile karşılaştırmalı):
+
+| Denetim | Sonuç |
+|---|---|
+| Birim testi (`scripts/test_tur_gecisi.js`): aralık, paya duyarlı aralık (M 3,5–4,1), 5 yıl kuralı, değerlendirilemedi (oran > %50, tam %50 sınırı, tek yıl, olay yok), "değerlendirilen yıl n / N", metin ifadeleri | 21/21 |
+| Kabul testi (`kabul_tur.js`, 11 senaryo): b(t), a(t), G–R ve Mc uyarısı önce = sonra; b(t) ve a(t) notları tutarlı; "uyarı yok" yalnızca veri yeterliyken; her öneri ≥ 5 yıla dayanıyor; seyrek Marmara'da "değerlendirilemedi" | 39/39 |
+| Eşik duyarlılığı (`esik_duyarlilik.js`): 5 senaryo × 9 birleşim; varsayılan birleşim tarayıcı kabul testiyle aynı (5/5) | yeniden üretildi |
+| Görsel regresyon (`gorsel_esik.js`): 9 birleşim × 2 senaryo; b(t), a(t), G–R ve Mc uyarısı her birleşimde `main` ile aynı; tarayıcı = Node; Marmara GK74 yıllık 30 olayda "değerlendirilemedi" notu | 58/58 |
+| Tüm birim testleri (`scripts/test_*.js`, 17 dosya) | 17/17, hata yok |
+
+Ekran görüntüleri: `tur_uyari_emsc98.png` (varsayılan), `gorsel_tr_{50_10, 60_20, 70_30}.png`, `gorsel_mar_gk74_{50_10, 60_20, 70_30}.png` (70_30: "değerlendirilemedi" notu).
 

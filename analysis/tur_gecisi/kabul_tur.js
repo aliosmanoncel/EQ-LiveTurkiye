@@ -1,7 +1,8 @@
 // Kabul testi (2026-11-01): büyüklük türü geçişi uyarısı. Önce = verilen index.html (main), sonra = depodaki index.html. Veri yerel.
 // Senaryolar (Türkiye kutusu 36–42° K / 26–45° D; Marmara 40–41,5° K / 26–31° D):
 //   emsc98 (+ GK74, + Mc 3,5, + Mc 4,0), marmara (+ GK74), birlesik ISC 1971–1997 + EMSC 1998– (+ basamaklar 1971 M ≥ 4,5 / 1998 M ≥ 3,5),
-//   isc71_97 (yalnız ISC), kmaras (2023 dizisi; yalnız ML dönemi) — uyarı beklenmez.
+//   isc71_97 (yalnız ISC), kmaras (2023 dizisi), marmara_gk74_mc40 (seyrek; 'değerlendirilemedi' beklenir).
+// 2026-11-01 güncelleme (RAPOR §9): öneri aralığı, 5 yıl kuralı, 'değerlendirilemedi' notu denetimleri eklendi.
 // Denetimler: (1) b(t) ve a(t) grafikleri, uyarı blokları (Mc ve tür) dışındaki b(t)/a(t) metinleri ve G–R metni önce = sonra (hesap değişmedi);
 //   (2) Mc uyarısı önce = sonra; (3) tür uyarısı b(t)'de varsa a(t)'de kısa notu da var (ve tersi), önce yok; (4) emsc98'de MD → ML geçişi
 //   (2010/2011 → 2012) algılanıyor; kmaras'ta uyarı yok; (5) sayfa hatası yok.
@@ -40,10 +41,10 @@ window.__kur = async (pencereler, S, W, N, E) => { for (const [a, b] of pencerel
   if (!showTimeMag) toggleTimeMag(); else renderTimeMag([...events, ...liveEvents]); };
 window.__cs = steps => { csSteps = steps.map(([start, mc]) => ({ start, mc })); csEnabled = true; const cb = document.getElementById('csEnabled'); if (cb) cb.checked = true; csRenderRows(); onCsChange(true); renderTimeMag([...events, ...liveEvents]); };
 window.__mc = v => { document.getElementById('regionMcOverride').value = v; renderTimeMag([...events, ...liveEvents]); };
-window.__oku = () => { const tx = id => { const el = document.getElementById(id); if (!el) return null; const c = el.cloneNode(true); c.querySelectorAll('#mcUyariB, #mcUyariA, #turUyariB, #turUyariA').forEach(n => n.remove()); return c.textContent; };
+window.__oku = () => { const tx = id => { const el = document.getElementById(id); if (!el) return null; const c = el.cloneNode(true); c.querySelectorAll('#mcUyariB, #mcUyariA, #turUyariB, #turUyariA, #turYetersizB, #turYetersizA').forEach(n => n.remove()); return c.textContent; };
   const sa = document.getElementById('tmSvgA'), t = id => document.getElementById(id) ? document.getElementById(id).textContent : null;
   return { bSvg: document.getElementById('tmSvgB').innerHTML, bTxt: tx('tmStatsB'), aSvg: sa ? sa.innerHTML : null, aTxt: tx('tmStatsA'), grTxt: document.getElementById('tmStatsGR').textContent,
-    mcB: t('mcUyariB'), mcA: t('mcUyariA'), turB: t('turUyariB'), turA: t('turUyariA'),
+    mcB: t('mcUyariB'), mcA: t('mcUyariA'), turB: t('turUyariB'), turA: t('turUyariA'), yetB: t('turYetersizB'), yetA: t('turYetersizA'),
     durum: typeof lastTurUyari !== 'undefined' && lastTurUyari ? JSON.parse(JSON.stringify(lastTurUyari)) : null, Mc: lastGrMc, csAktif: !!lastCs }; };
 `;
 const TR = [36, 26, 42, 45], MAR = [40, 26, 41.5, 31];
@@ -54,6 +55,7 @@ const SEN = {
   emsc98_mc40:   { p: [[1998, null]], r: TR, mc: '4.0' },
   marmara:       { p: [[1998, null]], r: MAR },
   marmara_gk74:  { p: [[1998, null]], r: MAR, gk: true },
+  marmara_gk74_mc40: { p: [[1998, null]], r: MAR, gk: true, mc: '4.0' },   // seyrek: yıllık ≥ 20 olay koşulu çoğu yılda sağlanmaz → 'değerlendirilemedi' beklenir
   birlesik:      { p: [[1971, 1997], [1998, null]], r: TR },
   birlesik_cs:   { p: [[1971, 1997], [1998, null]], r: TR, cs: [['1971-01-01', '4.5'], ['1998-01-01', '3.5']] },
   isc71_97:      { p: [[1971, 1997]], r: TR },
@@ -77,13 +79,18 @@ const SEN = {
   for (const k of Object.keys(SEN)) { const o = O[k], y = Y[k];
     ok(o.bSvg === y.bSvg && o.bTxt === y.bTxt && o.aSvg === y.aSvg && o.aTxt === y.aTxt && o.grTxt === y.grTxt, `(1) ${k}: b(t) ve a(t) grafikleri, uyarılar dışındaki metinler ve G–R metni önce = sonra`);
     ok(o.mcB === y.mcB && o.mcA === y.mcA, `(2) ${k}: Mc uyarısı önce = sonra (${y.mcB ? 'var' : 'yok'})`);
-    ok(!!y.turB === !!y.turA && !!y.turB === !!(y.durum && y.durum.on) && !o.turB && !o.turA, `(3) ${k}: tür uyarısı ${y.turB ? 'VAR' : 'yok'} (b(t) ve a(t) tutarlı; önce yok)`);
-    const d = y.durum; console.log(`     ${k}: Mc ${y.Mc}${y.csAktif ? ' (basamaklı)' : ''}${SEN[k].gk ? ', GK74' : ''}; ` + (d && d.on ? `geçişler ${d.gecisler.map(g => `${g.a}→${g.b} ${g.ySon}–${g.yIlk}${g.karisik.length ? ' (karışık ' + g.karisik.join(',') + ')' : ''}`).join('; ')}; dönemler ${d.donemler.map(x => `${x.tur} ${x.y0}–${x.y1}`).join(', ')}; öneri ${d.oner ? `M ${d.oner.M} (${d.oner.tur}, ${d.oner.nYil} yıl)` : '—'}` : `uyarı yok; yıllar ${d ? d.yillar.map(q => q.y + ':' + (q.tur || 'karışık')).join(' ') : '—'}`)); }
+    ok(!!y.turB === !!y.turA && !!y.turB === !!(y.durum && y.durum.on) && !!y.yetB === !!y.yetA && !!y.yetB === !!(y.durum && !y.durum.on && y.durum.degerlendirilemedi) && !(y.turB && y.yetB) && !o.turB && !o.turA && !o.yetB,
+      `(3) ${k}: tür uyarısı ${y.turB ? 'VAR' : y.yetB ? 'DEĞERLENDİRİLEMEDİ' : 'yok (veri yeterli)'} (b(t) ve a(t) tutarlı; önce yok)`);
+    const d = y.durum; console.log(`     ${k}: Mc ${y.Mc}${y.csAktif ? ' (basamaklı)' : ''}${SEN[k].gk ? ', GK74' : ''}; ` + (d && d.on ? `geçişler ${d.gecisler.map(g => `${g.a}→${g.b} ${g.ySon}–${g.yIlk}${g.karisik.length ? ' (karışık ' + g.karisik.join(',') + ')' : ''}`).join('; ')}; dönemler ${d.donemler.map(x => `${x.tur} ${x.y0}–${x.y1}`).join(', ')}; öneri ${d.oner ? `M ${d.oner.Mlo}–${d.oner.Mhi} (${d.oner.aralik.map(a => `%${a.pay * 100}: ${a.M ?? '—'}${a.M !== null ? '/' + a.nYil + 'y' : ''}`).join(' ')})` : '—'}` : `${d && d.degerlendirilemedi ? `DEĞERLENDİRİLEMEDİ (${d.nYetersiz}/${d.yilTum} yıl yetersiz)` : 'uyarı yok'}; yıllar ${d ? d.yillar.map(q => q.y + ':' + (q.tur || 'karışık')).join(' ') : '—'}`)); }
   { const d = Y.emsc98.durum, g = d && d.on && d.gecisler.find(x => x.a === 'MD' && x.b === 'ML');
     ok(!!g && (g.ySon === 2010 || g.ySon === 2011) && g.yIlk >= 2011 && g.yIlk <= 2012, `(4) Türkiye EMSC 1998–: MD → ML geçişi algılanıyor (${g ? g.ySon + ' → ' + g.yIlk : '—'})`); }
   ok(!(Y.kmaras.durum && Y.kmaras.durum.on) || Y.kmaras.durum.gecisler.every(x => x.ySon < 2013), '(4) Kahramanmaraş: ML dönemi içinde tür geçişi yok (yalnız 2012 öncesi geçiş olabilir)');
+  ok(Y.marmara_gk74_mc40.durum && !Y.marmara_gk74_mc40.durum.on && Y.marmara_gk74_mc40.durum.degerlendirilemedi && /değerlendirilemedi/.test(Y.marmara_gk74_mc40.yetB || '') && /geçişi olmadığı anlamına gelmez/.test(Y.marmara_gk74_mc40.yetB || ''),
+    '(4) Marmara GK74 Mc 4,0 (seyrek): "değerlendirilemedi" notu gösteriliyor, "uyarı yok" değil');
+  ok(Object.values(Y).filter(v => v && v.durum && !v.durum.on && !v.durum.degerlendirilemedi).every(v => v.durum.nYetersiz <= 0.5 * v.durum.yilTum && v.durum.nDeg >= 2), '(4) "uyarı yok" yalnız veri yeterliyken (yetersiz yıl ≤ %50, en az 2 değerlendirilebilir yıl)');
+  ok(Object.values(Y).filter(v => v && v.durum && v.durum.on && v.durum.oner).every(v => v.durum.oner.aralik.every(a => a.M === null || a.nYil >= 5)), '(4) Her öneri en az 5 değerlendirilebilir yıla dayanıyor');
   ok(!O.hatalar.length && !Y.hatalar.length, `(5) Sayfa hatası yok (önce ${O.hatalar.length}, sonra ${Y.hatalar.length})` + (Y.hatalar.length ? ': ' + Y.hatalar.join(' | ') : ''));
-  const ozet = {}; for (const k of Object.keys(SEN)) ozet[k] = { Mc: Y[k].Mc, durum: Y[k].durum, uyari: Y[k].turB, mcUyari: Y[k].mcB };
+  const ozet = {}; for (const k of Object.keys(SEN)) ozet[k] = { Mc: Y[k].Mc, durum: Y[k].durum, uyari: Y[k].turB, yetersiz: Y[k].yetB, mcUyari: Y[k].mcB };
   fs.writeFileSync(path.join(__dirname, 'kabul_sonuc.json'), JSON.stringify({ senaryolar: SEN, sonuc: ozet, denetimler: kayit, ozet: { pass, fail } }, null, 1));
   console.log(`\n${fail ? 'KALDI' : 'GEÇTİ'}: ${pass} geçti, ${fail} kaldı`);
   await br.close(); srv.close(); process.exit(fail ? 1 : 0);

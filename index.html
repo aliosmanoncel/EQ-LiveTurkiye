@@ -3041,35 +3041,53 @@ function mcUyariHtml(d, kisa) {
 // yılının baskın büyüklük türü (en az TUR_QC.minN olay, pay ≥ TUR_QC.pay) bulunur; pencere içinde iki farklı baskın tür varsa uyarı verilir.
 // Gerekçe (analysis/tur_gecisi/RAPOR.md): EMSC Türkiye verisinde 2011–2012'de MD → ML geçişi var (büyüklük yazarı da EMSC → ISK/DDA); MD döneminin
 // frekans–büyüklük dağılımı M < 4'te belirgin biçimde daha dik. Mc uyarısı bunu yakalamaz (Mc 3,2 her iki dönemde aynı). Etiket aynı kalan ajans
-// değişimleri (ör. ISC mb → EMSC mb) bu uyarıyla yakalanmaz. Önerilen eşik: baskın tür geçişinin görülmediği en küçük eşik (yıllık ≥ TUR_QC.minNOner
-// olay, en az 3 değerlendirilebilir yıl, ilk geçişin iki yanında yıl bulunmalı; karışık yıllar geçiş sayılmaz) — ölçek eşdeğerliğini KANITLAMAZ.
-const TUR_QC = { minN: 20, pay: 0.6, minNOner: 10 };
+// değişimleri (ör. ISC mb → EMSC mb) bu uyarıyla yakalanmaz.
+// Önerilen eşik (RAPOR §8–9): baskın tür geçişinin görülmediği en küçük eşik; her baskınlık payı (TUR_QC.payAralik) için ayrı aranır ve ARALIK olarak
+// verilir (pay seçimine duyarlı: Türkiye M 3,6–4,1). Koşullar: yıllık ≥ TUR_QC.minNOner olay, en az TUR_QC.minYilOner değerlendirilebilir yıl (asgari
+// raporlama kuralı; istatistiksel güvenilirlik ölçütü değil), ilk geçişin iki yanında yıl; karışık yıllar geçiş sayılmaz. Tamlık (Mc) eşiği DEĞİLDİR.
+// Değerlendirilemedi: geçiş bulunmadığında, takvim yıllarının TUR_QC.yetersizOran'dan fazlası yıllık TUR_QC.minN olay koşulunu sağlamıyorsa (ya da
+// 2'den az yıl değerlendirilebiliyorsa) 'uyarı yok' yerine 'değerlendirilemedi' notu gösterilir: uyarının olmaması geçiş olmadığı anlamına gelmez.
+const TUR_QC = { minN: 20, pay: 0.6, minNOner: 10, minYilOner: 5, payAralik: [0.5, 0.6, 0.7], yetersizOran: 0.5 };
 function turNorm(mt) { const t = String(mt || '?').toLowerCase(); return t === 'mb' ? 'mb' : t === 'ms' ? 'Ms' : t === 'ml' ? 'ML' : t === 'md' ? 'MD' : /^mw/.test(t) ? 'Mw' : 'diğer'; }
-function turYillik(ol, minN) {   // ol: [{ t (ms), mt }] → [{ y, n, tur, pay }] (tur null: karışık)
+function turYillik(ol, minN, pay = TUR_QC.pay) {   // ol: [{ t (ms), mt }] → [{ y, n, tur, pay }] (tur null: karışık); yalnız ≥ minN olaylı yıllar
   const by = {}; ol.forEach(e => { const y = new Date(e.t).getUTCFullYear(), k = turNorm(e.mt); (by[y] = by[y] || {})[k] = (by[y][k] || 0) + 1; });
   return Object.keys(by).map(Number).sort((a, b) => a - b).map(y => { const c = by[y], n = Object.values(c).reduce((a, v) => a + v, 0), [k, v] = Object.entries(c).sort((p, q) => q[1] - p[1])[0];
-    return { y, n, tur: n >= minN && v / n >= TUR_QC.pay ? k : null, pay: v / n, enCok: k }; }).filter(q => q.n >= minN); }
-function turGecisDurum(ol, mag, M0) {   // ol: analize giren olaylar [{ t, mt, m }]; mag: eşik adayları için büyüklük (m); M0: kullanılan eşik
-  const yy = turYillik(ol, TUR_QC.minN), tip = yy.filter(q => q.tur);
-  if (new Set(tip.map(q => q.tur)).size < 2) return { on: false, yillar: yy };
+    return { y, n, tur: n >= minN && v / n >= pay ? k : null, pay: v / n, enCok: k }; }).filter(q => q.n >= minN); }
+function turGecisDurum(ol, mag, M0) {   // ol: analize giren olaylar [{ t, mt, m }]; mag: eşik önerisi aransın mı; M0: kullanılan eşik
+  const yy = turYillik(ol, TUR_QC.minN), tip = yy.filter(q => q.tur), ys = ol.map(e => new Date(e.t).getUTCFullYear());
+  const yilTum = ys.length ? Math.max(...ys) - Math.min(...ys) + 1 : 0, kapsam = { yilTum, nDeg: yy.length, nYetersiz: yilTum - yy.length, minN: TUR_QC.minN, M0 };   // takvim yılı aralığı (olaysız yıllar da yetersiz)
+  if (new Set(tip.map(q => q.tur)).size < 2) {
+    const yetersiz = yy.length < 2 || kapsam.nYetersiz > TUR_QC.yetersizOran * yilTum;
+    return { on: false, degerlendirilemedi: yetersiz, yillar: yy, ...kapsam }; }
   const donem = []; tip.forEach(q => { const d = donem[donem.length - 1]; if (d && d.tur === q.tur) { d.y1 = q.y; d.n += q.n; } else donem.push({ tur: q.tur, y0: q.y, y1: q.y, n: q.n }); });
   const gecis = donem.slice(1).map((d, i) => ({ a: donem[i].tur, b: d.tur, ySon: donem[i].y1, yIlk: d.y0, karisik: yy.filter(q => !q.tur && q.y > donem[i].y1 && q.y < d.y0).map(q => q.y) }));
   let oner = null; const g0 = gecis[0];
-  if (mag && Number.isFinite(M0)) for (let k = 1; k <= 20 && oner === null; k++) { const M = Math.round((M0 + k / 10) * 10) / 10, s = ol.filter(e => e.m >= M - 1e-9), q = turYillik(s, TUR_QC.minNOner);
-    const tq = [...new Set(q.filter(x => x.tur).map(x => x.tur))];   // karışık yıllar (hiçbir tür ≥ TUR_QC.pay değil) geçiş sayılmaz — ana uyarıyla aynı ölçüt
-    if (q.length >= 3 && q.some(x => x.y <= g0.ySon) && q.some(x => x.y >= g0.yIlk) && tq.length <= 1) oner = { M, tur: tq[0] || null, nYil: q.length, nKarisik: q.filter(x => !x.tur).length }; }
-  return { on: true, yillar: yy, donemler: donem, gecisler: gecis, oner, M0 };
+  if (mag && Number.isFinite(M0)) {
+    const aralik = TUR_QC.payAralik.map(pay => { for (let k = 1; k <= 20; k++) { const M = Math.round((M0 + k / 10) * 10) / 10, q = turYillik(ol.filter(e => e.m >= M - 1e-9), TUR_QC.minNOner, pay);
+        const tq = [...new Set(q.filter(x => x.tur).map(x => x.tur))];   // karışık yıllar (hiçbir tür ≥ pay değil) geçiş sayılmaz — ana uyarıyla aynı ölçüt
+        if (q.length >= TUR_QC.minYilOner && q.some(x => x.y <= g0.ySon) && q.some(x => x.y >= g0.yIlk) && tq.length <= 1) return { pay, M, tur: tq[0] || null, nYil: q.length, nKarisik: q.filter(x => !x.tur).length }; }
+      return { pay, M: null }; });
+    const bul = aralik.filter(a => a.M !== null);
+    if (bul.length) oner = { Mlo: Math.min(...bul.map(a => a.M)), Mhi: Math.max(...bul.map(a => a.M)), aralik }; }
+  return { on: true, yillar: yy, donemler: donem, gecisler: gecis, oner, ...kapsam };
 }
 function turUyariHtml(d, kisa) {
-  if (!d || !d.on) return '';
+  if (!d) return '';
+  const f = v => v.toFixed(1).replace('.', ','), esik = Number.isFinite(d.M0) ? f(d.M0) : 'Mc';
+  if (!d.on) {
+    if (!d.degerlendirilemedi) return '';
+    if (kisa) return `<div id="turYetersizA" style="color:#9ca3af;margin-bottom:3px">ⓘ <b>Büyüklük türü geçişi değerlendirilemedi</b> (yetersiz veri; ayrıntı b(t) panelinde).</div>`;
+    return `<div id="turYetersizB" style="color:#9ca3af;border:1px solid #9ca3af55;border-radius:4px;padding:3px 6px;margin-bottom:4px">ⓘ <b>Büyüklük türü geçişi değerlendirilemedi.</b> ${d.yilTum ? `Pencerenin ${d.yilTum} takvim yılından ${d.nYetersiz} tanesi analiz koşulunu sağlamıyor (M ≥ ${esik} olaylardan yıllık en az ${d.minN}); değerlendirilebilen yıl sayısı ${d.nDeg}.` : `Analize giren olay yok (M ≥ ${esik}).`} Uyarının olmaması, büyüklük türü geçişi olmadığı anlamına gelmez.</div>`; }
   const g = d.gecisler.map(x => `${x.a} → ${x.b} (son ${x.a} yılı ${x.ySon}, ilk ${x.b} yılı ${x.yIlk}${x.karisik.length ? `; karışık: ${x.karisik.join(', ')}` : ''})`).join('; ');
   if (kisa) return `<div id="turUyariA" style="color:#f59e0b;margin-bottom:3px">⚠ <b>Büyüklük türü geçişi:</b> ${g}; a(t)'deki değişimler ölçek farkından etkilenebilir (ayrıntı b(t) panelinde).</div>`;
-  const f = v => v.toFixed(1).replace('.', ',');
-  const don = d.donemler.map(x => `${x.tur} ${x.y0 === x.y1 ? x.y0 : `${x.y0}–${x.y1}`}`).join(', ');
-  return `<div id="turUyariB" style="color:#f59e0b;border:1px solid #f59e0b55;border-radius:4px;padding:3px 6px;margin-bottom:4px">⚠ <b>Büyüklük Türü Geçişi.</b> Analize giren olaylarda (M ≥ ${Number.isFinite(d.M0) ? f(d.M0) : 'Mc'}) baskın büyüklük türü pencere içinde değişiyor: ${g}. Baskın tür dönemleri: ${don}. ` +
+  const don = d.donemler.map(x => `${x.tur} ${x.y0 === x.y1 ? x.y0 : `${x.y0}–${x.y1}`}`).join(', '), yuzde = p => `%${Math.round(100 * p)}`;
+  const o = d.oner, oMetin = o
+    ? `Baskın tür geçişinin görülmediği en küçük eşik, baskınlık payı seçimine göre ${o.Mlo === o.Mhi ? `≈ M ${f(o.Mlo)}` : `≈ M ${f(o.Mlo)}–${f(o.Mhi)}`} (${o.aralik.map(a => `${yuzde(a.pay)}: ${a.M !== null ? `${f(a.M)}, ${a.nYil} yıl` : 'bulunamadı'}`).join('; ')}); bu aralıkta ya da tek tür dönemi içinde karşılaştırma önerilir. ` +
+      `Bu bir tamlık (Mc) eşiği değildir; yalnızca tür etiketinin yıldan yıla homojen göründüğü eşiktir. `
+    : `Baskın tür geçişinin görülmediği bir eşik bulunamadı; karşılaştırmayı tek tür dönemi içinde yapın. `;
+  return `<div id="turUyariB" style="color:#f59e0b;border:1px solid #f59e0b55;border-radius:4px;padding:3px 6px;margin-bottom:4px">⚠ <b>Büyüklük Türü Geçişi.</b> Analize giren olaylarda (M ≥ ${esik}) baskın büyüklük türü pencere içinde değişiyor: ${g}. Baskın tür dönemleri: ${don}${d.nYetersiz > 0 ? ` (değerlendirilen yıl ${d.nDeg} / ${d.yilTum})` : ''}. ` +
     `Farklı büyüklük türleri aynı ölçek değildir; ayrıca tür seçimi büyüklüğe bağlı olabilir (büyük olaylar mb ya da Mw olarak raporlanır). Bu nedenle dönemler arası b, a ve hız karşılaştırmaları ölçek farkından etkilenebilir. Mc uyarısı tamlığı denetler, tür farkını denetlemez; Mc aynı olsa da bu fark sürebilir. ` +
-    (d.oner ? `Baskın tür geçişinin görülmediği en küçük eşik ≈ M ${f(d.oner.M)} (${d.oner.nYil} yıl değerlendirildi, yıllık en az ${TUR_QC.minNOner} olay; ${d.oner.tur ? `baskın tür ${d.oner.tur}` : 'baskın tür yok'}${d.oner.nKarisik ? `, ${d.oner.nKarisik} yıl karışık türlü` : ''}); bu eşikte ya da tek tür dönemi içinde karşılaştırma önerilir. ` : `Baskın tür geçişinin görülmediği bir eşik bulunamadı; karşılaştırmayı tek tür dönemi içinde yapın. `) +
-    `<span style="color:#d4a24a">Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.</span></div>`;
+    oMetin + `<span style="color:#d4a24a">Öneri için en az ${TUR_QC.minYilOner} değerlendirilebilir yıl (yıllık en az ${TUR_QC.minNOner} olay) aranır; bu bir asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir. Aynı baskın tür, ölçek eşdeğerliğini kanıtlamaz; etiketi aynı kalan ajans değişimleri (ör. ISC → EMSC) bu uyarıyla yakalanmaz.</span></div>`;
 }
 let lastTurUyari = null;
 let lastMcUyari = null;

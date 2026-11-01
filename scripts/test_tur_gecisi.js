@@ -1,6 +1,7 @@
 // Birim testleri: büyüklük türü geçişi uyarısı (2026-11-01). index.html'den TUR_QC, turNorm, turYillik, turGecisDurum, turUyariHtml okunur.
 // Denetimler: geçiş algılama (baskın tür ≥ %60, yıllık ≥ 20 olay), karışık yıllar, az olaylı yılların yok sayılması, A → B → A, önerilen eşik
-// (iki yanda yıl şartı), metin (tam / kısa / boş), tür adlarının birleştirilmesi.
+// (pay aralığı %50–70, en az 5 yıl, iki yanda yıl şartı), 'değerlendirilemedi' durumu, metin (tam / kısa / boş / yetersiz), tür adlarının birleştirilmesi.
+// 2026-11-01 güncelleme: öneri aralık olarak (RAPOR §9), 5 yıl asgari raporlama kuralı, yetersiz veride 'değerlendirilemedi'.
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const src = fs.readFileSync(process.argv[2] || path.join(__dirname, '..', 'index.html'), 'utf8').replace(/\r\n/g, '\n');
@@ -20,20 +21,35 @@ ok(X.turNorm('ML') === 'ML' && X.turNorm('ml') === 'ML' && X.turNorm('mww') === 
   ok(/id="turUyariA"/.test(k) && !/turUyariB/.test(k) && /a\(t\)/.test(k), 'kısa metin (a(t) paneli) ayrı');
   ok(d.oner === null && /geçişinin görülmediği bir eşik bulunamadı/.test(h), 'tüm olaylar 3,5 iken daha yüksek eşikte yıl kalmıyor → öneri yok, metin bunu söylüyor'); }
 { const s = {}; for (let y = 2004; y <= 2018; y++) s[y] = [['ML', 80], ['mb', 10]]; const d = X.turGecisDurum(kat(s), true, 3.0);
-  ok(!d.on && X.turUyariHtml(d) === '' && X.turUyariHtml(d, true) === '', 'tek baskın tür → uyarı yok, metin boş'); }
+  ok(!d.on && !d.degerlendirilemedi && X.turUyariHtml(d) === '' && X.turUyariHtml(d, true) === '', 'tek baskın tür, veri yeterli → uyarı yok, metin boş'); }
 { const s = {}; for (let y = 2004; y <= 2010; y++) s[y] = [['MD', 80]]; for (let y = 2012; y <= 2018; y++) s[y] = [['ML', 15]];
-  ok(!X.turGecisDurum(kat(s), true, 3.0).on, 'ML yılları < 20 olaylı → değerlendirilmiyor, uyarı yok'); }
+  const d = X.turGecisDurum(kat(s), true, 3.0), h = X.turUyariHtml(d), k = X.turUyariHtml(d, true);
+  ok(!d.on && d.degerlendirilemedi && d.yilTum === 15 && d.nDeg === 7 && d.nYetersiz === 8, `ML yılları < 20 olaylı, 2011 olaysız → 15 yıldan 8'i yetersiz (> %50) → 'değerlendirilemedi' (uyarı yok değil)`);
+  ok(/id="turYetersizB"/.test(h) && /değerlendirilemedi/.test(h) && /15 takvim yılından 8 tanesi/.test(h) && /geçişi olmadığı anlamına gelmez/.test(h) && !/turUyariB/.test(h), 'yetersiz veri metni: yıl sayıları ve "olmadığı anlamına gelmez"');
+  ok(/id="turYetersizA"/.test(k) && !/turYetersizB/.test(k), 'yetersiz veri kısa notu (a(t) paneli)'); }
+{ // Sınır: yetersiz yıl oranı tam %50 → değerlendirilebilir sayılır (koşul '> %50'); tek tür → uyarı yok
+  const s = {}; for (let y = 2001; y <= 2005; y++) s[y] = [['ML', 30]]; for (let y = 2006; y <= 2010; y++) s[y] = [['ML', 5]];
+  const d = X.turGecisDurum(kat(s), true, 3.0); ok(!d.on && !d.degerlendirilemedi && d.nYetersiz === 5 && d.yilTum === 10 && X.turUyariHtml(d) === '', 'yetersiz oranı tam %50 → değerlendirilmiş, uyarı yok'); }
+{ const d = X.turGecisDurum(kat({ 2010: [['MD', 30]] }), true, 3.0); ok(!d.on && d.degerlendirilemedi, 'tek değerlendirilebilir yıl → değerlendirilemedi'); }
+{ const d = X.turGecisDurum([], true, 3.0); ok(!d.on && d.degerlendirilemedi && /Analize giren olay yok/.test(X.turUyariHtml(d)) && X.turUyariHtml(null) === '', 'olay yok → değerlendirilemedi ("analize giren olay yok"); durum yoksa metin boş'); }
 { const s = {}; for (let y = 2004; y <= 2007; y++) s[y] = [['MD', 50]]; for (let y = 2008; y <= 2011; y++) s[y] = [['ML', 50]]; for (let y = 2012; y <= 2015; y++) s[y] = [['MD', 50]];
   const d = X.turGecisDurum(kat(s), true, 3.0); ok(d.on && d.gecisler.length === 2 && d.gecisler[1].a === 'ML' && d.gecisler[1].b === 'MD', 'MD → ML → MD: iki geçiş'); }
-{ // Küçük olaylarda MD → ML, M ≥ 4,0'da her iki yanda mb baskın (yıllık 12) → öneri M 4,0 (mb)
+{ // Küçük olaylarda MD → ML, M ≥ 3,5'te her iki yanda mb baskın (%75–80) → üç payda da öneri M 3,5
   const s = {}; for (let y = 2004; y <= 2010; y++) s[y] = [['MD', 80, 3.4], ['mb', 12, 4.2], ['ML', 3, 4.1]]; for (let y = 2012; y <= 2018; y++) s[y] = [['ml', 80, 3.4], ['mb', 12, 4.3], ['ML', 4, 4.0]];
-  const d = X.turGecisDurum(kat(s), true, 3.2);
-  ok(d.on && d.oner && d.oner.M === 3.5 && d.oner.tur === 'mb' && d.oner.nYil === 14, `öneri: türün değişmediği en küçük eşik ${d.oner && d.oner.M} (mb, ${d.oner && d.oner.nYil} yıl)`);
-  ok(/en küçük eşik ≈ M 3,5 \(14 yıl değerlendirildi, yıllık en az 10 olay; baskın tür mb\)/.test(X.turUyariHtml(d)), 'önerilen eşik metinde'); }
-{ // M ≥ 4,0'da yıllar karışık (mb %50 / ML %50): geçiş yok sayılır → öneri, karışık yıl sayısıyla
-  const s = {}; for (let y = 2004; y <= 2010; y++) s[y] = [['MD', 80, 3.4], ['mb', 6, 4.2], ['ML', 6, 4.1]]; for (let y = 2012; y <= 2018; y++) s[y] = [['ml', 80, 3.4], ['mb', 6, 4.3], ['ML', 6, 4.0]];
-  const d = X.turGecisDurum(kat(s), true, 3.2);
-  ok(d.on && d.oner && d.oner.M === 3.5 && d.oner.tur === null && d.oner.nKarisik === 14 && /baskın tür yok, 14 yıl karışık türlü/.test(X.turUyariHtml(d)), 'karışık türlü yıllar geçiş sayılmıyor → öneri M 3,5, metinde "14 yıl karışık türlü"'); }
+  const d = X.turGecisDurum(kat(s), true, 3.2), o = d.oner;
+  ok(d.on && o && o.Mlo === 3.5 && o.Mhi === 3.5 && o.aralik.every(a => a.M === 3.5 && a.tur === 'mb' && a.nYil === 14), `öneri: üç payda da M ${o && o.Mlo} (mb, 14 yıl)`);
+  const h = X.turUyariHtml(d);
+  ok(/baskınlık payı seçimine göre ≈ M 3,5 \(%50: 3,5, 14 yıl; %60: 3,5, 14 yıl; %70: 3,5, 14 yıl\)/.test(h) && /Bu bir tamlık \(Mc\) eşiği değildir/.test(h) && /asgari raporlama kuralıdır, istatistiksel güvenilirlik ölçütü değildir/.test(h), 'önerilen eşik metinde; "tamlık eşiği değildir" ve "asgari raporlama kuralı" ifadeleri'); }
+{ // Pay duyarlılığı: M ≥ 3,5'te mb %53 (önce) / ML %53 (sonra) → %50'de geçiş sürer (öneri M 4,1: yalnız Mw), %60–70'te karışık (öneri M 3,5)
+  const s = {}; for (let y = 2004; y <= 2010; y++) s[y] = [['MD', 80, 3.4], ['mb', 18, 4.0], ['ML', 6, 4.0], ['Mw', 10, 4.6]]; for (let y = 2012; y <= 2018; y++) s[y] = [['ml', 80, 3.4], ['ML', 18, 4.0], ['mb', 6, 4.0], ['Mw', 10, 4.6]];
+  const d = X.turGecisDurum(kat(s), true, 3.2), o = d.oner, a = o && Object.fromEntries(o.aralik.map(x => [x.pay, x.M]));
+  ok(d.on && o && a[0.5] === 4.1 && a[0.6] === 3.5 && a[0.7] === 3.5 && o.Mlo === 3.5 && o.Mhi === 4.1 && /≈ M 3,5–4,1 \(%50: 4,1/.test(X.turUyariHtml(d)), `öneri paya duyarlı → aralık M ${o && o.Mlo}–${o && o.Mhi} (%50: ${a && a[0.5]}, %60: ${a && a[0.6]}, %70: ${a && a[0.7]})`); }
+{ // 5 yıl kuralı: eşiğin üstünde yalnız 4 yıl (2009–2010 ve 2012–2013) değerlendirilebilir → öneri yok (eski 3 yıl kuralında olurdu)
+  const s = {}; for (let y = 2004; y <= 2010; y++) s[y] = [['MD', 80, 3.4], ...(y >= 2009 ? [['mb', 12, 4.2]] : [])]; for (let y = 2012; y <= 2018; y++) s[y] = [['ml', 80, 3.4], ...(y <= 2013 ? [['mb', 12, 4.3]] : [])];
+  const d = X.turGecisDurum(kat(s), true, 3.2); ok(d.on && d.oner === null && /bir eşik bulunamadı/.test(X.turUyariHtml(d)), '4 değerlendirilebilir yıl < 5 → öneri yok'); }
+{ // Geçiş var ama bazı yıllar yetersiz → metinde değerlendirilen yıl sayısı
+  const s = {}; for (let y = 2004; y <= 2010; y++) s[y] = [['MD', 80]]; s[2011] = [['ML', 5]]; for (let y = 2012; y <= 2018; y++) s[y] = [['ML', 80]];
+  const d = X.turGecisDurum(kat(s), true, 3.0); ok(d.on && d.nYetersiz === 1 && /değerlendirilen yıl 14 \/ 15/.test(X.turUyariHtml(d)), 'geçiş + 1 yetersiz yıl → "değerlendirilen yıl 14 / 15"'); }
 { // Yüksek eşikte yalnız geçiş sonrası yıllar değerlendirilebilir → öneri yapılmaz (iki yan şartı)
   const s = {}; for (let y = 2004; y <= 2010; y++) s[y] = [['MD', 80, 3.4]]; for (let y = 2012; y <= 2018; y++) s[y] = [['ml', 80, 3.4], ['mb', 12, 4.3]];
   const d = X.turGecisDurum(kat(s), true, 3.2); ok(d.on && d.oner === null, 'eşiğin üstünde yalnız geçiş sonrası yıllar → öneri yok (eşdeğerlik sınanamaz)'); }
