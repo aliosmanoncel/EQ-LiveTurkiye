@@ -11,6 +11,7 @@ Durum: **taslak, kullanıcı incelemesinde**. Yalnız belge; kod değişikliği 
 - Revizyon 7 (2026-11-02): T1, CY14 ve BSSA14 için Gregor vd. (2014) Tablo 1'den kapatıldı (kullanıcının İndirilenler klasöründeki PDF).
 - Revizyon 8 (2026-11-02): kullanıcı incelemesi — BSSA14 sınırlarının gösterimi, T2 için dört adımlı doğrulama zinciri, T öncelik sırası, Aşama 2 adım 1'in tasarımı.
 - Revizyon 9 (2026-11-02): kullanıcı incelemesi — ESHM20 temel model / uyarlama ayrımı ve 800 m/s'nin etiketi; Kahramanmaraş için model başına kapsam tablosu; T2 öncelik sırası.
+- Revizyon 10 (2026-11-02): geçiş koşulunun bilinçli ve sınırlı revizyonu (kullanıcı kararı): Aşama 2 adım 1 (yazılım doğrulaması) T1/T2 kapanmadan başlayabilir; doğrulama tablosunun içeriği tanımlandı.
 - Kod, `index.html`, `data/`, `seismoreport/` ve canlı site değişmedi.
 
 İşaretler:
@@ -332,6 +333,14 @@ Kabul edilmiş bir ilke ile veri ya da kaynakla henüz doğrulanmamış bir vars
 Not: Vs30 = 760 m/s girdisi, ASB14 ve KAAH15 için referanstan biraz yüksek, CY14 ve CY08 için düşük bir saha anlamına gelir; Zh06'da 760 m/s bir saha sınıfına eşlenir. Bu nedenle "760 m/s" tüm modellerde aynı fiziksel referans kaya değildir; D5'in (2). maddesi bunun içindir.
 
 **Aşama 2'ye geçiş koşulu (kullanıcı kararı, 2026-11-02):** D9, D2, D3, D5 ve D6 kapatıldı; **yöntemsel geçiş koşulu kapandı.**
+
+**Geçiş koşulunun sınırlı revizyonu (kullanıcı kararı, 2026-11-02, revizyon 10):**
+- T1 ve T2 kaynak doğrulamaları tamamlanmadan Aşama 2'nin 1. adımı (OpenQuake yazılım doğrulaması) başlayabilir. Bu adım yalnız GMPE hesaplarının yazılım uygulamasını sınar; modellerin bilimsel geçerliliğini ya da Türkiye için uygunluğunu değerlendirmez.
+- T1 (KAAH15 geçerlilik aralığı) ve T2 (referans Vs30 değerlerinin özgün yayınlardan doğrulanması) açık kalır; Türkiye kayıtlarıyla bilimsel performans sınamasının (Aşama 2, 3. adım) başlangıcından önce tamamlanır.
+- Doğrulaması tamamlanmamış bilgiler sonuçlarda "yayından doğrulanmamış" olarak etiketlenir. OpenQuake kaynak kodundan elde edilen Vs30 değerleri, yayından doğrulanmış değerler gibi sunulmaz.
+- Bu, önceki geçiş koşulunun bilinçli ve sınırlı bir revizyonudur; T1 ve T2 yükümlülüklerini kaldırmaz.
+
+**Aşama 2, adım 1 — doğrulama tablosunun içeriği (kullanıcı):** her model için model adı ve OpenQuake sürümü (3.26.2); test girdileri ve birimleri; GMPE çıktısı (PGA ve ortak periyotlar); bağımsız referans sonuçla karşılaştırma; sayısal fark ve tolerans; sonuç (geçti / kaldı); T1 ve T2 kaynak doğrulama durumu. Aynı test girdileri bütün modellerde kullanılır; testler yeniden üretilebilir. Testin geçmesi yalnız uygulamanın doğru çalıştığını gösterir; Türkiye'deki performansa ilişkin sonuç üretmez.
 
 **Vazgeçilmez iki koşul (kullanıcı):** (i) D2'de 30–40 km grubu birincil sonuçlara karıştırılmaz; (ii) D5'te 760 m/s evrensel referans kaya olarak sunulmaz.
 
