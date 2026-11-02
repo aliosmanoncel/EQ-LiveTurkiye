@@ -12,6 +12,7 @@ Durum: **taslak, kullanıcı incelemesinde**. Yalnız belge; kod değişikliği 
 - Revizyon 8 (2026-11-02): kullanıcı incelemesi — BSSA14 sınırlarının gösterimi, T2 için dört adımlı doğrulama zinciri, T öncelik sırası, Aşama 2 adım 1'in tasarımı.
 - Revizyon 9 (2026-11-02): kullanıcı incelemesi — ESHM20 temel model / uyarlama ayrımı ve 800 m/s'nin etiketi; Kahramanmaraş için model başına kapsam tablosu; T2 öncelik sırası.
 - Revizyon 10 (2026-11-02): geçiş koşulunun bilinçli ve sınırlı revizyonu (kullanıcı kararı): Aşama 2 adım 1 (yazılım doğrulaması) T1/T2 kapanmadan başlayabilir; doğrulama tablosunun içeriği tanımlandı.
+- Revizyon 11 (2026-11-02): T1/T2 kaynak envanteri (§14); T2'de AC10 ve BSSA14 kapatıldı, ESHM20 kısmen; Aşama 2.3 için önerilen ölçütler (§15, karar değil).
 - Kod, `index.html`, `data/`, `seismoreport/` ve canlı site değişmedi.
 
 İşaretler:
@@ -349,7 +350,7 @@ Not: Vs30 = 760 m/s girdisi, ASB14 ve KAAH15 için referanstan biraz yüksek, CY
 | No | Konu | Gerektiği hesap |
 |---|---|---|
 | T1 | KAAH15, CY14, BSSA14, ESHM20 geçerlilik aralıkları (Mw, uzaklık, Vs30, periyot) | O modelin her hesabı. **CY14 ve BSSA14 kapatıldı; ESHM20'nin temel modeli (Kotha vd. 2020) kapatıldı** (aşağıda); KAAH15 açık |
-| T2 | Model başına referans Vs30 (yayından; şu an OpenQuake kodundan) | D5 senaryo (2) |
+| T2 | Model başına referans Vs30 (yayından; şu an OpenQuake kodundan) | D5 senaryo (2). **AC10 ve BSSA14 kapatıldı; ESHM20 kısmen; ASB14, KAAH15, CY14 açık** (§14) |
 | T3 | ESHM20 aktif sığ kabuk bölgelendirme dosyası ve sürümü | D2 sınıflaması |
 | T4 | NESS 2.1 sürümü, lisansı, atıfı; ESM sürümü ve sayıları | İlgili veri kümesinin Aşama 2'de ilk kullanımı (§8.4); yazılım doğrulaması için gerekmez |
 | T5 | Campbell (1981) veri aralığı ve büyüklük ölçekleri | Karşılaştırma dalı |
@@ -466,3 +467,46 @@ Yorum:
 - Fark yakın alanda Mw 5,5–6'da bile ihmal edilemez; uzak alanda göreli olarak küçülür. Bu, D4'teki ölçütü destekler.
 - Eşik Aşama 2'de yalnız Mw sınıflarına göre değil; kırık boyutu, istasyonun kırığa göre konumu ve uzaklığa göre belirlenir.
 - NESS yalnız Mw ≥ 5,5 içerdiğinden daha küçük olaylar için ESM ile tamamlanmalıdır.
+
+## 14. T1 / T2 kaynak envanteri (2026-11-02)
+
+İlke (kullanıcı): erişilemeyen bilgi tahminle doldurulmaz; OpenQuake kaynak kodundaki değerler yayın doğrulamasının yerine kullanılmaz. Erişim durumu bu oturumdan (web ve kullanıcının Zotero / İndirilenler klasörleri) denetlendi.
+
+| Sıra | Yayın | DOI | Erişim | Gerekli bilgi | Durum |
+|---|---|---|---|---|---|
+| 1 | Kale, Akkar, Ansari & Hamzehloo (2015), BSSA 105(2A):963–980 | 10.1785/0120140134 **[teyit]** | Açık erişim kopyası bulunamadı; Zotero ve İndirilenler'de yok | T1: Mw, Rjb, Vs30, derinlik, periyot aralıkları. T2: zemin teriminin referans hızı (OpenQuake: Vref = 750 m/s) | **Açık**: PDF gerekli |
+| 2 | Akkar, Sandıkkaya & Bommer (2014), BEE 12(1):359–387 | 10.1007/s10518-013-9461-4 **[teyit]** | Kabul edilmiş yazar sürümü Imperial College Spiral deposunda listeleniyor; indirme bu oturumdan sunucu hatası verdi | T2: zemin terimindeki Vref (OpenQuake: 750 m/s) ve Vcon, denklem ve sayfa | **Açık**: PDF gerekli ya da depo yeniden denenecek |
+| 3 | Akkar & Çağnan (2010), BSSA 100(6):2978–2995 | 10.1785/0120090367 **[teyit]** | Yazar kopyası (Boğaziçi Üniversitesi sayfası) okundu | T2: Vref | **Kapatıldı (aşağıda)** |
+| 4 | Boore, Stewart, Seyhan & Atkinson (2014), Earthquake Spectra 30(3):1057–1085 | 10.1193/070113EQS184M | Dergi makalesi yok; aynı modelin PEER raporu 2013/05 (yazar sitesi) okundu | T2: Vref | **Kapatıldı, PEER raporundan** (dergi metniyle karşılaştırma **[teyit]**) |
+| 5 | Chiou & Youngs (2014), Earthquake Spectra 30(3):1117–1153 | 10.1193/072813EQS219M | Açık erişim kopyası bulunamadı | T2: referans hız (OpenQuake: 1130 m/s), denklem ve sayfa | **Açık**: PDF gerekli |
+| 6 | Weatherill, Kotha & Cotton (2020), BEE 18:5087–5117 | 10.1007/s10518-020-00899-9 | Açık erişim; yayıncı sayfasından okundu | T2: ESHM20 uyarlamasının referans koşulu | **Kısmen kapatıldı (aşağıda)** |
+
+**AC10 (Akkar & Çağnan 2010; yazar kopyası):**
+- Zemin terimi Boore & Atkinson (2008) biçimi: F_S = F_LIN + F_NL (Denklem 2), F_LIN = b_lin·ln(Vs30/Vref) (Denklem 3), s. 2982. **Vref = 760 m/s** (s. 2983). OpenQuake değeriyle (BA08 büyütmesi, 760 m/s) **uyumlu**.
+- Veri: model Mw 5–7,6 için türetilmiş (s. 2979); Rjb 0–200 km (s. 2979); spektral denklemler 0,03 s ≤ T ≤ 2,0 s (s. 2983); derinlik sınırı metinde sayısal olarak verilmemiş.
+- **Önemli:** Veri tabanında Vs30 ≥ 760 m/s olan kayıt "çok az" (s. 2981; Vs30 > 720 m/s olan istasyon "az", s. 2982). Bu nedenle AC10 için D5'in 760 m/s ortak senaryosu, modelin veri kapsamının kenarındadır.
+- Senaryo tanımı (T2 adım 4): D5 senaryo 2'de AC10 için Vs30 = 760 m/s.
+
+**BSSA14 (PEER Raporu 2013/05; dergi makalesi değil, raporda model "BSSA13" olarak geçiyor):**
+- Zemin teriminde **Vref = 760 m/s**: "büyütmenin bire eşit olduğu saha koşulu" (Denklem 3.9, s. 18). OpenQuake değeriyle **uyumlu**.
+- Uygulama aralığı: doğrultu atımlı ve ters faylanmada M 3–8,5, normal faylanmada M 3–7; uzaklık 0–400 km; Vs30 150–1500 m/s; z1 0–3 km; periyot 0–10 s (özet, s. iv). Gregor vd. (2014) Tablo 1 ile **uyumlu**.
+- Çin ve Türkiye "yüksek Q" (daha yavaş soğrulma) bölgeleri; düzeltme c3 katsayısına bölgesel ek olarak; dayanak olay içi artıkların uzaklıkla eğilimi (Bölüm 4.4.2, s. 50–56).
+- Dergi makalesindeki nihai değerlerle karşılaştırma **[teyit]**.
+
+**ESHM20 uyarlaması (Weatherill, Kotha & Cotton 2020):**
+- Omurganın hedef saha koşulu: **Eurocode 8 A sınıfı kaya, ölçülmüş Vs30 = 800 m/s** (Bölüm 1). OpenQuake'teki 800 m/s referansıyla **uyumlu**.
+- Vs30'a bağlı zemin büyütme işlevinin kendisi bu makalede verilmiyor; ayrı bir yayına bırakılmış (Bölüm 3). OpenQuake'teki Vs30 büyütme katsayılarının kaynağı bu nedenle **açık [teyit]**.
+- İyi kısıtlanmış aralık: çoğunlukla 4,5 ≤ M ≤ 6 ve 30 ≤ Rjb ≤ 100 km (Bölüm 4.4); Mw ≥ 6,5–7 verisi çok seyrek.
+- **Türkiye:** Batı Türkiye orta Anadolu platosundan ayrı bölge; Türkiye bölgelerinin çoğu küme 4'te; Doğu Anadolu Fayı gibi bazı bölgeler küme 2'de (Bölüm 4.1, 5).
+- **Sonuç (T3 ile bağlantılı):** Aşama 2.1 ve 2.2'deki ESHM20 hesapları varsayılan bölge (0) ile yapıldı; bu bir yazılım testi için uygundur, ama Türkiye senaryoları için doğru soğrulma bölgesi değildir. Aşama 2.3'te her kayıt için doğru bölge atanmalıdır (T3).
+
+**T2 özet:** AC10 ve BSSA14 kapatıldı (BSSA14 PEER raporundan); ESHM20 kısmen (referans koşulu doğrulandı, büyütme işlevinin kaynağı açık); ASB14, KAAH15 ve CY14 açık. **T1 özet:** yalnız KAAH15 açık.
+
+## 15. Aşama 2.3 tasarımı için önerilen ölçütler (öneri — henüz karar değil)
+
+Kullanıcı incelemesinden (2026-11-02); Aşama 2.3 tasarlanırken karara bağlanacak:
+- medyan tahmin yanlılığı (bias);
+- logaritmik artıkların standart sapması;
+- büyüklüğe, uzaklığa ve Vs30'a (ya da zemin sınıfına; ölçülmüş / vekil ayrı) göre artık davranışı;
+- yeterli kayıt bulunmayan aralıklarda sonuçların sınırlandırılması;
+- aynı depremin kayıtları bağımsız gözlem sayılmaz: olaylar arası ve olay içi artıklar ayrıştırılır (YONTEM.md §8.4 ile tutarlı).
