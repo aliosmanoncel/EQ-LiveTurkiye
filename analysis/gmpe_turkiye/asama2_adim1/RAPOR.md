@@ -2,6 +2,17 @@
 
 Tarih: 2026-11-02. Dal: `gmpe-turkiye-methodology`. Yöntem belgesi: `../YONTEM.md` (revizyon 10).
 
+**Durum: KAPATILDI** (kullanıcı kararı, 2026-11-02) — yazılım doğrulaması olarak. Terim: sonuçlar "**OpenQuake doğrulama tablolarıyla sayısal uyum sağlandı**" olarak ifade edilir; "bağımsız referanslarla doğrulandı" denmez, çünkü bazı modellerde ikinci bağımsız uygulama yok ve AC10 tablosunun kaynağı belirsiz.
+
+| Kanıt düzeyi | Sonuç |
+|---|---|
+| OpenQuake referans tablolarıyla sayısal uyum (9 model) | Başarılı |
+| pygmm ile ikinci uygulama karşılaştırması | Üç model için başarılı (ASB14, BSSA14, CY14) |
+| Campbell (1981) ↔ mevcut EQ-Live betiği | Birebir eşit (yalnız kod eşitliği) |
+| AC10 referans tablosunun kaynağı ve bağımsızlığı | Açık |
+| T1 KAAH15 / T2 referans Vs30 / T3 ESHM20 bölgelendirmesi / T5 Campbell (1981) | Açık |
+| T4 NESS / ESM künyeleri | Kayıt karşılaştırmasından önce açık |
+
 **Kapsam sınırı.** Bu adım yalnız **yazılım doğrulamasıdır**. Sonuçlar, OpenQuake 3.26.2'deki GMPE uygulamalarının bağımsız uygulamalarla aynı sayıları verdiğini gösterir. Bunlar şunları göstermez:
 - modellerin Türkiye depremleri, tektonik ortamı ya da saha koşulları için uygunluğu;
 - modellerin performansı.
@@ -10,17 +21,17 @@ Bu sorular Aşama 2'nin 3. adımına aittir. Ortak girdi ızgarası bir test ız
 
 ## Sonuç
 
-| Model | Rol | OpenQuake sınıfı | Bağımsız referans | En büyük fark, hedef IM: medyan / σ (%) | pygmm ile fark: medyan / σ (%) | Tolerans (OpenQuake testi) | Sonuç | T1 | T2 |
+| Model | Rol | OpenQuake sınıfı | Referans ve niteliği | En büyük fark, hedef IM: medyan / σ (%) | pygmm ile fark: medyan / σ (%) | Tolerans (OpenQuake testi) | Sonuç | T1 | T2 |
 |---|---|---|---|---|---|---|---|---|---|
-| ASB14 | Liste B | `AkkarEtAlRjb2014` | Yazarların Matlab kodu | 4,9·10⁻⁷ / 6,1·10⁻⁸ | 8,9·10⁻¹⁴ / 3,4·10⁻³ | 0,1 | **Geçti** | Kapalı (Akkar vd. 2018, Tablo 1) | Açık: Vref 750 m/s, OpenQuake kodundan, **yayından doğrulanmamış** |
-| AC10 | Liste B | `AkkarCagnan2010` | Test dosyasında kaynak belirtilmemiş | 4,3·10⁻² / 4,5·10⁻³ | — | 0,1 | **Geçti** | Kapalı (Akkar vd. 2018, Tablo 1) | Açık: BA08 büyütmesi, Vref 760 m/s, **yayından doğrulanmamış** |
-| KAAH15 | Liste B | `KaleEtAl2015Turkey` | Yazarların Matlab kodu | 4,7·10⁻⁷ / 8,0·10⁻⁸ | — | 0,1 | **Geçti** | **Açık** | Açık: Vref 750 m/s, **yayından doğrulanmamış** |
-| BSSA14 Yüksek Q | Liste B | `BooreEtAl2014HighQ` | D. M. Boore'un Fortran uygulaması (2014) | 4,2·10⁻³ / 7,6·10⁻³ | 8,0·10⁻³ / 0 | 2,0 (σ 1,0) | **Geçti** | Kapalı (Gregor vd. 2014) | Açık: Vref 760 m/s, **yayından doğrulanmamış** |
-| CY14 | Liste B | `ChiouYoungs2014` | Medyan: yazarların aracı; σ: OpenSHA | 6,4·10⁻¹¹ / 1,1·10⁻³ (yalnız SA) | 1,8·10⁻¹³ / 3,3·10⁻¹⁴ | 0,05 | **Geçti** | Kapalı (Gregor vd. 2014) | Açık: 1130 m/s, **yayından doğrulanmamış** |
-| ESHM20 | Liste B | `KothaEtAl2020ESHM20` | Yazarın R uygulaması | 4,8·10⁻⁷ / 7,2·10⁻⁷ | — | 0,01 | **Geçti** | Temel model kapalı (Kotha vd. 2020) | Açık: 800 m/s (uyarlama), **yayından doğrulanmamış** |
-| CY08 | Karşılaştırma | `ChiouYoungs2008` | OpenSHA | 4,5·10⁻² / 1,3·10⁻² | — | 0,05 | **Geçti** | — | — |
-| Zh06 | Karşılaştırma | `ZhaoEtAl2006Asc` | J. Zhao'nun Fortran uygulaması | 3,0·10⁻¹ / 3,6·10⁻² (PGV yok) | — | 0,4 | **Geçti** | — | — |
-| Campbell 1981 | Karşılaştırma | `Campbell1981EQLive` (özel) | `scripts/build_hazard_grid.py` `gmpe_pga()` (main) | 0 (40 değer, yalnız PGA) | — | birebir | **Geçti** | Açık (T5) | — |
+| ASB14 | Liste B | `AkkarEtAlRjb2014` | Yazarların Matlab kodu — güçlü bağımsız çapraz kontrol | 4,9·10⁻⁷ / 6,1·10⁻⁸ | 8,9·10⁻¹⁴ / 3,4·10⁻³ | 0,1 | **Geçti** | Kapalı (Akkar vd. 2018, Tablo 1) | Açık: Vref 750 m/s, OpenQuake kodundan, **yayından doğrulanmamış** |
+| AC10 | Liste B | `AkkarCagnan2010` | Kaynağı belirtilmemiş test tablosu — **sayısal uyum sağlandı; tablonun kaynağı ve bağımsızlığı doğrulanmadı** | 4,3·10⁻² / 4,5·10⁻³ | — | 0,1 | **Geçti** | Kapalı (Akkar vd. 2018, Tablo 1) | Açık: BA08 büyütmesi, Vref 760 m/s, **yayından doğrulanmamış** |
+| KAAH15 | Liste B | `KaleEtAl2015Turkey` | Yazarların Matlab kodu — güçlü bağımsız çapraz kontrol | 4,7·10⁻⁷ / 8,0·10⁻⁸ | — | 0,1 | **Geçti** | **Açık** | Açık: Vref 750 m/s, **yayından doğrulanmamış** |
+| BSSA14 Yüksek Q | Liste B | `BooreEtAl2014HighQ` | D. M. Boore'un Fortran uygulaması (2014) — güçlü bağımsız çapraz kontrol | 4,2·10⁻³ / 7,6·10⁻³ | 8,0·10⁻³ / 0 | 2,0 (σ 1,0) | **Geçti** | Kapalı (Gregor vd. 2014) | Açık: Vref 760 m/s, **yayından doğrulanmamış** |
+| CY14 | Liste B | `ChiouYoungs2014` | Medyan: yazarların aracı; σ: OpenSHA — iki çıktı için farklı referanslar | 6,4·10⁻¹¹ / 1,1·10⁻³ (yalnız SA) | 1,8·10⁻¹³ / 3,3·10⁻¹⁴ | 0,05 | **Geçti** | Kapalı (Gregor vd. 2014) | Açık: 1130 m/s, **yayından doğrulanmamış** |
+| ESHM20 | Liste B | `KothaEtAl2020ESHM20` | Yazarın R uygulaması — güçlü bağımsız çapraz kontrol | 4,8·10⁻⁷ / 7,2·10⁻⁷ | — | 0,01 | **Geçti** | Temel model kapalı (Kotha vd. 2020) | Açık: 800 m/s (uyarlama), **yayından doğrulanmamış** |
+| CY08 | Karşılaştırma | `ChiouYoungs2008` | OpenSHA — referans uygulama doğrulaması | 4,5·10⁻² / 1,3·10⁻² | — | 0,05 | **Geçti** | — | — |
+| Zh06 | Karşılaştırma | `ZhaoEtAl2006Asc` | J. Zhao'nun Fortran uygulaması — güçlü bağımsız çapraz kontrol | 3,0·10⁻¹ / 3,6·10⁻² (PGV yok) | — | 0,4 | **Geçti** | — | — |
+| Campbell 1981 | Karşılaştırma | `Campbell1981EQLive` (özel) | `scripts/build_hazard_grid.py` `gmpe_pga()` (main) — yalnız kod eşitliği | 0 (40 değer, yalnız PGA) | — | birebir | **Geçti** | Açık (T5) | — |
 
 Tablo notları:
 - "Hedef IM" PGA, PGV, SA(0,2 s) ve SA(1,0 s) demektir.
@@ -30,13 +41,18 @@ Tablo notları:
 
 ### Ayrıntılar ve sınırlar
 
-1. **BSSA14:** Referans tablonun bütün periyotları içinde en büyük fark %1,76'dır. Bu fark yalnız SA(0,23 s) satırında ve OpenQuake'in kendi %2 eşiğinin altında. Hedef IM'lerde fark ≤ %0,0042.
+1. **BSSA14 — hedef IM ile bütün tablo ayrı:**
+   - Hedef IM'ler (PGA, PGV, SA 0,2 s, SA 1,0 s): en büyük fark %0,0042.
+   - Bütün referans tablosu (bütün periyotlar): en büyük fark %1,76, yalnız SA(0,23 s) satırında.
+   - OpenQuake'in BSSA14 testindeki tolerans %2 (σ için %1). Bu bir yazılım test eşiğidir, **bilimsel performans eşiği değildir**.
 2. **CY14:** OpenQuake'in bağımsız medyan tablosunda PGA ve PGV yok. Bu iki IM yalnız pygmm ile çapraz denetlendi; fark ≤ 2·10⁻¹³ %.
 3. **AC10:** Test tablosunun kaynağı OpenQuake test dosyasında belirtilmemiş. Bağımsızlığı bu nedenle **belirsiz**. pygmm'de AC10 yok. Kaynak, ilgili makale (T2) okunduğunda yeniden değerlendirilecek.
 4. **AC10, KAAH15, ESHM20, CY08 ve Zh06** için ikinci bir bağımsız uygulama yok; tek referans OpenQuake'in doğrulama tablosudur.
 5. **Zh06:** PGV tanımlı değil. Hücre boş bırakıldı, değer üretilmedi.
 6. **Campbell (1981):** Özel sınıf, EQ-Live katmanındaki uygulamanın birebir kopyasıdır. Uzaklık dış merkez uzaklığıdır. σ katmanda kullanılmadığı için 0 verildi. Denklemin yayınla uyumu ayrı bir sorudur (T5, açık). Bu satır yalnız "OpenQuake'teki kopya = mevcut betik" eşitliğini gösterir.
 7. **Ortak girdi ızgarasında bir girdi hatası bulunup düzeltildi.** OpenQuake'in `global_mean_z1pt0` işlevi z1.0'ı değil ln(z1.0)'ı döndürüyor. İlk çalıştırmada bu değer metre gibi girildi. Sonuç: pygmm ile CY14'te PGV %5,4, SA(1,0 s) %16,8 farklı çıktı. Düzeltmeden sonra (exp ile metreye çevrildi) fark ≤ 2·10⁻¹³ %. Bu bir OpenQuake hatası değil, bizim girdi hatamızdı. Çapraz denetimin bu tür hataları yakaladığını gösteriyor.
+9. **Ortak girdi ızgarasının kapsam sınırı:** Izgara yalnız doğrultu atımlı faylanma, düşey düzlem ve ztor = 0 (Rrup = Rx = Rjb) içerir. Ters ve normal faylanma, eğimli fay geometrisi ve asılı blok etkileri bu ızgarada sınanmadı. OpenQuake'in referans tabloları bu durumların bir kısmını içerir (ör. CY14 HW tabloları: normal, ters), ama ortak ızgara içermez. Adım 1'in başarılı olması bütün mekanizma ve geometri seçeneklerinin doğrulandığı anlamına gelmez. Vs30 = 760 m/s ortak girdidir; bütün modellerin doğal referans kaya koşulu değildir.
+10. **KAAH15'in Mw 7,8 çıktısı:** "Yazılım çıktısı üretildi; model geçerlilik aralığı henüz doğrulanmadı" (T1 açık). Bu değerler için ne "ekstrapolasyon" ne "aralık içinde" denir.
 8. **OpenQuake test paketinin dört testi bu ortamda çalışmadı.** Nedeni, pip kurulumunda eksik iki veri dosyası (`cy14_host_to_target/source_function_table.txt` ve `Kotha_2020/kotha_attenuation_regions.geojson`). İlgili sınıflar `BooreEtAl2022Adjustments` ve `KothaEtAl2020regional`; ikisi de aday değil, sonuçları etkilemez. Bu ESHM20 bölgesel coğrafi dosyası D2/T3 için ayrıca gerekecek.
 
 ## Ortak girdi ızgarası: örnek sonuçlar (yalnız yazılım çıktısı)
@@ -57,7 +73,7 @@ Ortak girdiler: doğrultu atımlı, düşey düzlem, ztor = 0. Bu nedenle Rrup =
 
 İşaretler:
 - **ᵉ**: modelin yayımlanmış veri aralığı dışında (ekstrapolasyon). AC10 ve ASB14'te Mw ≤ 7,6; ESHM20'de Mw ≤ 7,4. Campbell (1981) için R > 50 km **[teyit, T5]**.
-- **?**: KAAH15'in geçerlilik aralığı henüz doğrulanmadı (T1 açık).
+- **?**: yazılım çıktısı üretildi; KAAH15'in geçerlilik aralığı henüz doğrulanmadı (T1 açık) — ne ekstrapolasyon ne aralık içi.
 
 Bu tablo **modellerin karşılaştırması ya da sıralaması değildir**. Yalnız ortak girdilerle sayıların üretildiğini ve tutarlı biçimde kaydedildiğini gösterir. Bütün sayılar `ortak_girdi.csv` dosyasında: 9 model × 4 Mw × 5 Rjb × 2 Vs30 × 4 IM = 1440 satır.
 
