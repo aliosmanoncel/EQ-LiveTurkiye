@@ -1,0 +1,18 @@
+{
+ "kayit": [
+  "GEÇTİ (1) Seçilen M boş: tablo (28 satır), cmpSvg ve olasılık şekli önce = sonra",
+  "GEÇTİ (1) Varsayılan 7,5 ve 8: main'deki 28 satır aynı değerlerle; yalnız 4 yeni satır: Seçilen M ≥ 7,5: λ /yıl [%95] · Tr, yıl [%95] · Tr/T | Seçilen M ≥ 7,5: P(t), % [%95] | Seçilen M ≥ 8: λ /yıl [%95] · Tr, yıl [%95] · Tr/T | Seçilen M ≥ 8: P(t), % [%95]; cmpSvg ve şekil aynı",
+  "GEÇTİ (2) Yeni satırlar = cmpProb.cell = G–R fonksiyonları (grLambdaSimple, grPoissonBootSimple): λ, P en büyük göreli fark 0; λ %95 ve P %95 en büyük fark 0",
+  "GEÇTİ (2) G–R panelinin kendisi (M = 8, t = 50, Doğu Anadolu): n 5007/5007, Mc 3.2/3.2, T 28.7019/28.7019, b 0.9904181052080725/0.9904181052080725; λ 3.0737e-3/3.0737e-3; Tr aralığı ve P aralığı tabloyla birebir",
+  "GEÇTİ (3) M≥6 tekrarlanma satırı = Tr(≥6) olasılık satırı (Aki–Utsu): Türkiye 1.600 / 1.600; Marmara 29.160 / 29.160; Doğu Anadolu 3.400 / 3.400",
+  "GEÇTİ (4) Bender: yeni satırlar Bender'e geçti, P bağımsız hesapla aynı; Aki–Utsu'ya dönünce tablo ilk hâl",
+  "GEÇTİ (5) JSON: M_secilen = [7.5, 8], bölge başına 8/8/8 seçilen M hücresi; yeniden_uret.js: GEÇTİ: 16 geçti, 0 kaldı, 0 uyarı",
+  "GEÇTİ (6) ʰ işareti: Türkiye (GK74 kapalı) var, Marmara (GK74 açık) yok, Doğu Anadolu (GK74 kapalı) var",
+  "GEÇTİ (7) Girdi: \"7,5; 8\" → [7.5,8]; \"7.5, 8\" → [7.5,8]; \"6 7\" → []; \"8 7.5 7.5\" → [7.5,8]; \"10 2\" → []; \"7,5 8 8,5 9\" → [7.5,8,8.5]",
+  "GEÇTİ (8) Sayfa hatası yok (önce 0, sonra 0); 390 px'te scrollWidth 390"
+ ],
+ "ozet": {
+  "pass": 10,
+  "fail": 0
+ }
+}
