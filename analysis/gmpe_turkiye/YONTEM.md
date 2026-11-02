@@ -6,6 +6,7 @@ Durum: **taslak, kullanıcı incelemesinde**. Yalnız belge; kod değişikliği 
 - Revizyon 2 (2026-11-02): kullanıcı incelemesi — Repi − Rjb farkının yorumu, Mw kaynağı kaydı (7,7 / 7,8), Vs30 veri kalitesi işareti, SHA-256'nın kapsamı, yazılım doğrulaması / yöntem doğrulaması ayrımı; §11 her karar için "karar, bilimsel gerekçe, doğrulama durumu" olarak yeniden düzenlendi; Aşama 2'ye geçiş koşulu yazıldı.
 - Revizyon 3 (2026-11-02): kullanıcı incelemesi — uzaklık tanımı farkı / geometri belirsizliği / GMPE artığı ayrımı (§6), Vs30 kaynağının analiz çıktısında da gösterilmesi (§8, §9), D9 inceleme sırası (§11).
 - Revizyon 4 (2026-11-02): Akkar vd. (2018) tam metni okundu (kullanıcının Zotero kütüphanesi); §3.1 eklendi, D9 için öneri yazıldı.
+- Revizyon 5 (2026-11-02): D9 kullanıcı kararıyla kapatıldı (Liste A kabul, Liste B koşullu kabul); üç sınır eklendi (§3.1). D2, D3, D5, D6 için kanıta dayalı öneriler yazıldı; model başına referans Vs30 OpenQuake kaynak kodundan çıkarıldı.
 - Kod, `index.html`, `data/`, `seismoreport/` ve canlı site değişmedi.
 
 İşaretler:
@@ -176,6 +177,11 @@ Kaynak: Akkar vd. (2018), BEE 16:3439–3463; kullanıcının Zotero kütüphane
 
 Ağırlık verilmez. Nihai küme Aşama 2 artık analizinden sonra belirlenir.
 
+**Liste B'nin kapsamı ve üç sınır (kullanıcı kararı, 2026-11-02):** Liste B'ye alınmak, modelin Türkiye için geçerlilik aralığının doğrulandığı ya da performansının yeterli bulunduğu anlamına gelmez; yalnız Aşama 2'de bağımsız olarak sınanacak aday havuzudur.
+1. **Mw > 7,6 ekstrapolasyonu:** AC10 ve ASB14'ün Mw 7,7–7,8 (Kahramanmaraş) sonuçları doğrulanmış tahmin gibi sunulmaz; ekstrapolasyon olarak işaretlenir.
+2. **Periyot kapsamı:** AC10 yalnız T ≤ 2 s için tanımlıdır; daha uzun periyotlarda AC10 sonucu varmış gibi karşılaştırma yapılmaz (hücre boş bırakılır).
+3. **Model sürümleri:** CY14 ve BSSA14, CY08 ve BA08'in ardılıdır ama aynı model değildir; sürüm değişikliği performansın otomatik olarak iyileştiği anlamına gelmez. BA08'in Liste B dışında tutulması onun bilimsel olarak geçersiz olduğu biçiminde yorumlanmaz.
+
 ---
 
 ## 4. Girdi parametreleri
@@ -288,14 +294,14 @@ Kabul edilmiş bir ilke ile veri ya da kaynakla henüz doğrulanmamış bir vars
 | No | Konu | Karar | Bilimsel gerekçe | Doğrulama durumu |
 |---|---|---|---|---|
 | D1 | Mw kaynağı | Ana hesap yalnız doğrudan Mw. Diğer türler yalnız dönüşümleri doğrulanırsa ve ayrı senaryo olarak. Her olayda Mw değeri ve kaynağı (ajans / yayın) kaydedilir; aynı olay için farklı Mw'ler (ör. Kahramanmaraş 7,7 NESS / 7,8) birbirinin yerine otomatik geçirilmez, gerekirse ayrı senaryo olur. | GMPE'ler Mw ile kalibre edilmiştir; dönüşüm hatası medyanı sistematik kaydırır ve σ'ya karışırsa görünmez olur. EQ-Live'daki ML/MD ilkesiyle tutarlı. | **Kabul** (kullanıcı, 2026-11-02) |
-| D2 | Tektonik sınıflama | Derinlik ≤ 35 km ve ESHM20 aktif sığ kabuk poligonu. | Aday modellerin hepsi aktif sığ kabuk verisiyle kurulmuştur; dalma-batma olayları ayrı model ailesi ister. | **Koşullu**: poligon kaynağı ve 35 km eşiği **[teyit]** |
-| D3 | Uzaklık sınırı | Rjb ≤ 200 km. | Kahramanmaraş 2023'te modeller Rjb > 200 km'de uyumsuz (Buckreis vd. 2024); aday modellerin çoğunun veri aralığı ~200 km **[teyit]**. | **Geçici**: Aşama 2 artıklarıyla yeniden değerlendirilecek |
+| D2 | Tektonik sınıflama | **Öneri:** odak derinliği ≤ 30 km ve olay ESHM20 aktif sığ kabuk bölgesinde. 30–40 km arası olaylar hesaplanır ama "derinlik sınırında" işaretlenir; > 40 km hesaplanmaz. Katalog derinliği sabit (ör. 10 km) olan olaylar ayrıca işaretlenir. | Akkar vd. (2018) Türkiye aktif sığ kabuk verisini odak derinliği ≤ 30 km ile sınırladı (s. 3443); NESS 2.1 ≤ 37,9 km. Liste B modellerinin hepsi aktif sığ kabuk modelidir. | **Öneri, onay bekliyor.** ESHM20 bölgelendirme dosyasının sürümü ve erişimi **[teyit]** |
+| D3 | Uzaklık sınırı | **Öneri:** Rjb ≤ 200 km (Rrup kullanan modellerde eşdeğer kapsam). Sınır dışı hücreler hesaplanmaz, "kapsam dışı" gösterilir. | ASB14 ve AC10 veri aralığı Rjb ≤ 200 km (Akkar vd. 2018, Tablo 1); 2018 değerlendirmesi de Rjb ≤ 200 km ile yapıldı (s. 3447); Kahramanmaraş 2023'te modeller Rjb > 200 km'de uyumsuz (Buckreis vd. 2024). | **Öneri, onay bekliyor.** Aşama 2 artıklarıyla yeniden değerlendirilebilir (Geçici) |
 | D4 | Kaynak geometrisi | Yayımlanmış sonlu fay modeli varsa o; yoksa belgelenmiş senaryo geometrisi. Sonlu kaynak gereksinimi Mw sınıfıyla değil, kırık boyutu, istasyonun kırığa göre konumu (doğrultu boyunca / dik, asılı ya da taban blok) ve uzaklıkla belirlenir. | Repi − Rjb farkı (§13) bir GMPE hatası değil, uzaklık tanımının sonlu kırığı ne ölçüde temsil ettiğinin göstergesidir; GMPE'ye yanlış uzaklık girerse medyan yanlı olur. | **Kabul** (ilke). Eşik ve senaryo geometrisi **Açık**; Aşama 2'de NESS ile belirlenecek |
-| D5 | Vs30 | 760 m/s ortak karşılaştırma senaryosu; her modelin kendi referans koşulu ayrı denetlenir; vekil harita ikinci senaryo. Her Vs30 değeri kaynağıyla işaretlenir (ölçülmüş / jeoloji / topoğrafya); zemin terimi analizinde ölçülmüş ve tahmini Vs30 aynı kalite sayılmaz. | Modellerin referans kaya tanımları farklı; topoğrafik Vs30'un belirsizliği ölçülmüşe göre çok büyüktür (NESS'te Kahramanmaraş ana şokunun 120 kaydının hepsi topoğrafik). | **Koşullu**: model başına referans koşulu **[teyit]** |
-| D6 | Mevcut Campbell (1981) katmanı | Seçenekler: olduğu gibi kalsın / `hazard-etiket` birleştirilsin / yeniden adlandırılsın / kaldırılsın. | §1'deki tespitler. | **Açık** |
+| D5 | Vs30 | **Öneri:** (1) ortak karşılaştırma senaryosu Vs30 = 760 m/s; (2) her model için kendi referans koşulunda ayrı denetim (aşağıdaki tablo); (3) ikinci saha senaryosu vekil Vs30 haritası; (4) her Vs30 değeri kaynağıyla (ölçülmüş / jeoloji / topoğrafya / senaryo) taşınır ve çıktıda görünür. | Modellerin referans koşulları farklı (750–1130 m/s); 760 m/s Türkiye ulusal haritasının saha tanımı (Akkar vd. 2018, s. 3450). Ölçülmüş ve tahmini Vs30 aynı kalitede değil. | **Öneri, onay bekliyor.** Referans değerler OpenQuake 3.26.2 kodundan; yayından **[teyit]** |
+| D6 | Mevcut Campbell (1981) katmanı | **Öneri:** yeni katman Aşama 2'yi geçene kadar mevcut katmanın hesabına dokunulmaz. Yalnız etiket düzeltmeleri (`hazard-etiket`, 6e9ff73) ayrı onayla birleştirilebilir; bu dal `seismoreport/` altındaki iki betiğe de dokunduğu için birleştirmede o iki dosya dışarıda bırakılır. Yeni katman canlıya alınırken eskisinin kaldırılması ya da "tarihsel / gösterim" olarak yeniden adlandırılması ayrıca kararlaştırılır. | §1'deki tespitler: katman bilimsel olarak savunulabilir bir yer hareketi tahmini değil, ama kullanıcıların alıştığı bir görünüm; ani kaldırma yerine yerine konacak katman hazır olunca değiştirilmeli. | **Öneri, onay bekliyor** |
 | D7 | Kayıt verisi | NESS 2.1 + ESM + Türkiye için AFAD TADAS / SMD-TR. Olay ve kayıt örneklemi ayrı raporlanır; yinelenen kayıtlar eşleştirilir. | Küresel uyum ile Türkiye'deki uyum iki ayrı soru; NESS yalnız Mw ≥ 5,5. | **Koşullu**: NESS dosyası mevcut ve sayımlar dosyadan doğrulandı. SHA-256 yalnız dosya bütünlüğünü doğrular; NESS sürümü, lisansı ve atıfı ile ESM sürümü ve sayıları **[teyit]** |
 | D8 | Hesap yeri | Önce OpenQuake ile bağımsız doğrulama; EQ-Live'daki hesap yeri sonra seçilir. | Referans uygulama önce; yazılım doğrulaması yöntem doğrulamasından ayrı (§8). | **Kabul** |
-| D9 | Aday modeller | Liste A (Türkiye'de geçmişte kullanılan, TBDY 2018 temeli): ASB14 0,30, CY08 0,30, AC10 0,30, Zh06 0,10 — kayıt amaçlı. Liste B (Aşama 2 adayları): ASB14, AC10, KAAH15, CY14, BSSA14 Yüksek Q, ESHM20. Karşılaştırma dalı: CY08, Zh06 (2018 tabanı), Campbell (1981) (mevcut katman). Ağırlık yok; nihai küme Aşama 2'den sonra (§3.1). | 2018 ağırlıkları normalize spektral değerlerle yapılan PSHA duyarlılığından seçilmiş, deterministik katmana aktarılmaz. KAAH15 2018'de zamanlama nedeniyle sınanmadı; CY14 ve BSSA14, Liste A/2018 adaylarının NGA-West2 ardılları. AC10 ve ASB14 Mw ≤ 7,6: Kahramanmaraş ana şoku ekstrapolasyon. | **Kabul önerisi**: Liste A birincil metinden doğrulandı (Tablo 5). Liste B kullanıcı onayı bekliyor; KAAH15, CY14, BSSA14, ESHM20 geçerlilik aralıkları **[teyit]** |
+| D9 | Aday modeller | Liste A (TBDY 2018 temeli: ASB14 0,30, CY08 0,30, AC10 0,30, Zh06 0,10): kayıt amaçlı. Liste B (Aşama 2 aday havuzu: ASB14, AC10, KAAH15, CY14, BSSA14 Yüksek Q, ESHM20): bağımsız sınanacak, ağırlık yok. Karşılaştırma dalı: CY08, Zh06 (2018 tabanı), Campbell (1981) (mevcut katman). Üç sınır §3.1'de. | 2018 ağırlıkları PSHA duyarlılığından seçilmiş, deterministik katmana aktarılmaz. KAAH15 2018'de zamanlama nedeniyle sınanmadı; CY14 ve BSSA14 NGA-West2 ardılları. | **Kapatıldı (kullanıcı, 2026-11-02):** Liste A **Kabul**; Liste B **Koşullu kabul** (aday havuzu); karşılaştırma dalı **Kabul**; KAAH15, CY14, BSSA14, ESHM20 geçerlilik aralıkları **Açık [teyit]** |
 
 **D9 inceleme sırası (uygulandı, revizyon 4; sonuçlar §3.1):**
 1. Makalenin gerçekten kullandığı GMPE listesi ve her modelin künyesi.
@@ -305,6 +311,21 @@ Kabul edilmiş bir ilke ile veri ya da kaynakla henüz doğrulanmamış bir vars
 5. Ayrım: "Türkiye'de geçmişte kullanılmış modeller" (kayıt amaçlı) ile "bu çalışmada aday modeller" (Aşama 2'de sınanacak) ayrı listeler olarak yazılır.
 
 2018 listesi ve ağırlıkları EQ-Live'ın nihai model kümesini otomatik olarak belirlemez (D9 gerekçesi).
+
+**D5 — model başına referans saha koşulu (OpenQuake 3.26.2 kaynak kodundan; yayından [teyit]):**
+
+| Model | OpenQuake sınıfı | Referans koşulu |
+|---|---|---|
+| ASB14 | `AkkarEtAlRjb2014` | Vref = 750 m/s |
+| AC10 | `AkkarCagnan2010` | BA08 zemin büyütmesi (Vref = 760 m/s) |
+| KAAH15 | `KaleEtAl2015Turkey` | Vref = 750 m/s |
+| CY14 | `ChiouYoungs2014` | Referans hız 1130 m/s |
+| BSSA14 Yüksek Q | `BooreEtAl2014HighQ` | Vref = 760 m/s |
+| ESHM20 | `KothaEtAl2020ESHM20` | 800 m/s'ye göre büyütme |
+| CY08 (karşılaştırma) | `ChiouYoungs2008` | Referans hız 1130 m/s |
+| Zh06 (karşılaştırma) | `ZhaoEtAl2006Asc` | Saha sınıfları (Vs30 > 1100 m/s sert kaya sınıfı); sürekli Vs30 değil |
+
+Not: Vs30 = 760 m/s girdisi, ASB14 ve KAAH15 için referanstan biraz yüksek, CY14 ve CY08 için düşük bir saha anlamına gelir; Zh06'da 760 m/s bir saha sınıfına eşlenir. Bu nedenle "760 m/s" tüm modellerde aynı fiziksel referans kaya değildir; D5'in (2). maddesi bunun içindir.
 
 **Aşama 2'ye geçiş koşulu (kullanıcı kararı, 2026-11-02):** Önce D9, Akkar vd. (2018) tam metninden kesinleştirilir (revizyon 4'te metin okundu; Liste B onayı bekleniyor). Ardından D2, D3, D5 ve D6 ayrı ayrı kapatılır. Bu kararlar tamamlanmadan Aşama 2 hesaplarına geçilmez.
 
