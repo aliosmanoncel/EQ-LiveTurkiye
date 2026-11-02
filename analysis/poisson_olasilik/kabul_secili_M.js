@@ -1,7 +1,8 @@
 // Kabul testi (2026-11-02, 2b): bölge karşılaştırma tablosunda kullanıcı tanımlı büyüklük (seçilen M) için λ, Tr, Tr/T ve P(10/50/100).
 // Önce = verilen index.html (main 0408c0e), sonra = depodaki index.html. Bölgeler kabul_cmp_prob.js ile aynı (Türkiye GK74 kapalı, Marmara GK74 açık, Doğu Anadolu GK74 kapalı).
 // Kabul koşulları:
-//   (1) Seçilen M boşken tablo, cmpSvg ve olasılık şekli önce = sonra. Varsayılan (7,5 ve 8) ile: main'deki bütün tablo satırları aynı değerlerle;
+//   (0) Varsayılan: 'seçilen M' alanı sayfa açılışında boş; dokunulmadan tablo, cmpSvg ve şekil önce = sonra (kullanıcı kararı 2026-11-02: varsayılan görünüm değişmez).
+//   (1) Seçilen M boşken tablo, cmpSvg ve olasılık şekli önce = sonra. Kullanıcı 7,5 ve 8 girince: main'deki bütün tablo satırları aynı değerlerle;
 //       yalnız 4 yeni satır; cmpSvg ve şekil aynı.
 //   (2) Aynı hesap yolu: yeni satır değerleri cmpProb(...).cell(M, t) ile ve G–R panelinin fonksiyonu grPoissonBootSimple ile (λ, λ %95, P, P %95) birebir;
 //       G–R panelinin kendisi (M girdisi = 8) gösterilen bölge için tabloyla aynı λ, Tr aralığı ve P aralığı.
@@ -62,7 +63,8 @@ const rel = (a, b) => a === b ? 0 : Math.abs(a - b) / Math.max(Math.abs(a), Math
     const { p, ctx, hatalar } = await sayfa(br, yol); await p.evaluate(KUR);
     for (let i = 0; i < BOLGE.length; i++) await p.evaluate(a => __bolge(...a), [...BOLGE[i], i === 0]);
     const set = async v => p.evaluate(v => { const e = document.getElementById('cmpPM'); if (e) e.value = v; cmpRender(); }, v);
-    await set(''); await p.waitForTimeout(200); R[ad] = { bos: await p.evaluate(() => __oku()) };
+    R[ad] = { ilk: await p.evaluate(() => ({ v: document.getElementById('cmpPM') ? document.getElementById('cmpPM').value : null, o: __oku() })) };
+    await set(''); await p.waitForTimeout(200); R[ad].bos = await p.evaluate(() => __oku());
     await set('7.5 8'); await p.waitForTimeout(200); R[ad].vars = await p.evaluate(() => __oku());
     if (ad === 'sonra') {
       R.yol = await p.evaluate(() => { const S = CMP.map(cmpStats); return CMP.map((r, i) => { const s = S[i], pr = cmpProb(r, s, 'aki');
@@ -86,9 +88,10 @@ const rel = (a, b) => a === b ? 0 : Math.abs(a - b) / Math.max(Math.abs(a), Math
     R[ad].hatalar = hatalar; await ctx.close();
   }
   const O = R.once, Y = R.sonra, keys = o => Object.keys(o.tablo || {});
+  ok(Y.ilk.v === '' && JSON.stringify(O.ilk.o.tablo) === JSON.stringify(Y.ilk.o.tablo) && O.ilk.o.cmpSvg === Y.ilk.o.cmpSvg && O.ilk.o.fig === Y.ilk.o.fig, `(0) Varsayılan: seçilen M alanı boş ("${Y.ilk.v}"); dokunulmadan tablo (${keys(Y.ilk.o).length} satır), cmpSvg ve şekil önce = sonra`);
   ok(JSON.stringify(O.bos.tablo) === JSON.stringify(Y.bos.tablo) && O.bos.cmpSvg === Y.bos.cmpSvg && O.bos.fig === Y.bos.fig, `(1) Seçilen M boş: tablo (${keys(Y.bos).length} satır), cmpSvg ve olasılık şekli önce = sonra`);
   const eski = keys(O.vars), yeni = keys(Y.vars).filter(k => !eski.includes(k)), ayni = eski.every(k => JSON.stringify(O.vars.tablo[k]) === JSON.stringify(Y.vars.tablo[k]));
-  ok(ayni && yeni.length === 4 && O.vars.cmpSvg === Y.vars.cmpSvg && O.vars.fig === Y.vars.fig, `(1) Varsayılan 7,5 ve 8: main'deki ${eski.length} satır aynı değerlerle; yalnız ${yeni.length} yeni satır: ${yeni.map(k => k.split(' — ')[0]).join(' | ')}; cmpSvg ve şekil aynı`);
+  ok(ayni && yeni.length === 4 && O.vars.cmpSvg === Y.vars.cmpSvg && O.vars.fig === Y.vars.fig, `(1) Kullanıcı 7,5 ve 8 girdi: main'deki ${eski.length} satır aynı değerlerle; yalnız ${yeni.length} yeni satır: ${yeni.map(k => k.split(' — ')[0]).join(' | ')}; cmpSvg ve şekil aynı`);
   let mx = 0, mxG = 0; for (const b of R.yol) for (const m of b.M) { mx = Math.max(mx, rel(m.lam, m.lamG), ...m.c.map(c => rel(c.P, c.gP))); mxG = Math.max(mxG, rel(m.Llo, m.gLlo), rel(m.Lhi, m.gLhi), ...m.c.map(c => Math.max(Math.abs(c.lo - c.glo), Math.abs(c.hi - c.ghi)))); }
   ok(mx === 0 && mxG === 0, `(2) Yeni satırlar = cmpProb.cell = G–R fonksiyonları (grLambdaSimple, grPoissonBootSimple): λ, P en büyük göreli fark ${mx}; λ %95 ve P %95 en büyük fark ${mxG}`);
   for (const b of R.yol) for (const m of b.M) { const c50 = m.c[1]; const k = b.ad;
