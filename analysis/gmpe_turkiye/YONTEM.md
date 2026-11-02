@@ -8,6 +8,7 @@ Durum: **taslak, kullanıcı incelemesinde**. Yalnız belge; kod değişikliği 
 - Revizyon 4 (2026-11-02): Akkar vd. (2018) tam metni okundu (kullanıcının Zotero kütüphanesi); §3.1 eklendi, D9 için öneri yazıldı.
 - Revizyon 5 (2026-11-02): D9 kullanıcı kararıyla kapatıldı (Liste A kabul, Liste B koşullu kabul); üç sınır eklendi (§3.1). D2, D3, D5, D6 için kanıta dayalı öneriler yazıldı; model başına referans Vs30 OpenQuake kaynak kodundan çıkarıldı.
 - Revizyon 6 (2026-11-02): D2, D3, D5, D6 kullanıcı kararıyla kapatıldı; yöntemsel geçiş koşulu kapandı; hesap öncesi kalan [teyit] listesi yazıldı (§11).
+- Revizyon 7 (2026-11-02): T1, CY14 ve BSSA14 için Gregor vd. (2014) Tablo 1'den kapatıldı (kullanıcının İndirilenler klasöründeki PDF).
 - Kod, `index.html`, `data/`, `seismoreport/` ve canlı site değişmedi.
 
 İşaretler:
@@ -336,12 +337,24 @@ Not: Vs30 = 760 m/s girdisi, ASB14 ve KAAH15 için referanstan biraz yüksek, CY
 
 | No | Konu | Gerektiği hesap |
 |---|---|---|
-| T1 | KAAH15, CY14, BSSA14, ESHM20 geçerlilik aralıkları (Mw, uzaklık, Vs30, periyot) | O modelin her hesabı |
+| T1 | KAAH15, CY14, BSSA14, ESHM20 geçerlilik aralıkları (Mw, uzaklık, Vs30, periyot) | O modelin her hesabı. **CY14 ve BSSA14 kapatıldı** (aşağıda); KAAH15 ve ESHM20 açık |
 | T2 | Model başına referans Vs30 (yayından; şu an OpenQuake kodundan) | D5 senaryo (2) |
 | T3 | ESHM20 aktif sığ kabuk bölgelendirme dosyası ve sürümü | D2 sınıflaması |
 | T4 | NESS 2.1 sürümü, lisansı, atıfı; ESM sürümü ve sayıları | Kayıt karşılaştırması (§8.4) |
 | T5 | Campbell (1981) veri aralığı ve büyüklük ölçekleri | Karşılaştırma dalı |
 | T6 | Künye ayrıntıları (AC10 sayfaları, CY08, Zh06, Danciu vd. 2016, Kotha vd. 2020) | Raporlama |
+
+**T1 — kapatılan kısım (Gregor vd. 2014, Earthquake Spectra 30(3):1179–1197, Tablo 1, s. 1180; model geliştiricilerinin ortak karşılaştırma makalesi):**
+
+| Model | Mw (mekanizma) | Uzaklık (km) | Vs30 (m/s) | Periyot |
+|---|---|---|---|---|
+| BSSA14 | 3,0–8,5 (doğrultu atımlı, ters); 3,3–7,0 (normal) | 0–400 (Rjb) | 150–1500 | PGA–10 s, PGV |
+| CY14 | 3,5–8,5 (doğrultu atımlı); 3,5–8,0 (ters, normal) | 0–300 (Rrup) | 180–1500 | PGA–10 s, PGV |
+
+Aynı makale (s. 1182): bölgesel soğrulma düzeltmesinde BSSA14 için "China and Turkey" bölgesi tanımlı (OpenQuake'te `BooreEtAl2014HighQ`); BSSA14'te "belirtilmemiş" faylanma türü parametresi var; CY14'ün İtalya/Japonya düzeltmeleri yalnız Mw 6–6,9 için. Sonuçlar:
+- BSSA14 normal faylanmada Mw > 7,0 ekstrapolasyondur (Ege graben sistemi için önemli).
+- D3'ün 200 km ortak sınırı her iki modelin aralığı içinde.
+- Bu tablo geliştiricilerin özetidir; ayrıntılı ek koşullar (ör. z1.0) her modelin kendi makalesindedir.
 
 ## 12. Kaynaklar
 
@@ -351,6 +364,7 @@ Not: Vs30 = 760 m/s girdisi, ASB14 ve KAAH15 için referanstan biraz yüksek, CY
 - Boore, D. M., Stewart, J. P., Seyhan, E., & Atkinson, G. M. (2014). NGA-West2 equations for predicting PGA, PGV, and 5% damped PSA for shallow crustal earthquakes. *Earthquake Spectra, 30*(3), 1057–1085.
 - Buckreis, T. E., Pretell, R., Sandıkkaya, M. A., Kale, Ö., Askan, A., Brandenberg, S. J., & Stewart, J. P. (2024). Engineering attributes of ground motions from February 2023 Türkiye earthquake sequence. *Earthquake Spectra, 40*(4), 2268–2284. https://doi.org/10.1177/87552930241259024
 - Campbell, K. W. (1981). Near-source attenuation of peak horizontal acceleration. *Bulletin of the Seismological Society of America, 71*(6), 2039–2070 **[teyit]**.
+- Gregor, N., Abrahamson, N. A., Atkinson, G. M., Boore, D. M., Bozorgnia, Y., Campbell, K. W., Chiou, B. S.-J., Idriss, I. M., Kamai, R., Seyhan, E., Silva, W., Stewart, J. P., & Youngs, R. (2014). Comparison of NGA-West2 GMPEs. *Earthquake Spectra, 30*(3), 1179–1197. https://doi.org/10.1193/070113EQS186M
 - Chiou, B. S.-J., & Youngs, R. R. (2008). An NGA model for the average horizontal component of peak ground motion and response spectra. *Earthquake Spectra, 24*(1), 173–215 **[teyit]**.
 - Chiou, B. S.-J., & Youngs, R. R. (2014). Update of the Chiou and Youngs NGA model for the average horizontal component of peak ground motion and response spectra. *Earthquake Spectra, 30*(3), 1117–1153.
 - Danciu, L., Kale, Ö., & Akkar, S. (2016). The 2014 Earthquake Model of the Middle East: Ground motion model and uncertainties. *Bulletin of Earthquake Engineering* **[teyit: cilt ve sayfa]**.
