@@ -5,6 +5,7 @@ Durum: **taslak, kullanıcı incelemesinde**. Yalnız belge; kod değişikliği 
 - Revizyon 1 (2026-11-02): kullanıcı incelemesi (ChatGPT yorumu dahil) — D1, uzaklık tanımları, Vs30 kapsamı, belirsizlik türleri, D7 ve D9 güncellendi; NESS 2.1 flat-file'ından nicel bulgular eklendi (§13).
 - Revizyon 2 (2026-11-02): kullanıcı incelemesi — Repi − Rjb farkının yorumu, Mw kaynağı kaydı (7,7 / 7,8), Vs30 veri kalitesi işareti, SHA-256'nın kapsamı, yazılım doğrulaması / yöntem doğrulaması ayrımı; §11 her karar için "karar, bilimsel gerekçe, doğrulama durumu" olarak yeniden düzenlendi; Aşama 2'ye geçiş koşulu yazıldı.
 - Revizyon 3 (2026-11-02): kullanıcı incelemesi — uzaklık tanımı farkı / geometri belirsizliği / GMPE artığı ayrımı (§6), Vs30 kaynağının analiz çıktısında da gösterilmesi (§8, §9), D9 inceleme sırası (§11).
+- Revizyon 4 (2026-11-02): Akkar vd. (2018) tam metni okundu (kullanıcının Zotero kütüphanesi); §3.1 eklendi, D9 için öneri yazıldı.
 - Kod, `index.html`, `data/`, `seismoreport/` ve canlı site değişmedi.
 
 İşaretler:
@@ -88,7 +89,7 @@ Bütün modeller OpenQuake 3.26.2'de mevcut ve aşağıdaki sınıf adlarıyla b
 
 ### Türkiye için mevcut kanıt (yalnız okunabilen özetlerden)
 
-- **Akkar, Kale, Yakut & Çeken (2018), BEE 16(8):3439–3463** (doi:10.1007/s10518-017-0101-2): Türkiye Deprem Tehlike Haritası (2018) için yer hareketi nitelendirmesi. Adaylar test edildi ve "merkez, gövde, aralık" (CBR) gruplarına ayrıldı. **Seçilen modeller ve ağırlıklar bu oturumda okunamadı** (makale sayfası erişim sınırına takıldı) **[teyit]**. Aşama 1'in kapanışından önce okunmalı; aday listesi buna göre daraltılır. OpenMETU kaydında (hdl:11511/48585) tam metin yok; kullanıcının Zotero kütüphanesinde de bulunamadı (2026-11-02). İkincil bir kaynakta (JRC Balkan raporu) Türkiye haritası için AC10, CY08, Zhao vd. (2006) ve ASB14 sayılıyor; bu, 2018 makalesinin nihai listesi yerine konulmaz **[teyit]**.
+- **Akkar, Kale, Yakut & Çeken (2018), BEE 16(8):3439–3463** (doi:10.1007/s10518-017-0101-2): Türkiye Deprem Tehlike Haritası (2018) için yer hareketi nitelendirmesi. Tam metin okundu; ayrıntılar §3.1'de.
 - **Buckreis vd. (2024), Earthquake Spectra 40(4):2268–2284** (doi:10.1177/87552930241259024), 6 Şubat 2023 dizisi:
   - Küresel ve Türkiye'ye özgü modeller Rjb > 200 km'de uyumsuz; yazarlar bunu karmaşık yol etkilerine bağlıyor.
   - Küresel model Anadolu bloğunda fazla, Arap bloğunda az tahmin ediyor.
@@ -102,10 +103,78 @@ Bütün modeller OpenQuake 3.26.2'de mevcut ve aşağıdaki sınıf adlarıyla b
   - Sıralama: AC10 ≈ BSSA21 ≈ KAAH15 > ASB14; BA08 en sonda. Yazarların kendi veriyle geliştirdiği bir model birinci, ama bu kısmen örneklem içi sonuç.
   - Yazarlar sıralamanın mantık ağacı ağırlığı olmadığını belirtiyor.
 
-**Çıkarım (geçici):**
+**Çıkarım:**
 - Türkiye verisiyle kalibre edilmiş veya sınanmış modeller (KAAH15, AC10, ASB14) ile Türkiye için soğrulma terimi olan BSSA14 Yüksek Q, aday çekirdeğini oluşturuyor.
 - ESHM20 omurgası, epistemik aralığı tutarlı biçimde veren tek seçenek.
 - Hiçbir model Rjb > 200 km'de güvenilir değil (Buckreis vd. 2024). Bu yüzden hesap Rjb ≤ 200 km ile sınırlanmalı **[karar D3]**.
+
+### 3.1 Türkiye Deprem Tehlike Haritası (2018) yer hareketi mantık ağacı — Akkar vd. (2018), birincil metin
+
+Kaynak: Akkar vd. (2018), BEE 16:3439–3463; kullanıcının Zotero kütüphanesindeki PDF (25 sayfa), 2026-11-02'de okundu. Sayfa numaraları dergi sayfalarıdır.
+
+**Veri (T-SHM_db, Türkiye alt kümesi; s. 3441–3443):**
+- 1066 yatay kayıt çifti, 183 olay, 292 istasyon, 1976–2013.
+- Mw 4,0–7,6, Rjb 0–200 km, odak derinliği ≤ 30 km.
+- Kayıtların yaklaşık %97'sinde Vs30 ölçülmüş.
+- Türkiye verisi doğrultu atımlı ve normal faylanma ağırlıklı; zemin çoğunlukla 180–760 m/s.
+- Mw için fay düzlemi çözümlerinden gelen değerler tercih edilmiş; dönüşümle hesaplanan Mw küçük olaylarda kullanılmamış (s. 3442). Bu, D1 ile aynı ilkedir.
+
+**Adaylar ve eleme (Tablo 1; s. 3445–3452):**
+- Veri dışı ölçütlerle (Cotton vd. 2006; Bommer vd. 2010) 11 aday: Ozb04, KG04, Zh06, CF08, AS08, BA08, CB08, CY08, ASB14, AC10, Bnd14.
+- Veri temelli sıralama: yüksek AC10, ASB14, Bnd14, CF08; orta BA08, CY08, Zh06; diğerleri elendi.
+- Trellis incelemesinde Bnd14 (kısa periyotta, yakın uzaklık ve büyük M'de belirgin yüksek) ve CF08 (genel olarak yüksek; Japonya havza kayıtları) elendi.
+- KAAH15, hakem süreci proje süresinde tamamlanmadığı için **sınanmadı**. Yazarlara göre KAAH15'in yüzdelik eğrileri AC10'a benziyor ve kullanılması dağılımı belirgin değiştirmezdi (s. 3455).
+- NGA-West2 yerine NGA-West1 (AS08, BA08, CB08, CY08) kullanıldı, çünkü West2 proje sırasında tam yayımlanmamıştı (s. 3445–3447).
+- Trellis referans sahası Vs30 = 760 m/s; bu, ulusal haritanın saha tanımıdır (s. 3450).
+
+**Merkez, gövde, aralık (CBR) sınıflaması (PGA; s. 3454):**
+- Merkez ve gövde: ASB14, CY08, BA08.
+- Alt aralık: AC10.
+- Üst aralık: Zh06.
+- 0,2 s ve 1,0 s'de benzer eğilim.
+
+**Nihai mantık ağacı (Tablo 5; s. 3459):**
+
+| Bölge | Model | Ağırlık |
+|---|---|---|
+| Aktif sığ kabuk | ASB14 | 0,30 |
+| | CY08 | 0,30 |
+| | AC10 | 0,30 |
+| | Zh06 | 0,10 |
+| Dalma-batma (EMME'den aktarıldı) | Zh06 | 0,40 |
+| | AB03 | 0,20 |
+| | Ygs97 | 0,20 |
+| | LL08 | 0,20 |
+
+- Karşılaştırma için EMME (Danciu vd. 2016) aktif sığ kabuk ağırlıkları: AC10 0,20, CY08 0,35, ASB14 0,35, Zh06 0,10 (s. 3460).
+- **Ağırlıkların amacı:** Normalize edilmiş spektral değerlerle yapılan PSHA duyarlılık analizinden seçildi. Amaç, hiçbir modelin tehlikeyi tek başına belirlememesi. Haritalar PGA, SA(0,2 s) ve SA(1,0 s) için; dönüş periyotları 43, 72, 475 ve 2475 yıl (s. 3458–3459). Ağırlıklar bir modelin bir olay için doğruluk derecesi değil, PSHA'da epistemik yayılımı dengeleyen inanç dereceleridir. Bu yüzden D9 ilkesi gereği bu deterministik katmana aktarılmaz.
+
+**EQ-Live için önemli sonuçlar:**
+- AC10 ve ASB14'ün veri aralığı Mw ≤ 7,6. **Kahramanmaraş ana şoku (Mw 7,7–7,8) her iki modelde de ekstrapolasyondur.** Akkar vd. de Mw 8 için AC10'un Rjb > 100 km'de neredeyse düz spektral eğilim verdiğini, çünkü bu büyüklüğün modelin uygulama aralığı dışında olduğunu belirtiyor (s. 3451–3452).
+- AC10 yalnız T ≤ 2 s için tanımlı. SA(1,0 s) dahil, ama uzun periyot yok.
+- Zh06 Japonya verisinden (Mw 5,0–8,3, Rrup ≤ 300 km); 2018'de "üst aralık" temsilcisi.
+
+**D9 adım 4–5: iki ayrı liste (öneri):**
+
+*Liste A — Türkiye'de geçmişte kullanılan modeller (TBDY 2018 haritasının temeli; kayıt amaçlı):* ASB14, CY08, AC10, Zh06 (aktif sığ kabuk).
+
+*Liste B — EQ-Live için Aşama 2'de sınanacak adaylar:*
+
+| Model | Liste A ile ilişki | OpenQuake sınıfı | Uzaklık | Mw aralığı (yayın) | Gerekçe |
+|---|---|---|---|---|---|
+| ASB14 | aynı | `AkkarEtAlRjb2014` | Rjb | 4,0–7,6 | Liste A'da merkez/gövde; Avrupa–Orta Doğu verisi |
+| AC10 | aynı | `AkkarCagnan2010` | Rjb | 5,0–7,6 | Liste A'da alt aralık; Türkiye verisi; T ≤ 2 s |
+| KAAH15 | 2018'de zamanlama nedeniyle sınanmamış; AC10'un ardılı niteliğinde | `KaleEtAl2015Turkey` | Rjb | **[teyit]** | Türkiye–İran verisi; daha yeni Türkiye modeli |
+| CY14 | CY08'in ardılı (NGA-West2) | `ChiouYoungs2014` | Rrup, Rjb, Rx | **[teyit]** | Liste A'da merkez/gövde olan CY08'in güncel sürümü |
+| BSSA14 Yüksek Q | BA08'in ardılı (2018'de merkez/gövde, nihai ağaçta yok) | `BooreEtAl2014HighQ` | Rjb | **[teyit]** | Türkiye için soğrulma terimi |
+| ESHM20 | yok (2020) | `KothaEtAl2020ESHM20` | Rjb | **[teyit]** | Ölçekli omurga ile epistemik aralık |
+
+*Karşılaştırma dalı (aday değil):*
+- CY08 (`ChiouYoungs2008`) ve Zh06 (`ZhaoEtAl2006Asc`): EQ-Live tahminlerini TBDY 2018 haritasının model tabanıyla karşılaştırmak için. Liste A'nın tamamı böylece OpenQuake'te yeniden üretilebilir (sınıflar 3.26.2 kayıt defterinde var).
+- Campbell (1981) yalnız mevcut katmanla karşılaştırma içindir.
+- BA08: 2018 nihai ağacında yok; Sharafi vd. (2026) sıralamasında en sonda. Aday değil.
+
+Ağırlık verilmez. Nihai küme Aşama 2 artık analizinden sonra belirlenir.
 
 ---
 
@@ -226,9 +295,9 @@ Kabul edilmiş bir ilke ile veri ya da kaynakla henüz doğrulanmamış bir vars
 | D6 | Mevcut Campbell (1981) katmanı | Seçenekler: olduğu gibi kalsın / `hazard-etiket` birleştirilsin / yeniden adlandırılsın / kaldırılsın. | §1'deki tespitler. | **Açık** |
 | D7 | Kayıt verisi | NESS 2.1 + ESM + Türkiye için AFAD TADAS / SMD-TR. Olay ve kayıt örneklemi ayrı raporlanır; yinelenen kayıtlar eşleştirilir. | Küresel uyum ile Türkiye'deki uyum iki ayrı soru; NESS yalnız Mw ≥ 5,5. | **Koşullu**: NESS dosyası mevcut ve sayımlar dosyadan doğrulandı. SHA-256 yalnız dosya bütünlüğünü doğrular; NESS sürümü, lisansı ve atıfı ile ESM sürümü ve sayıları **[teyit]** |
 | D8 | Hesap yeri | Önce OpenQuake ile bağımsız doğrulama; EQ-Live'daki hesap yeri sonra seçilir. | Referans uygulama önce; yazılım doğrulaması yöntem doğrulamasından ayrı (§8). | **Kabul** |
-| D9 | Aday modeller | Üç soru ayrı: (1) Türkiye'de daha önce kullanılanlar, Akkar vd. (2018) tam metninden; (2) EQ-Live adayları: KAAH15, AC10, ASB14, BSSA14 Yüksek Q, ESHM20 (NGA-West2'nin geri kalanı duyarlılık için); (3) nihai küme, Aşama 2 artık analizinden sonra. 2018 PSHA mantık ağacı ağırlıkları bu deterministik katmana aktarılmaz. | PSHA ağırlıkları farklı bir amaç için kurulmuştur; Türkiye'de geliştirilmiş olmak her M–R aralığında en uygun olmayı garanti etmez. | **Açık**: Akkar vd. (2018) tam metni bekleniyor |
+| D9 | Aday modeller | Liste A (Türkiye'de geçmişte kullanılan, TBDY 2018 temeli): ASB14 0,30, CY08 0,30, AC10 0,30, Zh06 0,10 — kayıt amaçlı. Liste B (Aşama 2 adayları): ASB14, AC10, KAAH15, CY14, BSSA14 Yüksek Q, ESHM20. Karşılaştırma dalı: CY08, Zh06 (2018 tabanı), Campbell (1981) (mevcut katman). Ağırlık yok; nihai küme Aşama 2'den sonra (§3.1). | 2018 ağırlıkları normalize spektral değerlerle yapılan PSHA duyarlılığından seçilmiş, deterministik katmana aktarılmaz. KAAH15 2018'de zamanlama nedeniyle sınanmadı; CY14 ve BSSA14, Liste A/2018 adaylarının NGA-West2 ardılları. AC10 ve ASB14 Mw ≤ 7,6: Kahramanmaraş ana şoku ekstrapolasyon. | **Kabul önerisi**: Liste A birincil metinden doğrulandı (Tablo 5). Liste B kullanıcı onayı bekliyor; KAAH15, CY14, BSSA14, ESHM20 geçerlilik aralıkları **[teyit]** |
 
-**D9 inceleme sırası (Akkar vd. 2018 tam metni geldiğinde):**
+**D9 inceleme sırası (uygulandı, revizyon 4; sonuçlar §3.1):**
 1. Makalenin gerçekten kullandığı GMPE listesi ve her modelin künyesi.
 2. Modellerin merkez, gövde ve aralık (CBR) sınıfları.
 3. Mantık ağacı ağırlıkları ve hangi amaçla kullanıldıkları (PSHA, spektral periyot, tektonik bölge).
@@ -237,7 +306,7 @@ Kabul edilmiş bir ilke ile veri ya da kaynakla henüz doğrulanmamış bir vars
 
 2018 listesi ve ağırlıkları EQ-Live'ın nihai model kümesini otomatik olarak belirlemez (D9 gerekçesi).
 
-**Aşama 2'ye geçiş koşulu (kullanıcı kararı, 2026-11-02):** Önce D9, Akkar vd. (2018) tam metninden kesinleştirilir. Ardından D2, D3, D5 ve D6 ayrı ayrı kapatılır. Bu kararlar tamamlanmadan Aşama 2 hesaplarına geçilmez.
+**Aşama 2'ye geçiş koşulu (kullanıcı kararı, 2026-11-02):** Önce D9, Akkar vd. (2018) tam metninden kesinleştirilir (revizyon 4'te metin okundu; Liste B onayı bekleniyor). Ardından D2, D3, D5 ve D6 ayrı ayrı kapatılır. Bu kararlar tamamlanmadan Aşama 2 hesaplarına geçilmez.
 
 ## 12. Kaynaklar
 
@@ -247,13 +316,16 @@ Kabul edilmiş bir ilke ile veri ya da kaynakla henüz doğrulanmamış bir vars
 - Boore, D. M., Stewart, J. P., Seyhan, E., & Atkinson, G. M. (2014). NGA-West2 equations for predicting PGA, PGV, and 5% damped PSA for shallow crustal earthquakes. *Earthquake Spectra, 30*(3), 1057–1085.
 - Buckreis, T. E., Pretell, R., Sandıkkaya, M. A., Kale, Ö., Askan, A., Brandenberg, S. J., & Stewart, J. P. (2024). Engineering attributes of ground motions from February 2023 Türkiye earthquake sequence. *Earthquake Spectra, 40*(4), 2268–2284. https://doi.org/10.1177/87552930241259024
 - Campbell, K. W. (1981). Near-source attenuation of peak horizontal acceleration. *Bulletin of the Seismological Society of America, 71*(6), 2039–2070 **[teyit]**.
+- Chiou, B. S.-J., & Youngs, R. R. (2008). An NGA model for the average horizontal component of peak ground motion and response spectra. *Earthquake Spectra, 24*(1), 173–215 **[teyit]**.
 - Chiou, B. S.-J., & Youngs, R. R. (2014). Update of the Chiou and Youngs NGA model for the average horizontal component of peak ground motion and response spectra. *Earthquake Spectra, 30*(3), 1117–1153.
+- Danciu, L., Kale, Ö., & Akkar, S. (2016). The 2014 Earthquake Model of the Middle East: Ground motion model and uncertainties. *Bulletin of Earthquake Engineering* **[teyit: cilt ve sayfa]**.
 - Kale, Ö., Akkar, S., Ansari, A., & Hamzehloo, H. (2015). A ground-motion predictive model for Iran and Turkey for horizontal PGA, PGV, and 5% damped response spectrum: Investigation of possible regional effects. *Bulletin of the Seismological Society of America, 105*(2A), 963–980.
 - Kotha, S. R., Weatherill, G., Bindi, D., & Cotton, F. (2020). A regionally-adaptable ground-motion model for shallow crustal earthquakes in Europe. *Bulletin of Earthquake Engineering, 18*, 4091–4125 **[teyit]**.
 - Mabrouk, A. H. A. S. H. (2024). *Performance of alternative ground motion models with strong-motion data from moderate to large events in different seismotectonic regions in Türkiye* (Yüksek lisans tezi). Orta Doğu Teknik Üniversitesi.
 - Scherbaum, F., Delavaud, E., & Riggelsen, C. (2009). Model selection in seismic hazard analysis: An information-theoretic perspective. *Bulletin of the Seismological Society of America, 99*(6), 3234–3247.
 - Sharafi, F., Banimahd, S. A., Karimzadeh, S., Askan, A., & Lourenço, P. B. (2026). Objective ground motion model selection and ranking using likelihood and Bayesian criteria: A case study for Türkiye. *GeoHazards, 7*(5), 131. https://doi.org/10.3390/geohazards7050131
 - Weatherill, G., Kotha, S. R., & Cotton, F. (2020). A regionally-adaptable "scaled backbone" ground motion logic tree for shallow seismicity in Europe: Application to the 2020 European seismic hazard model. *Bulletin of Earthquake Engineering, 18*, 5087–5117.
+- Zhao, J. X., Zhang, J., Asano, A., Ohno, Y., Oouchi, T., Takahashi, T., Ogawa, H., Irikura, K., Thio, H. K., Somerville, P. G., Fukushima, Y., & Fukushima, Y. (2006). Attenuation relations of strong ground motion in Japan using site classification based on predominant period. *Bulletin of the Seismological Society of America, 96*(3), 898–913 **[teyit]**.
 
 Ortam notu: OpenQuake sınıf adları ve gerekli girdiler `openquake.engine 3.26.2` kayıt defterinden (`gsim.base.registry`) 2026-11-02'de okundu.
 
