@@ -94,7 +94,7 @@ Tablo notları:
    - Mw 6: 10 km'de 0,64–1,15 → 200 km'de 0,25–0,67;
    - Mw 7,8: 10 km'de 0,51–0,79 → 200 km'de 0,32–0,69.
 
-   Campbell'ın uygulanan biçiminde uzaklık terimi yalnız geometrik yayılımdır (−1,09 ln R; soğrulma terimi yok). Bu nedenle R > 50 km'de, yani Campbell'ın yaklaşık veri aralığı dışında **[teyit]**, Campbell medyanı modern modellerin 1,4–4 katına çıkıyor.
+   Campbell'ın uygulanan biçiminde uzaklık terimi yalnız geometrik yayılımdır (−1,09 ln R; soğrulma terimi yok). Bu nedenle R > 50 km'de, yani Campbell'ın yaklaşık veri aralığı dışında **[teyit]**, Campbell medyanı Mw ≥ 6'da Liste B medyanlarının yaklaşık 0,95–4,0 katı, Mw 5'te 1,7–12 katı oluyor (Liste B'nin tek tek modellerine göre; 75–200 km).
 2. **Uzaklık tanımı farkı (çerçeve B).** Büyük depremlerde dış merkez uzaklığı kırığa olan uzaklıktan çok büyük. Campbell'a katmandaki gibi Repi verildiğinde yakın alanda değer düşüyor:
    - Mw 7,8, Rjb = 10 km: Liste B medyanları Campbell'ın 1,66–2,60 katı;
    - Mw 7,6, Rjb = 1 km: 2,81–4,33 katı;
