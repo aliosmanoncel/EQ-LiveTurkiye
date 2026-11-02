@@ -1,0 +1,229 @@
+{
+ "kayit": [
+  {
+   "name": "Türkiye",
+   "gk74": false,
+   "mcU": "tekMc",
+   "turU": "MD → ML (2010–2011)",
+   "n": 27346,
+   "T": 28.70188370725277,
+   "b": 1.1367955606948117,
+   "Mc": 3.2,
+   "tr6": 1.5997206868492326,
+   "Mmax": 7.8
+  },
+  {
+   "name": "Marmara",
+   "gk74": true,
+   "mcU": null,
+   "turU": "MD → ML (2008–2012)",
+   "n": 624,
+   "T": 28.70188370725277,
+   "b": 1.0007376540163455,
+   "Mc": 3.2,
+   "tr6": 29.160249933802806,
+   "Mmax": 6.3
+  },
+  {
+   "name": "Doğu Anadolu",
+   "gk74": false,
+   "mcU": "tekMc",
+   "turU": "MD → ML (2009–2012)",
+   "n": 5007,
+   "T": 28.70188370725277,
+   "b": 0.9904181052080725,
+   "Mc": 3.2,
+   "tr6": 3.400192488739337,
+   "Mmax": 7.8
+  }
+ ],
+ "tablo": {
+  "Katalog": [
+   "Tarihsel Katalog (ISC+EMSC, statik)",
+   "Tarihsel Katalog (ISC+EMSC, statik)",
+   "Tarihsel Katalog (ISC+EMSC, statik)"
+  ],
+  "Bölge": [
+   "dikdörtgen 36.00–42.00° K, 26.00–45.00° D",
+   "dikdörtgen 40.00–41.50° K, 26.00–31.00° D",
+   "dikdörtgen 36.50–39.00° K, 36.00–41.00° D"
+  ],
+  "Dönem": [
+   "1998-01-01 – 2026-09-14",
+   "1998-01-01 – 2026-09-14",
+   "1998-01-01 – 2026-09-14"
+  ],
+  "T (yıl)": [
+   "28.7",
+   "28.7",
+   "28.7"
+  ],
+  "A (km²)": [
+   "1.094.914",
+   "70.249",
+   "122.195"
+  ],
+  "N (tümü)": [
+   "48584",
+   "1283",
+   "7987"
+  ],
+  "Mc": [
+   "3.2",
+   "3.2",
+   "3.2"
+  ],
+  "N(≥Mc)": [
+   "27346",
+   "624",
+   "5007"
+  ],
+  "b [%95]": [
+   "1.14 [1.13–1.16]",
+   "1.00 [0.93–1.09]",
+   "0.99 [0.97–1.02]"
+  ],
+  "a [log₁₀(N/T·A) = a − bM; T: yıl, A: 10⁴ km²]": [
+   "4.58",
+   "3.69",
+   "4.32"
+  ],
+  "b farkı, 1. bölgeye göre (Utsu 1992, P)": [
+   "referans",
+   "0,002 (anlamlı)",
+   "< 0,001 (anlamlı)"
+  ],
+  "Mmax": [
+   "7.8",
+   "6.3",
+   "7.8"
+  ],
+  "N(≥5) / N(≥6)": [
+   "252 / 19",
+   "11 / 3",
+   "63 / 7"
+  ],
+  "λ(≥5) /yıl/10⁴ km²": [
+   "0.0802",
+   "0.0546",
+   "0.180"
+  ],
+  "M≥6 tekrarlanma (yıl, tüm bölge)": [
+   "1.60",
+   "29.2",
+   "3.40"
+  ],
+  "b [%95 bootstrap] — Aki–Utsu (referans) / Bender (1983)": [
+   "Aki–Utsu: 1.137 [1.116–1.144]Bender: 1.143 [1.129–1.157]P(≥7; 50 yıl): 89,8 [88,3 – 93,5] / 88,4 [85,2 – 91,3]",
+   "Aki–Utsu: 1.001 [0.920–1.082]Bender: 1.005 [0.930–1.093]P(≥7; 50 yıl): 15,7 [8,1 – 29,2] / 15,2 [7,4 – 27,4]",
+   "Aki–Utsu: 0.990 [0.959–1.014]Bender: 0.995 [0.968–1.023]P(≥7; 50 yıl): 77,8 [70,7 – 86,2] / 76,5 [67,9 – 84,2]"
+  ],
+  "P(≥5; t), % [%95] — Poisson, tüm bölge, b: Aki–Utsu": [
+   "10 yıl: > 99,9 [> 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
+   "10 yıl: 96,8 [91,3 – 99,2]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
+   "10 yıl: > 99,9 [> 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]"
+  ],
+  "P(≥6; t), % [%95] — Poisson, tüm bölge, b: Aki–Utsu": [
+   "10 yıl: 99,8 [99,7 – > 99,9]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]",
+   "10 yıl: 29,0 [18,3 – 43,7] †50 yıl: 82,0 [63,5 – 94,3] †100 yıl: 96,8 [86,7 – 99,7] †",
+   "10 yıl: 94,7 [92,0 – 97,3]50 yıl: > 99,9 [> 99,9]100 yıl: > 99,9 [> 99,9]"
+  ],
+  "P(≥7; t), % [%95] — Poisson, tüm bölge, b: Aki–Utsu": [
+   "10 yıl: 36,6 [34,9 – 42,1]50 yıl: 89,8 [88,3 – 93,5]100 yıl: 99,0 [98,6 – 99,6]",
+   "10 yıl: 3,4 [1,7 – 6,7] ᵉ ‡50 yıl: 15,7 [8,1 – 29,2] ᵉ ‡100 yıl: 29,0 [15,5 – 49,8] ᵉ ‡",
+   "10 yıl: 26,0 [21,8 – 32,7] †50 yıl: 77,8 [70,7 – 86,2] †100 yıl: 95,1 [91,4 – 98,1] †"
+  ],
+  "Tr(≥M) / T — ekstrapolasyon (Tr = 1/λ), b: Aki–Utsu": [
+   "M≥5: 0,1 yıl (Tr/T = < 0,1)M≥6: 1,6 yıl (Tr/T = < 0,1)M≥7: 22 yıl (Tr/T = 0,76)",
+   "M≥5: 2,9 yıl (Tr/T = 0,10)M≥6: 29 yıl (Tr/T = 1,02) †M≥7: 292 yıl (Tr/T = 10,2) ‡",
+   "M≥5: 0,3 yıl (Tr/T = < 0,1)M≥6: 3,4 yıl (Tr/T = 0,12)M≥7: 33 yıl (Tr/T = 1,16) †"
+  ],
+  "Olasılık uyarıları": [
+   "GK74 kapalı: artçılar dahil, olasılık büyük olasılıkla şişkintamlık (Mc) uyarısı var: oran ve b etkilenebilirbüyüklük türü geçişi: MD → ML (2010–2011)",
+   "GK74 açık: bağımsızlık garanti değil; büyük dizi dönemlerinde olasılık iyimser kalabilirbüyüklük türü geçişi: MD → ML (2008–2012)† M≥6: Tr ≈ 29 yıl, T = 28,7 yıl (Tr/T = 1,02) — G–R gözlem süresinin ötesine uzatıldı‡ M≥7: Tr ≈ 292 yıl, T = 28,7 yıl (Tr/T = 10,2) — yüksek ekstrapolasyon belirsizliğiᵉ M > gözlenen Mmax (6.3): ekstrapolasyon",
+   "GK74 kapalı: artçılar dahil, olasılık büyük olasılıkla şişkintamlık (Mc) uyarısı var: oran ve b etkilenebilirbüyüklük türü geçişi: MD → ML (2009–2012)† M≥7: Tr ≈ 33 yıl, T = 28,7 yıl (Tr/T = 1,16) — G–R gözlem süresinin ötesine uzatıldı"
+  ],
+  "GNSS istasyonu (MIDAS)": [
+   "194 (rms 6.6 mm/yıl)",
+   "19 (rms 2.4 mm/yıl)",
+   "19 (rms 1.3 mm/yıl)"
+  ],
+  "ε̇₁ / ε̇₂ (nstrain/yıl)": [
+   "20.6 / -10.8",
+   "104.4 / -66.7",
+   "20.1 / -19.5"
+  ],
+  "Ṁ₀ jeodezik (N·m/yıl)": [
+   "2.03e+19 ± 1.66e+18",
+   "6.60e+18 ± 6.25e+17",
+   "2.21e+18 ± 3.35e+17"
+  ],
+  "Ṁ₀ sismik, Kostrov ΣM₀/T": [
+   "3.94e+19",
+   "3.32e+17",
+   "3.16e+19"
+  ],
+  "Ṁ₀ sismik, kesik G–R": [
+   "1.41e+19 (Mmax 7.8)",
+   "1.55e+17 (Mmax 6.3)",
+   "7.55e+18 (Mmax 7.8)"
+  ],
+  "Sismik kenetlenme (Kostrov / G–R)": [
+   "%194 / %70",
+   "%5 / %2",
+   "%1429 / %342"
+  ],
+  "Büyüklük türleri": [
+   "md %50, ml %44, mb %4",
+   "md %58, ml %35, mb %5",
+   "ml %60, md %32, mb %5"
+  ]
+ },
+ "bootstrap": {
+  "maks_fark_yp": 0.6544538385937881,
+  "yer": "Marmara M≥7, t = 100",
+  "M7_t50": [
+   "Türkiye: %95 [88.33–93.48] (B 2000) / [88.32–93.40] (B 5000)",
+   "Marmara: %95 [8.05–29.17] (B 2000) / [8.24–28.71] (B 5000)",
+   "Doğu Anadolu: %95 [70.74–86.19] (B 2000) / [70.58–86.01] (B 5000)"
+  ]
+ },
+ "denetimler": [
+  "GEÇTİ (1) main'deki 22 tablo satırının hepsi aynı değerlerle duruyor",
+  "GEÇTİ (1) yalnız 6 yeni satır: b [%95 bootstrap] — Aki–Utsu (referans) / Bender (1983) | P(≥5; t), % [%95] — Poisson, tüm bölge, b: Aki–Utsu | P(≥6; t), % [%95] — Poisson, tüm bölge, b: Aki–Utsu | P(≥7; t), % [%95] — Poisson, tüm bölge, b: Aki–Utsu | Tr(≥M) / T — ekstrapolasyon (Tr = 1/λ), b: Aki–Utsu | Olasılık uyarıları",
+  "GEÇTİ (1) karşılaştırma grafiği (cmpSvg) aynı",
+  "GEÇTİ (1) G–R grafiği ve metni (Poisson satırı dışında) aynı",
+  "GEÇTİ (1) b(t) ve a(t) grafikleri ve metinleri aynı",
+  "GEÇTİ (2) 27 hücrenin 27'i bağımsız hesapla aynı (P = 1 − e^(−λt), λ = n/T·10^(−b(M − Mc)))",
+  "GEÇTİ (2) P(≥6; t) = 1 − e^(−t/tr6): tablodaki tekrarlanma süresiyle tutarlı",
+  "GEÇTİ (3) GK74 durumu kayıtta ve uyarıda doğru (Türkiye kapalı, Marmara açık)",
+  "GEÇTİ (3) tamlık ve tür uyarı alanları kayıtlı (Türkiye: tür MD → ML (2010–2011); Marmara: tür MD → ML (2008–2012); Doğu Anadolu: tür MD → ML (2009–2012))",
+  "GEÇTİ (4) yayın şekli: 493 pt, 3 panel (a–c), 4 süre",
+  "GEÇTİ (4) bant düğmesi (16.–84. yüzdelik) şekli değiştiriyor",
+  "GEÇTİ (7) şekil, altyazı, tablo ve düğmede '±1σ' yok (düğme: \"Aki–Utsu (referans) | Bender (1983) | %95 | 16.–84. yüzdelik | SVG (EN) | PNG 600 dpi (EN) | SVG (TR) | PNG 600 dpi (TR) | Yeniden üretim (JSON)\")",
+  "GEÇTİ (7) Tr/T satırı: 9 hücrenin 9'i bağımsız hesapla ve sınıfla aynı",
+  "GEÇTİ (7) Marmara M≥7: Tr ≈ 292 yıl, T = 28.7 yıl (Tr/T = 10.18) → ‡ belirgin uyarı",
+  "GEÇTİ (7) şekil: her panelde Tr = T çizgisi, Tr > 10T gri zemin, lejant ve altyazı",
+  "GEÇTİ (7) 10T sınırı altyazıda (EN/TR) ve tablo dipnotunda operasyonel ölçüt olarak belirtiliyor",
+  "GEÇTİ (4) altyazı EN/TR, üç bölge",
+  "GEÇTİ (4) önce (main) yayın şekli yok",
+  "GEÇTİ (8) üç bölgede B = 2000 (NegBin; Türkiye dahil, eski şemada 200); sağlamlık B = 5000 hesaplandı",
+  "GEÇTİ (8) B = 2000 ile 5000 arasında %95 sınırlarının en büyük farkı 0.654 yüzde puan (Marmara M≥7, t = 100); P(≥7; 50 yıl): Türkiye: %95 [88.33–93.48] (B 2000) / [88.32–93.40] (B 5000); Marmara: %95 [8.05–29.17] (B 2000) / [8.24–28.71] (B 5000); Doğu Anadolu: %95 [70.74–86.19] (B 2000) / [70.58–86.01] (B 5000)",
+  "GEÇTİ (8) G–R panelinin bootstrap'ı (grPoissonBootSimple) ile karşılaştırma tablosu aynı çekilişler: P(≥7; 50 yıl) sınırları birebir aynı",
+  "GEÇTİ (9) SVG <metadata>: katalog (data/eq_historical.json, üretim 2026-09-14T13:10:40Z, blob 879a89b948), bölge ve dönem, Mc, a, b, N, T, model, B ve tohum, Mmax varsayımı ve kaynağı, yazılım blob 576507144c; <title> ve <desc>",
+  "GEÇTİ (9) JSON kaydı: 3 bölge, girdi büyüklükleri (48584 / 1283 / 7987), 12 hücre/bölge (M 5–7 × t 10/25/50/100), ayarlar, model, yazılım (500 KB)",
+  "GEÇTİ (9) yeniden_uret.js kayıttan bütün sayıları birebir yeniden üretti: GEÇTİ: 16 geçti, 0 kaldı, 0 uyarı",
+  "GEÇTİ (10) varsayılan (Aki–Utsu): P(≥5/6/7; t), Tr/T ve uyarı satırları önceki sürümle birebir aynı",
+  "GEÇTİ (10) yan yana satır: b ve %95 aralık iki kestiriciyle; ayrı analizle (b_kestirici) aynı — Aki–Utsu: 1.137 [1.116–1.144]Bender: 1.143 [1.129–1.157] | Aki–Utsu: 1.001 [0.920–1.082]Bender: 1.005 [0.930–1.093] | Aki–Utsu: 0.990 [0.959–1.014]Bender: 0.995 [0.968–1.023]",
+  "GEÇTİ (10) Bender seçili: 27 hücrenin 27'i bağımsız hesapla (b_B, aynı n, T, Mc) aynı; satır etiketi, şekil başlığı ve altyazı kestiriciyi belirtiyor",
+  "GEÇTİ (10) JSON ve SVG metadata kestiriciyi kaydediyor (secili: bender); yeniden_uret.js Bender kaydını birebir üretti: GEÇTİ: 16 geçti, 0 kaldı, 0 uyarı",
+  "GEÇTİ (10) Aki–Utsu'ya dönünce tablo ilk hâliyle birebir aynı",
+  "GEÇTİ (5) SVG indirildi (89 KB, vektörel, 493 × 233 pt)",
+  "GEÇTİ (5) PNG 600 dpi: 4108 × 1942 px (= 174 mm genişlik)",
+  "GEÇTİ (6) sayfa hatası yok (0)"
+ ],
+ "ozet": {
+  "pass": 32,
+  "fail": 0
+ }
+}
