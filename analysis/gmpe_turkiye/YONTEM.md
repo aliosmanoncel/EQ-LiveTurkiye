@@ -9,6 +9,7 @@ Durum: **taslak, kullanıcı incelemesinde**. Yalnız belge; kod değişikliği 
 - Revizyon 5 (2026-11-02): D9 kullanıcı kararıyla kapatıldı (Liste A kabul, Liste B koşullu kabul); üç sınır eklendi (§3.1). D2, D3, D5, D6 için kanıta dayalı öneriler yazıldı; model başına referans Vs30 OpenQuake kaynak kodundan çıkarıldı.
 - Revizyon 6 (2026-11-02): D2, D3, D5, D6 kullanıcı kararıyla kapatıldı; yöntemsel geçiş koşulu kapandı; hesap öncesi kalan [teyit] listesi yazıldı (§11).
 - Revizyon 7 (2026-11-02): T1, CY14 ve BSSA14 için Gregor vd. (2014) Tablo 1'den kapatıldı (kullanıcının İndirilenler klasöründeki PDF).
+- Revizyon 8 (2026-11-02): kullanıcı incelemesi — BSSA14 sınırlarının gösterimi, T2 için dört adımlı doğrulama zinciri, T öncelik sırası, Aşama 2 adım 1'in tasarımı.
 - Kod, `index.html`, `data/`, `seismoreport/` ve canlı site değişmedi.
 
 İşaretler:
@@ -337,10 +338,10 @@ Not: Vs30 = 760 m/s girdisi, ASB14 ve KAAH15 için referanstan biraz yüksek, CY
 
 | No | Konu | Gerektiği hesap |
 |---|---|---|
-| T1 | KAAH15, CY14, BSSA14, ESHM20 geçerlilik aralıkları (Mw, uzaklık, Vs30, periyot) | O modelin her hesabı. **CY14 ve BSSA14 kapatıldı** (aşağıda); KAAH15 ve ESHM20 açık |
+| T1 | KAAH15, CY14, BSSA14, ESHM20 geçerlilik aralıkları (Mw, uzaklık, Vs30, periyot) | O modelin her hesabı. **CY14 ve BSSA14 kapatıldı; ESHM20'nin temel modeli (Kotha vd. 2020) kapatıldı** (aşağıda); KAAH15 açık |
 | T2 | Model başına referans Vs30 (yayından; şu an OpenQuake kodundan) | D5 senaryo (2) |
 | T3 | ESHM20 aktif sığ kabuk bölgelendirme dosyası ve sürümü | D2 sınıflaması |
-| T4 | NESS 2.1 sürümü, lisansı, atıfı; ESM sürümü ve sayıları | Kayıt karşılaştırması (§8.4) |
+| T4 | NESS 2.1 sürümü, lisansı, atıfı; ESM sürümü ve sayıları | İlgili veri kümesinin Aşama 2'de ilk kullanımı (§8.4); yazılım doğrulaması için gerekmez |
 | T5 | Campbell (1981) veri aralığı ve büyüklük ölçekleri | Karşılaştırma dalı |
 | T6 | Künye ayrıntıları (AC10 sayfaları, CY08, Zh06, Danciu vd. 2016, Kotha vd. 2020) | Raporlama |
 
@@ -355,6 +356,27 @@ Aynı makale (s. 1182): bölgesel soğrulma düzeltmesinde BSSA14 için "China a
 - BSSA14 normal faylanmada Mw > 7,0 ekstrapolasyondur (Ege graben sistemi için önemli).
 - D3'ün 200 km ortak sınırı her iki modelin aralığı içinde.
 - Bu tablo geliştiricilerin özetidir; ayrıntılı ek koşullar (ör. z1.0) her modelin kendi makalesindedir.
+- **Gösterim kuralı:** BSSA14'ün normal faylanmada Mw > 7,0 sonuçları, sonucun hemen yanında "ekstrapolasyon" uyarısıyla gösterilir (Ege graben sistemi karşılaştırmalarında özellikle).
+- **Kapsam ≠ performans:** BSSA14'ün "China and Turkey" bölge terimi, modelin Türkiye'deki her tektonik ortam (KAF, DAF, Ege grabenleri, Doğu Anadolu sıkışma bölgesi) için ayrı ayrı doğrulandığı anlamına gelmez. Coğrafi veri kapsamı ile yerel performans ayrı sorulardır; yerel performans Aşama 2 artık analizinde ortam bazında sınanır.
+
+**T1 — ESHM20 temel modeli (Kotha vd. 2020, BEE 18(9):4091–4125, doi:10.1007/s10518-020-00869-1; açık erişim, yayıncı sayfasından okundu):**
+- Veri: ESM; 927 olay, 18 222 kayıt, 1829 istasyon.
+- Mw 3,1–7,4 (özette 3–7,4); Rjb 0–545 km (uzaklık kesilmemiş; Rjb yoksa yalnız Mw ≤ 6,2 olaylarda Repi kullanılmış); odak derinliği ≤ 39 km.
+- Vs30 90–3000 m/s ya da eğim 0,001–1 m/m; RotD50 PGA, PGV ve SA 0,01–8 s.
+- Türkiye kayıtları dahil; bölgeselleştirme Türkiye'yi en az sekiz bölgeye ayırıyor (en büyükleri Doğu ve Batı Anadolu).
+- **Sonuç:** Kahramanmaraş Mw 7,7–7,8 bu modelde de ekstrapolasyondur (veri Mw ≤ 7,4). Temel modelde sabit bir referans Vs30 yok (istasyon terimleri δS2S); 800 m/s referansı ESHM20 uyarlamasından (Weatherill vd. 2020) geliyor ve OpenQuake kodunda görülüyor, makaleden **[teyit]** (T2).
+
+**T2 — doğrulama zinciri (her model için dört adım):**
+1. OpenQuake 3.26.2 kaynak kodundaki referans değer (§11 D5 tablosu; tamamlandı).
+2. Modelin özgün makalesindeki referans saha koşulu (sayfa ve denklem numarasıyla).
+3. İki kaynak arasındaki uyum ya da farkın kaydı.
+4. Kullanılacak senaryonun açık tanımı (D5 senaryo 2'de girilecek Vs30 değeri).
+
+CY14, BSSA14, ASB14, AC10 ve KAAH15 için bu zincir tamamlanmadan D5 tablosu kesinleşmiş sayılmaz. ESHM20 ve Zh06 için de aynı zincir uygulanır.
+
+**Öncelik sırası (kullanıcı, 2026-11-02):** T1 → T2 → T3 → T5 → T4. T4 (NESS / ESM künyeleri) ilgili veri kümesi Aşama 2'de ilk kez kullanılmadan önce zorunludur; yazılım doğrulaması (§8.1) için gerekmez.
+
+**Aşama 2, adım 1'in tasarımı (T1 ve T2 kapandıktan sonra):** Her model için aynı test girdileri (Mw, uzaklık, Vs30, faylanma türü, derinlik ızgarası) ile bağımsız ve yeniden üretilebilir bir OpenQuake doğrulama tablosu. Tablo yalnız yazılım doğrulamasıdır; modelin Türkiye depremleri, tektonik ortamı ve saha koşulu için kullanılabilirliğini kanıtlamaz (§8.5).
 
 ## 12. Kaynaklar
 
@@ -369,7 +391,7 @@ Aynı makale (s. 1182): bölgesel soğrulma düzeltmesinde BSSA14 için "China a
 - Chiou, B. S.-J., & Youngs, R. R. (2014). Update of the Chiou and Youngs NGA model for the average horizontal component of peak ground motion and response spectra. *Earthquake Spectra, 30*(3), 1117–1153.
 - Danciu, L., Kale, Ö., & Akkar, S. (2016). The 2014 Earthquake Model of the Middle East: Ground motion model and uncertainties. *Bulletin of Earthquake Engineering* **[teyit: cilt ve sayfa]**.
 - Kale, Ö., Akkar, S., Ansari, A., & Hamzehloo, H. (2015). A ground-motion predictive model for Iran and Turkey for horizontal PGA, PGV, and 5% damped response spectrum: Investigation of possible regional effects. *Bulletin of the Seismological Society of America, 105*(2A), 963–980.
-- Kotha, S. R., Weatherill, G., Bindi, D., & Cotton, F. (2020). A regionally-adaptable ground-motion model for shallow crustal earthquakes in Europe. *Bulletin of Earthquake Engineering, 18*, 4091–4125 **[teyit]**.
+- Kotha, S. R., Weatherill, G., Bindi, D., & Cotton, F. (2020). A regionally-adaptable ground-motion model for shallow crustal earthquakes in Europe. *Bulletin of Earthquake Engineering, 18*(9), 4091–4125. https://doi.org/10.1007/s10518-020-00869-1
 - Mabrouk, A. H. A. S. H. (2024). *Performance of alternative ground motion models with strong-motion data from moderate to large events in different seismotectonic regions in Türkiye* (Yüksek lisans tezi). Orta Doğu Teknik Üniversitesi.
 - Scherbaum, F., Delavaud, E., & Riggelsen, C. (2009). Model selection in seismic hazard analysis: An information-theoretic perspective. *Bulletin of the Seismological Society of America, 99*(6), 3234–3247.
 - Sharafi, F., Banimahd, S. A., Karimzadeh, S., Askan, A., & Lourenço, P. B. (2026). Objective ground motion model selection and ranking using likelihood and Bayesian criteria: A case study for Türkiye. *GeoHazards, 7*(5), 131. https://doi.org/10.3390/geohazards7050131
