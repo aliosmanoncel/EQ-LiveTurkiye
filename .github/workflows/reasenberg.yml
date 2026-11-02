@@ -1,0 +1,46 @@
+name: Reasenberg (Python secenegi, donmus v0.3.0)
+
+# scripts/reasenberg.py dondurulmustur (v0.3.0). Bu is akisi: modul testleri,
+# EQ-Live adaptoru, donmus regresyon referanslari ve gercek katalogda calisma
+# (UTC ve Europe/Istanbul). GK74 ve index.html bu is akisindan etkilenmez.
+on:
+  push:
+    paths:
+      - 'scripts/reasenberg.py'
+      - 'scripts/decluster_reasenberg.py'
+      - 'scripts/freeze_reasenberg_fixtures.py'
+      - 'scripts/reasenberg_tests/**'
+      - 'scripts/fixtures/reasenberg_zmap_*'
+      - 'scripts/decluster_gk74.py'
+      - '.github/workflows/reasenberg.yml'
+  pull_request:
+    paths:
+      - 'scripts/reasenberg.py'
+      - 'scripts/decluster_reasenberg.py'
+      - 'scripts/freeze_reasenberg_fixtures.py'
+      - 'scripts/reasenberg_tests/**'
+      - 'scripts/fixtures/reasenberg_zmap_*'
+      - 'scripts/decluster_gk74.py'
+      - '.github/workflows/reasenberg.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reasenberg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Bagimliliklar
+        run: pip install numpy pytest
+      - name: Modul + adaptor testleri, donmus regresyon referanslari
+        run: python -m pytest -q scripts/reasenberg_tests
+      - name: Gercek katalog (EMSC, xmeff 3.0) — UTC ve Europe/Istanbul ayni olmali
+        run: |
+          python scripts/decluster_reasenberg.py --xmeff 3.0 --src EMSC --membership --output /tmp/r_utc.json
+          TZ=Europe/Istanbul python scripts/decluster_reasenberg.py --xmeff 3.0 --src EMSC --membership --output /tmp/r_ist.json
+          python -c "import json; a=json.load(open('/tmp/r_utc.json'))['membership']; b=json.load(open('/tmp/r_ist.json'))['membership']; assert a==b, 'TZ farki'; print('membership ayni:', len(a))"
