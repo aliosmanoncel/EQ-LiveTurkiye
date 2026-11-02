@@ -3,6 +3,7 @@
 Tarih: 2026-11-02. Dal: `gmpe-turkiye-methodology` (taban: `main` 9b5d386).
 Durum: **taslak, kullanıcı incelemesinde**. Yalnız belge; kod değişikliği yok.
 - Revizyon 1 (2026-11-02): kullanıcı incelemesi (ChatGPT yorumu dahil) — D1, uzaklık tanımları, Vs30 kapsamı, belirsizlik türleri, D7 ve D9 güncellendi; NESS 2.1 flat-file'ından nicel bulgular eklendi (§13).
+- Revizyon 2 (2026-11-02): kullanıcı incelemesi — Repi − Rjb farkının yorumu, Mw kaynağı kaydı (7,7 / 7,8), Vs30 veri kalitesi işareti, SHA-256'nın kapsamı, yazılım doğrulaması / yöntem doğrulaması ayrımı; §11 her karar için "karar, bilimsel gerekçe, doğrulama durumu" olarak yeniden düzenlendi; Aşama 2'ye geçiş koşulu yazıldı.
 - Kod, `index.html`, `data/`, `seismoreport/` ve canlı site değişmedi.
 
 İşaretler:
@@ -182,6 +183,7 @@ EQ-Live'daki Poisson modülü bölge ölçeğinde büyüklük aşılma olasılı
    - Artıklar büyüklük, uzaklık, Vs30 (ölçülmüş / vekil ayrı) ve fay türüne göre ayrıca incelenir.
    - Bu adım yazılım doğrulaması değil, **model uygunluğu** sınamasıdır.
 5. **Raporlama.** Aşama A/B ayrımı korunur: hesaplama doğruluğu ayrı, bilimsel uygunluk ayrı raporlanır.
+   - **Yazılım doğrulaması ≠ yöntem doğrulaması.** OpenQuake ile birebir aynı sonucu almak, yalnız denklemin doğru uygulandığını gösterir. Seçilen GMPE'nin Türkiye'ye uygunluğunu ya da girdi senaryosunun (Mw kaynağı, geometri, Vs30) doğruluğunu kanıtlamaz. Bunlar ancak 4. adımdaki kayıtlarla karşılaştırmayla sınanır ve ayrı raporlanır.
 
 ## 9. Aşama 3 — EQ-Live entegrasyon ilkeleri (öneri)
 
@@ -197,19 +199,29 @@ ShakeMap, GMPE tahminini istasyon kayıtları ve şiddet raporlarıyla koşullan
 - ShakeMap'e bağlantı verilir;
 - EQ-Live tahmininin koşullandırılmamış olduğu belirtilir.
 
-## 11. Kullanıcı kararları (Aşama 2'den önce)
+## 11. Kararlar: karar, bilimsel gerekçe ve doğrulama durumu
 
-| No | Konu | Seçenekler / öneri |
-|---|---|---|
-| D1 | Mw kaynağı | **Ana hesap: yalnız doğrudan Mw.** Dönüşüm yalnız doğrulanırsa, ayrı senaryo olarak (revizyon 1) |
-| D2 | Tektonik sınıflama | Derinlik ≤ 35 km + ESHM20 ASC poligonu (öneri) |
-| D3 | Uzaklık sınırı | Rjb ≤ 200 km (öneri) |
-| D4 | Kaynak geometrisi | Yayımlanmış sonlu fay modeli varsa o; yoksa belgelenmiş senaryo geometrisi. Sonlu kaynak ölçütü Mw'ye değil kırık boyutu / uzaklık oranına dayanır (revizyon 1; eşik Aşama 2'de NESS ile belirlenir) |
-| D5 | Vs30 | 760 m/s ortak karşılaştırma senaryosu + modelin kendi referans koşulu ayrı denetlenir + vekil harita senaryosu |
-| D6 | Mevcut Campbell (1981) katmanı | Olduğu gibi kalsın / `hazard-etiket` birleştirilsin / yeniden adlandırılsın / kaldırılsın |
-| D7 | Kayıt verisi | NESS 2.1 (kullanıcıda mevcut, §13) + ESM + Türkiye için AFAD TADAS / SMD-TR (revizyon 1) |
-| D8 | Hesap yeri | Önce OpenQuake ile bağımsız doğrulama; EQ-Live'daki hesap yeri sonra seçilir |
-| D9 | Aday modeller | Üç ayrı soru: (1) Türkiye'de daha önce kullanılanlar, Akkar vd. (2018) tam metninden doğrulanacak; (2) EQ-Live adayları: KAAH15, AC10, ASB14, BSSA14 Yüksek Q, ESHM20 (geçici), NGA-West2'nin geri kalanı duyarlılık için; (3) nihai küme: Aşama 2 artık analizinden sonra. 2018 PSHA mantık ağacı ağırlıkları bu deterministik katmana aktarılmaz (farklı amaç). Türkiye'de geliştirilmiş olmak her M–R aralığında en uygun olmayı garanti etmez. |
+Doğrulama durumu sınıfları:
+- **Kabul**: kullanıcı onayladı; yöntem ilkesi olarak geçerli.
+- **Koşullu**: ilke kabul, ama bir parametre ya da kaynak henüz doğrulanmadı.
+- **Geçici**: çalışma varsayımı; Aşama 2 verisiyle yeniden değerlendirilecek.
+- **Açık**: karar verilmedi.
+
+Kabul edilmiş bir ilke ile veri ya da kaynakla henüz doğrulanmamış bir varsayım bu sütunda ayrı tutulur.
+
+| No | Konu | Karar | Bilimsel gerekçe | Doğrulama durumu |
+|---|---|---|---|---|
+| D1 | Mw kaynağı | Ana hesap yalnız doğrudan Mw. Diğer türler yalnız dönüşümleri doğrulanırsa ve ayrı senaryo olarak. Her olayda Mw değeri ve kaynağı (ajans / yayın) kaydedilir; aynı olay için farklı Mw'ler (ör. Kahramanmaraş 7,7 NESS / 7,8) birbirinin yerine otomatik geçirilmez, gerekirse ayrı senaryo olur. | GMPE'ler Mw ile kalibre edilmiştir; dönüşüm hatası medyanı sistematik kaydırır ve σ'ya karışırsa görünmez olur. EQ-Live'daki ML/MD ilkesiyle tutarlı. | **Kabul** (kullanıcı, 2026-11-02) |
+| D2 | Tektonik sınıflama | Derinlik ≤ 35 km ve ESHM20 aktif sığ kabuk poligonu. | Aday modellerin hepsi aktif sığ kabuk verisiyle kurulmuştur; dalma-batma olayları ayrı model ailesi ister. | **Koşullu**: poligon kaynağı ve 35 km eşiği **[teyit]** |
+| D3 | Uzaklık sınırı | Rjb ≤ 200 km. | Kahramanmaraş 2023'te modeller Rjb > 200 km'de uyumsuz (Buckreis vd. 2024); aday modellerin çoğunun veri aralığı ~200 km **[teyit]**. | **Geçici**: Aşama 2 artıklarıyla yeniden değerlendirilecek |
+| D4 | Kaynak geometrisi | Yayımlanmış sonlu fay modeli varsa o; yoksa belgelenmiş senaryo geometrisi. Sonlu kaynak gereksinimi Mw sınıfıyla değil, kırık boyutu, istasyonun kırığa göre konumu (doğrultu boyunca / dik, asılı ya da taban blok) ve uzaklıkla belirlenir. | Repi − Rjb farkı (§13) bir GMPE hatası değil, uzaklık tanımının sonlu kırığı ne ölçüde temsil ettiğinin göstergesidir; GMPE'ye yanlış uzaklık girerse medyan yanlı olur. | **Kabul** (ilke). Eşik ve senaryo geometrisi **Açık**; Aşama 2'de NESS ile belirlenecek |
+| D5 | Vs30 | 760 m/s ortak karşılaştırma senaryosu; her modelin kendi referans koşulu ayrı denetlenir; vekil harita ikinci senaryo. Her Vs30 değeri kaynağıyla işaretlenir (ölçülmüş / jeoloji / topoğrafya); zemin terimi analizinde ölçülmüş ve tahmini Vs30 aynı kalite sayılmaz. | Modellerin referans kaya tanımları farklı; topoğrafik Vs30'un belirsizliği ölçülmüşe göre çok büyüktür (NESS'te Kahramanmaraş ana şokunun 120 kaydının hepsi topoğrafik). | **Koşullu**: model başına referans koşulu **[teyit]** |
+| D6 | Mevcut Campbell (1981) katmanı | Seçenekler: olduğu gibi kalsın / `hazard-etiket` birleştirilsin / yeniden adlandırılsın / kaldırılsın. | §1'deki tespitler. | **Açık** |
+| D7 | Kayıt verisi | NESS 2.1 + ESM + Türkiye için AFAD TADAS / SMD-TR. Olay ve kayıt örneklemi ayrı raporlanır; yinelenen kayıtlar eşleştirilir. | Küresel uyum ile Türkiye'deki uyum iki ayrı soru; NESS yalnız Mw ≥ 5,5. | **Koşullu**: NESS dosyası mevcut ve sayımlar dosyadan doğrulandı. SHA-256 yalnız dosya bütünlüğünü doğrular; NESS sürümü, lisansı ve atıfı ile ESM sürümü ve sayıları **[teyit]** |
+| D8 | Hesap yeri | Önce OpenQuake ile bağımsız doğrulama; EQ-Live'daki hesap yeri sonra seçilir. | Referans uygulama önce; yazılım doğrulaması yöntem doğrulamasından ayrı (§8). | **Kabul** |
+| D9 | Aday modeller | Üç soru ayrı: (1) Türkiye'de daha önce kullanılanlar, Akkar vd. (2018) tam metninden; (2) EQ-Live adayları: KAAH15, AC10, ASB14, BSSA14 Yüksek Q, ESHM20 (NGA-West2'nin geri kalanı duyarlılık için); (3) nihai küme, Aşama 2 artık analizinden sonra. 2018 PSHA mantık ağacı ağırlıkları bu deterministik katmana aktarılmaz. | PSHA ağırlıkları farklı bir amaç için kurulmuştur; Türkiye'de geliştirilmiş olmak her M–R aralığında en uygun olmayı garanti etmez. | **Açık**: Akkar vd. (2018) tam metni bekleniyor |
+
+**Aşama 2'ye geçiş koşulu (kullanıcı kararı, 2026-11-02):** Önce D9, Akkar vd. (2018) tam metninden kesinleştirilir. Ardından D2, D3, D5 ve D6 ayrı ayrı kapatılır. Bu kararlar tamamlanmadan Aşama 2 hesaplarına geçilmez.
 
 ## 12. Kaynaklar
 
@@ -234,7 +246,7 @@ Ortam notu: OpenQuake sınıf adları ve gerekli girdiler `openquake.engine 3.26
 Dosya: `NESS21_2026.zip` (kullanıcının İndirilenler klasörü; depoya kopyalanmadı).
 - SHA-256: `25293fe1c59875a9bfc2c297e4bdb2820124a23e62b5ba93f91aa88dbf49628b`.
 - İçerik: `NESS21_flat-file_2026.csv` (`;` ayırıcılı, 412 sütun), `readme.txt`, `reference.csv`.
-- Sürüm tarihi, lisans ve künye readme'de yazmıyor; NESS sayfasından alınacak **[teyit]**.
+- Sürüm tarihi, lisans ve künye readme'de yazmıyor; NESS sayfasından alınacak **[teyit]**. SHA-256 yalnız dosyanın bütünlüğünü doğrular; sürümü, lisansı ya da atıfı doğrulamaz.
 
 | Özellik | Değer (dosyadan sayıldı) |
 |---|---|
@@ -249,7 +261,7 @@ Dosya: `NESS21_2026.zip` (kullanıcının İndirilenler klasörü; depoya kopyal
 | Türkiye'deki istasyonlarda kayıt | 264 |
 
 Notlar:
-- NESS'te Kahramanmaraş ana şoku Mw 7,7 (`mw_ref`: Pondrelli vd. veri kümesi); başka kaynaklarda 7,8. Artık analizinde Mw kaynağı ayrıca kaydedilir.
+- NESS'te Kahramanmaraş ana şoku Mw 7,7 (`mw_ref`: Pondrelli vd. veri kümesi); başka kaynaklarda 7,8. 7,7 değeri 7,8'in yerine otomatik geçirilmez: olay kimliği ve Mw kaynağı kaydedilir, gerekirse iki değer ayrı senaryo olur (D1).
 - Ana şok üç segmentli sonlu fay modeliyle tanımlı (USGS web servisi; uzunluklar 50,2 / 185,9 / 156,8 km).
 - Kahramanmaraş ana şokunun 120 kaydının **hepsinde Vs30 topoğrafyadan** (Wald & Allen 2007) alınmış; ölçülmüş Vs30 yok. Türkiye için saha terimi sonuçları bu nedenle vekil Vs30 belirsizliğini taşır.
 
@@ -264,6 +276,7 @@ Notlar:
 | 7,5–8,1 | 807 | 47,8 / 174,3 | 52,8 / 171,6 | %99 (n = 154) |
 
 Yorum:
-- Fark yakın alanda Mw 5,5–6'da bile ihmal edilemez; uzak alanda göreli olarak küçülür. Bu, D4'teki "kırık boyutu / uzaklık oranı" ölçütünü destekler.
-- Eşik Aşama 2'de bu tabloya dayanarak belirlenir.
+- Bu fark bir GMPE hatası değildir. Nokta kaynak uzaklığının sonlu kırık geometrisini ne ölçüde temsil ettiğini gösterir.
+- Fark yakın alanda Mw 5,5–6'da bile ihmal edilemez; uzak alanda göreli olarak küçülür. Bu, D4'teki ölçütü destekler.
+- Eşik Aşama 2'de yalnız Mw sınıflarına göre değil; kırık boyutu, istasyonun kırığa göre konumu ve uzaklığa göre belirlenir.
 - NESS yalnız Mw ≥ 5,5 içerdiğinden daha küçük olaylar için ESM ile tamamlanmalıdır.
