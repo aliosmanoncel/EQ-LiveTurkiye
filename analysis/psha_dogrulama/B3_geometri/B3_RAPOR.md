@@ -175,7 +175,25 @@ Davao:
   - Kuehn'de Cotabato yaklaşık +25 %, Davao yaklaşık +44 %.
   - Yani Vs30 etkisi geometriye bağlıdır, ama bunun nedeni geometrinin kendisi değil, geometrinin değiştirdiği sarsıntı düzeyidir.
 - **Soruya yanıt.** 760 m/s yerine 360 m/s kullanmak %10/50 PGA'yı modele, kaynağa ve geometriye göre +6 ile +61 % (+0,02 ile +0,38 g) artırıyor.
-- **Hangi Vs30 sahayı temsil ediyor?** Ölçülmüş yerel Vs30 verisi olmadan söylenemez. 360 m/s, raporun kendi varsayımıdır ("Sarangani kıyı dolgusu").
+- **Hangi Vs30 sahayı temsil ediyor?** Ölçülmüş yerel Vs30 verisi olmadan söylenemez. **360 m/s bir senaryo varsayımıdır**; raporun kendi varsayımı ("Sarangani kıyı dolgusu") olup yerel ölçümle doğrulanmamıştır.
+
+### 4.4 Vs30 senaryolarının sınırlılıkları
+
+Vs30 karşılaştırması bu raporda **geometri etkisinden ayrı** bir bulgudur ve şu sınırlarla okunmalıdır.
+
+1. **Vs30 tek başına yeterli değil.** Vs30, saha koşullarının önemli bir göstergesidir; ama yerel zemin davranışını tek başına bütünüyle tanımlamaz. Aynı Vs30 değerine sahip sahalar, farklı kayma dalgası hızı profilleri ve jeolojik koşullar nedeniyle farklı saha tepkileri gösterebilir.
+   - Kaynak: Kamai vd. (2016). Çalışma California, Tayvan ve Japonya hız profillerini karşılaştırıyor ve aynı Vs30 aralığındaki profillerin bölgeler arasında farklılaştığını gösteriyor.
+   - Yazarların önerisi: sahaya özgü değerlendirmede, sahada ölçülmüş ya da benzer jeolojik ve çökelme ortamından alınmış temsil edici bir hız profili kurmak.
+   - Önerdikleri medyan profil modeli yalnız 250 ≤ Vs30 ≤ 850 m/s aralığı için geçerli.
+2. **Bölgesel Vs30 ölçeklenmesi.** Kamai vd. (2016), NGA-West2 modellerinin üçünde ayrı California ve Japonya Vs30 ölçeklenmesi bulunduğunu, hangisinin kullanılacağına coğrafyaya göre değil sahanın hız profiline göre karar verilmesini öneriyor.
+   - Bu öneri NGA-West2 (sığ kabuk) GMPE'leri içindir.
+   - Mindanao'daki subdüksiyon GMPE'lerinin zemin terimlerini doğrudan doğrulamaz; bu raporun modellerine aktarılması bir varsayım olur.
+3. **Ölçülmemiş Vs30'un ek belirsizliği.** Kamai vd. (2016), jeoloji ya da topografya gibi dolaylı göstergelerden tahmin edilen Vs30 için ek epistemik belirsizlik önerildiğini aktarıyor (Ancheta vd. 2013). General Santos için 360 m/s bir dolaylı tahmin bile değil, senaryo varsayımıdır. Bu nedenle 360 m/s sonuçları sahanın temsili olarak değil, duyarlılık olarak okunmalıdır.
+4. **Modellerin "referans kaya" tanımları farklı** (§4.1). 760 m/s yalnız Parker (2022) için referans koşuldur. BC Hydro'nun referansı 1000 m/s, Kuehn'in 1100 m/s'dir. Youngs (1997) iki ayrık sınıf kullanır. 760 m/s bu raporda tüm modeller için ortak bir "referans kaya" olarak kullanılmamıştır; her modelde ayrı bir saha koşuludur.
+5. **Harici zemin düzeltmesi seçeneği (uygulanmadı).** Seyhan ve Stewart (2014) 760 m/s referanslı, doğrusal olmayan bir yarı-ampirik büyütme modeli verir. Kaya referanslı modellere uygulanabilir; ancak NGA-West2 sığ kabuk verisinden türetilmiştir ve subdüksiyon yer hareketine uygulanması ayrı bir varsayım olur.
+   - Parker (2022)'nin doğrusal olmayan terimi aynı fonksiyonel biçimdedir, sabitleri farklıdır (OpenQuake: Vb 200 m/s, f3 0,05 g; SS14: 360 m/s, 0,1 g).
+   - Uygulanırsa ayrı bir model varsayımı olarak raporlanacaktır (onay bekliyor).
+6. **Sahaya özgü tepki analizi** (yerel profil ile 1-B tepki) bu çalışmanın kapsamı dışındadır; gerçek saha büyütmesi için gereklidir.
 
 ## 5. Mantık ağacı: P0 ve sonlu fay
 
@@ -194,6 +212,7 @@ Kod bağıntısıyla sonlu fay mantık ağacı sonucunu yalnız %2–6 değişti
 
 ## 6. Yorum ve sınırlar
 
+0. **Vs30 notu.** Bütün 360 m/s sonuçları, yerel ölçümle doğrulanmamış bir **senaryo varsayımına** dayanır (§4.4).
 1. **Soruya yanıt.**
    - Duyarlılık GMPE'ye bağlı. Kod bağıntısıyla Cotabato'da ≤ ±3 %; modern GMPE'lerle +10 ile +57 %.
    - Davao'da alternatiflere göre −6 ile +54 % (Kuehn'in dik fay sonucu bir model uyumsuzluğu, §2).
@@ -211,5 +230,23 @@ Kod bağıntısıyla sonlu fay mantık ağacı sonucunu yalnız %2–6 değişti
 - `b3_geometri.py` → `b3_sonuc.json` ve `egri_*.npy`.
 - `b3_vs30_tani.py` → `b3_vs30_tani.json`.
 - `b3_sekil.py` → `b3_sekil.png` / `.svg`.
+
+## Kaynakça (APA 7)
+
+- Abrahamson, N., Gregor, N., & Addo, K. (2016). BC Hydro ground motion prediction equations for subduction earthquakes. *Earthquake Spectra, 32*(1), 23–44.
+- Ancheta, T. D., vd. (2013). PEER NGA-West2 Database (PEER Report 2013/03). Pacific Earthquake Engineering Research Center. (Kamai vd. 2016'dan aktarma)
+- Kamai, R., Abrahamson, N. A., & Silva, W. J. (2016). VS30 in the NGA GMPEs: Regional differences and suggested practice. *Earthquake Spectra, 32*(4), 2083–2108. https://doi.org/10.1193/072615EQS121M
+- Kuehn, N. M., Bozorgnia, Y., Campbell, K. W., & Gregor, N. (2020). *Partially non-ergodic ground-motion model for subduction regions using the NGA-Subduction database* (PEER Report 2020/04). Pacific Earthquake Engineering Research Center.
+- Parker, G. A., Stewart, J. P., Boore, D. M., Atkinson, G. M., & Hassani, B. (2022). NGA-subduction global ground motion models with regional adjustment factors. *Earthquake Spectra, 38*(1), 456–493. https://doi.org/10.1177/87552930211034889
+- Seyhan, E., & Stewart, J. P. (2014). Semi-empirical nonlinear site amplification from NGA-West2 data and simulations. *Earthquake Spectra, 30*(3), 1241–1256. https://doi.org/10.1193/063013EQS181M
+- Strasser, F. O., Arango, M. C., & Bommer, J. J. (2010). Scaling of the source dimensions of interface and intraslab subduction-zone earthquakes with moment magnitude. *Seismological Research Letters, 81*(6), 941–950.
+- Wells, D. L., & Coppersmith, K. J. (1994). New empirical relationships among magnitude, rupture length, rupture width, rupture area, and surface displacement. *Bulletin of the Seismological Society of America, 84*(4), 974–1002.
+- Youngs, R. R., Chiou, S.-J., Silva, W. J., & Humphrey, J. R. (1997). Strong ground motion attenuation relationships for subduction zone earthquakes. *Seismological Research Letters, 68*(1), 58–73.
+
+Kamai vd. (2016) ve Seyhan ve Stewart (2014) birincil kaynaktan okundu (kullanıcının Zotero kütüphanesi). Diğer künyeler, B2 raporunda erişilen sayfalardan ve bilinen künye bilgisinden alınmıştır.
+
+## Durum
+
+B3 henüz **dondurulmadı**. Koddaki bağıntının zayıf uzaklık bağımlılığı (§3) B3'ün yorumunu etkiliyor; bu nedenle önce B1 kapsamında Youngs vd. (1988) özgün denklemi doğrulanacak (makale bekleniyor).
 
 Ortam: openquake.engine 3.26.2. Sağlama: P0, kod bağıntısı ve Vs30 360 için 0,70338 g; mantık ağacı λ ortalaması 0,92838 g. İkisi de Aşama A ile aynı.

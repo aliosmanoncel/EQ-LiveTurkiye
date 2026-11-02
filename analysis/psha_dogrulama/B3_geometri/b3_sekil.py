@@ -17,5 +17,5 @@ for j, vs in enumerate((360.0, 760.0)):
         a.set_title(f'({"abcd"[2 * i + j]}) {kay}\nVs30 = {int(vs)} m/s', fontsize=8); a.set_xlabel('%10/50 yıl PGA (g)' if i else '')
         if j == 1: a.legend(fontsize=6, frameon=False, loc='upper left', bbox_to_anchor=(1.02, 1.0))
 fig.text(0.01, 0.01, textwrap.fill('Model duyarlılığı — doğrulanmış tehlike değeri değildir. MFD, oranlar, Mmax, GMPE ve Vs30 B2 ile aynı; yalnız geometri değişir. '
-         'Davao alternatifleri ayrı gösterilir, birleştirilmez. σ kesilmemiş.', 150), fontsize=5.6)
-fig.tight_layout(rect=(0, 0.04, 0.82, 1)); fig.savefig('b3_sekil.png', dpi=600); fig.savefig('b3_sekil.svg'); print('ok')
+         'Davao alternatifleri ayrı gösterilir, birleştirilmez. σ kesilmemiş. Vs30 = 360 m/s yerel ölçümle doğrulanmamış bir senaryo varsayımıdır; 760 m/s her model için referans kaya değildir (BC Hydro 1000, Kuehn 1100 m/s).', 150), fontsize=5.6)
+fig.tight_layout(rect=(0, 0.065, 0.82, 1)); fig.savefig('b3_sekil.png', dpi=600); fig.savefig('b3_sekil.svg'); print('ok')
