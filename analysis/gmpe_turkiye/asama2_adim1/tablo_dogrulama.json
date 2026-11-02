@@ -1,0 +1,285 @@
+{
+ "aciklama": "Aşama 2, adım 1 (a): OpenQuake 3.26.2 GMPE uygulamalarının referans doğrulama tablolarına karşı sınanması.",
+ "openquake_engine": "3.26.2",
+ "referans_tablolar": "gem/oq-engine v3.26.2 (080f8f82392fed7259204a79271e2858f7a49209), openquake/hazardlib/tests/gsim/data",
+ "hedef_IM": [
+  "PGA",
+  "PGV",
+  "SA(0.2)",
+  "SA(1.0)"
+ ],
+ "modeller": [
+  {
+   "rol": "Liste B",
+   "model": "ASB14",
+   "openquake_sinifi": "AkkarEtAlRjb2014",
+   "tablo_kaynagi": "yazarların Matlab kodundan üretilmiş tablolar (akkar_2014_test.py)",
+   "tablolar": {
+    "MEAN": {
+     "dosya": "AKKAR14/AKKAR_2014_RJB_MEAN.csv",
+     "sha256": "d0558e5af77ffcb16486e9587aba7c7ba6ab219859835df7d14414ee6af12ad3",
+     "IM_sayisi": 64,
+     "satir_x_IM": 34560,
+     "en_buyuk_fark_yuzde_tum_IM": 4.949441190227333e-07,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 4.923936813838736e-07,
+      "PGV": 4.597227043490193e-07,
+      "SA(0.2)": 4.6694881294939705e-07,
+      "SA(1.0)": 4.1642093107086e-07
+     }
+    },
+    "TOTAL_STDDEV": {
+     "dosya": "AKKAR14/AKKAR_2014_RJB_STD_TOTAL.csv",
+     "sha256": "23fb86acca4a6766d8916b1101ae8f636fd246350eaa7dc4b5157cba2be150e7",
+     "IM_sayisi": 64,
+     "satir_x_IM": 34560,
+     "en_buyuk_fark_yuzde_tum_IM": 6.639824245979753e-08,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 4.642655149211805e-08,
+      "PGV": 6.127665042043873e-08,
+      "SA(0.2)": 3.994582442601313e-10,
+      "SA(1.0)": 2.2578849900867226e-08
+     }
+    }
+   }
+  },
+  {
+   "rol": "Liste B",
+   "model": "AC10",
+   "openquake_sinifi": "AkkarCagnan2010",
+   "tablo_kaynagi": "test dosyasında kaynak belirtilmemiş (akkar_cagnan_2010_test.py)",
+   "tablolar": {
+    "MEAN": {
+     "dosya": "AC10/AC10_MEAN.csv",
+     "sha256": "6105bb7ebc328d69697f875a6cb587443ba1df0c745ca91feae45556dec3527e",
+     "IM_sayisi": 16,
+     "satir_x_IM": 5376,
+     "en_buyuk_fark_yuzde_tum_IM": 0.0754217504759902,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 0.04192765990094216,
+      "PGV": 0.017076053839293337,
+      "SA(0.2)": 0.036365016752659685,
+      "SA(1.0)": 0.04324767271288721
+     }
+    },
+    "TOTAL_STDDEV": {
+     "dosya": "AC10/AC10_STD_TOTAL.csv",
+     "sha256": "f8edd3e085f69a3e2e51c462326d1feb23f27bb99ce54e5ca762158a563301e6",
+     "IM_sayisi": 16,
+     "satir_x_IM": 5376,
+     "en_buyuk_fark_yuzde_tum_IM": 0.004646700112043156,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 0.0018871919123641945,
+      "PGV": 0.004500811147611916,
+      "SA(0.2)": 0.002852462245694909,
+      "SA(1.0)": 0.0020565011849882353
+     }
+    }
+   }
+  },
+  {
+   "rol": "Liste B",
+   "model": "KAAH15",
+   "openquake_sinifi": "KaleEtAl2015Turkey",
+   "tablo_kaynagi": "yazarların Matlab kodundan üretilmiş tablolar (kale_2015_test.py)",
+   "tablolar": {
+    "MEAN": {
+     "dosya": "KALE15/KALE_2015_TURKEY_MEAN.csv",
+     "sha256": "fc9f27121b0f77655eaebadd12220aca5adc19af7bdfb1f81da5d2dc701d8dc0",
+     "IM_sayisi": 64,
+     "satir_x_IM": 34560,
+     "en_buyuk_fark_yuzde_tum_IM": 4.956814958489986e-07,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 4.5915211632774344e-07,
+      "PGV": 4.2847672077073184e-07,
+      "SA(0.2)": 4.655963614652592e-07,
+      "SA(1.0)": 4.3453063369724987e-07
+     }
+    },
+    "TOTAL_STDDEV": {
+     "dosya": "KALE15/KALE_2015_TURKEY_STD_TOTAL.csv",
+     "sha256": "eb11c050f6dca2ef50b38d0e09276d3d283224652e597e4a7132a90f42df0051",
+     "IM_sayisi": 64,
+     "satir_x_IM": 34560,
+     "en_buyuk_fark_yuzde_tum_IM": 8.041871613073681e-08,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 4.349098858824618e-08,
+      "PGV": 5.797378133109987e-08,
+      "SA(0.2)": 8.041871613073681e-08,
+      "SA(1.0)": 4.451143897910015e-08
+     }
+    }
+   }
+  },
+  {
+   "rol": "Liste B",
+   "model": "BSSA14 Yüksek Q",
+   "openquake_sinifi": "BooreEtAl2014HighQ",
+   "tablo_kaynagi": "D. M. Boore'un Fortran uygulaması, Temmuz 2014 (boore_2014_test.py)",
+   "tablolar": {
+    "MEAN": {
+     "dosya": "BSSA2014/BSSA_2014_HIGHQ_MEAN.csv",
+     "sha256": "09ba75284fbf5111324ee0207a52e8fe7f322bdee83e5ae0a02b2e02e54af239",
+     "IM_sayisi": 39,
+     "satir_x_IM": 17550,
+     "en_buyuk_fark_yuzde_tum_IM": 1.7590133983933942,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 0.00418907673502833,
+      "PGV": 0.0006922324437441674,
+      "SA(0.2)": 0.0034120078866051173,
+      "SA(1.0)": 0.0018448508290691557
+     }
+    },
+    "TOTAL_STDDEV": {
+     "dosya": "BSSA2014/BSSA_2014_HIGHQ_TOTAL_STD.csv",
+     "sha256": "ce36f2c42ca26f1494d60f1f455bdd14ea3566cb552a828cd9ad7724de7c9917",
+     "IM_sayisi": 39,
+     "satir_x_IM": 17550,
+     "en_buyuk_fark_yuzde_tum_IM": 0.013860530800424709,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 0.007012746029411154,
+      "PGV": 0.006010245543042192,
+      "SA(0.2)": 0.00756919585460647,
+      "SA(1.0)": 0.006450624386555859
+     }
+    }
+   }
+  },
+  {
+   "rol": "Liste B",
+   "model": "CY14",
+   "openquake_sinifi": "ChiouYoungs2014",
+   "tablo_kaynagi": "medyan: yazarların verdiği araç; σ: OpenSHA ile üretilmiş (chiou_youngs_2014_test.py)",
+   "tablolar": {
+    "MEAN": {
+     "dosya": "NGA/CY14/CY14_MEDIAN_MS_HW_SS.csv",
+     "sha256": "5f179525a89c2ba06b4008a3b5ce608a88fe75b8320fab3b7af128cc7e6fae91",
+     "IM_sayisi": 24,
+     "satir_x_IM": 3888,
+     "en_buyuk_fark_yuzde_tum_IM": 9.863221350769891e-11,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": null,
+      "PGV": null,
+      "SA(0.2)": 2.984279490192421e-11,
+      "SA(1.0)": 6.423750420481156e-11
+     }
+    },
+    "TOTAL_STDDEV": {
+     "dosya": "NGA/CY14/CY14_TOTAL_EVENT_SIGMA.csv",
+     "sha256": "49baa7db50cd64314a38c11ba12c73768981a4f812301fea2da8c99d9bf160ce",
+     "IM_sayisi": 24,
+     "satir_x_IM": 11664,
+     "en_buyuk_fark_yuzde_tum_IM": 0.001276202446698349,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": null,
+      "PGV": null,
+      "SA(0.2)": 0.0011178031464109672,
+      "SA(1.0)": 0.0008177141093357321
+     }
+    }
+   }
+  },
+  {
+   "rol": "Liste B",
+   "model": "ESHM20",
+   "openquake_sinifi": "KothaEtAl2020ESHM20",
+   "tablo_kaynagi": "yazarın R uygulamasından beklenen değerler (kotha_2020_test.py)",
+   "tablolar": {
+    "MEAN": {
+     "dosya": "kotha20/KOTHA_2020_ESHM_CENTRAL_MEAN.csv",
+     "sha256": "8e005b8f09e60faa47733c45aa19302e0c71f3d3079ac425ec33c30c64056bde",
+     "IM_sayisi": 8,
+     "satir_x_IM": 768,
+     "en_buyuk_fark_yuzde_tum_IM": 4.775849937743715e-07,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 4.0673938661583975e-07,
+      "PGV": 4.775849937743715e-07,
+      "SA(0.2)": 2.4209838578315157e-07,
+      "SA(1.0)": 4.424933197633152e-07
+     }
+    },
+    "TOTAL_STDDEV": {
+     "dosya": "kotha20/KOTHA_2020_ESHM_STDDEV_TOTAL.csv",
+     "sha256": "9ddae2d4b414e04c1bed4280209f5c8814618b5f8d972606c765eb5ff2cd5122",
+     "IM_sayisi": 8,
+     "satir_x_IM": 768,
+     "en_buyuk_fark_yuzde_tum_IM": 7.815305069769352e-07,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 6.687019160622754e-07,
+      "PGV": 7.211107155846719e-07,
+      "SA(0.2)": 6.634097049484922e-07,
+      "SA(1.0)": 6.23326101845123e-07
+     }
+    }
+   }
+  },
+  {
+   "rol": "Karşılaştırma",
+   "model": "CY08",
+   "openquake_sinifi": "ChiouYoungs2008",
+   "tablo_kaynagi": "OpenSHA ile üretilmiş (chiou_youngs_2008_test.py); σ: ölçülmüş Vs30",
+   "tablolar": {
+    "MEAN": {
+     "dosya": "NGA/CY08/CY08_MEDIAN_MS_HW_SS.csv",
+     "sha256": "e5543b7ecf6d642f99563efb1df3227c22936a8d70ec4265cd97b79d4f5a49b3",
+     "IM_sayisi": 24,
+     "satir_x_IM": 3816,
+     "en_buyuk_fark_yuzde_tum_IM": 0.048833185804531,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 0.039770558281815305,
+      "PGV": 0.04204475821608655,
+      "SA(0.2)": 0.0446491284465278,
+      "SA(1.0)": 0.04237266907001214
+     }
+    },
+    "TOTAL_STDDEV": {
+     "dosya": "NGA/CY08/CY08_SIGMEAS_MS_HW_SS.csv",
+     "sha256": "dc69044b431ecbe769c64112885bc28573384cd4e0f8c518c7eaa47924980bb3",
+     "IM_sayisi": 24,
+     "satir_x_IM": 3816,
+     "en_buyuk_fark_yuzde_tum_IM": 0.013841631181876757,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 0.011850496511678354,
+      "PGV": 0.01014137747035182,
+      "SA(0.2)": 0.013414439532488664,
+      "SA(1.0)": 0.008561085355762721
+     }
+    }
+   }
+  },
+  {
+   "rol": "Karşılaştırma",
+   "model": "Zh06",
+   "openquake_sinifi": "ZhaoEtAl2006Asc",
+   "tablo_kaynagi": "J. Zhao'nun Fortran uygulaması (zhao_2006_test.py)",
+   "tablolar": {
+    "MEAN": {
+     "dosya": "ZHAO06/Z06Asc_MEAN.csv",
+     "sha256": "a692c4cfb13c116c4c40d39e57461ca5d47c9dca137fb526349258659cb86271",
+     "IM_sayisi": 21,
+     "satir_x_IM": 32256,
+     "en_buyuk_fark_yuzde_tum_IM": 0.35968782042206104,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 0.2329376201178568,
+      "PGV": null,
+      "SA(0.2)": 0.29975050777450996,
+      "SA(1.0)": 0.15161160692632736
+     }
+    },
+    "TOTAL_STDDEV": {
+     "dosya": "ZHAO06/Z06Asc_STD_TOTAL.csv",
+     "sha256": "2ced64759cc741484cacad7f783b2929b22fd34e05b5392136f6bea45aa36ee7",
+     "IM_sayisi": 21,
+     "satir_x_IM": 32256,
+     "en_buyuk_fark_yuzde_tum_IM": 0.05966516391853194,
+     "en_buyuk_fark_yuzde_hedef_IM": {
+      "PGA": 0.013229426236938124,
+      "PGV": null,
+      "SA(0.2)": 0.03604302077839794,
+      "SA(1.0)": 1.5401000030834666e-06
+     }
+    }
+   }
+  }
+ ]
+}

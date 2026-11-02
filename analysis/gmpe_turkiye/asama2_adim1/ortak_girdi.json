@@ -1,0 +1,109 @@
+{
+ "aciklama": "Aşama 2, adım 1 (b, c): ortak test girdileriyle bütün modeller + bağımsız uygulama (pygmm) ile çapraz kontrol + Campbell (1981).",
+ "openquake_engine": "3.26.2",
+ "pygmm": "0.8.0",
+ "girdi": {
+  "Mw": [
+   5.0,
+   6.0,
+   7.0,
+   7.8
+  ],
+  "Rjb_km": [
+   1.0,
+   10.0,
+   30.0,
+   100.0,
+   200.0
+  ],
+  "Vs30": [
+   360.0,
+   760.0
+  ],
+  "mekanizma": "doğrultu atımlı, rake 0, dip 90",
+  "ztor_km": 0.0,
+  "odak_derinligi_km": 10.0,
+  "Rrup = Rx = Rjb; Ry0 = 0": true,
+  "z1pt0": "CY14 küresel ortalama",
+  "ESHM20_bolge": 0,
+  "vs30measured": true,
+  "IM": [
+   "PGA",
+   "PGV",
+   "SA(0.2)",
+   "SA(1.0)"
+  ]
+ },
+ "build_hazard_grid_sha256": "6fde05f01a050674f31a4fa55790dfbe0d9351c2ffb0c5a90a374c22b99539e6",
+ "capraz_kontrol_pygmm": {
+  "ASB14": {
+   "PGA": {
+    "medyan": 8.881784197001252e-14,
+    "sigma": 0.0007503623937532566,
+    "n": 40
+   },
+   "PGV": {
+    "medyan": 8.881784197001252e-14,
+    "sigma": 0.0028559971851471744,
+    "n": 40
+   },
+   "SA(0.2)": {
+    "medyan": 8.881784197001252e-14,
+    "sigma": 0.0033834024145029673,
+    "n": 40
+   },
+   "SA(1.0)": {
+    "medyan": 8.881784197001252e-14,
+    "sigma": 0.0030978242799184486,
+    "n": 40
+   }
+  },
+  "BSSA14 Yüksek Q": {
+   "PGA": {
+    "medyan": 0.007962341721379218,
+    "sigma": 0.0,
+    "n": 40
+   },
+   "PGV": {
+    "medyan": 0.00016575334564894462,
+    "sigma": 0.0,
+    "n": 40
+   },
+   "SA(0.2)": {
+    "medyan": 0.005971771999102593,
+    "sigma": 0.0,
+    "n": 40
+   },
+   "SA(1.0)": {
+    "medyan": 0.002165189319414118,
+    "sigma": 0.0,
+    "n": 40
+   }
+  },
+  "CY14": {
+   "PGA": {
+    "medyan": 1.7763568394002505e-13,
+    "sigma": 0.0,
+    "n": 40
+   },
+   "PGV": {
+    "medyan": 1.1102230246251565e-13,
+    "sigma": 0.0,
+    "n": 40
+   },
+   "SA(0.2)": {
+    "medyan": 8.881784197001252e-14,
+    "sigma": 2.220446049250313e-14,
+    "n": 40
+   },
+   "SA(1.0)": {
+    "medyan": 9.992007221626409e-14,
+    "sigma": 3.3306690738754696e-14,
+    "n": 40
+   }
+  }
+ },
+ "campbell1981_en_buyuk_fark_yuzde": 0.0,
+ "campbell1981_n": 40,
+ "satir_sayisi": 1440
+}
