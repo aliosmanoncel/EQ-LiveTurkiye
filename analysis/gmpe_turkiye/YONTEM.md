@@ -4,6 +4,7 @@ Tarih: 2026-11-02. Dal: `gmpe-turkiye-methodology` (taban: `main` 9b5d386).
 Durum: **taslak, kullanıcı incelemesinde**. Yalnız belge; kod değişikliği yok.
 - Revizyon 1 (2026-11-02): kullanıcı incelemesi (ChatGPT yorumu dahil) — D1, uzaklık tanımları, Vs30 kapsamı, belirsizlik türleri, D7 ve D9 güncellendi; NESS 2.1 flat-file'ından nicel bulgular eklendi (§13).
 - Revizyon 2 (2026-11-02): kullanıcı incelemesi — Repi − Rjb farkının yorumu, Mw kaynağı kaydı (7,7 / 7,8), Vs30 veri kalitesi işareti, SHA-256'nın kapsamı, yazılım doğrulaması / yöntem doğrulaması ayrımı; §11 her karar için "karar, bilimsel gerekçe, doğrulama durumu" olarak yeniden düzenlendi; Aşama 2'ye geçiş koşulu yazıldı.
+- Revizyon 3 (2026-11-02): kullanıcı incelemesi — uzaklık tanımı farkı / geometri belirsizliği / GMPE artığı ayrımı (§6), Vs30 kaynağının analiz çıktısında da gösterilmesi (§8, §9), D9 inceleme sırası (§11).
 - Kod, `index.html`, `data/`, `seismoreport/` ve canlı site değişmedi.
 
 İşaretler:
@@ -145,6 +146,11 @@ Her IM için **medyan**, **16. ve 84. yüzdelik** (ln-normal: medyan·e^(±σ)) 
   - (a) Çoklu model: aday modellerin medyanları yan yana. Ağırlık verilmez; ağırlık ancak Aşama 2'deki artık analizinden sonra ve gerekçeyle verilir.
   - (b) ESHM20 omurgası: ölçekli dallar (ör. ±1,28 σ_µ) doğrudan epistemik aralıktır.
   - Aleatorik ve epistemik belirsizlik **tek bir sayıda birleştirilmez**; ayrı gösterilir.
+- **Kayıtlarla karşılaştırmada üç fark ayrı tutulur:**
+  - (a) **uzaklık tanımı farkı**: aynı kaynak için nokta kaynak ve sonlu kırık uzaklıklarının (Repi/Rjb, Rhyp/Rrup) GMPE medyanında yarattığı fark;
+  - (b) **sonlu fay geometrisi belirsizliği**: farklı yayımlanmış ya da senaryo geometrileri arasındaki fark (ör. NESS ve USGS segment modelleri);
+  - (c) **GMPE artığı**: doğru uzaklık ve girdilerle bile gözlem ile medyan arasında kalan fark (olaylar arası + olay içi).
+  - Yalnız (c) modelin performansını ölçer. (a) ve (b) girdi senaryosu farkıdır; birbirinin ya da (c)'nin yerine geçmez. Artık analizinde (c), NESS'in sonlu fay uzaklıklarıyla hesaplanır; (a) ve (b) ayrı duyarlılık olarak raporlanır.
 - **Uzamsal yorum uyarısı:** Her ızgara noktasının 84. yüzdeliği ayrı ayrı hesaplanır. Bu nedenle "84. yüzdelik haritası" gerçekleşebilecek tek bir yer hareketi alanı değildir (uzamsal korelasyon yok). Bu uyarı haritada yazılı olmalı.
 - **Girdi senaryosu farkı:** Mw kaynağı (doğrudan / dönüştürülmüş), kaynak geometrisi, mekanizma ve Vs30 varsayımlarının etkisi σ'ya eklenmez; her biri duyarlılık senaryosu olarak raporlanır (Mindanao B3 yaklaşımı).
 - **Dört gösterim ayrı tutulur (arayüzde de):** (1) medyan, modelin merkezi tahmini; (2) 16.–84. yüzdelik, aleatorik dağılım; (3) modeller arası aralık, epistemik; (4) girdi senaryosu farkı. Bunlar aynı belirsizliğin farklı gösterimleri değildir ve toplanmaz.
@@ -181,6 +187,7 @@ EQ-Live'daki Poisson modülü bölge ölçeğinde büyüklük aşılma olasılı
    - Kümeler birleştirilirken aynı olay–istasyon kaydı iki kez sayılmaz (ESM olay kimliği, istasyon ağı ve kodu ile eşleştirme).
    - Olay ve kayıt düzeyindeki örneklem büyüklükleri ayrı raporlanır; aynı depremin çok sayıda kaydı bağımsız olay sayısını yapay olarak artırmaz (olaylar arası / olay içi ayrıştırma bu yüzden zorunlu).
    - Artıklar büyüklük, uzaklık, Vs30 (ölçülmüş / vekil ayrı) ve fay türüne göre ayrıca incelenir.
+   - Vs30 kaynağı (ölçülmüş / jeoloji / topoğrafya) yalnız veri tablosunda değil, **her artık tablosunda ve şeklinde** de görünür; zemin terimi sonuçları kaynağa göre ayrı verilir.
    - Bu adım yazılım doğrulaması değil, **model uygunluğu** sınamasıdır.
 5. **Raporlama.** Aşama A/B ayrımı korunur: hesaplama doğruluğu ayrı, bilimsel uygunluk ayrı raporlanır.
    - **Yazılım doğrulaması ≠ yöntem doğrulaması.** OpenQuake ile birebir aynı sonucu almak, yalnız denklemin doğru uygulandığını gösterir. Seçilen GMPE'nin Türkiye'ye uygunluğunu ya da girdi senaryosunun (Mw kaynağı, geometri, Vs30) doğruluğunu kanıtlamaz. Bunlar ancak 4. adımdaki kayıtlarla karşılaştırmayla sınanır ve ayrı raporlanır.
@@ -189,7 +196,7 @@ EQ-Live'daki Poisson modülü bölge ölçeğinde büyüklük aşılma olasılı
 
 - Ayrı dal ve ayrı katman; **varsayılan kapalı**. Mevcut "Hazard" katmanına dokunulmaz (D6 kararına kadar).
 - Katman adı örneği: "Tahmini yer hareketi (GMPE, model)". "Hazard", "tehlike" ve "ölçülen" sözcükleri kullanılmaz.
-- Her değer için açılır bilgi: model, girdiler (Mw kaynağı, uzaklık türü, Vs30 senaryosu), σ, model aralığı, aralık dışı işareti.
+- Her değer için açılır bilgi: model, girdiler (Mw değeri ve kaynağı, uzaklık türü, Vs30 değeri ve kaynağı: ölçülmüş / jeoloji / topoğrafya / senaryo), σ, model aralığı, aralık dışı işareti.
 - Yeniden üretim kaydı: Poisson modülündeki gibi JSON; katalog ve yazılım kimlikleri (git blob SHA), model sürümleri ve OpenQuake sürümü.
 - Hesap yeri: istemci tarafında JavaScript ya da iş akışında Python + OpenQuake ile önceden hesaplanmış ızgara **[karar D8]**. OpenQuake iş akışı doğrulama açısından güçlü; istemci tarafı etkileşim açısından esnek.
 
@@ -220,6 +227,15 @@ Kabul edilmiş bir ilke ile veri ya da kaynakla henüz doğrulanmamış bir vars
 | D7 | Kayıt verisi | NESS 2.1 + ESM + Türkiye için AFAD TADAS / SMD-TR. Olay ve kayıt örneklemi ayrı raporlanır; yinelenen kayıtlar eşleştirilir. | Küresel uyum ile Türkiye'deki uyum iki ayrı soru; NESS yalnız Mw ≥ 5,5. | **Koşullu**: NESS dosyası mevcut ve sayımlar dosyadan doğrulandı. SHA-256 yalnız dosya bütünlüğünü doğrular; NESS sürümü, lisansı ve atıfı ile ESM sürümü ve sayıları **[teyit]** |
 | D8 | Hesap yeri | Önce OpenQuake ile bağımsız doğrulama; EQ-Live'daki hesap yeri sonra seçilir. | Referans uygulama önce; yazılım doğrulaması yöntem doğrulamasından ayrı (§8). | **Kabul** |
 | D9 | Aday modeller | Üç soru ayrı: (1) Türkiye'de daha önce kullanılanlar, Akkar vd. (2018) tam metninden; (2) EQ-Live adayları: KAAH15, AC10, ASB14, BSSA14 Yüksek Q, ESHM20 (NGA-West2'nin geri kalanı duyarlılık için); (3) nihai küme, Aşama 2 artık analizinden sonra. 2018 PSHA mantık ağacı ağırlıkları bu deterministik katmana aktarılmaz. | PSHA ağırlıkları farklı bir amaç için kurulmuştur; Türkiye'de geliştirilmiş olmak her M–R aralığında en uygun olmayı garanti etmez. | **Açık**: Akkar vd. (2018) tam metni bekleniyor |
+
+**D9 inceleme sırası (Akkar vd. 2018 tam metni geldiğinde):**
+1. Makalenin gerçekten kullandığı GMPE listesi ve her modelin künyesi.
+2. Modellerin merkez, gövde ve aralık (CBR) sınıfları.
+3. Mantık ağacı ağırlıkları ve hangi amaçla kullanıldıkları (PSHA, spektral periyot, tektonik bölge).
+4. Bu listenin EQ-Live aday listesiyle karşılaştırılması: OpenQuake sınıfı, veri, uzaklık türü, geçerlilik aralığı.
+5. Ayrım: "Türkiye'de geçmişte kullanılmış modeller" (kayıt amaçlı) ile "bu çalışmada aday modeller" (Aşama 2'de sınanacak) ayrı listeler olarak yazılır.
+
+2018 listesi ve ağırlıkları EQ-Live'ın nihai model kümesini otomatik olarak belirlemez (D9 gerekçesi).
 
 **Aşama 2'ye geçiş koşulu (kullanıcı kararı, 2026-11-02):** Önce D9, Akkar vd. (2018) tam metninden kesinleştirilir. Ardından D2, D3, D5 ve D6 ayrı ayrı kapatılır. Bu kararlar tamamlanmadan Aşama 2 hesaplarına geçilmez.
 
