@@ -1,0 +1,152 @@
+{
+ "not": "MODEL DUYARLILIĞI — doğrulanmış tehlike değeri değildir; nokta kaynak varsayımı korunmuştur (B3).",
+ "kaynak": "Aşama A ile aynı (c_comb: Cotabato + Davao, medyan dal)",
+ "sonuc": [
+  {
+   "model": "Kod bağıntısı (\"Youngs 1988\" etiketli)",
+   "gsim": "MindanaoKodGMPE",
+   "Vs30": 360.0,
+   "pga10": 0.7061502024369075,
+   "pga02": 1.0448138783757865,
+   "pga10_3sigma": 0.5512288515860876,
+   "pga02_3sigma": 0.7238278235677889,
+   "medyan_M7.8_R58": 0.16073609225773572,
+   "sigma_ln_M7.8": 0.6699999999999999
+  },
+  {
+   "model": "Kod bağıntısı (\"Youngs 1988\" etiketli)",
+   "gsim": "MindanaoKodGMPE",
+   "Vs30": 760.0,
+   "pga10": 0.54363711798442,
+   "pga02": 0.8043900543874917,
+   "pga10_3sigma": 0.4244138230627029,
+   "pga02_3sigma": 0.5572539216971246,
+   "medyan_M7.8_R58": 0.1237469557192193,
+   "sigma_ln_M7.8": 0.6699999999999999
+  },
+  {
+   "model": "Youngs vd. (1997)",
+   "gsim": "YoungsEtAl1997SInter",
+   "Vs30": 360.0,
+   "pga10": 0.993823236535353,
+   "pga02": 1.4757376036305463,
+   "pga10_3sigma": 0.824001743366398,
+   "pga02_3sigma": 1.0950978970630594,
+   "medyan_M7.8_R58": 0.2275961143225205,
+   "sigma_ln_M7.8": 0.6699999999999999
+  },
+  {
+   "model": "Youngs vd. (1997)",
+   "gsim": "YoungsEtAl1997SInter",
+   "Vs30": 760.0,
+   "pga10": 0.6617104169906233,
+   "pga02": 0.9812196952366998,
+   "pga10_3sigma": 0.5392001192542892,
+   "pga02_3sigma": 0.7075482204125315,
+   "medyan_M7.8_R58": 0.14459803278656685,
+   "sigma_ln_M7.8": 0.6699999999999999
+  },
+  {
+   "model": "BC Hydro (Abrahamson vd. 2016)",
+   "gsim": "AbrahamsonEtAl2015SInter",
+   "Vs30": 360.0,
+   "pga10": 0.539167740909974,
+   "pga02": 0.9406116012116554,
+   "pga10_3sigma": 0.5234804267397012,
+   "pga02_3sigma": 0.8975096575293706,
+   "medyan_M7.8_R58": 0.20337585536843056,
+   "sigma_ln_M7.8": 0.74
+  },
+  {
+   "model": "BC Hydro (Abrahamson vd. 2016)",
+   "gsim": "AbrahamsonEtAl2015SInter",
+   "Vs30": 760.0,
+   "pga10": 0.44462137097261695,
+   "pga02": 0.7916641228003034,
+   "pga10_3sigma": 0.4333703111593327,
+   "pga02_3sigma": 0.7597910678532847,
+   "medyan_M7.8_R58": 0.17068065559454715,
+   "sigma_ln_M7.8": 0.74
+  },
+  {
+   "model": "Parker vd. (2022), küresel",
+   "gsim": "ParkerEtAl2020SInter",
+   "Vs30": 360.0,
+   "pga10": 0.42936529240751636,
+   "pga02": 0.7198403959778542,
+   "pga10_3sigma": 0.4108470704999212,
+   "pga02_3sigma": 0.6723070529459944,
+   "medyan_M7.8_R58": 0.1439161186057446,
+   "sigma_ln_M7.8": 0.7495780688439324
+  },
+  {
+   "model": "Parker vd. (2022), küresel",
+   "gsim": "ParkerEtAl2020SInter",
+   "Vs30": 760.0,
+   "pga10": 0.3806235149360382,
+   "pga02": 0.6644584553658667,
+   "pga10_3sigma": 0.3644016746335989,
+   "pga02_3sigma": 0.6211776847994307,
+   "medyan_M7.8_R58": 0.12212525441671401,
+   "sigma_ln_M7.8": 0.7914543574963752
+  },
+  {
+   "model": "Kuehn vd. (2023), küresel",
+   "gsim": "KuehnEtAl2020SInter",
+   "Vs30": 360.0,
+   "pga10": 0.9170957579847575,
+   "pga02": 1.5873942665029037,
+   "pga10_3sigma": 0.8849416819514789,
+   "pga02_3sigma": 1.4959027520555317,
+   "medyan_M7.8_R58": 0.3215682336633011,
+   "sigma_ln_M7.8": 0.7705814006644593
+  },
+  {
+   "model": "Kuehn vd. (2023), küresel",
+   "gsim": "KuehnEtAl2020SInter",
+   "Vs30": 760.0,
+   "pga10": 0.7288261623049321,
+   "pga02": 1.2923379605384377,
+   "pga10_3sigma": 0.7058381383782525,
+   "pga02_3sigma": 1.2285483166148465,
+   "medyan_M7.8_R58": 0.2649023707486762,
+   "sigma_ln_M7.8": 0.7705814006644593
+  }
+ ],
+ "sagla_asamaA": {
+  "pga10_B2": 0.7061502024369075,
+  "pga10_kod": 0.7061500280325574
+ },
+ "uygulanabilirlik": [
+  {
+   "model": "Kod bağıntısı",
+   "veri": "Youngs vd. (1988) olarak etiketli; birincil kaynakla doğrulanmadı (B1)",
+   "filipinler": "bilinmiyor",
+   "zemin": "kodda eklenmiş 0,35 ln(760/Vs30) — yayından doğrulanmadı"
+  },
+  {
+   "model": "Youngs vd. (1997)",
+   "veri": "Alaska, Şili, Cascadia, Japonya, Meksika, Peru, Solomon Adaları; 1940–1992; 5,0 < M < 8,2; 8,5–550 km; 19 deprem, 271 kayıt (IISEE)",
+   "filipinler": "veri setinde yok",
+   "zemin": "kaya / zemin iki sınıf (OpenQuake: Vs30 ≥ 760 kaya)"
+  },
+  {
+   "model": "BC Hydro (Abrahamson vd. 2016)",
+   "veri": "küresel subdüksiyon verisi; 2018 güncellemesi altı bölge: Cascadia, Orta Amerika, Japonya, Yeni Zelanda, Güney Amerika, Tayvan (PEER 2018/02)",
+   "filipinler": "bölgesel terim yok (incelenen kaynaklarda)",
+   "zemin": "Vs30 sürekli, doğrusal olmayan"
+  },
+  {
+   "model": "Parker vd. (2022)",
+   "veri": "NGA-Sub; bölgesel ayarlar: Japonya, Tayvan, Meksika, Orta Amerika, Güney Amerika, Alaska, Aleut, Cascadia; arayüz M 5–9,1, 15–1000 km",
+   "filipinler": "bölgesel ayar yok — küresel sürüm kullanıldı",
+   "zemin": "Vs30 sürekli"
+  },
+  {
+   "model": "Kuehn vd. (2023)",
+   "veri": "NGA-Sub; yedi bölge: Alaska, Orta Amerika–Meksika, Cascadia, Japonya, Yeni Zelanda, Güney Amerika, Tayvan (PEER 2020/04)",
+   "filipinler": "bölge yok — küresel (GLO) sürüm; OpenQuake'te deneysel",
+   "zemin": "Vs30 sürekli"
+  }
+ ]
+}

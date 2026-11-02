@@ -172,7 +172,7 @@
   }
  },
  "B_youngs1997": {
-  "not": "EŞDEĞER DEĞİL: OpenQuake YoungsEtAl1997SInter (kaya, Vs30 terimi yok); epistemik dallar (eps, Zt=1) yok; yalnız b ve Mmax dalları",
+  "not": "EŞDEĞER DEĞİL: OpenQuake YoungsEtAl1997SInter (Vs30 = 360 < 760 → zemin katsayıları; ilk sürümde yanlışlıkla 'kaya' yazılmıştı); epistemik dallar (eps, Zt=1) yok; yalnız b ve Mmax dalları",
   "c1_med": {
    "pga10_kod_bagintisi": 0.7033820580179373,
    "pga10_Y97": 0.9933622755229502,

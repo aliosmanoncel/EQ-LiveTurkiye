@@ -22,7 +22,7 @@ for i, f in enumerate(FR):
     ax[0, 1].loglog(x, poe(R['lt_frac_curves'][i]), color=col[i], lw=1.6, alpha=0.45)
     ax[0, 1].loglog(x, poe(O['fr_oq'][i]), color=col[i], lw=0.8, ls='--')
 ax[0, 1].loglog(x, poe(R['lt_lam_mean']), color='#E69F00', lw=1.6, alpha=0.45); ax[0, 1].loglog(x, poe(O['lam_mean_oq']), color='#E69F00', lw=0.8, ls='--')
-ax[0, 1].loglog(x, poe(O['w97'] @ O['lt97']), color='#D55E00', lw=1.1, ls='-.', label='Youngs (1997), OpenQuake — EŞDEĞER DEĞİL\n(b ve Mmax dalları, kaya, ağırlıklı ortalama)')
+ax[0, 1].loglog(x, poe(O['w97'] @ O['lt97']), color='#D55E00', lw=1.1, ls='-.', label='Youngs (1997), OpenQuake — EŞDEĞER DEĞİL\n(b ve Mmax dalları, Vs30 = 360 → zemin katsayıları, ağırlıklı ortalama)')
 for p in (0.10, 0.02): ax[0, 1].axhline(p, color='#888', lw=0.5, ls=':')
 from matplotlib.lines import Line2D
 ax[0, 1].legend(handles=[Line2D([], [], color='#000', lw=1.6, alpha=0.45, label='mevcut kod (kalın)'), Line2D([], [], color='#000', lw=0.8, ls='--', label='OpenQuake (kesikli)'),

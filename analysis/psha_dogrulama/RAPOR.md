@@ -86,7 +86,7 @@ Ayrıntılar `karsilastirma_sonuc.json` ve `karsilastirma_sekil.png` / `.svg` do
 
 ## 5. Model duyarlılığı (B): EŞDEĞER DEĞİL
 
-Aynı kaynaklar OpenQuake'in yerleşik `YoungsEtAl1997SInter` modeliyle hesaplandı: kaya koşulu, Vs30 terimi yok, odak derinliği terimi var.
+Aynı kaynaklar OpenQuake'in yerleşik `YoungsEtAl1997SInter` modeliyle hesaplandı. **Düzeltme (2026-11-02, B2):** Vs30 = 360 m/s < 760 olduğundan OpenQuake Youngs (1997) **zemin** katsayılarını kullandı; ilk sürümdeki "kaya koşulu" ifadesi yanlıştı. Odak derinliği terimi var.
 
 | Hesap | %10/50 yıl PGA (g) | %2/50 yıl PGA (g) |
 |---|---|---|
@@ -96,7 +96,7 @@ Aynı kaynaklar OpenQuake'in yerleşik `YoungsEtAl1997SInter` modeliyle hesaplan
 | b × Mmax dalları ortalaması, Youngs (1997) (9 dal) | 1,066 | 1,571 |
 
 - Son iki satır aynı mantık ağacı değil: (B)'de epistemik GMPE dalları yok. Doğrudan karşılaştırılamaz.
-- Bu tablo **GMPE + zemin koşulu birleşik duyarlılığını** gösterir (2026-11-02 düzeltmesi): koddaki bağıntı Vs30 = 360 m/s için ≈ ×1,30 zemin büyütmesi içeriyor, Youngs (1997) hesabı kaya koşulunda ve büyütmesiz. 0,703 → 0,993 g (≈ %41) farkı yalnız GMPE etkisi olarak sunulamaz; aynı zemin koşulunda fark daha büyük olurdu. Saf GMPE duyarlılığı Aşama B2'de Vs30'u doğrudan alan modellerle ölçülür. Her durumda bu duyarlılık, iki hesap motoru arasındaki farktan dört basamak büyüktür.
+- Bu tablo **GMPE + zemin formülasyonu birleşik duyarlılığını** gösterir. İki hesap da Vs30 = 360 m/s'de, ama farklı zemin gösterimleriyle: koddaki 0,35·ln(760/Vs30) terimi ve Youngs (1997)'nin ayrı zemin katsayıları. Bu bölümün ilk sürümünde ve 2026-11-02 sabahki düzeltmede Youngs (1997) hesabı yanlışlıkla "kaya, büyütmesiz" diye tanımlanmıştı; doğrusu yukarıdaki gibi. Saf GMPE ve zemin etkilerinin aynı Vs30'ta ayrımı: `B2_gmpe/B2_RAPOR.md` §2–3 (Vs30 = 360 m/s'de modeller arası 0,43–0,99 g). Her durumda bu duyarlılık, iki hesap motoru arasındaki farktan dört basamak büyüktür.
 
 ## 6. Bilimsel değerlendirme (ayrı konu; motor karşılaştırmasından bağımsız)
 

@@ -13,7 +13,7 @@ ya da GMPE'nin bilimsel doğruluğunu KANITLAMAZ (RAPOR §5).
     Süre  : Poisson, 1 yıl; λ = −ln(1 − PoE)
     Sınanan eğriler: c1_med, c1_1sig (eps = 1), c1_2sig (eps = 2), c2_med, c_ftls, c_comb ve mantık ağacının 27 dalı, ağırlıklı ortalaması,
     5/16/50/84/95. yüzdelikleri.
-(B) Model duyarlılığı — EŞDEĞER DEĞİL: aynı kaynaklar, OpenQuake'in yerleşik YoungsEtAl1997SInter modeli (kaya; Vs30 terimi yok).
+(B) Model duyarlılığı — EŞDEĞER DEĞİL: aynı kaynaklar, OpenQuake'in yerleşik YoungsEtAl1997SInter modeli (Vs30 = 360 < 760 → OpenQuake zemin katsayıları; 2026-11-02 düzeltmesi).
     Youngs (1997) ile koddaki bağıntı farklı modellerdir; (B) yalnız GMPE seçiminin sonuca etkisini gösterir.
 Kullanım: /home/claude/oqenv/bin/python oq_karsilastirma.py   (önce referans_kod.py)
 """
@@ -127,7 +127,7 @@ dal = [fark(LT[i], REF['lt_branch_curves'][i])['maks_goreli_fark'] for i in rang
 sonuc['A_mantik_agaci'] = {'agirlik_esit': bool(np.allclose(W, REF['lt_branch_weights'])), 'dal_maks_goreli_fark': max(dal), 'ortalama': fark(lam_mean, REF['lt_lam_mean']),
   'tablo': {s: {'kod': {**{f'{int(100*f)}.': pga_at(lt, REF['lt_frac_curves'][i]) for i, f in enumerate(FR)}, 'ort': pga_at(lt, REF['lt_lam_mean'])},
                 'oq': {**{f'{int(100*f)}.': pga_at(lt, fr_oq[i]) for i, f in enumerate(FR)}, 'ort': pga_at(lt, lam_mean)}} for s, lt in (('%50/50', L50), ('%10/50', L10), ('%2/50', L02))}}
-sonuc['B_youngs1997'] = {'not': 'EŞDEĞER DEĞİL: OpenQuake YoungsEtAl1997SInter (kaya, Vs30 terimi yok); epistemik dallar (eps, Zt=1) yok; yalnız b ve Mmax dalları',
+sonuc['B_youngs1997'] = {'not': 'EŞDEĞER DEĞİL: OpenQuake YoungsEtAl1997SInter (Vs30 = 360 < 760 → zemin katsayıları; ilk sürümde yanlışlıkla 'kaya' yazılmıştı); epistemik dallar (eps, Zt=1) yok; yalnız b ve Mmax dalları',
   'c1_med': {'pga10_kod_bagintisi': sonuc['A_egriler']['c1_med']['pga10_kod'], 'pga10_Y97': pga_at(L10, Bsens['c1_med_Y97']), 'pga02_Y97': pga_at(L02, Bsens['c1_med_Y97'])},
   'mantik_agaci_bMmax_ort': {'pga10_Y97': pga_at(L10, W97 @ LT97), 'pga02_Y97': pga_at(L02, W97 @ LT97)}}
 np.savez(os.path.join(HERE, 'oq_egriler.npz'), x_im=x_im, lt_oq=LT, lt_w=W, lam_mean_oq=lam_mean, fr_oq=fr_oq, lt97=LT97, w97=W97, **{f'A_{k}': v for k, v in A.items()}, **{f'B_{k}': v for k, v in Bsens.items()})
