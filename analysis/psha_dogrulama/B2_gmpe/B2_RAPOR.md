@@ -75,6 +75,7 @@ Kaynak: Cotabato + Davao, medyan dal. Değerler g cinsinden. "Kesilmemiş" sütu
 
 - Nokta kaynak, sabit uzaklık ve aynı MFD korundu; modern modellerin kırık geometrisine bağlı girdileri (ztor, odak derinliği) nokta kırıktan türetildi.
 - **B3 (sonraki adım):** megathrust için fay düzlemi, Davao için fay ya da alan kaynağı. Aynı beş model ve iki Vs30 değeri. Geometrinin etkisi B2'den ayrı ölçülecek.
+- **İstatistik tanımı:** B2'de mantık ağacı yok, her satır tek bir eğridir. Mantık ağacı kurulan sonraki aşamalarda (B3–B4) ortalama ve yüzdelikler **hem λ hem PoE uzayında** raporlanacak (Aşama A kararı; `A_job/A_RAPOR.md`).
 - **GMPE ağırlıklandırması yapılmadı.** Ağırlıklar uygulanabilirlik gerekçesiyle ayrıca belirlenmeli (kullanıcı koşulu).
 
 ## Kaynaklar

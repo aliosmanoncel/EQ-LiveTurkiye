@@ -1,0 +1,119 @@
+{
+ "tanim": "Aşama A ek denetimi: mantık ağacı istatistiklerinin TANIMI. Ortalama ve yüzdelik iki uzayda hesaplanır ve ikisi de korunur:\n  λ uzayı  : λ̄ = Σ wᵢ λᵢ ; yüzdelik λ değerleri üzerinde        (mevcut kod)\n  PoE uzayı: P̄(T) = Σ wᵢ Pᵢ(T), Pᵢ = 1 − e^(−λᵢT) ; yüzdelik PoE üzerinde, T = 50 yıl   (OpenQuake hcurves-stats)\nYüzdelik algoritması iki yazılımda AYNI (openquake.hazardlib.stats.quantile_curve ile kodun döngüsü): her IM düzeyinde dalları değere göre\nartan sırala → ağırlıkların kümülatif toplamı (cumsum) → numpy.interp(q, kümülatif ağırlık, sıralı değer), yani kümülatif ağırlığa göre\ndoğrusal ara değer; uç kural: q ilk kümülatif ağırlıktan küçükse en küçük değer. Fark yalnız ara değerin hangi uzayda yapıldığından gelir.",
+ "senaryo": {
+  "%50/50": {
+   "ortalama": {
+    "lambda_uzayi": 0.5426042418424056,
+    "poe_uzayi": 0.5017084072609925,
+    "kod": 0.542603777340878,
+    "motor_istatistik": 0.5017084095107718
+   },
+   "q0.05": {
+    "lambda_uzayi": 0.3844761359475588,
+    "poe_uzayi": 0.3844757517088387,
+    "kod": 0.3844757970835293,
+    "motor_istatistik": 0.3844757515370317
+   },
+   "q0.16": {
+    "lambda_uzayi": 0.4049558799199659,
+    "poe_uzayi": 0.40479122043936894,
+    "kod": 0.40495552430166815,
+    "motor_istatistik": 0.4047912236729676
+   },
+   "q0.5": {
+    "lambda_uzayi": 0.45518703373976316,
+    "poe_uzayi": 0.4551747084824442,
+    "kod": 0.4551866482520878,
+    "motor_istatistik": 0.45517470771845425
+   },
+   "q0.84": {
+    "lambda_uzayi": 0.6824673549116144,
+    "poe_uzayi": 0.682330583505177,
+    "kod": 0.6824667672819779,
+    "motor_istatistik": 0.6823305693420221
+   },
+   "q0.95": {
+    "lambda_uzayi": 0.7340385607166362,
+    "poe_uzayi": 0.7321800640757204,
+    "kod": 0.7340379337435952,
+    "motor_istatistik": 0.7321800752235593
+   }
+  },
+  "%10/50": {
+   "ortalama": {
+    "lambda_uzayi": 0.9283828070927401,
+    "poe_uzayi": 0.9147257272530028,
+    "kod": 0.9283820274560957,
+    "motor_istatistik": 0.914725729743504
+   },
+   "q0.05": {
+    "lambda_uzayi": 0.6555137303313713,
+    "poe_uzayi": 0.6555135968571817,
+    "kod": 0.65551314729206,
+    "motor_istatistik": 0.6555136005388982
+   },
+   "q0.16": {
+    "lambda_uzayi": 0.6860572635222999,
+    "poe_uzayi": 0.6860206923157228,
+    "kod": 0.6860566888842816,
+    "motor_istatistik": 0.6860206901860368
+   },
+   "q0.5": {
+    "lambda_uzayi": 0.759048696359032,
+    "poe_uzayi": 0.7590452469461266,
+    "kod": 0.7590480618791223,
+    "motor_istatistik": 0.759045242028322
+   },
+   "q0.84": {
+    "lambda_uzayi": 1.1398141965115252,
+    "poe_uzayi": 1.139809222619459,
+    "kod": 1.1398132089245645,
+    "motor_istatistik": 1.1398092155419715
+   },
+   "q0.95": {
+    "lambda_uzayi": 1.2359933824964273,
+    "poe_uzayi": 1.2355702824834727,
+    "kod": 1.2359923356400204,
+    "motor_istatistik": 1.2355702742066113
+   }
+  },
+  "%2/50": {
+   "ortalama": {
+    "lambda_uzayi": 1.3872137441993673,
+    "poe_uzayi": 1.3828826543358694,
+    "kod": 1.3872125779552666,
+    "motor_istatistik": 1.382882662443556
+   },
+   "q0.05": {
+    "lambda_uzayi": 0.9800740834824166,
+    "poe_uzayi": 0.9800740482745242,
+    "kod": 0.9800732383123747,
+    "motor_istatistik": 0.9800740528884909
+   },
+   "q0.16": {
+    "lambda_uzayi": 1.0192990885561266,
+    "poe_uzayi": 1.0192903799706985,
+    "kod": 1.0192982008170308,
+    "motor_istatistik": 1.019290367073056
+   },
+   "q0.5": {
+    "lambda_uzayi": 1.111931234538809,
+    "poe_uzayi": 1.1119303905452944,
+    "kod": 1.111930306666808,
+    "motor_istatistik": 1.1119303838007861
+   },
+   "q0.84": {
+    "lambda_uzayi": 1.6740686909205929,
+    "poe_uzayi": 1.674068690918924,
+    "kod": 1.674067309922517,
+    "motor_istatistik": 1.6740686916702487
+   },
+   "q0.95": {
+    "lambda_uzayi": 1.824377655965043,
+    "poe_uzayi": 1.8242779314278794,
+    "kod": 1.8243760982995887,
+    "motor_istatistik": 1.824277927255197
+   }
+  }
+ }
+}

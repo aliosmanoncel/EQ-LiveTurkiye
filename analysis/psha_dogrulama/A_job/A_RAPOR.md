@@ -1,4 +1,25 @@
-# Aşama A: hesap doğrulaması, tam OpenQuake motor akışı (`job.ini`)
+# Mindanao PSHA – Aşama A: Hesaplama Motorunun Sayısal Doğrulanması
+
+**Dondurulmuş belge (2026-11-02).** Kullanıcı kararıyla Aşama A tamamlandı ve bu rapor değiştirilmeyecek doğrulama belgesi olarak saklanıyor.
+- İçerdiği dosyaların SHA-256 değerleri `MANIFEST_A.txt`'te.
+- Aşama B (bilimsel model değerlendirmesi) bundan bağımsız raporlanır (`../B2_gmpe/`, …).
+- Bu belge yalnız şu soruyu yanıtlar: hesaplama algoritması doğru çalışıyor mu? Kullanılan modellerin güvenilirliği ve sonuçların gerçek tehlikeyi temsil edip etmediği bu belgenin kapsamı dışındadır.
+
+## Karar tablosu
+
+| Kontrol | Sonuç |
+|---|---|
+| Ortak girdiler | Başarılı |
+| GMPE eşleştirmesi (özel GMPE, birebir kopya) | Başarılı |
+| Tekil kaynak hesapları | Başarılı |
+| Kaynakların toplanması | Başarılı |
+| Mantık ağacı (27 dal) | Başarılı |
+| Tam OpenQuake motor akışı | Başarılı |
+| Ortalama ve yüzdelik tanımı | Yöntem farkı belirlendi; iki tanım da korunur (aşağıda) |
+| Modelin bilimsel doğruluğu | Bu aşamanın kapsamı dışında, doğrulanmadı |
+
+---
+
 
 Tarih: 2026-11-02. Dal: `psha-dogrulama`. Bu rapor yalnız hesap doğrulamasıdır; model değerlendirmesi Aşama B'dedir. Hiçbir PGA değeri doğrulanmış tehlike değeri olarak sunulmaz.
 
@@ -41,7 +62,39 @@ Tam motor akışı mevcut koda `calc_hazard_curves`'tan daha yakın. Olası aç�
 | 95. | 1,23599 | 1,23557 | — |
 | Ortalama | **0,92838** | **0,91473** | 0,92838 |
 
-### Tanım farkı (hata değil)
+### İstatistik tanımları (iki seçenek de korunur)
+
+Mantık ağacı istatistikleri iki uzayda tanımlanabilir. **Hiçbiri diğerine dönüştürülmez; raporlarda hangi uzayın kullanıldığı her zaman belirtilir.**
+
+| Tanım | Ortalama | Yüzdelik | Kullanan |
+|---|---|---|---|
+| λ uzayı | λ̄ = Σ wᵢ λᵢ (yıllık aşılma oranı) | Her IM düzeyinde λᵢ değerleri üzerinde | Mevcut kod |
+| PoE uzayı | P̄(T) = Σ wᵢ Pᵢ(T), Pᵢ = 1 − e^(−λᵢT), T = 50 yıl | Her IM düzeyinde Pᵢ(T) üzerinde | OpenQuake `hcurves-stats` |
+
+**Yüzdelik algoritması iki yazılımda aynı.** Kaynaklar: `openquake.hazardlib.stats.quantile_curve` ve `mindanao_logic_tree.py` §4. Her IM düzeyinde:
+1. **Sıralama:** dal değerleri artan sırada dizilir; her değer kendi ağırlığını taşır.
+2. **Kümülatif ağırlık:** sıralı ağırlıkların kümülatif toplamı (cumsum) alınır; toplam 1.
+3. **Ara değer:** `numpy.interp(q, kümülatif ağırlık, sıralı değer)`, yani kümülatif ağırlığa göre doğrusal ara değer. q ilk kümülatif ağırlıktan küçükse en küçük değer, son ağırlıktan büyükse en büyük değer alınır.
+4. **PGA'ya dönüşüm:** hedef aşılma düzeyindeki PGA, eğri üzerinde log–log doğrusal ara değerle bulunur (kodun `loglog_interp` fonksiyonu).
+
+Fark yalnız 3. adımın hangi uzayda yapıldığından gelir. P = 1 − e^(−λT) dönüşümü monoton olduğundan sıralama değişmez; ama doğrusal ara değer ve ortalama doğrusal olmayan dönüşüm nedeniyle farklı sonuç verir.
+
+`istatistik_tanim.py` bunu sayısal olarak gösteriyor (`istatistik_tanim.json`). Aynı algoritma (OpenQuake `quantile_curve`) motorun 27 gerçekleşmesine:
+- λ uzayında uygulanınca kodun değerlerini,
+- PoE uzayında uygulanınca motorun istatistiklerini
+
+her senaryo ve her yüzdelikte beş anlamlı basamakta birebir veriyor. Örnek, %10/50 yıl (g):
+
+| | λ uzayı (= kod) | PoE uzayı (= OpenQuake motoru) |
+|---|---|---|
+| Ortalama | 0,92838 | 0,91473 |
+| 16. | 0,68606 | 0,68602 |
+| 50. | 0,75905 | 0,75905 |
+| 95. | 1,23599 | 1,23557 |
+
+%50/50 yılda ortalama 0,5426 / 0,5017 g; fark yüksek olasılıkta büyür.
+
+### Tanım farkının ayrıntısı
 
 Ortalama tehlike eğrisi iki farklı biçimde tanımlanabiliyor:
 - **OpenQuake:** dalların 50 yıllık aşılma olasılıklarının ağırlıklı ortalaması.
@@ -55,7 +108,7 @@ Motorun gerçekleşmelerinden λ uzayında hesaplanan ortalama, kodla 6·10⁻�
 
 Raporlarda hangi tanımın kullanıldığı yazılmalı. Bu, Aşama B'de yöntem seçimi olarak değerlendirilecek.
 
-95. yüzdelikteki %0,03'lük fark da iki yazılımın ağırlıklı yüzdelik ara değer yönteminin farklı olmasından kaynaklanıyor.
+95. yüzdelikteki %0,03'lük fark da algoritma farkı değil, ara değerin yapıldığı uzayın (λ / PoE) farkıdır; yukarıdaki tablo ve `istatistik_tanim.py` bunu gösteriyor.
 
 ## Kapsam ve sınırlar
 
@@ -78,3 +131,5 @@ Ortam: Python 3.13; openquake.engine 3.26.2 (GDAL olmadan); NumPy 2.x.
 1. `kod_gmpe.py` dosyasını `openquake/hazardlib/gsim/mindanao_kod_gmpe.py` olarak kopyala (GMPE kaydı).
 2. `python girdi_uret.py`
 3. `PATH=<oqenv>/bin:$PATH python calistir.py` → `asamaA_sonuc.json`, `*/lam_job.npy`, `lt/lam_job.npz`.
+4. `python istatistik_tanim.py` → `istatistik_tanim.json`.
+5. Bütünlük denetimi: `sha256sum -c MANIFEST_A.txt` (A_job klasöründe).
