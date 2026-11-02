@@ -59,6 +59,16 @@
 - **Doğrulama:** `python scripts/validate_gk74_parity.py --mwauth scripts/fixtures/gk74_mwauth_*_ref_*.json` → JS == Python == donmuş (4 fixture × 13 kontrol).
 - **JS (index.html):** `gk74BuildMwOverride`, `gk74SelectContext(…, mwEntries)`, `gk74Decluster(…, mwEntries)`, `GK74_MWAUTH_VERSION`; arayüzde "Büyük depremlerde otoriter Mw (Faz 2a)" kutusu, **varsayılan kapalı** (Faz 1 davranışı). Tablo `data/mw_authority.json` tarayıcıda yüklenir.
 
+### 1F · Reasenberg (1985) — Python seçeneği (GK74'ün YANINDA, yerine değil)
+- **Modül:** `scripts/reasenberg.py` v0.3.0 — **DONDURULMUŞ** (sha256 `c5b1248a…99bc9`). Değişirse adaptör çalışmayı reddeder ve CI kırılır. Yeni kural/parametre = yeni sürüm + yeni fixture + not.
+- **Adaptör:** `scripts/decluster_reasenberg.py` (`decluster_gk74.py` ile aynı zaman ayrıştırıcısı ve büyüklük seçimi). Örnek: `python scripts/decluster_reasenberg.py --xmeff 3.0 --src EMSC --output data/eq_emsc_dc_reasenberg.json`
+- **Kurallar:** `--rule zmap` **varsayılan**; `--rule cluster2000x` **deneysel** (USGS kaynağından yeniden kurulmuş; derlenmiş Fortran ile olay bazında doğrulama — D1 — açık).
+- **Çıktı:** ana çıktı **temsilci olay** (kümenin en büyüğü) + kümelenmemiş tekil olaylar; sınıflar algoritmiktir (single / representative / dependent), fiziksel ana şok iddiası değildir. `--membership` tüm olayların küme/sınıfını, `--equivalent` eşdeğer olayları (**yalnız duyarlılık analizi**) yazar. Her çıktıda kural, kural durumu, modül sürümü, hash'ler ve varsayımlar kayıtlıdır.
+- **Varsayımlar:** derinlikler katalogdaki gibi (mesafe hiposantral; GK74 episantral); katalogda konum hatası yok → `err = derr = 0` (belgelenmiş varsayım, "hata sıfırdır" değil); `xmeff` zorunlu. Tamamlılığı dönemlere göre değişen birleşik katalogda (ISC 1900–1997 + EMSC) tek `xmeff` kullanmak bu farkları yok sayar — dönem/kaynak filtresi (`--src`) kullanın.
+- **Bilinen sonuç (1998–2026 EMSC, 80 929 olay, `mag`, xmeff 3.0):** GK74 %56,4, Reasenberg (zmap) %18,5 olay ayıklar; GK74'ün bağımsız kümesi neredeyse tamamen Reasenberg'inkinin içindedir. Fark büyük ölçüde yöntem tanımındandır (M3 için GK74 ≈ 23 km / 12 gün, Reasenberg ≈ 1,7 km / 1–10 gün). Sonuçlar karışık büyüklük ölçeğine (ML/MD/mb/Mw) koşullu; ayrıntı: `analysis/2026-11-02_reasenberg_gk74/`.
+- **Testler:** `python -m pytest -q scripts/reasenberg_tests` (modül 87 + adaptör 12); donmuş regresyon referansları `scripts/fixtures/reasenberg_zmap_{adiyaman,izmit_dogu,saimbeyli,van_bati}_ref.json` (GK74 bağlam alt katalogları üzerinde; **doğrulama değil, regresyon**). CI: `.github/workflows/reasenberg.yml`.
+- **Kapsam dışı:** tarayıcı (`index.html`) ve mevcut b-değeri ürünleri değişmedi; GK74 (1B–1E) aynen geçerli.
+
 ---
 
 ## AŞAMA 2 — b-Değeri Hesabı
