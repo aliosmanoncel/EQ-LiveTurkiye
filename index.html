@@ -4209,14 +4209,14 @@ function renderGutenbergRichter(evList, Mc) {
     const tP0 = regionWindowStart ? +regionWindowStart : Math.min(...ts), tP1 = regionWindowEnd ? +regionWindowEnd : Math.max(...ts), Tp = (tP1 - tP0) / (365.25 * 864e5);
     if (Tp > 0) {
       const { M: pM, t: pT } = grPoisInputs(), g = lastGrSimple, aT = g.a - Math.log10(Tp);
-      const lam = grLambdaSimple(g.n, Tp, g.b, g.mc, pM), ci = grPoissonBootSimple(g.n, Tp, g.b, g.mc, tmMagDM, pM, pT);
+      const lam = grLambdaSimple(g.n, Tp, g.b, g.mc, pM), ci = grPoissonBootSimple(g.n, Tp, g.b, g.mc, tmMagDM, pM, pT, { ts: grPoisTs(pT) });
       const warns = [];
       if (!(typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect)) warns.push('GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)');
       const hs = grHalfSplitTest(evList.filter(e => (e.mw ?? e.mag) >= g.mc - 1e-9).map(e => +new Date(e.time)).filter(Number.isFinite), tP0, tP1);
       const compWarn = hs.n >= 10 && hs.p < GR_POIS.halfAlpha;
       if (compWarn) warns.push(`M ≥ Mc olayları dönemin ilk yarısında belirgin az (${hs.n1} / ${hs.n2}; tek yönlü binom p = ${hs.p < 1e-4 ? hs.p.toExponential(1) : hs.p.toFixed(4)}): katalog T boyunca Mc'de tam görünmüyor. Etkisi: eksik dönem küçük olayları büyüklere göre daha çok eksiltir; b aşağı yanlı olur ve Mc'den büyük M'ye uzatılan λ ile P yukarı yanlı olabilir; N(≥Mc)/T ise düşük kalır. Bu satırdaki P yorumlanmamalıdır; yıllık oran için Tamlık basamaklarını (Weichert) kullanın`);
       const nObs = evList.filter(e => (e.mw ?? e.mag) >= pM - 1e-9).length, obs = grObsVsExp(nObs, lam * Tp, Tp);
-      lastGrPois = { path: 'tekMc', lam, ci, M: pM, t: pT, T: Tp, n: g.n, b: g.b, mc: g.mc, warns: warns.slice(), obs, compWarn };
+      lastGrPois = { path: 'tekMc', lam, ci, M: pM, t: pT, Pt: grPoisPt(lam, ci, pT), T: Tp, n: g.n, b: g.b, mc: g.mc, warns: warns.slice(), obs, compWarn };
       poisHtml = grPoissonHtml({ eq: `log₁₀[N(≥M)/T] = ${aT.toFixed(2)} − ${g.b.toFixed(2)}·M (T = ${Tp.toFixed(1)} yıl)`, lam, ci, M: pM, t: pT, mObsMax: mMax, mx: null, obs, compWarn,
         src: `tek Mc = ${fmtM(g.mc)}, N(≥Mc) = ${g.n}, Aki–Utsu b; kesilmesiz G–R (Mx yalnız tamlık basamaklarıyla); oran, katalog T boyunca M ≥ Mc'de tamsa geçerlidir`, warns });
     }
@@ -5929,7 +5929,10 @@ function grGofPoisson(classes, wf, opt) {
 // Kapsam dışı (aralığa girmez): Mc / tamlık basamakları seçimi, Mx, büyüklük hataları ve dönüşüm bağıntısı, artçı ayıklama yöntemi.
 // Tekrar sayısı (aşama 3, 2026-11-01): tek Mc bootstrap'ı (G–R paneli, dönem raporu, bölge karşılaştırması) B = 2000; sağlamlık denetimi için
 // URL ?bootB=5000. Weichert bootstrap'ı (grPoissonBootWeichert) Bw = 1000'de bırakıldı (ayrı karar). maxDraws artık kullanılmıyor (NegBin örnekleyici).
-const GR_POIS = { B: (() => { try { const v = +new URLSearchParams(location.search).get('bootB'); return v === 5000 ? 5000 : 2000; } catch (e) { return 2000; } })(), Bw: 1000, seed: 20261027, mDef: 7, tDef: 50, halfAlpha: 0.01 };
+const GR_POIS = { B: (() => { try { const v = +new URLSearchParams(location.search).get('bootB'); return v === 5000 ? 5000 : 2000; } catch (e) { return 2000; } })(), Bw: 1000, seed: 20261027, mDef: 7, tDef: 50, halfAlpha: 0.01, tSet: [10, 50, 100] };   // tSet (2026-11-02, 2a): satırda aynı anda gösterilen süreler
+// Gösterilen süreler: tSet ∪ {kullanıcının t'si}, artan sırada. Hepsi AYNI λ ve AYNI bootstrap çekilişlerinden (yeni çekiliş yok, rastgele akış değişmez).
+function grPoisTs(t) { return [...new Set([...GR_POIS.tSet, t])].filter(x => x > 0).sort((x, y) => x - y); }
+function grPoisByT(Lm, ts) { const o = {}; for (const t of ts || []) { const P = Lm.map(l => grPoissonP(l, t)); o[t] = { pLo: grPctl(P, 0.025), pHi: grPctl(P, 0.975) }; } return o; }
 function grPoissonP(lam, t) { return lam !== null && lam >= 0 && t > 0 ? -Math.expm1(-lam * t) : null; }
 // Tek Mc (Aki–Utsu): λ(≥M) = (n/T)·10^(−b(M − Mc)), kesilmesiz; M katalog büyüklük sınıfıdır (paneldeki N(≥M) ve G–R doğrusuyla aynı tanım)
 function grLambdaSimple(n, T, b, Mc, M) { return n > 0 && T > 0 && b > 0 ? (n / T) * Math.pow(10, -b * (M - Mc)) : null; }
@@ -5963,7 +5966,7 @@ function grBootDraws(n, b, Mc, dm, B, seed, est) {   // { B, nFail, seed, sample
 function grPoissonBootSimple(n, T, b, Mc, dm, M, t, opt) {
   const o = Object.assign({ B: GR_POIS.B, seed: GR_POIS.seed }, opt || {}), bt = grBootDraws(n, b, Mc, dm, o.B, o.seed), P = [], Lm = [];
   for (const [ns, bs] of bt.D) { const lam = grLambdaSimple(ns, T, bs, Mc, M); Lm.push(lam); P.push(grPoissonP(lam, t)); }
-  return { B: o.B, nFail: bt.nFail, seed: o.seed, sampler: bt.sampler, lamLo: grPctl(Lm, 0.025), lamHi: grPctl(Lm, 0.975), pLo: grPctl(P, 0.025), pHi: grPctl(P, 0.975) };
+  return { B: o.B, nFail: bt.nFail, seed: o.seed, sampler: bt.sampler, lamLo: grPctl(Lm, 0.025), lamHi: grPctl(Lm, 0.975), pLo: grPctl(P, 0.025), pHi: grPctl(P, 0.975), byT: o.ts ? grPoisByT(Lm, o.ts) : null };
 }
 // Bootstrap, Weichert: n_i* ~ Poisson(μ_i), μ_i = weichertExpected (grGofPoisson ile aynı örnekleme); weichertFit yeniden; λ* = lamOf(fit*)
 function grPoissonBootWeichert(classes, wf, lamOf, t, opt) {
@@ -5975,7 +5978,7 @@ function grPoissonBootWeichert(classes, wf, lamOf, t, opt) {
     if (lam === null) { nFail++; continue; }
     Lm.push(lam); P.push(grPoissonP(lam, t));
   }
-  return { B: o.B, nFail, seed: o.seed, lamLo: grPctl(Lm, 0.025), lamHi: grPctl(Lm, 0.975), pLo: grPctl(P, 0.025), pHi: grPctl(P, 0.975) };
+  return { B: o.B, nFail, seed: o.seed, lamLo: grPctl(Lm, 0.025), lamHi: grPctl(Lm, 0.975), pLo: grPctl(P, 0.025), pHi: grPctl(P, 0.975), byT: o.ts ? grPoisByT(Lm, o.ts) : null };
 }
 // Tamlık denetimi (tek Mc; sezgisel): M ≥ Mc olaylarının dönemin ilk yarısındaki sayısı Bin(n, ½) altında beklenenden az mı (tek yönlü, kesin)
 function grHalfSplitTest(times, t0, t1) {
@@ -6009,6 +6012,7 @@ function grObsVsExp(nObs, mu, Tobs) {
 function grPoisInputs() { const g = id => parseFloat(document.getElementById(id)?.value); const M = g('grPM'), t = g('grPt');
   return { M: Number.isFinite(M) ? M : GR_POIS.mDef, t: Number.isFinite(t) && t > 0 ? t : GR_POIS.tDef }; }
 // Panel satırı (iki G–R yolunda ortak). r: { eq, lam, ci, M, t, mObsMax, mx, src, warns[], obs (grObsVsExp), compWarn }
+function grPoisPt(lam, ci, t) { return grPoisTs(t).map(u => ({ t: u, P: grPoissonP(lam, u), lo: ci && ci.byT && ci.byT[u] ? ci.byT[u].pLo : null, hi: ci && ci.byT && ci.byT[u] ? ci.byT[u].pHi : null })); }
 function grPoissonHtml(r) {
   const pc = v => v === null || !Number.isFinite(v) ? '—' : (100 * v < 0.1 && v > 0 ? '< 0,1' : (100 * v).toFixed(1).replace('.', ','));
   const yr = v => v === null || !Number.isFinite(v) || v <= 0 ? '—' : v >= 1e4 ? v.toExponential(2).replace('.', ',') : v >= 100 ? Math.round(v).toLocaleString('tr-TR') : v.toPrecision(3).replace('.', ',');
@@ -6027,7 +6031,10 @@ function grPoissonHtml(r) {
   return `<div id="grPoisRow" style="margin-top:5px;padding-top:4px;border-top:1px dashed #334;color:#cbd5e1;line-height:1.55;">` +
     `<b style="color:#e2e8f0;">${r.eq}</b><br>` +
     `<span title="Poisson (zamandan bağımsız): P(t) = 1 − e^(−λt), Tr = 1/λ">Poisson: λ(M≥${r.M}) = <b>${lmb(r.lam)}</b>/yıl · ortalama tekrarlanma Tr = <b>${yr(Tr)}</b> yıl${trCi} · ${r.t} yılda en az bir M≥${r.M} olasılığı P = <b>%${pc(P)}</b>${ci}${pTag}</span> ` +
-    `<span style="color:#888">(${r.src})</span>` + obsLine + `<br>` +
+    `<span style="color:#888">(${r.src})</span>` +
+    `<br><span id="grPoisPt" title="Aynı λ(≥M) ve aynı bootstrap çekilişleri; yalnız t değişir: P(t) = 1 − e^(−λt). Yüzdelikler her süre için ayrı alınır.">Süreye göre P(en az bir M≥${r.M}): ` +
+      grPoisPt(r.lam, r.ci, r.t).map(q => { const s = `${q.t} yıl: <b>%${pc(q.P)}</b>${q.lo !== null ? ` [%${pc(q.lo)}–%${pc(q.hi)}]` : ''}`; return q.t === r.t ? `<u>${s}</u>` : s; }).join(' · ') + `</span>` +
+    obsLine + `<br>` +
     `<span style="color:#888">%95 aralık: parametrik bootstrap${r.ci ? ` (B = ${r.ci.B}, tohum ${r.ci.seed}${r.ci.nFail ? `, kurulamayan ${r.ci.nFail}` : ''})` : ''}; Poisson sayım + b belirsizliği birlikte. Dahil değil: Mc/tamlık seçimi, Mx, büyüklük hataları ve dönüşüm, artçı ayıklama yöntemi. ` +
     `Değerler seçili bölgenin tamamı içindir; bir noktanın tehlikesi ya da bir depremin zamanı değildir (tahmin değildir).</span>` +
     (W.length ? `<br><span style="color:#f59e0b">⚠ ${W.join(' · ⚠ ')}</span>` : '') + `</div>`;
@@ -6631,14 +6638,14 @@ function renderGutenbergRichterCS(cs) {
   if (wf && rate0Best > 0) {
     const { M: pM, t: pT } = grPoisInputs();
     const lamOf = f => grLambdaWeichert(rateGE(f.rate0, f.beta, Mx, clsBest), f.beta, m0, pM, Mx);
-    const lam = lamOf(wf), ci = grPoissonBootWeichert(clsBest, wf, lamOf, pT), aW = Math.log10(rate0Best) + wf.b * m0;
+    const lam = lamOf(wf), ci = grPoissonBootWeichert(clsBest, wf, lamOf, pT, { ts: grPoisTs(pT) }), aW = Math.log10(rate0Best) + wf.b * m0;
     const warns = [];
     if (!(typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect)) warns.push('GK74 artçı ayıklama kapalı: Poisson modelinin bağımsız olay varsayımı daha az uygun olabilir; ayıklamanın oran ve b üzerindeki etkisi veri kümesine göre değişir (ikisi birlikte değişir, olasılığın yönü önceden belli değildir)');
     if (fitOn && (pM < m0 - 1e-9)) warns.push(`M ≥ ${pM} fit aralığının (M ${m0.toFixed(1)}–${mTopFit.toFixed(1)}) altında`);
     // Gözlenen: M'nin tam gözlendiği dönemler (eşik ≤ M) ve bu dönemlerdeki M ≥ M olayları; maruz kalma T(M) = csObsYears(M)
     const Tobs = csObsYears(pM, cs.periods), nObs = items.filter(it => it.mc <= pM + 1e-9 && it.m >= pM - 1e-9).length;
     const obs = Tobs > 0 ? grObsVsExp(nObs, lam * Tobs, Tobs) : null;
-    lastGrPois = { path: 'weichert', lam, ci, M: pM, t: pT, mx: Mx, m0, rate0: rate0Best, b: wf.b, warns: warns.slice(), obs };
+    lastGrPois = { path: 'weichert', lam, ci, M: pM, t: pT, Pt: grPoisPt(lam, ci, pT), mx: Mx, m0, rate0: rate0Best, b: wf.b, warns: warns.slice(), obs };
     poisHtml = grPoissonHtml({ eq: Mx === null ? `log₁₀λ(≥M) = ${aW.toFixed(2)} − ${wf.b.toFixed(2)}·M (Weichert; λ: yıllık oran)` : `λ(≥M) = λ₀·[e^(−β(M−m₀)) − e^(−β(Mx−m₀))]/[1 − e^(−β(Mx−m₀))], Mx = ${Mx} (kesik G–R; Mx'ten uzakta log₁₀λ ≈ ${aW.toFixed(2)} − ${wf.b.toFixed(2)}·M)`,
       lam, ci, M: pM, t: pT, mObsMax: Math.max(...items.map(it => it.m)), mx: Mx, obs, src: `Weichert (1980), tamlık basamaklarıyla; m₀ = ${m0.toFixed(1)}, λ(≥m₀) = ${rate0Best.toPrecision(4)}/yıl`, warns });
   }
