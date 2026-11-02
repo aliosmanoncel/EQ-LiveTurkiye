@@ -2,6 +2,8 @@
 
 Tarih: 2026-11-02. Dal: `gmpe-turkiye-methodology`. Yöntem belgesi: `../YONTEM.md`. Önceki adım: `../asama2_adim1/RAPOR.md` (kapatıldı).
 
+**Durum: KAPATILDI** (kullanıcı kararı, 2026-11-02), aşağıdaki dört yöntem açıklaması ve iki raporlama düzeltmesiyle. Bu adım, modern GMPE'lerin Campbell'dan hangi koşullarda daha yüksek ya da düşük medyan ürettiğini gösterir; hangi modelin Türkiye'de daha iyi sonuç verdiğini göstermez (Aşama 2.3).
+
 **Kapsam.** Yalnız analiz çıktısı. Mevcut Campbell katmanı, `index.html` ve `data/` değişmedi; EQ-Live entegrasyonu ve model seçimi bu adımın kapsamında değil.
 - Sonuçlar bir **model sıralaması** ya da **Türkiye performans değerlendirmesi** değildir; yalnız aynı girdilerde medyan farkını betimler.
 - Kayıt verisi kullanılmadı.
@@ -11,11 +13,19 @@ Tarih: 2026-11-02. Dal: `gmpe-turkiye-methodology`. Yöntem belgesi: `../YONTEM.
 | No | Koşul | Uygulama |
 |---|---|---|
 | 1 | Campbell, mevcut EQ-Live uygulamasının aynısı | `Campbell1981EQLive`; adım 1'de `build_hazard_grid.py` ile fark 0 |
-| 2 | Campbell'ın dış merkez uzaklığı Rjb ile eşdeğer sayılmaz | İki çerçeve ayrı: **A** — nokta kaynak temsili (aynı sayısal R; yalnız kaynak bir nokta kabul edilirse geçerli); **B** — uzaklık tanımı farkı dahil, temsili: saha kırığa Rjb = R uzaklıkta, Campbell katmandaki gibi Repi = R + Δ(Mw) alır; Δ = NESS 2.1'de Repi − Rjb medyanı (YONTEM.md §13: 4,2 / 6,9 / 11,0 / 12,6 / 47,8 km). Geometri belirsizliği ve Δ'nın dağılımı dahil değil; Mw 5 için NESS verisi yok |
+| 2 | Campbell'ın dış merkez uzaklığı Rjb ile eşdeğer sayılmaz | İki çerçeve ayrı: **A** — sayısal uzaklık eşleştirmesi (aşağıdaki açıklama); **B** — uzaklık tanımı farkı dahil, temsili: saha kırığa Rjb = R uzaklıkta, Campbell katmandaki gibi Repi = R + Δ(Mw) alır; Δ = NESS 2.1'de Repi − Rjb medyanı (YONTEM.md §13: 4,2 / 6,9 / 11,0 / 12,6 / 47,8 km). Geometri belirsizliği ve Δ'nın dağılımı dahil değil; Mw 5 için NESS verisi yok |
 | 3 | Campbell'ın sınırları T5'e kadar işaretli | Bütün Campbell hücreleri **[teyit]**; yaklaşık veri aralığı dışında (M > 7,7 ya da R > 50 km) **ᵉ[teyit]** |
 | 4 | Medyan ve belirsizlik ayrı | Oranlar yalnız medyandır; σ ayrı tabloda (Tablo 3). Campbell'da σ hesaplanmaması belirsizliğin sıfır olduğu anlamına gelmez; yalnız mevcut katmanda bu bileşenin hesaplanmadığını gösterir |
 | 5 | Ekstrapolasyon işaretleri | **ᵉ**: modelin yayımlanmış veri aralığı dışında (AC10, ASB14 Mw > 7,6; ESHM20 temel model Mw > 7,4). **?**: KAAH15, aralık doğrulanmadı (T1) |
 | 6 | Sıralama / performans değil | Liste B için tek tek değerler ve aralık (en küçük–en büyük) verilir; ortalama ya da ağırlık yok |
+
+**Çerçeve A — sayısal uzaklık eşleştirmesi.** Campbell'ın dış merkez uzaklığı Repi ile modern GMPE'lerin Joyner–Boore uzaklığı Rjb (kırığın yüzey izdüşümüne en yakın yatay uzaklık) sayısal olarak eşitlenir. Bu eşitlik iki uzaklık tanımının fiziksel olarak eşdeğer olduğu anlamına gelmez. Sonuçlar ortak bir fiziksel kaynak geometrisinin karşılaştırması değil, aynı sayısal uzaklık girdisindeki medyan farklarıdır.
+
+**Çerçeve B — temsili senaryo.** Çerçeve B'de kullanılan Δ değerleri, olay–istasyon çiftlerine ait eşleştirilmiş uzaklık dönüşümleri değildir; Mw sınıfına göre hesaplanmış medyan farkların temsili bir senaryoya uygulanmasıdır. Bu nedenle sonuçlar belirli bir istasyonun gerçek Repi değerini ya da uzaklık belirsizliğini vermez.
+
+**Campbell geçerlilik işaretlerinin uzaklık tabanı.** İşaretler, her çerçevede Campbell'a fiilen verilen uzaklıkla değerlendirilir: çerçeve A'da R, çerçeve B'de Repi = R + Δ. Bu nedenle aynı satırda A işaretsiz, B "ᵉ" olabilir (ör. Rjb = 10 km, Mw 7,6: Repi ≈ 58 km > 50 km).
+
+**Mw 5 satırları.** Mw = 5,0 satırları sayısal duyarlılık karşılaştırması olarak korunmuştur. Campbell bağıntısının bu büyüklük aralığındaki büyüklük ölçeği T5 kapsamında doğrulanmadan, bu satırlardan fiziksel olarak eşdeğer büyüklüklerde medyan farkı sonucu çıkarılmamalıdır.
 
 Ortak girdiler: doğrultu atımlı, düşey düzlem, ztor = 0 (Rrup = Rx = Rjb), odak derinliği 10 km, Vs30 = 760 m/s. Bu Vs30 ortak girdidir, bütün modellerin referans kayası değildir; Campbell'da zemin terimi yoktur. Vs30 = 360 m/s sonuçları (yalnız modern modeller) CSV'de.
 
@@ -67,7 +77,7 @@ Ortak girdiler: doğrultu atımlı, düşey düzlem, ztor = 0 (Rrup = Rx = Rjb),
 | CY08 | 1,02 | 0,49 | 0,80 | 0,66 | 0,47 |
 | Zh06 | 0,98 | 0,68 | 1,04 | 0,95 | 0,60 |
 
-### Tablo 3 — σ_ln (ayrı; Campbell'da hesaplanmıyor), Vs30 = 760 m/s, R = 30 km
+### Tablo 3 — σ_total,ln: toplam standart sapma, doğal logaritma (olaylar arası ve olay içi bileşenlerin birleşimi; OpenQuake `get_mean_stds` toplam σ), Vs30 = 760 m/s, R = 30 km. Campbell'da hesaplanmıyor
 
 | Model | Mw 5 | Mw 6 | Mw 7 | Mw 7,8 |
 |---|---|---|---|---|
@@ -94,16 +104,16 @@ Tablo notları:
    - Mw 6: 10 km'de 0,64–1,15 → 200 km'de 0,25–0,67;
    - Mw 7,8: 10 km'de 0,51–0,79 → 200 km'de 0,32–0,69.
 
-   Campbell'ın uygulanan biçiminde uzaklık terimi yalnız geometrik yayılımdır (−1,09 ln R; soğrulma terimi yok). Bu nedenle R > 50 km'de, yani Campbell'ın yaklaşık veri aralığı dışında **[teyit]**, Campbell medyanı Mw ≥ 6'da Liste B medyanlarının yaklaşık 0,95–4,0 katı, Mw 5'te 1,7–12 katı oluyor (Liste B'nin tek tek modellerine göre; 75–200 km).
+   Mevcut EQ-Live Campbell uygulamasında kullanılan uzaklık bağımlılığı −1,09 ln R biçimindedir; uygulamada ayrıca bir anelastik soğrulma terimi bulunmamaktadır. Bunun Campbell (1981) özgün bağıntısıyla tam uyumu T5 kapsamında ayrıca doğrulanacaktır. Bu nedenle R > 50 km'de, yani Campbell'ın yaklaşık veri aralığı dışında **[teyit]**, Campbell medyanı Mw ≥ 6'da Liste B medyanlarının yaklaşık 0,95–4,0 katı, Mw 5'te 1,7–12 katı oluyor (Liste B'nin tek tek modellerine göre; 75–200 km).
 2. **Uzaklık tanımı farkı (çerçeve B).** Büyük depremlerde dış merkez uzaklığı kırığa olan uzaklıktan çok büyük. Campbell'a katmandaki gibi Repi verildiğinde yakın alanda değer düşüyor:
    - Mw 7,8, Rjb = 10 km: Liste B medyanları Campbell'ın 1,66–2,60 katı;
    - Mw 7,6, Rjb = 1 km: 2,81–4,33 katı;
    - uzak alanda (200 km) Campbell yine yüksek kalıyor (oran 0,40–0,86).
 
    Yani mevcut katmanda iki etki **uzaklığa göre zıt yönde** çalışıyor: yakın alanda dış merkez uzaklığı nedeniyle düşük, uzak alanda yavaş azalma nedeniyle yüksek. Bu bir girdi senaryosu farkıdır (YONTEM.md §6, fark türü a); bir GMPE artığı değildir.
-3. **Küçük büyüklük (Mw 5).** Campbell bütün uzaklıklarda Liste B'nin üstünde (oran ≤ 0,80; 200 km'de 0,08–0,31). Campbell'ın büyüklük ölçeği M < 6 için ML'dir **[teyit, T5]**. EQ-Live ise katmana çoğunlukla mb girmektedir (YONTEM.md §1). Bu ikinci bir ölçek uyumsuzluğudur ve burada ayrıca ölçülmedi.
+3. **Küçük büyüklük (Mw 5).** Campbell bütün uzaklıklarda Liste B'nin üstünde (oran ≤ 0,80; 200 km'de 0,08–0,31). Campbell'ın büyüklük ölçeği M < 6 için ML'dir **[teyit, T5]**. EQ-Live ise katmana çoğunlukla mb girmektedir (YONTEM.md §1). Bu ikinci bir ölçek uyumsuzluğudur ve burada ayrıca ölçülmedi. T5 tamamlanmadan bu satırlardan güçlü bir bilimsel çıkarım yapılmaz (yukarıdaki "Mw 5 satırları" notu).
 4. **Model aralığı Campbell farkıyla aynı büyüklükte.** Liste B'nin kendi içindeki yayılım, Mw 6 ve 10 km'de 0,105–0,187 g (yaklaşık 1,8 kat). Bu, Campbell ile modern modeller arasındaki farkla karşılaştırılabilir düzeyde. Tek bir modern modelin Campbell'ın yerine konması bu epistemik aralığı gizler (YONTEM.md §6).
-5. **σ.** Modern modellerde σ_ln 0,52–0,83 (Tablo 3). Örnek: σ = 0,7 için 16.–84. yüzdelik aralığı medyanın yaklaşık 0,5 ile 2 katı arasıdır. Campbell'da bu bileşen hesaplanmıyor.
+5. **σ.** Modern modellerde σ_total,ln 0,52–0,83 (Tablo 3). Örnek: σ = 0,7 için 16.–84. yüzdelik aralığı medyanın yaklaşık 0,5 ile 2 katı arasıdır. Campbell'da bu bileşen hesaplanmıyor.
 
 ## Sınırlar
 
