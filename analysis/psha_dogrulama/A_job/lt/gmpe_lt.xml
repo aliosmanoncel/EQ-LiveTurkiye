@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nrml xmlns:gml="http://www.opengis.net/gml" xmlns="http://openquake.org/xmlns/nrml/0.5">
+  <logicTree logicTreeID="gmpe">
+      <logicTreeBranchSet uncertaintyType="gmpeModel" branchSetID="bs1" applyToTectonicRegionType="Subduction Interface">
+        <logicTreeBranch branchID="g0"><uncertaintyModel>[MindanaoKodGMPE]
+Zt = 0
+eps = 0.0</uncertaintyModel><uncertaintyWeight>0.7</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="g1"><uncertaintyModel>[MindanaoKodGMPE]
+Zt = 0
+eps = 0.5</uncertaintyModel><uncertaintyWeight>0.2</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="g2"><uncertaintyModel>[MindanaoKodGMPE]
+Zt = 1
+eps = 0.0</uncertaintyModel><uncertaintyWeight>0.1</uncertaintyWeight></logicTreeBranch>
+      </logicTreeBranchSet>
+  </logicTree>
+</nrml>

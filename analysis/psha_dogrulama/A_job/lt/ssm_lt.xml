@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nrml xmlns:gml="http://www.opengis.net/gml" xmlns="http://openquake.org/xmlns/nrml/0.5">
+  <logicTree logicTreeID="kaynak">
+      <logicTreeBranchSet uncertaintyType="sourceModel" branchSetID="bs0">
+        <logicTreeBranch branchID="s0"><uncertaintyModel>ssm_b0_m0.xml</uncertaintyModel><uncertaintyWeight>0.3</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="s1"><uncertaintyModel>ssm_b0_m1.xml</uncertaintyModel><uncertaintyWeight>0.18</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="s2"><uncertaintyModel>ssm_b0_m2.xml</uncertaintyModel><uncertaintyWeight>0.12</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="s3"><uncertaintyModel>ssm_b1_m0.xml</uncertaintyModel><uncertaintyWeight>0.15</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="s4"><uncertaintyModel>ssm_b1_m1.xml</uncertaintyModel><uncertaintyWeight>0.09</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="s5"><uncertaintyModel>ssm_b1_m2.xml</uncertaintyModel><uncertaintyWeight>0.06</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="s6"><uncertaintyModel>ssm_b2_m0.xml</uncertaintyModel><uncertaintyWeight>0.05</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="s7"><uncertaintyModel>ssm_b2_m1.xml</uncertaintyModel><uncertaintyWeight>0.03</uncertaintyWeight></logicTreeBranch>
+        <logicTreeBranch branchID="s8"><uncertaintyModel>ssm_b2_m2.xml</uncertaintyModel><uncertaintyWeight>0.02</uncertaintyWeight></logicTreeBranch>
+      </logicTreeBranchSet>
+  </logicTree>
+</nrml>

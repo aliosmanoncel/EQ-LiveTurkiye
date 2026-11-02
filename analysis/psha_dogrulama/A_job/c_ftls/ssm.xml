@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nrml xmlns:gml="http://www.opengis.net/gml" xmlns="http://openquake.org/xmlns/nrml/0.5">
+  <sourceModel name="c_ftls">
+   <sourceGroup tectonicRegion="Subduction Interface">
+    <pointSource id="ftls" name="ftls" tectonicRegion="Subduction Interface">
+      <pointGeometry><gml:Point><gml:pos>0.0 0.0</gml:pos></gml:Point>
+        <upperSeismoDepth>0.0</upperSeismoDepth><lowerSeismoDepth>200.0</lowerSeismoDepth></pointGeometry>
+      <magScaleRel>PointMSR</magScaleRel><ruptAspectRatio>1.0</ruptAspectRatio>
+      <incrementalMFD minMag="5.1" binWidth="0.2"><occurRates>58.329452989309544 43.53994776260845 32.500339948638214 24.25983840256609 18.108726254824276 13.517236229301368 10.089924200497578 7.531611391913085 5.621961972320646 4.196506534067344 3.1324770920143052 2.3382336360820486 1.7453715945261037 1.3028304596981901 0.0 0.0 0.0</occurRates></incrementalMFD>
+      <nodalPlaneDist><nodalPlane probability="1.0" strike="0.0" dip="90.0" rake="90.0"/></nodalPlaneDist>
+      <hypoDepthDist><hypoDepth probability="1.0" depth="35.5"/></hypoDepthDist>
+    </pointSource>
+   </sourceGroup>
+  </sourceModel>
+</nrml>

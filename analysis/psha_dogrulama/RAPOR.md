@@ -96,7 +96,7 @@ Aynı kaynaklar OpenQuake'in yerleşik `YoungsEtAl1997SInter` modeliyle hesaplan
 | b × Mmax dalları ortalaması, Youngs (1997) (9 dal) | 1,066 | 1,571 |
 
 - Son iki satır aynı mantık ağacı değil: (B)'de epistemik GMPE dalları yok. Doğrudan karşılaştırılamaz.
-- Bu tablo yalnız şunu gösteriyor: GMPE seçimi tasarım değerini yaklaşık %40 değiştirebiliyor. Sonucun GMPE'ye duyarlılığı, iki hesap motoru arasındaki farktan dört basamak büyük.
+- Bu tablo **GMPE + zemin koşulu birleşik duyarlılığını** gösterir (2026-11-02 düzeltmesi): koddaki bağıntı Vs30 = 360 m/s için ≈ ×1,30 zemin büyütmesi içeriyor, Youngs (1997) hesabı kaya koşulunda ve büyütmesiz. 0,703 → 0,993 g (≈ %41) farkı yalnız GMPE etkisi olarak sunulamaz; aynı zemin koşulunda fark daha büyük olurdu. Saf GMPE duyarlılığı Aşama B2'de Vs30'u doğrudan alan modellerle ölçülür. Her durumda bu duyarlılık, iki hesap motoru arasındaki farktan dört basamak büyüktür.
 
 ## 6. Bilimsel değerlendirme (ayrı konu; motor karşılaştırmasından bağımsız)
 
@@ -115,6 +115,12 @@ Aynı kaynaklar OpenQuake'in yerleşik `YoungsEtAl1997SInter` modeliyle hesaplan
    - Mmax = 7,8 "gözlenen" etiketiyle 0,50 ağırlık alıyor. Bu, Mmax'ı gözlenen en büyük büyüklüğe eşitleme anlamına gelir; aşama 5'te kabul ettiğiniz ilkeyle çelişir.
    - Ayrıca mantık ağacı şeklindeki dal ve panel etiketleri (Mmax 8,0/8,5/9,0; "Mmax = 8,5 sabit") kodla (7,8/8,0/8,2; 8,0) uyumsuz.
 7. **GMPE seçimi.** Tek GMPE ailesi kullanılmış. (B), modern subdüksiyon modelleriyle önemli fark olabileceğini gösteriyor. Örnekler: BC Hydro (Abrahamson vd. 2016; `AbrahamsonEtAl2015SInter`), Parker vd. (2022; `ParkerEtAl2020SInter`), Kuehn vd. (2023; `KuehnEtAl2020SInter`); üçü de OpenQuake 3.26.2'de mevcut (doğrulandı).
+
+## 6b. Aşama A tamamlandı (2026-11-02)
+
+`job.ini` ile tam OpenQuake motor akışı çalıştırıldı: `A_job/A_RAPOR.md`.
+- Motor sonuçları mevcut koda göre en büyük göreli λ farkı ≈ 5·10⁻⁶; tasarım düzeyleri beş anlamlı basamakta aynı.
+- Tanım farkı belgelendi: mantık ağacı ortalaması OpenQuake'te PoE üzerinden, kodda λ üzerinden alınıyor (%10/50: 0,915 / 0,928 g).
 
 ## 7. Sonraki adım seçenekleri (karar sizin)
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nrml xmlns:gml="http://www.opengis.net/gml" xmlns="http://openquake.org/xmlns/nrml/0.5">
+  <sourceModel name="ssm_b2_m2.xml">
+   <sourceGroup tectonicRegion="Subduction Interface">
+    <pointSource id="lt" name="lt" tectonicRegion="Subduction Interface">
+      <pointGeometry><gml:Point><gml:pos>0.0 0.0</gml:pos></gml:Point>
+        <upperSeismoDepth>0.0</upperSeismoDepth><lowerSeismoDepth>200.0</lowerSeismoDepth></pointGeometry>
+      <magScaleRel>PointMSR</magScaleRel><ruptAspectRatio>1.0</ruptAspectRatio>
+      <incrementalMFD minMag="5.1" binWidth="0.2"><occurRates>1.209209278753942 0.7219406082806941 0.43102401796137346 0.2573365480880853 0.15363899973626519 0.0917279042379952 0.054764795594466106 0.03269651543244731 0.019520973461504006 0.011654709984984527 0.006958273115936747 0.004154334583901891 0.0024802843388650095 0.0014808172710636728 0.0008841001638077909 0.0005278389946678001</occurRates></incrementalMFD>
+      <nodalPlaneDist><nodalPlane probability="1.0" strike="0.0" dip="90.0" rake="90.0"/></nodalPlaneDist>
+      <hypoDepthDist><hypoDepth probability="1.0" depth="35.5"/></hypoDepthDist>
+    </pointSource>
+   </sourceGroup>
+  </sourceModel>
+</nrml>
