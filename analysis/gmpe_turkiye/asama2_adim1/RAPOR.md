@@ -51,9 +51,9 @@ Tablo notları:
 5. **Zh06:** PGV tanımlı değil. Hücre boş bırakıldı, değer üretilmedi.
 6. **Campbell (1981):** Özel sınıf, EQ-Live katmanındaki uygulamanın birebir kopyasıdır. Uzaklık dış merkez uzaklığıdır. σ katmanda kullanılmadığı için 0 verildi. Denklemin yayınla uyumu ayrı bir sorudur (T5, açık). Bu satır yalnız "OpenQuake'teki kopya = mevcut betik" eşitliğini gösterir.
 7. **Ortak girdi ızgarasında bir girdi hatası bulunup düzeltildi.** OpenQuake'in `global_mean_z1pt0` işlevi z1.0'ı değil ln(z1.0)'ı döndürüyor. İlk çalıştırmada bu değer metre gibi girildi. Sonuç: pygmm ile CY14'te PGV %5,4, SA(1,0 s) %16,8 farklı çıktı. Düzeltmeden sonra (exp ile metreye çevrildi) fark ≤ 2·10⁻¹³ %. Bu bir OpenQuake hatası değil, bizim girdi hatamızdı. Çapraz denetimin bu tür hataları yakaladığını gösteriyor.
-9. **Ortak girdi ızgarasının kapsam sınırı:** Izgara yalnız doğrultu atımlı faylanma, düşey düzlem ve ztor = 0 (Rrup = Rx = Rjb) içerir. Ters ve normal faylanma, eğimli fay geometrisi ve asılı blok etkileri bu ızgarada sınanmadı. OpenQuake'in referans tabloları bu durumların bir kısmını içerir (ör. CY14 HW tabloları: normal, ters), ama ortak ızgara içermez. Adım 1'in başarılı olması bütün mekanizma ve geometri seçeneklerinin doğrulandığı anlamına gelmez. Vs30 = 760 m/s ortak girdidir; bütün modellerin doğal referans kaya koşulu değildir.
-10. **KAAH15'in Mw 7,8 çıktısı:** "Yazılım çıktısı üretildi; model geçerlilik aralığı henüz doğrulanmadı" (T1 açık). Bu değerler için ne "ekstrapolasyon" ne "aralık içinde" denir.
-8. **OpenQuake test paketinin dört testi bu ortamda çalışmadı.** Nedeni, pip kurulumunda eksik iki veri dosyası (`cy14_host_to_target/source_function_table.txt` ve `Kotha_2020/kotha_attenuation_regions.geojson`). İlgili sınıflar `BooreEtAl2022Adjustments` ve `KothaEtAl2020regional`; ikisi de aday değil, sonuçları etkilemez. Bu ESHM20 bölgesel coğrafi dosyası D2/T3 için ayrıca gerekecek.
+8. **Ortak girdi ızgarasının kapsam sınırı:** Izgara yalnız doğrultu atımlı faylanma, düşey düzlem ve ztor = 0 (Rrup = Rx = Rjb) içerir. Ters ve normal faylanma, eğimli fay geometrisi ve asılı blok etkileri bu ızgarada sınanmadı. OpenQuake'in referans tabloları bu durumların bir kısmını içerir (ör. CY14 HW tabloları: normal, ters), ama ortak ızgara içermez. Adım 1'in başarılı olması bütün mekanizma ve geometri seçeneklerinin doğrulandığı anlamına gelmez. Vs30 = 760 m/s ortak girdidir; bütün modellerin doğal referans kaya koşulu değildir.
+9. **KAAH15'in Mw 7,8 çıktısı:** "Yazılım çıktısı üretildi; model geçerlilik aralığı henüz doğrulanmadı" (T1 açık). Bu değerler için ne "ekstrapolasyon" ne "aralık içinde" denir.
+10. **OpenQuake test paketinin dört testi bu ortamda çalışmadı.** Nedeni, pip kurulumunda eksik iki veri dosyası (`cy14_host_to_target/source_function_table.txt` ve `Kotha_2020/kotha_attenuation_regions.geojson`). İlgili sınıflar `BooreEtAl2022Adjustments` ve `KothaEtAl2020regional`; ikisi de aday değil, sonuçları etkilemez. Bu ESHM20 bölgesel coğrafi dosyası D2/T3 için ayrıca gerekecek.
 
 ## Ortak girdi ızgarası: örnek sonuçlar (yalnız yazılım çıktısı)
 
@@ -91,7 +91,7 @@ Adımlar:
 2. Tabloları kurulu pakete kopyala (test yardımcıları `openquake.hazardlib.tests.gsim.utils` için): `tests/__init__.py` ve `tests/gsim/`.
 3. Tablo doğrulaması: `python tablo_dogrulama.py <…/tests/gsim/data>` → `tablo_dogrulama.json`.
 4. Ortak girdi, pygmm ve Campbell denetimi: `python ortak_girdi.py <main'deki scripts/build_hazard_grid.py>` → `ortak_girdi.csv`, `ortak_girdi.json`. Betiğin SHA-256 değeri JSON'da; git blob kimliği `ef186a2b243650cef39863bd9b6c9e3da3c6a4a8`.
-5. İsteğe bağlı: OpenQuake'in kendi testleri `pytest openquake/hazardlib/tests/gsim/{akkar_2014,akkar_cagnan_2010,kale_2015,boore_2014,chiou_youngs_2014,kotha_2020,zhao_2006,chiou_youngs_2008}_test.py`. Sonuç: 57 geçti, 4 kaldı (8. madde).
+5. İsteğe bağlı: OpenQuake'in kendi testleri `pytest openquake/hazardlib/tests/gsim/{akkar_2014,akkar_cagnan_2010,kale_2015,boore_2014,chiou_youngs_2014,kotha_2020,zhao_2006,chiou_youngs_2008}_test.py`. Sonuç: 57 geçti, 4 kaldı (10. madde).
 
 ## Açık kalanlar (Aşama 2, 3. adımdan önce)
 
