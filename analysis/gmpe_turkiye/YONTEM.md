@@ -10,6 +10,7 @@ Durum: **taslak, kullanıcı incelemesinde**. Yalnız belge; kod değişikliği 
 - Revizyon 6 (2026-11-02): D2, D3, D5, D6 kullanıcı kararıyla kapatıldı; yöntemsel geçiş koşulu kapandı; hesap öncesi kalan [teyit] listesi yazıldı (§11).
 - Revizyon 7 (2026-11-02): T1, CY14 ve BSSA14 için Gregor vd. (2014) Tablo 1'den kapatıldı (kullanıcının İndirilenler klasöründeki PDF).
 - Revizyon 8 (2026-11-02): kullanıcı incelemesi — BSSA14 sınırlarının gösterimi, T2 için dört adımlı doğrulama zinciri, T öncelik sırası, Aşama 2 adım 1'in tasarımı.
+- Revizyon 9 (2026-11-02): kullanıcı incelemesi — ESHM20 temel model / uyarlama ayrımı ve 800 m/s'nin etiketi; Kahramanmaraş için model başına kapsam tablosu; T2 öncelik sırası.
 - Kod, `index.html`, `data/`, `seismoreport/` ve canlı site değişmedi.
 
 İşaretler:
@@ -324,7 +325,7 @@ Kabul edilmiş bir ilke ile veri ya da kaynakla henüz doğrulanmamış bir vars
 | KAAH15 | `KaleEtAl2015Turkey` | Vref = 750 m/s |
 | CY14 | `ChiouYoungs2014` | Referans hız 1130 m/s |
 | BSSA14 Yüksek Q | `BooreEtAl2014HighQ` | Vref = 760 m/s |
-| ESHM20 | `KothaEtAl2020ESHM20` | 800 m/s'ye göre büyütme |
+| ESHM20 uyarlaması | `KothaEtAl2020ESHM20` | 800 m/s'ye göre büyütme (OpenQuake uygulaması; kaynağı Weatherill vd. 2020; temel modelin referansı değil) |
 | CY08 (karşılaştırma) | `ChiouYoungs2008` | Referans hız 1130 m/s |
 | Zh06 (karşılaştırma) | `ZhaoEtAl2006Asc` | Saha sınıfları (Vs30 > 1100 m/s sert kaya sınıfı); sürekli Vs30 değil |
 
@@ -364,7 +365,24 @@ Aynı makale (s. 1182): bölgesel soğrulma düzeltmesinde BSSA14 için "China a
 - Mw 3,1–7,4 (özette 3–7,4); Rjb 0–545 km (uzaklık kesilmemiş; Rjb yoksa yalnız Mw ≤ 6,2 olaylarda Repi kullanılmış); odak derinliği ≤ 39 km.
 - Vs30 90–3000 m/s ya da eğim 0,001–1 m/m; RotD50 PGA, PGV ve SA 0,01–8 s.
 - Türkiye kayıtları dahil; bölgeselleştirme Türkiye'yi en az sekiz bölgeye ayırıyor (en büyükleri Doğu ve Batı Anadolu).
-- **Sonuç:** Kahramanmaraş Mw 7,7–7,8 bu modelde de ekstrapolasyondur (veri Mw ≤ 7,4). Temel modelde sabit bir referans Vs30 yok (istasyon terimleri δS2S); 800 m/s referansı ESHM20 uyarlamasından (Weatherill vd. 2020) geliyor ve OpenQuake kodunda görülüyor, makaleden **[teyit]** (T2).
+- **Sonuç:** Mw ≤ 7,4 sınırı **temel modelin** (Kotha vd. 2020) doğrulanmış veri kapsamıdır; ESHM20 uyarlamasının bütün teknik özelliklerini tek başına doğrulamaz.
+- **İki katman ayrı tutulur:**
+  - Kotha vd. (2020): temel model (ESM verisi; Türkiye dahil).
+  - Weatherill, Kotha & Cotton (2020): ESHM20 için **Avrupa geneli** "ölçekli omurga" uyarlaması (beş soğrulma bölgesi, Vs30 tabanlı saha terimi, heteroskedastik σ) — Türkiye'ye özgü bir uyarlama değildir. OpenQuake'teki `KothaEtAl2020ESHM20` sınıfı bu uyarlamayı uygular (sınıf açıklaması).
+- **800 m/s:** temel modelin doğal referans Vs30'u olarak yazılmaz. Durum: "OpenQuake 3.26.2 `KothaEtAl2020ESHM20` uygulamasında görülen referans; kaynağı Weatherill vd. (2020) uyarlaması; yayından doğrulama T2 kapsamında açık."
+
+**Kahramanmaraş 2023 (Mw 7,7–7,8; doğrultu atımlı) için model başına kapsam (geçici):**
+
+| Model | Değerlendirme | Dayanak |
+|---|---|---|
+| AC10 | Ekstrapolasyon (veri Mw ≤ 7,6) | Akkar vd. 2018, Tablo 1 |
+| ASB14 | Ekstrapolasyon (veri Mw ≤ 7,6) | Akkar vd. 2018, Tablo 1 |
+| ESHM20 | Ekstrapolasyon (temel model verisi Mw ≤ 7,4) | Kotha vd. 2020 |
+| BSSA14 | Aralık içinde (doğrultu atımlı Mw ≤ 8,5) | Gregor vd. 2014, Tablo 1 |
+| CY14 | Aralık içinde (doğrultu atımlı Mw ≤ 8,5) | Gregor vd. 2014, Tablo 1 |
+| KAAH15 | Henüz doğrulanmadı (T1 açık) | — |
+
+Not: BSSA14'ün Mw 7,0 sınırı yalnız **normal** faylanma içindir; bütün mekanizmalara genellenmez. CY14'ün ters ve normal faylanma sınırı Mw 8,0'dır. "Aralık içinde" yalnız veri kapsamını anlatır, performansı değil.
 
 **T2 — doğrulama zinciri (her model için dört adım):**
 1. OpenQuake 3.26.2 kaynak kodundaki referans değer (§11 D5 tablosu; tamamlandı).
@@ -372,7 +390,7 @@ Aynı makale (s. 1182): bölgesel soğrulma düzeltmesinde BSSA14 için "China a
 3. İki kaynak arasındaki uyum ya da farkın kaydı.
 4. Kullanılacak senaryonun açık tanımı (D5 senaryo 2'de girilecek Vs30 değeri).
 
-CY14, BSSA14, ASB14, AC10 ve KAAH15 için bu zincir tamamlanmadan D5 tablosu kesinleşmiş sayılmaz. ESHM20 ve Zh06 için de aynı zincir uygulanır.
+Sıra: (1) ASB14, (2) AC10, (3) KAAH15, (4) BSSA14, (5) CY14, (6) ESHM20 uyarlaması (Weatherill vd. 2020); ardından Zh06. Her model için yayın sayfası, denklem ya da tablo numarası, OpenQuake değeri ve senaryoda kullanılacak değer ayrı kaydedilir. Bu zincir tamamlanmadan D5 tablosu kesinleşmiş sayılmaz.
 
 **Öncelik sırası (kullanıcı, 2026-11-02):** T1 → T2 → T3 → T5 → T4. T4 (NESS / ESM künyeleri) ilgili veri kümesi Aşama 2'de ilk kez kullanılmadan önce zorunludur; yazılım doğrulaması (§8.1) için gerekmez.
 
