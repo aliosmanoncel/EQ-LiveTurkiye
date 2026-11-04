@@ -1,1 +1,1 @@
-{"generated":"2026-11-04T16:44:22Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261104_0000215","time":"2026-11-04T15:49:35.05Z","lat":36.6063,"lon":-9.7502,"dep":31.0,"mag":2.4,"mtype":"ml","mw":null,"place":"WEST OF GIBRALTAR"}]}
+{"generated":"2026-11-04T22:19:24Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261104_0000299","time":"2026-11-04T21:19:31.06Z","lat":38.7408,"lon":14.1045,"dep":10.2,"mag":2.2,"mtype":"ml","mw":null,"place":"SICILY, ITALY"}]}
