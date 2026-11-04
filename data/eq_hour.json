@@ -1,1 +1,1 @@
-{"generated":"2026-11-04T08:26:41Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261104_0000094","time":"2026-11-04T08:12:20.993Z","lat":51.5335,"lon":16.1436,"dep":0.0,"mag":2.4,"mtype":"m","mw":null,"place":"POLAND"}]}
+{"generated":"2026-11-04T16:44:22Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"20261104_0000215","time":"2026-11-04T15:49:35.05Z","lat":36.6063,"lon":-9.7502,"dep":31.0,"mag":2.4,"mtype":"ml","mw":null,"place":"WEST OF GIBRALTAR"}]}
