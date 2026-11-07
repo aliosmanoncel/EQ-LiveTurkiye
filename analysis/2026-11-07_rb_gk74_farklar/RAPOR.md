@@ -72,7 +72,23 @@ Ebeveyn büyüklüğüne göre (`fig_mekanizma.png`):
 
 1999 İzmit depremi katalogda **mb 6,3** olarak yer alır; Mw ≈ 7,6'dır. mb büyük depremlerde doyduğu için her iki yöntemin penceresi de küçülür. Reasenberg'in yarıçapı 10·r(6,3) = 36 km olur; Mw 7,6 için bu değer ≈ 120 km'dir. Bu yüzden İzmit artçılarının çoğu "far" mekanizmasıyla R_only grubuna düşer. 2008 Rodos ve 2009 Girit (mb) için de aynı durum geçerlidir.
 
-Dolayısıyla farkların bir bölümü algoritmadan değil, **büyüklük ölçeğinden** kaynaklanır. Bu bulgu, EQ-Live'daki otoriter Mw tablosunun (WORKFLOW 1E, `data/mw_authority.json`) Reasenberg karşılaştırmasında da kullanılmasının değerlendirilmesini gerektirir. Bu bir yöntem kararıdır ve burada uygulanmadı.
+Bu, büyük depremlerde ölçeğin yerel etkisini gösterir; genel farka katkısı §6a'da ölçüldü ve küçüktür.
+
+### 6a. Duyarlılık: otoriter M<sub>w</sub> iki yönteme birlikte uygulanırsa (`mwauth_sensitivity.py`)
+
+`data/mw_authority.json` (mwauth-2026-10-06; 9 doğrulanmış kayıt; projedeki `build_override` eşleşmesi). Yalnız bu büyük depremlerin büyüklüğü değişir; aynı 80 929 olay, aynı kod.
+
+| | Taban (`mag`) | Otoriter M<sub>w</sub> |
+|---|---|---|
+| Yalnız Reasenberg'de bağımsız | 30 976 | 30 985 |
+| Yalnız GK74'te bağımsız | 334 | 334 |
+| Aynı sınıflandırma | %61,31 | %61,30 |
+| Reasenberg küme sayısı | 2 080 | 2 071 |
+| Kategori değiştiren olay | — | 259 (%0,3) |
+
+Büyüklüğü değişen olaylar: İzmit 1999 (mb 6,3 → M<sub>w</sub> 7,6), Düzce 1999 (mb 6,0 → 7,2), Van 2011 (Ms 7,3 → 7,1), Kythira 2006 (mb 6,5 → 6,7); diğerleri zaten M<sub>w</sub>. İzmit'in 100 km / 1 yıl çevresinde yalnız-Reasenberg olayları 540 → 509, iki yöntemde birlikte çıkarılanlar 164 → 209 olur. M<sub>w</sub> 7,6 ile **iki yöntemin penceresi birlikte büyüdüğü** için fark yalnız kısmen kapanır.
+
+**Düzeltilmiş yorum:** Büyük depremlerin büyüklük ölçeği yerel olarak (İzmit, Düzce) etkilidir, ama genel GK74–Reasenberg farkını açıklamaz. Fark büyük ölçüde yöntemlerin pencere tanımından gelir (§2). Küçük olaylardaki ölçek karışıklığının (ML/MD/mb) etkisi bu analizle sınanmadı.
 
 ## 7. Sınırlılıklar
 
@@ -83,7 +99,7 @@ Dolayısıyla farkların bir bölümü algoritmadan değil, **büyüklük ölçe
 
 ## 8. Sonraki adımlar (öneri, karar sizde)
 
-1. Otoriter Mw'nin (1E) büyük olaylarda Reasenberg ve GK74 girdisine uygulanmasıyla farkın ne kadar değiştiğinin ölçülmesi.
+1. ~~Otoriter Mw duyarlılığı~~ — yapıldı (§6a): genel farkı değiştirmiyor.
 2. 2025 düşük payının nedeninin incelenmesi.
 3. Mc duyarlılığı (M ≥ 3,5 / 4,0) — ayrı PR.
 
@@ -94,4 +110,5 @@ Dolayısıyla farkların bir bölümü algoritmadan değil, **büyüklük ölçe
 | `rb_gk74_differences.py` | Analiz betiği (yeniden üretilebilir; depo kökünden çalıştırılır) |
 | `differences_events.csv` | 31 310 olay: grup, sınıflar, GK74 ebeveyni, uzaklık, zaman farkı, mekanizma |
 | `summary.json` | Tüm sayılar ve dağılımlar |
+| `mwauth_sensitivity.py`, `mwauth_sensitivity.json` | Otoriter M<sub>w</sub> duyarlılığı (§6a) |
 | `fig_mekansal.png`, `fig_zamansal.png`, `fig_mekanizma.png` | Şekiller |

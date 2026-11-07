@@ -1,0 +1,233 @@
+{
+ "table": {
+  "file": "data/mw_authority.json",
+  "version": "mwauth-2026-10-06",
+  "verified_entries": 9
+ },
+ "matched_in_EMSC_subset": [
+  {
+   "name": "2023 Elbistan",
+   "id": "20230206_0000222",
+   "time": "2023-02-06T10:24:49.6Z",
+   "catalog_mag": 7.5,
+   "catalog_mtype": "mw",
+   "mw": 7.5
+  },
+  {
+   "name": "2023 Pazarcık",
+   "id": "20230206_0000008",
+   "time": "2023-02-06T01:17:36.1Z",
+   "catalog_mag": 7.8,
+   "catalog_mtype": "mw",
+   "mw": 7.8
+  },
+  {
+   "name": "2020 Samos",
+   "id": "20201030_0000082",
+   "time": "2020-10-30T11:51:25.7Z",
+   "catalog_mag": 7.0,
+   "catalog_mtype": "mw",
+   "mw": 7.0
+  },
+  {
+   "name": "2018 Sarpol-e Zahab (İran–Irak)",
+   "id": "20181125_0000088",
+   "time": "2018-11-25T16:37:31.7Z",
+   "catalog_mag": 6.3,
+   "catalog_mtype": "mb",
+   "mw": 6.3
+  },
+  {
+   "name": "2017 İran–Irak (Halabja)",
+   "id": "20171112_0000082",
+   "time": "2017-11-12T18:18:17.3Z",
+   "catalog_mag": 7.3,
+   "catalog_mtype": "mw",
+   "mw": 7.3
+  },
+  {
+   "name": "2011 Van",
+   "id": "20111023_0000031",
+   "time": "2011-10-23T10:41:22.1Z",
+   "catalog_mag": 7.3,
+   "catalog_mtype": "Ms",
+   "mw": 7.1
+  },
+  {
+   "name": "2006 Kythira",
+   "id": "20060108_0000067",
+   "time": "2006-01-08T11:34:53.7Z",
+   "catalog_mag": 6.5,
+   "catalog_mtype": "mb",
+   "mw": 6.7
+  },
+  {
+   "name": "1999 Düzce",
+   "id": "19991112_0000008",
+   "time": "1999-11-12T16:57:21.4Z",
+   "catalog_mag": 6.0,
+   "catalog_mtype": "mb",
+   "mw": 7.2
+  },
+  {
+   "name": "1999 İzmit (Kocaeli)",
+   "id": "19990817_0000001",
+   "time": "1999-08-17T00:01:38.9Z",
+   "catalog_mag": 6.3,
+   "catalog_mtype": "mb",
+   "mw": 7.6
+  }
+ ],
+ "A_baseline": {
+  "categories": {
+   "both_independent": 34966,
+   "R_only_independent": 30976,
+   "both_dependent": 14653,
+   "GK_only_independent": 334
+  },
+  "agreement": 0.6131,
+  "reasenberg_clusters": 2080
+ },
+ "B_authoritative_Mw": {
+  "categories": {
+   "both_independent": 34901,
+   "R_only_independent": 30985,
+   "both_dependent": 14709,
+   "GK_only_independent": 334
+  },
+  "agreement": 0.613,
+  "reasenberg_clusters": 2071
+ },
+ "events_changing_category": 259,
+ "transitions": {
+  "R_only_independent -> both_dependent": 88,
+  "both_independent -> R_only_independent": 83,
+  "both_dependent -> R_only_independent": 44,
+  "R_only_independent -> both_independent": 27,
+  "both_independent -> both_dependent": 9,
+  "GK_only_independent -> both_dependent": 3,
+  "R_only_independent -> GK_only_independent": 3,
+  "both_independent -> GK_only_independent": 1,
+  "GK_only_independent -> both_independent": 1
+ },
+ "per_large_event_100km_1yr": [
+  {
+   "name": "2023 Elbistan",
+   "id": "20230206_0000222",
+   "time": "2023-02-06T10:24:49.6Z",
+   "catalog_mag": 7.5,
+   "catalog_mtype": "mw",
+   "mw": 7.5,
+   "n_within_100km_1yr": 2287,
+   "R_only_A": 1229,
+   "R_only_B": 1229,
+   "both_dependent_A": 1039,
+   "both_dependent_B": 1039
+  },
+  {
+   "name": "2023 Pazarcık",
+   "id": "20230206_0000008",
+   "time": "2023-02-06T01:17:36.1Z",
+   "catalog_mag": 7.8,
+   "catalog_mtype": "mw",
+   "mw": 7.8,
+   "n_within_100km_1yr": 1407,
+   "R_only_A": 793,
+   "R_only_B": 793,
+   "both_dependent_A": 602,
+   "both_dependent_B": 602
+  },
+  {
+   "name": "2020 Samos",
+   "id": "20201030_0000082",
+   "time": "2020-10-30T11:51:25.7Z",
+   "catalog_mag": 7.0,
+   "catalog_mtype": "mw",
+   "mw": 7.0,
+   "n_within_100km_1yr": 532,
+   "R_only_A": 206,
+   "R_only_B": 206,
+   "both_dependent_A": 315,
+   "both_dependent_B": 315
+  },
+  {
+   "name": "2018 Sarpol-e Zahab (İran–Irak)",
+   "id": "20181125_0000088",
+   "time": "2018-11-25T16:37:31.7Z",
+   "catalog_mag": 6.3,
+   "catalog_mtype": "mb",
+   "mw": 6.3,
+   "n_within_100km_1yr": 107,
+   "R_only_A": 67,
+   "R_only_B": 67,
+   "both_dependent_A": 34,
+   "both_dependent_B": 34
+  },
+  {
+   "name": "2017 İran–Irak (Halabja)",
+   "id": "20171112_0000082",
+   "time": "2017-11-12T18:18:17.3Z",
+   "catalog_mag": 7.3,
+   "catalog_mtype": "mw",
+   "mw": 7.3,
+   "n_within_100km_1yr": 235,
+   "R_only_A": 159,
+   "R_only_B": 159,
+   "both_dependent_A": 68,
+   "both_dependent_B": 68
+  },
+  {
+   "name": "2011 Van",
+   "id": "20111023_0000031",
+   "time": "2011-10-23T10:41:22.1Z",
+   "catalog_mag": 7.3,
+   "catalog_mtype": "Ms",
+   "mw": 7.1,
+   "n_within_100km_1yr": 2296,
+   "R_only_A": 941,
+   "R_only_B": 944,
+   "both_dependent_A": 1331,
+   "both_dependent_B": 1324
+  },
+  {
+   "name": "2006 Kythira",
+   "id": "20060108_0000067",
+   "time": "2006-01-08T11:34:53.7Z",
+   "catalog_mag": 6.5,
+   "catalog_mtype": "mb",
+   "mw": 6.7,
+   "n_within_100km_1yr": 122,
+   "R_only_A": 77,
+   "R_only_B": 81,
+   "both_dependent_A": 18,
+   "both_dependent_B": 18
+  },
+  {
+   "name": "1999 Düzce",
+   "id": "19991112_0000008",
+   "time": "1999-11-12T16:57:21.4Z",
+   "catalog_mag": 6.0,
+   "catalog_mtype": "mb",
+   "mw": 7.2,
+   "n_within_100km_1yr": 523,
+   "R_only_A": 285,
+   "R_only_B": 276,
+   "both_dependent_A": 227,
+   "both_dependent_B": 243
+  },
+  {
+   "name": "1999 İzmit (Kocaeli)",
+   "id": "19990817_0000001",
+   "time": "1999-08-17T00:01:38.9Z",
+   "catalog_mag": 6.3,
+   "catalog_mtype": "mb",
+   "mw": 7.6,
+   "n_within_100km_1yr": 732,
+   "R_only_A": 540,
+   "R_only_B": 509,
+   "both_dependent_A": 164,
+   "both_dependent_B": 209
+  }
+ ],
+ "note": "Yalniz otoriter Mw tablosundaki dogrulanmis buyuk depremlerin buyuklugu degisir; yuzlerce kucuk mb/ML/MD olayinin olcegi degismez."
+}
