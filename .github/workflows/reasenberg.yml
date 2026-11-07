@@ -3,9 +3,14 @@ name: Reasenberg (Python secenegi, donmus v0.3.0)
 # scripts/reasenberg.py dondurulmustur (v0.3.0). Bu is akisi: modul testleri,
 # EQ-Live adaptoru, donmus regresyon referanslari ve gercek katalogda calisma
 # (UTC ve Europe/Istanbul). GK74 ve index.html bu is akisindan etkilenmez.
+# 1G: data/reasenberg_gk74_emsc.json katalogdan ve kodlardan birebir yeniden uretilebilmeli;
+# katalog guncellenirse bu is akisi kirmizi olur -> urunu yeniden uretip ayrica onaylayin.
 on:
   push:
     paths:
+      - 'scripts/build_reasenberg_gk74_compare.py'
+      - 'data/reasenberg_gk74_emsc.json'
+      - 'data/eq_historical.json'
       - 'scripts/reasenberg.py'
       - 'scripts/decluster_reasenberg.py'
       - 'scripts/freeze_reasenberg_fixtures.py'
@@ -15,6 +20,9 @@ on:
       - '.github/workflows/reasenberg.yml'
   pull_request:
     paths:
+      - 'scripts/build_reasenberg_gk74_compare.py'
+      - 'data/reasenberg_gk74_emsc.json'
+      - 'data/eq_historical.json'
       - 'scripts/reasenberg.py'
       - 'scripts/decluster_reasenberg.py'
       - 'scripts/freeze_reasenberg_fixtures.py'
@@ -37,7 +45,7 @@ jobs:
           python-version: '3.11'
       - name: Bagimliliklar
         run: pip install numpy pytest
-      - name: Modul + adaptor testleri, donmus regresyon referanslari
+      - name: Modul + adaptor testleri, donmus regresyon referanslari, site urunu (1G)
         run: python -m pytest -q scripts/reasenberg_tests
       - name: Gercek katalog (EMSC, xmeff 3.0) — UTC ve Europe/Istanbul ayni olmali
         run: |
