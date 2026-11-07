@@ -1009,7 +1009,7 @@
     <span style="color:#888;font-size:.75rem;align-self:center;margin-left:6px">⚫ Fay Düzlemi Çözümleri (GCMT):</span>
     <button class="tbtn" id="btnFocalMech" onclick="toggleLayer('focalmech')" style="font-size:.7rem;padding:3px 7px" title="Global CMT (globalcmt.org) doğrulanmış moment-tensör çözümleri · sarsıntı şiddeti (MMI) DEĞİL, kaynak mekanizmasıdır · şu an yalnızca 2020 Elazığ + 2023 Pazarcık + 2023 Elbistan">Beachball</button>
     <button class="tbtn tr-only" id="btnRecurrence" onclick="toggleLayer('recurrence')" style="font-size:.7rem;padding:3px 7px" title="Öncel &amp; Wilson (2006) tekrarlanma süresi yöntemi × GSRM v2.1 strain + yerel b-değeri · araştırma/keşif hesabı, PSHA değil · Pazarcık (kararlı) + Elbistan (yapısal applicability failure)">⏳ Tekrarlanma Süresi</button>
-    <button class="tbtn tr-only" id="btnRbCompare" onclick="toggleLayer('rbcompare')" style="font-size:.7rem;padding:3px 7px" title="GK74 ile Reasenberg (1985) küme ayıklamasının aynı olaylar üzerinde karşılaştırması · 1998–2026 EMSC, M ≥ 3.0 · STATİK, önceden hesaplanmış (data/reasenberg_gk74_emsc.json); bölge/dönem değiştirilince yeniden hesaplanmaz · deprem tahmini değildir">🔀 GK74 / Reasenberg</button>
+    <button class="tbtn tr-only" id="btnRbCompare" onclick="toggleLayer('rbcompare')" style="font-size:.7rem;padding:3px 7px" title="GK74 ile Reasenberg (1985) küme ayıklamasının aynı olaylar üzerinde karşılaştırması · 1998–2026 EMSC, M ≥ 3.0 · koşullu algoritmik karşılaştırma (karışık büyüklük ölçeği; tamlık doğrulaması veya tehlike değerlendirmesi değil) · STATİK, önceden hesaplanmış (data/reasenberg_gk74_emsc.json); bölge/dönem değiştirilince yeniden hesaplanmaz · deprem tahmini değildir">🔀 GK74 / Reasenberg</button>
   </div>
 
   <!-- Seismicity renk modu — Seismicity butonunun hemen altında, aynı görsel
@@ -10938,14 +10938,15 @@ function loadRbCompareLayer() {
       div.style.cssText = 'background:rgba(20,20,20,.92);color:#ddd;padding:8px 10px;border-radius:6px;font-size:.72rem;max-width:340px;line-height:1.45;margin-bottom:96px;max-height:calc(100vh - 260px);overflow-y:auto';
       div.innerHTML = `
         <b style="color:#e5e5e5">🔀 GK74 / Reasenberg — aynı ${rbFmt(t.n)} olay</b><br>
+        <div style="color:#fbbf24;margin:2px 0">${d.status}</div>
         <span style="color:#888">${d.definition.source} ${d.definition.period} · M ≥ ${(+d.definition.mag_min).toFixed(1).replace('.', ',')} · ${d.definition.bounds.lat_min}–${d.definition.bounds.lat_max}°N, ${d.definition.bounds.lon_min}–${d.definition.bounds.lon_max}°E · veri tarihi ${String(d.data_date).slice(0, 10)}</span>
         <table style="margin-top:4px;border-collapse:collapse">
           <tr style="color:#888"><td></td><td style="${td}">bağımsız</td><td style="${td}">çıkarılan</td></tr>
           <tr><td style="color:#888">GK74 (yalnız artçı ayıklar)</td><td style="${td}">${rbFmt(gk.independent)}</td><td style="${td}">${rbPct(gk.aftershock_removed, t.n)}</td></tr>
           <tr><td style="color:#888">Reasenberg (zmap)</td><td style="${td}">${rbFmt(rb.independent)}</td><td style="${td}">${rbPct(rb.dependent, t.n)}</td></tr>
         </table>
-        <div style="color:#888;margin-top:2px">Reasenberg: ${rbFmt(rb.single)} tekil + ${rbFmt(rb.representative)} küme temsilcisi; bağımlı ${rbFmt(rb.dependent)} (öncü ${rbFmt(rb.dependent_foreshock)}, artçı ${rbFmt(rb.dependent_aftershock)})</div>
-        <div style="margin-top:4px">Uyum ${rbPct(k.both_independent + k.both_dependent, t.n)} · <span style="color:#fd8d3c">yalnız Reasenberg'de bağımsız ${rbFmt(k.R_only_independent)}</span> · <span style="color:#60a5fa">yalnız GK74'te bağımsız ${rbFmt(k.GK_only_independent)}</span></div>
+        <div style="color:#888;margin-top:2px">Reasenberg: ${rbFmt(rb.single)} tekil + ${rbFmt(rb.representative)} küme temsilcisi; bağımlı ${rbFmt(rb.dependent)} (öncü ${rbFmt(rb.dependent_foreshock)}, artçı ${rbFmt(rb.dependent_aftershock)}). GK74 burada yalnız artçı ayıklar, öncüler kalır; Reasenberg kümeleri öncüleri de içerir.</div>
+        <div style="margin-top:4px">Aynı sınıflandırma ${rbPct(k.both_independent + k.both_dependent, t.n)} <span style="color:#888">(yöntemler arası uyum; doğruluk ölçüsü değil)</span> · <span style="color:#fd8d3c">yalnız Reasenberg'de bağımsız ${rbFmt(k.R_only_independent)}</span> · <span style="color:#60a5fa">yalnız GK74'te bağımsız ${rbFmt(k.GK_only_independent)}</span></div>
         <div style="color:#888;margin-top:2px">Sınır etkisi: katalog sınırına &lt; 25 km olaylarda yalnız Reasenberg'de bağımsız payı ${rbPct(d.by_boundary_distance[0].R_only_independent, d.by_boundary_distance[0].n)}, &gt; 100 km'de ${rbPct(d.by_boundary_distance[2].R_only_independent, d.by_boundary_distance[2].n)}</div>
         <table style="margin-top:4px;border-collapse:collapse;font-size:.95em"><tr style="color:#888"><td></td><td style="${td}">olay</td><td style="${td}">yalnız R</td><td style="${td}">yalnız GK</td></tr>${mrows}</table>
         <div style="margin-top:4px"><span style="display:inline-block;width:70px;height:7px;background:linear-gradient(90deg,#fff5eb,#fdd0a2,#fd8d3c,#d94801,#7f2704);vertical-align:middle"></span> <span style="color:#888">hücre rengi: yalnız Reasenberg'de bağımsız payı (0 → %60)</span></div>

@@ -141,7 +141,11 @@ def build(catalog=CATALOG):
                                          'err = derr = 0 (katalogda konum hatası yok; belgelenmiş varsayım)']),
             builder='scripts/build_reasenberg_gk74_compare.py',
             builder_sha256=_sha_file(os.path.abspath(__file__))),
+        status='Koşullu algoritmik karşılaştırma: 1998–2026 EMSC, M ≥ 3,0 ve karışık büyüklük ölçeğine '
+               'koşullu; katalog tamlık doğrulaması veya deprem tehlikesi değerlendirmesi değildir.',
         caveats=['Statik ürün: haritada bölge veya dönem değiştirildiğinde yeniden hesaplanmaz.',
+                 'Aynı sınıflandırma oranı iki yöntemin birbirine uyumudur; doğruluk ölçüsü değildir.',
+                 'GK74 burada yalnız artçı ayıklar (öncüler kalır); Reasenberg kümeleri öncüleri de içerir.',
                  'Sınıflar algoritmiktir; fiziksel ana şok iddiası değildir.',
                  'Büyüklük ölçeği karışıktır (ML/MD/mb/Mw); farkların fiziksel yorumu bu ürünle yapılmaz.',
                  'Deprem tahmini için değildir.'],
