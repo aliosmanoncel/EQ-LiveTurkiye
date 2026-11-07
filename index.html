@@ -78,6 +78,14 @@
     #posterPanel .pdet > summary{cursor:pointer;color:#cbd5e1;padding:2px 0}
     #posterPanel .pdet-note{color:#666;font-size:.92em;margin-left:6px}
     #posterPanel .pdet-grid{display:grid;grid-template-columns:auto 1fr;gap:3px 6px;align-items:center;margin:3px 0 4px}
+    /* 3. aşama: gelişmiş analiz araçları (açılır-kapanır) */
+    .padv{flex:1 1 100%;border:1px solid #262b33;border-radius:7px;padding:3px 8px;background:rgba(255,255,255,.01)}
+    .padv > summary{cursor:pointer;color:#8fa3b8;font-size:.72rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;list-style-position:inside}
+    .padv-t{font-weight:600;color:#a9bccf}
+    .padv-n{color:#06b6d4;font-weight:700}
+    .padv-hint{color:#5b6875;font-size:.95em}
+    .padv[open] .padv-hint{display:none}
+    .padv-body{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:6px 0 3px}
     .heat-ctrl{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
     body:has(#btnHeat:not(.active)) .heat-ctrl{display:none}
     .psearch{display:flex;align-items:center;background:#1a1a2e;border:1px solid #334;border-radius:6px;padding:0 2px 0 8px;min-width:230px}
@@ -1051,64 +1059,70 @@
     <button class="tbtn tr-only"        id="btnAmbraseys" onclick="toggleLayer('ambraseys')" title="Marmara Tarihsel · Ambraseys 2002 · Table 1 — Ms ≥ 6.8, 32–1999; kaynak büyüklüğü Ms olarak korunmuştur">Marmara Tarihsel · Ambraseys 2002</button>
     <button class="tbtn"                id="btnHistHK" onclick="toggleLayer('histhk')"  title="Hong Kong Tarihsel · GEO Publication No. 1/2012 (Geotechnical Engineering Office) Regional Earthquake Catalogue · Mw≥5.0 · 500km yarıçap (HKO, Tsim Sha Tsui) · 1067-2005 · EAGP verisi, bağımsız doğrulanmadı">🇭🇰 HK Tarihsel</button>
   </div>
-  <div class="pgrp" role="group" aria-label="b-değeri, fraktal ve gerinim">
-    <span class="pgrp-lbl">📈 b-değeri, fraktal ve gerinim</span>
-    <button class="tbtn tr-only"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
-    <button class="tbtn tr-only"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Düşük b sınıflaması · Kırmızı = düşük b (b-değeri sınıfı; tehlike ya da tahmin değildir)">b-Adaptif</button>
-    <button class="tbtn tr-only active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
-    <button class="tbtn tr-only active" id="btnZoneM"  onclick="toggleBAdaptZone('MID')"  style="font-size:.7rem;padding:3px 7px;color:#ffaa00;border-color:#ffaa00" title="R=50km · Orta sismisite">🟠R50</button>
-    <button class="tbtn tr-only"        id="btnZoneL"  onclick="toggleBAdaptZone('LOW')"  style="font-size:.7rem;padding:3px 7px;color:#aaa;border-color:#555"       title="R=100km · Düşük sismisite · Geniş alan · Dikkatli yorumla">🟡R100</button>
-    <button class="tbtn tr-only" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
-    <button class="tbtn tr-only" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
-    <button class="tbtn tr-only"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
-    <button class="tbtn tr-only" id="btnStrainRate" onclick="toggleLayer('strainrate')" title="GSRM v2.1 jeodezik strain-rate modeli (Kreemer ve ark. 2014) · GPS-tabanlı, uzun-dönem gerinim oranı · CANLI ÖLÇÜM veya deprem tahmini DEĞİL · b-değeri/asperite katmanlarıyla karşılaştırma için">🌐 Strain Rate (GSRM)</button>
-    <button class="tbtn global-only" id="btnStrainRateGlobal" onclick="toggleLayer('strainrateglobal')" title="GSRM v2.1 jeodezik strain-rate modeli · Dünya geneli · Yalnızca plaka sınırı bölgeleri (veri olmayan alanlar şeffaf, doldurulmadı) · GPS-tabanlı, canlı ölçüm DEĞİL">🌍 Strain Rate (GSRM, Global)</button>
-  </div>
-  <div class="pgrp" role="group" aria-label="Tarihi şiddet (MMI)">
-    <span class="pgrp-lbl">🟪 Tarihi şiddet (MMI)</span>
-    <button class="tbtn shakebtn" data-shake="murefte1912"   onclick="toggleShakeLayer('murefte1912')"   style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1912 Mürefte</button>
-    <button class="tbtn shakebtn" data-shake="yenice1953"    onclick="toggleShakeLayer('yenice1953')"    style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1953 Yenice</button>
-    <button class="tbtn shakebtn" data-shake="adapazari1963" onclick="toggleShakeLayer('adapazari1963')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1963 Adapazarı</button>
-    <button class="tbtn shakebtn" data-shake="gediz1970"     onclick="toggleShakeLayer('gediz1970')"     style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1970 Gediz</button>
-    <button class="tbtn shakebtn" data-shake="elazig2020"    onclick="toggleShakeLayer('elazig2020')"    style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us60007ewc) · Surfer regrid">2020 Elazığ</button>
-    <button class="tbtn shakebtn" data-shake="pazarcik2023"  onclick="toggleShakeLayer('pazarcik2023')"  style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us6000jllz) · Kahramanmaraş çift depremi (1. şok) · Surfer regrid">2023 Pazarcık</button>
-    <button class="tbtn shakebtn" data-shake="elbistan2023"  onclick="toggleShakeLayer('elbistan2023')"  style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us6000jlqa) · Kahramanmaraş çift depremi (2. şok) · Surfer regrid">2023 Elbistan</button>
-    <button class="tbtn shakebtn global-only" data-shake="kanto1923" onclick="toggleShakeLayer('kanto1923')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid · Japonya">1923 Kanto</button>
-    <button class="tbtn shakebtn global-only" data-shake="chile1960" onclick="toggleShakeLayer('chile1960')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/makrosismik model) · Surfer regrid · Şili · Kayıtlara geçen en büyük deprem (Mw9.5)">1960 Şili</button>
-  </div>
   <div class="pgrp" role="group" aria-label="Fay düzlemi çözümleri (GCMT)">
     <span class="pgrp-lbl">⚫ Fay düzlemi çözümleri (GCMT)</span>
     <button class="tbtn" id="btnFocalMech" onclick="toggleLayer('focalmech')" style="font-size:.7rem;padding:3px 7px" title="Global CMT (globalcmt.org) doğrulanmış moment-tensör çözümleri · sarsıntı şiddeti (MMI) DEĞİL, kaynak mekanizmasıdır · şu an yalnızca 2020 Elazığ + 2023 Pazarcık + 2023 Elbistan">Beachball</button>
   </div>
-  <div class="pgrp tr-only" role="group" aria-label="Araştırma kayıtları">
-    <span class="pgrp-lbl">📐 Araştırma kayıtları</span>
-    <button class="tbtn tr-only" id="btnRecurrence" onclick="toggleLayer('recurrence')" style="font-size:.7rem;padding:3px 7px" title="Öncel &amp; Wilson (2006) tekrarlanma süresi yöntemi × GSRM v2.1 strain + yerel b-değeri · araştırma/keşif hesabı, PSHA değil · Pazarcık (kararlı) + Elbistan (yapısal applicability failure)">⏳ Tekrarlanma Süresi</button>
-    <button class="tbtn tr-only" id="btnRbCompare" onclick="toggleLayer('rbcompare')" style="font-size:.7rem;padding:3px 7px" title="GK74 ile Reasenberg (1985) küme ayıklamasının aynı olaylar üzerinde karşılaştırması · 1998–2026 EMSC, M ≥ 3.0 · koşullu algoritmik karşılaştırma (karışık büyüklük ölçeği; tamlık doğrulaması veya tehlike değerlendirmesi değil) · STATİK, önceden hesaplanmış (data/reasenberg_gk74_emsc.json); bölge/dönem değiştirilince yeniden hesaplanmaz · deprem tahmini değildir">🔀 GK74 / Reasenberg</button>
-  </div>
-
-  <!-- Layer toggles — satir 2: b-analiz + Forecast (Türkiye/Marmara-özel) -->
-  <div class="pgrp tr-only" role="group" aria-label="b-tabanlı araştırma katmanları">
-    <span class="pgrp-lbl">🔬 b-tabanlı araştırma (Türkiye / Marmara)</span>
-    <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
-    <button class="tbtn"        id="btnTL"     onclick="toggleLayer('tl')"     title="Öncel&Wyss(2000,2001) T_L Anomalisi · 10^(b·M−a_ann) · T_L minimumları literatürde kilitli asperite ile ilişkilendirilir (hipotez, kanıt değil) · Triple-Target: 6.8/7.4/7.8 · tahmin değildir">🔴 Asperite (T_L)</button>
-    <select id="selTL" onchange="setTLTarget(+this.value)" style="background:#1a2a3a;color:#7ecfff;border:1px solid #7ecfff33;border-radius:4px;font-size:11px;padding:2px 4px;cursor:pointer">
-      <option value="6.8">Mw 6.8</option>
-      <option value="7.4" selected>Mw 7.4</option>
-      <option value="7.8">Mw 7.8</option>
-    </select>
-    <button class="tbtn"        id="btnConf"   onclick="toggleLayer('conf')"    title="Tarihsel Sismisite Güven Endeksi · Ambraseys(2002) · Marmara=2000yr / KAFZ=500yr / DAFZ=200yr · Epistemik belirsizlik bölgeleri">🛡 Veri Güveni</button>
-    <button class="tbtn"        id="btnValid"  onclick="toggleLayer('valid')"   title="T_L Retrospektif Validasyon · Öncel&Wyss(2000) · EPICA tarihsel epicenter ↔ T_L minima · %96 R&lt;50km uyum · Schwartz&Coppersmith(1984)">✅ Validasyon</button>
-    <button class="tbtn"        id="btnDeltaB" onclick="toggleLayer('deltab')"  title="Katalog Kalite Δb = b(main)-b(all) · Öncel(2026) · 🔵Mavi=artçı baskısı(%9) · ⚫Gri=ana deprem karakterli(%78) · 🟠Turuncu=stres artçısı(%12) · Veri Denetim Laboratuvarı">🔴 Katalog Kalite (Δb)</button>
-    <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2030) · Wiemer&Wyss (2002)">📍 Forecast TR</button>
-    <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km Mc=2.6 · Öncel&Wyss (2000) · eğitim 1998-2019 → test ML≥3 (2020-2030)">🔬 Marmara FC</button>
-  </div>
-
-  <div class="sep"></div>
-
   <button onclick="openIEB()" title="EarthScope IEB — bölge seçip Mc istatistiği görün"
     style="padding:5px 13px;border-radius:5px;border:1px solid #f59e0b;background:rgba(245,158,11,0.12);color:#f59e0b;font-size:.8rem;cursor:pointer;font-weight:700;white-space:nowrap;">
     📊 Mc İstatistik
   </button>
+
+  <!-- 3. aşama (2026-11-08): gelişmiş analiz grupları varsayılan kapalı. Kural: açık katman sayısı
+       başlıkta gösterilir; kapalıyken bir katman açılırsa bölüm kendiliğinden açılır (betik: advTools). -->
+  <details class="padv" id="advTools">
+    <summary><span class="padv-t">🧪 Gelişmiş analiz araçları</span> <span class="padv-n" id="advToolsCount"></span><span class="padv-hint">b-değeri, fraktal, gerinim · tarihi şiddet (MMI) · araştırma kayıtları · b-tabanlı araştırma</span></summary>
+    <div class="padv-body">
+    <div class="pgrp" role="group" aria-label="b-değeri, fraktal ve gerinim">
+      <span class="pgrp-lbl">📈 b-değeri, fraktal ve gerinim</span>
+      <button class="tbtn tr-only"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
+      <button class="tbtn tr-only"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Düşük b sınıflaması · Kırmızı = düşük b (b-değeri sınıfı; tehlike ya da tahmin değildir)">b-Adaptif</button>
+      <button class="tbtn tr-only active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
+      <button class="tbtn tr-only active" id="btnZoneM"  onclick="toggleBAdaptZone('MID')"  style="font-size:.7rem;padding:3px 7px;color:#ffaa00;border-color:#ffaa00" title="R=50km · Orta sismisite">🟠R50</button>
+      <button class="tbtn tr-only"        id="btnZoneL"  onclick="toggleBAdaptZone('LOW')"  style="font-size:.7rem;padding:3px 7px;color:#aaa;border-color:#555"       title="R=100km · Düşük sismisite · Geniş alan · Dikkatli yorumla">🟡R100</button>
+      <button class="tbtn tr-only" id="btnBFC" onclick="setBvalueMethod('fc')" title="Fixed Circle · R=100km sabit · Öncel&Wyss(2000)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FC</button>
+      <button class="tbtn tr-only" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
+      <button class="tbtn tr-only"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
+      <button class="tbtn tr-only" id="btnStrainRate" onclick="toggleLayer('strainrate')" title="GSRM v2.1 jeodezik strain-rate modeli (Kreemer ve ark. 2014) · GPS-tabanlı, uzun-dönem gerinim oranı · CANLI ÖLÇÜM veya deprem tahmini DEĞİL · b-değeri/asperite katmanlarıyla karşılaştırma için">🌐 Strain Rate (GSRM)</button>
+      <button class="tbtn global-only" id="btnStrainRateGlobal" onclick="toggleLayer('strainrateglobal')" title="GSRM v2.1 jeodezik strain-rate modeli · Dünya geneli · Yalnızca plaka sınırı bölgeleri (veri olmayan alanlar şeffaf, doldurulmadı) · GPS-tabanlı, canlı ölçüm DEĞİL">🌍 Strain Rate (GSRM, Global)</button>
+    </div>
+    <div class="pgrp" role="group" aria-label="Tarihi şiddet (MMI)">
+      <span class="pgrp-lbl">🟪 Tarihi şiddet (MMI)</span>
+      <button class="tbtn shakebtn" data-shake="murefte1912"   onclick="toggleShakeLayer('murefte1912')"   style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1912 Mürefte</button>
+      <button class="tbtn shakebtn" data-shake="yenice1953"    onclick="toggleShakeLayer('yenice1953')"    style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1953 Yenice</button>
+      <button class="tbtn shakebtn" data-shake="adapazari1963" onclick="toggleShakeLayer('adapazari1963')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1963 Adapazarı</button>
+      <button class="tbtn shakebtn" data-shake="gediz1970"     onclick="toggleShakeLayer('gediz1970')"     style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1970 Gediz</button>
+      <button class="tbtn shakebtn" data-shake="elazig2020"    onclick="toggleShakeLayer('elazig2020')"    style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us60007ewc) · Surfer regrid">2020 Elazığ</button>
+      <button class="tbtn shakebtn" data-shake="pazarcik2023"  onclick="toggleShakeLayer('pazarcik2023')"  style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us6000jllz) · Kahramanmaraş çift depremi (1. şok) · Surfer regrid">2023 Pazarcık</button>
+      <button class="tbtn shakebtn" data-shake="elbistan2023"  onclick="toggleShakeLayer('elbistan2023')"  style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us6000jlqa) · Kahramanmaraş çift depremi (2. şok) · Surfer regrid">2023 Elbistan</button>
+      <button class="tbtn shakebtn global-only" data-shake="kanto1923" onclick="toggleShakeLayer('kanto1923')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid · Japonya">1923 Kanto</button>
+      <button class="tbtn shakebtn global-only" data-shake="chile1960" onclick="toggleShakeLayer('chile1960')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/makrosismik model) · Surfer regrid · Şili · Kayıtlara geçen en büyük deprem (Mw9.5)">1960 Şili</button>
+    </div>
+    <div class="pgrp tr-only" role="group" aria-label="Araştırma kayıtları">
+      <span class="pgrp-lbl">📐 Araştırma kayıtları</span>
+      <button class="tbtn tr-only" id="btnRecurrence" onclick="toggleLayer('recurrence')" style="font-size:.7rem;padding:3px 7px" title="Öncel &amp; Wilson (2006) tekrarlanma süresi yöntemi × GSRM v2.1 strain + yerel b-değeri · araştırma/keşif hesabı, PSHA değil · Pazarcık (kararlı) + Elbistan (yapısal applicability failure)">⏳ Tekrarlanma Süresi</button>
+      <button class="tbtn tr-only" id="btnRbCompare" onclick="toggleLayer('rbcompare')" style="font-size:.7rem;padding:3px 7px" title="GK74 ile Reasenberg (1985) küme ayıklamasının aynı olaylar üzerinde karşılaştırması · 1998–2026 EMSC, M ≥ 3.0 · koşullu algoritmik karşılaştırma (karışık büyüklük ölçeği; tamlık doğrulaması veya tehlike değerlendirmesi değil) · STATİK, önceden hesaplanmış (data/reasenberg_gk74_emsc.json); bölge/dönem değiştirilince yeniden hesaplanmaz · deprem tahmini değildir">🔀 GK74 / Reasenberg</button>
+    </div>
+
+    <!-- Layer toggles — satir 2: b-analiz + Forecast (Türkiye/Marmara-özel) -->
+    <div class="pgrp tr-only" role="group" aria-label="b-tabanlı araştırma katmanları">
+      <span class="pgrp-lbl">🔬 b-tabanlı araştırma (Türkiye / Marmara)</span>
+      <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
+      <button class="tbtn"        id="btnTL"     onclick="toggleLayer('tl')"     title="Öncel&Wyss(2000,2001) T_L Anomalisi · 10^(b·M−a_ann) · T_L minimumları literatürde kilitli asperite ile ilişkilendirilir (hipotez, kanıt değil) · Triple-Target: 6.8/7.4/7.8 · tahmin değildir">🔴 Asperite (T_L)</button>
+      <select id="selTL" onchange="setTLTarget(+this.value)" style="background:#1a2a3a;color:#7ecfff;border:1px solid #7ecfff33;border-radius:4px;font-size:11px;padding:2px 4px;cursor:pointer">
+        <option value="6.8">Mw 6.8</option>
+        <option value="7.4" selected>Mw 7.4</option>
+        <option value="7.8">Mw 7.8</option>
+      </select>
+      <button class="tbtn"        id="btnConf"   onclick="toggleLayer('conf')"    title="Tarihsel Sismisite Güven Endeksi · Ambraseys(2002) · Marmara=2000yr / KAFZ=500yr / DAFZ=200yr · Epistemik belirsizlik bölgeleri">🛡 Veri Güveni</button>
+      <button class="tbtn"        id="btnValid"  onclick="toggleLayer('valid')"   title="T_L Retrospektif Validasyon · Öncel&Wyss(2000) · EPICA tarihsel epicenter ↔ T_L minima · %96 R&lt;50km uyum · Schwartz&Coppersmith(1984)">✅ Validasyon</button>
+      <button class="tbtn"        id="btnDeltaB" onclick="toggleLayer('deltab')"  title="Katalog Kalite Δb = b(main)-b(all) · Öncel(2026) · 🔵Mavi=artçı baskısı(%9) · ⚫Gri=ana deprem karakterli(%78) · 🟠Turuncu=stres artçısı(%12) · Veri Denetim Laboratuvarı">🔴 Katalog Kalite (Δb)</button>
+      <button class="tbtn"        id="btnForecast"    onclick="toggleLayer('forecast')"    title="b-value öngörü testi: eğitim 1998-2019 → test M≥5.0 (2020-2030) · Wiemer&Wyss (2002)">📍 Forecast TR</button>
+      <button class="tbtn"        id="btnMarForecast" onclick="toggleLayer('marforecast')" title="Marmara pilot: R=20km dr=5km Mc=2.6 · Öncel&Wyss (2000) · eğitim 1998-2019 → test ML≥3 (2020-2030)">🔬 Marmara FC</button>
+    </div>
+    </div>
+  </details>
+
 
   </div><!-- /panel-body -->
 </div>
@@ -12402,6 +12416,25 @@ fetch(EQ_ANNUAL).then(r=>r.json()).then(json=>{
     mag:e.mag||0, mw:e.mw||e.mag||0, place:e.place||''
   }));
 }).catch(()=>{});
+</script>
+<script>
+/* 3. aşama (2026-11-08): "Gelişmiş analiz araçları" bölümünde açık katman sayısı.
+   Yalnız düğmelerin 'active' sınıfını izler; katman/hesap koduna dokunmaz.
+   R20/R50/R100 bölge filtreleri ve FC/FN yöntem seçimi katman değil, ayar olduğundan sayılmaz. */
+(function () {
+  const d = document.getElementById('advTools'), out = document.getElementById('advToolsCount');
+  if (!d || !out || typeof MutationObserver === 'undefined') return;
+  const SETTINGS = new Set(['btnZoneH', 'btnZoneM', 'btnZoneL', 'btnBFC', 'btnBFN']);
+  let prev = 0;
+  function update() {
+    const n = [...d.querySelectorAll('.tbtn.active')].filter(b => !SETTINGS.has(b.id)).length;
+    out.textContent = n ? '(' + n + ' katman açık)' : '';
+    if (n > prev && !d.open) d.open = true;   // kapalıyken katman açıldı → bölümü göster
+    prev = n;
+  }
+  new MutationObserver(update).observe(d, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  update();
+})();
 </script>
 </body>
 </html>
