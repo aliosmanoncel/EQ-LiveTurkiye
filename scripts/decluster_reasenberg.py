@@ -53,9 +53,25 @@ import reasenberg as R  # noqa: E402
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
-ADAPTER_VERSION = 'reasenberg-adapter-2026-11-03'
+ADAPTER_VERSION = 'reasenberg-adapter-2026-11-07'  # strict JSON (inf -> "inf")
 MODULE_SHA256_FROZEN = 'c5b1248af557f29b4f04bf7c6ed9adfefd97c4153975a8989804b872ccf99bc9'
 CLASS = {R.SINGLE: 'single', R.REPRESENTATIVE: 'representative', R.DEPENDENT: 'dependent'}
+
+
+def json_safe(obj):
+    """Strict JSON: +/-inf -> "inf"/"-inf", NaN -> None (Python would write Infinity/NaN,
+    which browsers' JSON.parse rejects). Used for every file this module writes."""
+    if isinstance(obj, float):
+        if obj != obj:
+            return None
+        if obj in (float('inf'), float('-inf')):
+            return 'inf' if obj > 0 else '-inf'
+        return obj
+    if isinstance(obj, dict):
+        return {k: json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [json_safe(v) for v in obj]
+    return obj
 
 
 def _sha_file(p):
@@ -186,7 +202,7 @@ def main(argv=None):
             for k in range(res.n_clusters)]
 
     with open(a.output, 'w', encoding='utf-8') as f:
-        json.dump(result, f, ensure_ascii=False, separators=(',', ':'))
+        json.dump(json_safe(result), f, ensure_ascii=False, separators=(',', ':'), allow_nan=False)
     print(f'[OK] Kaydedildi: {a.output}')
     return result
 
