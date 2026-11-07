@@ -66,6 +66,10 @@
     .ctrl span{color:#06b6d4;font-weight:700;min-width:20px;text-align:right}
 
     .sep{width:1px;height:26px;background:#2a2a2a;flex-shrink:0}
+    /* Alt panel katman grupları (2026-11-08): başlıklı, kenarlıklı kutular */
+    .pgrp{display:flex;gap:4px;flex-wrap:wrap;align-items:center;padding:4px 8px;border:1px solid #262b33;border-radius:7px;background:rgba(255,255,255,.015)}
+    .pgrp-lbl{color:#8fa3b8;font-size:.7rem;font-weight:600;letter-spacing:.01em;margin-right:4px;white-space:nowrap}
+    .pgrp-sub{color:#6b7c8d;font-size:.68rem;margin:0 2px 0 8px;white-space:nowrap}
 
     .tbtn{padding:5px 11px;border-radius:5px;border:1px solid #333;background:transparent;color:#888;font-size:.8rem;cursor:pointer;transition:all .12s}
     .tbtn:hover{border-color:#06b6d4;color:#06b6d4}
@@ -972,20 +976,59 @@
     </select>
   </div>
 
-  <!-- Layer toggles — satir 1 -->
-  <div style="display:flex;gap:4px;flex-wrap:wrap">
+  <!-- Katman düğmeleri — başlıklı gruplar (2026-11-08). Yalnız yerleşim değişti:
+       düğme satırları, kimlikleri (id), sınıfları ve işlevleri birebir aynı. -->
+  <div class="pgrp" role="group" aria-label="Harita görünümü">
+    <span class="pgrp-lbl">🗺️ Harita görünümü</span>
     <button class="tbtn active" id="btnHeat"   onclick="toggleLayer('heat')">Heat Map</button>
     <button class="tbtn active" id="btnCircle" onclick="toggleLayer('circle')">Seismicity</button>
     <button class="tbtn"        id="btnTestimony" onclick="toggleLayer('testimony')" title="EMSC Testimonies · hissedilme raporları · seismicportal.eu/testimonies-ws · yeşil=az → mor=çok tanıklık">🗣️ Tanıklıklar</button>
+    <span class="pgrp-sub" title="Heat Map (deprem olay yoğunluğu) yumuşatma yarıçapı">Heat Map R (km):</span>
+    <button class="tbtn" id="rBtn10"  onclick="setHeatRadius(10)"  title="Micro — Ben-Zion">10</button>
+    <button class="tbtn active" id="rBtn20"  onclick="setHeatRadius(20)"  title="Moderate — Öncel &amp; Wyss">20</button>
+    <button class="tbtn" id="rBtn100" onclick="setHeatRadius(100)" title="Macro — Missenard">100</button>
+    <!-- Seismicity renk modu — Seismicity butonunun hemen altında, aynı görsel
+         blokta. İki AYRI EMSC referans şeması: Mw (sarı→turuncu→kırmızı→siyah)
+         ve Derinlik (0-40 sarı/40-80 turuncu/80-150 pembe/150-300 mor/>300 lacivert). -->
+    <div class="ctrl">
+      <label>Seismicity Renk</label>
+      <button class="tbtn active" id="btnColorMag" style="font-size:.7rem;padding:3px 8px" onclick="setSeismicityColorMode('mag')" title="EMSC Magnitude haritası referans">Mw</button>
+      <button class="tbtn" id="btnColorDepth" style="font-size:.7rem;padding:3px 8px" onclick="setSeismicityColorMode('depth')" title="EMSC Depth haritası referans">Derinlik</button>
+      <span id="depthColorHint" style="display:none;font-size:.65rem;color:#888;margin-left:4px">🟡0–40 · 🟠40–80 · 🩷80–150 · 🟣150–300 · 🔵&gt;300 km</span>
+    </div>
+
+    <!-- 🗣️ Tanıklık Sayısı — Tanıklıklar butonunun (yukarıdaki satırda) hemen altında,
+         aynı görsel blokta tutulur. EMSC'nin kendi #TESTIMONIES Min/Max mantığıyla aynı;
+         minnbtestimonies/maxnbtestimonies API'ye doğrudan gönderilir. Min boş = alt sınır
+         yok, Max boş = üst sınır yok. -->
+    <div class="ctrl">
+      <label>🗣️ Tanıklık Sayısı</label>
+      <input id="tMin" type="number" min="1" step="1" placeholder="min" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+      <span style="color:#555">–</span>
+      <input id="tMax" type="number" min="1" step="1" placeholder="max" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
+      <button class="tbtn" onclick="applyTestimonyRange()">Uygula</button>
+    </div>
+  </div>
+  <div class="pgrp" role="group" aria-label="Zaman analizi">
+    <span class="pgrp-lbl">⏱️ Zaman analizi</span>
     <button class="tbtn"        id="btnTimeMag" onclick="openTimeMagMode('normal')" title="Zaman–Magnitude Dağılımı · seçili pencere/kaynak/eşikle senkron · Mc = MAXC (Wiemer &amp; Wyss 2000) + Woessner &amp; Wiemer (2005) +0.2 düzeltmesi">📈 Time-Mag (normal)</button>
     <button class="tbtn"        id="btnBtWin" onclick="openTimeMagMode('ince')" title="Aynı Zaman–Magnitude penceresi, ince adım modunda: bütün araçlar ve ayarlar ortak; yalnız b(t) N = 100 pencereyle 10 yerine 1 olay kaydırılarak hesaplanır. Dışa aktarımlarda &quot;Adım 1 (İnce)&quot; yazar.">📈 Time-Mag (ince)</button>
     <button class="tbtn"        id="btnAftWin" onclick="toggleAftWin()" title="Artçı dizisi başına p (Omori–Utsu, Ogata 1983) ve b (Aki 1965) değerleri; tablodaki satıra tıklayınca TM-02 dizi analizi (M–t, b(t), p modeli; GK74 ya da M ≥ 7 için Kagan 2002)">📈 Time-Mag (artçı)</button>
+  </div>
+  <div class="pgrp tr-only" role="group" aria-label="Tehlike ve risk">
+    <span class="pgrp-lbl">⚠️ Tehlike ve risk</span>
     <button class="tbtn tr-only"        id="btnHazard" onclick="toggleLayer('hazard')" title="Campbell (1981) GMPE · EMSC annual data">Hazard</button>
     <button class="tbtn tr-only"        id="btnRisk"   onclick="toggleLayer('risk')"   title="ESRM20 Sismik Risk Endeksi · EFEHR/GEM · Crowley et al. 2021">Risk</button>
     <button class="tbtn tr-only"        id="btnEuHaz"  onclick="toggleLayer('euhaz')"  title="ESHM20 Avrupa Sismik Tehlike Haritası · PGA 475yr · EFEHR/ETH Zürich · Danciu et al. 2021">Av.Hazard</button>
+  </div>
+  <div class="pgrp" role="group" aria-label="Tarihsel kataloglar">
+    <span class="pgrp-lbl">📜 Tarihsel kataloglar</span>
     <button class="tbtn tr-only"        id="btnHist"   onclick="toggleLayer('hist')"   title="EPICA v1.1 (Batı) + SHARE-CET (Doğu) Tarihsel Deprem Kataloğu · M≥4 · 1003-1899 · Rovida & Antonucci (2021) INGV + emidius.eu/SHEEC">Tarihsel</button>
     <button class="tbtn tr-only"        id="btnAmbraseys" onclick="toggleLayer('ambraseys')" title="Marmara Tarihsel · Ambraseys 2002 · Table 1 — Ms ≥ 6.8, 32–1999; kaynak büyüklüğü Ms olarak korunmuştur">Marmara Tarihsel · Ambraseys 2002</button>
     <button class="tbtn"                id="btnHistHK" onclick="toggleLayer('histhk')"  title="Hong Kong Tarihsel · GEO Publication No. 1/2012 (Geotechnical Engineering Office) Regional Earthquake Catalogue · Mw≥5.0 · 500km yarıçap (HKO, Tsim Sha Tsui) · 1067-2005 · EAGP verisi, bağımsız doğrulanmadı">🇭🇰 HK Tarihsel</button>
+  </div>
+  <div class="pgrp" role="group" aria-label="b-değeri, fraktal ve gerinim">
+    <span class="pgrp-lbl">📈 b-değeri, fraktal ve gerinim</span>
     <button class="tbtn tr-only"        id="btnBvalue" onclick="toggleLayer('bvalue')" title="Gutenberg-Richter b-degeri · Aki (1965) · N≥50">b-value</button>
     <button class="tbtn tr-only"        id="btnBAdapt" onclick="toggleLayer('badapt')" title="Öncel (2026) Adaptif b-Değeri · R=20/50/100km · Sismisite yoğunluğu bazlı · Düşük b sınıflaması · Kırmızı = düşük b (b-değeri sınıfı; tehlike ya da tahmin değildir)">b-Adaptif</button>
     <button class="tbtn tr-only active" id="btnZoneH"  onclick="toggleBAdaptZone('HIGH')" style="font-size:.7rem;padding:3px 7px;color:#ff4444;border-color:#ff4444" title="R=20km · Yüksek sismisite · Güvenilir asperite sinyali">🔴R20</button>
@@ -996,7 +1039,9 @@
     <button class="tbtn tr-only"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
     <button class="tbtn tr-only" id="btnStrainRate" onclick="toggleLayer('strainrate')" title="GSRM v2.1 jeodezik strain-rate modeli (Kreemer ve ark. 2014) · GPS-tabanlı, uzun-dönem gerinim oranı · CANLI ÖLÇÜM veya deprem tahmini DEĞİL · b-değeri/asperite katmanlarıyla karşılaştırma için">🌐 Strain Rate (GSRM)</button>
     <button class="tbtn global-only" id="btnStrainRateGlobal" onclick="toggleLayer('strainrateglobal')" title="GSRM v2.1 jeodezik strain-rate modeli · Dünya geneli · Yalnızca plaka sınırı bölgeleri (veri olmayan alanlar şeffaf, doldurulmadı) · GPS-tabanlı, canlı ölçüm DEĞİL">🌍 Strain Rate (GSRM, Global)</button>
-    <span style="color:#888;font-size:.75rem;align-self:center;margin-left:6px">🟪 Tarihi Şiddet (MMI):</span>
+  </div>
+  <div class="pgrp" role="group" aria-label="Tarihi şiddet (MMI)">
+    <span class="pgrp-lbl">🟪 Tarihi şiddet (MMI)</span>
     <button class="tbtn shakebtn" data-shake="murefte1912"   onclick="toggleShakeLayer('murefte1912')"   style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1912 Mürefte</button>
     <button class="tbtn shakebtn" data-shake="yenice1953"    onclick="toggleShakeLayer('yenice1953')"    style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1953 Yenice</button>
     <button class="tbtn shakebtn" data-shake="adapazari1963" onclick="toggleShakeLayer('adapazari1963')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid">1963 Adapazarı</button>
@@ -1006,36 +1051,20 @@
     <button class="tbtn shakebtn" data-shake="elbistan2023"  onclick="toggleShakeLayer('elbistan2023')"  style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (us6000jlqa) · Kahramanmaraş çift depremi (2. şok) · Surfer regrid">2023 Elbistan</button>
     <button class="tbtn shakebtn global-only" data-shake="kanto1923" onclick="toggleShakeLayer('kanto1923')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/sentetik model) · Surfer regrid · Japonya">1923 Kanto</button>
     <button class="tbtn shakebtn global-only" data-shake="chile1960" onclick="toggleShakeLayer('chile1960')" style="font-size:.7rem;padding:3px 7px" title="USGS ShakeMap MMI (tarihsel/makrosismik model) · Surfer regrid · Şili · Kayıtlara geçen en büyük deprem (Mw9.5)">1960 Şili</button>
-    <span style="color:#888;font-size:.75rem;align-self:center;margin-left:6px">⚫ Fay Düzlemi Çözümleri (GCMT):</span>
+  </div>
+  <div class="pgrp" role="group" aria-label="Fay düzlemi çözümleri (GCMT)">
+    <span class="pgrp-lbl">⚫ Fay düzlemi çözümleri (GCMT)</span>
     <button class="tbtn" id="btnFocalMech" onclick="toggleLayer('focalmech')" style="font-size:.7rem;padding:3px 7px" title="Global CMT (globalcmt.org) doğrulanmış moment-tensör çözümleri · sarsıntı şiddeti (MMI) DEĞİL, kaynak mekanizmasıdır · şu an yalnızca 2020 Elazığ + 2023 Pazarcık + 2023 Elbistan">Beachball</button>
+  </div>
+  <div class="pgrp tr-only" role="group" aria-label="Araştırma kayıtları">
+    <span class="pgrp-lbl">📐 Araştırma kayıtları</span>
     <button class="tbtn tr-only" id="btnRecurrence" onclick="toggleLayer('recurrence')" style="font-size:.7rem;padding:3px 7px" title="Öncel &amp; Wilson (2006) tekrarlanma süresi yöntemi × GSRM v2.1 strain + yerel b-değeri · araştırma/keşif hesabı, PSHA değil · Pazarcık (kararlı) + Elbistan (yapısal applicability failure)">⏳ Tekrarlanma Süresi</button>
     <button class="tbtn tr-only" id="btnRbCompare" onclick="toggleLayer('rbcompare')" style="font-size:.7rem;padding:3px 7px" title="GK74 ile Reasenberg (1985) küme ayıklamasının aynı olaylar üzerinde karşılaştırması · 1998–2026 EMSC, M ≥ 3.0 · koşullu algoritmik karşılaştırma (karışık büyüklük ölçeği; tamlık doğrulaması veya tehlike değerlendirmesi değil) · STATİK, önceden hesaplanmış (data/reasenberg_gk74_emsc.json); bölge/dönem değiştirilince yeniden hesaplanmaz · deprem tahmini değildir">🔀 GK74 / Reasenberg</button>
   </div>
 
-  <!-- Seismicity renk modu — Seismicity butonunun hemen altında, aynı görsel
-       blokta. İki AYRI EMSC referans şeması: Mw (sarı→turuncu→kırmızı→siyah)
-       ve Derinlik (0-40 sarı/40-80 turuncu/80-150 pembe/150-300 mor/>300 lacivert). -->
-  <div class="ctrl">
-    <label>Seismicity Renk</label>
-    <button class="tbtn active" id="btnColorMag" style="font-size:.7rem;padding:3px 8px" onclick="setSeismicityColorMode('mag')" title="EMSC Magnitude haritası referans">Mw</button>
-    <button class="tbtn" id="btnColorDepth" style="font-size:.7rem;padding:3px 8px" onclick="setSeismicityColorMode('depth')" title="EMSC Depth haritası referans">Derinlik</button>
-    <span id="depthColorHint" style="display:none;font-size:.65rem;color:#888;margin-left:4px">🟡0–40 · 🟠40–80 · 🩷80–150 · 🟣150–300 · 🔵&gt;300 km</span>
-  </div>
-
-  <!-- 🗣️ Tanıklık Sayısı — Tanıklıklar butonunun (yukarıdaki satırda) hemen altında,
-       aynı görsel blokta tutulur. EMSC'nin kendi #TESTIMONIES Min/Max mantığıyla aynı;
-       minnbtestimonies/maxnbtestimonies API'ye doğrudan gönderilir. Min boş = alt sınır
-       yok, Max boş = üst sınır yok. -->
-  <div class="ctrl">
-    <label>🗣️ Tanıklık Sayısı</label>
-    <input id="tMin" type="number" min="1" step="1" placeholder="min" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
-    <span style="color:#555">–</span>
-    <input id="tMax" type="number" min="1" step="1" placeholder="max" style="width:52px;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:2px 4px;font-size:.75rem">
-    <button class="tbtn" onclick="applyTestimonyRange()">Uygula</button>
-  </div>
-
   <!-- Layer toggles — satir 2: b-analiz + Forecast (Türkiye/Marmara-özel) -->
-  <div class="tr-only" style="display:flex;gap:4px;flex-wrap:nowrap;margin-top:4px">
+  <div class="pgrp tr-only" role="group" aria-label="b-tabanlı araştırma katmanları">
+    <span class="pgrp-lbl">🔬 b-tabanlı araştırma (Türkiye / Marmara)</span>
     <button class="tbtn"        id="btnAvalue" onclick="toggleLayer('avalue')" title="Öncel&Wyss(2000) G-R a-değeri · Sismik Üretkenlik · log10(N/ΔT)+b·Mc · Yıllık normalize (1900-2026)">a-Üretkenlik</button>
     <button class="tbtn"        id="btnTL"     onclick="toggleLayer('tl')"     title="Öncel&Wyss(2000,2001) T_L Anomalisi · 10^(b·M−a_ann) · T_L minimumları literatürde kilitli asperite ile ilişkilendirilir (hipotez, kanıt değil) · Triple-Target: 6.8/7.4/7.8 · tahmin değildir">🔴 Asperite (T_L)</button>
     <select id="selTL" onchange="setTLTarget(+this.value)" style="background:#1a2a3a;color:#7ecfff;border:1px solid #7ecfff33;border-radius:4px;font-size:11px;padding:2px 4px;cursor:pointer">
@@ -1059,13 +1088,6 @@
 
   <div class="sep"></div>
 
-  <!-- Heat Map metodoloji seçimi -->
-  <div class="ctrl"><label style="color:#555;font-size:.72rem">R (km)</label></div>
-  <div style="display:flex;gap:4px">
-    <button class="tbtn" id="rBtn10"  onclick="setHeatRadius(10)"  title="Micro — Ben-Zion">10</button>
-    <button class="tbtn active" id="rBtn20"  onclick="setHeatRadius(20)"  title="Moderate — Öncel &amp; Wyss">20</button>
-    <button class="tbtn" id="rBtn100" onclick="setHeatRadius(100)" title="Macro — Missenard">100</button>
-  </div>
 
   <!-- EMSC Canlı Akış -->
   <div class="live-badge off" id="liveBadge">
