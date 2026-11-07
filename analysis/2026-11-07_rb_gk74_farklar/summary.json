@@ -1,0 +1,421 @@
+{
+ "reference": {
+  "main_commit": "be61bae",
+  "catalog_sha256": "bd303aa30a17ae590073cfe664fd58c87cf93ed643cdb8374aa33c27a6d7545b",
+  "script_sha256": "9375294da3178e1cadb1903b248faf159db515cec8adad36fac4fc0669147bb9"
+ },
+ "checks": {
+  "gk74_copy_identical_to_project": true,
+  "counts_match_site_product": true
+ },
+ "groups": {
+  "R_only": 30976,
+  "GK_only": 334
+ },
+ "R_only_reasenberg_class": {
+  "single": 29893,
+  "representative": 1083
+ },
+ "GK_only_reasenberg_role": {
+  "foreshock": 235,
+  "aftershock": 99
+ },
+ "R_only_mechanism": {
+  "far": 20430,
+  "window": 2579,
+  "late": 7967
+ },
+ "R_only_mechanism_by_parent_magnitude": {
+  "3.0-3.9": {
+   "far": 8467,
+   "window": 752,
+   "late": 347
+  },
+  "4.0-4.9": {
+   "far": 7765,
+   "window": 715,
+   "late": 1489
+  },
+  "5.0-5.9": {
+   "late": 1997,
+   "far": 3168,
+   "window": 443
+  },
+  ">=6.0": {
+   "window": 669,
+   "far": 1030,
+   "late": 4134
+  }
+ },
+ "R_only_distance_km_quantiles": {
+  "10": 3.6,
+  "25": 7.7,
+  "50": 15.9,
+  "75": 25.5,
+  "90": 36.1
+ },
+ "R_only_dt_days_quantiles": {
+  "10": 1.12,
+  "25": 6.58,
+  "50": 22.21,
+  "75": 71.84,
+  "90": 189.26
+ },
+ "R_only_share_from_parents_M6plus": 0.1883,
+ "R_only_n_distinct_parents": 7472,
+ "top_gk74_parents": [
+  {
+   "time": "2011-10-23T10:41",
+   "lat": 38.76,
+   "lon": 43.48,
+   "mag": 7.3,
+   "mtype": "Ms",
+   "n_R_only": 1129,
+   "window": 148,
+   "late": 981,
+   "gk_window_km": 77.0,
+   "gk_window_days": 938.6,
+   "reasenberg_radius_km": 91.5
+  },
+  {
+   "time": "2023-02-06T10:24",
+   "lat": 38.11,
+   "lon": 37.24,
+   "mag": 7.5,
+   "mtype": "mw",
+   "n_R_only": 600,
+   "window": 25,
+   "late": 575,
+   "gk_window_km": 81.6,
+   "gk_window_days": 952.6,
+   "reasenberg_radius_km": 110.0
+  },
+  {
+   "time": "2023-02-06T01:17",
+   "lat": 37.17,
+   "lon": 37.08,
+   "mag": 7.8,
+   "mtype": "mw",
+   "n_R_only": 450,
+   "window": 91,
+   "late": 359,
+   "gk_window_km": 88.8,
+   "gk_window_days": 973.9,
+   "reasenberg_radius_km": 145.0
+  },
+  {
+   "time": "2009-07-01T09:30",
+   "lat": 34.11,
+   "lon": 25.47,
+   "mag": 6.1,
+   "mtype": "mb",
+   "n_R_only": 311,
+   "far": 126,
+   "window": 46,
+   "late": 139,
+   "gk_window_km": 54.7,
+   "gk_window_days": 565.6,
+   "reasenberg_radius_km": 30.3
+  },
+  {
+   "time": "2020-10-30T11:51",
+   "lat": 37.91,
+   "lon": 26.84,
+   "mag": 7.0,
+   "mtype": "mw",
+   "n_R_only": 285,
+   "window": 56,
+   "far": 2,
+   "late": 227,
+   "gk_window_km": 70.7,
+   "gk_window_days": 918.1,
+   "reasenberg_radius_km": 69.4
+  },
+  {
+   "time": "1999-08-17T00:01",
+   "lat": 40.75,
+   "lon": 29.97,
+   "mag": 6.3,
+   "mtype": "mb",
+   "n_R_only": 280,
+   "window": 28,
+   "far": 166,
+   "late": 86,
+   "gk_window_km": 57.9,
+   "gk_window_days": 725.6,
+   "reasenberg_radius_km": 36.4
+  },
+  {
+   "time": "2008-07-15T03:26",
+   "lat": 35.73,
+   "lon": 27.87,
+   "mag": 6.4,
+   "mtype": "mb",
+   "n_R_only": 237,
+   "window": 14,
+   "far": 135,
+   "late": 88,
+   "gk_window_km": 59.6,
+   "gk_window_days": 821.8,
+   "reasenberg_radius_km": 39.9
+  },
+  {
+   "time": "2003-05-01T00:27",
+   "lat": 39.0,
+   "lon": 40.53,
+   "mag": 5.6,
+   "mtype": "mb",
+   "n_R_only": 214,
+   "far": 68,
+   "window": 42,
+   "late": 104,
+   "gk_window_km": 47.5,
+   "gk_window_days": 303.4,
+   "reasenberg_radius_km": 19.1
+  },
+  {
+   "time": "2017-11-12T18:18",
+   "lat": 34.79,
+   "lon": 45.85,
+   "mag": 7.3,
+   "mtype": "mw",
+   "n_R_only": 209,
+   "window": 21,
+   "late": 188,
+   "gk_window_km": 77.0,
+   "gk_window_days": 938.6,
+   "reasenberg_radius_km": 91.5
+  },
+  {
+   "time": "2020-05-02T12:51",
+   "lat": 34.14,
+   "lon": 25.7,
+   "mag": 6.6,
+   "mtype": "mw",
+   "n_R_only": 203,
+   "far": 41,
+   "window": 23,
+   "late": 139,
+   "gk_window_km": 63.1,
+   "gk_window_days": 891.5,
+   "reasenberg_radius_km": 48.0
+  },
+  {
+   "time": "2002-02-03T07:11",
+   "lat": 38.55,
+   "lon": 31.28,
+   "mag": 5.7,
+   "mtype": "mb",
+   "n_R_only": 193,
+   "far": 122,
+   "window": 16,
+   "late": 55,
+   "gk_window_km": 48.8,
+   "gk_window_days": 343.7,
+   "reasenberg_radius_km": 21.0
+  },
+  {
+   "time": "2023-02-06T02:03",
+   "lat": 37.86,
+   "lon": 37.81,
+   "mag": 5.5,
+   "mtype": "mb",
+   "n_R_only": 191,
+   "far": 150,
+   "window": 17,
+   "late": 24,
+   "gk_window_km": 46.1,
+   "gk_window_days": 267.9,
+   "reasenberg_radius_km": 17.4
+  },
+  {
+   "time": "2007-10-29T09:23",
+   "lat": 36.92,
+   "lon": 29.32,
+   "mag": 4.9,
+   "mtype": "mb",
+   "n_R_only": 190,
+   "window": 10,
+   "far": 93,
+   "late": 87,
+   "gk_window_km": 38.9,
+   "gk_window_days": 126.9,
+   "reasenberg_radius_km": 10.0
+  },
+  {
+   "time": "1999-11-12T16:57",
+   "lat": 40.8,
+   "lon": 31.2,
+   "mag": 6.0,
+   "mtype": "mb",
+   "n_R_only": 185,
+   "window": 39,
+   "far": 51,
+   "late": 95,
+   "gk_window_km": 53.2,
+   "gk_window_days": 499.3,
+   "reasenberg_radius_km": 27.6
+  },
+  {
+   "time": "2017-07-20T22:31",
+   "lat": 36.96,
+   "lon": 27.45,
+   "mag": 6.6,
+   "mtype": "mw",
+   "n_R_only": 181,
+   "far": 33,
+   "window": 25,
+   "late": 123,
+   "gk_window_km": 63.1,
+   "gk_window_days": 891.5,
+   "reasenberg_radius_km": 48.0
+  }
+ ],
+ "R_only_by_year": {
+  "1998": {
+   "n": 294,
+   "of_all": 919,
+   "frac": 0.32
+  },
+  "1999": {
+   "n": 1339,
+   "of_all": 2740,
+   "frac": 0.489
+  },
+  "2000": {
+   "n": 885,
+   "of_all": 1800,
+   "frac": 0.492
+  },
+  "2001": {
+   "n": 720,
+   "of_all": 1779,
+   "frac": 0.405
+  },
+  "2002": {
+   "n": 648,
+   "of_all": 1664,
+   "frac": 0.389
+  },
+  "2003": {
+   "n": 942,
+   "of_all": 2559,
+   "frac": 0.368
+  },
+  "2004": {
+   "n": 1299,
+   "of_all": 3253,
+   "frac": 0.399
+  },
+  "2005": {
+   "n": 1947,
+   "of_all": 4624,
+   "frac": 0.421
+  },
+  "2006": {
+   "n": 1177,
+   "of_all": 3135,
+   "frac": 0.375
+  },
+  "2007": {
+   "n": 1643,
+   "of_all": 4490,
+   "frac": 0.366
+  },
+  "2008": {
+   "n": 2340,
+   "of_all": 5410,
+   "frac": 0.433
+  },
+  "2009": {
+   "n": 2202,
+   "of_all": 5134,
+   "frac": 0.429
+  },
+  "2010": {
+   "n": 1359,
+   "of_all": 4075,
+   "frac": 0.333
+  },
+  "2011": {
+   "n": 1490,
+   "of_all": 5190,
+   "frac": 0.287
+  },
+  "2012": {
+   "n": 1386,
+   "of_all": 3088,
+   "frac": 0.449
+  },
+  "2013": {
+   "n": 801,
+   "of_all": 2194,
+   "frac": 0.365
+  },
+  "2014": {
+   "n": 578,
+   "of_all": 1679,
+   "frac": 0.344
+  },
+  "2015": {
+   "n": 677,
+   "of_all": 1753,
+   "frac": 0.386
+  },
+  "2016": {
+   "n": 444,
+   "of_all": 1448,
+   "frac": 0.307
+  },
+  "2017": {
+   "n": 704,
+   "of_all": 2334,
+   "frac": 0.302
+  },
+  "2018": {
+   "n": 477,
+   "of_all": 1353,
+   "frac": 0.353
+  },
+  "2019": {
+   "n": 509,
+   "of_all": 1511,
+   "frac": 0.337
+  },
+  "2020": {
+   "n": 1029,
+   "of_all": 2817,
+   "frac": 0.365
+  },
+  "2021": {
+   "n": 865,
+   "of_all": 2179,
+   "frac": 0.397
+  },
+  "2022": {
+   "n": 662,
+   "of_all": 1590,
+   "frac": 0.416
+  },
+  "2023": {
+   "n": 2510,
+   "of_all": 5022,
+   "frac": 0.5
+  },
+  "2024": {
+   "n": 759,
+   "of_all": 1728,
+   "frac": 0.439
+  },
+  "2025": {
+   "n": 801,
+   "of_all": 4116,
+   "frac": 0.195
+  },
+  "2026": {
+   "n": 489,
+   "of_all": 1345,
+   "frac": 0.364
+  }
+ }
+}
