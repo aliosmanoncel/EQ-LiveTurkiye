@@ -68,6 +68,21 @@
     .sep{width:1px;height:26px;background:#2a2a2a;flex-shrink:0}
     /* Alt panel katman grupları (2026-11-08): başlıklı, kenarlıklı kutular */
     .panel-body:has(.pgrp){row-gap:8px}
+    /* 2. aşama (2026-11-08): tek tip düğme boyutu; etkin düğme = camgöbeği zemin + siyah yazı
+       (lejant renkleri pasif düğmenin kenar/yazı renginde ve emojide korunur) */
+    .panel-body .tbtn{font-size:.75rem !important;padding:3px 9px !important;line-height:1.3;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+    .panel-body .tbtn.active{color:#000 !important;border-color:#06b6d4 !important}
+    .heat-ctrl{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+    body:has(#btnHeat:not(.active)) .heat-ctrl{display:none}
+    .psearch{display:flex;align-items:center;background:#1a1a2e;border:1px solid #334;border-radius:6px;padding:0 2px 0 8px;min-width:230px}
+    .psearch:focus-within{border-color:#06b6d4}
+    .psearch-ico{font-size:.75rem;opacity:.6;margin-right:4px}
+    .psearch input{flex:1;min-width:0;background:transparent;color:#e2e8f0;border:0;padding:5px 4px;font-size:.78rem;outline:none}
+    .psearch-btn{background:transparent;border:0;border-left:1px solid #334;color:#888;font-size:.75rem;padding:4px 9px;cursor:pointer}
+    .psearch-btn:hover{color:#06b6d4}
+    .sbar-live{margin-left:auto;display:inline-flex;align-items:center;gap:12px;color:#777}
+    .sbar-live .live-badge{font-size:.7rem;padding:1px 7px}
+    .sbar-live #countdown{color:#999;font-weight:400}
     .pgrp{display:flex;gap:3px 4px;flex-wrap:wrap;align-items:center;padding:2px 6px;border:1px solid #262b33;border-radius:7px;background:rgba(255,255,255,.015)}
     .pgrp-lbl{color:#8fa3b8;font-size:.7rem;font-weight:600;letter-spacing:.01em;margin-right:4px;white-space:nowrap}
     .pgrp-sub{color:#6b7c8d;font-size:.68rem;margin:0 2px 0 8px;white-space:nowrap}
@@ -938,17 +953,19 @@
   <div class="sep"></div>
 
   <!-- Konum Arama -->
-  <div style="display:flex;gap:4px">
-    <input id="searchBox" type="text" placeholder="Search location…"
-      style="flex:1;background:#1a1a2e;color:#e2e8f0;border:1px solid #334;border-radius:4px;padding:3px 7px;font-size:0.78rem;outline:none"
+  <div class="psearch" role="search">
+    <span class="psearch-ico" aria-hidden="true">🔍</span>
+    <input id="searchBox" type="text" placeholder="Konum ara… (ör. İzmit)" aria-label="Konum ara"
       onkeydown="if(event.key==='Enter')searchLocation()">
-    <button class="tbtn" onclick="searchLocation()" title="Go">Go</button>
-    <button class="tbtn" onclick="clearSearch()" title="Clear">✕</button>
+    <button class="psearch-btn" onclick="searchLocation()" title="Ara (Enter)">Ara</button>
+    <button class="psearch-btn" onclick="clearSearch()" title="Aramayı temizle" aria-label="Aramayı temizle">✕</button>
   </div>
 
   <div class="sep"></div>
 
-  <!-- Sliders -->
+  <!-- Heat Map ayarları: yalnız Heat Map açıkken görünür (CSS :has, btnHeat.active) -->
+  <div class="heat-ctrl" role="group" aria-label="Heat Map ayarları">
+  <span class="pgrp-sub" style="margin-left:0">Heat Map:</span>
   <div class="ctrl">
     <label>Radius</label>
     <input type="range" id="sRadius" min="1" max="50" value="18">
@@ -964,8 +981,8 @@
     <input type="range" id="sOpacity" min="10" max="100" value="75">
     <span id="vOpacity">75</span>
   </div>
-
   <div class="sep"></div>
+  </div>
 
   <!-- Kaynak -->
   <div class="ctrl">
@@ -1087,22 +1104,6 @@
     📊 Mc İstatistik
   </button>
 
-  <div class="sep"></div>
-
-
-  <!-- EMSC Canlı Akış -->
-  <div class="live-badge off" id="liveBadge">
-    <span class="dot"></span>
-    <span id="liveLabel">EMSC Canlı</span>
-  </div>
-  <div class="ctrl" style="font-size:.75rem;color:#555">
-    <span>+<b id="liveCount" style="color:#34d399">0</b> yeni</span>
-  </div>
-
-  <div style="margin-left:auto" class="ctrl">
-    <label style="color:#444">Yenileme:</label>
-    <span id="countdown" style="color:#444;min-width:32px">300s</span>
-  </div>
   </div><!-- /panel-body -->
 </div>
 
@@ -1361,6 +1362,12 @@
   <span>Mw≥5: <b id="sM5">—</b></span>
   <span>Maks: <b id="sMx">—</b></span>
   <span>Güncelleme: <b id="sUpd">—</b></span>
+  <!-- Canlı akış durumu (2026-11-08: alt panelden buraya taşındı; panel kapalıyken de görünür) -->
+  <span class="sbar-live" role="status" aria-label="Canlı akış durumu">
+    <span class="live-badge off" id="liveBadge"><span class="dot"></span><span id="liveLabel">EMSC Canlı</span></span>
+    <span>+<b id="liveCount" style="color:#34d399">0</b> yeni</span>
+    <span title="Sonraki otomatik yenilemeye kalan süre">Yenileme: <span id="countdown">300s</span></span>
+  </span>
 </div>
 <div class="sbar sbar-source">
   <span id="statusTxt">Yükleniyor…</span>
