@@ -207,3 +207,86 @@ Aki–Utsu b ± σ (Shi & Bolt), her katalog ayrı; Δb = b(RB) − b(GK74), "or
 - **b ve G–R tabanlı analizlerde** declustering yöntemi Türkiye'de de baskın bir belirsizlik kaynağı: Δb ≈ 0,11–0,13, örnekleme belirsizliğinin 6–9 katı.
 - **Doğrudan M ≥ 7 sayımlarında** yöntem etkisi tek bir olaya indirgeniyor: Elbistan–Pazarcık. Ama o olay, "bağımsız iki deprem mi, tek dizi mi" sorusunun ta kendisi.
 - Sıradaki adımlar (sırayla): dönemsel Mc ve Weichert; b farkının büyüklük sınıflarına göre ayrıştırılması; DOUBLET adaylarının literatürle karşılaştırılması.
+
+---
+
+# 3. tur (ikinci aşama) — Dönemsel Mc(t) ve Weichert (`donemsel_mc_weichert.py`, `donemsel_sonuc.json`, `fig_donemsel.png`)
+
+**Soru:** Türkiye'de GK74 ile Reasenberg arasındaki b farkı, dönemsel tamlık hesaba katıldığında da istatistiksel olarak anlamlı mı?
+
+## Yöntem
+
+- **Kapsam:** Türkiye 30 km, EMSC 1998–2026,7, M ≥ 3,0, 44 697 olay, EMSC büyüklüğü (aynı ölçek). Kataloglar ayrı tutuldu: iki yöntem alt kümede ayrı çalıştırıldı ("yeniden").
+- **Mc(t):** Her dönem için **ham** katalogda tahmin edildi (tamlık kataloğun özelliğidir). Aynı Mc iki kataloğa uygulandı.
+- **Mc tahmincileri:**
+  - MAXC+0,2 (sitenin kuralı).
+  - Kümülatif GFT (R ≥ %95, olmazsa %90).
+  - MAXC bootstrap (500 yeniden örnekleme).
+  - max(GFT, MAXC).
+  - Sabit 3,5.
+- **Dönem başına:** N(≥Mc); b (Aki–Utsu, ΔM = 0,1) ± σ (Shi & Bolt) ve %95 aralık; yıllık a = log₁₀(N/Tₚ) + b·Mc; Δb, σ_Δb ve z.
+- **Birleşik Δb:** Dönemlerin ters-varyans ağırlıklı ortalaması; heterojenlik için Cochran Q ve χ².
+- **Weichert (1980), çok dönemli:** Her 0,1 büyüklük sınıfı yalnız Mc(dönem) ≤ sınıf olan dönemlerde sayıldı. Her katalog için ayrı hesaplandı.
+- **Duyarlılık:** Dönem uzunluğu 4 / 5 / 7 yıl, başlangıç +2 yıl kaydırma, tahminci değişimi, Mc + 0,1.
+
+## Önemli yöntem bulgusu: bu katalogda MAXC tamlığı ölçmüyor
+
+EMSC dosyası **M ≥ 3,0'da kesilmiş**. Bu yüzden en kalabalık sınıf her dönemde 3,0 oluyor; MAXC+0,2 de her dönemde 3,2 veriyor ve bootstrap ile değişmiyor. MAXC burada tamlığı değil, kesim eşiğini ölçüyor. **GFT ise dönemsel değişim gösteriyor:** 2003–2008'de 3,8, 2008–2013'te 3,4, diğer dönemlerde 3,0. Bu nedenle sonuçlar GFT'li ve "max(GFT, MAXC)" varyantlarıyla da verildi. Aynı durum sitenin bu dosyayla hesapladığı Mc için de geçerlidir; ayrıca not edilmeli.
+
+## Dönem tablosu (ihtiyatlı varyant: Mc = max(GFT, MAXC+0,2))
+
+| Dönem | Mc | Baskın ölçek | N GK74 | b GK74 ± σ | N RB | b RB ± σ | Δb | z |
+|---|---|---|---|---|---|---|---|---|
+| 1998–2003 | 3,2 | md %92 | 1 495 | 0,984 ± 0,024 | 2 766 | 1,113 ± 0,021 | +0,129 | 4,1 |
+| 2003–2008 | 3,8 | md %93 | 338 | 0,931 ± 0,048 | 490 | 1,036 ± 0,046 | +0,104 | 1,6 |
+| 2008–2013 | 3,4 | md %57 / ml %40 | 1 172 | 1,204 ± 0,038 | 1 929 | 1,298 ± 0,032 | +0,093 | 1,9 |
+| 2013–2018 | 3,2 | ml %93 | 1 234 | 0,933 ± 0,025 | 1 923 | 1,050 ± 0,023 | +0,117 | 3,5 |
+| 2018–2023 | 3,2 | ml %92 | 918 | 0,822 ± 0,026 | 1 625 | 0,932 ± 0,023 | +0,110 | 3,2 |
+| 2023–2026,7 | 3,2 | ml %90 | 898 | 0,761 ± 0,025 | 2 873 | 0,989 ± 0,018 | **+0,228** | 7,5 |
+
+Yıllık a değerleri ve her varyantın tam tablosu `donemsel_sonuc.json`'da.
+
+## Birleşik sonuç ve duyarlılık
+
+| Varyant | Mc(t) | Birleşik Δb ± σ | z | Heterojenlik p | Weichert Δb (z) |
+|---|---|---|---|---|---|
+| 5 yıl, MAXC+0,2 (ana) | 3,2 hepsi | +0,148 ± 0,014 | 10,5 | 0,05 | +0,133 (9,1) |
+| 5 yıl, GFT | 3,0 / 3,8 / 3,4 / 3,0 / 3,0 / 3,0 | +0,141 ± 0,013 | 11,0 | 0,08 | +0,139 (11,8) |
+| **5 yıl, max(GFT, MAXC)** | 3,2 / 3,8 / 3,4 / 3,2 / 3,2 / 3,2 | **+0,143 ± 0,015** | **9,5** | 0,05 | **+0,142 (9,6)** |
+| 5 yıl, Mc = 3,5 sabit | 3,5 hepsi | +0,132 ± 0,020 | 6,7 | 0,09 | +0,116 (5,7) |
+| 5 yıl, MAXC+0,2 + 0,1 | 3,3 hepsi | +0,140 ± 0,016 | 9,0 | 0,11 | +0,123 (7,6) |
+| 4 yıl, MAXC+0,2 | 3,2 hepsi | +0,153 ± 0,014 | 10,8 | 0,17 | +0,133 (9,1) |
+| 7 yıl, MAXC+0,2 | 3,2 hepsi | +0,157 ± 0,014 | 11,1 | 0,43 | +0,133 (9,1) |
+| 5 yıl, +2 kaydırılmış | 3,2 hepsi | +0,159 ± 0,014 | 11,2 | 0,25 | +0,133 (9,1) |
+
+Çok dönemli Weichert, max(GFT, MAXC) tamlık tablosuyla: **GK74 b = 0,922, yıllık a = 4,64 · Reasenberg b = 1,063, a = 5,44** (a, M_ref = 3,8 için). Δb = +0,142 (z 9,6). Tek Mc'li (3,2) varyantta GK74 1,103 ↔ RB 1,235 (Δb +0,133). Mutlak b tamlık tablosuna duyarlı, Δb değil.
+
+## Cevap
+
+- **Evet.** Dönemsel tamlık hesaba katıldığında Δb, **her dönemde ve her varyantta pozitif**.
+- **Birleşik Δb +0,13 ile +0,16 arasında; z 6,7–11,8** (p ≪ 0,001).
+- Çok dönemli Weichert aynı sonucu veriyor: **Δb +0,12 ile +0,14, z 5,7–11,8.** Türkiye için 2. turda bulunan ~0,13 korunuyor.
+- **Tek tek dönemlerde** ihtiyatlı Mc (3,4–3,8) olay sayısını düşürüyor; bazı dönemlerde z 1,6–2,5'e iniyor. Anlamlılık esas olarak **dönemlerin birleşiminden** geliyor; tek bir dönemin sonucu tek başına yorumlanmamalı.
+- **Heterojenlik sınırda** (p 0,05–0,43). Ayrışan dönem **2023–2026**: Δb +0,23. Kahramanmaraş dizisi, iki yöntemin en çok ayrıştığı dönem; GK74 geniş pencereleriyle çok daha fazla olay ayıklıyor (N 898 ↔ 2 873). **2023–2026 dışarıda bırakıldığında birleşik Δb +0,115 ± 0,017, z 6,7**; yani fark o diziden kaynaklanmıyor. Diğer dönemlerde Δb +0,09 ile +0,18 arasında.
+
+## Ek bulgu: büyüklük ölçeği değişimi b'nin mutlak değerini sürüklüyor
+
+- 1998–2013 arası **md** ağırlıklı, 2013 sonrası **ml** ağırlıklı. Muhtemelen veri sağlayıcının büyüklük türü değişti.
+- **Mutlak b** dönemler arasında 0,76 ile 1,58 arasında geziniyor; bu sürüklenme büyük ölçüde ölçek ve Mc değişimini yansıtıyor.
+- **Δb ise ölçek değişiminden büyük ölçüde etkilenmiyor:** md döneminde +0,09…+0,13, ml döneminde +0,11…+0,23.
+- Sonuç: **mutlak b değerleri dönemler arası karşılaştırılamaz; yöntem farkı (Δb) karşılaştırılabilir.**
+
+## Sınırlılıklar
+
+- Katalog M ≥ 3,0'da kesik olduğu için gerçek tamlık 3,0'ın altındaysa ölçülemez; MAXC bu dosyada bilgisizdir.
+- GFT'nin %95 eşiği bazı dönemlerde ancak 3,8'de sağlanıyor. Bu, karışık ölçek (md/ml/mb) altında tek bir G–R doğrusunun uymamasından da kaynaklanabilir; tamlıktan ayırt edilemiyor.
+- Büyüklük ölçeği karışık; dönemler arası homojenleştirme (ml/md → Mw) yapılmadı. Bu, sitenin büyüklük dönüştürme seçenekleriyle ayrıca sınanmalı.
+- Aki–Utsu σ, olayların bağımsız olduğunu varsayar. Ayrıştırılmış kataloglarda bile tam bağımsızlık garanti değildir; z değerleri iyimser olabilir.
+- 2023–2026 dönemi tek bir büyük dizinin baskısı altında.
+- Bulgular tehlike değerlendirmesi değildir.
+
+## Sonraki adımlar (önerilen sırayla)
+
+1. **b farkının kaynağı:** büyüklük sınıflarına göre iki yöntemin ayıkladığı olay oranları. GK74'ün küçük olayları orantısız biçimde ayıklayıp ayıklamadığına bakılacak.
+2. **Ölçek homojenleştirmesi:** sitenin dönüştürme bağıntılarıyla aynı analiz.
+3. **DOUBLET adaylarının literatürle karşılaştırılması.**
