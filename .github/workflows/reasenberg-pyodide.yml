@@ -1,0 +1,58 @@
+name: Reasenberg Pyodide denemesi (eşleşme + kapılar)
+
+# DENEME: tarayıcıda (Pyodide) çalışan dondurulmuş Reasenberg'in yerel CPython ile
+# BİREBİR aynı sonucu verdiğini ve uygunluk kapılarının doğru çalıştığını denetler.
+# Site (index.html) ve statik GK74/Reasenberg katmanı bu iş akışından etkilenmez.
+on:
+  pull_request:
+    paths:
+      - 'lab/reasenberg-pyodide/**'
+      - 'scripts/reasenberg.py'
+      - 'scripts/decluster_reasenberg.py'
+      - 'scripts/decluster_gk74.py'
+      - 'scripts/reasenberg_tests/*.mjs'
+      - 'scripts/fixtures/reasenberg_zmap_*'
+      - '.github/workflows/reasenberg-pyodide.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYODIDE_VERSION: '0.27.7'
+
+jobs:
+  pyodide-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install numpy
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pyodide dağıtımı (önbellek)
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: pyodide-dist
+          key: pyodide-${{ env.PYODIDE_VERSION }}-core-numpy
+      - name: Pyodide indir (yalnız çekirdek + numpy)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p pyodide-dist
+          curl -sSL "https://github.com/pyodide/pyodide/releases/download/${PYODIDE_VERSION}/pyodide-${PYODIDE_VERSION}.tar.bz2" \
+            | tar xj -C pyodide-dist --wildcards 'pyodide/pyodide.mjs' 'pyodide/pyodide.js' 'pyodide/pyodide.asm.js' \
+              'pyodide/pyodide.asm.wasm' 'pyodide/python_stdlib.zip' 'pyodide/pyodide-lock.json' 'pyodide/package.json' 'pyodide/numpy-*.whl'
+          ls -la pyodide-dist/pyodide
+      - name: Uygunluk kapıları (birim testleri)
+        run: node --test scripts/reasenberg_tests/gates.test.mjs
+      - name: Eşleşme — dondurulmuş referanslar + tam EMSC kataloğu (Pyodide = CPython)
+        run: PYODIDE_DIR=pyodide-dist/pyodide node scripts/reasenberg_tests/pyodide_parity.mjs --out pyodide_parity.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pyodide-parity
+          path: pyodide_parity.json

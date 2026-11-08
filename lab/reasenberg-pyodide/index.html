@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reasenberg Pyodide Denemesi</title>
+<meta name="robots" content="noindex">
+<style>
+  :root { --bg:#0f1115; --panel:#161a21; --line:#262b33; --text:#d7dee8; --mute:#8fa3b8; --acc:#06b6d4; --ok:#34d399; --warn:#f59e0b; --bad:#f87171; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 20px 16px 60px; }
+  h1 { font-size: 1.25rem; margin: 0 0 4px; } h2 { font-size: 1rem; margin: 0 0 10px; color:#a9bccf; }
+  .note { color: var(--mute); font-size: .85rem; }
+  .box { background: var(--panel); border:1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin: 14px 0; }
+  .banner { border-left: 3px solid var(--warn); }
+  button { background:#1e2530; color:var(--text); border:1px solid #334; border-radius:6px; padding:6px 12px; cursor:pointer; font:inherit; }
+  button.primary { background: var(--acc); color:#001; border-color: var(--acc); font-weight:600; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  label { display:inline-flex; flex-direction:column; gap:2px; font-size:.78rem; color:var(--mute); margin:0 10px 8px 0; }
+  input, select { background:#0f141b; color:var(--text); border:1px solid #334; border-radius:5px; padding:4px 6px; font:inherit; width:110px; }
+  table { border-collapse: collapse; width:100%; font-size:.84rem; margin-top:8px; }
+  th, td { text-align:left; padding:5px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color: var(--mute); font-weight:600; }
+  .s-pass { color: var(--ok); } .s-warn { color: var(--warn); } .s-fail { color: var(--bad); }
+  .state { display:inline-block; padding:2px 10px; border-radius:999px; font-weight:700; font-size:.8rem; }
+  .state.ON { background:rgba(52,211,153,.15); color:var(--ok); } .state.ON_WARN { background:rgba(245,158,11,.15); color:var(--warn); } .state.OFF { background:rgba(248,113,113,.15); color:var(--bad); }
+  code { background:#0b0e13; padding:1px 5px; border-radius:4px; }
+  #log { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: .78rem; color: var(--mute); }
+  @media (max-width: 600px) { input, select { width: 92px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Reasenberg (1985) — Pyodide denemesi</h1>
+  <div class="note">Deneme sayfası; sitenin parçası değildir. Sitedeki statik GK74 / Reasenberg katmanı referans olarak aynen kalır.</div>
+
+  <div class="box banner">
+    <b>İlkeler.</b> Algoritma tarayıcıya çevrilmemiştir: depodaki dondurulmuş <code>reasenberg.py</code> v0.3.0 ve adaptör, bayt bayt aynı biçimde
+    Pyodide (tarayıcıda Python) içinde çalışır; sha256 tutmazsa hesap yapılmaz. Her hesaptan önce uygunluk kapıları denetlenir;
+    zorunlu bir koşul sağlanmazsa hesap <b>yapılmaz</b> (OFF) ve nedeni gösterilir. Sınıflar algoritmiktir (fiziksel ana şok iddiası değildir); sonuçlar deprem tahmini değildir.
+  </div>
+
+  <div class="box">
+    <h2>1. Çalışma ortamı</h2>
+    <button class="primary" id="bLoad">Pyodide'yi yükle (~13 MB, bir kez)</button>
+    <span id="envState" class="note"></span>
+  </div>
+
+  <div class="box">
+    <h2>2. Öz-sınama: dondurulmuş referanslarla birebir karşılaştırma</h2>
+    <div class="note">4 bağlam kataloğu × <code>scripts/fixtures/reasenberg_zmap_*_ref.json</code>: olay sırası, küme kimliği ve sınıf aynı olmalı (tolerans yok).</div>
+    <button id="bSelf" disabled>Öz-sınamayı çalıştır</button>
+    <div id="selfOut"></div>
+  </div>
+
+  <div class="box">
+    <h2>3. Dinamik deneme: daire içi katalog</h2>
+    <div class="note">Veri: <code>data/eq_historical.json</code> (sitenin statik kataloğu). Sorgu sınırı, sitedeki bölge sorgusunun üst sınırını taklit eder: seçilen olay sayısı sınırı aşarsa katalog kesik sayılır (K1).</div>
+    <div style="margin-top:10px">
+      <label>Merkez enlem<input id="iLat" type="number" step="0.01" value="40.75"></label>
+      <label>Merkez boylam<input id="iLon" type="number" step="0.01" value="29.95"></label>
+      <label>Yarıçap (km)<input id="iR" type="number" step="5" value="100"></label>
+      <label>Başlangıç yılı<input id="iY0" type="number" value="1998"></label>
+      <label>Bitiş yılı<input id="iY1" type="number" value="2026"></label>
+      <label>Kaynak<select id="iSrc"><option value="EMSC">EMSC</option><option value="ISC">ISC</option><option value="ALL">EMSC + ISC</option></select></label>
+      <label>Sorgu sınırı<select id="iLim"><option>500</option><option selected>2000</option><option>5000</option><option>20000</option><option value="0">sınırsız</option></select></label>
+      <label>xmeff (seçim)<input id="iX" type="number" step="0.1" placeholder="= Mc tahmini"></label>
+    </div>
+    <button id="bRun" disabled>Kapıları denetle ve hesapla</button>
+    <div id="runOut"></div>
+  </div>
+
+  <div class="box"><h2>Kayıt</h2><div id="log"></div></div>
+</main>
+
+<script type="module">
+import { initReasenberg, runReasenberg, PY_FILES } from './rb_core.mjs';
+import { evaluateGates, estimateMcMaxc } from './gates.mjs';
+
+const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
+const ROOT = '../../';
+const $ = id => document.getElementById(id);
+const log = s => { $('log').textContent += s + '\n'; };
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+let py = null, catalog = null;
+window.__rbLab = { results: {} };
+
+async function bytes(path) { const r = await fetch(ROOT + path); if (!r.ok) throw new Error(`${path}: ${r.status}`); return new Uint8Array(await r.arrayBuffer()); }
+async function json(path) { const r = await fetch(ROOT + path); if (!r.ok) throw new Error(`${path}: ${r.status}`); return r.json(); }
+
+$('bLoad').onclick = async () => {
+  $('bLoad').disabled = true; $('envState').textContent = ' yükleniyor…';
+  try {
+    const t0 = performance.now();
+    const { loadPyodide } = await import(PYODIDE_URL + 'pyodide.mjs');
+    py = await loadPyodide({ indexURL: PYODIDE_URL });
+    await py.loadPackage('numpy');
+    const tLoad = performance.now() - t0;
+    const src = {}; for (const f of PY_FILES) src[f] = await bytes('scripts/' + f);
+    const meta = await initReasenberg(py, src);
+    const tReady = performance.now() - t0;
+    $('envState').innerHTML = ` <span class="s-pass">hazır</span> — Pyodide ${py.version}, Python ${meta.python}, numpy ${meta.numpy}, modül ${meta.module_version}, sha256 ${meta.sha256.slice(0, 12)}… (dondurulmuş ile aynı) · yükleme ${(tLoad / 1000).toFixed(1)} s, hazır ${(tReady / 1000).toFixed(1)} s`;
+    window.__rbLab.env = { ...meta, pyodide: py.version, load_s: tLoad / 1000, ready_s: tReady / 1000 };
+    $('bSelf').disabled = false; $('bRun').disabled = false;
+    log(`[ok] ortam hazır (${(tReady / 1000).toFixed(2)} s)`);
+  } catch (e) {
+    $('envState').innerHTML = ` <span class="s-fail">${esc(e.message)}</span>`; log('[hata] ' + e.message); $('bLoad').disabled = false;
+  }
+};
+
+$('bSelf').onclick = async () => {
+  $('bSelf').disabled = true;
+  const names = ['adiyaman', 'izmit_dogu', 'saimbeyli', 'van_bati'];
+  const rows = [];
+  for (const nm of names) {
+    const ref = await json(`scripts/fixtures/reasenberg_zmap_${nm}_ref.json`);
+    const cat = (await json(ref.catalog)).events;
+    const t = performance.now();
+    const r = runReasenberg(py, cat, ref.params.xmeff, { rule: ref.params.rule, magField: ref.params.mag_field });
+    const s = (performance.now() - t) / 1000;
+    const got = r.ids.map((id, i) => [id, r.cluster_id[i], r.event_class[i]]);
+    const same = JSON.stringify(got) === JSON.stringify(ref.membership);
+    rows.push({ nm, n: got.length, k: r.n_clusters, same, s });
+  }
+  window.__rbLab.results.selftest = rows;
+  const all = rows.every(r => r.same);
+  $('selfOut').innerHTML = `<table><tr><th>Bağlam</th><th>N</th><th>Küme</th><th>Üyelik</th><th>Süre</th></tr>${rows.map(r =>
+    `<tr><td>${r.nm}</td><td>${r.n}</td><td>${r.k}</td><td class="${r.same ? 's-pass' : 's-fail'}">${r.same ? 'birebir aynı' : 'FARK'}</td><td>${r.s.toFixed(2)} s</td></tr>`).join('')}</table>
+    <p class="${all ? 's-pass' : 's-fail'}">${all ? 'Öz-sınama geçti: tarayıcıdaki sonuç dondurulmuş referanslarla birebir aynı.' : 'Öz-sınama BAŞARISIZ: dinamik hesap kullanılmamalı.'}</p>`;
+  log(`[${all ? 'ok' : 'FARK'}] öz-sınama`); $('bSelf').disabled = false;
+};
+
+const epiKm = (a, b, c, d) => { const r = Math.PI / 180, x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2; return 2 * 6371 * Math.asin(Math.sqrt(Math.min(1, x))); };
+
+$('bRun').onclick = async () => {
+  $('bRun').disabled = true;
+  try {
+    if (!catalog) { log('[*] katalog indiriliyor…'); catalog = (await json('data/eq_historical.json')).events; }
+    const lat = +$('iLat').value, lon = +$('iLon').value, R = +$('iR').value, y0 = +$('iY0').value, y1 = +$('iY1').value;
+    const src = $('iSrc').value, lim = +$('iLim').value;
+    let sel = catalog.filter(e => (src === 'ALL' || e.src === src) && +e.time.slice(0, 4) >= y0 && +e.time.slice(0, 4) <= y1
+      && epiKm(lat, lon, e.lat, e.lon) <= R);
+    sel.sort((a, b) => Date.parse(b.time) - Date.parse(a.time));           // en yeni önce (sitedeki sorgu gibi)
+    const capped = lim > 0 && sel.length > lim;
+    if (capped) sel = sel.slice(0, lim);
+    const mcEst = estimateMcMaxc(sel.map(e => e.mag));
+    const xRaw = $('iX').value.trim();
+    const xmeff = xRaw === '' ? (mcEst.mc ?? NaN) : +xRaw;
+    const g = evaluateGates({ events: sel, capped, limit: lim || null, xmeff, mcEst, region: { type: 'circle', lat, lon, rKm: R } });
+    let html = `<p>Durum: <span class="state ${g.state}">${g.state === 'ON_WARN' ? 'ON (uyarılı)' : g.state}</span>
+      <span class="note"> — Mc (tahmin) ${mcEst.mc ?? '—'} · xmeff (${xRaw === '' ? 'tahminden' : 'kullanıcı seçimi'}) ${Number.isFinite(xmeff) ? xmeff.toFixed(2) : '—'}</span></p>
+      <table><tr><th>Kapı</th><th></th><th>Ayrıntı</th></tr>${g.checks.map(c =>
+      `<tr><td>${c.id} ${esc(c.label)}</td><td class="s-${c.status}">${{ pass: 'sağlandı', warn: 'uyarı', fail: 'sağlanmadı' }[c.status]}</td><td>${esc(c.detail)}</td></tr>`).join('')}</table>`;
+    const rec = { input: { lat, lon, R, y0, y1, src, lim }, n: sel.length, capped, mcEst, xmeff, state: g.state, checks: g.checks.map(c => [c.id, c.status]) };
+    if (g.state === 'OFF') {
+      html += `<p class="s-fail">Hesap yapılmadı (OFF). Koşullar sağlanınca aynı düğmeyle yeniden denenebilir.</p>`;
+    } else {
+      const t = performance.now();
+      const r = runReasenberg(py, sel, xmeff);
+      const s = (performance.now() - t) / 1000;
+      const c = k => r.event_class.filter(x => x === k).length;
+      rec.result = { single: c('single'), representative: c('representative'), dependent: c('dependent'), invalid: c('invalid'), clusters: r.n_clusters, seconds: s };
+      html += `<table><tr><th>N</th><th>Tekil</th><th>Temsilci (= küme)</th><th>Bağımlı</th><th>Geçersiz</th><th>Süre</th></tr>
+        <tr><td>${r.ids.length}</td><td>${c('single')}</td><td>${c('representative')}</td><td>${c('dependent')}</td><td>${c('invalid')}</td><td>${s.toFixed(2)} s</td></tr></table>
+        <p class="note">Bölgeye, döneme, kaynağa ve xmeff'e koşullu keşif sonucu. Doğruluk ölçüsü değildir; deprem tahmini için değildir.${g.state === 'ON_WARN' ? ' Uyarılı kapılar yorumu sınırlar.' : ''}</p>`;
+    }
+    window.__rbLab.results.last = rec;
+    $('runOut').innerHTML = html; log(`[*] dinamik: N=${sel.length} durum=${g.state}`);
+  } catch (e) { $('runOut').innerHTML = `<p class="s-fail">${esc(e.message)}</p>`; log('[hata] ' + e.message); }
+  $('bRun').disabled = false;
+};
+</script>
+</body>
+</html>

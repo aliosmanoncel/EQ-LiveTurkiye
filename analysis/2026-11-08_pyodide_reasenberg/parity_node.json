@@ -1,0 +1,73 @@
+{
+ "pyodide": "0.27.7",
+ "python": "3.12.7",
+ "numpy": "2.0.2",
+ "module_version": "0.3.0",
+ "module_sha256": "c5b1248af557f29b4f04bf7c6ed9adfefd97c4153975a8989804b872ccf99bc9",
+ "adapter_version": "reasenberg-adapter-2026-11-07",
+ "load_s": 2.557,
+ "ready_s": 3.141,
+ "fixtures": [
+  {
+   "fixture": "reasenberg_zmap_adiyaman_ref.json",
+   "n": 4231,
+   "membership_identical": true,
+   "independent_identical": true
+  },
+  {
+   "fixture": "reasenberg_zmap_izmit_dogu_ref.json",
+   "n": 2267,
+   "membership_identical": true,
+   "independent_identical": true
+  },
+  {
+   "fixture": "reasenberg_zmap_saimbeyli_ref.json",
+   "n": 4510,
+   "membership_identical": true,
+   "independent_identical": true
+  },
+  {
+   "fixture": "reasenberg_zmap_van_bati_ref.json",
+   "n": 4468,
+   "membership_identical": true,
+   "independent_identical": true
+  }
+ ],
+ "full_catalog": {
+  "n": 80929,
+  "membership_identical_to_cpython": true,
+  "totals": {
+   "n": 80929,
+   "single": 63862,
+   "representative": 2080,
+   "dependent": 14987,
+   "clusters": 2080
+  },
+  "totals_identical_to_site_product": true,
+  "seconds": 6.632
+ },
+ "timing": [
+  {
+   "n": 500,
+   "seconds": 0.072
+  },
+  {
+   "n": 2000,
+   "seconds": 0.117
+  },
+  {
+   "n": 5000,
+   "seconds": 0.314
+  },
+  {
+   "n": 20000,
+   "seconds": 1.347
+  },
+  {
+   "n": 80929,
+   "seconds": 5.971
+  }
+ ],
+ "pass": true,
+ "failures": []
+}
