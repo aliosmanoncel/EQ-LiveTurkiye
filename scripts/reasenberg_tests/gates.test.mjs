@@ -42,8 +42,8 @@ test('K3: geçersiz alan oranı eşiği aşınca → OFF', () => {
   assert.equal(status(evaluateGates({ events: ev, capped: false, xmeff: mc.mc, mcEst: mc }), 'K3'), 'fail');
 });
 
-test('K4: yinelenen kimlik → OFF', () => {
-  const ev = cat(); ev[5].id = ev[4].id;
+test('K4: içerikçe yinelenen kayıt → OFF (kimlik olmasa da)', () => {
+  const ev = cat().map(({ id, ...e }) => e); ev[5] = { ...ev[4] };
   const mc = estimateMc(ev);
   assert.equal(status(evaluateGates({ events: ev, capped: false, xmeff: mc.mc, mcEst: mc }), 'K4'), 'fail');
 });
@@ -96,4 +96,22 @@ test('D-P1: Mc tahmincisi index.html computeMcSrc/mcSrcMag ile BİREBİR aynı k
 test('estimateMc: Reasenberg ile aynı büyüklük alanı (mag) kullanılır; mw yok sayılır', () => {
   const ev = cat().map(e => ({ ...e, mw: 9.9 }));
   assert.equal(estimateMc(ev).mc, estimateMc(cat()).mc);
+});
+
+test('K4: kimliksiz ama farklı olaylar yineleme sayılmaz', () => {
+  const ev = cat().map(({ id, ...e }) => e); const mc = estimateMc(ev);
+  assert.equal(status(evaluateGates({ events: ev, capped: false, xmeff: mc.mc, mcEst: mc }), 'K4'), 'pass');
+});
+
+test('K9: geri tampon yoksa uyarı, ≥90 gün tamponla geçer, başlangıç bilinmiyorsa uyarı', () => {
+  const ev = cat(); const mc = estimateMc(ev); const t0 = Date.parse(ev[0].time);
+  assert.equal(status(evaluateGates({ events: ev, capped: false, xmeff: mc.mc, mcEst: mc, windowStart: t0 }), 'K9'), 'warn');
+  assert.equal(status(evaluateGates({ events: ev, capped: false, xmeff: mc.mc, mcEst: mc, windowStart: t0, bufferDays: 90 }), 'K9'), 'pass');
+  assert.equal(status(evaluateGates({ events: ev, capped: false, xmeff: mc.mc, mcEst: mc, windowStart: null }), 'K9'), 'warn');
+  assert.equal(evaluateGates({ events: ev, capped: false, xmeff: mc.mc, mcEst: mc }).checks.some(c => c.id === 'K9'), false);
+});
+
+test('K7: köşeli bölgede genel sınır uyarısı', () => {
+  const ev = cat(); const mc = estimateMc(ev);
+  assert.equal(status(evaluateGates({ events: ev, capped: false, xmeff: mc.mc, mcEst: mc, region: { type: 'rect' } }), 'K7'), 'warn');
 });

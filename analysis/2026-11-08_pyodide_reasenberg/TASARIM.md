@@ -161,3 +161,50 @@ Kenara uzaklık / L kutularında değişen oranı (18 dairenin toplamı): **< 0,
 ## 10. Kapsam dışı
 
 `reasenberg.py`'de değişiklik; JavaScript'e çeviri; `cluster2000x` kuralının dinamik kullanımı (deneysel, D1 açık); deprem tahmini.
+
+
+## 11. Mc duyarlılığı: xmeff 3,0 ↔ 3,2 (`mc_ve_zaman.py`, `mc_ve_zaman.json`)
+
+Aynı katalog, aynı bölge ve dönem (tüm EMSC + 18 daire). A: M ≥ 3,0, xmeff 3,0 (statik ürün) · B: aynı katalog, xmeff 3,2 (yalnız parametre) · C: M ≥ 3,2, xmeff 3,2 (modülün önerdiği tutarlı kurulum).
+
+| | Tüm EMSC | 18 daire (aralık) |
+|---|---|---|
+| B: ortak olaylarda sınıfı değişen | %0.10 | %0.00–0.96 |
+| B: A kümelerinin aynen yeniden üretilmesi | %99.4 | %91.7–100.0 |
+| B: küme sayısı değişimi | %-0.19 | — |
+| C: ortak olaylarda (M ≥ 3,2) sınıfı değişen | %0.52 | %0.48–3.32 |
+| C: A kümelerinin aynen yeniden üretilmesi | %92.9 | %82.6–95.5 |
+| C: küme sayısı değişimi | %-33.1 | %-55.3 … %-28.1 |
+| C: bağımlı olay sayısı değişimi | %-34.1 | %-54.6 … %-24.9 |
+
+**Yorum:** Parametrenin kendisi (3,0 → 3,2) üyeliği az değiştiriyor (≤ %1). Büyük fark katalog kesiminden geliyor: M 3,0–3,1 olayları çıkınca küme sayısı yaklaşık üçte bir azalıyor; çünkü kümelerin önemli bir bölümü küçük olaylarla kuruluyor. Ortak olayların sınıfı ise %0,5–3,3 değişiyor. Statik ürün (A) değiştirilmedi; bu bulgu metodolojideki "Mc duyarlılığı" açık işine girdidir.
+
+## 12. Zaman penceresi sınırı (`mc_ve_zaman.json`, `zaman_tamponu.json`)
+
+| Pencere | N | Sınıfı değişen |
+|---|---|---|
+| son 90 gün | 380 | %1.05 |
+| son 1 yıl | 2225 | %0.72 |
+| son 5 yıl | 14525 | %0.01 |
+| 1999-09-01 → 1999-12-31 (İzmit sonrası başlar) | 1349 | %1.63 |
+| 2020 yılı | 2817 | %0.00 |
+| 2023-02-10 → 2023-12-31 (Kahramanmaraş sonrası başlar) | 3875 | %5.83 |
+
+Pencere başından geçen süreye göre: ilk 30 gün **%8.4** · 30–365 gün %0.22 · > 365 gün %0.00.
+**Geri tampon:** 90 günlük geri tampon, ölçülen 4 pencerenin 4'ünde değişimi %0'a indirdi (30 gün: 3/4). Zaman sınırı uzaysal sınırdan belirgin biçimde daha etkili. K9 uyarısı bu ölçümle eklendi. Sitede 90 günlük geri tampon sorgusu bir sonraki adımdır (sorgu koduna dokunmayı gerektirir).
+
+## 13. Siteye bağlama (dal `ozellik/reasenberg-dinamik`, PR ayrı)
+
+- Araştırma Bölgesi'nde GK74 düğmesinin altında **🧪 Reasenberg (deneysel)**, varsayılan KAPALI. Kod: `lab/reasenberg-pyodide/site_rb.mjs`; `index.html`'e yalnız 1 düğme, 1 rapor kutusu ve 1 modül satırı eklendi. Sorgu kodu ve GK74 kodu değişmedi.
+- Açılınca: depodaki Pyodide → K0 öz-sınama (oturumda bir kez) → K1–K9. Girdiler sitenin kendi durumundan alınır: `regionEvents`, `regionCapped`, `regionLimit`, `regionSource`, daire geometrisi, pencere başı ve sitenin `computeMcSrc`'i.
+- Bölge, dönem, sınır ya da xmeff değişince kendiliğinden yeniden değerlendirilir; koşul bozulursa KAPALI, sağlanınca yeniden çalışır.
+- **GK74 ↔ Reasenberg double-check:** GK74 açıksa aynı olaylarda dört grup gösterilir: ikisi de bağımsız, ikisi de bağımlı, yalnız GK74 bağımlı, yalnız Reasenberg bağımlı. Ayrıca farklı grupların büyüklük dağılımı ve yıl aralığı verilir. Hiçbir yöntem doğru kabul edilmez.
+- Sonuç yalnız raporlanır; harita, GK74 ve diğer analizler değişmez.
+- Tarayıcı testi (İzmit R = 100 km, EMSC):
+
+| Durum | Sonuç |
+|---|---|
+| Sınır 500 | KAPALI (K1) |
+| Sınır 5000 | UYARILI, 61 küme, 64 ms (kendiliğinden yeniden çalıştı) |
+| xmeff 2,5 | KAPALI (K5) |
+| GK74 açık | ikisi de bağımsız 496 · ikisi de bağımlı 210 · yalnız GK74 823 · yalnız Reasenberg 9 (toplamlar GK74 ve Reasenberg sayılarıyla tutarlı) |

@@ -67,7 +67,7 @@ export const interactionKm = (m, rfact = DEFAULTS.rfact) => rfact * 0.011 * 10 *
  */
 export const STATE_LABEL = Object.freeze({ ELIGIBLE: 'UYGUN', WARNING: 'UYARILI', OFF: 'KAPALI' });
 
-export function evaluateGates({ events, capped, limit, xmeff, mcEst, region = null, selfTestPassed = true, opts = {} }) {
+export function evaluateGates({ events, capped, limit, xmeff, mcEst, region = null, selfTestPassed = true, windowStart = undefined, bufferDays = 0, opts = {} }) {
   const o = { ...DEFAULTS, ...opts };
   const checks = [];
   const add = (id, label, status, detail) => checks.push({ id, label, status, detail });
@@ -94,11 +94,12 @@ export function evaluateGates({ events, capped, limit, xmeff, mcEst, region = nu
   add('K3', 'Geçerli alanlar', fInv > o.maxInvalidFrac ? 'fail' : 'pass',
     `${invalid} geçersiz olay (%${(100 * fInv).toFixed(1)}; eşik %${100 * o.maxInvalidFrac}). Geçersizler kümelenmez ve çıkarılmaz.`);
 
-  // K4 zaman sıralaması ve kimlik tekilliği (sıralamayı adaptör yapar; yinelenen kimlik = yinelenen kayıt)
-  const ids = events.map(e => e.id);
-  const dupIds = ids.length - new Set(ids).size;
+  // K4 zaman sıralaması ve tekil kayıt. Kimlik her kaynakta yok (EMSC metin biçimi), bu yüzden yineleme
+  // İÇERİKLE denetlenir: aynı zaman (ms), konum (0,001°) ve büyüklük. Sıralamayı adaptör UTC ile yapar.
+  const keyOf = e => `${Date.parse(e.time)}|${(+e.lat).toFixed(3)}|${(+e.lon).toFixed(3)}|${e.mag}`;
+  const dupIds = events.length - new Set(events.map(keyOf)).size;
   add('K4', 'Zaman sıralaması / tekil kayıt', dupIds ? 'fail' : 'pass',
-    dupIds ? `${dupIds} yinelenen kimlik: aynı olay birden çok kez var.` : 'Kimlikler tekil; zaman sıralaması adaptörde UTC ile yapılır.');
+    dupIds ? `${dupIds} yinelenen kayıt (aynı zaman, konum, büyüklük).` : 'Yinelenen kayıt yok; zaman sıralaması adaptörde UTC ile yapılır.');
 
   // K5 Mc: tahmin ile seçim AYRI gösterilir
   const mcTxt = mcEst && mcEst.mc !== null ? `Mc (tahmin, ${mcEst.method}) = ${mcEst.mc.toFixed(2)}` : `Mc tahmin edilemedi${mcEst?.reason ? ` — ${mcEst.reason}` : ''}`;
@@ -112,7 +113,9 @@ export function evaluateGates({ events, capped, limit, xmeff, mcEst, region = nu
   add('K6', 'Olay sayısı (M ≥ xmeff)', nUse < o.minN ? 'fail' : 'pass', `N = ${nUse} (en az ${o.minN}).`);
 
   // K7 sınır etkisi (uyarı): en büyük olayın bağlantı ölçeği kadar kenara yakın olaylar
-  if (region && region.type === 'circle') {
+  if (region && region.type !== 'circle') {
+    add('K7', 'Sınır etkisi', 'warn', 'Dikdörtgen/poligon bölgede sınır payı hesaplanmadı. Daireler için ölçülen üyelik değişimi %0–1,5 (sinir_etkisi.json); köşeli bölgelerde ölçülmedi.');
+  } else if (region && region.type === 'circle') {
     const mags = events.map(e => num(e.mag)).filter(v => v !== null);
     const mMax = mags.length ? Math.max(...mags) : null;
     const dB = mMax === null ? 0 : Math.min(region.rKm, interactionKm(mMax, o.rfact));
@@ -123,6 +126,22 @@ export function evaluateGates({ events, capped, limit, xmeff, mcEst, region = nu
       `Kenara ${dB.toFixed(1)} km'den yakın olay: ${near} (%${(100 * f).toFixed(1)}); ölçek = 10·r(Mmax=${mMax ?? '—'}). `
       + `Bu oran üyelik değişimi DEĞİLDİR: 18 test dairesinde (tüm katalog referansına göre) sınıfı değişen olay %0–1,5, `
       + `kenara 0,5·L'den yakın olaylarda %0,6 ölçüldü (analysis/2026-11-08_pyodide_reasenberg/sinir_etkisi.json).`);
+  }
+
+  // K9 zaman penceresi başı (uyarı). Ölçüm (mc_ve_zaman.json, zaman_tamponu.json): pencere başından sonraki ilk
+  // 30 günde sınıf değişimi %8,4; büyük bir depremin hemen ardından başlayan pencerede tüm pencerede %5,8.
+  // 90 günlük geri tampon bu etkiyi ölçülen 4 pencerenin 4'ünde sıfırladı.
+  if (windowStart !== undefined) {
+    if (windowStart === null) {
+      add('K9', 'Zaman penceresi başı', 'warn', 'Pencere başlangıcı bilinmiyor; pencere başındaki kümeler kesik olabilir.');
+    } else if (bufferDays >= 90) {
+      add('K9', 'Zaman penceresi başı', 'pass', `${bufferDays} günlük geri tampon kullanıldı (ölçümde 90 gün yeterliydi).`);
+    } else {
+      const t0 = +windowStart, first = events.filter(e => { const d = (Date.parse(e.time) - t0) / 86400e3; return d >= 0 && d < 30; }).length;
+      add('K9', 'Zaman penceresi başı', 'warn',
+        `Geri tampon yok (${bufferDays} gün). Pencerenin ilk 30 gündeki olay: ${first} (%${events.length ? (100 * first / events.length).toFixed(1) : 0}). `
+        + `Ölçümde bu bölümde sınıf değişimi %8,4; büyük bir depremin hemen ardından başlayan pencerede tüm pencerede %5,8. 90 günlük geri tampon etkiyi sıfırladı (zaman_tamponu.json).`);
+    }
   }
 
   // K8 büyüklük ölçeği (uyarı)

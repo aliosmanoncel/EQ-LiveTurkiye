@@ -58,3 +58,17 @@ json.dumps(dict(
   pyodide.globals.delete('_rb_in');
   return JSON.parse(out);
 }
+
+// Öz-sınama (K0): 4 dondurulmuş referansla birebir karşılaştırma. getJson(path) depo kökünden okur.
+export const SELFTEST_NAMES = ['adiyaman', 'izmit_dogu', 'saimbeyli', 'van_bati'];
+export async function runSelfTest(pyodide, getJson) {
+  const rows = [];
+  for (const nm of SELFTEST_NAMES) {
+    const ref = await getJson(`scripts/fixtures/reasenberg_zmap_${nm}_ref.json`);
+    const cat = (await getJson(ref.catalog)).events;
+    const r = runReasenberg(pyodide, cat, ref.params.xmeff, { rule: ref.params.rule, magField: ref.params.mag_field });
+    const got = r.ids.map((id, i) => [id, r.cluster_id[i], r.event_class[i]]);
+    rows.push({ name: nm, n: got.length, same: JSON.stringify(got) === JSON.stringify(ref.membership) });
+  }
+  return { passed: rows.every(r => r.same), rows };
+}
