@@ -1,0 +1,570 @@
+{
+ "xmeff": 3.0,
+ "rule": "zmap",
+ "reference": "tüm EMSC kataloğu (sınırsız)",
+ "module_sha256": "c5b1248af557f29b4f04bf7c6ed9adfefd97c4153975a8989804b872ccf99bc9",
+ "cases": [
+  {
+   "center": "izmit",
+   "R": 50,
+   "n": 338,
+   "mmax": 6.3,
+   "L_km": 36.4,
+   "k7_near_frac": 0.669,
+   "changed": 1,
+   "changed_frac": 0.003,
+   "dependent_ref": 64,
+   "dependent_dyn": 63,
+   "by_bin": {
+    "0-0.5": [
+     1,
+     133
+    ],
+    "0.5-1": [
+     0,
+     93
+    ],
+    "1-2": [
+     0,
+     112
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "izmit",
+   "R": 100,
+   "n": 1538,
+   "mmax": 6.3,
+   "L_km": 36.4,
+   "k7_near_frac": 0.578,
+   "changed": 13,
+   "changed_frac": 0.0085,
+   "dependent_ref": 230,
+   "dependent_dyn": 217,
+   "by_bin": {
+    "0-0.5": [
+     11,
+     395
+    ],
+    "0.5-1": [
+     2,
+     494
+    ],
+    "1-2": [
+     0,
+     468
+    ],
+    "2-inf": [
+     0,
+     181
+    ]
+   }
+  },
+  {
+   "center": "izmit",
+   "R": 200,
+   "n": 4697,
+   "mmax": 6.3,
+   "L_km": 36.4,
+   "k7_near_frac": 0.374,
+   "changed": 13,
+   "changed_frac": 0.0028,
+   "dependent_ref": 1229,
+   "dependent_dyn": 1216,
+   "by_bin": {
+    "0-0.5": [
+     13,
+     1394
+    ],
+    "0.5-1": [
+     0,
+     363
+    ],
+    "1-2": [
+     0,
+     832
+    ],
+    "2-inf": [
+     0,
+     2108
+    ]
+   }
+  },
+  {
+   "center": "van",
+   "R": 50,
+   "n": 2826,
+   "mmax": 7.3,
+   "L_km": 50,
+   "k7_near_frac": 1.0,
+   "changed": 3,
+   "changed_frac": 0.0011,
+   "dependent_ref": 1352,
+   "dependent_dyn": 1349,
+   "by_bin": {
+    "0-0.5": [
+     3,
+     2816
+    ],
+    "0.5-1": [
+     0,
+     10
+    ],
+    "1-2": [
+     0,
+     0
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "van",
+   "R": 100,
+   "n": 3710,
+   "mmax": 7.3,
+   "L_km": 91.5,
+   "k7_near_frac": 0.989,
+   "changed": 5,
+   "changed_frac": 0.0013,
+   "dependent_ref": 1431,
+   "dependent_dyn": 1430,
+   "by_bin": {
+    "0-0.5": [
+     5,
+     826
+    ],
+    "0.5-1": [
+     0,
+     2843
+    ],
+    "1-2": [
+     0,
+     41
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "van",
+   "R": 200,
+   "n": 5839,
+   "mmax": 7.3,
+   "L_km": 91.5,
+   "k7_near_frac": 0.323,
+   "changed": 0,
+   "changed_frac": 0.0,
+   "dependent_ref": 1587,
+   "dependent_dyn": 1587,
+   "by_bin": {
+    "0-0.5": [
+     0,
+     799
+    ],
+    "0.5-1": [
+     0,
+     1088
+    ],
+    "1-2": [
+     0,
+     3438
+    ],
+    "2-inf": [
+     0,
+     514
+    ]
+   }
+  },
+  {
+   "center": "kahramanmaras",
+   "R": 50,
+   "n": 984,
+   "mmax": 7.8,
+   "L_km": 50,
+   "k7_near_frac": 1.0,
+   "changed": 15,
+   "changed_frac": 0.0152,
+   "dependent_ref": 283,
+   "dependent_dyn": 268,
+   "by_bin": {
+    "0-0.5": [
+     15,
+     984
+    ],
+    "0.5-1": [
+     0,
+     0
+    ],
+    "1-2": [
+     0,
+     0
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "kahramanmaras",
+   "R": 100,
+   "n": 3748,
+   "mmax": 7.8,
+   "L_km": 100,
+   "k7_near_frac": 1.0,
+   "changed": 2,
+   "changed_frac": 0.0005,
+   "dependent_ref": 1158,
+   "dependent_dyn": 1156,
+   "by_bin": {
+    "0-0.5": [
+     2,
+     3524
+    ],
+    "0.5-1": [
+     0,
+     224
+    ],
+    "1-2": [
+     0,
+     0
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "kahramanmaras",
+   "R": 200,
+   "n": 7725,
+   "mmax": 7.8,
+   "L_km": 145.0,
+   "k7_near_frac": 0.847,
+   "changed": 27,
+   "changed_frac": 0.0035,
+   "dependent_ref": 1737,
+   "dependent_dyn": 1710,
+   "by_bin": {
+    "0-0.5": [
+     27,
+     3050
+    ],
+    "0.5-1": [
+     0,
+     3494
+    ],
+    "1-2": [
+     0,
+     1181
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "denizli",
+   "R": 50,
+   "n": 1138,
+   "mmax": 5.8,
+   "L_km": 23.0,
+   "k7_near_frac": 0.316,
+   "changed": 1,
+   "changed_frac": 0.0009,
+   "dependent_ref": 173,
+   "dependent_dyn": 172,
+   "by_bin": {
+    "0-0.5": [
+     1,
+     102
+    ],
+    "0.5-1": [
+     0,
+     258
+    ],
+    "1-2": [
+     0,
+     723
+    ],
+    "2-inf": [
+     0,
+     55
+    ]
+   }
+  },
+  {
+   "center": "denizli",
+   "R": 100,
+   "n": 2084,
+   "mmax": 5.8,
+   "L_km": 23.0,
+   "k7_near_frac": 0.331,
+   "changed": 4,
+   "changed_frac": 0.0019,
+   "dependent_ref": 307,
+   "dependent_dyn": 303,
+   "by_bin": {
+    "0-0.5": [
+     4,
+     502
+    ],
+    "0.5-1": [
+     0,
+     187
+    ],
+    "1-2": [
+     0,
+     207
+    ],
+    "2-inf": [
+     0,
+     1188
+    ]
+   }
+  },
+  {
+   "center": "denizli",
+   "R": 200,
+   "n": 13433,
+   "mmax": 7.0,
+   "L_km": 69.4,
+   "k7_near_frac": 0.725,
+   "changed": 20,
+   "changed_frac": 0.0015,
+   "dependent_ref": 3533,
+   "dependent_dyn": 3513,
+   "by_bin": {
+    "0-0.5": [
+     20,
+     4882
+    ],
+    "0.5-1": [
+     0,
+     4863
+    ],
+    "1-2": [
+     0,
+     2409
+    ],
+    "2-inf": [
+     0,
+     1279
+    ]
+   }
+  },
+  {
+   "center": "elazig",
+   "R": 50,
+   "n": 1243,
+   "mmax": 6.8,
+   "L_km": 50,
+   "k7_near_frac": 1.0,
+   "changed": 4,
+   "changed_frac": 0.0032,
+   "dependent_ref": 256,
+   "dependent_dyn": 252,
+   "by_bin": {
+    "0-0.5": [
+     4,
+     882
+    ],
+    "0.5-1": [
+     0,
+     361
+    ],
+    "1-2": [
+     0,
+     0
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "elazig",
+   "R": 100,
+   "n": 2849,
+   "mmax": 6.8,
+   "L_km": 57.7,
+   "k7_near_frac": 0.621,
+   "changed": 6,
+   "changed_frac": 0.0021,
+   "dependent_ref": 611,
+   "dependent_dyn": 607,
+   "by_bin": {
+    "0-0.5": [
+     5,
+     1070
+    ],
+    "0.5-1": [
+     1,
+     700
+    ],
+    "1-2": [
+     0,
+     1079
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "elazig",
+   "R": 200,
+   "n": 7865,
+   "mmax": 7.5,
+   "L_km": 110.0,
+   "k7_near_frac": 0.685,
+   "changed": 95,
+   "changed_frac": 0.0121,
+   "dependent_ref": 1757,
+   "dependent_dyn": 1724,
+   "by_bin": {
+    "0-0.5": [
+     47,
+     2324
+    ],
+    "0.5-1": [
+     41,
+     3061
+    ],
+    "1-2": [
+     7,
+     2480
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "ege_samos",
+   "R": 50,
+   "n": 2326,
+   "mmax": 7.0,
+   "L_km": 50,
+   "k7_near_frac": 1.0,
+   "changed": 2,
+   "changed_frac": 0.0009,
+   "dependent_ref": 861,
+   "dependent_dyn": 859,
+   "by_bin": {
+    "0-0.5": [
+     2,
+     1821
+    ],
+    "0.5-1": [
+     0,
+     505
+    ],
+    "1-2": [
+     0,
+     0
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "ege_samos",
+   "R": 100,
+   "n": 3735,
+   "mmax": 7.0,
+   "L_km": 69.4,
+   "k7_near_frac": 0.745,
+   "changed": 1,
+   "changed_frac": 0.0003,
+   "dependent_ref": 950,
+   "dependent_dyn": 949,
+   "by_bin": {
+    "0-0.5": [
+     1,
+     920
+    ],
+    "0.5-1": [
+     0,
+     1861
+    ],
+    "1-2": [
+     0,
+     954
+    ],
+    "2-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "center": "ege_samos",
+   "R": 200,
+   "n": 15897,
+   "mmax": 7.0,
+   "L_km": 69.4,
+   "k7_near_frac": 0.598,
+   "changed": 30,
+   "changed_frac": 0.0019,
+   "dependent_ref": 4955,
+   "dependent_dyn": 4925,
+   "by_bin": {
+    "0-0.5": [
+     30,
+     4791
+    ],
+    "0.5-1": [
+     0,
+     4720
+    ],
+    "1-2": [
+     0,
+     3690
+    ],
+    "2-inf": [
+     0,
+     2696
+    ]
+   }
+  }
+ ],
+ "aggregate_by_bin": {
+  "0-0.5": {
+   "changed": 191,
+   "n": 31215,
+   "frac": 0.0061
+  },
+  "0.5-1": {
+   "changed": 44,
+   "n": 25125,
+   "frac": 0.0018
+  },
+  "1-2": {
+   "changed": 7,
+   "n": 17614,
+   "frac": 0.0004
+  },
+  "2-inf": {
+   "changed": 0,
+   "n": 8021,
+   "frac": 0.0
+  }
+ }
+}

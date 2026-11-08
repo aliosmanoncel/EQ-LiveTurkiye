@@ -1,0 +1,861 @@
+{
+ "module_sha256": "c5b1248af557f29b4f04bf7c6ed9adfefd97c4153975a8989804b872ccf99bc9",
+ "rule": "zmap",
+ "catalog": "data/eq_historical.json src=EMSC",
+ "mc_sensitivity": [
+  {
+   "scope": "tüm EMSC",
+   "A": {
+    "n": 80929,
+    "clusters": 2080,
+    "dependent": 14987,
+    "dependent_pct": 18.519
+   },
+   "B": {
+    "n": 80929,
+    "clusters": 2076,
+    "dependent": 15064,
+    "dependent_pct": 18.614
+   },
+   "C": {
+    "n": 50038,
+    "clusters": 1392,
+    "dependent": 9880,
+    "dependent_pct": 19.745
+   },
+   "B_vs_A": {
+    "common": 80929,
+    "changed": 77,
+    "changed_pct": 0.095,
+    "clusters_reproduced_pct": 99.38,
+    "clusters_change_pct": -0.19,
+    "dependent_change_pct": 0.51
+   },
+   "C_vs_A": {
+    "common": 50038,
+    "changed": 259,
+    "changed_pct": 0.518,
+    "clusters_reproduced_pct": 92.86,
+    "clusters_change_pct": -33.08,
+    "dependent_change_pct": -34.08
+   }
+  },
+  {
+   "scope": "izmit R=50",
+   "A": {
+    "n": 338,
+    "clusters": 12,
+    "dependent": 63,
+    "dependent_pct": 18.639
+   },
+   "B": {
+    "n": 338,
+    "clusters": 12,
+    "dependent": 65,
+    "dependent_pct": 19.231
+   },
+   "C": {
+    "n": 168,
+    "clusters": 6,
+    "dependent": 46,
+    "dependent_pct": 27.381
+   },
+   "B_vs_A": {
+    "common": 338,
+    "changed": 2,
+    "changed_pct": 0.592,
+    "clusters_reproduced_pct": 91.67,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 3.17
+   },
+   "C_vs_A": {
+    "common": 168,
+    "changed": 1,
+    "changed_pct": 0.595,
+    "clusters_reproduced_pct": 83.33,
+    "clusters_change_pct": -50.0,
+    "dependent_change_pct": -26.98
+   }
+  },
+  {
+   "scope": "izmit R=100",
+   "A": {
+    "n": 1538,
+    "clusters": 61,
+    "dependent": 217,
+    "dependent_pct": 14.109
+   },
+   "B": {
+    "n": 1538,
+    "clusters": 61,
+    "dependent": 219,
+    "dependent_pct": 14.239
+   },
+   "C": {
+    "n": 751,
+    "clusters": 35,
+    "dependent": 118,
+    "dependent_pct": 15.712
+   },
+   "B_vs_A": {
+    "common": 1538,
+    "changed": 2,
+    "changed_pct": 0.13,
+    "clusters_reproduced_pct": 98.36,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.92
+   },
+   "C_vs_A": {
+    "common": 751,
+    "changed": 7,
+    "changed_pct": 0.932,
+    "clusters_reproduced_pct": 88.57,
+    "clusters_change_pct": -42.62,
+    "dependent_change_pct": -45.62
+   }
+  },
+  {
+   "scope": "izmit R=200",
+   "A": {
+    "n": 4697,
+    "clusters": 166,
+    "dependent": 1216,
+    "dependent_pct": 25.889
+   },
+   "B": {
+    "n": 4697,
+    "clusters": 166,
+    "dependent": 1218,
+    "dependent_pct": 25.931
+   },
+   "C": {
+    "n": 2294,
+    "clusters": 105,
+    "dependent": 673,
+    "dependent_pct": 29.337
+   },
+   "B_vs_A": {
+    "common": 4697,
+    "changed": 2,
+    "changed_pct": 0.043,
+    "clusters_reproduced_pct": 99.4,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.16
+   },
+   "C_vs_A": {
+    "common": 2294,
+    "changed": 24,
+    "changed_pct": 1.046,
+    "clusters_reproduced_pct": 90.2,
+    "clusters_change_pct": -36.75,
+    "dependent_change_pct": -44.65
+   }
+  },
+  {
+   "scope": "van R=50",
+   "A": {
+    "n": 2826,
+    "clusters": 63,
+    "dependent": 1349,
+    "dependent_pct": 47.735
+   },
+   "B": {
+    "n": 2826,
+    "clusters": 63,
+    "dependent": 1360,
+    "dependent_pct": 48.125
+   },
+   "C": {
+    "n": 1717,
+    "clusters": 43,
+    "dependent": 882,
+    "dependent_pct": 51.369
+   },
+   "B_vs_A": {
+    "common": 2826,
+    "changed": 11,
+    "changed_pct": 0.389,
+    "clusters_reproduced_pct": 98.41,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.82
+   },
+   "C_vs_A": {
+    "common": 1717,
+    "changed": 26,
+    "changed_pct": 1.514,
+    "clusters_reproduced_pct": 93.02,
+    "clusters_change_pct": -31.75,
+    "dependent_change_pct": -34.62
+   }
+  },
+  {
+   "scope": "van R=100",
+   "A": {
+    "n": 3710,
+    "clusters": 82,
+    "dependent": 1430,
+    "dependent_pct": 38.544
+   },
+   "B": {
+    "n": 3710,
+    "clusters": 82,
+    "dependent": 1441,
+    "dependent_pct": 38.841
+   },
+   "C": {
+    "n": 2267,
+    "clusters": 59,
+    "dependent": 945,
+    "dependent_pct": 41.685
+   },
+   "B_vs_A": {
+    "common": 3710,
+    "changed": 11,
+    "changed_pct": 0.296,
+    "clusters_reproduced_pct": 98.78,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.77
+   },
+   "C_vs_A": {
+    "common": 2267,
+    "changed": 28,
+    "changed_pct": 1.235,
+    "clusters_reproduced_pct": 93.22,
+    "clusters_change_pct": -28.05,
+    "dependent_change_pct": -33.92
+   }
+  },
+  {
+   "scope": "van R=200",
+   "A": {
+    "n": 5839,
+    "clusters": 137,
+    "dependent": 1587,
+    "dependent_pct": 27.179
+   },
+   "B": {
+    "n": 5839,
+    "clusters": 137,
+    "dependent": 1598,
+    "dependent_pct": 27.368
+   },
+   "C": {
+    "n": 3602,
+    "clusters": 91,
+    "dependent": 1042,
+    "dependent_pct": 28.928
+   },
+   "B_vs_A": {
+    "common": 5839,
+    "changed": 11,
+    "changed_pct": 0.188,
+    "clusters_reproduced_pct": 99.27,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.69
+   },
+   "C_vs_A": {
+    "common": 3602,
+    "changed": 31,
+    "changed_pct": 0.861,
+    "clusters_reproduced_pct": 93.41,
+    "clusters_change_pct": -33.58,
+    "dependent_change_pct": -34.34
+   }
+  },
+  {
+   "scope": "kahramanmaras R=50",
+   "A": {
+    "n": 984,
+    "clusters": 37,
+    "dependent": 268,
+    "dependent_pct": 27.236
+   },
+   "B": {
+    "n": 984,
+    "clusters": 36,
+    "dependent": 273,
+    "dependent_pct": 27.744
+   },
+   "C": {
+    "n": 633,
+    "clusters": 26,
+    "dependent": 175,
+    "dependent_pct": 27.646
+   },
+   "B_vs_A": {
+    "common": 984,
+    "changed": 5,
+    "changed_pct": 0.508,
+    "clusters_reproduced_pct": 94.59,
+    "clusters_change_pct": -2.7,
+    "dependent_change_pct": 1.87
+   },
+   "C_vs_A": {
+    "common": 633,
+    "changed": 21,
+    "changed_pct": 3.318,
+    "clusters_reproduced_pct": 82.61,
+    "clusters_change_pct": -29.73,
+    "dependent_change_pct": -34.7
+   }
+  },
+  {
+   "scope": "kahramanmaras R=100",
+   "A": {
+    "n": 3748,
+    "clusters": 97,
+    "dependent": 1156,
+    "dependent_pct": 30.843
+   },
+   "B": {
+    "n": 3748,
+    "clusters": 95,
+    "dependent": 1192,
+    "dependent_pct": 31.804
+   },
+   "C": {
+    "n": 2432,
+    "clusters": 69,
+    "dependent": 868,
+    "dependent_pct": 35.691
+   },
+   "B_vs_A": {
+    "common": 3748,
+    "changed": 36,
+    "changed_pct": 0.961,
+    "clusters_reproduced_pct": 96.91,
+    "clusters_change_pct": -2.06,
+    "dependent_change_pct": 3.11
+   },
+   "C_vs_A": {
+    "common": 2432,
+    "changed": 55,
+    "changed_pct": 2.262,
+    "clusters_reproduced_pct": 92.31,
+    "clusters_change_pct": -28.87,
+    "dependent_change_pct": -24.91
+   }
+  },
+  {
+   "scope": "kahramanmaras R=200",
+   "A": {
+    "n": 7725,
+    "clusters": 211,
+    "dependent": 1710,
+    "dependent_pct": 22.136
+   },
+   "B": {
+    "n": 7725,
+    "clusters": 208,
+    "dependent": 1759,
+    "dependent_pct": 22.77
+   },
+   "C": {
+    "n": 4789,
+    "clusters": 151,
+    "dependent": 1266,
+    "dependent_pct": 26.436
+   },
+   "B_vs_A": {
+    "common": 7725,
+    "changed": 49,
+    "changed_pct": 0.634,
+    "clusters_reproduced_pct": 98.1,
+    "clusters_change_pct": -1.42,
+    "dependent_change_pct": 2.87
+   },
+   "C_vs_A": {
+    "common": 4789,
+    "changed": 76,
+    "changed_pct": 1.587,
+    "clusters_reproduced_pct": 91.22,
+    "clusters_change_pct": -28.44,
+    "dependent_change_pct": -25.96
+   }
+  },
+  {
+   "scope": "denizli R=50",
+   "A": {
+    "n": 1138,
+    "clusters": 47,
+    "dependent": 172,
+    "dependent_pct": 15.114
+   },
+   "B": {
+    "n": 1138,
+    "clusters": 47,
+    "dependent": 172,
+    "dependent_pct": 15.114
+   },
+   "C": {
+    "n": 528,
+    "clusters": 21,
+    "dependent": 78,
+    "dependent_pct": 14.773
+   },
+   "B_vs_A": {
+    "common": 1138,
+    "changed": 0,
+    "changed_pct": 0.0,
+    "clusters_reproduced_pct": 100.0,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.0
+   },
+   "C_vs_A": {
+    "common": 528,
+    "changed": 6,
+    "changed_pct": 1.136,
+    "clusters_reproduced_pct": 86.36,
+    "clusters_change_pct": -55.32,
+    "dependent_change_pct": -54.65
+   }
+  },
+  {
+   "scope": "denizli R=100",
+   "A": {
+    "n": 2084,
+    "clusters": 80,
+    "dependent": 303,
+    "dependent_pct": 14.539
+   },
+   "B": {
+    "n": 2084,
+    "clusters": 80,
+    "dependent": 303,
+    "dependent_pct": 14.539
+   },
+   "C": {
+    "n": 960,
+    "clusters": 38,
+    "dependent": 158,
+    "dependent_pct": 16.458
+   },
+   "B_vs_A": {
+    "common": 2084,
+    "changed": 0,
+    "changed_pct": 0.0,
+    "clusters_reproduced_pct": 100.0,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.0
+   },
+   "C_vs_A": {
+    "common": 960,
+    "changed": 6,
+    "changed_pct": 0.625,
+    "clusters_reproduced_pct": 92.31,
+    "clusters_change_pct": -52.5,
+    "dependent_change_pct": -47.85
+   }
+  },
+  {
+   "scope": "denizli R=200",
+   "A": {
+    "n": 13433,
+    "clusters": 407,
+    "dependent": 3513,
+    "dependent_pct": 26.152
+   },
+   "B": {
+    "n": 13433,
+    "clusters": 407,
+    "dependent": 3517,
+    "dependent_pct": 26.182
+   },
+   "C": {
+    "n": 6896,
+    "clusters": 224,
+    "dependent": 2034,
+    "dependent_pct": 29.495
+   },
+   "B_vs_A": {
+    "common": 13433,
+    "changed": 4,
+    "changed_pct": 0.03,
+    "clusters_reproduced_pct": 99.51,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.11
+   },
+   "C_vs_A": {
+    "common": 6896,
+    "changed": 57,
+    "changed_pct": 0.827,
+    "clusters_reproduced_pct": 89.78,
+    "clusters_change_pct": -44.96,
+    "dependent_change_pct": -42.1
+   }
+  },
+  {
+   "scope": "elazig R=50",
+   "A": {
+    "n": 1243,
+    "clusters": 37,
+    "dependent": 252,
+    "dependent_pct": 20.274
+   },
+   "B": {
+    "n": 1243,
+    "clusters": 37,
+    "dependent": 252,
+    "dependent_pct": 20.274
+   },
+   "C": {
+    "n": 770,
+    "clusters": 20,
+    "dependent": 164,
+    "dependent_pct": 21.299
+   },
+   "B_vs_A": {
+    "common": 1243,
+    "changed": 0,
+    "changed_pct": 0.0,
+    "clusters_reproduced_pct": 100.0,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.0
+   },
+   "C_vs_A": {
+    "common": 770,
+    "changed": 4,
+    "changed_pct": 0.519,
+    "clusters_reproduced_pct": 90.48,
+    "clusters_change_pct": -45.95,
+    "dependent_change_pct": -34.92
+   }
+  },
+  {
+   "scope": "elazig R=100",
+   "A": {
+    "n": 2849,
+    "clusters": 97,
+    "dependent": 607,
+    "dependent_pct": 21.306
+   },
+   "B": {
+    "n": 2849,
+    "clusters": 97,
+    "dependent": 607,
+    "dependent_pct": 21.306
+   },
+   "C": {
+    "n": 1773,
+    "clusters": 65,
+    "dependent": 401,
+    "dependent_pct": 22.617
+   },
+   "B_vs_A": {
+    "common": 2849,
+    "changed": 0,
+    "changed_pct": 0.0,
+    "clusters_reproduced_pct": 100.0,
+    "clusters_change_pct": 0.0,
+    "dependent_change_pct": 0.0
+   },
+   "C_vs_A": {
+    "common": 1773,
+    "changed": 11,
+    "changed_pct": 0.62,
+    "clusters_reproduced_pct": 91.04,
+    "clusters_change_pct": -32.99,
+    "dependent_change_pct": -33.94
+   }
+  },
+  {
+   "scope": "elazig R=200",
+   "A": {
+    "n": 7865,
+    "clusters": 209,
+    "dependent": 1724,
+    "dependent_pct": 21.92
+   },
+   "B": {
+    "n": 7865,
+    "clusters": 205,
+    "dependent": 1751,
+    "dependent_pct": 22.263
+   },
+   "C": {
+    "n": 4827,
+    "clusters": 141,
+    "dependent": 1246,
+    "dependent_pct": 25.813
+   },
+   "B_vs_A": {
+    "common": 7865,
+    "changed": 35,
+    "changed_pct": 0.445,
+    "clusters_reproduced_pct": 97.61,
+    "clusters_change_pct": -1.91,
+    "dependent_change_pct": 1.57
+   },
+   "C_vs_A": {
+    "common": 4827,
+    "changed": 53,
+    "changed_pct": 1.098,
+    "clusters_reproduced_pct": 88.81,
+    "clusters_change_pct": -32.54,
+    "dependent_change_pct": -27.73
+   }
+  },
+  {
+   "scope": "ege_samos R=50",
+   "A": {
+    "n": 2326,
+    "clusters": 74,
+    "dependent": 859,
+    "dependent_pct": 36.93
+   },
+   "B": {
+    "n": 2326,
+    "clusters": 73,
+    "dependent": 866,
+    "dependent_pct": 37.231
+   },
+   "C": {
+    "n": 1384,
+    "clusters": 42,
+    "dependent": 576,
+    "dependent_pct": 41.618
+   },
+   "B_vs_A": {
+    "common": 2326,
+    "changed": 7,
+    "changed_pct": 0.301,
+    "clusters_reproduced_pct": 97.3,
+    "clusters_change_pct": -1.35,
+    "dependent_change_pct": 0.81
+   },
+   "C_vs_A": {
+    "common": 1384,
+    "changed": 9,
+    "changed_pct": 0.65,
+    "clusters_reproduced_pct": 95.24,
+    "clusters_change_pct": -43.24,
+    "dependent_change_pct": -32.95
+   }
+  },
+  {
+   "scope": "ege_samos R=100",
+   "A": {
+    "n": 3735,
+    "clusters": 119,
+    "dependent": 949,
+    "dependent_pct": 25.408
+   },
+   "B": {
+    "n": 3735,
+    "clusters": 118,
+    "dependent": 956,
+    "dependent_pct": 25.596
+   },
+   "C": {
+    "n": 2151,
+    "clusters": 65,
+    "dependent": 615,
+    "dependent_pct": 28.591
+   },
+   "B_vs_A": {
+    "common": 3735,
+    "changed": 7,
+    "changed_pct": 0.187,
+    "clusters_reproduced_pct": 98.32,
+    "clusters_change_pct": -0.84,
+    "dependent_change_pct": 0.74
+   },
+   "C_vs_A": {
+    "common": 2151,
+    "changed": 12,
+    "changed_pct": 0.558,
+    "clusters_reproduced_pct": 95.45,
+    "clusters_change_pct": -45.38,
+    "dependent_change_pct": -35.19
+   }
+  },
+  {
+   "scope": "ege_samos R=200",
+   "A": {
+    "n": 15897,
+    "clusters": 417,
+    "dependent": 4925,
+    "dependent_pct": 30.981
+   },
+   "B": {
+    "n": 15897,
+    "clusters": 416,
+    "dependent": 4935,
+    "dependent_pct": 31.044
+   },
+   "C": {
+    "n": 9326,
+    "clusters": 249,
+    "dependent": 3216,
+    "dependent_pct": 34.484
+   },
+   "B_vs_A": {
+    "common": 15897,
+    "changed": 10,
+    "changed_pct": 0.063,
+    "clusters_reproduced_pct": 99.28,
+    "clusters_change_pct": -0.24,
+    "dependent_change_pct": 0.2
+   },
+   "C_vs_A": {
+    "common": 9326,
+    "changed": 45,
+    "changed_pct": 0.483,
+    "clusters_reproduced_pct": 92.74,
+    "clusters_change_pct": -40.29,
+    "dependent_change_pct": -34.7
+   }
+  }
+ ],
+ "time_window": [
+  {
+   "window": "son 90 gün",
+   "n": 380,
+   "changed": 4,
+   "changed_pct": 1.053,
+   "dependent_ref": 32,
+   "dependent_dyn": 28,
+   "by_days_since_start": {
+    "0-30": [
+     4,
+     161
+    ],
+    "30-365": [
+     0,
+     219
+    ],
+    "365-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "window": "son 1 yıl",
+   "n": 2225,
+   "changed": 16,
+   "changed_pct": 0.719,
+   "dependent_ref": 756,
+   "dependent_dyn": 748,
+   "by_days_since_start": {
+    "0-30": [
+     8,
+     211
+    ],
+    "30-365": [
+     8,
+     2013
+    ],
+    "365-inf": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "window": "son 5 yıl",
+   "n": 14525,
+   "changed": 1,
+   "changed_pct": 0.007,
+   "dependent_ref": 4959,
+   "dependent_dyn": 4958,
+   "by_days_since_start": {
+    "0-30": [
+     1,
+     313
+    ],
+    "30-365": [
+     0,
+     1504
+    ],
+    "365-inf": [
+     0,
+     12708
+    ]
+   }
+  },
+  {
+   "window": "1999-09-01 → 1999-12-31 (İzmit sonrası başlar)",
+   "n": 1349,
+   "changed": 22,
+   "changed_pct": 1.631,
+   "dependent_ref": 339,
+   "dependent_dyn": 317,
+   "by_days_since_start": {
+    "0-30": [
+     22,
+     454
+    ],
+    "30-365": [
+     0,
+     895
+    ],
+    "365-inf": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "window": "2020 yılı",
+   "n": 2817,
+   "changed": 0,
+   "changed_pct": 0.0,
+   "dependent_ref": 1041,
+   "dependent_dyn": 1041,
+   "by_days_since_start": {
+    "0-30": [
+     0,
+     377
+    ],
+    "30-365": [
+     0,
+     2438
+    ],
+    "365-inf": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "window": "2023-02-10 → 2023-12-31 (Kahramanmaraş sonrası başlar)",
+   "n": 3875,
+   "changed": 226,
+   "changed_pct": 5.832,
+   "dependent_ref": 785,
+   "dependent_dyn": 567,
+   "by_days_since_start": {
+    "0-30": [
+     213,
+     1437
+    ],
+    "30-365": [
+     13,
+     2438
+    ],
+    "365-inf": [
+     0,
+     0
+    ]
+   }
+  }
+ ],
+ "time_window_aggregate": {
+  "0-30 gün": {
+   "changed": 248,
+   "n": 2953,
+   "pct": 8.398
+  },
+  "30-365 gün": {
+   "changed": 21,
+   "n": 9507,
+   "pct": 0.221
+  },
+  "365-inf gün": {
+   "changed": 0,
+   "n": 12711,
+   "pct": 0.0
+  }
+ }
+}
