@@ -1,0 +1,19 @@
+olcek,olay1,olay2,dt_gun,uzaklik_km,dM,dkm_100_icinde,gk_pencere_T_gun,gk_pencere_D_km,gk_ikinci_pencerede,gk74_birinci,gk74_ikinci,rb_birinci,rb_ikinci,ayni_rb_kumesi,ikinci_iki_yontemde
+H0 ham,1999-08-17T00:01 M6.3 (mb) WESTERN TURKEY,1999-11-12T16:57 M6.0 (mb) WESTERN TURKEY,87.705,103.6,-0.3,False,725.6,57.9,False,bağımsız,bağımsız,representative,representative,False,aynı
+H0 ham,2012-08-11T12:23 M6.4 (mw) NORTHWESTERN IRAN,2012-08-11T12:34 M6.3 (mw) NORTHWESTERN IRAN,0.008,9.4,-0.1,True,821.8,59.6,True,bağımsız,artçı,representative,dependent,True,aynı
+H0 ham,2018-08-25T22:13 M6.1 (mw) WESTERN IRAN,2018-11-25T16:37 M6.3 (mb) IRAN-IRAQ BORDER REGION,91.767,60.8,0.2,True,565.6,54.7,False,artçı,artçı,representative,representative,False,ayrışıyor
+H0 ham,"2021-09-27T06:17 M6.0 (mw) CRETE, GREECE","2021-10-12T09:24 M6.4 (mw) CRETE, GREECE",15.13,95.9,0.4,True,499.3,53.2,False,bağımsız,bağımsız,representative,representative,False,aynı
+H0 ham,2023-02-06T01:17 M7.8 (mw) CENTRAL TURKEY,2023-02-06T10:24 M7.5 (mw) CENTRAL TURKEY,0.38,105.5,-0.3,False,973.9,88.8,False,bağımsız,bağımsız,representative,dependent,True,ayrışıyor
+H0 ham,2023-02-06T01:28 M6.7 (mw) CENTRAL TURKEY,2023-02-20T17:04 M6.3 (mw) TURKEY-SYRIA BORDER REGION,14.65,128.8,-0.4,False,898.0,64.9,False,artçı,bağımsız,dependent,representative,False,aynı
+H0 ham,2023-02-06T10:26 M6.0 (mb) CENTRAL TURKEY,2023-02-06T12:02 M6.0 (mb) CENTRAL TURKEY,0.066,130.5,0.0,False,499.3,53.2,False,artçı,artçı,dependent,dependent,True,aynı
+H0 ham,"2025-05-13T22:51 M6.0 (mw) DODECANESE ISLANDS, GREECE","2025-05-22T03:19 M6.2 (mw) CRETE, GREECE",8.186,115.9,0.2,False,499.3,53.2,False,bağımsız,bağımsız,representative,representative,False,aynı
+H0 ham,2025-08-10T16:53 M6.1 (mw) WESTERN TURKEY,2025-10-27T19:48 M6.0 (mw) WESTERN TURKEY,78.121,17.5,-0.1,True,565.6,54.7,True,bağımsız,artçı,representative,dependent,True,aynı
+H2+A otoriter Mw,1999-08-17T00:01 M7.6 (mb) WESTERN TURKEY,1999-11-12T16:57 M7.2 (mb) WESTERN TURKEY,87.705,103.6,-0.4,False,959.6,83.9,False,bağımsız,bağımsız,representative,representative,False,aynı
+H2+A otoriter Mw,2012-08-11T12:23 M6.4 (mw) NORTHWESTERN IRAN,2012-08-11T12:34 M6.3 (mw) NORTHWESTERN IRAN,0.008,9.4,-0.1,True,821.8,59.6,True,bağımsız,artçı,representative,dependent,True,aynı
+H2+A otoriter Mw,2018-08-25T22:13 M6.1 (mw) WESTERN IRAN,2018-11-25T16:37 M6.3 (mb) IRAN-IRAQ BORDER REGION,91.767,60.8,0.2,True,565.6,54.7,False,artçı,artçı,representative,representative,False,ayrışıyor
+H2+A otoriter Mw,"2021-09-27T06:17 M6.0 (mw) CRETE, GREECE","2021-10-12T09:24 M6.4 (mw) CRETE, GREECE",15.13,95.9,0.4,True,499.3,53.2,False,bağımsız,bağımsız,representative,representative,False,aynı
+H2+A otoriter Mw,2023-02-06T01:17 M7.8 (mw) CENTRAL TURKEY,2023-02-06T10:24 M7.5 (mw) CENTRAL TURKEY,0.38,105.5,-0.3,False,973.9,88.8,False,bağımsız,bağımsız,representative,dependent,True,ayrışıyor
+H2+A otoriter Mw,2023-02-06T01:28 M6.7 (mw) CENTRAL TURKEY,2023-02-20T17:04 M6.3 (mw) TURKEY-SYRIA BORDER REGION,14.65,128.8,-0.4,False,898.0,64.9,False,artçı,bağımsız,dependent,representative,False,aynı
+H2+A otoriter Mw,2023-02-06T10:26 M6.1 (mb) CENTRAL TURKEY,2023-02-06T12:02 M6.1 (mb) CENTRAL TURKEY,0.066,130.5,0.0,False,587.1,55.2,False,artçı,artçı,dependent,dependent,True,aynı
+H2+A otoriter Mw,"2025-05-13T22:51 M6.0 (mw) DODECANESE ISLANDS, GREECE","2025-05-22T03:19 M6.2 (mw) CRETE, GREECE",8.186,115.9,0.2,False,499.3,53.2,False,bağımsız,bağımsız,representative,representative,False,aynı
+H2+A otoriter Mw,2025-08-10T16:53 M6.1 (mw) WESTERN TURKEY,2025-10-27T19:48 M6.0 (mw) WESTERN TURKEY,78.121,17.5,-0.1,True,565.6,54.7,True,bağımsız,artçı,representative,dependent,True,aynı

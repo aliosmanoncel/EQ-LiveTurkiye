@@ -1,0 +1,177 @@
+{
+ "degistirilen": [
+  {
+   "ad": "1999 İzmit (Kocaeli)",
+   "emsc": "6.3 mb",
+   "otoriter_mw": 7.6
+  },
+  {
+   "ad": "1999 Düzce",
+   "emsc": "6.0 mb",
+   "otoriter_mw": 7.2
+  },
+  {
+   "ad": "2011 Van",
+   "emsc": "7.3 Ms",
+   "otoriter_mw": 7.1
+  },
+  {
+   "ad": "2023 Pazarcık",
+   "emsc": "7.8 mw",
+   "otoriter_mw": 7.8
+  },
+  {
+   "ad": "2023 Elbistan",
+   "emsc": "7.5 mw",
+   "otoriter_mw": 7.5
+  },
+  {
+   "ad": "2020 Samos",
+   "emsc": "7.0 mw",
+   "otoriter_mw": 7.0
+  },
+  {
+   "ad": "2017 İran–Irak (Halabja)",
+   "emsc": "7.3 mw",
+   "otoriter_mw": 7.3
+  },
+  {
+   "ad": "2006 Kythira",
+   "emsc": "6.5 mb",
+   "otoriter_mw": 6.7
+  },
+  {
+   "ad": "2018 Sarpol-e Zahab (İran–Irak)",
+   "emsc": "6.3 mb",
+   "otoriter_mw": 6.3
+  }
+ ],
+ "T_yil": 28.701568518518517,
+ "sonuc": {
+  "M6": {
+   "ham": {
+    "sayi": 41,
+    "lambda_yil": 1.428493358247875,
+    "lambda_95": [
+     1.0251114969368917,
+     1.9379125405584594
+    ],
+    "P1y": 0.7603302531939167,
+    "P1y_95": [
+     0.6412435370707905,
+     0.8559957607435353
+    ],
+    "P50y": 1.0,
+    "olaylar": null
+   },
+   "gk74": {
+    "sayi": 34,
+    "lambda_yil": 1.1846042483031158,
+    "lambda_95": [
+     0.8203728785547098,
+     1.655365701165362
+    ],
+    "P1y": 0.6941327969858846,
+    "P1y_95": [
+     0.5597325423981268,
+     0.808977814105484
+    ],
+    "P50y": 1.0,
+    "olaylar": null
+   },
+   "reasenberg": {
+    "sayi": 35,
+    "lambda_yil": 1.2194455497237957,
+    "lambda_95": [
+     0.8493885059553575,
+     1.695953562178197
+    ],
+    "P1y": 0.7046060972408961,
+    "P1y_95": [
+     0.5723236264389475,
+     0.816575760807925
+    ],
+    "P50y": 1.0,
+    "olaylar": null
+   },
+   "sinifi_farkli": [
+    "2023-02-06T10:24 M7.5 CENTRAL TURKEY GK74 bağımsız / RB bağımlı",
+    "2018-11-25T16:37 M6.3 IRAN-IRAQ BORDER REGION GK74 artçı / RB bağımsız",
+    "2018-08-25T22:13 M6.1 WESTERN IRAN GK74 artçı / RB bağımsız"
+   ]
+  },
+  "M7": {
+   "ham": {
+    "sayi": 7,
+    "lambda_yil": 0.24388910994475912,
+    "lambda_95": [
+     0.0980560713852281,
+     0.5025047795696856
+    ],
+    "P1y": 0.2164254799327967,
+    "P1y_95": [
+     0.09340193188080259,
+     0.3949866648171636
+    ],
+    "P50y": 0.9999949415755529,
+    "olaylar": [
+     "1999-08-17 M7.6 WESTERN TURKEY",
+     "1999-11-12 M7.2 WESTERN TURKEY",
+     "2011-10-23 M7.1 EASTERN TURKEY",
+     "2017-11-12 M7.3 IRAN-IRAQ BORDER REGION",
+     "2020-10-30 M7.0 DODECANESE ISLANDS, GREE",
+     "2023-02-06 M7.8 CENTRAL TURKEY",
+     "2023-02-06 M7.5 CENTRAL TURKEY"
+    ]
+   },
+   "gk74": {
+    "sayi": 7,
+    "lambda_yil": 0.24388910994475912,
+    "lambda_95": [
+     0.0980560713852281,
+     0.5025047795696856
+    ],
+    "P1y": 0.2164254799327967,
+    "P1y_95": [
+     0.09340193188080259,
+     0.3949866648171636
+    ],
+    "P50y": 0.9999949415755529,
+    "olaylar": [
+     "1999-08-17 M7.6 WESTERN TURKEY",
+     "1999-11-12 M7.2 WESTERN TURKEY",
+     "2011-10-23 M7.1 EASTERN TURKEY",
+     "2017-11-12 M7.3 IRAN-IRAQ BORDER REGION",
+     "2020-10-30 M7.0 DODECANESE ISLANDS, GREE",
+     "2023-02-06 M7.8 CENTRAL TURKEY",
+     "2023-02-06 M7.5 CENTRAL TURKEY"
+    ]
+   },
+   "reasenberg": {
+    "sayi": 6,
+    "lambda_yil": 0.20904780852407925,
+    "lambda_95": [
+     0.07671686138233764,
+     0.4550090708141122
+    ],
+    "P1y": 0.18864355503797958,
+    "P1y_95": [
+     0.07384795410361722,
+     0.3655577869852519
+    ],
+    "P50y": 0.9999711208427715,
+    "olaylar": [
+     "1999-08-17 M7.6 WESTERN TURKEY",
+     "1999-11-12 M7.2 WESTERN TURKEY",
+     "2011-10-23 M7.1 EASTERN TURKEY",
+     "2017-11-12 M7.3 IRAN-IRAQ BORDER REGION",
+     "2020-10-30 M7.0 DODECANESE ISLANDS, GREE",
+     "2023-02-06 M7.8 CENTRAL TURKEY"
+    ]
+   },
+   "sinifi_farkli": [
+    "2023-02-06T10:24 M7.5 CENTRAL TURKEY GK74 bağımsız / RB bağımlı"
+   ]
+  }
+ }
+}
