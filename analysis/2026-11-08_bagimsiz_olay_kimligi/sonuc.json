@@ -1,0 +1,550 @@
+{
+ "tanim": {
+  "katalog": "data/eq_historical.json src=EMSC",
+  "n": 80929,
+  "donem": [
+   "1998-01-01T02:45:46.600000+00:00",
+   "2026-09-14T08:42:45.280000+00:00"
+  ],
+  "T_yil": 28.701568518518517,
+  "sinirlar": "33–45°N, 23–48°E dikdörtgeni (İran, Yunanistan, Ege dahil)",
+  "gk74": "scripts/decluster_gk74.py (yalnız artçı, episantral)",
+  "reasenberg": "zmap, xmeff=3.0, modül 0.3.0",
+  "module_sha256": "c5b1248af557f29b4f04bf7c6ed9adfefd97c4153975a8989804b872ccf99bc9",
+  "dm": 0.1,
+  "doublet": {
+   "mmin": 6.0,
+   "dm": 0.5,
+   "dt_days": 365.0,
+   "dkm": 150.0
+  }
+ },
+ "kimlik": {
+  "ortak_bagimsiz": 34966,
+  "yalniz_gk74_bagimsiz": 334,
+  "yalniz_rb_bagimsiz": 30976,
+  "ikisi_de_bagimli": 14653
+ },
+ "buyuk_farklar": [
+  {
+   "id": "20180825_0000108",
+   "time": "2018-08-25T22:13:25.8Z",
+   "mag": 6.1,
+   "mtype": "mw",
+   "place": "WESTERN IRAN",
+   "gk74": "artçı",
+   "reasenberg": "representative",
+   "gk74_bastiran": "2017-11-12T18:18 M7.3 IRAN-IRAQ BORDER REGION",
+   "rb_temsilci": "",
+   "rb_temsilciye_km": "",
+   "rb_temsilciye_saat": ""
+  },
+  {
+   "id": "20181125_0000088",
+   "time": "2018-11-25T16:37:31.7Z",
+   "mag": 6.3,
+   "mtype": "mb",
+   "place": "IRAN-IRAQ BORDER REGION",
+   "gk74": "artçı",
+   "reasenberg": "representative",
+   "gk74_bastiran": "2017-11-12T18:18 M7.3 IRAN-IRAQ BORDER REGION",
+   "rb_temsilci": "",
+   "rb_temsilciye_km": "",
+   "rb_temsilciye_saat": ""
+  },
+  {
+   "id": "20230206_0000222",
+   "time": "2023-02-06T10:24:49.6Z",
+   "mag": 7.5,
+   "mtype": "mw",
+   "place": "CENTRAL TURKEY",
+   "gk74": "bağımsız",
+   "reasenberg": "dependent",
+   "gk74_bastiran": "",
+   "rb_temsilci": "2023-02-06T01:17 M7.8 CENTRAL TURKEY",
+   "rb_temsilciye_km": 105.5,
+   "rb_temsilciye_saat": 9.12
+  }
+ ],
+ "doublet_adaylari": [
+  {
+   "dkm_100_icinde": false,
+   "olay1": "1999-08-17T00:01 M6.3 WESTERN TURKEY",
+   "olay2": "1999-11-12T16:57 M6.0 WESTERN TURKEY",
+   "dt_gun": 87.705,
+   "uzaklik_km": 103.6,
+   "dM": -0.3,
+   "gk74_ikinci": "bağımsız",
+   "rb_ikinci": "representative",
+   "gk74_birinci": "bağımsız",
+   "rb_birinci": "representative",
+   "ayni_rb_kumesi": false,
+   "yontemler_ayrisiyor": false
+  },
+  {
+   "dkm_100_icinde": true,
+   "olay1": "2012-08-11T12:23 M6.4 NORTHWESTERN IRAN",
+   "olay2": "2012-08-11T12:34 M6.3 NORTHWESTERN IRAN",
+   "dt_gun": 0.008,
+   "uzaklik_km": 9.4,
+   "dM": -0.1,
+   "gk74_ikinci": "artçı",
+   "rb_ikinci": "dependent",
+   "gk74_birinci": "bağımsız",
+   "rb_birinci": "representative",
+   "ayni_rb_kumesi": true,
+   "yontemler_ayrisiyor": false
+  },
+  {
+   "dkm_100_icinde": true,
+   "olay1": "2018-08-25T22:13 M6.1 WESTERN IRAN",
+   "olay2": "2018-11-25T16:37 M6.3 IRAN-IRAQ BORDER REGION",
+   "dt_gun": 91.767,
+   "uzaklik_km": 60.8,
+   "dM": 0.2,
+   "gk74_ikinci": "artçı",
+   "rb_ikinci": "representative",
+   "gk74_birinci": "artçı",
+   "rb_birinci": "representative",
+   "ayni_rb_kumesi": false,
+   "yontemler_ayrisiyor": true
+  },
+  {
+   "dkm_100_icinde": true,
+   "olay1": "2021-09-27T06:17 M6.0 CRETE, GREECE",
+   "olay2": "2021-10-12T09:24 M6.4 CRETE, GREECE",
+   "dt_gun": 15.13,
+   "uzaklik_km": 95.9,
+   "dM": 0.4,
+   "gk74_ikinci": "bağımsız",
+   "rb_ikinci": "representative",
+   "gk74_birinci": "bağımsız",
+   "rb_birinci": "representative",
+   "ayni_rb_kumesi": false,
+   "yontemler_ayrisiyor": false
+  },
+  {
+   "dkm_100_icinde": false,
+   "olay1": "2023-02-06T01:17 M7.8 CENTRAL TURKEY",
+   "olay2": "2023-02-06T10:24 M7.5 CENTRAL TURKEY",
+   "dt_gun": 0.38,
+   "uzaklik_km": 105.5,
+   "dM": -0.3,
+   "gk74_ikinci": "bağımsız",
+   "rb_ikinci": "dependent",
+   "gk74_birinci": "bağımsız",
+   "rb_birinci": "representative",
+   "ayni_rb_kumesi": true,
+   "yontemler_ayrisiyor": true
+  },
+  {
+   "dkm_100_icinde": false,
+   "olay1": "2023-02-06T01:28 M6.7 CENTRAL TURKEY",
+   "olay2": "2023-02-20T17:04 M6.3 TURKEY-SYRIA BORDER REGION",
+   "dt_gun": 14.65,
+   "uzaklik_km": 128.8,
+   "dM": -0.4,
+   "gk74_ikinci": "bağımsız",
+   "rb_ikinci": "representative",
+   "gk74_birinci": "artçı",
+   "rb_birinci": "dependent",
+   "ayni_rb_kumesi": false,
+   "yontemler_ayrisiyor": false
+  },
+  {
+   "dkm_100_icinde": false,
+   "olay1": "2023-02-06T10:26 M6.0 CENTRAL TURKEY",
+   "olay2": "2023-02-06T12:02 M6.0 CENTRAL TURKEY",
+   "dt_gun": 0.066,
+   "uzaklik_km": 130.5,
+   "dM": 0.0,
+   "gk74_ikinci": "artçı",
+   "rb_ikinci": "dependent",
+   "gk74_birinci": "artçı",
+   "rb_birinci": "dependent",
+   "ayni_rb_kumesi": true,
+   "yontemler_ayrisiyor": false
+  },
+  {
+   "dkm_100_icinde": false,
+   "olay1": "2025-05-13T22:51 M6.0 DODECANESE ISLANDS, GREECE",
+   "olay2": "2025-05-22T03:19 M6.2 CRETE, GREECE",
+   "dt_gun": 8.186,
+   "uzaklik_km": 115.9,
+   "dM": 0.2,
+   "gk74_ikinci": "bağımsız",
+   "rb_ikinci": "representative",
+   "gk74_birinci": "bağımsız",
+   "rb_birinci": "representative",
+   "ayni_rb_kumesi": false,
+   "yontemler_ayrisiyor": false
+  },
+  {
+   "dkm_100_icinde": true,
+   "olay1": "2025-08-10T16:53 M6.1 WESTERN TURKEY",
+   "olay2": "2025-10-27T19:48 M6.0 WESTERN TURKEY",
+   "dt_gun": 78.121,
+   "uzaklik_km": 17.5,
+   "dM": -0.1,
+   "gk74_ikinci": "artçı",
+   "rb_ikinci": "dependent",
+   "gk74_birinci": "bağımsız",
+   "rb_birinci": "representative",
+   "ayni_rb_kumesi": true,
+   "yontemler_ayrisiyor": false
+  }
+ ],
+ "parametreler": {
+  "ham": {
+   "n": 80929,
+   "mc3.2": {
+    "aki_utsu": {
+     "n": 50038,
+     "b": 1.0212186866109456,
+     "sigma_b": 0.004426575465811442,
+     "a": 7.967199739936557
+    },
+    "weichert": {
+     "n": 50038,
+     "b": 1.0257909020330893,
+     "sigma_b": 0.004600702171859927,
+     "rate_ge_mc": 1743.3890404879796,
+     "sigma_rate": 7.793711763540628
+    }
+   },
+   "mc3.5": {
+    "aki_utsu": {
+     "n": 24753,
+     "b": 1.0226348853993903,
+     "sigma_b": 0.0061238598306276445,
+     "a": 7.972849940732685
+    },
+    "weichert": {
+     "n": 24753,
+     "b": 1.0270746613134134,
+     "sigma_b": 0.006554140077314587,
+     "rate_ge_mc": 862.426734066089,
+     "sigma_rate": 5.481611970474482
+    }
+   },
+   "M6": {
+    "sayi": 41,
+    "lambda_yil": 1.428493358247875,
+    "lambda_95": [
+     1.0251114969368917,
+     1.9379125405584594
+    ],
+    "tekrarlanma_yil": 0.7000382565492321,
+    "tekrarlanma_95": [
+     0.5160191593124344,
+     0.9755036432505861
+    ],
+    "P": {
+     "1y": {
+      "deger": 0.7603302531939167,
+      "aralik_95": [
+       0.6412435370707905,
+       0.8559957607435353
+      ]
+     },
+     "10y": {
+      "deger": 0.9999993746370167,
+      "aralik_95": [
+       0.9999646818997107,
+       0.9999999961651113
+      ]
+     },
+     "50y": {
+      "deger": 1.0,
+      "aralik_95": [
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "lambda_GR_weichert_mc3.2": 2.3398056527271107,
+    "P_GR": {
+     "1y": 0.9036536389364062,
+     "10y": 0.9999999999310788,
+     "50y": 1.0
+    }
+   },
+   "M7": {
+    "sayi": 5,
+    "lambda_yil": 0.17420650710339938,
+    "lambda_95": [
+     0.056564378670487386,
+     0.4065398750522695
+    ],
+    "tekrarlanma_yil": 5.740313703703703,
+    "tekrarlanma_95": [
+     2.45978331122237,
+     17.678970820583814
+    ],
+    "P": {
+     "1y": {
+      "deger": 0.15987661170382494,
+      "aralik_95": [
+       0.054994355670221706,
+       0.33404945972598155
+      ]
+     },
+     "10y": {
+      "deger": 0.8248416874806935,
+      "aralik_95": [
+       0.43200563819214477,
+       0.9828438531130479
+      ]
+     },
+     "50y": {
+      "deger": 0.9998351253970587,
+      "aralik_95": [
+       0.940881946859434,
+       0.9999999985137263
+      ]
+     }
+    },
+    "lambda_GR_weichert_mc3.2": 0.22048999307166217,
+    "P_GR": {
+     "1y": 0.19787433436447788,
+     "10y": 0.8897384414524203,
+     "50y": 0.9999837025133221
+    }
+   }
+  },
+  "gk74": {
+   "n": 35300,
+   "mc3.2": {
+    "aki_utsu": {
+     "n": 22474,
+     "b": 0.9460896802494722,
+     "sigma_b": 0.006091804652201537,
+     "a": 7.379167353326206
+    },
+    "weichert": {
+     "n": 22474,
+     "b": 0.9495203962559018,
+     "sigma_b": 0.00635804283557991,
+     "rate_ge_mc": 783.0234081283595,
+     "sigma_rate": 5.223174760818195
+    }
+   },
+   "mc3.5": {
+    "aki_utsu": {
+     "n": 11800,
+     "b": 0.9591740073479019,
+     "sigma_b": 0.008429903999559238,
+     "a": 7.428991033023782
+    },
+    "weichert": {
+     "n": 11800,
+     "b": 0.9625529870818154,
+     "sigma_b": 0.008903936737103931,
+     "rate_ge_mc": 411.1273567640225,
+     "sigma_rate": 3.784734093605877
+    }
+   },
+   "M6": {
+    "sayi": 34,
+    "lambda_yil": 1.1846042483031158,
+    "lambda_95": [
+     0.8203728785547098,
+     1.655365701165362
+    ],
+    "tekrarlanma_yil": 0.8441637799564269,
+    "tekrarlanma_95": [
+     0.6040961216581988,
+     1.218957898464108
+    ],
+    "P": {
+     "1y": {
+      "deger": 0.6941327969858846,
+      "aralik_95": [
+       0.5597325423981268,
+       0.808977814105484
+      ]
+     },
+     "10y": {
+      "deger": 0.9999928331367599,
+      "aralik_95": [
+       0.9997263686472911,
+       0.999999935309858
+      ]
+     },
+     "50y": {
+      "deger": 1.0,
+      "aralik_95": [
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "lambda_GR_weichert_mc3.2": 1.7183737737983251,
+    "P_GR": {
+     "1y": 0.820642413118324,
+     "10y": 0.9999999655493419,
+     "50y": 1.0
+    }
+   },
+   "M7": {
+    "sayi": 5,
+    "lambda_yil": 0.17420650710339938,
+    "lambda_95": [
+     0.056564378670487386,
+     0.4065398750522695
+    ],
+    "tekrarlanma_yil": 5.740313703703703,
+    "tekrarlanma_95": [
+     2.45978331122237,
+     17.678970820583814
+    ],
+    "P": {
+     "1y": {
+      "deger": 0.15987661170382494,
+      "aralik_95": [
+       0.054994355670221706,
+       0.33404945972598155
+      ]
+     },
+     "10y": {
+      "deger": 0.8248416874806935,
+      "aralik_95": [
+       0.43200563819214477,
+       0.9828438531130479
+      ]
+     },
+     "50y": {
+      "deger": 0.9998351253970587,
+      "aralik_95": [
+       0.940881946859434,
+       0.9999999985137263
+      ]
+     }
+    },
+    "lambda_GR_weichert_mc3.2": 0.1930177458903916,
+    "P_GR": {
+     "1y": 0.17553265689781394,
+     "10y": 0.8548775570712407,
+     "50y": 0.9999356315720649
+    }
+   }
+  },
+  "reasenberg": {
+   "n": 65942,
+   "mc3.2": {
+    "aki_utsu": {
+     "n": 39989,
+     "b": 1.0524786020786043,
+     "sigma_b": 0.00514726904014304,
+     "a": 7.969872070572201
+    },
+    "weichert": {
+     "n": 39989,
+     "b": 1.057545229563406,
+     "sigma_b": 0.005305268098178943,
+     "rate_ge_mc": 1393.2688025115676,
+     "sigma_rate": 6.967302082466013
+    }
+   },
+   "mc3.5": {
+    "aki_utsu": {
+     "n": 19347,
+     "b": 1.0537313018657508,
+     "sigma_b": 0.007268382024155772,
+     "a": 7.974673188187132
+    },
+    "weichert": {
+     "n": 19347,
+     "b": 1.0586960984948803,
+     "sigma_b": 0.007639967336703615,
+     "rate_ge_mc": 674.0746585858935,
+     "sigma_rate": 4.846198340950667
+    }
+   },
+   "M6": {
+    "sayi": 35,
+    "lambda_yil": 1.2194455497237957,
+    "lambda_95": [
+     0.8493885059553575,
+     1.695953562178197
+    ],
+    "tekrarlanma_yil": 0.8200448148148147,
+    "tekrarlanma_95": [
+     0.5896387862858996,
+     1.1773175560872946
+    ],
+    "P": {
+     "1y": {
+      "deger": 0.7046060972408961,
+      "aralik_95": [
+       0.5723236264389475,
+       0.816575760807925
+      ]
+     },
+     "10y": {
+      "deger": 0.9999949415755529,
+      "aralik_95": [
+       0.9997952836221692,
+       0.999999956891068
+      ]
+     },
+     "50y": {
+      "deger": 1.0,
+      "aralik_95": [
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "lambda_GR_weichert_mc3.2": 1.5237308829251532,
+    "P_GR": {
+     "1y": 0.7821025812049249,
+     "10y": 0.9999997587202599,
+     "50y": 1.0
+    }
+   },
+   "M7": {
+    "sayi": 4,
+    "lambda_yil": 0.1393652056827195,
+    "lambda_95": [
+     0.03797232799047668,
+     0.35683027806636164
+    ],
+    "tekrarlanma_yil": 7.175392129629628,
+    "tekrarlanma_95": [
+     2.8024527666736416,
+     26.33496688037658
+    ],
+    "P": {
+     "1y": {
+      "deger": 0.13008972573665256,
+      "aralik_95": [
+       0.03726041853853457,
+       0.30010872544473577
+      ]
+     },
+     "10y": {
+      "deger": 0.7518326735319907,
+      "aralik_95": [
+       0.3159493264079397,
+       0.9717963190852285
+      ]
+     },
+     "50y": {
+      "deger": 0.9990587109422899,
+      "aralik_95": [
+       0.8502242943351753,
+       0.99999998215449
+      ]
+     }
+    },
+    "lambda_GR_weichert_mc3.2": 0.13346366304830784,
+    "P_GR": {
+     "1y": 0.12494073461382493,
+     "10y": 0.736746183509416,
+     "50y": 0.9987356323363542
+    }
+   }
+  }
+ }
+}
