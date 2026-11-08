@@ -59,6 +59,16 @@ json.dumps(dict(
   return JSON.parse(out);
 }
 
+// Geri tampon olaylarını sonuçtan çıkarır: yalnız kimliği `prefix` ile başlayan (pencere) olaylar kalır.
+// Küme sayısı, en az bir pencere olayı içeren kümelerdir (yalnız tampondaki kümeler sayılmaz).
+// Saf fonksiyon; site (site_rb.mjs) ve regresyon testi aynı kodu kullanır.
+export function windowOnly(r, prefix = 'r') {
+  const keep = r.ids.map((id, k) => String(id).startsWith(prefix) ? k : -1).filter(k => k >= 0);
+  const cl = new Set(keep.map(k => r.cluster_id[k]).filter(c => c >= 0));
+  return { ...r, ids: keep.map(k => r.ids[k]), cluster_id: keep.map(k => r.cluster_id[k]), event_class: keep.map(k => r.event_class[k]),
+           n_clusters: cl.size, n_input: r.ids.length };
+}
+
 // Öz-sınama (K0): 4 dondurulmuş referansla birebir karşılaştırma. getJson(path) depo kökünden okur.
 export const SELFTEST_NAMES = ['adiyaman', 'izmit_dogu', 'saimbeyli', 'van_bati'];
 export async function runSelfTest(pyodide, getJson) {
