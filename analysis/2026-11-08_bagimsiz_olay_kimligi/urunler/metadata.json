@@ -1,0 +1,100 @@
+{
+ "urun": "Ayrı ayrıştırılmış kataloglar — GK74 ve Reasenberg (birleştirilmez)",
+ "olusturma": "2026-11-08",
+ "katalog": {
+  "dosya": "data/eq_historical.json",
+  "sha256": "bd303aa30a17ae590073cfe664fd58c87cf93ed643cdb8374aa33c27a6d7545b",
+  "generated": "2026-09-14T13:10:40Z",
+  "kaynak": "EMSC",
+  "n": 80929,
+  "donem": [
+   "1998-01-01T02:45:46.6Z",
+   "2026-09-14T08:42:45.28Z"
+  ],
+  "buyukluk_esigi": 3.0,
+  "sinirlar": "33–45°K, 23–48°D",
+  "buyukluk_olcegi": "karışık (ML/mb/Ms/Mw); otoriter Mw uygulanmadı"
+ },
+ "yontemler": {
+  "GK74": {
+   "betik": "scripts/decluster_gk74.py",
+   "kural": "Gardner & Knopoff (1974) Tablo 1; yalnız ileri pencere (artçı), episantral mesafe, UTC",
+   "representative_event_id": "olayı pencere içinde bağımlı kılan daha büyük bağımsız olay (GK74 kuralıyla, raporlama için)"
+  },
+  "Reasenberg1985": {
+   "modul": "scripts/reasenberg.py",
+   "surum": "0.3.0",
+   "sha256": "c5b1248af557f29b4f04bf7c6ed9adfefd97c4153975a8989804b872ccf99bc9",
+   "adaptor": "scripts/decluster_reasenberg.py",
+   "kural": "zmap (varsayılan)",
+   "parametreler": {
+    "xmeff": 3.0,
+    "rfact": 10.0,
+    "xk": 0.5,
+    "tau_min": 1.0,
+    "tau_max": 10.0,
+    "p": 0.95,
+    "err": 0.0,
+    "derr": 0.0,
+    "err_factor": 1.5,
+    "tie": "first",
+    "coords": "geographic",
+    "rule": "zmap",
+    "r_max": "inf",
+    "tau0": 1.0,
+    "cmag_unclustered": 0.0
+   },
+   "xmeff": 3.0,
+   "representative_event_id": "kümenin en büyük olayı (temsilci)"
+  }
+ },
+ "mc": {
+  "site_tahmini": "MAXC+0,2 = 3,2 (tüm EMSC)",
+  "not_": "xmeff = 3,0 statik ürünle aynı; Mc duyarlılığı açık iş"
+ },
+ "alanlar": [
+  "event_id",
+  "origin_time",
+  "latitude",
+  "longitude",
+  "depth",
+  "magnitude",
+  "magnitude_type",
+  "place",
+  "method",
+  "classification",
+  "cluster_id",
+  "representative_event_id",
+  "dependent_role",
+  "reasenberg_class"
+ ],
+ "uyarilar": [
+  "bağımlı ≠ artçı: dependent_role yalnız temsilci/bastıran olaya göre zaman sırasıdır, fiziksel nedensellik iddiası değildir",
+  "GK74 bu uygulamada yalnız artçı ayıklar; GK74 bağımlıları tanım gereği \"aftershock_candidate\"dır",
+  "iki yöntemin sonuçları tek bir ortak artçı kataloğunda birleştirilmemelidir",
+  "Coulomb modellemesinin yerine geçmez; gözlemsel sınama verisidir",
+  "deprem tahmini için değildir"
+ ],
+ "dosyalar": {
+  "gk74_bagimsiz.csv.gz": {
+   "n": 35300,
+   "sha256": "034f7f735c1ed2f5b8748a7eddac080bccfee2a1c24cdfb7ee2e00de5360f29a"
+  },
+  "gk74_bagimli.csv.gz": {
+   "n": 45629,
+   "sha256": "204cd9b67ba6ff7821f742d84ce47fbf70705373c03def05a1fe7629ad939017"
+  },
+  "reasenberg_bagimsiz.csv.gz": {
+   "n": 65942,
+   "sha256": "5dc327bbfc9c2af1d41a46329aa7142766698b076c964233e2c5125d4c442721"
+  },
+  "reasenberg_bagimli.csv.gz": {
+   "n": 14987,
+   "sha256": "960294e8b9e5907ddb674107bd98f148903876b1d55396184fe9a011e4e5241e"
+  },
+  "yontem_farklari.csv.gz": {
+   "n": 31310,
+   "sha256": "8c8f6170b13610713e25e3782adc1f2fd1d55807478b22d6cc39196e6d82af16"
+  }
+ }
+}
