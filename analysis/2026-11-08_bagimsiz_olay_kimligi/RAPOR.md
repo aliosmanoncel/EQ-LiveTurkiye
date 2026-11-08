@@ -147,3 +147,63 @@ GeoJSON ve JSON için `--urunler --format=csv,geojson,json` kullanılır. Bu bi�
 | Omori–Utsu (p, c) yöntem duyarlılığı; mekânsal göç; bağımlı ↔ bağımsız b | **IN, sonraki araştırma adımları** (ürünler bunlara hazır) |
 | Coulomb gerilme karşılaştırması | **OUT (şimdilik)**: fay geometrisi, kayma modeli ve alıcı fay varsayımları gerekir; ayrı bilimsel aşama. Ürünler Coulomb'un yerine geçmez, onu gözlemsel olarak sınamak için kullanılabilir. |
 | Ürünlerin sitede indirilebilir olması | **OUT (şimdilik)**: karar gereği araştırma tamamlanmadan siteye özellik eklenmiyor. |
+
+---
+
+# 2. tur — Türkiye alt kümesi (`turkiye_sinir.py`, `turkiye_alt_kume.py`, `turkiye_sonuc.json`)
+
+**Sınır tanımı (tekrarlanabilir):**
+- Kaynak: Natural Earth 1:10m Admin-0 v5.1.2 (sha256 `239eec57…`, betik denetler).
+- Tanım: Türkiye kara alanı + **B km deniz payı**. Payın içindeki boşluklar doldurulur (Marmara); komşu ülkelerin kara alanları çıkarılır.
+- B = **30 km (ana tanım)**; duyarlılık için 0 ve 50 km.
+- Yalnız kara (0 km) İzmit Körfezi ve Marmara'yı dışarıda bırakıyor; bu yüzden ana tanım olarak uygun değil.
+- Halabja, Atina, Midilli ve Kıbrıs dışarıda; Samos 2020 (denizde) içeride.
+- Poligonlar: `turkiye_sinir_{0,30,50}km.geojson`. Deniz payı siyasi yetki alanı değildir.
+
+**İki uygulama:**
+- **(i) yeniden:** yöntemler yalnız alt küme olaylarıyla çalıştırılır.
+- **(ii) tam:** tüm katalogdaki sınıf alt kümeye süzülür.
+
+Ayrıca **Türkiye dışı** (30 km tanımının tümleyeni) aynı ölçülerle hesaplandı. Sonuçlar birleştirilmedi.
+
+## Merkez soru: ~0,10'luk b farkı Türkiye'de sürüyor mu?
+
+Aki–Utsu b ± σ (Shi & Bolt), her katalog ayrı; Δb = b(RB) − b(GK74), "oran" = Δb / √(σ²GK + σ²RB).
+
+| Kapsam | N | Mc 3,2: b GK74 | b RB | Δb (oran) | Mc 3,5: b GK74 | b RB | Δb (oran) |
+|---|---|---|---|---|---|---|---|
+| Tüm bölge | 80 929 | 0,946 ± 0,006 | 1,052 ± 0,005 | +0,106 (13σ) | 0,959 ± 0,008 | 1,054 ± 0,007 | +0,095 (8σ) |
+| **Türkiye 30 km, yeniden** | 44 697 | 1,097 ± 0,012 | 1,227 ± 0,010 | **+0,130 (8σ)** | 1,000 ± 0,016 | 1,114 ± 0,013 | **+0,114 (6σ)** |
+| Türkiye 30 km, tam | 44 697 | 1,097 | 1,227 | +0,130 | 0,998 | 1,114 | +0,116 |
+| Türkiye 30 km, yeniden, otoriter Mw | 44 697 | 1,098 | 1,231 | +0,133 | 1,002 | 1,119 | +0,117 |
+| Türkiye 0 km, yeniden | 36 798 | 1,107 | 1,224 | +0,116 (7σ) | 0,989 | 1,103 | +0,114 (5σ) |
+| Türkiye 50 km, yeniden | 47 075 | 1,089 | 1,220 | +0,130 (9σ) | 1,001 | 1,118 | +0,117 (6σ) |
+| **Türkiye dışı (30 km tümleyeni)** | 36 232 | 0,861 ± 0,007 | 0,940 ± 0,006 | **+0,080 (9σ)** | 0,940 ± 0,010 | 1,019 ± 0,009 | +0,079 (6σ) |
+
+**Cevap:**
+- Fark Türkiye'de **sürüyor, hatta daha büyük**: +0,11–0,13; dışarıda +0,08.
+- Bu nedenle tüm bölgedeki farkın Türkiye dışı olaylardan geldiği **söylenemez**. Tam tersine, Türkiye dışı olaylar farkı bir miktar küçültüyor.
+- Sonuç sağlam: sınır tanımına (0/30/50 km), uygulamaya (yeniden / tam), Mc'ye (3,2 / 3,5) ve büyüklük kaynağına (EMSC / otoriter Mw) göre değişmiyor.
+- Yön her yerde aynı: GK74 daha düşük b veriyor.
+
+**Ek bulgular:**
+- **Mutlak b, bölgeye göre belirgin farklı.** Türkiye'de b ≈ 1,10 (GK74) ve 1,23 (RB); dışarıda 0,86 ve 0,94 (Mc 3,2). Tüm bölge değerleri iki farklı nüfusun karışımı; Türkiye için temsil edici değil.
+- **Türkiye'de b, Mc'ye duyarlı:** 3,2'den 3,5'e geçince b yaklaşık 0,1 düşüyor. Muhtemel nedenler büyüklük ölçeği karışımı ve bölgesel tamlık farkları. Bu konu dönemsel Mc analizine (sıradaki adım) taşınmalı. Δb ise Mc'den bağımsız olarak sabit kalıyor.
+- **"Yeniden" ile "tam" arasındaki sınıf farkı küçük:** 30 km'de GK74'te 204, Reasenberg'de 35 olay (44 697 olay içinde). b üzerinde etkisi yok.
+
+## Türkiye'de büyük depremler (30 km)
+
+| | Büyüklük | Ham | GK74 | RB | Kimlik farkı | λ GK74 /yıl [%95] | λ RB /yıl |
+|---|---|---|---|---|---|---|---|
+| M ≥ 6 | EMSC | 19 | 15 | 14 | Elbistan | 0,523 [0,293–0,862] | 0,488 |
+| M ≥ 7 | EMSC | 4 | 4 | 3 | Elbistan | 0,139 [0,038–0,357] | 0,105 |
+| M ≥ 7 | otoriter Mw | 6 | 6 | 5 | Elbistan | 0,209 [0,077–0,455] | 0,174 |
+
+- Türkiye'de M ≥ 6'da bile **tek kimlik farkı Elbistan**. Tüm bölgedeki diğer iki fark (Batı İran 2018, Sarpol-e Zahab 2018) Türkiye dışında.
+- M ≥ 7'de belirsizlik sıralaması aynı kalıyor: örnekleme (6 olay → %95 aralık ≈ 6 kat) > büyüklük ölçeği (4 → 6 olay) > yöntem (6 ↔ 5).
+
+## 2. tur sonucu
+
+- **b ve G–R tabanlı analizlerde** declustering yöntemi Türkiye'de de baskın bir belirsizlik kaynağı: Δb ≈ 0,11–0,13, örnekleme belirsizliğinin 6–9 katı.
+- **Doğrudan M ≥ 7 sayımlarında** yöntem etkisi tek bir olaya indirgeniyor: Elbistan–Pazarcık. Ama o olay, "bağımsız iki deprem mi, tek dizi mi" sorusunun ta kendisi.
+- Sıradaki adımlar (sırayla): dönemsel Mc ve Weichert; b farkının büyüklük sınıflarına göre ayrıştırılması; DOUBLET adaylarının literatürle karşılaştırılması.
