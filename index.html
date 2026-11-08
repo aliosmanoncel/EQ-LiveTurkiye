@@ -507,7 +507,7 @@
       <label>Yarıçap (km)</label>
       <input type="number" id="litCircleRadius" step="1" placeholder="500" style="width:90px">
     </div>
-    <button class="tbtn" id="btnLitCirclePick" onclick="litCirclePickStart()" title="Haritada tıklayın — merkez lat/lon otomatik dolar ve daire çizilir">📍 Haritadan Merkez Seç</button>
+    <button class="tbtn" id="btnLitCirclePick" onclick="litCirclePickStart()" title="Haritada tıklayın — merkez lat/lon otomatik dolar ve daire çizilir. Bir deprem işaretinin üstüne (≤ 10 piksel) tıklarsanız merkez tam o depremin dış merkezine yapışır. Esc: iptal.">📍 Haritadan Merkez Seç</button>
     <button class="tbtn" id="btnLitCircleDraw" onclick="drawLitRegionCircle()" style="background:#3b0764;border-color:#a855f7">⭕ Daireyi Çiz</button>
   </div>
   <button class="tbtn" id="btnLitRegionClear" onclick="litRegionClear()" style="display:none">✕ Araştırma Bölgesini Kaldır</button>
@@ -10112,19 +10112,60 @@ function setLitRegionMode(mode) {
 }
 
 let litCirclePicking = false;
+// 2026-11-08: Merkez seçimi deprem işaretinin üstünde de çalışır. Önceden map.once('click') kullanılıyordu;
+// deprem işaretine tıklanınca işaretin açılır penceresi tıklamayı durdurduğu için harita olayı hiç gelmiyor,
+// merkez yalnız boş alanda seçilebiliyordu. Şimdi tıklama, işaretlerden ÖNCE (yakalama aşamasında) alınır.
+// Tıklanan noktaya ≤ LIT_SNAP_PX piksel yakın bir DEPREM varsa merkez tam onun dış merkezine yapıştırılır
+// (yalnız sitenin deprem listelerindeki konumlar: events, liveEvents, regionEvents — istasyon vb. işaretler hariç).
+// Sürükleme tıklama sayılmaz; Esc seçimi iptal eder.
+const LIT_SNAP_PX = 10;
+function litNearestQuake(cp) {
+  const keys = new Set();
+  for (const arr of [events, liveEvents, (typeof regionEvents !== 'undefined' ? regionEvents : [])])
+    for (const e of arr || []) if (e && isFinite(e.lat) && isFinite(e.lon)) keys.add(`${(+e.lat).toFixed(4)},${(+e.lon).toFixed(4)}`);
+  let best = null;
+  map.eachLayer(l => {
+    if (!(l instanceof L.CircleMarker) || l instanceof L.Circle || !l.getLatLng) return;
+    const ll = l.getLatLng();
+    if (!keys.has(`${ll.lat.toFixed(4)},${ll.lng.toFixed(4)}`)) return;
+    const d = map.latLngToContainerPoint(ll).distanceTo(cp);
+    if (d <= LIT_SNAP_PX && (!best || d < best.d)) best = { ll, d };
+  });
+  return best;
+}
 function litCirclePickStart() {
   if (litCirclePicking) return;
   litCirclePicking = true;
   document.getElementById('btnLitCirclePick').classList.add('active');
-  map.getContainer().style.cursor = 'crosshair';
-  map.once('click', (ev) => {
-    document.getElementById('litCircleLat').value = ev.latlng.lat.toFixed(4);
-    document.getElementById('litCircleLon').value = ev.latlng.lng.toFixed(4);
+  const el = map.getContainer();
+  el.style.cursor = 'crosshair';
+  let down = null;
+  const onDown = e => { down = [e.clientX, e.clientY]; };
+  const onKey = e => { if (e.key === 'Escape') { finish(); setStatus('Merkez seçimi iptal edildi'); } };
+  const onClick = e => {
+    if (e.target.closest && e.target.closest('.leaflet-control, .leaflet-popup')) return;   // denetimler normal çalışır
+    if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;           // sürükleme
+    e.stopPropagation(); e.preventDefault();                                                // işaretin açılır penceresi açılmasın
+    const cp = map.mouseEventToContainerPoint(e);
+    const snap = litNearestQuake(cp);
+    const ll = snap ? snap.ll : map.containerPointToLatLng(cp);
+    document.getElementById('litCircleLat').value = ll.lat.toFixed(4);
+    document.getElementById('litCircleLon').value = ll.lng.toFixed(4);
+    finish();
+    drawLitRegionCircle();
+    if (snap) setStatus(`Merkez depremin dış merkezine yapıştırıldı (${ll.lat.toFixed(4)}°, ${ll.lng.toFixed(4)}°)`);
+  };
+  function finish() {
     litCirclePicking = false;
     document.getElementById('btnLitCirclePick').classList.remove('active');
-    map.getContainer().style.cursor = '';
-    drawLitRegionCircle();
-  });
+    el.style.cursor = '';
+    el.removeEventListener('pointerdown', onDown, true);
+    el.removeEventListener('click', onClick, true);
+    document.removeEventListener('keydown', onKey);
+  }
+  el.addEventListener('pointerdown', onDown, true);
+  el.addEventListener('click', onClick, true);
+  document.addEventListener('keydown', onKey);
 }
 
 function drawLitRegionCircle() {
