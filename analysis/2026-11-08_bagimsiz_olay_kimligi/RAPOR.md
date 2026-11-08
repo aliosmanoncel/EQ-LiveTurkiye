@@ -573,3 +573,57 @@ Sınıf katkıları (tümü, Mc 3,2): 3,2–3,5 **+0,361**; 3,5–4,0 −0,047; 
 - Bölge, katalog ve büyüklük ölçeği farklı. GK74 burada yalnız ileri pencere kullanıyor; Mizrahi vd.'nin pencere yöntemi öncüleri de işaretliyor.
 - Reasenberg parametreleri farklı. Sayısal karşılaştırma niteliksel düzeydedir.
 - M ≥ 6'da N 14–23; r(m) ve CCFF kuyruğu sayım gürültüsü taşıyor.
+
+---
+
+# 8. tur — Reasenberg parametre duyarlılığı: Mizrahi vd. (2021) ayarları (`rb_parametre_duyarlilik.py`, `rb_parametre_sonuc.json`, `fig_rb_parametre.png`)
+
+**Soru:** 7. turda Reasenberg Türkiye'de b'yi yükseltti (Kaliforniya'da düşürüyordu). Bu fark parametre seçiminden mi geliyor (7. tur sonrası OUT 1 hipotezi)?
+
+## Ayarlar
+
+- **Kaynak:** Mizrahi vd. (2021), Tablo S1 ve Metin S3 (arXiv:2012.09053).
+- **Standart değerler:** τ_min 1,0 · τ_max 10,0 · x_k 0,5 · p 0,95 · r_fact 10 · xm_eff = Mc.
+  - EQ-Live sabit kodu (v0.3.0) bu değerlerle **aynı**. Tek farklar xm_eff (3,0 ↔ Mc) ve etkileşim bağıntısı.
+- **Aralıklar:**
+  - τ_min: 0,5–2,5
+  - τ_max: 3–15
+  - x_k: 0–1
+  - p: 0,75–0,95
+  - r_fact: 5–20
+- **Etkileşim bağıntısı:** Reasenberg (1985), r = 0,011·10^(0,4M); ya da Wells & Coppersmith (1994) tabanlı 0,01·10^(0,5M).
+  - W&C bağıntısı sabit kodda yok. Yalnız deney süresince geçici olarak bağlandı; `reasenberg.py` değişmedi (sha `c5b1248a…` koşu sonunda denetlendi).
+  - Bu bir araştırma deneyidir; sitenin yöntemi değildir.
+- **Deney:** Türkiye 30 km, H0 (Mc 3,2): her bağıntı için 2 standart + 22 tek-parametre (OAT) + 60 rastgele kombinasyon, toplam 168 koşu. H2+A (Mc 3,3): 4 standart koşu.
+
+## Sonuç
+
+| | N (M ≥ Mc) | b − b_tam | k_RB |
+|---|---|---|---|
+| H0 standart, Reasenberg (1985), xm_eff 3,0 / Mc | 18 257 / 18 210 | +0,066 / +0,067 | −0,061 |
+| H0 standart, W&C (1994), xm_eff 3,0 / Mc | 14 695 / 14 662 | +0,060 / +0,062 | −0,052 / −0,053 |
+| H0, Reasenberg (1985), tüm 84 koşu | 14 701–22 696 | **+0,032 … +0,069** (medyan +0,055) | −0,063 … −0,030 |
+| H0, W&C (1994), tüm 84 koşu | 12 582–20 117 | **+0,024 … +0,088** (medyan +0,058) | −0,080 … −0,019 |
+| H2+A standart, Reasenberg / W&C | 17 590 / 14 349 | +0,082 / +0,069 | −0,060 / −0,046 |
+| Karşılaştırma: GK74 (H0) | 9 682 | −0,064 | +0,067 |
+
+- **En etkili parametreler (OAT):** r_fact (W&C'de +0,037 … +0,084) ve x_k (+0,044 … +0,069).
+- **Etkisiz parametreler:** τ_min, τ_max ve p, farkı yalnız ±0,01 değiştiriyor.
+
+## Cevap
+
+- **Parametre hipotezi reddedildi.** 172 koşunun **hiçbirinde** Reasenberg b'yi tam kataloğun altına indirmiyor. Hepsinde b_RB − b_tam > 0 ve k_RB < 0. Bu, iki etkileşim bağıntısı, xm_eff = Mc ve iki büyüklük ölçeği için geçerli.
+- Mizrahi vd.'nin standart ayarı burada standart sonucu yeniden üretmiyor. Türkiye'deki ters yön Reasenberg parametrelerinden kaynaklanmıyor.
+- **Agresiflik eğilimi:** Mizrahi vd. "daha çok ayıklama ile daha düşük b" eğilimini bildiriyor. Reasenberg koşuları içinde benzer bir eğilim var: W&C ile N azaldıkça b tam kataloğa yaklaşıyor (Şekil a). Ancak hiçbir koşu b_tam'a ulaşmıyor. GK74 (N 9 682) ise ayrı bir noktada duruyor.
+- **Geriye kalan açıklamalar:**
+  - Katalog ve ölçek: 5. turda KOERI Md zinciriyle md döneminde k_RB ≈ 0 çıkmıştı.
+  - Bölgenin dizi yapısı.
+  - Katalogdaki büyüklük türü atama örüntüsü: büyük olaylar mb/Mw, küçükler ML/Md.
+  - Bunlar bu çalışmada ayrıştırılmadı.
+- **Raporun ana sonucu değişmiyor:** Δb = b_RB − b_GK74 > 0, yöntem seçimine bağlı istatistiksel bir katalog seçimi etkisidir. Bu turda Reasenberg tarafı da parametre aralığı boyunca +0,02 … +0,09 bandında kalıyor.
+
+## Sınırlılıklar
+
+- W&C bağıntısının yarıçapa çevrilme biçimi Metin S3'te ayrıntılı verilmiyor. Burada 0,01·10^(0,5M) değeri, sabit koddaki r_main yerine doğrudan kullanıldı (r_fact ile çarpılır). Mizrahi vd.'nin uygulamasıyla birebir aynı olmayabilir.
+- Rastgele örnekleme 60 kombinasyonla sınırlı; Mizrahi vd. daha geniş bir tarama yapıyor.
+- H2+A ölçeğinde yalnız standart koşular yapıldı.
