@@ -183,6 +183,8 @@
     .regionCtrl-toggle{color:#555;font-size:.85rem;line-height:1}
     .regionCtrl-body{display:flex;flex-direction:column;gap:6px;margin-top:6px}
     .regionCtrl-body.hidden{display:none}
+    /* 2026-11-08: gövde ekran içinde kalır (max-height JS ile: layoutRegionPanels), fazlası panel içinde kaydırılır */
+    .regionCtrl-body{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable;padding-right:2px}
     .regionCtrl .tbtn{background:rgba(20,20,20,.9);width:210px;text-align:left;font-size:.85rem;padding:8px 12px}
     .regionCtrl .rowbox{display:flex;gap:6px;align-items:center;background:rgba(20,20,20,.9);border-radius:6px;padding:7px 10px}
     .regionCtrl .rowbox label{font-size:.78rem;color:#999;white-space:nowrap}
@@ -521,7 +523,7 @@
   <div id="gkReport" role="status" aria-live="polite" style="display:none;font-size:.72rem;color:#e2e8f0;background:rgba(20,20,20,.92);border:1px solid #334;border-radius:6px;padding:6px 8px;width:260px;line-height:1.45"></div>
   <!-- 2026-11-08: dinamik Reasenberg (Pyodide, dondurulmuş modül, Web Worker); varsayılan KAPALI; 90 günlük geri tampon; yalnız rapor üretir (lab/reasenberg-pyodide/site_rb.mjs) -->
   <button class="tbtn" id="btnRegionRb" style="display:none" aria-pressed="false" title="Reasenberg (1985) — dinamik. Seçili bölgenin güncel kataloğunda, dondurulmuş Python modülü (v0.3.0) tarayıcıda (Pyodide, arka planda) çalışır. Önce öz-sınama ve uygunluk kapıları (sorgu sınırı, tek kaynak, Mc, olay sayısı, sınır, zaman penceresi) denetlenir; koşul sağlanmazsa hesap yapılmaz. Canlı EMSC/USGS sorgusunda pencere başından önceki 90 gün aynı bölge ve süzgeçlerle ek olarak çekilir (geri tampon; yalnız girdi, raporda sayılmaz). Parametreler sabit: zmap kuralı, τ 1–10 gün, p 0,95, x_k 0,5, r_fact 10; xmeff = sitenin Mc tahmini (elle değiştirilebilir). Sonuç yalnız raporlanır; harita ve diğer analizler değişmez. Statik GK74/Reasenberg katmanından ayrıdır.">🧪 Reasenberg (dinamik): KAPALI</button>
-  <div id="rbReport" role="status" aria-live="polite" style="display:none;font-size:.72rem;color:#e2e8f0;background:rgba(20,20,20,.92);border:1px solid #334;border-radius:6px;padding:6px 8px;width:260px;line-height:1.45"></div>
+  <div id="rbReport" role="status" aria-live="polite" style="display:none;font-size:.78rem;color:#e2e8f0;background:rgba(20,20,20,.92);border:1px solid #334;border-radius:6px;padding:7px 9px;width:260px;line-height:1.5"></div>
   <label id="regionDeclusterCtxRow" style="display:none;align-items:center;gap:6px;font-size:.72rem;color:#ccc;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;cursor:pointer;width:260px" title="Bağlamlı GK74 (yalnız Daire modu; EMSC/USGS canlı ve Tarihsel Katalog): daire dışındaki olaylar taramaya bağlam olarak katılır — dar halka R+30 km (M ≥ sorgu alt eşiği), geniş halka R+90 km (M ≥ 4), başlangıçtan 1100 gün önce. Bağlam olayları pencere açabilir ama sonuca girmez. Tüm katalog üzerinde uygulanan GK74 ile aynı sonucu verir; M ≥ 7 bir kırığın uç bölgesinde artçılar eksik ayıklanabilir (episantr uzaklığı).">
     <input type="checkbox" id="regionDeclusterCtx" onchange="onRegionDeclusterCtxChange()">
     Daire dışı ana şokları dahil et (bağlamlı GK74)
@@ -8463,7 +8465,8 @@ function makeDraggablePanel(panel, header, setWasDragged) {
     dragging = false;
     header.classList.remove('dragging');
     header.releasePointerCapture(e.pointerId);
-    if (moved) setWasDragged(); // hemen ardından gelecek click'i panelin toggle'ı yutsun
+    if (moved) { setWasDragged(); panel.dataset.userMoved = '1'; } // hemen ardından gelecek click'i panelin toggle'ı yutsun
+    if (typeof layoutRegionPanels === 'function') layoutRegionPanels();
   });
 }
 
@@ -8696,6 +8699,72 @@ function makeDraggablePanel(panel, header, setWasDragged) {
       if (isLit) litRegionCtrlWasDragged = true; else regionCtrlWasDragged = true;
     });
   });
+})();
+
+/* 2026-11-08 — Bölge Analizi / Araştırma Bölgesi panellerinin ekran içi yerleşimi.
+   (1) Açık gövde, ekranın altındaki durum çubuğuna kadar uzar; fazlası panel İÇİNDE kaydırılır (önceden
+       Reasenberg raporu vb. ekranın altına taşıyor, okunamıyordu).
+   (2) İki panel alt alta dizildiğinde (CSS'te aynı sol konum; dizüstü genişlikleri) akordiyon gibi davranır:
+       biri açılınca öteki kapanır ve Araştırma Bölgesi başlığı Bölge Analizi'nin hemen altında kalır
+       (önceden açık gövde öteki panelin başlığının ve gövdesinin üstüne biniyordu).
+   Kullanıcının elle sürüklediği panellere ve mobil yığına (#mDock) karışılmaz. */
+function layoutRegionPanels() {
+  const rc = document.querySelector('.regionCtrl:not(.litRegionCtrl)'), lit = document.querySelector('.litRegionCtrl');
+  const rcB = document.getElementById('rcBody'), litB = document.getElementById('lrcBody');
+  if (!rc || !lit || !rcB || !litB) return;
+  const docked = p => p.closest('#mDock');
+  const sbar = document.querySelector('.sbar');
+  const sb = sbar && sbar.getClientRects().length ? sbar.getBoundingClientRect() : null;   // position:fixed → offsetParent hep null; görünürlük getClientRects ile
+  const bottom = sb && sb.top > 0 && sb.top < window.innerHeight ? sb.top : window.innerHeight;
+  const stacked = !docked(rc) && !docked(lit) && !rc.dataset.userMoved && !lit.dataset.userMoved
+    && getComputedStyle(rc).left === (lit.style.left || getComputedStyle(lit).left);
+  if (!lit.dataset.userMoved && !docked(lit)) lit.style.top = '';
+  if (stacked) {
+    const rcHead = rc.querySelector('.regionCtrl-header'), litHead = lit.querySelector('.regionCtrl-header');
+    const gap = 6;
+    const rcBottom = rcB.classList.contains('hidden') ? rcHead.getBoundingClientRect().bottom : null;
+    if (rcBottom !== null) lit.style.top = (rcBottom + gap) + 'px';
+    if (!rcB.classList.contains('hidden')) {
+      // Bölge Analizi açık: gövdesi, altındaki Araştırma Bölgesi başlığına yer bırakacak kadar uzar
+      const top = rcB.getBoundingClientRect().top;
+      const lgb = (() => { const lg = document.querySelector('.legend'); if (!lg || lg.closest('#mDock') || !lg.getClientRects().length) return bottom;
+        const g = lg.getBoundingClientRect(), r = rcB.getBoundingClientRect(); return (g.left < r.right && g.right > r.left && g.top > top) ? Math.min(bottom, g.top) : bottom; })();
+      const maxH = Math.max(140, Math.floor(lgb - top - litHead.offsetHeight - 3 * gap));
+      rcB.style.maxHeight = maxH + 'px';
+      lit.style.top = (top + Math.min(rcB.scrollHeight, maxH) + gap) + 'px';
+    } else rcB.style.maxHeight = '';
+  }
+  // Sol alttaki Legend kutusu panelle yatayda çakışıyorsa onun üstünde dur
+  const legendTop = r => { const lg = document.querySelector('.legend'); if (!lg || lg.closest('#mDock') || !lg.getClientRects().length) return bottom;
+    const g = lg.getBoundingClientRect(); return (g.left < r.right && g.right > r.left && g.top > r.top) ? Math.min(bottom, g.top) : bottom; };
+  for (const [p, b] of [[rc, rcB], [lit, litB]]) {
+    if (docked(p) || b.classList.contains('hidden')) { if (!stacked || b === litB) b.style.maxHeight = ''; continue; }
+    if (stacked && b === rcB) continue;               // yukarıda ayarlandı
+    const r = b.getBoundingClientRect();
+    b.style.maxHeight = Math.max(140, Math.floor(legendTop(r) - r.top - 8)) + 'px';
+  }
+}
+(function initRegionPanelLayout() {
+  const rc = document.querySelector('.regionCtrl:not(.litRegionCtrl)'), lit = document.querySelector('.litRegionCtrl');
+  const rcB = document.getElementById('rcBody'), litB = document.getElementById('lrcBody');
+  if (!rc || !lit || !rcB || !litB) return;
+  let raf = 0; const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; layoutRegionPanels(); }); };
+  const stackedNow = () => !rc.closest('#mDock') && !lit.closest('#mDock') && !rc.dataset.userMoved && !lit.dataset.userMoved
+    && getComputedStyle(rc).left === getComputedStyle(lit).left;
+  // Akordiyon: alt alta dizilişte bir gövde açılınca öteki kapanır (hangi yoldan açılırsa açılsın: tık, link, sorgu)
+  const accordion = (opened, other, toggleId) => () => {
+    if (opened.classList.contains('hidden') || other.classList.contains('hidden') || !stackedNow()) return;
+    other.classList.add('hidden'); const t = document.getElementById(toggleId); if (t) t.textContent = '▼';
+  };
+  new MutationObserver(() => { accordion(rcB, litB, 'lrcToggle')(); schedule(); }).observe(rcB, { attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(() => { accordion(litB, rcB, 'rcToggle')(); schedule(); }).observe(litB, { attributes: true, attributeFilter: ['class'] });
+  // İçerik büyüyünce (bölge bilgisi, GK74, Reasenberg raporu) ve pencere değişince yeniden yerleştir
+  // Gövdenin KENDİ style'ı (max-height) bu fonksiyonca yazılır; döngü olmasın diye yalnız iç öğelerin değişimi izlenir
+  const inner = body => muts => { if (muts.some(m => m.target !== body)) schedule(); };
+  new MutationObserver(inner(rcB)).observe(rcB, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+  new MutationObserver(inner(litB)).observe(litB, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+  window.addEventListener('resize', schedule);
+  schedule();
 })();
 
 // Zaman/eşik filtreleme mantığına (hours, minMag vb.) dokunmaz -- eqMarkerList

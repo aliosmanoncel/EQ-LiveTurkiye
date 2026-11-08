@@ -201,28 +201,41 @@ function cmpHtml(cmp, gkReady) {
     `<div style="color:#888">Yöntem farkı: GK74 burada yalnız artçı ayıklar (öncüler kalır), episantral mesafe${cmp.ctx ? ', bağlamlı' : ''}; Reasenberg öncüleri de kümeye katar, hiposantral mesafe. Hiçbir yöntem doğru kabul edilmez; farklar karşılaştırmanın verisidir.</div></div>`;
 }
 
+// Kapının kısa adı ve kullanıcıya önerisi (düğmede ve özet satırında; ayrıntı "Uygunluk kapıları" altında)
+const GATE_HINT = { K0: 'öz-sınama geçmedi', K1: 'sorgu sınırına takıldı — Limit\'i artırın', K2: 'birden çok kaynak', K3: 'geçersiz alanlar %5\'i aşıyor',
+  K4: 'yinelenen kayıt', K5: 'Mc tahmin edilemedi ya da xmeff Mc\'nin altında', K6: 'M ≥ xmeff olay sayısı 50\'nin altında — dönemi/bölgeyi genişletin' };
+
 function render(g, res, ms, inp, cmp, gkReady, buf) {
   const col = { ELIGIBLE: '#4ade80', WARNING: '#fbbf24', OFF: '#f87171' }[g.state];
   const icon = { ELIGIBLE: '✅', WARNING: '⚠', OFF: '⛔' }[g.state];
   const rows = g.checks.map(c => `<tr><td style="white-space:nowrap;vertical-align:top">${c.id}</td><td style="color:${{ pass: '#4ade80', warn: '#fbbf24', fail: '#f87171' }[c.status]};vertical-align:top">${{ pass: '✓', warn: '!', fail: '✗' }[c.status]}</td><td>${esc(c.label)}: ${esc(c.detail)}</td></tr>`).join('');
-  const mcLine = `Mc (tahmin, ${esc(inp.mcEst.method)}) <b>${inp.mcEst.mc ?? '—'}</b> · xmeff (${inp.xFromUser ? 'kullanıcı seçimi' : 'tahminden'}) <b>${Number.isFinite(inp.xmeff) ? inp.xmeff.toFixed(2) : '—'}</b>`;
-  let body = '';
+  const fails = g.checks.filter(c => c.status === 'fail'), warns = g.checks.filter(c => c.status === 'warn');
+  const mcLine = `Mc ${inp.mcEst.mc ?? '—'} · xmeff <b>${Number.isFinite(inp.xmeff) ? inp.xmeff.toFixed(2) : '—'}</b> <span style="color:#888">(${inp.xFromUser ? 'kullanıcı' : 'Mc tahmini'})</span>` +
+    ` <label style="display:inline-flex;gap:4px;align-items:center">· değiştir <input id="rbXmeff" type="number" step="0.1" value="${inp.xFromUser ? inp.xmeff : ''}" placeholder="= Mc" style="width:54px;background:#111;color:#ddd;border:1px solid #444;border-radius:4px;padding:1px 4px"></label>`;
+  let summary = '', more = '';
   if (res) {
     const c = k => res.event_class.filter(x => x === k).length;
     const n = res.ids.length, dep = c('dependent');
     setBtn(`${icon} Reasenberg ${STATE_LABEL[g.state]} · ${f(n)} → ${f(n - dep)} bağımsız`, g.state === 'ELIGIBLE' ? 'gkOn' : 'gkWarn');
-    body = `Toplam <b>${f(n)}</b> olay → bağımsız <b>${f(n - dep)}</b> (tekil ${f(c('single'))} + temsilci ${f(c('representative'))}) · bağımlı <b>${f(dep)}</b> (%${n ? (100 * dep / n).toFixed(0) : 0}) · küme <b>${f(res.n_clusters)}</b><br>` +
-      `<span style="color:#888">Geri tampon: ${buf && buf.days ? `${f(buf.n)} olay, ${buf.days} gün${buf.capped ? ' (sorgu sınırına takıldı)' : ''} — yalnız girdi, raporda sayılmaz` : esc(buf?.reason || 'yok')}</span><br>` +
-      `<span style="color:#888">Süre ${Math.round(ms)} ms${S.worker ? ' (arka planda)' : ''} · kural zmap · modül ${esc(S.meta.module_version)} (sha256 ${esc(S.meta.sha256.slice(0, 10))}…) · Pyodide ${esc(S.meta.python ? '0.27.7' : '')}</span><br>` +
+    const agree = cmp ? ` · GK74 ile uyum %${cmp.n ? (100 * (cmp.cat.both_indep + cmp.cat.both_dep) / cmp.n).toFixed(0) : 0}` : '';
+    summary = `<div style="font-size:.86rem;margin:3px 0"><b>${f(n)}</b> olay → <b style="color:#4ade80">${f(n - dep)}</b> bağımsız</div>` +
+      `<div>bağımlı ${f(dep)} (%${n ? (100 * dep / n).toFixed(0) : 0}) · küme ${f(res.n_clusters)}${agree}</div>` +
+      (warns.length ? `<div style="color:#fbbf24">Uyarı: ${warns.map(w => w.id + ' ' + esc(w.label.toLowerCase())).join(', ')}</div>` : '');
+    more = `Tekil ${f(c('single'))} + küme temsilcisi ${f(c('representative'))}.<br>` +
+      `<span style="color:#9ab0c5">Geri tampon: ${buf && buf.days ? `${f(buf.n)} olay, ${buf.days} gün${buf.capped ? ' (sorgu sınırına takıldı)' : ''} — yalnız girdi, raporda sayılmaz` : esc(buf?.reason || 'yok')}</span><br>` +
+      `<span style="color:#888">Süre ${Math.round(ms)} ms${S.worker ? ' (arka planda)' : ''} · kural zmap · modül ${esc(S.meta.module_version)} (sha256 ${esc(S.meta.sha256.slice(0, 10))}…) · Pyodide 0.27.7</span><br>` +
       `<span style="color:#9ab0c5">Sonuç yalnız raporlanır: harita, GK74 ve diğer analizler değişmez. Çalıştırılabilmesi, sonucun bilimsel olarak yorumlanabilir olduğu anlamına gelmez; sonuç bölgeye, döneme, kaynağa ve xmeff'e koşulludur.</span>` +
       cmpHtml(cmp, gkReady);
   } else {
-    setBtn('⛔ Reasenberg: KAPALI (koşul sağlanmadı)', 'gkWarn');
-    body = `<span style="color:#f87171">Hesap yapılmadı.</span> Koşul sağlanınca (ör. sorgu sınırını artırınca) kendiliğinden yeniden çalışır.`;
+    const why = fails.map(c => GATE_HINT[c.id] || c.label).join('; ');
+    setBtn(`⛔ Reasenberg KAPALI: ${fails[0] ? (GATE_HINT[fails[0].id] || fails[0].label).split(' — ')[0] : 'koşul sağlanmadı'}`, 'gkWarn');
+    summary = `<div style="color:#f87171;margin:3px 0"><b>Hesap yapılmadı.</b> ${esc(why)}.</div>` +
+      `<div style="color:#9ab0c5">Koşul sağlanınca kendiliğinden yeniden çalışır.</div>`;
   }
-  report(`<b style="color:${col}">${icon} Reasenberg (dinamik): ${STATE_LABEL[g.state]}</b><br>${mcLine}<br>` +
-    `<label style="display:inline-flex;gap:4px;align-items:center;margin:3px 0">xmeff (seçim) <input id="rbXmeff" type="number" step="0.1" value="${inp.xFromUser ? inp.xmeff : ''}" placeholder="= Mc" style="width:58px;background:#111;color:#ddd;border:1px solid #444;border-radius:4px;padding:1px 4px"></label><br>` +
-    body + `<details style="margin-top:3px"><summary style="cursor:pointer;color:#9ab0c5">Uygunluk kapıları (${g.checks.filter(c => c.status !== 'pass').length} uyarı/engel)</summary><table style="font-size:.68rem;border-collapse:collapse">${rows}</table>` +
+  report(`<b style="color:${col}">${icon} Reasenberg (dinamik): ${STATE_LABEL[g.state]}</b>` + summary +
+    `<div style="margin-top:3px">${mcLine}</div>` +
+    (more ? `<details style="margin-top:4px"><summary style="cursor:pointer;color:#9ab0c5">Ayrıntılar ve GK74 karşılaştırması</summary>${more}</details>` : '') +
+    `<details style="margin-top:3px"><summary style="cursor:pointer;color:#9ab0c5">Uygunluk kapıları (${fails.length + warns.length} uyarı/engel)</summary><table style="font-size:.72rem;border-collapse:collapse">${rows}</table>` +
     `<div style="color:#888;margin-top:3px">Öz-sınama: ${S.selfTest.rows.map(r => `${r.name} ${r.same ? '✓' : '✗'}`).join(' · ')}</div></details>`);
   const x = $('rbXmeff'); if (x) x.onchange = () => evaluate(true);
 }
@@ -231,6 +244,7 @@ async function toggle() {
   S.on = !S.on;
   if (!S.on) { setBtn('🧪 Reasenberg (dinamik): KAPALI'); const r = $('rbReport'); if (r) r.style.display = 'none'; return; }
   await evaluate(true);
+  const r = $('rbReport'); if (r && r.style.display !== 'none') r.scrollIntoView({ block: 'nearest', behavior: 'smooth' });   // panel içinde görünür alana getir
 }
 
 function init() {
