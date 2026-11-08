@@ -442,3 +442,79 @@ Sınıf katkıları (tümü, Mc 3,2): 3,2–3,5 **+0,361**; 3,5–4,0 −0,047; 
 ## Sonraki adım (onay sonrası)
 
 - **DOUBLET adaylarının literatürle karşılaştırılması** (5. aşama).
+
+---
+
+# 6. tur (beşinci aşama) — DOUBLET adaylarının literatürle karşılaştırılması (`doublet_literatur.py`, `doublet_literatur.json/.csv`)
+
+**Soru:** Zaman ve mekânda birbirine yakın büyük deprem çiftlerini GK74 ve Reasenberg nasıl sınıflıyor? Bu sınıflar literatürdeki yorumla örtüşüyor mu?
+
+## Gelen yorum (Gemini, 5. tur değerlendirmesi) — IN / OUT
+
+- **IN:** 5. tur bulgularının ve tür tabanı düzeltmesinin kabulü; 5. aşamaya geçiş.
+- **OUT (düzeltme):** "Ölçekten bağımsız değişmezler hipotezi tamamen doğruluyor" ifadesi fazla güçlü. Gösterilen şu: Δb > 0 ve k_GK74 > 0, sınanan beş dönüşüm varyantında korunuyor. Hangi yöntemin doğru olduğu ve sınanmamış bağıntılarda ne olacağı açık kalıyor.
+- **OUT (düzeltme):** Md ≥ 4 boşluğu "sitedeki genel b-değeri hesaplamalarını" değil, yalnız Time-Mag panelinde **KOERI Md zinciri** seçeneği seçildiğinde yapılan b hesaplarını etkiler. Varsayılan seçenek ("Original / None") ve diğer dönüşümler etkilenmez.
+
+## Yöntem
+
+- **Aday kuralı** (1. turla aynı; literatür tanımı değildir): iki olay M ≥ 6, |ΔM| ≤ 0,5, Δt ≤ 365 gün, Δd ≤ 150 km.
+- **Ölçek:** Kural iki ölçekte uygulandı: ham EMSC (H0) ve H2 + otoriter Mw. İki ölçek **aynı 9 çifti** veriyor. İzmit–Düzce homojen ölçekte Mw 7,6/7,2 ile giriyor.
+- **Her çift için kaydedilenler:**
+  - GK74 sınıfı ve gerekçesi: 2. olay 1. olayın penceresinde mi? (Δt ≤ T(M1), Δd ≤ D(M1), M2 < M1).
+  - Reasenberg sınıfı ve iki olayın aynı kümede olup olmadığı.
+  - Literatür sınıfı ve kaynağı. Kaynak hakemli değilse bu ayrıca belirtildi.
+- **Mekanizma notu, Reasenberg (zmap kuralı, sabit kod v0.3.0):**
+  - Uzak bağ ancak kümenin en büyük olayından sonra τ ≤ 10 gün içinde ve d ≤ 10·0,011·10^(0,4M) mesafesinde kurulur. Bu mesafe M 7,8 için 145 km, Mw 7,6 için 121 km, mb 6,3 için 36 km.
+  - Küçük küme üyeleri yalnız kendi küçük yarıçaplarıyla bağ kurar.
+- **Mekanizma notu, GK74:**
+  - Pencere yalnız ileriye doğrudur ve episantır mesafesiyle ölçülür: D(7,8) = 89 km, D(7,6) = 84 km.
+  - Eşit ya da daha büyük olay hiçbir zaman artçı sayılmaz.
+- **Kırılma uzunluğu ile karşılaştırma:** Wells & Coppersmith (1994) doğrultu atımlı yüzey kırığı ölçeklemesiyle (log SRL = −3,55 + 0,74 Mw) Mw 7,8 için ~170 km, Mw 7,6 için ~120 km. İki yöntemin pencere yarıçapları bunun altında; iki yöntem de olayı nokta kaynak olarak ele alıyor.
+
+## Karşılaştırma
+
+| # | Çift (EMSC) | Δt | Δd (episantır) | Literatür | GK74 (2. olay) | Reasenberg (2. olay) | Uyum |
+|---|---|---|---|---|---|---|---|
+| 1 | 1999-08-17 İzmit → 1999-11-12 Düzce | 87,7 g | 103,6 km | **Tetiklenmiş**: İzmit'in Coulomb gerilme artışıyla (Çakır, Barka & Evren 2003) | bağımsız (Δd > D: 84 km Mw / 58 km mb) | bağımsız (Δt > τ_max 10 g) | **İkisi de ayırmıyor** |
+| 2 | 2012-08-11 Ahar → Varzaghan | 11 dk | 9,4 km | **Doublet**: iki ana şok, 11 dk arayla, ~10 km (2012 East Azerbaijan; ISC-EHB/GCMT) | artçı | bağımlı, aynı küme | İkisi de 2. olayı bağımlı sayıyor; fiziksel iki ana şok tek olaya iniyor (tanım farkı) |
+| 3 | 2018-08-25 Batı İran M6,1 → 2018-11-25 Sarpol-e Zahab M6,3 | 91,8 g | 60,8 km | İkisi de 2017 Mw 7,3'ün **tetiklemiş olabileceği** olaylar; aralarında doğrudan ilişki öne sürülmüyor (Jamalreyhani vd., EGU2020 özeti, hakemli değil) | ikisi de **2017'nin artçısı** (47 ve 53 km < D(7,3) = 77 km) | ikisi de temsilci, yani bağımsız | **Yöntemler ayrışıyor**; literatür GK74'e yakın ama kesin değil |
+| 4 | 2021-09-27 Arkalochori M6,0 → 2021-10-12 Doğu Girit M6,4 | 15,1 g | 95,9 km | **Bağımsız**: farklı yapılar; "doğrudan ilişkili değil" (Yunan sismologları, basın kaynaklı; hakemli kaynak bulunamadı) | bağımsız | bağımsız | ✓ |
+| 5 | 2023-02-06 Pazarcık M7,8 → Elbistan M7,5/7,6 | 9,1 sa | 105,5 km | **Tetiklenmiş doublet**: statik Coulomb yüklemesi; ~9 sa sonra, ~95 km kuzeyde (Xu vd. 2026, GRL; Ren vd. 2024, Science) | **bağımsız** (Δd 105,5 > D(7,8) 89 km) | **bağımlı**, aynı küme (≤ 145 km, τ içinde) | **Yöntemler ayrışıyor**; RB literatürdeki tetiklenme yorumuyla örtüşüyor, GK74 iki ayrı ana şok sayıyor |
+| 6 | 2023-02-06 01:28 M6,7 → 2023-02-20 Hatay M6,3/6,4 | 14,6 g | 128,8 km (Pazarcık'a 146,8 km) | **Aynı dizinin parçası**: bağlantılı segmentlerde gerilme tetiklemesi, Samandağ–Antakya segmenti (Yolsal-Çevikbilen vd. 2024, G-Cubed) | bağımsız (Pazarcık'a 146,8 km > 89 km) | bağımsız (146,8 km > 145 km ve Δt > τ) | **İkisi de ayırmıyor**; Pazarcık kırığının güney ucunda olmasına karşın |
+| 7 | 2023-02-06 10:26 M6,0 → 12:02 M6,0 | 1,6 sa | 130,5 km | Elbistan dizisi içindeki olaylar: Elbistan episantırına 64 ve 68 km (özel bir sınıflandırma çalışması bulunamadı) | ikisi de artçı | ikisi de bağımlı | ✓ (kaynak zayıf) |
+| 8 | 2025-05-13 Kasos M6,0 → 2025-05-22 Girit M6,1/6,2 | 8,2 g | 115,9 km | 13 Mayıs olayı **yalıtık**, ~64 km derinlikte (Lekkas, basın; hakemli kaynak bulunamadı) | bağımsız | bağımsız | ✓ (kaynak zayıf) |
+| 9 | 2025-08-10 Sındırgı Mw 6,1 → 2025-10-27 Mw 6,0 | 78,1 g | 17,5 km | **Aynı alanda ikinci büyük olay**, tek dizi olarak ele alınıyor (USGS ComCat; hakemli sınıflandırma henüz bulunamadı) | artçı (566 g / 55 km penceresinde) | bağımlı, aynı küme | ✓ |
+
+## Cevap
+
+- **Yakın çiftlerde (≤ ~70 km) iki yöntem de literatürle uyumlu:** Ahar–Varzaghan, Sındırgı, Elbistan dizisi M6,0'ları. Bağımsız kabul edilen uzak çiftlerde de uyumlular: Girit 2021, Kasos/Girit 2025.
+- **Ayrışma ve başarısızlık büyük (M ≥ 7) olayların uzun kırıklarında ortaya çıkıyor.** Nedeni, iki yöntemin de nokta kaynak (episantır) mesafesi kullanması:
+  - **İzmit → Düzce** (literatür: tetiklenmiş). İkisi de bağımsız sayıyor: Δd 104 km GK74 penceresinin dışında; 88 günlük gecikme Reasenberg'in τ ≤ 10 gün sınırının dışında.
+  - **Pazarcık → Elbistan** (literatür: tetiklenmiş doublet). GK74 bağımsız, RB bağımlı sayıyor. Bu tek çift, M ≥ 7 sayımında iki katalog arasındaki farkın ana kaynağı (1. ve 2. tur).
+  - **Pazarcık → Hatay 20 Şubat** (literatür: aynı dizi). İkisi de bağımsız sayıyor. Episantır mesafesi 146,8 km; ancak olay ~350 km'lik Pazarcık kırığının güney ucunda.
+- **İran 2018:** GK74 iki olayı da 2017 Mw 7,3'ün artçısı sayıyor; RB ikisini de bağımsız sayıyor. Literatür tetiklenmeyi yalnız olasılık olarak veriyor (hakemli olmayan bir özet); karar verilemiyor.
+- **"Doublet" ile "bağımlı olay" aynı şey değil:**
+  - Literatürde doublet, iki ayrı ana şok (ayrı fay ya da segment kırığı) anlamına gelir (Kagan & Jackson 1999).
+  - Ayrıştırmada ise ikinci olay, birincisiyle tetiklendiyse Poisson bağımsızlığı varsayımı gereği "bağımlı"dır.
+  - Bu nedenle "doğru sınıf" analizin amacına bağlı. Poisson oranı (tehlike) için ikinci olay bağımlıdır. Ana şok sayımı ya da fay bazlı hesap için ise iki ana şok vardır.
+  - Bu, iki katalogdan birinin "doğru" olarak seçilemeyeceği sonucunu (1.–5. turlar) destekliyor. Yöntem farkı, raporlanan bir belirsizlik bileşenidir.
+- **Δb ile ilişkisi:** Bu çiftler M ≥ 6 kuyruğundaki yaklaşık 9–12 olayı etkiliyor. Δb'yi belirleyen M 3,2–5 aralığına katkıları ihmal edilebilir. Etkileri asıl olarak M ≥ 6/7 Poisson oranlarında ve "bağımsız olay" listesinde görülüyor.
+
+## Sınırlılıklar
+
+- Literatür kaynaklarının bir kısmı hakemli değil: basın, EGU özeti, USGS ya da Wikipedia sayfası. Bu satırlar tabloda işaretli. 2025 olayları için hakemli sınıflandırma henüz bulunamadı.
+- Literatür sınıfları çoğu kez "tetiklenmiş olabilir" düzeyinde; kesin bir bağımlılık etiketi değil.
+- Mesafeler EMSC episantırlarıyla hesaplandı. Literatürdeki mesafeler (ör. Elbistan "~95 km") farklı referans noktaları kullanıyor.
+- Aday kuralı (M ≥ 6, |ΔM| ≤ 0,5, 150 km) bazı ilişkili çiftleri dışarıda bırakabilir, örneğin 2011 Van Mw 7,1 → 9 Kasım Edremit M5,6 (ΔM büyük).
+- Kırılma uzunluğu (sonlu fay) tabanlı bir pencere bu turda **denenmedi**. Bu, ancak ayrı bir yöntem çalışması olabilir; sabit Reasenberg kodu ve GK74 değiştirilmedi.
+
+## Kaynaklar
+
+- Çakır, Z., Barka, A. A. & Evren, E. (2003). Coulomb stress interactions and the 1999 Marmara earthquakes. Turkish J. Earth Sci. 12(1), 91–103.
+- Kagan, Y. Y. & Jackson, D. D. (1999). Worldwide doublets of large shallow earthquakes. BSSA 89(5), 1147–1155.
+- Ren, C. vd. (2024). Supershear triggering and cascading fault ruptures of the 2023 Kahramanmaraş, Türkiye, earthquake doublet. Science 383, 305–311.
+- Xu, W., Sun, K., Wang, Q., Meng, G., Xie, L. & Özkan, A. (2026). Fault kinematic controls on the spatio-temporal proximity of the 2023 Mw 7.8–7.7 Türkiye earthquakes. GRL 53, e2025GL119507.
+- Yolsal-Çevikbilen, S. vd. (2024). Source geometry and rupture characteristics of the 20 February 2023 Mw 6.4 Hatay (Türkiye) earthquake at the southwest edge of the East Anatolian Fault. G-Cubed 25(10), e2023GC011353.
+- Jamalreyhani, M. vd. (2020). EGU2020-759 (özet; hakemli değil).
+- Wells, D. L. & Coppersmith, K. J. (1994). New empirical relationships among magnitude, rupture length, rupture width, rupture area, and surface displacement. BSSA 84(4), 974–1002.
+- 2012 East Azerbaijan, 2021 Lasithi ve 2025 Balıkesir depremleri: Wikipedia sayfaları ve onlarda gösterilen USGS/ISC kaynakları; 2025 Kasos: LaPresse (14.05.2025, Lekkas). Bu kaynaklar ikincil ya da basın kaynağıdır.
