@@ -518,3 +518,58 @@ Sınıf katkıları (tümü, Mc 3,2): 3,2–3,5 **+0,361**; 3,5–4,0 −0,047; 
 - Jamalreyhani, M. vd. (2020). EGU2020-759 (özet; hakemli değil).
 - Wells, D. L. & Coppersmith, K. J. (1994). New empirical relationships among magnitude, rupture length, rupture width, rupture area, and surface displacement. BSSA 84(4), 974–1002.
 - 2012 East Azerbaijan, 2021 Lasithi ve 2025 Balıkesir depremleri: Wikipedia sayfaları ve onlarda gösterilen USGS/ISC kaynakları; 2025 Kasos: LaPresse (14.05.2025, Lekkas). Bu kaynaklar ikincil ya da basın kaynağıdır.
+
+---
+
+# 7. tur — Mizrahi vd. (2021) Şekil 2 karşılığı (`mizrahi_sekil2.py`, `mizrahi_sekil2.json`, `fig_mizrahi2_H0.png`, `fig_mizrahi2_H2A.png`)
+
+**Kaynak:** Mizrahi, L., Nandan, S. & Wiemer, S. (2021). The effect of declustering on the size distribution of mainshocks. SRL 92(4), 2333–2342. Şekil 2: Kaliforniya, M ≥ 3,6.
+
+**Panel karşılığı:** Aynı dört panel Türkiye 30 km alt kümesi için üretildi:
+- (a) Kümülatif ana şok sayısı.
+- (b) Gözlenen CCFF.
+- (c) Uydurulmuş G–R doğruları.
+- (d) r(m) = N_ana(≥m)/N(≥m) ve m_x.
+
+**Ölçekler:** H0 (ham EMSC, Mc 3,2) ve H2+A (Mw, Mc 3,3).
+
+## Sonuç
+
+| | Tam | GK74 | Reasenberg |
+|---|---|---|---|
+| **H0** N (M ≥ 3,2) | 24 815 | 9 682 | 18 257 |
+| **H0** b | 1,161 ± 0,008 | 1,097 ± 0,012 | 1,227 ± 0,010 |
+| **H0** N(≥6), gözlenen / G–R | 19 / 13,9 | 15 / 8,2 | 14 / 6,7 |
+| **H0** r(6,6) | — | 0,88 | 0,75 |
+| **H0** m_x | — | 9,6 | yok (b_RB > b) |
+| **H2+A** b | 1,220 ± 0,009 | 1,134 ± 0,014 | 1,300 ± 0,012 |
+| **H2+A** N(≥6), gözlenen / G–R | 23 / 12,6 | 17 / 7,9 | 16 / 5,5 |
+| **H2+A** m_x | — | 8,4 | yok |
+
+**Mizrahi vd. Kaliforniya değerleri:** b tam 1,01, GK 0,86, Reasenberg 0,96. r(6,6) GK 0,80, RB 0,86; m_x GK 7,2, RB 7,8.
+
+## Karşılaştırma
+
+- **GK74 aynı yönde, daha zayıf:**
+  - b düşüyor, ama Δb −0,06…−0,09 (Kaliforniya'da −0,15).
+  - m_x 8,4–9,6; bölgenin olası en büyük büyüklüklerinin üstünde (Kaliforniya'da 7,2).
+- **Reasenberg ters yönde:**
+  - Kaliforniya'da b düşüyor (−0,05); burada **yükseliyor** (+0,07…+0,08).
+  - Bu nedenle m_x tanımsız: G–R yaklaşımı r̂(m) M ile azalıyor.
+  - Bu, 4. turdaki k_RB < 0 bulgusunun aynısı (H0 ve H2'de; KOERI zincirinde k_RB ≈ 0).
+  - Muhtemel nedenler:
+    - Parametreler farklı. Mizrahi vd. Wells & Coppersmith uzaysal bağıntısı ve Schorlemmer & Gerstenberger (2007) zaman aralıklarını kullanıyor; burada zmap varsayılanları (rfact 10, τ 2–10 gün) kullanıldı.
+    - Katalog ve ölçek karışık.
+    - Bölgenin dizi yapısı farklı.
+- **Panel a:** Reasenberg kümülatif eğrisinde Van 2011 ve Kahramanmaraş 2023 basamakları kalıyor. Mizrahi vd. de Kaliforniya'da Reasenberg için aynı gözlemi yapıyor ("still clearly visible"). GK74 eğrisi neredeyse doğrusal.
+- **Panel b ve c:** Üç katalogda da G–R doğrusu M ≥ 6 sayısını gözlenenin altında tahmin ediyor. Örneğin H0'da GK74 için 8,2'ye karşı 15, RB için 6,7'ye karşı 14. Bu fark Mizrahi vd.'nin vurguladığı "m_x üstünde aşırı tahmin" sorununun tersi.
+  - Kaynak, tek doğrusal G–R'nin bu karışık ölçekli katalogda kuyruğa uymaması. Ham katalog da (19'a karşı 13,9) aynı davranışı gösteriyor.
+  - Mw ölçeğinde (H2+A) CCFF M 4–5 arasında bükülüyor; mb → Mw dönüşümünün yığılması (5. tur).
+  - Sonuç: M ≥ 6 oranları için tek bir G–R uyumu yerine doğrudan sayım ve Poisson aralığı (1. ve 2. tur) daha güvenilir.
+- **Panel d:** Gözlenen r(m) M ≥ 6'da iki yöntemde de 0,7–1,0 arasında; iki katalog orada birbirine yaklaşıyor (5. tur M ≥ 5,5 güven aralıklarıyla tutarlı).
+
+## Sınırlılıklar
+
+- Bölge, katalog ve büyüklük ölçeği farklı. GK74 burada yalnız ileri pencere kullanıyor; Mizrahi vd.'nin pencere yöntemi öncüleri de işaretliyor.
+- Reasenberg parametreleri farklı. Sayısal karşılaştırma niteliksel düzeydedir.
+- M ≥ 6'da N 14–23; r(m) ve CCFF kuyruğu sayım gürültüsü taşıyor.
