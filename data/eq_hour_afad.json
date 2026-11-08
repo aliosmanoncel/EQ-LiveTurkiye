@@ -1,1 +1,1 @@
-{"generated":"2026-11-08T10:58:29Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-11-08T16:56:43Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"598592","time":"2026-11-08T16:25:17","lat":37.0795,"lon":28.19033,"dep":6.92,"mag":1.8,"mtype":"ML","mw":null,"place":"Menteşe (Muğla)","province":"Muğla","district":"Menteşe"}]}
