@@ -5,8 +5,8 @@
  "module_version": "0.3.0",
  "module_sha256": "c5b1248af557f29b4f04bf7c6ed9adfefd97c4153975a8989804b872ccf99bc9",
  "adapter_version": "reasenberg-adapter-2026-11-07",
- "load_s": 2.557,
- "ready_s": 3.141,
+ "load_s": 2.51,
+ "ready_s": 3.099,
  "fixtures": [
   {
    "fixture": "reasenberg_zmap_adiyaman_ref.json",
@@ -44,28 +44,28 @@
    "clusters": 2080
   },
   "totals_identical_to_site_product": true,
-  "seconds": 6.632
+  "seconds": 6.079
  },
  "timing": [
   {
    "n": 500,
-   "seconds": 0.072
+   "seconds": 0.068
   },
   {
    "n": 2000,
-   "seconds": 0.117
+   "seconds": 0.106
   },
   {
    "n": 5000,
-   "seconds": 0.314
+   "seconds": 0.387
   },
   {
    "n": 20000,
-   "seconds": 1.347
+   "seconds": 1.291
   },
   {
    "n": 80929,
-   "seconds": 5.971
+   "seconds": 6.059
   }
  ],
  "pass": true,

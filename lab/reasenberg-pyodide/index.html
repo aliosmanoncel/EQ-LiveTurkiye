@@ -24,7 +24,7 @@
   th { color: var(--mute); font-weight:600; }
   .s-pass { color: var(--ok); } .s-warn { color: var(--warn); } .s-fail { color: var(--bad); }
   .state { display:inline-block; padding:2px 10px; border-radius:999px; font-weight:700; font-size:.8rem; }
-  .state.ON { background:rgba(52,211,153,.15); color:var(--ok); } .state.ON_WARN { background:rgba(245,158,11,.15); color:var(--warn); } .state.OFF { background:rgba(248,113,113,.15); color:var(--bad); }
+  .state.ELIGIBLE { background:rgba(52,211,153,.15); color:var(--ok); } .state.WARNING { background:rgba(245,158,11,.15); color:var(--warn); } .state.OFF { background:rgba(248,113,113,.15); color:var(--bad); }
   code { background:#0b0e13; padding:1px 5px; border-radius:4px; }
   #log { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: .78rem; color: var(--mute); }
   @media (max-width: 600px) { input, select { width: 92px; } }
@@ -43,14 +43,15 @@
 
   <div class="box">
     <h2>1. Çalışma ortamı</h2>
-    <button class="primary" id="bLoad">Pyodide'yi yükle (~13 MB, bir kez)</button>
+    <button class="primary" id="bLoad">Pyodide'yi yükle (~17 MB, depodan; ardından öz-sınama)</button>
     <span id="envState" class="note"></span>
   </div>
 
   <div class="box">
     <h2>2. Öz-sınama: dondurulmuş referanslarla birebir karşılaştırma</h2>
     <div class="note">4 bağlam kataloğu × <code>scripts/fixtures/reasenberg_zmap_*_ref.json</code>: olay sırası, küme kimliği ve sınıf aynı olmalı (tolerans yok).</div>
-    <button id="bSelf" disabled>Öz-sınamayı çalıştır</button>
+    <div class="note">Yüklemeden sonra kendiliğinden çalışır; geçmezse dinamik hesap kapalı kalır (K0).</div>
+    <button id="bSelf" disabled>Öz-sınamayı yeniden çalıştır</button>
     <div id="selfOut"></div>
   </div>
 
@@ -76,14 +77,14 @@
 
 <script type="module">
 import { initReasenberg, runReasenberg, PY_FILES } from './rb_core.mjs';
-import { evaluateGates, estimateMcMaxc } from './gates.mjs';
+import { evaluateGates, estimateMc, STATE_LABEL } from './gates.mjs';
 
-const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
+const PYODIDE_URL = new URL('../../vendor/pyodide/0.27.7/', location.href).href;   // D-P3: depoda, sürümü sabit
 const ROOT = '../../';
 const $ = id => document.getElementById(id);
 const log = s => { $('log').textContent += s + '\n'; };
 const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-let py = null, catalog = null;
+let py = null, catalog = null, selfTestPassed = false;
 window.__rbLab = { results: {} };
 
 async function bytes(path) { const r = await fetch(ROOT + path); if (!r.ok) throw new Error(`${path}: ${r.status}`); return new Uint8Array(await r.arrayBuffer()); }
@@ -102,15 +103,17 @@ $('bLoad').onclick = async () => {
     const tReady = performance.now() - t0;
     $('envState').innerHTML = ` <span class="s-pass">hazır</span> — Pyodide ${py.version}, Python ${meta.python}, numpy ${meta.numpy}, modül ${meta.module_version}, sha256 ${meta.sha256.slice(0, 12)}… (dondurulmuş ile aynı) · yükleme ${(tLoad / 1000).toFixed(1)} s, hazır ${(tReady / 1000).toFixed(1)} s`;
     window.__rbLab.env = { ...meta, pyodide: py.version, load_s: tLoad / 1000, ready_s: tReady / 1000 };
-    $('bSelf').disabled = false; $('bRun').disabled = false;
-    log(`[ok] ortam hazır (${(tReady / 1000).toFixed(2)} s)`);
+    $('bSelf').disabled = false;
+    log(`[ok] ortam hazır (${(tReady / 1000).toFixed(2)} s); öz-sınama başlıyor…`);
+    await runSelfTest();   // D-P5: her oturumda, hesaptan önce
   } catch (e) {
     $('envState').innerHTML = ` <span class="s-fail">${esc(e.message)}</span>`; log('[hata] ' + e.message); $('bLoad').disabled = false;
   }
 };
 
-$('bSelf').onclick = async () => {
-  $('bSelf').disabled = true;
+$('bSelf').onclick = () => runSelfTest();
+async function runSelfTest() {
+  $('bSelf').disabled = true; $('bRun').disabled = true;
   const names = ['adiyaman', 'izmit_dogu', 'saimbeyli', 'van_bati'];
   const rows = [];
   for (const nm of names) {
@@ -127,9 +130,10 @@ $('bSelf').onclick = async () => {
   const all = rows.every(r => r.same);
   $('selfOut').innerHTML = `<table><tr><th>Bağlam</th><th>N</th><th>Küme</th><th>Üyelik</th><th>Süre</th></tr>${rows.map(r =>
     `<tr><td>${r.nm}</td><td>${r.n}</td><td>${r.k}</td><td class="${r.same ? 's-pass' : 's-fail'}">${r.same ? 'birebir aynı' : 'FARK'}</td><td>${r.s.toFixed(2)} s</td></tr>`).join('')}</table>
-    <p class="${all ? 's-pass' : 's-fail'}">${all ? 'Öz-sınama geçti: tarayıcıdaki sonuç dondurulmuş referanslarla birebir aynı.' : 'Öz-sınama BAŞARISIZ: dinamik hesap kullanılmamalı.'}</p>`;
-  log(`[${all ? 'ok' : 'FARK'}] öz-sınama`); $('bSelf').disabled = false;
-};
+    <p class="${all ? 's-pass' : 's-fail'}">${all ? 'Öz-sınama geçti: tarayıcıdaki sonuç dondurulmuş referanslarla birebir aynı (yazılım doğruluğu; algoritmanın bilimsel geçerliliğini tek başına göstermez).' : 'Öz-sınama BAŞARISIZ: dinamik hesap kapalı.'}</p>`;
+  selfTestPassed = all; window.__rbLab.selfTestPassed = all;
+  log(`[${all ? 'ok' : 'FARK'}] öz-sınama`); $('bSelf').disabled = false; $('bRun').disabled = !all;
+}
 
 const epiKm = (a, b, c, d) => { const r = Math.PI / 180, x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2; return 2 * 6371 * Math.asin(Math.sqrt(Math.min(1, x))); };
 
@@ -144,17 +148,17 @@ $('bRun').onclick = async () => {
     sel.sort((a, b) => Date.parse(b.time) - Date.parse(a.time));           // en yeni önce (sitedeki sorgu gibi)
     const capped = lim > 0 && sel.length > lim;
     if (capped) sel = sel.slice(0, lim);
-    const mcEst = estimateMcMaxc(sel.map(e => e.mag));
+    const mcEst = estimateMc(sel);
     const xRaw = $('iX').value.trim();
     const xmeff = xRaw === '' ? (mcEst.mc ?? NaN) : +xRaw;
-    const g = evaluateGates({ events: sel, capped, limit: lim || null, xmeff, mcEst, region: { type: 'circle', lat, lon, rKm: R } });
-    let html = `<p>Durum: <span class="state ${g.state}">${g.state === 'ON_WARN' ? 'ON (uyarılı)' : g.state}</span>
-      <span class="note"> — Mc (tahmin) ${mcEst.mc ?? '—'} · xmeff (${xRaw === '' ? 'tahminden' : 'kullanıcı seçimi'}) ${Number.isFinite(xmeff) ? xmeff.toFixed(2) : '—'}</span></p>
+    const g = evaluateGates({ events: sel, capped, limit: lim || null, xmeff, mcEst, selfTestPassed, region: { type: 'circle', lat, lon, rKm: R } });
+    let html = `<p>Durum: <span class="state ${g.state}">${STATE_LABEL[g.state]}</span>
+      <span class="note"> — Mc (tahmin, ${esc(mcEst.method)}) ${mcEst.mc ?? '—'} · xmeff (${xRaw === '' ? 'tahminden' : 'kullanıcı seçimi'}) ${Number.isFinite(xmeff) ? xmeff.toFixed(2) : '—'}</span></p>
       <table><tr><th>Kapı</th><th></th><th>Ayrıntı</th></tr>${g.checks.map(c =>
       `<tr><td>${c.id} ${esc(c.label)}</td><td class="s-${c.status}">${{ pass: 'sağlandı', warn: 'uyarı', fail: 'sağlanmadı' }[c.status]}</td><td>${esc(c.detail)}</td></tr>`).join('')}</table>`;
     const rec = { input: { lat, lon, R, y0, y1, src, lim }, n: sel.length, capped, mcEst, xmeff, state: g.state, checks: g.checks.map(c => [c.id, c.status]) };
     if (g.state === 'OFF') {
-      html += `<p class="s-fail">Hesap yapılmadı (OFF). Koşullar sağlanınca aynı düğmeyle yeniden denenebilir.</p>`;
+      html += `<p class="s-fail">Hesap yapılmadı (KAPALI). Koşullar sağlanınca aynı düğmeyle yeniden denenebilir.</p>`;
     } else {
       const t = performance.now();
       const r = runReasenberg(py, sel, xmeff);
@@ -163,7 +167,7 @@ $('bRun').onclick = async () => {
       rec.result = { single: c('single'), representative: c('representative'), dependent: c('dependent'), invalid: c('invalid'), clusters: r.n_clusters, seconds: s };
       html += `<table><tr><th>N</th><th>Tekil</th><th>Temsilci (= küme)</th><th>Bağımlı</th><th>Geçersiz</th><th>Süre</th></tr>
         <tr><td>${r.ids.length}</td><td>${c('single')}</td><td>${c('representative')}</td><td>${c('dependent')}</td><td>${c('invalid')}</td><td>${s.toFixed(2)} s</td></tr></table>
-        <p class="note">Bölgeye, döneme, kaynağa ve xmeff'e koşullu keşif sonucu. Doğruluk ölçüsü değildir; deprem tahmini için değildir.${g.state === 'ON_WARN' ? ' Uyarılı kapılar yorumu sınırlar.' : ''}</p>`;
+        <p class="note">Bölgeye, döneme, kaynağa ve xmeff'e koşullu keşif sonucu. Doğruluk ölçüsü değildir; deprem tahmini için değildir.${g.state === 'WARNING' ? ' Uyarılı kapılar yorumu sınırlar.' : ' UYGUN: denetlenen koşullar sağlandı; bilimsel doğrulama anlamına gelmez.'}</p>`;
     }
     window.__rbLab.results.last = rec;
     $('runOut').innerHTML = html; log(`[*] dinamik: N=${sel.length} durum=${g.state}`);

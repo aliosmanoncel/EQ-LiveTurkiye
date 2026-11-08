@@ -1,9 +1,10 @@
 // gates.mjs — Dinamik Reasenberg için UYGUNLUK KAPILARI (DENEME).
 //
 // Kural: her çalıştırmadan önce veri yeterliliği ve parametre koşulları denetlenir.
-//   OFF      : en az bir zorunlu koşul sağlanmıyor → hesap YAPILMAZ, neden(ler) gösterilir.
-//   ON_WARN  : zorunlu koşullar sağlanıyor, yorum sınırlayıcı bir uyarı var → hesap + uyarı.
-//   ON       : tüm koşullar sağlanıyor.
+//   KAPALI   (OFF)     : en az bir zorunlu koşul sağlanmıyor → hesap YAPILMAZ, neden(ler) gösterilir.
+//   UYARILI  (WARNING) : zorunlu koşullar sağlanıyor; yorumu sınırlayan uyarı var → hesap + uyarı.
+//   UYGUN    (ELIGIBLE): yazılım bütünlüğü (öz-sınama, sha256) ve veri koşulları sağlandı.
+// "UYGUN", sonucun bilimsel olarak doğrulandığı anlamına GELMEZ; yalnız denetlenen koşulların sağlandığını söyler.
 // Koşul sonradan sağlanırsa (ör. sorgu sınırı artırılır) aynı denetim yeniden ON verir.
 //
 // Mc ayrımı: "Mc (tahmin)" veriden hesaplanan değerdir; "xmeff (seçim)" kullanıcının
@@ -12,22 +13,39 @@
 //
 // Algoritma kodu içermez; Reasenberg hesabı rb_core.mjs → Pyodide → reasenberg.py.
 
-export const DEFAULTS = Object.freeze({ minN: 50, maxInvalidFrac: 0.05, mcBin: 0.1, mcCorr: 0.2, minForMc: 50, rfact: 10 });
+export const DEFAULTS = Object.freeze({ minN: 50, maxInvalidFrac: 0.05, rfact: 10 });   // D-P4: başlangıç değerleri
 
 const num = v => (v === null || v === undefined || v === '' || !Number.isFinite(+v)) ? null : +v;
 const KM_PER_DEG = 111.195;
 
-// MAXC + düzeltme (Wiemer & Wyss 2000; düzeltme +0.2: Woessner & Wiemer 2005).
-// Deneme sayfası için; sitede bütünleştirmede sitenin mevcut Mc tahmincisi kullanılmalı.
-export function estimateMcMaxc(mags, { bin = DEFAULTS.mcBin, corr = DEFAULTS.mcCorr, minN = DEFAULTS.minForMc } = {}) {
-  const m = mags.map(num).filter(v => v !== null);
-  if (m.length < minN) return { mc: null, method: 'MAXC+0.2', n: m.length, reason: `Mc için en az ${minN} geçerli büyüklük gerekir (${m.length})` };
-  const counts = new Map();
-  for (const v of m) { const k = Math.round(v / bin); counts.set(k, (counts.get(k) || 0) + 1); }
-  let best = null, bestN = -1;
-  for (const [k, c] of [...counts.entries()].sort((a, b) => a[0] - b[0])) if (c > bestN) { best = k; bestN = c; }
-  return { mc: +(best * bin + corr).toFixed(2), method: `MAXC+${corr}`, n: m.length };
+// Mc TAHMİNCİSİ = SİTENİN KENDİSİ (D-P1). Aşağıdaki iki fonksiyon index.html'den BİREBİR kopyadır
+// (MAXC, Wiemer & Wyss 2000; +0.2 düzeltmesi, Woessner & Wiemer 2005). CI (gates.test.mjs) kopyanın
+// index.html ile aynı kaldığını denetler; site değişirse test kırmızı olur.
+// --- index.html kopyası başı ---
+function mcSrcMag(e) { return e.mcv ? e.mag : (e.mw ?? e.mag); }
+function computeMcSrc(evList) {
+  const mags = evList.map(mcSrcMag).filter(m => m > 0);
+  if (mags.length < 10) return null;
+  const bins = {};
+  mags.forEach(m => {
+    const b = (Math.round(m * 10) / 10).toFixed(1);
+    bins[b] = (bins[b] || 0) + 1;
+  });
+  let maxCount = -1, maxBin = null;
+  for (const b in bins) {
+    if (bins[b] > maxCount) { maxCount = bins[b]; maxBin = parseFloat(b); }
+  }
+  return maxBin !== null ? +(maxBin + 0.2).toFixed(1) : null;
 }
+// --- index.html kopyası sonu ---
+
+// Reasenberg'in kullandığı büyüklük alanı (mag) üzerinde sitenin tahmincisi.
+export function estimateMc(events) {
+  const mc = computeMcSrc(events.map(e => ({ mag: num(e.mag) })).filter(e => e.mag !== null));
+  return mc === null ? { mc: null, method: 'MAXC+0.2 (sitenin computeMcSrc)', reason: 'en az 10 geçerli büyüklük gerekir' }
+                     : { mc, method: 'MAXC+0.2 (sitenin computeMcSrc)' };
+}
+export { computeMcSrc, mcSrcMag };
 
 function epiKm(lat1, lon1, lat2, lon2) {
   const r = Math.PI / 180, dlat = (lat2 - lat1) * r, dlon = (lon2 - lon1) * r;
@@ -47,10 +65,17 @@ export const interactionKm = (m, rfact = DEFAULTS.rfact) => rfact * 0.011 * 10 *
  * @param {object|null} p.mcEst estimateMcMaxc çıktısı
  * @param {object|null} p.region { type: 'circle', lat, lon, rKm } — sınır denetimi için
  */
-export function evaluateGates({ events, capped, limit, xmeff, mcEst, region = null, opts = {} }) {
+export const STATE_LABEL = Object.freeze({ ELIGIBLE: 'UYGUN', WARNING: 'UYARILI', OFF: 'KAPALI' });
+
+export function evaluateGates({ events, capped, limit, xmeff, mcEst, region = null, selfTestPassed = true, opts = {} }) {
   const o = { ...DEFAULTS, ...opts };
   const checks = [];
   const add = (id, label, status, detail) => checks.push({ id, label, status, detail });
+
+  // K0 yazılım bütünlüğü: bu oturumda öz-sınama (dondurulmuş referanslarla birebir) geçti mi (D-P5)
+  add('K0', 'Öz-sınama (yazılım bütünlüğü)', selfTestPassed ? 'pass' : 'fail',
+    selfTestPassed ? 'Bu oturumda 4 dondurulmuş referansla birebir eşleşme sağlandı (yazılım doğruluğu; bilimsel geçerlilik değil).'
+                   : 'Bu oturumda öz-sınama geçmedi ya da çalışmadı; hesap yapılmaz.');
 
   // K1 katalog bütünlüğü (sorgu sınırı) — 500 algoritmanın değil veri erişiminin sınırıdır
   add('K1', 'Katalog bütünlüğü (sorgu sınırı)', capped ? 'fail' : 'pass',
@@ -95,7 +120,9 @@ export function evaluateGates({ events, capped, limit, xmeff, mcEst, region = nu
       && region.rKm - epiKm(region.lat, region.lon, +e.lat, +e.lon) <= dB).length;
     const f = events.length ? near / events.length : 0;
     add('K7', 'Sınır etkisi', near ? 'warn' : 'pass',
-      `Kenara ${dB.toFixed(1)} km'den yakın olay: ${near} (%${(100 * f).toFixed(1)}); ölçek = 10·r(Mmax=${mMax ?? '—'}). Bu olayların kümeleri daire dışına taşabilir.`);
+      `Kenara ${dB.toFixed(1)} km'den yakın olay: ${near} (%${(100 * f).toFixed(1)}); ölçek = 10·r(Mmax=${mMax ?? '—'}). `
+      + `Bu oran üyelik değişimi DEĞİLDİR: 18 test dairesinde (tüm katalog referansına göre) sınıfı değişen olay %0–1,5, `
+      + `kenara 0,5·L'den yakın olaylarda %0,6 ölçüldü (analysis/2026-11-08_pyodide_reasenberg/sinir_etkisi.json).`);
   }
 
   // K8 büyüklük ölçeği (uyarı)
@@ -103,6 +130,6 @@ export function evaluateGates({ events, capped, limit, xmeff, mcEst, region = nu
   add('K8', 'Büyüklük ölçeği', types.length > 1 ? 'warn' : 'pass',
     types.length > 1 ? `Karışık ölçek (${types.join(', ')}): r(M) ve τ büyüklüğe bağlı; sonuç bu karışıma koşulludur.` : `Ölçek: ${types[0]}`);
 
-  const state = checks.some(c => c.status === 'fail') ? 'OFF' : checks.some(c => c.status === 'warn') ? 'ON_WARN' : 'ON';
+  const state = checks.some(c => c.status === 'fail') ? 'OFF' : checks.some(c => c.status === 'warn') ? 'WARNING' : 'ELIGIBLE';
   return { state, checks, n_use: nUse };
 }

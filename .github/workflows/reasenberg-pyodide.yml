@@ -7,6 +7,8 @@ on:
   pull_request:
     paths:
       - 'lab/reasenberg-pyodide/**'
+      - 'vendor/pyodide/**'
+      - 'index.html'
       - 'scripts/reasenberg.py'
       - 'scripts/decluster_reasenberg.py'
       - 'scripts/decluster_gk74.py'
@@ -47,10 +49,18 @@ jobs:
             | tar xj -C pyodide-dist --wildcards 'pyodide/pyodide.mjs' 'pyodide/pyodide.js' 'pyodide/pyodide.asm.js' \
               'pyodide/pyodide.asm.wasm' 'pyodide/python_stdlib.zip' 'pyodide/pyodide-lock.json' 'pyodide/package.json' 'pyodide/numpy-*.whl'
           ls -la pyodide-dist/pyodide
-      - name: Uygunluk kapıları (birim testleri)
+      - name: Kaynak denetimi (D-P3) — depodaki Pyodide = resmi sürüm arşivi
+        run: |
+          cd vendor/pyodide/${PYODIDE_VERSION}
+          sha256sum -c SHA256SUMS
+          for f in $(awk '{print $2}' SHA256SUMS); do
+            cmp "$f" "../../../pyodide-dist/pyodide/$f" || { echo "FARK: $f resmi sürümle aynı değil"; exit 1; }
+          done
+          echo "depodaki Pyodide dosyaları resmi ${PYODIDE_VERSION} sürümüyle birebir aynı"
+      - name: Uygunluk kapıları (birim testleri; Mc kopyası index.html ile aynı mı)
         run: node --test scripts/reasenberg_tests/gates.test.mjs
-      - name: Eşleşme — dondurulmuş referanslar + tam EMSC kataloğu (Pyodide = CPython)
-        run: PYODIDE_DIR=pyodide-dist/pyodide node scripts/reasenberg_tests/pyodide_parity.mjs --out pyodide_parity.json
+      - name: Eşleşme — depodaki Pyodide ile; dondurulmuş referanslar + tam EMSC kataloğu (Pyodide = CPython)
+        run: PYODIDE_DIR=vendor/pyodide/${PYODIDE_VERSION} node scripts/reasenberg_tests/pyodide_parity.mjs --out pyodide_parity.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
