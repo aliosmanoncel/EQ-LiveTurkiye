@@ -9,7 +9,7 @@
 // süzgeçlerle ayrıca çekilir, Reasenberg girdisine katılır; RAPORDA yalnız pencere olayları sayılır.
 // Worker oluşturulamazsa hesap eski yolla ana iş parçacığında yapılır.
 
-import { initReasenberg, runReasenberg, runSelfTest, PY_FILES } from './rb_core.mjs';
+import { initReasenberg, runReasenberg, runSelfTest, windowOnly, PY_FILES } from './rb_core.mjs';
 import { evaluateGates, STATE_LABEL } from './gates.mjs';
 
 const BASE = new URL('../../', import.meta.url).href;            // depo kökü (site kökü)
@@ -165,15 +165,6 @@ async function evaluate(force = false) {
     setBtn('⛔ Reasenberg: KAPALI (hata)', 'gkWarn');
     report(`<b style="color:#f87171">KAPALI</b> — ${esc(e.message)}`);
   } finally { S.busy = false; }
-}
-
-// Tampon olaylarını sonuçtan çıkar: raporda yalnız pencere olayları (id 'r…') sayılır. Küme sayısı, en az bir
-// pencere olayı içeren kümelerdir (yalnız tampondaki kümeler sayılmaz).
-function windowOnly(r) {
-  const keep = r.ids.map((id, k) => id.startsWith('r') ? k : -1).filter(k => k >= 0);
-  const cl = new Set(keep.map(k => r.cluster_id[k]).filter(c => c >= 0));
-  return { ...r, ids: keep.map(k => r.ids[k]), cluster_id: keep.map(k => r.cluster_id[k]), event_class: keep.map(k => r.event_class[k]),
-           n_clusters: cl.size, n_input: r.ids.length };
 }
 
 // GK74 ile olay bazında karşılaştırma (double-check). Hiçbiri "doğru" kabul edilmez; farklar karşılaştırmanın verisidir.
