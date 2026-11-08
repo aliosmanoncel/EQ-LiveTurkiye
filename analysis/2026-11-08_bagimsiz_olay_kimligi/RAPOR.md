@@ -290,3 +290,71 @@ Yıllık a değerleri ve her varyantın tam tablosu `donemsel_sonuc.json`'da.
 1. **b farkının kaynağı:** büyüklük sınıflarına göre iki yöntemin ayıkladığı olay oranları. GK74'ün küçük olayları orantısız biçimde ayıklayıp ayıklamadığına bakılacak.
 2. **Ölçek homojenleştirmesi:** sitenin dönüştürme bağıntılarıyla aynı analiz.
 3. **DOUBLET adaylarının literatürle karşılaştırılması.**
+
+---
+
+# 4. tur (üçüncü aşama) — Δb'nin kaynağı: büyüklük sınıflarına göre ayıklama (`buyukluk_sinifi_ayiklama.py`, `buyukluk_sonuc.json`, `fig_ayiklama.png`)
+
+**Soru:** Hangi büyüklük sınıfında hangi yöntem ne kadar olay ayıklıyor ve bu, Türkiye'deki Δb ≈ +0,13'ü açıklıyor mu?
+Veri: Türkiye 30 km alt kümesi, "yeniden" sınıflar (2. tur ile aynı), EMSC büyüklüğü. Ham katalog değiştirilmedi; GK74 ve Reasenberg katalogları ayrı tutuldu.
+
+## Yöntem
+
+- Kalan oran f(M) = N_ayrıştırılmış(M) / N_ham(M).
+- f(M) ∝ 10^(k·M) ise ayrıştırılmış katalogda **b_d = b_ham − k**. Büyüklükten bağımsız ayıklama (k = 0) b'yi değiştirmez. f'nin M ile artması (k > 0) b'yi düşürür, azalması (k < 0) b'yi yükseltir.
+- Buradan **Δb = b_RB − b_GK ≈ k_GK − k_RB**.
+- k: log10 f'nin M'ye ağırlıklı doğrusal eğimi (binom varyansı, delta yöntemi; M ≥ Mc, N_ham ≥ 5 olan 0,1 kutuları).
+- Sınıf katkısı: GK74 sayımlarında yalnız o sınıf RB sayımıyla değiştirilince b'nin değişimi (gruplanmış Aki–Utsu). **Katkılar toplanabilir değildir**; yalnız yön ve görece büyüklük için okunmalı.
+
+## Sınıflara göre ayıklama (tümü 1998–2026)
+
+| Sınıf | N ham | GK74 ayıkladı | RB ayıkladı | ikisi de | yalnız GK74 | yalnız RB | kalan GK74 | kalan RB |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 3,0–3,2 | 19 882 | 11 941 | 3 594 | 3 547 | 8 394 | 47 | 0,399 | 0,819 |
+| 3,2–3,5 | 14 268 | 8 852 | 3 373 | 3 324 | 5 528 | 49 | 0,380 | 0,764 |
+| 3,5–4,0 | 7 397 | 4 474 | 2 086 | 2 056 | 2 418 | 30 | 0,395 | 0,718 |
+| 4,0–4,5 | 2 204 | 1 316 | 757 | 734 | 582 | 23 | 0,403 | 0,657 |
+| 4,5–5,0 | 722 | 401 | 269 | 252 | 149 | 17 | 0,445 | 0,627 |
+| 5,0–6,0 | 205 | 86 | 68 | 56 | 30 | 12 | 0,580 | 0,668 |
+| ≥ 6,0 | 19 | 4 | 5 | 4 | 0 | 1 | 0,789 | 0,737 |
+
+- RB'nin ayıkladığı olayların neredeyse tamamını GK74 de ayıklıyor ("yalnız RB" sınıf başına 1–49).
+- GK74, M < 4,5'te her sınıfta olayların ~%60'ını ayıklıyor; M ≥ 5'te daha az.
+- RB'nin ayıklama oranı ise M ile **artıyor** (%18 → %34–37).
+
+## Eğim ve Δb
+
+| Alt küme | Mc | b ham | b GK74 | b RB | Δb gözlenen | k_GK74 | k_RB | Δb (eğimden) |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| tümü 1998–2026 | 3,2 | 1,161 | 1,097 | 1,227 | **+0,130** | +0,067 ± 0,008 | −0,061 ± 0,005 | **+0,127** |
+| tümü 1998–2026 | 3,5 | 1,069 | 1,000 | 1,114 | +0,114 | +0,082 ± 0,011 | −0,046 ± 0,008 | +0,128 |
+| md dönemi 1998–2013 | 3,2 | 1,358 | 1,273 | 1,409 | +0,136 | +0,087 ± 0,010 | −0,039 ± 0,006 | +0,127 |
+| ml dönemi 2013–2026 | 3,2 | 0,944 | 0,843 | 0,991 | +0,148 | +0,121 ± 0,013 | −0,054 ± 0,008 | +0,176 |
+| ml dönemi, 2023+ hariç | 3,2 | 0,972 | 0,882 | 0,993 | +0,110 | +0,109 ± 0,015 | −0,025 ± 0,010 | +0,134 |
+| tümü, 2023+ hariç | 3,2 | 1,239 | 1,149 | 1,285 | +0,136 | +0,086 ± 0,008 | −0,042 ± 0,005 | +0,128 |
+
+Sınıf katkıları (tümü, Mc 3,2): 3,2–3,5 **+0,361**; 3,5–4,0 −0,047; 4,0–4,5 −0,084; 4,5–5,0 −0,039; 5,0–6,0 −0,008; ≥ 6 +0,001. md ve ml dönemlerinde de aynı desen (3,2–3,5 sınıfı +0,33…+0,38, üst sınıflar küçük ve negatif).
+
+## Cevap
+
+- **Δb, iki yöntemin büyüklüğe bağlı ayıklama eğimlerinin farkıyla nicel olarak açıklanıyor:** gözlenen +0,130, eğimden öngörülen +0,127. Bu, md ve ml dönemlerinde ve 2023+ hariç tutulduğunda da geçerli (öngörülen +0,13…+0,18, gözlenen +0,11…+0,15).
+- **İki yöntem zıt yönlerde seçici:**
+  - GK74'ün kalan oranı M ile **artıyor** (k > 0): büyük olaylar daha sık "bağımsız" kalıyor → b düşüyor.
+  - Reasenberg'in kalan oranı M ile **azalıyor** (k < 0): büyük olaylar daha sık bir kümeye bağlanıyor → b yükseliyor.
+  - İki etki yaklaşık eşit büyüklükte (+0,067 ve −0,061). Yani fark yalnızca "GK74 küçük olayları daha çok ayıklıyor" değil; Reasenberg'in büyük olayları daha çok ayıklaması da yarı yarıya katkı veriyor.
+- **Sınıf düzeyinde:** etkinin en büyük kaynağı Mc'nin hemen üstündeki 3,2–3,5 sınıfı. Bu sınıfta GK74, RB'nin bıraktığı olayların yarısından fazlasını ayıklıyor (5 528 olay yalnız GK74'te ayıklandı).
+- **Yorum:** +0,13, ayrıştırma algoritmalarının büyüklüğe bağlı katalog seçiminin **istatistiksel sonucudur**; fiziksel bir sismisite değişiminin kanıtı olarak yorumlanmamalıdır. Hangi yöntemin "doğru" olduğu bu analizle belirlenemez.
+- **md/ml:** ölçek değişimi mutlak b'yi kaydırıyor (b ham 1,36 → 0,94), ancak eğim farkı ve Δb her iki dönemde de korunuyor. ml döneminde k_GK daha büyük (+0,12); bunun bir kısmı 2023 dizisinden geliyor (2023+ hariç +0,11).
+
+## Sınırlılıklar
+
+- Büyüklük ölçeği karışık (md/ml/mb); homojenleştirme yapılmadı (sonraki aşama).
+- Üstel f(M) modeli bir yaklaşım; M ≥ 5'te kutular seyrek ve f gürültülü (şekilde görülüyor). Eğimler M 3,2–5 aralığındaki kalabalık kutular tarafından belirleniyor.
+- Binom ağırlıkları olayları bağımsız varsayar; σ_k iyimser olabilir.
+- Sınıf katkıları birbirini etkiler ve toplanmaz (toplam +0,184 ≠ +0,130).
+- Bulgular tehlike değerlendirmesi değildir.
+
+## Sonraki adımlar (onay sonrası)
+
+1. **Ölçek homojenleştirmesi:** sitenin dönüştürme bağıntılarıyla (md/ml → Mw) aynı analiz.
+2. **DOUBLET adaylarının literatürle karşılaştırılması.**
