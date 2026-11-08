@@ -358,3 +358,87 @@ Sınıf katkıları (tümü, Mc 3,2): 3,2–3,5 **+0,361**; 3,5–4,0 −0,047; 
 
 1. **Ölçek homojenleştirmesi:** sitenin dönüştürme bağıntılarıyla (md/ml → Mw) aynı analiz.
 2. **DOUBLET adaylarının literatürle karşılaştırılması.**
+
+---
+
+# 5. tur (dördüncü aşama) — md/ml → Mw ölçek homojenleştirmesi (`olcek_homojenlestirme.py`, `site_donusum_parite.mjs`, `olcek_sonuc.json`, `fig_olcek.png`)
+
+**Soru:** 3.–4. turdaki Δb ≈ +0,13 ve büyüklüğe bağlı ayıklama eğimleri, büyüklükler sitenin kendi dönüşüm bağıntılarıyla Mw'ye çevrilince korunuyor mu? M ≥ 5'te kalan oranlar ve gürültü nasıl değişiyor?
+
+## Gelen yorum (Gemini, 4. tur değerlendirmesi) — IN / OUT
+
+- **IN:** 4. tur sonucunun (`5f9dc4d`) kabulü; 4. aşamaya geçiş; M ≥ 5,0 aralığının ayrıca izlenmesi.
+- **IN:** 3,0–3,5 aralığında GK74'ün tek başına ayıkladığı olay hacminin (ör. 8 394 ↔ 47) sınıf baskınlığını gösterdiği.
+- **OUT (düzeltme):** "GK74 küçük olayları baskın şekilde ayıklıyor (k_GK > 0)" ifadesi tam doğru değil. GK74, M < 4,5'te her sınıfta ~%60 oranında **eşit** ayıklıyor. k_GK > 0, büyük olayları **daha az** ayıklamasından geliyor.
+- **OUT (düzeltme):** md/ml dönemlerinde Δb'nin korunması etkinin ölçekten bağımsız olduğunu "kanıtlamıyordu"; yalnızca tutarlıydı. Bunu sınamak bu turun konusu (sonuç aşağıda: Δb korunuyor, eğim mekanizmasının dağılımı ise ölçek seçimine bağlı).
+- **OUT (beklenti):** Homojenleştirme M ≥ 5'teki gürültüyü azaltmaz. Gürültü sayım sınırlıdır (binom); dönüşüm yalnızca olayları sınıflar arasında kaydırır.
+
+## Yöntem
+
+- **Bağıntılar:** `index.html` `MAG_CONVERSIONS` kayıtlarının Python kopyası; yeni bağıntı eklenmedi.
+  - **H0:** ham EMSC.
+  - **H1** `combined_dispatch`: mb/Ms → Scordilis (2006); ML → Çıvgın & Scordilis (2019); Md ham kalır.
+  - **H2** `combined_dispatch_md_eqml`: H1 + Md < 4,0 için MD = ML varsayımı.
+  - **H3** `combined_dispatch_md`: H1 + Md < 4,0 için KOERI zinciri (Cambaz vd. 2019 Md→ML + Çıvgın & Scordilis).
+  - **H2+A:** H2 + otoriter Mw (`data/mw_authority.json`).
+  - **H3\* (tanı, site bağıntısı değil):** zincir Md ≥ 4,0'a da uygulanır; H3'ün Md < 4 sınırının yarattığı boşluğu ayırmak için.
+- **Parite:** `site_donusum_parite.mjs`, `index.html` bloğunu Node'da değiştirmeden çalıştırır. Üç site dispatch'i için 80 929 olayın tamamı Python kopyasıyla birebir aynı.
+- **Ayrıştırma:** İki yöntem her varyantta dönüştürülmüş büyüklüklerle Türkiye 30 km alt kümesinde yeniden çalıştırıldı; xmeff 3,0 sabit. Varyant başına sınıf değiştiren olay: GK74 1 127–2 095, RB 861–1 592 (44 697 olayın %2–5'i).
+- **Mc:** dönem başına max(GFT R≥95/90, MAXC+0,2, **tür tabanı**). Tür tabanı, ham dosya her türde M ≥ 3,0 ile kesik olduğu için gerekli: dönüşüm sonrası türlerin alt sınırları ayrışıyor (ör. H3'te Md → Mw ≥ 2,45, ML → Mw ≥ 3,08). Bu sınırın altında katalog tür karışımı bakımından eksik. Yalnız dosya kesmesiyle kesilmiş türler (ham en küçük = 3,0, pay ≥ %1) tabana katılır.
+  - **İlk çalıştırmada bu sınır yoktu:** H3 md döneminde Mc 2,7 seçildi ve b ham 0,75 çıktı. Bu, yapay bir tür karışımı sonucuydu.
+
+## Sonuç
+
+**Δb = b_RB − b_GK74** (95% için ×1,96σ):
+
+| Varyant | md 1998–2013: Mc | md Δb (z) | md k_GK / k_RB | ml 2013–2026: Mc | ml Δb (z) | ml k_GK / k_RB | **Birleşik Δb (z), Q** |
+|---|---|---|---|---|---|---|---|
+| H0 ham | 3,2 | +0,136 (6,1) | +0,087 / −0,039 | 3,2 | +0,148 (7,8) | +0,121 / −0,054 | **+0,143 ± 0,014 (9,9)**, 0,19 |
+| H1 | 3,2 | +0,149 (6,5) | +0,078 / −0,034 | 3,3 | +0,176 (7,8) | +0,108 / −0,047 | **+0,163 ± 0,016 (10,2)**, 0,71 |
+| H2 | 3,3 | +0,167 (6,2) | +0,079 / −0,034 | 3,3 | +0,176 (7,8) | +0,108 / −0,047 | **+0,172 ± 0,017 (10,0)**, 0,07 |
+| H3 | 3,1 | +0,137 (7,1) | +0,131 / **+0,008** | 3,3 | +0,176 (7,8) | +0,108 / −0,047 | **+0,153 ± 0,015 (10,5)**, 1,77 |
+| H3\* (tanı) | 3,1 | +0,146 (7,1) | +0,125 / **−0,000** | 3,3 | +0,176 (7,8) | +0,108 / −0,047 | +0,160 ± 0,015 (10,5), 0,98 |
+| H2+A | 3,3 | +0,174 (6,4) | +0,076 / −0,042 | 3,3 | +0,176 (7,8) | +0,108 / −0,047 | **+0,175 ± 0,017 (10,1)**, 0,00 |
+
+- **ml dönemi, 2023+ hariç:** Mw varyantlarında Δb +0,131 ± 0,029 (z 4,5); H0'da +0,110.
+- **Mutlak b, md dönemi:** H2'de 1,42, H3'te 0,86. İki Md bağıntısı (MD ≈ ML ↔ Cambaz zinciri, Md − ML ≈ +0,7) md döneminin mutlak b'sini ~0,5–0,6 değiştiriyor.
+
+**M ≥ 5 kalan oranlar** (tüm dönem, Wilson %95):
+
+| Sınıf | H0: N | f_GK74 | f_RB | Mw varyantları (H1–H3): N | f_GK74 | f_RB |
+|---|---:|---|---|---:|---|---|
+| 5,0–5,5 | 162 | 0,59 [0,51–0,66] | 0,68 [0,60–0,75] | 354 | 0,49 [0,43–0,54] | 0,62 [0,57–0,67] |
+| 5,5–6,0 | 43 | 0,56 [0,41–0,70] | 0,63 [0,48–0,76] | 76 | 0,63 [0,52–0,73] | 0,68 [0,57–0,78] |
+| ≥ 6,0 | 19 | 0,79 [0,57–0,91] | 0,74 [0,51–0,88] | 23 | 0,74 [0,54–0,87] | 0,74 [0,54–0,87] |
+
+## Cevap
+
+- **Δb ölçek homojenleştirmesinde korunuyor:**
+  - Birleşik Δb tüm varyantlarda +0,14 ile +0,18 arasında, z ≈ 10.
+  - md ve ml dönemleri arasında heterojenlik yok (Q 0,00–1,77; 1 sd).
+  - Mw ölçeğinde Δb biraz büyüyor (H0 +0,143 → H2 +0,172). Bunun bir kısmı ölçek gerilmesi: ML → Mw eğimi 0,93 olduğu için Mw'de b ≈ b_ML / 0,93.
+  - Homojenleştirmeden sonra md ve ml dönemlerinin Δb'leri daha yakın (H2: +0,167 ↔ +0,176).
+- **Eğim mekanizması — korunan yön:** k_GK74 tüm varyant ve dönemlerde pozitif (+0,08…+0,13). Eğimden öngörülen Δb (k_GK − k_RB), gözleneni her varyantta ±0,05 içinde izliyor.
+- **Eğim mekanizması — ölçeğe bağlı kısım (4. tur bulgusunu sınırlayan sonuç):** Reasenberg'in negatif eğimi (büyük olayları daha çok kümeye bağlaması) **ölçek seçimine bağlı.**
+  - H0, H1, H2 ve ml döneminde k_RB −0,03…−0,05.
+  - KOERI zinciriyle (H3, H3\*) md döneminde k_RB ≈ 0; Δb tümüyle GK74'ün eğiminden geliyor.
+  - Bu nedenle 4. turdaki "iki yöntem yarı yarıya katkı veriyor" ifadesi **H0 ölçeğine özgüdür.** Ölçekten bağımsız olan, Δb'nin varlığı ve GK74'ün pozitif eğimi.
+- **M ≥ 5:**
+  - Dönüşüm M ≥ 5 olay sayısını ikiye katlıyor (224 → 453). Başlıca neden mb → Mw'nin (Scordilis 2006) mb 4,6–5,0 olaylarını 5,0 üstüne taşıması.
+  - Fark yalnız 5,0–5,5 sınıfında anlamlı: f_GK74 0,49 ↔ f_RB 0,62, güven aralıkları ayrık.
+  - M ≥ 5,5'te güven aralıkları örtüşüyor; M ≥ 6'da iki yöntem aynı (0,74).
+  - Gürültü sayım sınırlı (aralık yarı genişliği ±0,10–0,17); homojenleştirme bunu azaltmıyor.
+- **Yorum:** Δb, büyüklük ölçeği seçiminden bağımsız olarak var olan, ayrıştırma algoritmalarının **istatistiksel katalog seçimi** etkisidir; fiziksel sismisite değişimi kanıtı değildir. Mutlak b (özellikle md döneminde) Md bağıntısı seçimine ~0,5 düzeyinde duyarlı. Mutlak b, yalnız tek bir dönüşüm seçeneğiyle ve bu duyarlılık belirtilerek raporlanmalı.
+
+## Sınırlılıklar
+
+- **H3 (site bağıntısı):** Md ≥ 4,0 olayları ham bıraktığı için md döneminde Mw 3,4–3,9 aralığında Md kaynaklı olay yok (0 olay). H3\* tanı varyantı boşluğu doldurunca sonuç değişmiyor (Δb +0,137 → +0,146). Yine de boşluk, sitenin KOERI Md zinciri seçeneğinde b analizlerini etkileyebilecek bir **site bulgusu**; ayrıca not edilmeli. Site değiştirilmedi.
+- **Yuvarlama:** Dönüştürülmüş büyüklükler 0,1'e yuvarlandı. 0,93 eğimi bazı kutularda yığılma ve boşluk yaratır; f(M) kutularında ek gürültü kaynağıdır.
+- **xmeff:** 3,0 sabit tutuldu. Mw ölçeğinde (özellikle H3'te Md → Mw 2,45) yeniden seçilmesi ayrıca sınanabilir.
+- **Tür tabanı ve Mc:** Bu kural Mc'yi en fazla 0,1 yükseltti. Gerçek tamlık 3,0 altındaysa dosya kesmesi nedeniyle ölçülemez.
+- **Bağıntı sınırları:** ML ve mb bağıntıları ajans ve bölge farkı içerir (Çıvgın & Scordilis 2019 KOERI ağı için türetildi; EMSC ML'si birden çok ajanstan gelir).
+- Bulgular tehlike değerlendirmesi değildir.
+
+## Sonraki adım (onay sonrası)
+
+- **DOUBLET adaylarının literatürle karşılaştırılması** (5. aşama).
