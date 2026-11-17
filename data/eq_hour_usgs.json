@@ -1,1 +1,1 @@
-{"generated":"2026-11-16T17:46:39Z","source":"USGS FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"aka2026wsmwkd","time":"2026-11-16T16:56:11.799","lat":61.284,"lon":-152.263,"dep":5.0,"mag":2.1,"mtype":"ml","mw":null,"place":"65 km WNW of Tyonek, Alaska"}]}
+{"generated":"2026-11-17T01:25:53Z","source":"USGS FDSN","hours":1,"minmag":1.0,"count":1,"events":[{"id":"hv75071232","time":"2026-11-17T00:28:21.390","lat":19.261499404907,"lon":-155.39332580566,"dep":29.270000457764,"mag":1.75,"mtype":"md","mw":null,"place":"11 km NE of Pāhala, Hawaii"}]}
