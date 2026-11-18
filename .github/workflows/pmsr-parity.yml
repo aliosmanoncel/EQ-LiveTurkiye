@@ -8,12 +8,14 @@ on:
     paths:
       - 'lab/premainshock-rate/**'
       - 'scripts/validate_pmsr_parity.mjs'
+      - 'scripts/test_pmsr_rules.mjs'
       - 'scripts/fixtures/pmsr_*'
       - '.github/workflows/pmsr-parity.yml'
   pull_request:
     paths:
       - 'lab/premainshock-rate/**'
       - 'scripts/validate_pmsr_parity.mjs'
+      - 'scripts/test_pmsr_rules.mjs'
       - 'scripts/fixtures/pmsr_*'
   workflow_dispatch:
 
@@ -29,3 +31,4 @@ jobs:
         with:
           node-version: '22'
       - run: node scripts/validate_pmsr_parity.mjs
+      - run: node scripts/test_pmsr_rules.mjs

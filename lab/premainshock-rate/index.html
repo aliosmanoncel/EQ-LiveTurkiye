@@ -133,6 +133,7 @@ $('ver').textContent = PMSR_VERSION;
 const fmtT = t => new Date(t * 1000).toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
 const fmtP = p => p == null ? '—' : (p === 0 ? '0' : p < 0.001 ? p.toExponential(1) : p.toFixed(3));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const mtName = k => k === '?' ? 'belirtilmemiş' : k;
 const labelHtml = k => `<span class="lab ${k}">${(LABELS[k] || {}).tr || k}</span>`;
 function setStatus(msg, bad) { $('status').innerHTML = bad ? `<span class="fail">${esc(msg)}</span>` : esc(msg); }
 
@@ -210,7 +211,7 @@ $('fetch').onclick = async () => {
       meta: { source: src, url, fetchedAt: new Date().toISOString(), outer, inner, t0, t1, t2, nRaw: raw.length, nUsed: cat.length,
         magTypes: types, capped, sha256: sha } };
     $('catInfo').innerHTML = `${cat.length} olay (${fmtT(t0).slice(0, 10)} → ${fmtT(t2).slice(0, 10)}, genişletilmiş kutu). ` +
-      `Büyüklük türleri: ${types.slice(0, 6).map(([k, v]) => `${esc(k)} ${v}`).join(', ')}. ${typeNote}` +
+      `Büyüklük türleri: ${types.slice(0, 6).map(([k, v]) => `${esc(mtName(k))} ${v}`).join(', ')}. ${typeNote}` +
       (capped ? ` <span class="fail">Kaynak üst sınırına (20 000) ulaşıldı — katalog eksik; bölgeyi ya da dönemi küçültün.</span>` : '') +
       `<br>SHA-256: <code>${sha.slice(0, 16)}…</code>`;
     $('runAll').disabled = cat.length === 0;
@@ -256,12 +257,22 @@ function renderResults() {
     `<b>Combined ${out.counts.combined}</b> · analiz edilebilen ${ok.length} · ` +
     `${labelHtml('sig')} <b>${k}</b>${ok.length ? ` (%${(100 * k / ok.length).toFixed(1)}; Wilson %95: %${(100 * lo).toFixed(1)}–%${(100 * hi).toFixed(1)})` : ''}</div>` +
     (nd.length ? `<div class="flag">Varsayılan dışı: ${nd.map(x => `${x.key} = ${x.value} (varsayılan ${x.default})`).join('; ')}</div>` : `<div class="note">Tüm parametreler varsayılan.</div>`) +
-    `<div class="note">Kaynak: ${esc(state.meta.source.toUpperCase())} · ${state.meta.nUsed} olay · SHA-256 ${state.meta.sha256.slice(0, 12)}… · ${PMSR_VERSION}</div>`;
+    `<table style="width:auto;margin-top:6px"><tr><th>Katalog kaynağı</th><td>${esc(state.meta.source.toUpperCase())}${state.meta.url ? ` · <span class="note">${esc(state.meta.url.length > 90 ? state.meta.url.slice(0, 90) + '…' : state.meta.url)}</span>` : ''}</td></tr>` +
+    `<tr><th>Sorgulanan dönem</th><td>${fmtT(state.meta.t0).slice(0, 10)} → ${fmtT(state.meta.t2).slice(0, 10)} (ana şoklar ${fmtT(state.meta.t1).slice(0, 10)}'den itibaren)</td></tr>` +
+    `<tr><th>Olay sayısı</th><td>${state.meta.nUsed} kullanıldı / ${state.meta.nRaw} indirildi${state.meta.capped ? ' <span class="fail">— kaynak üst sınırı, katalog eksik</span>' : ''}</td></tr>` +
+    `<tr><th>Büyüklük türü</th><td>${state.meta.magTypes.length > 1 && $('oneType').checked ? esc(mtName(state.meta.magTypes[0][0])) + ' (baskın tür)' : state.meta.magTypes.map(([k]) => esc(mtName(k))).join(', ')}</td></tr>` +
+    `<tr><th>Analiz yarıçapı / pencere</th><td>${state.opts.radiusKm} km · ${state.opts.windowDays} gün · kalibrasyon ${state.opts.calibDays}→${state.opts.windowDays} gün · yerel Mc her satırda</td></tr>` +
+    `<tr><th>Parametreler</th><td>${nd.length ? '<span class="flag">varsayılan dışı</span>' : 'varsayılan (Khan vd., 2025)'}</td></tr>` +
+    `<tr><th>Katalog parmak izi</th><td><code>${state.meta.sha256.slice(0, 16)}…</code> · ${PMSR_VERSION}</td></tr></table>` +
+    `<div class="note">Sonuçlar seçilen kataloğa bağlıdır: aynı bölge için USGS, EMSC ve AFAD farklı olay sayıları, büyüklük türleri ve tamlık verir; ` +
+    `bu farklar Mc'yi ve sayımları, dolayısıyla p değerini değiştirir. Kaynaklar arası karşılaştırma için aynı bölgeyi her kaynakla ayrı çalıştırın.</div>` +
+    `<div class="note"><b>p = 0</b>: son 20 günün sayısı kalibrasyondaki kayan pencerelerin hiçbirinde aşılmadı demektir; olasılığın sıfır olduğu anlamına gelmez. ` +
+    `Çözünürlük ~1/32 500'dür ve etkin bağımsız pencere sayısı ~17 olduğundan p değerleri bir olasılık değil, ampirik sıra ölçüsüdür.</div>`;
   $('resTable').innerHTML = `<tr><th>Zaman (UTC)</th><th>M</th><th>Enlem</th><th>Boylam</th><th>Seçim</th><th>Mc (n, r)</th><th>N₂₀</th><th>Kalib.</th><th>p</th><th>Type A</th><th>Sonuç</th></tr>` +
     R.map((r, i) => `<tr class="click" data-i="${i}"><td>${fmtT(r.t).slice(0, 16)}</td><td>${r.m.toFixed(1)}</td><td>${r.lat.toFixed(3)}</td><td>${r.lon.toFixed(3)}</td>` +
       `<td>${r.combined ? 'Combined' : (r.fixed ? 'yalnız Fixed' : r.magdep ? 'yalnız Mag-Dep' : 'hiçbiri')}</td>` +
       `<td>${r.mc ? `${isFinite(r.mc.mc) ? r.mc.mc.toFixed(1) : '—'} (${r.mc.n}, ${r.mc.radiusKm} km)` : '—'}</td>` +
-      `<td>${r.esr ? r.esr.nObs : '—'}</td><td>${r.esr ? r.esr.nCalib : '—'}</td><td>${r.esr ? fmtP(r.esr.p) : '—'}</td>` +
+      `<td>${r.esr ? r.esr.nObs : '—'}</td><td>${r.esr ? r.esr.nCalib : '—'}</td><td>${r.esr ? (r.esr.p === 0 ? '0 <span class="flag" title="Kalibrasyondaki hiçbir pencere aşılmadı; olasılık sıfır değildir">*</span>' : fmtP(r.esr.p)) : '—'}</td>` +
       `<td>${r.typeA ?? '—'}${r.typeAWarning ? ' <span class="flag" title="Yerel Mc, Type A eşiğinin üstünde">!</span>' : ''}</td>` +
       `<td>${labelHtml(r.label)}${r.shortHistory ? ' <span class="flag" title="Katalog, kalibrasyon için yeterince geriye gitmiyor">kısa geçmiş</span>' : ''}</td></tr>`).join('');
   document.querySelectorAll('#resTable tr.click').forEach(tr => tr.onclick = () => {
