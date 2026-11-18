@@ -41,3 +41,6 @@ Yok. (Ridgecrest bölgesi tanımında haversine mesafesi kullanıldı; ön kayı
 
 ## Etiket
 Sonuçlar "ana şok öncesi anlamlı oran artışı"dır; "öncü" etiketi kullanılmaz.
+
+## Doğrulama ve sınırlılık
+Veri işleme, yıllık sayılar ve tekrarlanabilirlik kontrolleri: `DOGRULAMA.md`. Orada belgelenen önemli sınırlılık: Combined ana şokların büyüklük türü dönemler arasında farklı (2008–2017: Mw 32 / ML 27 / Mh 2; 2018–2026: Mw 50 / ML 1). Yalnız Mw ana şoklarla keşifsel karşılaştırma: 7/31 ↔ 8/48, Fisher p = 0,56.
