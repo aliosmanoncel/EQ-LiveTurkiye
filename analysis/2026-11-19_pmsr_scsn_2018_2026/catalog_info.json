@@ -1,0 +1,43 @@
+{
+ "dosya_sha256": {
+  "2017.catalog.txt": "912c84f31fd062450fc5269293b751edbfbeded15419dcfa5e0359808dfe000d",
+  "2018.catalog.txt": "c5165bfc0e712985c0cbec4176740113380ca2b7f27be07edc69c72102efdbb9",
+  "2019.catalog.txt": "9ec160cacb7582ca45aebb2f893e229c3187832c2176677dee225215d414caa5",
+  "2020.catalog.txt": "b8630b0daf90cb5b8e33efbe57e28ac7f9342a53f0dc2a5a7e3dfb85ae1557ef",
+  "2021.catalog.txt": "eccadce24356a87d2834b55f4ffb39502ffbd028fbfd24bfbffd497fc21c398f",
+  "2022.catalog.txt": "f64063c5bfbfc59a82a8a011dc6b6c163fe72d17818dd0c5887bb530b6254501",
+  "2023.catalog.txt": "26848025ae638a92c39662d66c2ad304a8ac9af1560774e5ce407d2ae357d9f9",
+  "2024.catalog.txt": "f683a19150354f43e28535659ec15e20e4189561d34843b1befa3f0456fb33c4",
+  "2025.catalog.txt": "930f295a7dd2815ef48eea25ace0b69a6e8cb37755e7babf3af2e01f7eeb5fd4",
+  "2026.catalog.txt": "abe089de84e67d891c7abf3358ff4b36e74d40e802ecaac3b82660ccc20212ef"
+ },
+ "toplam": 245016,
+ "bolge": 230954,
+ "tarih_ayrisamayan_satir": 0,
+ "ilk": "2017-01-01 00:04:06.480000",
+ "son": "2026-11-17 07:17:31.430000",
+ "yillik_bolge": {
+  "2017": 15508,
+  "2018": 19924,
+  "2019": 64987,
+  "2020": 34738,
+  "2021": 21955,
+  "2022": 15678,
+  "2023": 12471,
+  "2024": 14808,
+  "2025": 15602,
+  "2026": 15283
+ },
+ "olay_turu": {
+  "eq": 224786,
+  "qb": 6168
+ },
+ "buyukluk_turu": {
+  "l": 230034,
+  "w": 400,
+  "h": 266,
+  "lr": 253,
+  "d": 1
+ },
+ "M4_aday_2018_sonrasi": 187
+}

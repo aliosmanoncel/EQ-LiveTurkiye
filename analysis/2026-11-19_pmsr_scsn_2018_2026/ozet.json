@@ -1,0 +1,64 @@
+{
+ "version": "pmsr-core-0.1.0",
+ "period": "2018-01-01 – 2026-11-17",
+ "selection": {
+  "candidates": 187,
+  "fixed": 66,
+  "magdep": 57,
+  "combined": 52
+ },
+ "primary": {
+  "name": "birincil (Mc tüm dönem)",
+  "analyzed": 49,
+  "sig": 12,
+  "na": 3,
+  "rate": 0.245,
+  "wilson95": [
+   0.146,
+   0.381
+  ],
+  "fisher_vs_2008_2017": 1
+ },
+ "reference_2008_2017": {
+  "sig": 15,
+  "analyzed": 58,
+  "rate": 0.259,
+  "wilson95": [
+   0.163,
+   0.384
+  ]
+ },
+ "typeA": {
+  "n": 52,
+  "typeA_ge1": 19,
+  "ref_2008_2017": "24/61"
+ },
+ "sensitivity": {
+  "causal_mc": {
+   "name": "nedensel Mc",
+   "analyzed": 47,
+   "sig": 12,
+   "na": 5,
+   "rate": 0.255,
+   "wilson95": [
+    0.153,
+    0.395
+   ],
+   "fisher_vs_2008_2017": 1
+  },
+  "ridgecrest_excluded": {
+   "name": "Ridgecrest hariç",
+   "analyzed": 45,
+   "sig": 10,
+   "na": 3,
+   "rate": 0.222,
+   "wilson95": [
+    0.125,
+    0.363
+   ],
+   "fisher_vs_2008_2017": 0.8174
+  },
+  "ridgecrest_zone_n": 4,
+  "conservative_p_sig": 0
+ }
+}
