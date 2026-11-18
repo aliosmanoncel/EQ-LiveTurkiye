@@ -1,0 +1,20 @@
+{
+ "0.3": {
+  "rastgele_zaman_p01": 0.025333333333333333,
+  "n_rastgele": 1500,
+  "anasok_oncesi_p01": 0.046218487394957986,
+  "n_anasok": 476
+ },
+ "0.6": {
+  "rastgele_zaman_p01": 0.024666666666666667,
+  "n_rastgele": 1500,
+  "anasok_oncesi_p01": 0.047244094488188976,
+  "n_anasok": 381
+ },
+ "0.8": {
+  "rastgele_zaman_p01": 0.034666666666666665,
+  "n_rastgele": 1500,
+  "anasok_oncesi_p01": 0.13025210084033614,
+  "n_anasok": 238
+ }
+}

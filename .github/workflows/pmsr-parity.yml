@@ -1,0 +1,31 @@
+name: PMSR parity (JS == donmus SCSN referansi)
+
+# Pre-mainshock Seismicity Rate Test: lab/premainshock-rate/core.mjs,
+# scripts/fixtures/pmsr_scsn_box_ref.json ile BIREBIR ayni olmali
+# (ana sok secimi, yerel Mc, ESR, Type A).
+on:
+  push:
+    paths:
+      - 'lab/premainshock-rate/**'
+      - 'scripts/validate_pmsr_parity.mjs'
+      - 'scripts/fixtures/pmsr_*'
+      - '.github/workflows/pmsr-parity.yml'
+  pull_request:
+    paths:
+      - 'lab/premainshock-rate/**'
+      - 'scripts/validate_pmsr_parity.mjs'
+      - 'scripts/fixtures/pmsr_*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/validate_pmsr_parity.mjs
