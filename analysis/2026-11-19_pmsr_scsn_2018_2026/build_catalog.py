@@ -16,12 +16,12 @@ c['DATETIME'] = pd.to_datetime(c['D'] + ' ' + c['T'], format='%Y/%m/%d %H:%M:%S.
 bad = int(c.DATETIME.isna().sum())
 c = c.dropna(subset=['DATETIME']).sort_values('DATETIME').reset_index(drop=True)
 reg = c[(c.LON >= -118.80) & (c.LON <= -115.40) & (c.LAT >= 32.68) & (c.LAT <= 36.20)].copy()
-reg['t'] = (reg.DATETIME - pd.Timestamp('1970-01-01')).dt.total_seconds()
+reg['t'] = ((reg.DATETIME - pd.Timestamp('1970-01-01')).dt.total_seconds()).round(2)
 out = reg[['EVID','DATETIME','t','LAT','LON','DEPTH','MAG','M','ET']].rename(columns={
     'EVID':'id','DATETIME':'time_utc','LAT':'lat','LON':'lon','DEPTH':'depth_km','MAG':'mag','M':'mag_type','ET':'event_type'})
 out['time_utc'] = out.time_utc.dt.strftime('%Y-%m-%dT%H:%M:%S.%f').str[:-4]
 with gzip.open('scsn_box_2017_2026.csv.gz', 'wt', compresslevel=9, newline='') as g:
-    out.to_csv(g, index=False, float_format='%.6g')
+    out.to_csv(g, index=False)
 info = dict(dosya_sha256=sh, toplam=len(c), bolge=len(reg), tarih_ayrisamayan_satir=bad,
             ilk=str(reg.DATETIME.min()), son=str(reg.DATETIME.max()),
             yillik_bolge=reg.groupby(reg.DATETIME.dt.year).size().to_dict(),

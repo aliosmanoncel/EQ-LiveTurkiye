@@ -7,7 +7,7 @@ import { selectMainshocks, analyzeEvent, wilson, PMSR_VERSION } from '../../lab/
 const lines = gunzipSync(readFileSync(new URL('scsn_box_2017_2026.csv.gz', import.meta.url))).toString().trim().split('\n');
 const H = lines[0].split(',');
 const ix = k => H.indexOf(k);
-const cat = lines.slice(1).map(l => { const f = l.split(','); return { id: +f[ix('id')], time: f[ix('time_utc')], t: +f[ix('t')], lat: +f[ix('lat')], lon: +f[ix('lon')], m: +f[ix('mag')] }; })
+const cat = lines.slice(1).map(l => { const f = l.split(','); return { id: +f[ix('id')], time: f[ix('time_utc')], t: Date.parse(f[ix('time_utc')] + 'Z') / 1000, lat: +f[ix('lat')], lon: +f[ix('lon')], m: +f[ix('mag')] }; })
   .sort((a, b) => a.t - b.t);
 const T0 = Date.UTC(2017, 0, 1) / 1000, TS = Date.UTC(2018, 0, 1) / 1000, TE = Date.UTC(2026, 10, 18) / 1000;
 
