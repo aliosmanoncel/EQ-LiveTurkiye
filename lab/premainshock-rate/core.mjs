@@ -217,7 +217,8 @@ export function analyzeEvent(cat, idx, opt = {}) {
     if (days < o.windowDays && q.m >= o.typeAMin) typeA.push(q.id);
     if (mc.enough && q.m >= mc.mc) before.push(days);
   }
-  const catStartDays = (ev.t - cat[0].t) / DAY;
+  // Katalog başlangıcı: sorgunun başlangıç zamanı verilmişse o (canlı sorgularda ilk olay daha geç olabilir), yoksa ilk olay
+  const catStartDays = (ev.t - (isFinite(o.catalogStart) ? o.catalogStart : cat[0].t)) / DAY;
   const r = mc.enough ? esr(before, { ...o, cutOffDay: Math.min(catStartDays, o.calibDays) }) : null;
   const label = !mc.enough ? 'na' : (r.significant ? 'sig' : 'ns');
   return { id: ev.id, t: ev.t, m: ev.m, lat: ev.lat, lon: ev.lon, mc, esr: r, typeA: typeA.length,

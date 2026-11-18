@@ -278,7 +278,7 @@ $('runAll').onclick = async () => {
   setStatus('Ana şoklar seçiliyor ve test ediliyor…');
   $('runAll').disabled = true;
   try {
-    const out = await runWorker({ cat: state.cat, opts, inner: state.inner, t1: state.t1, t2: state.t2 },
+    const out = await runWorker({ cat: state.cat, opts, inner: state.inner, t1: state.t1, t2: state.t2, t0: state.meta.t0 },
       p => setStatus(`Test ediliyor… ${p.done}/${p.total}`));
     state.results = out; state.opts = opts;
     renderResults();
