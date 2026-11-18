@@ -11,7 +11,7 @@ Combined ana şok seçimi (Fixed ∪ Mag-Dep dışlaması), yerel Mc (b-değeri 
 Empirical Seismicity Rate (20 gün / 10 km; kalibrasyon 365→20 gün; 0,01 gün adım; p < 0,01).
 
 ## Arayüz (`index.html`)
-- **Bölge ve olay analizi:** kaynak USGS (küresel) ya da EMSC (Avrupa-Akdeniz) canlı FDSN, veya dosya yükleme
+- **Bölge ve olay analizi:** kaynak EMSC (Avrupa, Türkiye dahil) ya da USGS (Global) canlı FDSN, veya dosya yükleme
   (AFAD dışa aktarımı ya da başka katalog; CSV/JSON). AFAD tarayıcıdan canlı sorgulanamıyor (sunucu tarayıcı isteklerini
   reddediyor), bu yüzden dosya yükleme yolu.
   Katalog, ana şok döneminden 385 gün önce başlayarak ve kutu 0,5° genişletilerek alınır; ana şoklar iç kutudan seçilir.
@@ -19,6 +19,7 @@ Empirical Seismicity Rate (20 gün / 10 km; kalibrasyon 365→20 gün; 0,01 gün
   olmayanlar *analiz için yeterli veri yok* olarak işaretlenir. Satıra tıklamak tek olay ayrıntısını (günlük sayım grafiği,
   N₂₀, kalibrasyon persentili, p) açar.
 - Varsayılan dışı parametreler sonuçta işaretlenir; baskın büyüklük türü seçeneği varsayılan açıktır.
+- **EMSC kurum filtresi:** EMSC birçok kurumun çözümünü birleştirir (Türkiye için AFAD ve KOERI). Büyüklüğü veren kurum (MagAuthor) dağılımı gösterilir; tek kurum seçilerek homojen alt katalog elde edilir (ör. EMSC üzerinden AFAD).
 - **Analiz kaydı (JSON):** kaynak, sorgu URL'si, indirme zamanı, olay sayısı, katalog SHA-256, parametreler, sonuçlar.
 - **Referans: SCSN yeniden üretimi:** donmuş referansı tarayıcıda çalıştırır ve olay bazında karşılaştırır.
 

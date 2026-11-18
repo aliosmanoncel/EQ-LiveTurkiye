@@ -63,8 +63,8 @@
       <h2>1 · Veri kaynağı ve bölge</h2>
       <label>Kaynak
         <select id="src" class="wide">
-          <option value="usgs">USGS — küresel (canlı)</option>
-          <option value="emsc">EMSC — Avrupa-Akdeniz (canlı)</option>
+          <option value="emsc">EMSC — Avrupa, Türkiye dahil (canlı)</option>
+          <option value="usgs">USGS — Global (canlı)</option>
           <option value="upload">Dosya yükle — AFAD dışa aktarımı ya da başka katalog</option>
         </select></label>
       <span id="uploadBox" class="hidden">
@@ -125,7 +125,7 @@
 
 <script type="module">
 import { DEFAULTS, PMSR_VERSION, LABELS, nonDefault, wilson } from './core.mjs';
-import { SOURCES, parseUpload, magTypeSummary, sha256OfCatalog } from './sources.mjs';
+import { SOURCES, parseUpload, magTypeSummary, agencySummary, sha256OfCatalog } from './sources.mjs';
 
 const $ = id => document.getElementById(id);
 const DAY = 86400;
@@ -152,7 +152,9 @@ const PARAM_UI = [
 ];
 $('params').innerHTML = PARAM_UI.map(([k, t]) => `<label>${t}<input type="number" step="any" data-k="${k}" value="${DEFAULTS[k]}"></label>`).join('') +
   `<label class="chk"><input type="checkbox" id="mcCausal"> Mc yalnız ana şok öncesi veriden (nedensel)</label>` +
-  `<label class="chk"><input type="checkbox" id="oneType" checked> Yalnız baskın büyüklük türünü kullan</label>`;
+  `<label class="chk"><input type="checkbox" id="oneType" checked> Yalnız baskın büyüklük türünü kullan</label>` +
+  `<label>EMSC: büyüklüğü veren kurum<select id="agency" class="wide"><option value="">Tümü (karma katalog)</option></select></label>`;
+document.addEventListener('change', e => { if (e.target.id === 'agency' || e.target.id === 'oneType') applyFilters(); });
 function readOpts() {
   const o = {};
   document.querySelectorAll('#params input[data-k]').forEach(i => { const v = parseFloat(i.value); if (isFinite(v)) o[i.dataset.k] = v; });
@@ -163,7 +165,8 @@ function readOpts() {
 // ---- kaynak seçimi
 const SRC_NOTES = {
   usgs: 'USGS FDSN; tek sorguda en çok 20 000 olay; yalnız "earthquake" türü. Büyüklük türleri karışıktır (ml, md, mb, mw…).',
-  emsc: 'EMSC FDSN; tek sorguda en çok 20 000 olay. Büyüklük türleri karışıktır.',
+  emsc: 'EMSC FDSN; tek sorguda en çok 20 000 olay. EMSC birçok kurumun çözümünü birleştirir (Türkiye için AFAD ve Kandilli/KOERI, ' +
+    'İtalya için INGV…). Homojen bir alt katalog için kurum seçin: aşağıdaki "büyüklüğü veren kurum" listesi katalog indirildikten sonra dolar.',
   upload: 'AFAD verisi tarayıcıdan canlı sorgulanamıyor (AFAD sunucusu tarayıcı isteklerini reddediyor). ' +
     'deprem.afad.gov.tr › Deprem Kataloğu üzerinden indirdiğiniz CSV/JSON dosyasını yükleyin. Başlıklar: time/date, lat, lon, mag (isteğe bağlı: id, magtype).',
 };
@@ -200,24 +203,39 @@ $('fetch').onclick = async () => {
       capped = raw.length >= SOURCES[src].limit;
     }
     raw.sort((a, b) => a.t - b.t);
-    const types = magTypeSummary(raw);
-    let cat = raw, typeNote = '';
-    if ($('oneType').checked && types.length > 1) {
-      const dom = types[0][0]; cat = raw.filter(e => (e.magType || '?') === dom);
-      typeNote = `Baskın büyüklük türü <b>${esc(dom)}</b> kullanıldı (${cat.length}/${raw.length} olay).`;
-    } else if (types.length > 1) typeNote = `<span class="flag">Karışık büyüklük türleri kullanılıyor</span> — Mc ve sayımlar yanlı olabilir.`;
-    const sha = await sha256OfCatalog(cat);
-    state = { cat, inner, t1, t2, results: null,
-      meta: { source: src, url, fetchedAt: new Date().toISOString(), outer, inner, t0, t1, t2, nRaw: raw.length, nUsed: cat.length,
-        magTypes: types, capped, sha256: sha } };
-    $('catInfo').innerHTML = `${cat.length} olay (${fmtT(t0).slice(0, 10)} → ${fmtT(t2).slice(0, 10)}, genişletilmiş kutu). ` +
-      `Büyüklük türleri: ${types.slice(0, 6).map(([k, v]) => `${esc(mtName(k))} ${v}`).join(', ')}. ${typeNote}` +
-      (capped ? ` <span class="fail">Kaynak üst sınırına (20 000) ulaşıldı — katalog eksik; bölgeyi ya da dönemi küçültün.</span>` : '') +
-      `<br>SHA-256: <code>${sha.slice(0, 16)}…</code>`;
-    $('runAll').disabled = cat.length === 0;
-    setStatus(cat.length ? 'Katalog hazır.' : 'Bu bölge ve dönemde olay yok.', !cat.length);
+    state = { raw, inner, t1, t2, results: null, base: { source: src, url, fetchedAt: new Date().toISOString(), outer, inner, t0, t1, t2, capped } };
+    const agencies = agencySummary(raw);
+    $('agency').innerHTML = '<option value="">Tümü (karma katalog)</option>' + agencies.map(([k, v]) => `<option value="${esc(k)}">${esc(k)} (${v})</option>`).join('');
+    await applyFilters();
   } catch (err) { setStatus(err.message, true); }
 };
+
+// Kurum ve büyüklük türü filtreleri (yeniden indirmeden uygulanır)
+async function applyFilters() {
+  if (!state.raw) return;
+  const raw = state.raw, B = state.base;
+  const agencies = agencySummary(raw), ag = $('agency').value;
+  let pool = raw, note = '';
+  if (ag) { pool = raw.filter(e => e.magAuthor === ag); note = `Kurum: <b>${esc(ag)}</b> (${pool.length}/${raw.length} olay). `; }
+  else if (agencies.length > 1) note = `<span class="flag">Karma katalog: ${agencies.slice(0, 5).map(([k, v]) => `${esc(k)} ${v}`).join(', ')}</span> — homojenlik için 2. bölümden kurum seçin. `;
+  const types = magTypeSummary(pool);
+  let cat = pool;
+  if ($('oneType').checked && types.length > 1) {
+    const dom = types[0][0]; cat = pool.filter(e => (e.magType || '?') === dom);
+    note += `Baskın büyüklük türü <b>${esc(mtName(dom))}</b> kullanıldı (${cat.length}/${pool.length} olay).`;
+  } else if (types.length > 1) note += `<span class="flag">Karışık büyüklük türleri kullanılıyor</span> — Mc ve sayımlar yanlı olabilir.`;
+  const sha = await sha256OfCatalog(cat);
+  state.cat = cat; state.results = null;
+  state.meta = { ...B, nRaw: raw.length, nUsed: cat.length, agency: ag || null, agencies, magTypes: types, sha256: sha };
+  $('catInfo').innerHTML = `${cat.length} olay (${fmtT(B.t0).slice(0, 10)} → ${fmtT(B.t2).slice(0, 10)}, genişletilmiş kutu). ` +
+    `Büyüklük türleri: ${types.slice(0, 6).map(([k, v]) => `${esc(mtName(k))} ${v}`).join(', ')}. ${note}` +
+    (B.capped ? ` <span class="fail">Kaynak üst sınırına (20 000) ulaşıldı — katalog eksik; bölgeyi ya da dönemi küçültün.</span>` : '') +
+    `<br>SHA-256: <code>${sha.slice(0, 16)}…</code>`;
+  $('runAll').disabled = cat.length === 0;
+  $('resBox').classList.add('hidden');
+  setStatus(cat.length ? 'Katalog hazır.' : 'Bu bölge ve dönemde (filtrelerle) olay yok.', !cat.length);
+}
+
 
 // ---- analiz (Web Worker)
 function runWorker(payload, onProgress) {
@@ -260,6 +278,7 @@ function renderResults() {
     `<table style="width:auto;margin-top:6px"><tr><th>Katalog kaynağı</th><td>${esc(state.meta.source.toUpperCase())}${state.meta.url ? ` · <span class="note">${esc(state.meta.url.length > 90 ? state.meta.url.slice(0, 90) + '…' : state.meta.url)}</span>` : ''}</td></tr>` +
     `<tr><th>Sorgulanan dönem</th><td>${fmtT(state.meta.t0).slice(0, 10)} → ${fmtT(state.meta.t2).slice(0, 10)} (ana şoklar ${fmtT(state.meta.t1).slice(0, 10)}'den itibaren)</td></tr>` +
     `<tr><th>Olay sayısı</th><td>${state.meta.nUsed} kullanıldı / ${state.meta.nRaw} indirildi${state.meta.capped ? ' <span class="fail">— kaynak üst sınırı, katalog eksik</span>' : ''}</td></tr>` +
+    `<tr><th>Büyüklüğü veren kurum</th><td>${state.meta.agency ? esc(state.meta.agency) : (state.meta.agencies && state.meta.agencies.length > 1 ? '<span class="flag">karma</span>' : (state.meta.agencies && state.meta.agencies[0] ? esc(state.meta.agencies[0][0]) : '—'))}</td></tr>` +
     `<tr><th>Büyüklük türü</th><td>${state.meta.magTypes.length > 1 && $('oneType').checked ? esc(mtName(state.meta.magTypes[0][0])) + ' (baskın tür)' : state.meta.magTypes.map(([k]) => esc(mtName(k))).join(', ')}</td></tr>` +
     `<tr><th>Analiz yarıçapı / pencere</th><td>${state.opts.radiusKm} km · ${state.opts.windowDays} gün · kalibrasyon ${state.opts.calibDays}→${state.opts.windowDays} gün · yerel Mc her satırda</td></tr>` +
     `<tr><th>Parametreler</th><td>${nd.length ? '<span class="flag">varsayılan dışı</span>' : 'varsayılan (Khan vd., 2025)'}</td></tr>` +

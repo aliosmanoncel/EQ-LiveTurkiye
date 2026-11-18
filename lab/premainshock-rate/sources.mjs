@@ -5,7 +5,7 @@ const iso = t => new Date(t * 1000).toISOString().slice(0, 19);
 
 export const SOURCES = {
   usgs: {
-    label: 'USGS (küresel, canlı FDSN)',
+    label: 'USGS — Global (canlı FDSN)',
     url: (b, t0, t1) => `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time-asc&limit=20000` +
       `&minlatitude=${b.s}&maxlatitude=${b.n}&minlongitude=${b.w}&maxlongitude=${b.e}&starttime=${iso(t0)}&endtime=${iso(t1)}`,
     limit: 20000,
@@ -15,7 +15,7 @@ export const SOURCES = {
       evType: f.properties.type })).filter(e => e.evType === 'earthquake' || !e.evType),
   },
   emsc: {
-    label: 'EMSC (Avrupa-Akdeniz, canlı FDSN)',
+    label: 'EMSC — Avrupa, Türkiye dahil (canlı FDSN)',
     url: (b, t0, t1) => `https://www.seismicportal.eu/fdsnws/event/1/query?format=text&orderby=time-asc&limit=20000` +
       `&minlat=${b.s}&maxlat=${b.n}&minlon=${b.w}&maxlon=${b.e}&start=${iso(t0)}&end=${iso(t1)}`,
     limit: 20000,
@@ -32,7 +32,9 @@ export function parseFdsnText(txt) {
     const t = Date.parse(c[1].trim().replace(/Z?$/, 'Z')) / 1000;
     const m = parseFloat(c[10]);
     if (!isFinite(t) || !isFinite(m)) continue;
-    out.push({ id: c[0].trim(), t, lat: +c[2], lon: +c[3], m, magType: (c[9] || '').trim().toLowerCase() });
+    // Author: konum çözümünü veren kurum; MagAuthor: büyüklüğü veren kurum (ör. AFAD, KOERI, INGV, NOA)
+    out.push({ id: c[0].trim(), t, lat: +c[2], lon: +c[3], m, magType: (c[9] || '').trim().toLowerCase(),
+      author: (c[5] || '').trim(), magAuthor: (c[11] || '').trim() || (c[5] || '').trim() });
   }
   return out;
 }
@@ -76,8 +78,14 @@ export function magTypeSummary(cat) {
   return Object.entries(c).sort((a, b) => b[1] - a[1]);
 }
 
+// Büyüklüğü veren kurum dağılımı (EMSC). Tek kurum + tek büyüklük türü = homojen alt katalog.
+export function agencySummary(cat) {
+  const c = {}; for (const e of cat) if (e.magAuthor) c[e.magAuthor] = (c[e.magAuthor] || 0) + 1;
+  return Object.entries(c).sort((a, b) => b[1] - a[1]);
+}
+
 export async function sha256OfCatalog(cat) {
-  const s = cat.map(e => `${e.id},${e.t},${e.lat},${e.lon},${e.m},${e.magType}`).join('\n');
+  const s = cat.map(e => `${e.id},${e.t},${e.lat},${e.lon},${e.m},${e.magType},${e.magAuthor || ''}`).join('\n');
   const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
