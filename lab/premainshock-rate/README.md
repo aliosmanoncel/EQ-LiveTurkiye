@@ -44,9 +44,17 @@ Bu kod makaledeki yöntem tanımından bağımsız yazılmıştır. GPLv3 lisans
 depo dışında referans çıktı üretmek için kullanılmıştır; satır aktarımı yoktur. Doğrulama sırasında `statseis`
 kaynak kodu okunmuştur; bu nedenle "temiz oda" iddiası yoktur. Hukuki görüş değildir.
 
+## p değeri
+Monte Carlo ya da bootstrap değildir: p = (N₂₀'ye eşit ya da büyük sayıya sahip kayan pencere sayısı) / (toplam kayan pencere),
+pencereler 0,01 gün adımla kaydırılır (Khan vd., 2025). Pencereler örtüştüğünden bağımsız değildir; bilgi amaçlı olarak örtüşmeyen
+20 günlük pencerelerle muhafazakâr p = (k+1)/(n+1) de raporlanır. Tek yıllık kalibrasyonda n = 17 olduğundan muhafazakâr p en az
+1/18 ≈ 0,056'dır; yani yöntemin p < 0,01 eşiği muhafazakâr anlamda bir olasılık değil, ampirik bir sıralama ölçütüdür.
+Sonuç öncü etkinliğin varlığını kanıtlamaz.
+
 ## Bilinen sınırlar
 - Mc yarıçapı WGS84 jeodezik uzaklıkla; ESR ve Type A yarıçapı küresel (R = 6371 km) haversine ile ölçülür (referansla aynı).
 - 1 yıllık kalibrasyonla nominal %1 eşiğin gerçek yanlış pozitif oranı Poisson altında %1,7–3,0'tür (Faz 0, T2a).
+- Canlı test (2026-11-18): USGS Ridgecrest 2019-07-04 Mw 6,4 → Combined, Mc 1,4, N₂₀ = 8, en yoğun kalibrasyon penceresi 2, p = 0 (anlamlı artış). EMSC Düzce 2021-11-17 → bir yılda 38 olay (M ≥ 2,0) → *Analiz için yeterli veri yok*. Türkiye için yoğun ulusal katalog (dosya yükleme) gerekir.
 - Canlı USGS ve EMSC sorguları tek seferde en çok 20 000 olay alır; sınır aşılırsa uyarı verilir (bölgeyi ya da dönemi küçültün).
 - Mag-Dep seçimi için daha büyük olaylar 0,5°'lik kenar payı içinde aranır; M ≥ 6 olayların daha geniş pencereleri kenar payını aşabilir.
 - Canlı kaynaklarda yalnız deprem türü olaylar kullanılır (SCSN referansında ocak patlamaları da vardı).

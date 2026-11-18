@@ -186,8 +186,14 @@ export function esr(daysBefore, opt = {}) {
     q99 = s[f] + (s[Math.min(f + 1, s.length - 1)] - s[f]) * (pos - f);
     maxW = s[s.length - 1];
   }
+  // Bilgi amaçlı: örtüşmeyen W günlük pencereler (W..2W, 2W..3W, … ≤ cut) ile muhafazakâr p = (k+1)/(n+1).
+  // Yöntemin p'sini (Khan vd.) değiştirmez; tek yıllık kalibrasyonla ulaşılabilecek en küçük
+  // muhafazakâr p'nin 1/(n+1) ≈ 0,056 olduğunu göstermek içindir.
+  let nInd = 0, kInd = 0;
+  for (let a = W; a + W <= cut + 1e-9; a += W) { nInd++; if (ub(reg, a + W) - ub(reg, a) >= nObs) kInd++; }
+  const pCons = nInd ? (kInd + 1) / (nInd + 1) : NaN;
   return { nObs, nCalib: reg.length, nWindows: counts.length, p: pval, q99, maxWindow: maxW,
-           significant: pval < o.alpha };
+           significant: pval < o.alpha, nIndependent: nInd, kIndependent: kInd, pConservative: pCons };
 }
 
 // ---------- Tek ana şok için tüm zincir ----------

@@ -90,3 +90,12 @@ export async function sha256OfCatalog(cat) {
   const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
+
+// Baskın büyüklük türü filtresi: yalnız M < mMin olaylara uygulanır; M ≥ mMin (ana şok adayları,
+// çoğunlukla Mw) türünden bağımsız korunur. Döner: { cat, dominant }
+export function filterDominantMagType(cat, mMin) {
+  const types = magTypeSummary(cat);
+  if (types.length <= 1) return { cat, dominant: types[0] ? types[0][0] : null };
+  const dom = types[0][0];
+  return { cat: cat.filter(e => (e.magType || '?') === dom || e.m >= mMin), dominant: dom };
+}

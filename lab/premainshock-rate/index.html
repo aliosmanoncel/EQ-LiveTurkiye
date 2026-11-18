@@ -135,7 +135,7 @@
 
 <script type="module">
 import { DEFAULTS, PMSR_VERSION, LABELS, nonDefault, wilson } from './core.mjs';
-import { SOURCES, parseUpload, magTypeSummary, agencySummary, sha256OfCatalog } from './sources.mjs';
+import { SOURCES, parseUpload, magTypeSummary, agencySummary, sha256OfCatalog, filterDominantMagType } from './sources.mjs';
 
 const $ = id => document.getElementById(id);
 const DAY = 86400;
@@ -241,8 +241,8 @@ async function applyFilters() {
   let cat = pool;
   if ($('oneType').checked && types.length > 1) {
     // Büyük depremler çoğunlukla Mw ile verilir; ana şok eşiğinin üstündeki olaylar türüne bakılmadan korunur
-    const dom = types[0][0], mMin = readOpts().mainshockMin ?? DEFAULTS.mainshockMin;
-    cat = pool.filter(e => (e.magType || '?') === dom || e.m >= mMin);
+    const mMin = readOpts().mainshockMin ?? DEFAULTS.mainshockMin;
+    const f = filterDominantMagType(pool, mMin); cat = f.cat; const dom = f.dominant;
     note += `M &lt; ${mMin} için baskın büyüklük türü <b>${esc(mtName(dom))}</b> kullanıldı; M ≥ ${mMin} olaylar türünden bağımsız korundu (${cat.length}/${pool.length} olay).`;
   } else if (types.length > 1) note += `Katalogun tercih edilen büyüklükleri kullanılıyor (karışık türler: SCSN referansındaki gibi). `;
   const sha = await sha256OfCatalog(cat);
@@ -346,7 +346,12 @@ function renderDetail(r) {
   $('detail').innerHTML = `<div class="box"><b>${fmtT(r.t)} · M ${r.m.toFixed(1)}</b> ${labelHtml(r.label)}<br>` +
     `<span class="note">Son ${W} gün: <b>${r.esr.nObs}</b> olay (M ≥ ${r.mc.mc.toFixed(1)}, ${o.radiusKm} km). Kalibrasyonda (${C}→${W} gün) ${r.esr.nWindows} kayan pencere: ` +
     `99. persentil ${r.esr.q99.toFixed(1)}, en yoğun pencere ${r.esr.maxWindow}. p = ${fmtP(r.esr.p)}. ` +
-    `Örtüşmeyen ${W} günlük pencere sayısı yalnız ~${Math.floor((C - W) / W)}'dir; p bir olasılık değil, ampirik sıralama ölçüsüdür.</span>${svg}` +
+    `<br><b>p nasıl hesaplandı:</b> Monte Carlo ya da bootstrap değil. p = (N₂₀'ye eşit ya da büyük sayıya sahip kayan pencere sayısı) / (toplam kayan pencere, ${r.esr.nWindows}); ` +
+    `pencereler ${W} gün uzunluğunda, 0,01 gün adımla kalibrasyon dönemi boyunca kaydırılır (Khan vd., 2025; van den Ende ve Ampuero, 2020). Anlamlılık: p &lt; ${o.alpha}. ` +
+    (r.esr.p === 0 ? `<b>p = 0</b>: hiçbir pencere N₂₀'ye ulaşmadı; olasılığın sıfır olduğu anlamına gelmez. ` : '') +
+    `Pencereler örtüştüğü için bağımsız değildir: örtüşmeyen ${W} günlük pencere sayısı ${r.esr.nIndependent}, bunların ${r.esr.kIndependent}'inde sayı ≥ N₂₀; ` +
+    `bu pencerelerle muhafazakâr p = (k+1)/(n+1) = <b>${r.esr.pConservative.toFixed(3)}</b> (tek yıllık kalibrasyonla ulaşılabilecek en küçük değer ≈ ${(1 / (r.esr.nIndependent + 1)).toFixed(3)}). ` +
+    `Sonuç öncü etkinliğin varlığını kanıtlamaz; son ${W} günün, aynı noktanın önceki yılına göre olağan dışı olduğunu gösterir.</span>${svg}` +
     `<div class="note">Günlük olay sayısı; turuncu: öncü penceresi, mavi: kalibrasyon.</div></div>`;
 }
 
