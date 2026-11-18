@@ -60,6 +60,16 @@
   <!-- ========== ANALİZ ========== -->
   <section id="tab-analysis">
     <div class="box">
+      <h2>Hızlı başlangıç · Tek deprem</h2>
+      <label>Enlem<input type="number" id="qLat" step="0.001" placeholder="40.845"></label>
+      <label>Boylam<input type="number" id="qLon" step="0.001" placeholder="31.032"></label>
+      <label>Tarih (UTC)<input type="date" id="qDate"></label>
+      <label>&nbsp;<button class="primary" id="qRun">Bu depremi analiz et</button></label>
+      <div class="note">Seçilen kaynaktan (1. bölüm) episantrın çevresi indirilir, ana şok seçimi yapılır ve verilen konuma ve güne
+        en yakın M ≥ 4 deprem test edilir. Bağlantı olarak paylaşılabilir: <code>?src=emsc&amp;lat=40.845&amp;lon=31.032&amp;date=2021-11-17</code></div>
+    </div>
+
+    <div class="box">
       <h2>1 · Veri kaynağı ve bölge</h2>
       <label>Kaynak
         <select id="src" class="wide">
@@ -336,6 +346,33 @@ function renderDetail(r) {
     `99. persentil ${r.esr.q99.toFixed(1)}, en yoğun pencere ${r.esr.maxWindow}. p = ${fmtP(r.esr.p)}. ` +
     `Örtüşmeyen ${W} günlük pencere sayısı yalnız ~${Math.floor((C - W) / W)}'dir; p bir olasılık değil, ampirik sıralama ölçüsüdür.</span>${svg}` +
     `<div class="note">Günlük olay sayısı; turuncu: öncü penceresi, mavi: kalibrasyon.</div></div>`;
+}
+
+// ---- tek deprem (hızlı başlangıç) ve bağlantı parametreleri
+async function quickRun(lat, lon, dateStr) {
+  if (!isFinite(lat) || !isFinite(lon) || !dateStr) { setStatus('Enlem, boylam ve tarih girin.', true); return; }
+  $('s').value = (lat - 0.25).toFixed(3); $('n').value = (lat + 0.25).toFixed(3);
+  $('w').value = (lon - 0.3).toFixed(3); $('e').value = (lon + 0.3).toFixed(3);
+  const d = Date.parse(dateStr + 'T00:00:00Z');
+  $('t1').value = new Date(d - DAY * 1000).toISOString().slice(0, 10); $('t2').value = new Date(d + DAY * 1000).toISOString().slice(0, 10);
+  await $('fetch').onclick();
+  if (!state.cat || !state.cat.length) return;
+  await $('runAll').onclick();
+  const R = state.results && state.results.results; if (!R || !R.length) { setStatus('Bu konum ve günde M ≥ 4 deprem bulunamadı.', true); return; }
+  const t0 = d / 1000 + 43200, toRad = Math.PI / 180;
+  const score = r => Math.hypot((r.lat - lat) * 111, (r.lon - lon) * 111 * Math.cos(lat * toRad)) / 10 + Math.abs(r.t - t0) / DAY;
+  let bi = 0; R.forEach((r, i) => { if (score(r) < score(R[bi])) bi = i; });
+  const tr = document.querySelector(`#resTable tr.click[data-i="${bi}"]`); if (tr) { tr.click(); tr.scrollIntoView({ block: 'center' }); }
+  $('detail').scrollIntoView({ block: 'start' });
+}
+$('qRun').onclick = () => quickRun(+$('qLat').value, +$('qLon').value, $('qDate').value);
+{
+  const q = new URLSearchParams(location.search);
+  if (q.get('src') && SOURCES[q.get('src')]) { $('src').value = q.get('src'); onSrc(); }
+  if (q.has('lat') && q.has('lon') && q.has('date')) {
+    $('qLat').value = q.get('lat'); $('qLon').value = q.get('lon'); $('qDate').value = q.get('date');
+    quickRun(+q.get('lat'), +q.get('lon'), q.get('date'));
+  }
 }
 
 // ---- analiz kaydı
