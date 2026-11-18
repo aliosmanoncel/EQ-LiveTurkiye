@@ -19,7 +19,9 @@ Empirical Seismicity Rate (20 gün / 10 km; kalibrasyon 365→20 gün; 0,01 gün
   olmayanlar *analiz için yeterli veri yok* olarak işaretlenir. Satıra tıklamak tek olay ayrıntısını (günlük sayım grafiği,
   N₂₀, kalibrasyon persentili, p) açar.
 - Varsayılan dışı parametreler sonuçta işaretlenir; baskın büyüklük türü seçeneği varsayılan açıktır.
-- **EMSC kurum filtresi:** EMSC birçok kurumun çözümünü birleştirir (Türkiye için AFAD ve KOERI). Büyüklüğü veren kurum (MagAuthor) dağılımı gösterilir; tek kurum seçilerek homojen alt katalog elde edilir (ör. EMSC üzerinden AFAD).
+- **EMSC kurum filtreleri:** *Origin Agency* (Author: konum/zaman çözümünü veren) ve *Magnitude Agency* (MagAuthor:
+  büyüklüğü veren) ayrı filtrelerdir; ikisi aynı olmak zorunda değildir. Seçilen alt küme EMSC kataloğunun bir parçasıdır,
+  ilgili kurumun kendi kataloğuna eşdeğer sayılmaz. Karma katalog uyarısı her iki alan için ayrı verilir; filtreler SHA-256'ya yansır.
 - **Analiz kaydı (JSON):** kaynak, sorgu URL'si, indirme zamanı, olay sayısı, katalog SHA-256, parametreler, sonuçlar.
 - **Referans: SCSN yeniden üretimi:** donmuş referansı tarayıcıda çalıştırır ve olay bazında karşılaştırır.
 
@@ -39,6 +41,12 @@ Referans ve yeniden üretim ayrıntısı: `analysis/2026-11-18_pmsr_scsn_reprodu
 Bu kod makaledeki yöntem tanımından bağımsız yazılmıştır. GPLv3 lisanslı `statseis` (Azad Khan) yalnızca
 depo dışında referans çıktı üretmek için kullanılmıştır; satır aktarımı yoktur. Doğrulama sırasında `statseis`
 kaynak kodu okunmuştur; bu nedenle "temiz oda" iddiası yoktur. Hukuki görüş değildir.
+
+## Bekleyen doğrulama: EMSC alt kümesi ↔ AFAD kataloğu
+Aynı bölge ve dönem (Düzce, 2020-11 → 2022-12) için dört katalog karşılaştırılacak: EMSC karma, EMSC Origin = AFAD,
+EMSC Magnitude = AFAD ve AFAD'dan indirilen orijinal dosya. Ölçütler: olay sayısı, büyüklük-sıklık dağılımı ve Mc, zaman
+kapsamı ve olay eşleşme oranı. Kataloglar arası olay kimlikleri ortak olmadığından eşleşme kimlikle değil, zaman (± 5 s) ve
+episantr (≤ 10 km) toleransıyla yapılır; eşleşen olaylarda büyüklük farkı (ΔM) dağılımı raporlanır.
 
 ## Bilinen sınırlar
 - Mc yarıçapı WGS84 jeodezik uzaklıkla; ESR ve Type A yarıçapı küresel (R = 6371 km) haversine ile ölçülür (referansla aynı).

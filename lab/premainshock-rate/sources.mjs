@@ -34,7 +34,7 @@ export function parseFdsnText(txt) {
     if (!isFinite(t) || !isFinite(m)) continue;
     // Author: konum çözümünü veren kurum; MagAuthor: büyüklüğü veren kurum (ör. AFAD, KOERI, INGV, NOA)
     out.push({ id: c[0].trim(), t, lat: +c[2], lon: +c[3], m, magType: (c[9] || '').trim().toLowerCase(),
-      author: (c[5] || '').trim(), magAuthor: (c[11] || '').trim() || (c[5] || '').trim() });
+      author: (c[5] || '').trim() || '(boş)', magAuthor: (c[11] || '').trim() || '(boş)' });
   }
   return out;
 }
@@ -78,14 +78,15 @@ export function magTypeSummary(cat) {
   return Object.entries(c).sort((a, b) => b[1] - a[1]);
 }
 
-// Büyüklüğü veren kurum dağılımı (EMSC). Tek kurum + tek büyüklük türü = homojen alt katalog.
-export function agencySummary(cat) {
-  const c = {}; for (const e of cat) if (e.magAuthor) c[e.magAuthor] = (c[e.magAuthor] || 0) + 1;
+// Kurum dağılımı (EMSC). field: 'author' (konum/zaman çözümünü veren, Origin Agency)
+// ya da 'magAuthor' (büyüklüğü veren, Magnitude Agency). İkisi aynı olmak zorunda değildir.
+export function agencySummary(cat, field = 'magAuthor') {
+  const c = {}; for (const e of cat) if (e[field]) c[e[field]] = (c[e[field]] || 0) + 1;
   return Object.entries(c).sort((a, b) => b[1] - a[1]);
 }
 
 export async function sha256OfCatalog(cat) {
-  const s = cat.map(e => `${e.id},${e.t},${e.lat},${e.lon},${e.m},${e.magType},${e.magAuthor || ''}`).join('\n');
+  const s = cat.map(e => `${e.id},${e.t},${e.lat},${e.lon},${e.m},${e.magType},${e.author || ''},${e.magAuthor || ''}`).join('\n');
   const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
