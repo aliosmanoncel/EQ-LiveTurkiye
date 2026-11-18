@@ -6,12 +6,12 @@ const DAY = 86400;
 // msg: { cat (zamana göre sıralı), opts, inner: {s,n,w,e} | null, t1, t2 }
 self.onmessage = ({ data }) => {
   try {
-    const { cat, opts = {}, inner, t1 = -Infinity, t2 = Infinity, onlyIds } = data;
-    const o = { ...DEFAULTS, ...opts };
+    const { cat, opts = {}, inner, t1 = -Infinity, t2 = Infinity, onlyIds, t0 } = data;
+    const o = { ...DEFAULTS, ...opts, ...(isFinite(t0) ? { catalogStart: t0 } : {}) };
     const sel = selectMainshocks(cat, o);
     const inBox = e => !inner || (e.lat >= inner.s && e.lat <= inner.n && e.lon >= inner.w && e.lon <= inner.e);
     // Ana şok adayı: iç kutuda, istenen dönemde ve katalog başlangıcından en az kalibrasyon+pencere kadar sonra
-    const tStart = cat.length ? cat[0].t : 0;
+    const tStart = isFinite(t0) ? t0 : (cat.length ? cat[0].t : 0);
     const cand = sel.filter(s => {
       const e = cat[s.i];
       return inBox(e) && e.t >= t1 && e.t <= t2 && (!onlyIds || onlyIds.includes(String(e.id)));

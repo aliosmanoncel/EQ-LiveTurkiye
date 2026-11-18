@@ -278,7 +278,7 @@ $('runAll').onclick = async () => {
   setStatus('Ana şoklar seçiliyor ve test ediliyor…');
   $('runAll').disabled = true;
   try {
-    const out = await runWorker({ cat: state.cat, opts, inner: state.inner, t1: state.t1, t2: state.t2 },
+    const out = await runWorker({ cat: state.cat, opts, inner: state.inner, t1: state.t1, t2: state.t2, t0: state.meta.t0 },
       p => setStatus(`Test ediliyor… ${p.done}/${p.total}`));
     state.results = out; state.opts = opts;
     renderResults();
@@ -356,7 +356,7 @@ function renderDetail(r) {
 }
 
 // ---- tek deprem (hızlı başlangıç) ve bağlantı parametreleri
-async function quickRun(lat, lon, dateStr) {
+async function quickRun(lat, lon, dateStr, tSec) {
   if (!isFinite(lat) || !isFinite(lon) || !dateStr) { setStatus('Enlem, boylam ve tarih girin.', true); return; }
   $('s').value = (lat - 0.25).toFixed(3); $('n').value = (lat + 0.25).toFixed(3);
   $('w').value = (lon - 0.3).toFixed(3); $('e').value = (lon + 0.3).toFixed(3);
@@ -366,7 +366,7 @@ async function quickRun(lat, lon, dateStr) {
   if (!state.cat || !state.cat.length) return;
   await $('runAll').onclick();
   const R = state.results && state.results.results; if (!R || !R.length) { setStatus('Bu konum ve günde M ≥ 4 deprem bulunamadı.', true); return; }
-  const t0 = d / 1000 + 43200, toRad = Math.PI / 180;
+  const t0 = isFinite(tSec) ? tSec : d / 1000 + 43200, toRad = Math.PI / 180;  // t: olay zamanı (EQ-Live açılır kutusundan)
   const score = r => Math.hypot((r.lat - lat) * 111, (r.lon - lon) * 111 * Math.cos(lat * toRad)) / 10 + Math.abs(r.t - t0) / DAY;
   let bi = 0; R.forEach((r, i) => { if (score(r) < score(R[bi])) bi = i; });
   const tr = document.querySelector(`#resTable tr.click[data-i="${bi}"]`); if (tr) { tr.click(); tr.scrollIntoView({ block: 'center' }); }
@@ -378,7 +378,7 @@ $('qRun').onclick = () => quickRun(+$('qLat').value, +$('qLon').value, $('qDate'
   if (q.get('src') && SOURCES[q.get('src')]) { $('src').value = q.get('src'); onSrc(); }
   if (q.has('lat') && q.has('lon') && q.has('date')) {
     $('qLat').value = q.get('lat'); $('qLon').value = q.get('lon'); $('qDate').value = q.get('date');
-    quickRun(+q.get('lat'), +q.get('lon'), q.get('date'));
+    quickRun(+q.get('lat'), +q.get('lon'), q.get('date'), q.has('t') ? +q.get('t') : NaN);
   }
 }
 

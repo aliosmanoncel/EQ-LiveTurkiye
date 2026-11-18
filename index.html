@@ -2004,13 +2004,27 @@ function renderHeat(evList) {
         ? `<br>Depth: <b style="color:${c}">${e.dep.toFixed(0)} km</b>`
         : `<br>Depth: ${e.dep.toFixed(0)} km`) +
       `<br><span style="color:#666">${ago} ago</span>` +
-      (mVal >= 4 ? `<br><a href="#" style="color:#7ecbff" onclick="openOmoriPanel(${e.lat},${e.lon},${e.time.getTime()},${e.mag},'${String(e.place||'').replace(/[\\'"<>]/g,'')}');return false;">📉 Artçı dizisi (Omori–Utsu)</a>` : '')
+      (mVal >= 4 ? `<br><a href="#" style="color:#7ecbff" onclick="openOmoriPanel(${e.lat},${e.lon},${e.time.getTime()},${e.mag},'${String(e.place||'').replace(/[\\'"<>]/g,'')}');return false;">📉 Artçı dizisi (Omori–Utsu)</a>` : '') +
+      pmsrLinkHtml(e, src)
     ).addTo(markLayer);
     eqMarkerList.push({ e, marker });
   });
   if (showCircle) markLayer.addTo(map);
   labelLayer.bringToFront();
   updateEqList();
+}
+
+/* EQ-Live Research · Ana Şok Öncesi Sismisite Oranı Testi (2026-11-18) — deprem açılır kutusundan
+   lab/premainshock-rate/ aracına bağlantı. Yalnız M ≥ 4 (aracın ana şok eşiği); kaynak USGS ise USGS, aksi halde
+   EMSC (Avrupa, Türkiye dahil). Konum, UTC tarihi ve olay zamanı (t, epoch s) aktarılır; araç kendiliğinden çalışır. */
+function pmsrLinkHtml(e, prov) {
+  const m = e.mw ?? e.mag;
+  if (!(m >= 4) || !e.time || !isFinite(e.lat) || !isFinite(e.lon)) return '';
+  const t = e.time instanceof Date ? e.time : new Date(e.time);
+  if (isNaN(t)) return '';
+  const p = prov === 'usgs' ? 'usgs' : 'emsc';
+  const q = `src=${p}&lat=${(+e.lat).toFixed(4)}&lon=${(+e.lon).toFixed(4)}&date=${t.toISOString().slice(0, 10)}&t=${Math.round(t.getTime() / 1000)}`;
+  return `<br><a href="lab/premainshock-rate/?${q}" target="_blank" rel="noopener" style="color:#fb923c" title="Bu depremden önceki 20 günlük sismisite, önceki yıla göre anlamlı biçimde arttı mı? (${p.toUpperCase()} verisiyle)">🔬 Öncesi Sismisite Testi</a>`;
 }
 
 /* ══════════════════════════════════════════
@@ -9769,7 +9783,8 @@ async function fetchRegionEventsLive(bounds, provider) {
         `<b style="color:${markerColor}">M ${e.mag.toFixed(1)}</b>` +
         `<br><span style="color:#aaa">${e.place||regionLabel}</span>` +
         `<br>Depth: ${e.dep.toFixed(0)} km` +
-        `<br><span style="color:#666">${dfmt(e.time)}</span>`
+        `<br><span style="color:#666">${dfmt(e.time)}</span>` +
+        pmsrLinkHtml(e, provider)
       ).addTo(regionLayer);
     });
     regionLayer.addTo(map);
@@ -9912,7 +9927,8 @@ function redrawRegionMarkers() {
         `<b style="color:${markerColor}">M ${e.mag.toFixed(1)}</b>` +
         `<br><span style="color:#aaa">${e.place||regionLabel}</span>` +
         `<br>Depth: ${e.dep.toFixed(0)} km` +
-        `<br><span style="color:#666">${dfmt(e.time)}</span>`
+        `<br><span style="color:#666">${dfmt(e.time)}</span>` +
+        pmsrLinkHtml(e, provider)
       ).addTo(regionLayer);
     });
   }
