@@ -34,7 +34,7 @@ Empirical Seismicity Rate (20 gün / 10 km; kalibrasyon 365→20 gün; 0,01 gün
 Type A 61/61 · anlamlı 15/58. CI: `.github/workflows/pmsr-parity.yml`.
 Referans ve yeniden üretim ayrıntısı: `analysis/2026-11-18_pmsr_scsn_reproduction/`.
 
-## Lisans notu
+## Lisans notu (ayrıntı: PROVENANCE.md)
 Bu kod makaledeki yöntem tanımından bağımsız yazılmıştır. GPLv3 lisanslı `statseis` (Azad Khan) yalnızca
 depo dışında referans çıktı üretmek için kullanılmıştır; satır aktarımı yoktur. Doğrulama sırasında `statseis`
 kaynak kodu okunmuştur; bu nedenle "temiz oda" iddiası yoktur. Hukuki görüş değildir.

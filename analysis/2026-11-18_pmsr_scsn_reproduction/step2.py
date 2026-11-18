@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Bu betik GPL-3.0 lisanslı statseis paketini içe aktarır; bkz. lab/premainshock-rate/PROVENANCE.md
 import pandas as pd, datetime as dt, json, warnings, sys, io, contextlib
 warnings.filterwarnings('ignore')
 import statseis.foreshocks as F, statseis.utils as U

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Bu betik GPL-3.0 lisanslı statseis paketini içe aktarır; bkz. lab/premainshock-rate/PROVENANCE.md
 import numpy as np, time, json
 from fpa_ref import esr_independent as ind, esr_statseis as ref
 from multiprocessing import Pool
