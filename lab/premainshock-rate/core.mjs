@@ -28,6 +28,7 @@ export const DEFAULTS = Object.freeze({
   typeAMin: 3.0,          // Type A büyüklük eşiği (Mc kesmesiz)
   mcR0: 10, mcStep: 5, mcRmax: 50, mcMinN: 275, // yerel Mc yarıçap genişletme
   mbin: 0.1, mbsDM: 0.4,  // Mc (MBS) parametreleri
+  mcCausal: false,        // true: Mc yalnız ana şok öncesi veriden
 });
 
 const DAY = 86400;
@@ -145,7 +146,9 @@ export function mcMBS(mags, opt = {}) {
 // Yerel Mc: yarıçap mcR0'dan mcStep adımla mcRmax'a, ≥ mcMinN olay olana dek (tüm katalog süresi)
 export function localMc(cat, ev, opt = {}) {
   const o = { ...DEFAULTS, ...opt };
-  const d = cat.map(q => geodesicKm(ev.lat, ev.lon, q.lat, q.lon));
+  // mcCausal: yalnız ana şoktan önceki olaylar (canlı/nedensel kullanım). Varsayılan: false
+  // (Khan vd. gibi tüm katalog dönemi).
+  const d = cat.map(q => (o.mcCausal && q.t >= ev.t) ? Infinity : geodesicKm(ev.lat, ev.lon, q.lat, q.lon));
   let r = o.mcR0, sel;
   for (;;) {
     sel = [];
@@ -213,4 +216,16 @@ export function analyzeEvent(cat, idx, opt = {}) {
   const label = !mc.enough ? 'na' : (r.significant ? 'sig' : 'ns');
   return { id: ev.id, t: ev.t, m: ev.m, lat: ev.lat, lon: ev.lon, mc, esr: r, typeA: typeA.length,
            typeAWarning: mc.enough && mc.mc > o.typeAMin, label, version: PMSR_VERSION };
+}
+
+// Varsayılandan farklı parametreleri listeler (sonuç ekranında işaretlemek için)
+export function nonDefault(opt = {}) {
+  return Object.keys(opt).filter(k => k in DEFAULTS && opt[k] !== DEFAULTS[k]).map(k => ({ key: k, value: opt[k], default: DEFAULTS[k] }));
+}
+
+// Wilson %95 güven aralığı
+export function wilson(k, n, z = 1.959963984540054) {
+  if (!n) return [NaN, NaN];
+  const p = k / n, d = 1 + z * z / n, c = p + z * z / (2 * n), h = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n));
+  return [(c - h) / d, (c + h) / d];
 }

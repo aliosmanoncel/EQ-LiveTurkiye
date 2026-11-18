@@ -10,7 +10,20 @@ Yöntem: Azad Khan, Werner, Biggs ve Fagereng (2025), *JGR Solid Earth* 130(7), 
 Combined ana şok seçimi (Fixed ∪ Mag-Dep dışlaması), yerel Mc (b-değeri kararlılığı, 10→50 km, ≥ 275 olay),
 Empirical Seismicity Rate (20 gün / 10 km; kalibrasyon 365→20 gün; 0,01 gün adım; p < 0,01).
 
+## Arayüz (`index.html`)
+- **Bölge ve olay analizi:** kaynak USGS (küresel) ya da EMSC (Avrupa-Akdeniz) canlı FDSN, veya dosya yükleme
+  (AFAD dışa aktarımı ya da başka katalog; CSV/JSON). AFAD tarayıcıdan canlı sorgulanamıyor (sunucu tarayıcı isteklerini
+  reddediyor), bu yüzden dosya yükleme yolu.
+  Katalog, ana şok döneminden 385 gün önce başlayarak ve kutu 0,5° genişletilerek alınır; ana şoklar iç kutudan seçilir.
+  Bölgedeki tüm M ≥ 4 adaylar listelenir: Combined olmayanlar *ana şok seçim kuralını sağlamıyor*, Mc için yeterli olay
+  olmayanlar *analiz için yeterli veri yok* olarak işaretlenir. Satıra tıklamak tek olay ayrıntısını (günlük sayım grafiği,
+  N₂₀, kalibrasyon persentili, p) açar.
+- Varsayılan dışı parametreler sonuçta işaretlenir; baskın büyüklük türü seçeneği varsayılan açıktır.
+- **Analiz kaydı (JSON):** kaynak, sorgu URL'si, indirme zamanı, olay sayısı, katalog SHA-256, parametreler, sonuçlar.
+- **Referans: SCSN yeniden üretimi:** donmuş referansı tarayıcıda çalıştırır ve olay bazında karşılaştırır.
+
 ## Dosyalar
+- `index.html`, `worker.mjs` (hesaplar Web Worker'da), `sources.mjs` (USGS/EMSC/yükleme ayrıştırıcıları)
 - `core.mjs` — katalogdan bağımsız saf fonksiyonlar (`selectMainshocks`, `localMc`, `mcMBS`, `esr`, `analyzeEvent`).
   Girdi: `{id, t (UTC epoch s), lat, lon, m}`; tek büyüklük türü.
 - Etiketler: *İstatistiksel olarak anlamlı artış* · *İstatistiksel olarak anlamlı artış bulunamadı* · *Analiz için yeterli veri yok*.
@@ -29,4 +42,6 @@ kaynak kodu okunmuştur; bu nedenle "temiz oda" iddiası yoktur. Hukuki görüş
 ## Bilinen sınırlar
 - Mc yarıçapı WGS84 jeodezik uzaklıkla; ESR ve Type A yarıçapı küresel (R = 6371 km) haversine ile ölçülür (referansla aynı).
 - 1 yıllık kalibrasyonla nominal %1 eşiğin gerçek yanlış pozitif oranı Poisson altında %1,7–3,0'tür (Faz 0, T2a).
-- Arayüz henüz yok (sonraki adım: AFAD / EMSC / USGS / yüklenen katalog ile tek olay analizi).
+- Canlı USGS ve EMSC sorguları tek seferde en çok 20 000 olay alır; sınır aşılırsa uyarı verilir (bölgeyi ya da dönemi küçültün).
+- Mag-Dep seçimi için daha büyük olaylar 0,5°'lik kenar payı içinde aranır; M ≥ 6 olayların daha geniş pencereleri kenar payını aşabilir.
+- Canlı kaynaklarda yalnız deprem türü olaylar kullanılır (SCSN referansında ocak patlamaları da vardı).
