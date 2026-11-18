@@ -163,7 +163,7 @@ const PARAM_UI = [
 ];
 $('params').innerHTML = PARAM_UI.map(([k, t]) => `<label>${t}<input type="number" step="any" data-k="${k}" value="${DEFAULTS[k]}"></label>`).join('') +
   `<label class="chk"><input type="checkbox" id="mcCausal"> Mc yalnız ana şok öncesi veriden (nedensel)</label>` +
-  `<label class="chk"><input type="checkbox" id="oneType" checked> Yalnız baskın büyüklük türünü kullan</label>` +
+  `<label class="chk"><input type="checkbox" id="oneType"> M &lt; ana şok eşiği için yalnız baskın büyüklük türü</label>` +
   `<div><label>EMSC · Origin Agency (konum/zaman çözümü)<select id="agencyO" class="wide"><option value="">Tümü</option></select></label>` +
   `<label>EMSC · Magnitude Agency (büyüklük)<select id="agencyM" class="wide"><option value="">Tümü</option></select></label></div>` +
   `<div class="note">Kurum filtresi EMSC kataloğunun bir alt kümesini seçer; seçilen kurumun kendi kataloğuna eşdeğer değildir ` +
@@ -240,9 +240,11 @@ async function applyFilters() {
   const types = magTypeSummary(pool);
   let cat = pool;
   if ($('oneType').checked && types.length > 1) {
-    const dom = types[0][0]; cat = pool.filter(e => (e.magType || '?') === dom);
-    note += `Baskın büyüklük türü <b>${esc(mtName(dom))}</b> kullanıldı (${cat.length}/${pool.length} olay).`;
-  } else if (types.length > 1) note += `<span class="flag">Karışık büyüklük türleri kullanılıyor</span> — Mc ve sayımlar yanlı olabilir.`;
+    // Büyük depremler çoğunlukla Mw ile verilir; ana şok eşiğinin üstündeki olaylar türüne bakılmadan korunur
+    const dom = types[0][0], mMin = readOpts().mainshockMin ?? DEFAULTS.mainshockMin;
+    cat = pool.filter(e => (e.magType || '?') === dom || e.m >= mMin);
+    note += `M &lt; ${mMin} için baskın büyüklük türü <b>${esc(mtName(dom))}</b> kullanıldı; M ≥ ${mMin} olaylar türünden bağımsız korundu (${cat.length}/${pool.length} olay).`;
+  } else if (types.length > 1) note += `Katalogun tercih edilen büyüklükleri kullanılıyor (karışık türler: SCSN referansındaki gibi). `;
   const sha = await sha256OfCatalog(cat);
   state.cat = cat; state.results = null;
   state.meta = { ...B, nRaw: raw.length, nUsed: cat.length, originAgency: agO || null, magAgency: agM || null,

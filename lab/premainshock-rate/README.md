@@ -18,7 +18,7 @@ Empirical Seismicity Rate (20 gün / 10 km; kalibrasyon 365→20 gün; 0,01 gün
   Bölgedeki tüm M ≥ 4 adaylar listelenir: Combined olmayanlar *ana şok seçim kuralını sağlamıyor*, Mc için yeterli olay
   olmayanlar *analiz için yeterli veri yok* olarak işaretlenir. Satıra tıklamak tek olay ayrıntısını (günlük sayım grafiği,
   N₂₀, kalibrasyon persentili, p) açar.
-- Varsayılan dışı parametreler sonuçta işaretlenir; baskın büyüklük türü seçeneği varsayılan açıktır.
+- Varsayılan dışı parametreler sonuçta işaretlenir; katalogun tercih edilen büyüklükleri kullanılır (SCSN referansındaki gibi); isteğe bağlı "baskın tür" filtresi yalnız M < ana şok eşiğindeki olaylara uygulanır (büyük depremler çoğunlukla Mw ile verildiğinden ana şoklar korunur).
 - **EMSC kurum filtreleri:** *Origin Agency* (Author: konum/zaman çözümünü veren) ve *Magnitude Agency* (MagAuthor:
   büyüklüğü veren) ayrı filtrelerdir; ikisi aynı olmak zorunda değildir. Seçilen alt küme EMSC kataloğunun bir parçasıdır,
   ilgili kurumun kendi kataloğuna eşdeğer sayılmaz. Karma katalog uyarısı her iki alan için ayrı verilir; filtreler SHA-256'ya yansır.
