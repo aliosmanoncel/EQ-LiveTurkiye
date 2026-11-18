@@ -1,0 +1,129 @@
+{
+ "T1": {
+  "bos_katalog": {
+   "ind": 1.0,
+   "ref": 1.0,
+   "n_obs": 0,
+   "beklenen": true,
+   "uyum": true
+  },
+  "yalniz_onculer": {
+   "ind": 0.0,
+   "ref": 0.0,
+   "n_obs": 3,
+   "beklenen": true,
+   "uyum": true
+  },
+  "sinir_20gun": {
+   "ind": 1.0,
+   "ref": 1.0,
+   "n_obs": 0,
+   "beklenen": true,
+   "uyum": true
+  },
+  "sinir_19.999": {
+   "ind": 0.0,
+   "ref": 0.0,
+   "n_obs": 1,
+   "beklenen": true,
+   "uyum": true
+  },
+  "tek_kalib_olay": {
+   "ind": 1.0,
+   "ref": 1.0,
+   "n_obs": 0,
+   "beklenen": true,
+   "uyum": true
+  },
+  "esit_sayi": {
+   "ind": 0.06153656810559675,
+   "ref": 0.06153656810559675,
+   "n_obs": 1,
+   "beklenen": true,
+   "uyum": true,
+   "el_hesabi": 0.06153656810559675,
+   "el_uyum": true
+  },
+  "385_disarida": {
+   "ind": 0.0,
+   "ref": 0.0,
+   "n_obs": 1,
+   "beklenen": true,
+   "uyum": true
+  }
+ },
+ "T4": {
+  "n": 24,
+  "max_dp": 0.0,
+  "q99_esit": true,
+  "max_esit": true,
+  "ornek": [
+   {
+    "i": 0,
+    "n": 20,
+    "n_obs": 11,
+    "p_ind": 0.0,
+    "p_ref": 0.0,
+    "dp": 0.0,
+    "q99_ind": 2.0,
+    "q99_ref": 2.0,
+    "max_eq": 1.0
+   },
+   {
+    "i": 1,
+    "n": 35,
+    "n_obs": 2,
+    "p_ind": 0.5697363158056675,
+    "p_ref": 0.5697363158056675,
+    "dp": 0.0,
+    "q99_ind": 6.0,
+    "q99_ref": 6.0,
+    "max_eq": 1.0
+   },
+   {
+    "i": 2,
+    "n": 765,
+    "n_obs": 48,
+    "p_ind": 0.1419648626196117,
+    "p_ref": 0.1419648626196117,
+    "dp": 0.0,
+    "q99_ind": 57.0,
+    "q99_ref": 57.0,
+    "max_eq": 1.0
+   },
+   {
+    "i": 3,
+    "n": 39,
+    "n_obs": 1,
+    "p_ind": 0.8793575582289775,
+    "p_ref": 0.8793575582289775,
+    "dp": 0.0,
+    "q99_ind": 6.0,
+    "q99_ref": 6.0,
+    "max_eq": 1.0
+   },
+   {
+    "i": 4,
+    "n": 769,
+    "n_obs": 36,
+    "p_ind": 0.758899726162272,
+    "p_ref": 0.758899726162272,
+    "dp": 0.0,
+    "q99_ind": 56.0,
+    "q99_ref": 56.0,
+    "max_eq": 1.0
+   },
+   {
+    "i": 5,
+    "n": 34,
+    "n_obs": 2,
+    "p_ind": 0.5488754192178702,
+    "p_ref": 0.5488754192178702,
+    "dp": 0.0,
+    "q99_ind": 5.0,
+    "q99_ref": 5.0,
+    "max_eq": 1.0
+   }
+  ]
+ }
+}

@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EQ-Live Research · Pre-mainshock Seismicity Rate Test</title>
+<meta name="robots" content="noindex">
+<style>
+  :root { --bg:#0f1115; --panel:#161a21; --line:#262b33; --text:#d7dee8; --mute:#8fa3b8; --acc:#06b6d4; --ok:#34d399; --warn:#f59e0b; --bad:#f87171; --sig:#fb923c; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 20px 16px 60px; }
+  h1 { font-size: 1.25rem; margin: 0 0 2px; } h2 { font-size: 1rem; margin: 0 0 10px; color:#a9bccf; }
+  .brand { color: var(--acc); font-weight: 700; letter-spacing: .02em; font-size: .85rem; }
+  .note { color: var(--mute); font-size: .85rem; }
+  .box { background: var(--panel); border:1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin: 14px 0; }
+  .banner { border-left: 3px solid var(--warn); }
+  .tabs button { margin-right: 6px; } .tabs button.on { background: var(--acc); color:#001; border-color: var(--acc); font-weight:600; }
+  button { background:#1e2530; color:var(--text); border:1px solid #334; border-radius:6px; padding:6px 12px; cursor:pointer; font:inherit; }
+  button.primary { background: var(--acc); color:#001; border-color: var(--acc); font-weight:600; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  label { display:inline-flex; flex-direction:column; gap:2px; font-size:.78rem; color:var(--mute); margin:0 10px 8px 0; vertical-align: top; }
+  label.chk { flex-direction: row; align-items: center; gap: 6px; }
+  input, select { background:#0f141b; color:var(--text); border:1px solid #334; border-radius:5px; padding:4px 6px; font:inherit; width:110px; }
+  input[type=checkbox] { width:auto; } input[type=file] { width: 260px; } select.wide { width: 250px; }
+  table { border-collapse: collapse; width:100%; font-size:.82rem; margin-top:8px; }
+  th, td { text-align:left; padding:4px 7px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color: var(--mute); font-weight:600; } tr.click { cursor: pointer; } tr.click:hover { background:#1b212b; } tr.sel { background:#1f2a36; }
+  .lab { display:inline-block; padding:1px 8px; border-radius:999px; font-weight:700; font-size:.74rem; white-space: nowrap; }
+  .lab.sig { background:rgba(251,146,60,.16); color:var(--sig); } .lab.ns { background:rgba(143,163,184,.15); color:var(--mute); }
+  .lab.na { background:rgba(245,158,11,.12); color:var(--warn); } .lab.notMain { background:rgba(248,113,113,.12); color:var(--bad); }
+  .pass { color: var(--ok); } .fail { color: var(--bad); } .warn { color: var(--warn); }
+  .flag { color: var(--warn); font-weight: 600; }
+  code { background:#0b0e13; padding:1px 5px; border-radius:4px; }
+  #status { font-size: .85rem; color: var(--mute); min-height: 1.4em; }
+  svg text { fill: var(--mute); font-size: 10px; }
+  .hidden { display: none; }
+  @media (max-width: 600px) { input, select { width: 92px; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">EQ-Live Research</div>
+  <h1>Pre-mainshock Seismicity Rate Test · Ana Şok Öncesi Sismisite Oranı Testi</h1>
+  <div class="note">Deneme sürümü — <code id="ver"></code>. Ana sayfaya bağlı değildir.</div>
+
+  <div class="box banner note">
+    Bu test, seçilen bir ana şoktan önceki <b>20 gün</b>deki sismisitenin, aynı noktanın önceki <b>yılına</b> göre
+    istatistiksel olarak anlamlı biçimde artıp artmadığını sınar (Azad Khan vd., 2025, JGR Solid Earth 130, e2024JB030733:
+    Combined ana şok seçimi, yerel Mc, Empirical Seismicity Rate). <b>Deprem tahmini değildir.</b> Anlamlı artışların çoğu
+    büyük bir depremle sonuçlanmaz; tersine, büyük depremlerin çoğundan önce anlamlı artış görülmez. Sentetik testlere göre
+    1 yıllık kalibrasyonla nominal %1 eşiğin gerçek yanlış pozitif oranı %2–3'tür.
+  </div>
+
+  <div class="tabs">
+    <button data-tab="analysis" class="on">Bölge ve olay analizi</button>
+    <button data-tab="reference">Referans: SCSN yeniden üretimi</button>
+  </div>
+
+  <!-- ========== ANALİZ ========== -->
+  <section id="tab-analysis">
+    <div class="box">
+      <h2>Hızlı başlangıç · Tek deprem</h2>
+      <label>Enlem<input type="number" id="qLat" step="0.001" placeholder="40.845"></label>
+      <label>Boylam<input type="number" id="qLon" step="0.001" placeholder="31.032"></label>
+      <label>Tarih (UTC)<input type="date" id="qDate"></label>
+      <label>&nbsp;<button class="primary" id="qRun">Bu depremi analiz et</button></label>
+      <div class="note">Seçilen kaynaktan (1. bölüm) episantrın çevresi indirilir, ana şok seçimi yapılır ve verilen konuma ve güne
+        en yakın M ≥ 4 deprem test edilir. Bağlantı olarak paylaşılabilir: <code>?src=emsc&amp;lat=40.845&amp;lon=31.032&amp;date=2021-11-17</code></div>
+    </div>
+
+    <div class="box">
+      <h2>1 · Veri kaynağı ve bölge</h2>
+      <label>Kaynak
+        <select id="src" class="wide">
+          <option value="emsc">EMSC — Avrupa, Türkiye dahil (canlı)</option>
+          <option value="usgs">USGS — Global (canlı)</option>
+          <option value="upload">Dosya yükle — AFAD dışa aktarımı ya da başka katalog</option>
+        </select></label>
+      <span id="uploadBox" class="hidden">
+        <label>Katalog dosyası (CSV / JSON)<input type="file" id="file" accept=".csv,.txt,.json"></label>
+        <label>Saat dilimi belirtilmemişse (UTC+…)<input type="number" id="tz" value="3" step="1"></label>
+      </span>
+      <div class="note" id="srcNote"></div>
+      <div style="margin-top:8px">
+        <label>Güney enlem<input type="number" id="s" value="40.55" step="0.01"></label>
+        <label>Kuzey enlem<input type="number" id="n" value="41.15" step="0.01"></label>
+        <label>Batı boylam<input type="number" id="w" value="30.55" step="0.01"></label>
+        <label>Doğu boylam<input type="number" id="e" value="31.55" step="0.01"></label>
+        <label>Ana şoklar: başlangıç<input type="date" id="t1" value="2021-11-01"></label>
+        <label>Ana şoklar: bitiş<input type="date" id="t2" value="2022-12-31"></label>
+        <label>Hazır bölge
+          <select id="preset"><option value="">—</option><option value="duzce">Düzce 2021–2022</option><option value="ridgecrest">Ridgecrest 2019</option></select></label>
+      </div>
+      <div class="note">Katalog, ana şok döneminden <b>385 gün önce</b>sinden başlayarak ve bölge kutusu her yönde
+        <b>0,5°</b> genişletilerek indirilir (kalibrasyon, yerel Mc ve ana şok seçimi için). Ana şoklar yalnız iç kutudan seçilir.</div>
+      <div style="margin-top:8px"><button class="primary" id="fetch">Kataloğu indir</button></div>
+      <div id="catInfo" class="note" style="margin-top:8px"></div>
+    </div>
+
+    <div class="box">
+      <h2>2 · Parametreler</h2>
+      <div id="params"></div>
+      <div class="note">Varsayılanlar Khan vd. (2025) ile aynıdır. Değiştirilen her parametre sonuçlarda <span class="flag">varsayılan dışı</span> olarak işaretlenir.</div>
+      <div style="margin-top:8px">
+        <button class="primary" id="runAll" disabled>Bölgedeki tüm uygun ana şokları test et</button>
+        <span class="note">Tek olay için: sonuç tablosunda satıra tıklayın.</span>
+      </div>
+    </div>
+
+    <div id="status"></div>
+
+    <div class="box hidden" id="resBox">
+      <h2>3 · Sonuçlar</h2>
+      <div id="summary"></div>
+      <div id="detail"></div>
+      <table id="resTable"></table>
+      <div style="margin-top:10px"><button id="dl">Analiz kaydını indir (JSON)</button></div>
+    </div>
+  </section>
+
+  <!-- ========== REFERANS ========== -->
+  <section id="tab-reference" class="hidden">
+    <div class="box">
+      <h2>SCSN bölge kutusu — bağımsız yeniden üretim (donmuş referans)</h2>
+      <div class="note">SCEDC SCSN kataloğu 2008–2017; kutu −118,80/−115,40 boylam, 32,68/36,20 enlem; olay türü filtresi yok.
+        Referans: yazarların <code>statseis</code> 0.0.6 kodu ile üretilmiş seçim ve Mc + doğrulanmış ESR. Bu sayfadaki bağımsız
+        JavaScript çekirdeği aynı katalog üzerinde çalıştırılır ve olay bazında karşılaştırılır.
+        Makalenin 74 ana şokluk birleştirilmiş kümesiyle karıştırılmamalıdır.</div>
+      <div style="margin-top:8px"><button class="primary" id="runRef">Referans testini çalıştır</button></div>
+      <div id="refOut" style="margin-top:10px"></div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import { DEFAULTS, PMSR_VERSION, LABELS, nonDefault, wilson } from './core.mjs';
+import { SOURCES, parseUpload, magTypeSummary, agencySummary, sha256OfCatalog, filterDominantMagType } from './sources.mjs';
+
+const $ = id => document.getElementById(id);
+const DAY = 86400;
+$('ver').textContent = PMSR_VERSION;
+const fmtT = t => new Date(t * 1000).toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+const fmtP = p => p == null ? '—' : (p === 0 ? '0' : p < 0.001 ? p.toExponential(1) : p.toFixed(3));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const agTxt = L => !L || !L.length ? '— (kaynakta yok)' : L.length === 1 ? esc(L[0][0]) : `<span class="flag">karma</span>: ${L.slice(0, 4).map(([k, v]) => `${esc(k)} ${v}`).join(', ')}`;
+const mtName = k => k === '?' ? 'belirtilmemiş' : k;
+const labelHtml = k => `<span class="lab ${k}">${(LABELS[k] || {}).tr || k}</span>`;
+function setStatus(msg, bad) { $('status').innerHTML = bad ? `<span class="fail">${esc(msg)}</span>` : esc(msg); }
+
+// ---- sekmeler
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+  $('tab-analysis').classList.toggle('hidden', b.dataset.tab !== 'analysis');
+  $('tab-reference').classList.toggle('hidden', b.dataset.tab !== 'reference');
+});
+
+// ---- parametre alanları
+const PARAM_UI = [
+  ['radiusKm', 'Öncü/kalibrasyon yarıçapı (km)'], ['windowDays', 'Öncü penceresi (gün)'], ['calibDays', 'Kalibrasyon (gün önce)'],
+  ['alpha', 'Anlamlılık eşiği (p <)'], ['mainshockMin', 'Ana şok eşiği (M)'], ['typeAMin', 'Type A eşiği (M)'],
+  ['mcMinN', 'Mc için en az olay'], ['mcRmax', 'Mc için en büyük yarıçap (km)'],
+];
+$('params').innerHTML = PARAM_UI.map(([k, t]) => `<label>${t}<input type="number" step="any" data-k="${k}" value="${DEFAULTS[k]}"></label>`).join('') +
+  `<label class="chk"><input type="checkbox" id="mcCausal"> Mc yalnız ana şok öncesi veriden (nedensel)</label>` +
+  `<label class="chk"><input type="checkbox" id="oneType"> M &lt; ana şok eşiği için yalnız baskın büyüklük türü</label>` +
+  `<div><label>EMSC · Origin Agency (konum/zaman çözümü)<select id="agencyO" class="wide"><option value="">Tümü</option></select></label>` +
+  `<label>EMSC · Magnitude Agency (büyüklük)<select id="agencyM" class="wide"><option value="">Tümü</option></select></label></div>` +
+  `<div class="note">Kurum filtresi EMSC kataloğunun bir alt kümesini seçer; seçilen kurumun kendi kataloğuna eşdeğer değildir ` +
+  `(EMSC hangi kayıtları aldığına ve hangi çözümü tercih ettiğine kendisi karar verir). Ör. Magnitude Agency = AFAD: ` +
+  `"EMSC kataloğunda büyüklüğü AFAD tarafından verilmiş kayıtlar".</div>`;
+document.addEventListener('change', e => { if (['agencyO', 'agencyM', 'oneType'].includes(e.target.id)) applyFilters(); });
+function readOpts() {
+  const o = {};
+  document.querySelectorAll('#params input[data-k]').forEach(i => { const v = parseFloat(i.value); if (isFinite(v)) o[i.dataset.k] = v; });
+  o.mcCausal = $('mcCausal').checked;
+  return o;
+}
+
+// ---- kaynak seçimi
+const SRC_NOTES = {
+  usgs: 'USGS FDSN; tek sorguda en çok 20 000 olay; yalnız "earthquake" türü. Büyüklük türleri karışıktır (ml, md, mb, mw…).',
+  emsc: 'EMSC FDSN; tek sorguda en çok 20 000 olay. EMSC birçok kurumun çözümünü birleştirir (Türkiye için AFAD ve Kandilli/KOERI, ' +
+    'İtalya için INGV…). Daha homojen bir alt katalog için 2. bölümde Origin Agency ve/veya Magnitude Agency seçin (listeler katalog indirildikten sonra dolar).',
+  upload: 'AFAD verisi tarayıcıdan canlı sorgulanamıyor (AFAD sunucusu tarayıcı isteklerini reddediyor). ' +
+    'deprem.afad.gov.tr › Deprem Kataloğu üzerinden indirdiğiniz CSV/JSON dosyasını yükleyin. Başlıklar: time/date, lat, lon, mag (isteğe bağlı: id, magtype).',
+};
+const onSrc = () => { $('uploadBox').classList.toggle('hidden', $('src').value !== 'upload'); $('srcNote').textContent = SRC_NOTES[$('src').value]; };
+$('src').onchange = onSrc; onSrc();
+$('preset').onchange = () => {
+  const P = { duzce: [40.55, 41.15, 30.55, 31.55, '2021-11-01', '2022-12-31'], ridgecrest: [35.4, 36.1, -117.9, -117.2, '2019-06-01', '2019-07-31'] }[$('preset').value];
+  if (!P) return; ['s', 'n', 'w', 'e', 't1', 't2'].forEach((k, i) => $(k).value = P[i]);
+};
+
+// ---- katalog indirme / yükleme
+let state = { cat: null, meta: null, results: null, opts: null, inner: null };
+$('fetch').onclick = async () => {
+  try {
+    const inner = { s: +$('s').value, n: +$('n').value, w: +$('w').value, e: +$('e').value };
+    const t1 = Date.parse($('t1').value + 'T00:00:00Z') / 1000, t2 = Date.parse($('t2').value + 'T23:59:59Z') / 1000;
+    if (!(inner.n > inner.s && inner.e > inner.w && t2 > t1)) throw new Error('Bölge ya da tarih aralığı geçersiz.');
+    const outer = { s: +(inner.s - 0.5).toFixed(3), n: +(inner.n + 0.5).toFixed(3), w: +(inner.w - 0.5).toFixed(3), e: +(inner.e + 0.5).toFixed(3) };
+    const t0 = t1 - 385 * DAY;
+    const src = $('src').value;
+    let raw, url = null, capped = false;
+    setStatus('Katalog alınıyor…');
+    if (src === 'upload') {
+      const f = $('file').files[0]; if (!f) throw new Error('Dosya seçilmedi.');
+      raw = parseUpload(await f.text(), +$('tz').value)
+        .filter(e => e.lat >= outer.s && e.lat <= outer.n && e.lon >= outer.w && e.lon <= outer.e && e.t >= t0 && e.t <= t2);
+      url = `dosya: ${f.name}`;
+    } else {
+      url = SOURCES[src].url(outer, t0, t2);
+      const r = await fetch(url);
+      if (r.status === 204) raw = [];
+      else if (!r.ok) throw new Error(`${src.toUpperCase()} HTTP ${r.status}`);
+      else raw = SOURCES[src].parse(await r.text());
+      capped = raw.length >= SOURCES[src].limit;
+    }
+    raw.sort((a, b) => a.t - b.t);
+    state = { raw, inner, t1, t2, results: null, base: { source: src, url, fetchedAt: new Date().toISOString(), outer, inner, t0, t1, t2, capped } };
+    for (const [id, f] of [['agencyO', 'author'], ['agencyM', 'magAuthor']])
+      $(id).innerHTML = '<option value="">Tümü</option>' + agencySummary(raw, f).map(([k, v]) => `<option value="${esc(k)}">${esc(k)} (${v})</option>`).join('');
+    await applyFilters();
+  } catch (err) { setStatus(err.message, true); }
+};
+
+// Kurum ve büyüklük türü filtreleri (yeniden indirmeden uygulanır)
+async function applyFilters() {
+  if (!state.raw) return;
+  const raw = state.raw, B = state.base;
+  const agO = $('agencyO').value, agM = $('agencyM').value;
+  let pool = raw, note = '';
+  if (agO) pool = pool.filter(e => e.author === agO);
+  if (agM) pool = pool.filter(e => e.magAuthor === agM);
+  if (agO || agM) note = `Alt küme: ${agO ? `Origin Agency <b>${esc(agO)}</b>` : ''}${agO && agM ? ', ' : ''}${agM ? `Magnitude Agency <b>${esc(agM)}</b>` : ''} (${pool.length}/${raw.length} olay). `;
+  const aO = agencySummary(pool, 'author'), aM = agencySummary(pool, 'magAuthor');
+  const mixed = aO.length > 1 || aM.length > 1;
+  if (mixed) note += `<span class="flag">Karma katalog</span> — Origin: ${aO.slice(0, 4).map(([k, v]) => `${esc(k)} ${v}`).join(', ') || '—'}; Magnitude: ${aM.slice(0, 4).map(([k, v]) => `${esc(k)} ${v}`).join(', ') || '—'}. `;
+  const types = magTypeSummary(pool);
+  let cat = pool;
+  if ($('oneType').checked && types.length > 1) {
+    // Büyük depremler çoğunlukla Mw ile verilir; ana şok eşiğinin üstündeki olaylar türüne bakılmadan korunur
+    const mMin = readOpts().mainshockMin ?? DEFAULTS.mainshockMin;
+    const f = filterDominantMagType(pool, mMin); cat = f.cat; const dom = f.dominant;
+    note += `M &lt; ${mMin} için baskın büyüklük türü <b>${esc(mtName(dom))}</b> kullanıldı; M ≥ ${mMin} olaylar türünden bağımsız korundu (${cat.length}/${pool.length} olay).`;
+  } else if (types.length > 1) note += `Katalogun tercih edilen büyüklükleri kullanılıyor (karışık türler: SCSN referansındaki gibi). `;
+  const sha = await sha256OfCatalog(cat);
+  state.cat = cat; state.results = null;
+  state.meta = { ...B, nRaw: raw.length, nUsed: cat.length, originAgency: agO || null, magAgency: agM || null,
+    originAgencies: agencySummary(cat, 'author'), magAgencies: agencySummary(cat, 'magAuthor'), magTypes: types, sha256: sha };
+  $('catInfo').innerHTML = `${cat.length} olay (${fmtT(B.t0).slice(0, 10)} → ${fmtT(B.t2).slice(0, 10)}, genişletilmiş kutu). ` +
+    `Büyüklük türleri: ${types.slice(0, 6).map(([k, v]) => `${esc(mtName(k))} ${v}`).join(', ')}. ${note}` +
+    (B.capped ? ` <span class="fail">Kaynak üst sınırına (20 000) ulaşıldı — katalog eksik; bölgeyi ya da dönemi küçültün.</span>` : '') +
+    `<br>SHA-256: <code>${sha.slice(0, 16)}…</code>`;
+  $('runAll').disabled = cat.length === 0;
+  $('resBox').classList.add('hidden');
+  setStatus(cat.length ? 'Katalog hazır.' : 'Bu bölge ve dönemde (filtrelerle) olay yok.', !cat.length);
+}
+
+
+// ---- analiz (Web Worker)
+function runWorker(payload, onProgress) {
+  return new Promise((res, rej) => {
+    const w = new Worker(new URL('./worker.mjs', import.meta.url), { type: 'module' });
+    w.onmessage = ({ data }) => {
+      if (data.type === 'progress') onProgress && onProgress(data);
+      else { w.terminate(); data.type === 'done' ? res(data) : rej(new Error(data.message)); }
+    };
+    w.onerror = e => { w.terminate(); rej(new Error(e.message || 'Worker hatası')); };
+    w.postMessage(payload);
+  });
+}
+
+$('runAll').onclick = async () => {
+  if (!state.cat) return;
+  const opts = readOpts();
+  setStatus('Ana şoklar seçiliyor ve test ediliyor…');
+  $('runAll').disabled = true;
+  try {
+    const out = await runWorker({ cat: state.cat, opts, inner: state.inner, t1: state.t1, t2: state.t2 },
+      p => setStatus(`Test ediliyor… ${p.done}/${p.total}`));
+    state.results = out; state.opts = opts;
+    renderResults();
+    setStatus('Tamamlandı.');
+  } catch (err) { setStatus(err.message, true); }
+  $('runAll').disabled = false;
+};
+
+function renderResults() {
+  const out = state.results, nd = nonDefault(state.opts);
+  const R = out.results, main = R.filter(r => r.combined), ok = main.filter(r => r.label !== 'na');
+  const k = ok.filter(r => r.label === 'sig').length, [lo, hi] = wilson(k, ok.length);
+  $('resBox').classList.remove('hidden');
+  $('summary').innerHTML =
+    `<div>M ≥ ${state.opts.mainshockMin ?? DEFAULTS.mainshockMin} aday: <b>${out.nCandidates}</b> · Fixed ${out.counts.fixed} · Mag-Dep ${out.counts.magdep} · ` +
+    `<b>Combined ${out.counts.combined}</b> · analiz edilebilen ${ok.length} · ` +
+    `${labelHtml('sig')} <b>${k}</b>${ok.length ? ` (%${(100 * k / ok.length).toFixed(1)}; Wilson %95: %${(100 * lo).toFixed(1)}–%${(100 * hi).toFixed(1)})` : ''}</div>` +
+    (nd.length ? `<div class="flag">Varsayılan dışı: ${nd.map(x => `${x.key} = ${x.value} (varsayılan ${x.default})`).join('; ')}</div>` : `<div class="note">Tüm parametreler varsayılan.</div>`) +
+    `<table style="width:auto;margin-top:6px"><tr><th>Katalog kaynağı</th><td>${esc(state.meta.source.toUpperCase())}${state.meta.url ? ` · <span class="note">${esc(state.meta.url.length > 90 ? state.meta.url.slice(0, 90) + '…' : state.meta.url)}</span>` : ''}</td></tr>` +
+    `<tr><th>Sorgulanan dönem</th><td>${fmtT(state.meta.t0).slice(0, 10)} → ${fmtT(state.meta.t2).slice(0, 10)} (ana şoklar ${fmtT(state.meta.t1).slice(0, 10)}'den itibaren)</td></tr>` +
+    `<tr><th>Olay sayısı</th><td>${state.meta.nUsed} kullanıldı / ${state.meta.nRaw} indirildi${state.meta.capped ? ' <span class="fail">— kaynak üst sınırı, katalog eksik</span>' : ''}</td></tr>` +
+    `<tr><th>Origin Agency</th><td>${agTxt(state.meta.originAgencies)}</td></tr>` +
+    `<tr><th>Magnitude Agency</th><td>${agTxt(state.meta.magAgencies)}</td></tr>` +
+    `<tr><th>Büyüklük türü</th><td>${state.meta.magTypes.length > 1 && $('oneType').checked ? esc(mtName(state.meta.magTypes[0][0])) + ' (baskın tür)' : state.meta.magTypes.map(([k]) => esc(mtName(k))).join(', ')}</td></tr>` +
+    `<tr><th>Analiz yarıçapı / pencere</th><td>${state.opts.radiusKm} km · ${state.opts.windowDays} gün · kalibrasyon ${state.opts.calibDays}→${state.opts.windowDays} gün · yerel Mc her satırda</td></tr>` +
+    `<tr><th>Parametreler</th><td>${nd.length ? '<span class="flag">varsayılan dışı</span>' : 'varsayılan (Khan vd., 2025)'}</td></tr>` +
+    `<tr><th>Katalog parmak izi</th><td><code>${state.meta.sha256.slice(0, 16)}…</code> · ${PMSR_VERSION}</td></tr></table>` +
+    `<div class="note">Sonuçlar seçilen kataloğa bağlıdır: aynı bölge için USGS, EMSC ve AFAD farklı olay sayıları, büyüklük türleri ve tamlık verir; ` +
+    `bu farklar Mc'yi ve sayımları, dolayısıyla p değerini değiştirir. Kaynaklar arası karşılaştırma için aynı bölgeyi her kaynakla ayrı çalıştırın.</div>` +
+    `<div class="note"><b>p = 0</b>: son 20 günün sayısı kalibrasyondaki kayan pencerelerin hiçbirinde aşılmadı demektir; olasılığın sıfır olduğu anlamına gelmez. ` +
+    `Çözünürlük ~1/32 500'dür ve etkin bağımsız pencere sayısı ~17 olduğundan p değerleri bir olasılık değil, ampirik sıra ölçüsüdür.</div>`;
+  $('resTable').innerHTML = `<tr><th>Zaman (UTC)</th><th>M</th><th>Enlem</th><th>Boylam</th><th>Seçim</th><th>Mc (n, r)</th><th>N₂₀</th><th>Kalib.</th><th>p</th><th>Type A</th><th>Sonuç</th></tr>` +
+    R.map((r, i) => `<tr class="click" data-i="${i}"><td>${fmtT(r.t).slice(0, 16)}</td><td>${r.m.toFixed(1)}</td><td>${r.lat.toFixed(3)}</td><td>${r.lon.toFixed(3)}</td>` +
+      `<td>${r.combined ? 'Combined' : (r.fixed ? 'yalnız Fixed' : r.magdep ? 'yalnız Mag-Dep' : 'hiçbiri')}</td>` +
+      `<td>${r.mc ? `${isFinite(r.mc.mc) ? r.mc.mc.toFixed(1) : '—'} (${r.mc.n}, ${r.mc.radiusKm} km)` : '—'}</td>` +
+      `<td>${r.esr ? r.esr.nObs : '—'}</td><td>${r.esr ? r.esr.nCalib : '—'}</td><td>${r.esr ? (r.esr.p === 0 ? '0 <span class="flag" title="Kalibrasyondaki hiçbir pencere aşılmadı; olasılık sıfır değildir">*</span>' : fmtP(r.esr.p)) : '—'}</td>` +
+      `<td>${r.typeA ?? '—'}${r.typeAWarning ? ' <span class="flag" title="Yerel Mc, Type A eşiğinin üstünde">!</span>' : ''}</td>` +
+      `<td>${labelHtml(r.label)}${r.shortHistory ? ' <span class="flag" title="Katalog, kalibrasyon için yeterince geriye gitmiyor">kısa geçmiş</span>' : ''}</td></tr>`).join('');
+  document.querySelectorAll('#resTable tr.click').forEach(tr => tr.onclick = () => {
+    document.querySelectorAll('#resTable tr').forEach(x => x.classList.remove('sel')); tr.classList.add('sel');
+    renderDetail(R[+tr.dataset.i]);
+  });
+  $('detail').innerHTML = '';
+}
+
+// ---- tek olay ayrıntısı: günlük sayım (Mc ve R filtreli) + kalibrasyon dağılımı
+function renderDetail(r) {
+  const o = { ...DEFAULTS, ...state.opts };
+  if (!r.combined) { $('detail').innerHTML = `<div class="box">${labelHtml('notMain')} — Fixed: ${r.fixed ? 'evet' : 'hayır'}, Mag-Dep: ${r.magdep ? 'evet' : 'hayır'}. Test yalnız Combined ana şoklara uygulanır.</div>`; return; }
+  if (r.label === 'na') { $('detail').innerHTML = `<div class="box">${labelHtml('na')} — ${o.mcRmax} km içinde ${r.mc.n} olay (gerekli: ${o.mcMinN}).</div>`; return; }
+  const W = o.windowDays, C = o.calibDays, days = [];
+  const R2 = o.radiusKm, toRad = Math.PI / 180;
+  for (const q of state.cat) {
+    const d = (r.t - q.t) / DAY; if (d <= 0 || d >= C + W || q.m < r.mc.mc) continue;
+    const a = Math.sin((q.lat - r.lat) * toRad / 2) ** 2 + Math.cos(r.lat * toRad) * Math.cos(q.lat * toRad) * Math.sin((q.lon - r.lon) * toRad / 2) ** 2;
+    if (2 * 6371 * Math.asin(Math.sqrt(a)) < R2) days.push(d);
+  }
+  const nb = Math.ceil(C + W), hist = new Array(nb).fill(0); days.forEach(d => hist[Math.floor(d)]++);
+  const Wd = 900, H = 120, mx = Math.max(1, ...hist), x = d => Wd - 30 - (d / nb) * (Wd - 60);
+  const bars = hist.map((c, d) => c ? `<rect x="${x(d + 1).toFixed(1)}" y="${(H - 20 - (c / mx) * (H - 30)).toFixed(1)}" width="${Math.max(1, (Wd - 60) / nb).toFixed(2)}" height="${((c / mx) * (H - 30)).toFixed(1)}" fill="${d < W ? '#fb923c' : '#06b6d4'}"/>` : '').join('');
+  const svg = `<svg viewBox="0 0 ${Wd} ${H}" width="100%"><rect x="${x(W)}" y="0" width="${x(0) - x(W)}" height="${H - 20}" fill="rgba(251,146,60,.08)"/>${bars}` +
+    `<line x1="30" x2="${Wd - 30}" y1="${H - 20}" y2="${H - 20}" stroke="#334"/>` +
+    [0, 20, 100, 200, 300, 365].map(d => `<text x="${x(d)}" y="${H - 6}" text-anchor="middle">${d}</text>`).join('') +
+    `<text x="${Wd - 30}" y="10" text-anchor="end">ana şok</text><text x="30" y="10">gün önce →</text></svg>`;
+  $('detail').innerHTML = `<div class="box"><b>${fmtT(r.t)} · M ${r.m.toFixed(1)}</b> ${labelHtml(r.label)}<br>` +
+    `<span class="note">Son ${W} gün: <b>${r.esr.nObs}</b> olay (M ≥ ${r.mc.mc.toFixed(1)}, ${o.radiusKm} km). Kalibrasyonda (${C}→${W} gün) ${r.esr.nWindows} kayan pencere: ` +
+    `99. persentil ${r.esr.q99.toFixed(1)}, en yoğun pencere ${r.esr.maxWindow}. p = ${fmtP(r.esr.p)}. ` +
+    `<br><b>p nasıl hesaplandı:</b> Monte Carlo ya da bootstrap değil. p = (N₂₀'ye eşit ya da büyük sayıya sahip kayan pencere sayısı) / (toplam kayan pencere, ${r.esr.nWindows}); ` +
+    `pencereler ${W} gün uzunluğunda, 0,01 gün adımla kalibrasyon dönemi boyunca kaydırılır (Khan vd., 2025; van den Ende ve Ampuero, 2020). Anlamlılık: p &lt; ${o.alpha}. ` +
+    (r.esr.p === 0 ? `<b>p = 0</b>: hiçbir pencere N₂₀'ye ulaşmadı; olasılığın sıfır olduğu anlamına gelmez. ` : '') +
+    `Pencereler örtüştüğü için bağımsız değildir: örtüşmeyen ${W} günlük pencere sayısı ${r.esr.nIndependent}, bunların ${r.esr.kIndependent}'inde sayı ≥ N₂₀; ` +
+    `bu pencerelerle muhafazakâr p = (k+1)/(n+1) = <b>${r.esr.pConservative.toFixed(3)}</b> (tek yıllık kalibrasyonla ulaşılabilecek en küçük değer ≈ ${(1 / (r.esr.nIndependent + 1)).toFixed(3)}). ` +
+    `Sonuç öncü etkinliğin varlığını kanıtlamaz; son ${W} günün, aynı noktanın önceki yılına göre olağan dışı olduğunu gösterir.</span>${svg}` +
+    `<div class="note">Günlük olay sayısı; turuncu: öncü penceresi, mavi: kalibrasyon.</div></div>`;
+}
+
+// ---- tek deprem (hızlı başlangıç) ve bağlantı parametreleri
+async function quickRun(lat, lon, dateStr) {
+  if (!isFinite(lat) || !isFinite(lon) || !dateStr) { setStatus('Enlem, boylam ve tarih girin.', true); return; }
+  $('s').value = (lat - 0.25).toFixed(3); $('n').value = (lat + 0.25).toFixed(3);
+  $('w').value = (lon - 0.3).toFixed(3); $('e').value = (lon + 0.3).toFixed(3);
+  const d = Date.parse(dateStr + 'T00:00:00Z');
+  $('t1').value = new Date(d - DAY * 1000).toISOString().slice(0, 10); $('t2').value = new Date(d + DAY * 1000).toISOString().slice(0, 10);
+  await $('fetch').onclick();
+  if (!state.cat || !state.cat.length) return;
+  await $('runAll').onclick();
+  const R = state.results && state.results.results; if (!R || !R.length) { setStatus('Bu konum ve günde M ≥ 4 deprem bulunamadı.', true); return; }
+  const t0 = d / 1000 + 43200, toRad = Math.PI / 180;
+  const score = r => Math.hypot((r.lat - lat) * 111, (r.lon - lon) * 111 * Math.cos(lat * toRad)) / 10 + Math.abs(r.t - t0) / DAY;
+  let bi = 0; R.forEach((r, i) => { if (score(r) < score(R[bi])) bi = i; });
+  const tr = document.querySelector(`#resTable tr.click[data-i="${bi}"]`); if (tr) { tr.click(); tr.scrollIntoView({ block: 'center' }); }
+  $('detail').scrollIntoView({ block: 'start' });
+}
+$('qRun').onclick = () => quickRun(+$('qLat').value, +$('qLon').value, $('qDate').value);
+{
+  const q = new URLSearchParams(location.search);
+  if (q.get('src') && SOURCES[q.get('src')]) { $('src').value = q.get('src'); onSrc(); }
+  if (q.has('lat') && q.has('lon') && q.has('date')) {
+    $('qLat').value = q.get('lat'); $('qLon').value = q.get('lon'); $('qDate').value = q.get('date');
+    quickRun(+q.get('lat'), +q.get('lon'), q.get('date'));
+  }
+}
+
+// ---- analiz kaydı
+$('dl').onclick = () => {
+  const rec = { tool: 'EQ-Live Research · Pre-mainshock Seismicity Rate Test', version: PMSR_VERSION, createdAt: new Date().toISOString(),
+    method: 'Azad Khan et al. (2025) JGR Solid Earth 130, e2024JB030733 — Combined selection, local Mc (MBS), Empirical Seismicity Rate',
+    catalog: state.meta, parameters: { ...DEFAULTS, ...state.opts }, nonDefault: nonDefault(state.opts),
+    summary: { candidates: state.results.nCandidates, ...state.results.counts }, results: state.results.results,
+    disclaimer: 'Not an earthquake forecast. Significant rate increases are mostly not followed by large earthquakes.' };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(rec, null, 1)], { type: 'application/json' }));
+  a.download = `pmsr_${state.meta.source}_${new Date().toISOString().slice(0, 10)}.json`; a.click();
+};
+
+// ---- referans: SCSN
+$('runRef').onclick = async () => {
+  const out = $('refOut'); out.innerHTML = '<span class="note">Referans katalog yükleniyor…</span>';
+  try {
+    const base = new URL('../../scripts/fixtures/', import.meta.url);
+    const [gz, ref] = await Promise.all([fetch(new URL('pmsr_scsn_box_catalog.csv.gz', base)), fetch(new URL('pmsr_scsn_box_ref.json', base)).then(r => r.json())]);
+    if (!gz.ok) throw new Error('Referans katalog alınamadı.');
+    const txt = await new Response(gz.body.pipeThrough(new DecompressionStream('gzip'))).text();
+    const cat = txt.trim().split('\n').slice(1).map(l => { const [id, t, lat, lon, m] = l.split(','); return { id: +id, t: +t, lat: +lat, lon: +lon, m: +m }; }).sort((a, b) => a.t - b.t);
+    out.innerHTML = `<span class="note">${cat.length} olay yüklendi; test ediliyor…</span>`;
+    const res = await runWorker({ cat, opts: {}, inner: null, t1: Date.UTC(2009, 0, 1) / 1000 }, p => out.innerHTML = `<span class="note">Test ediliyor… ${p.done}/${p.total}</span>`);
+    const rc = new Map(ref.candidates.map(c => [c.id, c])), rr = new Map(ref.results.map(r => [r.id, r]));
+    let selDiff = 0, mcEq = 0, pEq = 0, nEnough = 0, sigJs = 0, sigRef = 0;
+    for (const r of res.results) {
+      const c = rc.get(r.id); if (!c || c.fixed !== r.fixed || c.magdep !== r.magdep) selDiff++;
+      if (!r.combined) continue; const f = rr.get(r.id); if (!f || !f.enough) continue;
+      nEnough++; if (Math.abs(r.mc.mc - f.mc) < 1e-6) mcEq++;
+      if (r.esr && Math.abs(r.esr.p - f.p) < 1e-12 && r.esr.nObs === f.n_obs) pEq++;
+      if (r.label === 'sig') sigJs++; if (f.p < 0.01) sigRef++;
+    }
+    const row = (t, a, b, good) => `<tr><td>${t}</td><td>${a}</td><td>${b}</td><td class="${good ? 'pass' : 'fail'}">${good ? 'aynı' : 'FARK'}</td></tr>`;
+    const allOk = selDiff === 0 && mcEq === nEnough && pEq === nEnough && sigJs === sigRef && res.counts.combined === 61;
+    out.innerHTML = `<table><tr><th>Gösterge</th><th>Bu sayfa</th><th>Referans</th><th></th></tr>` +
+      row('Aday (M ≥ 4, 2009+)', res.nCandidates, 90, res.nCandidates === 90) +
+      row('Fixed / Mag-Dep / Combined', `${res.counts.fixed} / ${res.counts.magdep} / ${res.counts.combined}`, '63 / 64 / 61 (makale: 67 / 64 / 61)', res.counts.magdep === 64 && res.counts.combined === 61) +
+      row('Olay bazında seçim farkı', selDiff, 0, selDiff === 0) +
+      row('Yerel Mc eşit', `${mcEq}/${nEnough}`, '58/58', mcEq === 58) +
+      row('ESR (N₂₀ ve p) eşit', `${pEq}/${nEnough}`, '58/58', pEq === 58) +
+      row('Anlamlı artış', sigJs, sigRef, sigJs === sigRef) + `</table>` +
+      `<p class="${allOk ? 'pass' : 'fail'}"><b>${allOk ? 'SONUÇ: BİREBİR AYNI' : 'SONUÇ: FARK VAR'}</b></p>`;
+  } catch (err) { out.innerHTML = `<span class="fail">${esc(err.message)}</span>`; }
+};
+</script>
+</body>
+</html>
