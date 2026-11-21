@@ -1,7 +1,8 @@
-# Araştırma tasarımı 2 — EMSC–NAF
+# EQ-LiveTürkiye — SAF ve NAF Karşılaştırmalı Sismolojik Araştırma Tasarımları
+## Tasarım 2 — EMSC–NAF (Kuzey Anadolu Fayı)
 
 **Çalışma başlığı (taslak):** *Seismicity Characteristics and b-Value Variations Along the North Anatolian Fault (2008–2026): Catalog Effects and Comparison with the San Andreas Fault*
-**Sürüm:** tasarım v0.1 · 2026-11-21 · Durum: **danışman onayı bekliyor** (kod yazılmadı)
+**Sürüm:** tasarım v0.2 · 2026-11-21 · Durum: **onaylandı** (danışman kararları §9'a işlendi; kod yazılmadı)
 **Karar kaydı:** `KARAR_2026-11-21.md` · **Eş belge:** `TASARIM_SCEDC_SAF.md` (yöntem protokolü ortak)
 
 > SAF tasarımındaki iş paketleri (İP1–İP4) burada **aynı protokolle** uygulanır. Bu belge yalnızca NAF'a ve EMSC kataloğuna özgü farkları ayrıntılandırır. Her İP başlamadan önce kendi ön kaydını commit eder.
@@ -38,8 +39,8 @@ Kuzey Anadolu Fayı (NAF) boyunca, 2008–2026 EMSC kataloğuyla:
 | Büyüklük | Tercih edilen büyüklük; **dönüşüm yok** (OUT 6). Tür ve kurum dağılımları her analizde raporlanır |
 | Duyarlılık kataloğu | **AFAD** (ulusal ağ) — yalnız İP-N1'de karşılaştırma ve gerekirse İP-N4 için; birincil kaynak EMSC kalır |
 
-### 3.1 Tekrarlanabilirlik için dondurulmuş anlık görüntü (karar gerekli)
-EMSC sorgusu her zaman güncel sürümü döndürür; geçmiş kayıtlar ve kurum çözümleri değişebilir. İlke 4 gereği, SCEDC arşivindeki düzenin aynısı önerilir: `data/emsc_naf/` altında **ham sorgu yanıtları + işlenmiş CSV + manifest (sorgu URL'leri, tarih, SHA-256)**, değiştirilemez anlık görüntüler ve CI doğrulaması. Bu yeni bir veri eklemesidir; SCEDC gibi ayrı onayla ve ayrı dalda yapılır. Sorgular parçalı yapılır (aylık), satır sayıları ve kimlik tekilliği denetlenir.
+### 3.1 Tekrarlanabilirlik için dondurulmuş anlık görüntü (ilke onaylandı; oluşturma ayrı onayla)
+EMSC sorgusu her zaman güncel sürümü döndürür; geçmiş kayıtlar ve kurum çözümleri değişebilir. İlke 4 gereği, SCEDC arşivindeki düzenin aynısı önerilir: `data/emsc_naf/` altında **ham sorgu yanıtları + işlenmiş CSV + manifest (sorgu URL'leri, tarih, SHA-256)**, değiştirilemez anlık görüntüler ve CI doğrulaması. **Karar (2026-11-21):** arşiv ilkesi kabul edildi; arşivin oluşturulması yeni bir veri eklemesi olduğu için **ayrı onayla** ve ayrı dalda yapılır (SCEDC Aşama 1 gibi). Sorgular parçalı yapılır (aylık), satır sayıları ve kimlik tekilliği denetlenir.
 
 ### 3.2 EMSC'ye özgü bilinen sorunlar
 - **Toplayıcı katalog:** EMSC, AFAD (EMSC'de `DDA`), KOERI ve diğer kurumların çözümlerini birleştirir. Bir olayın konumu bir kurumdan, büyüklüğü başka kurumdan gelebilir. SCEDC ↔ USGS ComCat karşılaştırmasında görülen toplayıcı etkisi (eksik olay, farklı çözüm sürümü; `data/scedc/KAYNAK_KARSILASTIRMA.md`) burada da beklenmeli.
@@ -49,7 +50,7 @@ EMSC sorgusu her zaman güncel sürümü döndürür; geçmiş kayıtlar ve kuru
 
 ## 4. Çalışma alanı: NAF ve segmentler
 
-**Fay izi kaynağı (karar gerekli):** (a) MTA Türkiye Diri Fay Veritabanı (Emre vd., 2018) — öneri; (b) GEM Global Active Faults (Styron & Pagani, 2020; EQ-Live'da katman olarak var). Kaynak dosyası sürümüyle arşive alınır.
+**Fay izi kaynağı — Karar (2026-11-21): MTA Türkiye Diri Fay Veritabanı** (Emre vd., 2018). Kaynak dosyası sürümüyle arşive alınır. GEM Global Active Faults (Styron & Pagani, 2020; EQ-Live'da katman olarak var) yalnız duyarlılık için ikinci model olabilir (açık konu, §9).
 
 **Ön segment listesi** (batıdan doğuya; 20. yüzyıl kırıklarına dayalı; sınırlar fay modelinden):
 
@@ -84,7 +85,7 @@ SAF İP3 ile aynı üç yöntem ve aynı parametre protokolü. GK74 ve Reasenber
 
 ### İP-N4 — PMSR
 - Kod değiştirilmeden (OUT 4). **Beklenen sorun:** EMSC ile çoğu ana şokta Mc için 275 olay koşulu sağlanmayabilir. Sonuç "sınanamadı" olarak raporlanır, "artış yok" olarak değil.
-- **Karar gerekli:** İP-N1, AFAD'ın NAF'ta yeterli yoğunluk sağladığını gösterirse İP-N4'ün AFAD ile de çalıştırılması (duyarlılık olarak, ayrı etiketle).
+- **Karar (2026-11-21) — AFAD duyarlılık analizi:** İP-N1'de EMSC ↔ AFAD karşılaştırması yapılır. İP-N1, AFAD'ın NAF'ta yeterli yoğunluk sağladığını gösterirse İP-N4 AFAD ile de çalıştırılır (duyarlılık olarak, ayrı etiketle; birincil kaynak EMSC kalır).
 - 2021 → 2022 Düzce vakası açıklayıcı örnek olarak; "öncü" dili kullanılmaz (OUT 7).
 
 ### İP-N5 — SAF–NAF karşılaştırması (RQ-N5) · makale P5 (ortak)
@@ -94,6 +95,7 @@ SAF İP3 ile aynı üç yöntem ve aynı parametre protokolü. GK74 ve Reasenber
    - SAF tarafında SCEDC ile EMSC'nin Kaliforniya kaydı karşılaştırılır. "EMSC kullanmak SAF sonuçlarını nasıl değiştirirdi?" sorusu, NAF'taki EMSC etkisinin ölçeğini verir.
    - NAF tarafında EMSC ile AFAD karşılaştırılır (İP-N1).
    - Böylece 2 fay × 2 katalog türü (bölgesel birincil ↔ toplayıcı) düzeni kurulur. Tektonik farkın yorumu yalnızca **katalog türünden bağımsız kalan** farklara dayandırılır.
+   - **Sınırlılık — tam faktöriyel tasarım değildir.** Bu 2 × 2 düzen, katalog etkisinin büyüklüğünü kestirmeye yardım eder; ancak katalog ve tektonik etkilerini **tamamen ayrıştırmaz**. Nedenleri: (i) iki bölgedeki "bölgesel birincil" kataloglar farklı ürünlerdir (SCEDC ↔ AFAD: farklı ağ yoğunluğu, işleme ve büyüklük ölçekleri); (ii) EMSC iki bölgede aynı ürün gibi davranmaz (katkı veren kurumlar ve ağ geometrisi farklıdır); (iii) ağ yoğunluğu ile tektonik ortam bölge düzeyinde iç içedir ve aynı bölgede birbirinden bağımsız değiştirilemez. Sonuçlar bu nedenle "katalog türünden bağımsız kalan farklar" ve "katalog etkisinin tahmini büyüklüğü" olarak raporlanır; artık karışıklık (confounding) açıkça belirtilir ve kesin nedensel ayrıştırma iddia edilmez.
 4. **Yasak çıkarım (OUT 5):** b_SAF ve b_NAF değerleri doğrudan eşdeğer kabul edilmez; karşılaştırma yalnızca aynı protokol, aynı eşik ve belgelenmiş katalog farklarıyla yapılır.
 
 ## 6. Tekrarlanabilirlik
@@ -107,14 +109,22 @@ SAF tasarımı §6 ile aynı. Ek olarak her EMSC sorgusunun tam URL'si, sorgu za
 - **Fay modeli seçimi:** ikinci modelle duyarlılık.
 
 ## 8. Aşamalar
-1. Danışman onayı ve §9 kararları → 2. EMSC anlık görüntü arşivinin ayrı onayı ve oluşturulması → 3. İP-N1 ön kaydı → 4. İP-N1 → 5. İP-N2, İP-N3 → 6. İP-N4 → 7. İP-N5 (SAF ile birlikte).
+1. Tasarım onayı (2026-11-21, tamam) → 2. EMSC anlık görüntü arşivinin ayrı onayı ve oluşturulması → 3. İP-N1 ön kaydı → 4. İP-N1 → 5. İP-N2, İP-N3 → 6. İP-N4 → 7. İP-N5 (SAF ile birlikte).
 
-## 9. Danışman kararı gereken konular
-1. Fay izi kaynağı: MTA Diri Fay Veritabanı (öneri) / GEM GAF.
-2. EMSC dondurulmuş anlık görüntü arşivi (`data/emsc_naf/`) oluşturulsun mu?
-3. AFAD duyarlılık kataloğu: kapsam (yalnız İP-N1 mi, İP-N4 de mi) ve veri alma yolu (kullanıcı indirmesi; tarayıcıdan erişim sorunu analiz için engel değil).
-4. Güney kol ve Marmara'daki kolların segment ataması.
-5. SAF tarafında EMSC'nin Kaliforniya kaydıyla karşılaştırma (İP-N5 madde 3) ana tasarıma girsin mi? (Öneri: evet; ilke 3'ün en doğrudan sınaması.)
+## 9. Danışman kararları
+**Verilen kararlar (2026-11-21):**
+| Konu | Karar |
+|---|---|
+| Fay izi kaynağı | MTA Türkiye Diri Fay Veritabanı (Emre vd., 2018) |
+| Birincil Mc yöntemi | MBS (SAF ile aynı; MAXC+0,2 ve EMR ikincil) |
+| EMSC dondurulmuş anlık görüntü arşivi | İlke kabul; oluşturma **ayrı onayla** |
+| AFAD duyarlılık analizi | İP-N1'de EMSC ↔ AFAD karşılaştırması; yoğunluk yeterliyse İP-N4'te de (ayrı etiket) |
+
+**Açık konular (ilgili İP ön kaydında karara bağlanacak):**
+1. GEM GAF ile ikinci fay modeli duyarlılığı yapılsın mı?
+2. Güney kol ve Marmara'daki kolların segment ataması.
+3. SAF tarafında EMSC'nin Kaliforniya kaydıyla karşılaştırma (İP-N5 madde 3) — öneri: evet; ilke 3'ün en doğrudan sınaması (sınırlılığı İP-N5'te yazılı).
+4. AFAD verisinin alınma yolu (kullanıcı indirmesi; tarayıcıdan erişim sorunu analiz için engel değil).
 
 ## Kaynaklar
 - Barka, A. (1996). Slip distribution along the North Anatolian Fault associated with the large earthquakes of the period 1939 to 1967. BSSA 86(5), 1238–1254.

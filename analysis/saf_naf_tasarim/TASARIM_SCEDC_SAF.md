@@ -1,7 +1,8 @@
-# Araştırma tasarımı 1 — SCEDC–SAF
+# EQ-LiveTürkiye — SAF ve NAF Karşılaştırmalı Sismolojik Araştırma Tasarımları
+## Tasarım 1 — SCEDC–SAF (San Andreas Fayı)
 
 **Çalışma başlığı (taslak):** *Seismicity Characteristics and Gutenberg–Richter b-Value Variations Along the San Andreas Fault System (2008–2026)*
-**Sürüm:** tasarım v0.1 · 2026-11-21 · Durum: **danışman onayı bekliyor** (kod yazılmadı)
+**Sürüm:** tasarım v0.2 · 2026-11-21 · Durum: **onaylandı** (danışman kararları §10'a işlendi; kod yazılmadı)
 **Karar kaydı:** `KARAR_2026-11-21.md` · **Eş belge:** `TASARIM_EMSC_NAF.md`
 
 > Bu belge bir çerçevedir; sonuç içermez. Her iş paketi (İP) başlamadan önce kendi **ön kaydını** (hipotez, parametreler, kabul ölçütleri) ayrı bir dosya olarak commit eder; sonuçlar ancak ondan sonra hesaplanır. PMSR 2018–2026 çalışmasında uygulanan düzen budur (`analysis/2026-11-19_pmsr_scsn_2018_2026/ON_KAYIT.md`).
@@ -49,7 +50,7 @@ Hipotezler ve sınama ölçütleri her İP'nin ön kaydında sayısal olarak yaz
 
 ## 4. Çalışma alanı: SAF ve segmentler
 
-**Fay izi kaynağı (karar gerekli, §10):** seçenekler (a) UCERF3 fay bölümleri (Field vd., 2014), (b) SCEC Community Fault Model (Plesch vd., 2007), (c) USGS Kuvaterner Fay ve Kıvrım Veritabanı. Öneri: **UCERF3 bölümleri** — segment adları ve sınırları yayımlanmış ve sabit; kaynak dosyası sürümüyle birlikte arşive alınır.
+**Fay izi kaynağı — Karar (2026-11-21): UCERF3 fay bölümleri** (Field vd., 2014) — segment adları ve sınırları yayımlanmış ve sabit; kaynak dosyası sürümüyle birlikte arşive alınır. SCEC Community Fault Model (Plesch vd., 2007) veya USGS Kuvaterner Fay ve Kıvrım Veritabanı yalnız duyarlılık için ikinci model olabilir (açık konu, §10).
 
 **Ön segment listesi** (SCEDC alanı içinde, kuzeyden güneye; sınırlar seçilen fay modelinden alınır):
 
@@ -65,7 +66,7 @@ Hipotezler ve sınama ölçütleri her İP'nin ön kaydında sayısal olarak yaz
 
 **Uzaklık şeritleri:** fay izine yatay uzaklık ≤ 10, ≤ 20, ≤ 30 km (iç içe) ve halkalar (0–10, 10–20, 20–30 km). Mesafe: WGS84 jeodezik (PMSR'deki Vincenty ile aynı). Bir olay birden çok segmente yakınsa en yakın segmente atanır; segment uçlarında ±10 km tampon duyarlılığı.
 
-**Fay sistemi bağlamı:** San Jacinto, Elsinore, Garlock ve Doğu Kaliforniya Kesme Zonu aynı katalogda. Ana analiz SAF şeritleriyle sınırlıdır; bu faylar **kontrol bölgeleri** olarak kullanılabilir (karar gerekli). Böylece SAF'a özgü sonuç ile bölgesel katalog etkisi ayrılabilir.
+**Fay sistemi bağlamı:** San Jacinto, Elsinore, Garlock ve Doğu Kaliforniya Kesme Zonu aynı katalogda. Ana analiz SAF şeritleriyle sınırlıdır; **Karar (2026-11-21): üç kontrol bölgesi ana tasarımdadır — San Jacinto Fayı, Elsinore Fayı ve Doğu Kaliforniya Kesme Zonu (ECSZ).** Kontrol bölgelerine SAF ile aynı şerit, yeterlilik ve Mc kuralları uygulanır. Böylece SAF'a özgü sonuç ile bölgesel katalog etkisi ayrılabilir (Garlock bağlam olarak işaretlenir, kontrol bölgesi değildir).
 
 Yeterlilik kuralı: bir segment × şerit × dönem hücresi, Mc üstünde **N ≥ 100** olay yoksa b raporlanmaz (duyarlılık: N ≥ 50, açıkça işaretli).
 
@@ -74,7 +75,7 @@ Yeterlilik kuralı: bir segment × şerit × dönem hücresi, Mc üstünde **N �
 ### İP1 — Katalog karakterizasyonu (RQ1, RQ3) · makale P1
 - **Mc(t):** tüm alan ve her segment için kayan pencerelerle (ör. 500 olay veya 1 yıl; ön kayıtta sabitlenir).
 - **Mc(x):** ızgara veya segment bazında.
-- **Yöntemler:** MAXC (+0,2 düzeltmesi), MBS (Cao & Gao, 2002; PMSR'deki uygulamayla aynı ΔM 0,4), EMR (Woessner & Wiemer, 2005). **Birincil yöntem ön kayıtta seçilir.** Yöntemler arası fark > 0,2 olan hücreler işaretlenir.
+- **Yöntemler:** MAXC (+0,2 düzeltmesi), MBS (Cao & Gao, 2002; PMSR'deki uygulamayla aynı ΔM 0,4), EMR (Woessner & Wiemer, 2005). **Karar (2026-11-21): birincil yöntem MBS** (PMSR'deki doğrulanmış uygulamayla tutarlı); MAXC+0,2 ve EMR ikincil olarak raporlanır. Yöntemler arası fark > 0,2 olan hücreler işaretlenir.
 - **Büyüklük türü dağılımı:** yıl × büyüklük aralığı tablosu (ör. M ≥ 3'te `l`/`w`/`h`/`lr` oranları).
 - **Kırılma testleri:** her bilinen tarihte önce/sonra karşılaştırması: Mc farkı, GR uyumu, ve (Mc üstünde) b farkı (Utsu testi). Büyük dizilerin etkisini dışlamak için kontrol bölgeleri. Kırılma tarihleri **önceden bilindiği** için hipotez testi uygundur; veri güdümlü değişim noktası arama yalnızca keşifsel.
 - **Çıktı:** Mc(t, x) tabloları, büyüklük türü tablosu, kırılma testleri; İP2–İP4 için **dönem başına önerilen Mc**.
@@ -105,9 +106,11 @@ Yeterlilik kuralı: bir segment × şerit × dönem hücresi, Mc üstünde **N �
 ### İP5 — SAF–NAF karşılaştırmasına girdi · makale P5
 `TASARIM_EMSC_NAF.md` ile **aynı** ölçüm protokolü uygulanır. Karşılaştırma iki düzeyde yapılır:
 1. **Doğal Mc:** her katalog kendi ölçülen Mc'siyle.
-2. **Ortak eşik:** M_ortak = max(Mc_SAF, Mc_NAF) (+ duyarlılık +0,2, +0,5). Bunun için SCEDC kataloğu, büyüklük türü dağılımı NAF'a yakın olacak biçimde de alt örneklenebilir (karar gerekli).
+2. **Ortak eşik:** M_ortak = max(Mc_SAF, Mc_NAF) (+ duyarlılık +0,2, +0,5). Bunun için SCEDC kataloğu, büyüklük türü dağılımı NAF'a yakın olacak biçimde de alt örneklenebilir (açık konu, §10).
 
 **Veri–yöntem ayrımı (ilke 3):** aynı SCEDC verisi EMSC'nin göreceği biçimde de incelenir: SCEDC'yi EMSC'nin Kaliforniya kaydıyla (aynı dönem, aynı alan) karşılaştırmak, "toplayıcı katalog" etkisinin SAF'ta ne kadar olduğunu ölçer. Bu fark bilinirse NAF'ta EMSC kullanmanın etkisi yorumlanabilir.
+
+**Sınırlılık — tam faktöriyel tasarım değildir.** Bu 2 × 2 düzen, katalog etkisinin büyüklüğünü kestirmeye yardım eder; ancak katalog ve tektonik etkilerini **tamamen ayrıştırmaz**. Nedenleri: (i) iki bölgedeki "bölgesel birincil" kataloglar farklı ürünlerdir (SCEDC ↔ AFAD: farklı ağ yoğunluğu, işleme ve büyüklük ölçekleri); (ii) EMSC iki bölgede aynı ürün gibi davranmaz (katkı veren kurumlar ve ağ geometrisi farklıdır); (iii) ağ yoğunluğu ile tektonik ortam bölge düzeyinde iç içedir ve aynı bölgede birbirinden bağımsız değiştirilemez. Sonuçlar bu nedenle "katalog türünden bağımsız kalan farklar" ve "katalog etkisinin tahmini büyüklüğü" olarak raporlanır; artık karışıklık (confounding) açıkça belirtilir ve kesin nedensel ayrıştırma iddia edilmez.
 
 ## 6. Tekrarlanabilirlik (ilke 4)
 
@@ -128,18 +131,24 @@ Her analiz çıktısı bir **çalıştırma kaydı** (JSON) taşır: katalog anl
 - **Büyüklük türü karışımı** (büyük olaylarda Mw, küçüklerde ML): GR eğimi M ~3,5 üstünde tür değişiminden etkilenebilir; b, ML-baskın aralıkla sınırlı da hesaplanır.
 - **Ridgecrest dizisinin gözden geçirilmemiş kısmı:** 2019-07 – 2020 dönemi ayrı işaretlenir.
 - **2026 kısmi:** yıllık sonuçlarda ayrıca etiketlenir.
-- **Fay modeli seçimi** segment sonuçlarını değiştirebilir: ikinci bir modelle duyarlılık (karar gerekli).
+- **Fay modeli seçimi** segment sonuçlarını değiştirebilir: ikinci bir modelle duyarlılık (açık konu, §10).
 
 ## 9. Aşamalar (tarih yok; sıralı)
-1. Danışman onayı ve §10 kararları → 2. İP1 ön kaydı → 3. İP1 → 4. İP2 ve İP3 ön kayıtları → 5. İP2, İP3 → 6. İP4 → 7. İP5 (NAF İP'leriyle birlikte) → 8. Yayın.
+1. Tasarım onayı (2026-11-21, tamam) → 2. İP1 ön kaydı → 3. İP1 → 4. İP2 ve İP3 ön kayıtları → 5. İP2, İP3 → 6. İP4 → 7. İP5 (NAF İP'leriyle birlikte) → 8. Yayın.
 SCEDC API entegrasyonu (Uygulama sırası 3) İP1'i engellemez: İP1–İP3 dondurulmuş arşivle yapılır.
 
-## 10. Danışman kararı gereken konular
-1. Fay izi kaynağı: UCERF3 bölümleri (öneri) / SCEC CFM / USGS Qfaults; duyarlılık için ikinci model?
-2. Birincil Mc yöntemi: MBS (PMSR ile tutarlı) / MAXC+0,2 / EMR.
-3. Kontrol bölgeleri (San Jacinto, Elsinore, ECSZ) ana tasarıma girsin mi?
-4. Derinlik sınırı: tümü (öneri, ≤ 20 km duyarlılık) / ≤ 20 km birincil.
-5. Ortak eşik deneyinde büyüklük türüne göre alt örnekleme yapılsın mı?
+## 10. Danışman kararları
+**Verilen kararlar (2026-11-21):**
+| Konu | Karar |
+|---|---|
+| Fay izi kaynağı | UCERF3 fay bölümleri (Field vd., 2014) |
+| Birincil Mc yöntemi | MBS (MAXC+0,2 ve EMR ikincil) |
+| Kontrol bölgeleri | San Jacinto, Elsinore, Doğu Kaliforniya Kesme Zonu — ana tasarımda |
+
+**Açık konular (ilgili İP ön kaydında karara bağlanacak):**
+1. İkinci fay modeliyle duyarlılık (SCEC CFM veya USGS Qfaults).
+2. Derinlik sınırı: tümü (öneri; ≤ 20 km duyarlılık) / ≤ 20 km birincil.
+3. Ortak eşik deneyinde büyüklük türüne göre alt örnekleme.
 
 ## Kaynaklar
 - Aki, K. (1965). Bull. Earthq. Res. Inst. Univ. Tokyo 43, 237–239.
