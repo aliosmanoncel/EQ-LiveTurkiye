@@ -1,0 +1,36 @@
+name: SCEDC arşiv doğrulaması (statik katalog, değişmezlik)
+
+# data/scedc/ — SHA-256, ham ↔ işlenmiş alan alan eşitlik, satır sayıları,
+# önceki anlık görüntülerin değiştirilmediği (main'deki manifestle karşılaştırma).
+on:
+  push:
+    paths:
+      - 'data/scedc/**'
+      - 'scripts/build_scedc_archive.py'
+      - 'scripts/validate_scedc_archive.py'
+      - '.github/workflows/scedc-archive.yml'
+  pull_request:
+    paths:
+      - 'data/scedc/**'
+      - 'scripts/build_scedc_archive.py'
+      - 'scripts/validate_scedc_archive.py'
+      - '.github/workflows/scedc-archive.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: main'deki manifest (değişmezlik karşılaştırması için)
+        run: git show origin/main:data/scedc/manifest.json > /tmp/base_manifest.json 2>/dev/null || echo '{}' > /tmp/base_manifest.json
+      - name: Doğrula
+        run: python scripts/validate_scedc_archive.py --base-manifest /tmp/base_manifest.json
