@@ -27,7 +27,8 @@ for (const s of comb) {
   rows.push({
     id: e.id, time: e.time, m: e.m, lat: e.lat, lon: e.lon,
     mc: a.mc.enough ? +a.mc.mc.toFixed(2) : '', n_mc: a.mc.n, r_mc: a.mc.radiusKm,
-    n_obs: a.esr?.nObs ?? '', n_calib: a.esr?.nCalib ?? '', p: a.esr ? a.esr.p : '', p_cons: a.esr ? a.esr.pConservative : '',
+    n_obs: a.esr?.nObs ?? '', n_calib: a.esr?.nCalib ?? '', n_windows: a.esr?.nWindows ?? '', p: a.esr ? a.esr.p : '',
+    p_report: !a.esr ? '' : (a.esr.p === 0 ? `<${(1 / a.esr.nWindows).toExponential(1)}` : a.esr.p.toPrecision(3)), p_cons: a.esr ? a.esr.pConservative : '',
     typeA: a.typeA, label: a.label,
     causal_mc: c.mc.enough ? +c.mc.mc.toFixed(2) : '', causal_label: c.label,
     ridgecrest_zone: e.t >= RC_T1 && e.t < RC_T2 && hav(e.lat, e.lon, rc.lat, rc.lon) <= 50,

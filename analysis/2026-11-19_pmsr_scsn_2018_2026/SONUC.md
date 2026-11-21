@@ -20,7 +20,7 @@ Bölge kutusunda 2017-01-01 – 2026-11-17 arasında 230 954 olay (eq 224 786, q
 | 2018–2026 | 49 (3 Mc yetersiz) | 12 | %24,5 | %14,6–38,1 |
 | 2008–2017 | 58 | 15 | %25,9 | %16,3–38,4 |
 
-İki yönlü Fisher kesin testi: **p = 1,00** (odds oranı 0,93; scipy ile doğrulandı). H0 reddedilmedi; iki dönemin oranları neredeyse aynı. Ön kayıtta belirtildiği gibi aralıklar geniştir: yaklaşık ±12 puanlık farklar bu örneklemle dışlanamaz. Makale değeri (SCSN %22, 16/74) iki aralığın da içindedir.
+İki yönlü Fisher kesin testi: **p = 1,00** (odds oranı 0,93; scipy ile doğrulandı). **İki dönem arasında anlamlı bir oran farklılığı gözlenmemiştir. Sonuçlar, yöntemin farklı katalog dönemlerinde benzer oranlar ürettiğini göstermektedir.** Bu, iki dönemin istatistiksel olarak eşdeğer olduğunu kanıtlamaz (eşdeğerlik testi yapılmadı); aralıklar geniştir ve yaklaşık ±12 puanlık farklar bu örneklemle dışlanamaz. Makale değeri (SCSN %22, 16/74) iki aralığın da içindedir.
 
 Type A (M≥3, Mc kesmesiz, 20 gün, 10 km, ≥1 olay): 19/52 (%37); 2008–2017: 24/61 (%39); makale %35.
 
@@ -33,10 +33,24 @@ Type A (M≥3, Mc kesmesiz, 20 gün, 10 km, ≥1 olay): 19/52 (%37); 2008–2017
 
 Birincil sonuç her duyarlılıkta değişmedi.
 
+## p = 0 nasıl okunmalı
+ESR p değeri, kalibrasyon yılındaki 32 501 kayan 20 günlük pencereden sayısı N_obs'a eşit ya da büyük olanların oranıdır. p = 0, bu pencerelerin **hiçbirinin** N_obs'a ulaşmadığı anlamına gelir; olasılığın sıfır olduğu anlamına gelmez. Raporlama biçimi: **p < 1/32 501 ≈ 3,1×10⁻⁵** (`sonuclar_2018_2026.csv` → `p_report`). 12 anlamlı ana şokun tamamı bu durumdadır ve hepsinde kalibrasyon tam (32 501 pencere). Pencereler büyük ölçüde örtüştüğü için bu alt sınır bağımsız gözlem sayısını yansıtmaz: 17 örtüşmeyen pencereyle muhafazakâr p en az 1/18 ≈ 0,056'dır (Duyarlılık tablosu).
+
 ## Önemli tek tek olaylar
-- **Ridgecrest Mw 6,4 (2019-07-04):** N₂₀ = 8, p = 0 → anlamlı. Canlı USGS sonucuyla (N₂₀ = 8, p = 0; ön kayıt §5) aynı.
-- **Ridgecrest Mw 7,1 (2019-07-06):** N₂₀ = 556, p = 0 → anlamlı. Artış Mw 6,4 ve onu izleyen diziden gelir; Mw 7,1 Fixed kuralını geçer çünkü önceki olay daha küçüktür.
+- **Ridgecrest Mw 6,4 (2019-07-04):** N₂₀ = 8, p < 3,1×10⁻⁵ → anlamlı. Canlı USGS sonucuyla (N₂₀ = 8, p = 0; ön kayıt §5) aynı.
+- **Ridgecrest Mw 7,1 (2019-07-06):** N₂₀ = 556, p < 3,1×10⁻⁵ → anlamlı. Artış Mw 6,4 ve onu izleyen diziden gelir; Mw 7,1 Fixed kuralını geçer çünkü önceki olay daha küçüktür.
 - Diğer 10 anlamlı ana şok M 4,06–5,21. Üçü aynı gün (2026-05-10, Imperial Valley, 32,97 K −115,55 B): kural gereği yalnız *önceki* büyük olaylar dışlandığından, bir dizinin artan büyüklükteki olaylarının her biri ayrı ana şok sayılabiliyor. Bu, yöntemin (Khan vd.) bir özelliğidir; 2008–2017'de de aynı kural uygulandı.
+
+## Hata geçmişi
+| Commit | İçerik | Durum |
+|---|---|---|
+| b44b906 | Ön kayıt | Geçerli (etkilenmedi) |
+| a8776c1 | İlk sonuçlar: 8/48 (%16,7), Ridgecrest Mw 6,4 p = 0,013 | **Geçersiz** — `build_catalog.py` CSV'yi `float_format='%.6g'` ile yazdı; Unix zaman sütunu ~3 saat çözünürlüğe yuvarlandı; `run_pmsr.mjs` zamanı bu sütundan okudu |
+| 3ce9aa5 | İlk doğrulama belgesi (yıllık sayılar; hatayı fark etmeden önce) | Kısmen geçersiz; yerini bbea7ba aldı |
+| bbea7ba | Düzeltme: zaman `time_utc` metninden okunur, `t` tam yazılır; sonuçlar yeniden hesaplandı (12/49) | Geçerli |
+| (bu commit) | `verify_catalog.py`: işlenen katalog ham SCEDC dosyalarıyla alan alan karşılaştırıldı; `p_report`, `n_windows` sütunları | Geçerli |
+
+Düzeltmeyi doğrulayan testler: `verify_catalog.py` → `verify_catalog.json` (230 954/230 954 olay; zaman metni, sayısal zaman, enlem, boylam, derinlik, büyüklük ve türü birebir; en büyük zaman farkı 0 s; ham dosyaların zaman çözünürlüğü 0,01 s) ve iki çalıştırmada bayt bayt aynı çıktı (`DOGRULAMA.md` §3).
 
 ## Ön kayıttan sapma
 Yok. (Ridgecrest bölgesi tanımında haversine mesafesi kullanıldı; ön kayıtta mesafe türü belirtilmemişti.)

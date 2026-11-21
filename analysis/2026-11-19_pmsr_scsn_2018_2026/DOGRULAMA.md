@@ -27,12 +27,14 @@ Okuma, 2008–2017 çalışmasıyla aynı kod mantığını kullanır (`step1.py
 
 **Hata (düzeltildi):** ilk sürümde `build_catalog.py`, CSV'yi `float_format='%.6g'` ile yazdığı için Unix zaman sütunu `t` 6 anlamlı basamağa yuvarlanıyordu (ör. 1.56238e+09; yaklaşık 10 000 s ≈ 3 saat çözünürlük). `run_pmsr.mjs` zamanı bu sütundan okuduğundan ana şok seçimi, 20 günlük pencere ve kalibrasyon sayıları etkilendi; a8776c1'deki sonuçlar (8/48) geçersizdir. Düzeltme: `run_pmsr.mjs` zamanı `time_utc` metninden okur; `t` tam (0,01 s) yazılır. Kontrol: 230 954 olayın tümünde |t − time_utc| = 0 s.
 
+**Ham dosyayla alan alan karşılaştırma (`verify_catalog.py` → `verify_catalog.json`):** ham SCEDC dosyalarında bölge kutusuna düşen 230 954 olayın tamamı işlenen katalogda var (eksik 0, fazla 0); EVID bazında zaman metni, sayısal zaman, enlem, boylam, derinlik, büyüklük ve büyüklük türü uyuşmazlığı 0; en büyük zaman farkı 0 s. Ham dosyaların zaman çözünürlüğü tüm yıllarda 0,01 s (saniyede 2 ondalık basamak); işlenen katalog bu çözünürlüğü kayıpsız korur.
+
 Düzeltilmiş `node run_pmsr.mjs` iki kez çalıştırıldı; çıktılar bayt bayt aynı.
 
 | Dosya | SHA-256 |
 |---|---|
 | scsn_box_2017_2026.csv.gz | 64997395f50fdac2536033ace2ab576767155eba720a6dca312fa27c7e14a4d5 |
-| sonuclar_2018_2026.csv | 54b30c4610aad2c4db2ae19590e9c43143558a6b1ced96ce51cd22e683016660 |
+| sonuclar_2018_2026.csv | dd3b341b199bb9a8cf6ef47616406965a31a93335b94453bddb37f771abee582 (`n_windows`, `p_report` sütunları eklendikten sonra; sonuç değerleri değişmedi) |
 | ozet.json | cc23b4f178fd74ada0e0866602a4e60fe81c772329af5d7ba62df0197a1591b2 |
 
 2008–2017 parite testi (`scripts/validate_pmsr_parity.mjs`): BİREBİR AYNI (o testin donmuş kataloğu bu hatadan etkilenmez). Fisher p değerleri scipy ile bağımsız olarak doğrulandı. Bağımsız tutarlılık: Ridgecrest Mw 6,4 için SCSN sonucu (N₂₀ = 8, p = 0) canlı USGS sonucuyla aynı.

@@ -1,0 +1,99 @@
+{
+ "dosyalar": {
+  "2017": {
+   "satir": 16344,
+   "altbilgi": 16344,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  },
+  "2018": {
+   "satir": 20730,
+   "altbilgi": 20730,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  },
+  "2019": {
+   "satir": 66341,
+   "altbilgi": 66341,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  },
+  "2020": {
+   "satir": 37285,
+   "altbilgi": 37285,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  },
+  "2021": {
+   "satir": 23201,
+   "altbilgi": 23201,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  },
+  "2022": {
+   "satir": 16884,
+   "altbilgi": 16884,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  },
+  "2023": {
+   "satir": 13680,
+   "altbilgi": 13680,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  },
+  "2024": {
+   "satir": 17266,
+   "altbilgi": 17266,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  },
+  "2025": {
+   "satir": 16844,
+   "altbilgi": 16844,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  },
+  "2026": {
+   "satir": 16441,
+   "altbilgi": 16441,
+   "esit": true,
+   "saniye_ondalik_basamak": [
+    2
+   ]
+  }
+ },
+ "kutudaki_ham_olay": 230954,
+ "islenen": 230954,
+ "eksik": 0,
+ "fazla": 0,
+ "uyusmazlik": {
+  "zaman_metni": 0,
+  "zaman_sayisal_s": 0,
+  "enlem": 0,
+  "boylam": 0,
+  "derinlik": 0,
+  "buyukluk": 0,
+  "buyukluk_turu": 0
+ },
+ "en_buyuk_zaman_farki_s": 0.0,
+ "sonuc": "BİREBİR AYNI"
+}
