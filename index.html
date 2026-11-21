@@ -386,6 +386,7 @@
       <option value="afad">AFAD (statik)</option>
       <option value="hk_local">HK Yerel Katalog (statik)</option>
       <option value="hk_historical">HK Tarihsel Katalog (statik)</option>
+      <option value="scedc">SCEDC SCSN — G. Kaliforniya (statik)</option>
     </select>
   </div>
   <div class="rowbox" id="regionLimitRow">
@@ -411,6 +412,7 @@
   <div id="regionAfadNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ AFAD: GitHub Action ile saatlik güncellenen önceden çekilmiş katalog — canlı API sorgusu değildir (AFAD sunucusu tarayıcıdan gelen isteği reddediyor), poligon filtresi tarayıcıda uygulanır. "1 Yıl" penceresinde AFAD verisi yok → en geniş pencere olan "1 Ay" kullanılır.</div>
   <div id="regionHKLocalNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ HK Yerel Katalog: GEO Pub. 1/2012 Appendix D, statik — 1970-2011, 150km yarıçap, ML (Mw dönüşümü YOK). Bu aralık/alan dışındaki bölge seçimlerinde boş sonuç döner. Zaman/Limit/Sırala geçersizdir, TÜM eşleşen olaylar gösterilir.</div>
   <div id="regionHKHistoricalNote" style="display:none;font-size:.7rem;color:#f59e0b;line-height:1.4;width:210px">⚠ HK Tarihsel Katalog: GEO Pub. 1/2012 Appendix C, statik — 1067-2005, 500km yarıçap, gerçek Mw (Ms/mb'den dönüştürülmüş). Mw≥5.0 ile KESİLMİŞTİR — Gutenberg-Richter/b-value analizi için UYGUN DEĞİLDİR (b-value için HK Yerel Katalog'u kullanın). Zaman/Limit/Sırala geçersizdir, TÜM eşleşen olaylar gösterilir.</div>
+  <div id="regionScedcNote" style="display:none;font-size:.7rem;color:#22c55e;line-height:1.4;width:210px">SCEDC SCSN: Güney Kaliforniya Sismik Ağı kataloğu, statik ve sürümlü arşiv (data/scedc, 2008–2026, doi:10.7909/C3WD3XH1). Kapsam 32–37° K, 122–114° B; dışında 0 olay döner. Tarih alanları kullanılır (boşsa son 365 gün); yalnız gereken yıllık dosyalar yüklenir ve SHA-256 ile doğrulanır. Büyüklük = SCEDC tercih edilen (ML/Mw/… karışık, dönüşüm yok). Yalnız deprem olayları (qb patlamaları hariç). Limit/Sırala geçersiz; tüm olaylar gösterilir. 2026 kısmi.</div>
   <div class="rowbox" id="regionDateRangeRow">
     <label>Tarih (canlı)</label>
     <input id="regionDateFrom" type="date" style="width:118px" title="EMSC/USGS canlı sorgusu için başlangıç tarihi. Boş bırakılırsa üstteki zaman penceresi (1s..1Yıl) kullanılır. Uzun aralıklar (ör. 1971-2026) yalnızca burada seçilebilir — üstteki butonlar en fazla 1 yılla sınırlıdır." onchange="reapplyRegionQuery()">
@@ -3697,6 +3699,9 @@ function cmpCatalogMeta() {
       bitis: tr && historicalCache ? historicalCache.endtime ?? null : null, olay_sayisi: tr && historicalCache ? historicalCache.count ?? null : null, iscgem_katmani: tr ? isc : null,
       pencereler: activeHistWindows.map(w => ({ anahtar: w.key, y0: w.startYear, y1: w.endYear })), buyukluk: mag, gk74_surum: gk, kayit_zamani: now };
   }
+  if (regionSource === 'scedc' && scedcLastMeta) return { tur: 'statik (sürümlü arşiv, SHA-256 doğrulamalı)', kaynak: regionSourceLabel(), anlik_goruntu: scedcLastMeta.snapshot, doi: scedcLastMeta.doi,
+    dosyalar: scedcLastMeta.files, olay_turu: 'yalnız eq', deprem_disi_haric: scedcLastMeta.nonEqExcluded, kismi_yillar: scedcLastMeta.partial, buyukluk: { ...mag, not: 'SCEDC tercih edilen büyüklük; tür karışık, dönüşüm yok', turler: scedcLastMeta.magTypes },
+    pencere: [regionWindowStart?.toISOString(), regionWindowEnd?.toISOString()], gk74_surum: gk, kayit_zamani: now };
   const st = { hk_local: 'data/hongkong_local_catalog.json', hk_historical: 'data/hongkong_historical.json' }[regionSource];
   if (st) return { tur: 'statik (git sürümlü dosya)', kaynak: regionSourceLabel(), dosyalar: [st], buyukluk: mag, gk74_surum: gk, kayit_zamani: now };
   return { tur: 'canlı sorgu (sürümsüz)', kaynak: regionSourceLabel(), saglayici: regionSource, sorgu_zamani: now, buyukluk: mag, gk74_surum: gk,
@@ -8846,7 +8851,7 @@ let regionCapped  = false;  // son sorgu limite takıldı mı
 let regionOrderUsed = 'time';
 let regionWindowStart = null, regionWindowEnd = null;
 let regionIsPolygon = false; // true ise regionRect aslında bir L.Polygon — fetchRegionEvents ek point-in-polygon filtresi uygular
-let regionSource = 'emsc';   // 'emsc' | 'usgs' | 'afad' — Bölge Analizi'nin KENDİ kaynak seçimi, üstteki genel Kaynak (srcSel/src) ile bağımsız (bkz. DATA FLOW NOTE)
+let regionSource = 'emsc';   // 'emsc' | 'usgs' | 'afad' | 'hk_local' | 'hk_historical' | 'scedc' — Bölge Analizi'nin KENDİ kaynak seçimi, üstteki genel Kaynak (srcSel/src) ile bağımsız (bkz. DATA FLOW NOTE)
 // Circle bölge modu — regionIsPolygon'a PARALEL, birbirini dışlayan bir bayrak (ikisi aynı anda true olmaz).
 // USGS Earthquake Catalog'un "Geographic Region → Circle" (center lat/lon + maxradiuskm) mantığıyla
 // aynı: distance(event, center) ≤ R. Circle bir KAYNAK ZONU değildir, sadece araştırma alanı sorgusudur.
@@ -9210,6 +9215,7 @@ function regionSourceLabel() {
   if (regionSource === 'afad') return 'AFAD (önceden çekilmiş katalog, statik)';
   if (regionSource === 'hk_local') return 'HK Yerel Katalog (GEO Pub. 1/2012 Appendix D, ML, statik)';
   if (regionSource === 'hk_historical') return 'HK Tarihsel Katalog (GEO Pub. 1/2012 Appendix C, Mw≥5.0, statik)';
+  if (regionSource === 'scedc') return `SCEDC SCSN (statik arşiv${scedcLastMeta ? ', anlık görüntü ' + scedcLastMeta.snapshot.join('+') : ''}, doi:10.7909/C3WD3XH1)`;
   return 'EMSC (canlı sorgu)';
 }
 
@@ -9240,11 +9246,17 @@ function renderRegionInfo() {
     ? `HK Yerel Katalog (${regionWindowStart ? regionWindowStart.getFullYear() : '—'}–${regionWindowEnd ? regionWindowEnd.getFullYear() : '—'})`
     : regionSource === 'hk_historical'
     ? `HK Tarihsel Katalog (${regionWindowStart ? regionWindowStart.getFullYear() : '—'}–${regionWindowEnd ? regionWindowEnd.getFullYear() : '—'})`
+    : regionSource === 'scedc'
+    ? `SCEDC SCSN (${regionWindowStart ? regionWindowStart.toISOString().slice(0, 10) : '—'} – ${regionWindowEnd ? regionWindowEnd.toISOString().slice(0, 10) : '—'})`
     : (regionSource === 'afad' && hours > 720) ? (HOURS_LABEL[720] + ' — AFAD 1 yıl sağlamıyor')
     : (HOURS_LABEL[hours] || `${hours} sa`);
   let line = `Kaynak: <b>${regionSourceLabel()}</b>`;
   line += `<br>Pencere: ${winLabel} (${dfmt(regionWindowStart)} – ${dfmt(regionWindowEnd)})`;
-  if (magMin || magMax) line += ` · ${regionSource === 'hk_local' ? 'ML' : 'Mw'} ${magMin||'0'}–${magMax||'∞'}`;
+  if (magMin || magMax) line += ` · ${regionSource === 'hk_local' ? 'ML' : regionSource === 'scedc' ? 'M (tercih edilen)' : 'Mw'} ${magMin||'0'}–${magMax||'∞'}`;
+  if (regionSource === 'scedc' && !historicalMode && scedcLastMeta) {
+    const mt = Object.entries(scedcLastMeta.magTypes).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(', ');
+    line += `<br><span style="color:#22c55e">SCEDC: büyüklük türleri ${mt || '—'} (dönüşüm yok) · deprem dışı olay hariç: ${scedcLastMeta.nonEqExcluded}${scedcLastMeta.partial.length ? ' · ' + scedcLastMeta.partial.join(', ') + ' kısmi yıl' : ''}</span>`;
+  }
   if (depMin || depMax) line += ` · ${depMin||'0'}–${depMax||'∞'}km`;
   if (regionEvents.length) {
     const times = regionEvents.map(e => e.time.getTime());
@@ -9490,6 +9502,7 @@ async function fetchRegionEvents(bounds) {
     if (regionSource === 'afad') return await fetchRegionEventsFromAfad(bounds);
     if (regionSource === 'hk_local') return await fetchRegionEventsFromHKLocal(bounds);
     if (regionSource === 'hk_historical') return await fetchRegionEventsFromHKHistorical(bounds);
+    if (regionSource === 'scedc') return await fetchRegionEventsFromScedc(bounds);
     return await fetchRegionEventsLive(bounds, regionSource === 'usgs' ? 'usgs' : 'emsc');
   } finally { regionLoading = false; syncDeclusterBtn(); }
 }
@@ -9708,6 +9721,106 @@ function renderChunkLog() {
     `<details style="margin-top:3px"><summary style="cursor:pointer;color:#888">Parça günlüğü</summary>` +
     c.plan.map((p, i) => `${i + 1}. ${dt(p.t0)} → ${dt(p.t1)} · count ${p.count}` + (p.raw !== undefined ? ` · indirilen ${p.raw}${p.capped ? ' 🔴' : ''} · ayrıştırılan ${p.parsed}` : (p.count === 0 ? ' · boş, indirilmedi' : ''))).join('<br>') +
     `</details>`;
+}
+
+// SCEDC SCSN — data/scedc/ (statik, sürümlü arşiv; 2026-11-21 Aşama 2). Güney Kaliforniya
+// (32–37° K, 122–114° B), 2008–2026. Yalnız seçilen tarih aralığına düşen YILLIK dosyalar
+// yüklenir; her dosyanın SHA-256'sı manifestle karşılaştırılır (uyuşmazsa analiz durur).
+// Büyüklük: SCEDC'nin tercih ettiği büyüklük, DÖNÜŞÜM YOK (mw alanı set edilmez → e.mw ?? e.mag
+// tercih edilen büyüklüğü okur). Olay türü: yalnız 'eq' (qb patlamaları vb. sayılıp dışlanır).
+// Tarih: "Tarih" alanları kullanılır; boşsa arşivin son 365 günü.
+let scedcManifest = null;
+const scedcFileCache = new Map();          // yol → ayrıştırılmış satırlar
+let scedcLastMeta = null;                  // cmpCatalogMeta / bilgi kutusu için son yükleme kaydı
+const SCEDC_MT = { l: 'ML', w: 'Mw', h: 'Mh', lr: 'Mlr', d: 'Md' };
+async function scedcSha256(buf) { return [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].map(x => x.toString(16).padStart(2, '0')).join(''); }
+async function scedcLoadYear(f) {
+  const path = 'data/scedc/' + f.processed.path;
+  if (scedcFileCache.has(path)) return scedcFileCache.get(path);
+  const res = await fetchTimeout(path, {}, 60000);
+  if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
+  const buf = await res.arrayBuffer();
+  const sha = await scedcSha256(buf);
+  if (sha !== f.processed.sha256_gz) throw new Error(`${f.year} dosyasının SHA-256 değeri manifestle uyuşmuyor — analiz durduruldu`);
+  const txt = await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  const lines = txt.trim().split('\n'); const H = lines[0].split(','); const ix = k => H.indexOf(k);
+  const iT = ix('time_utc'), iLa = ix('lat'), iLo = ix('lon'), iD = ix('depth_km'), iM = ix('mag'), iMt = ix('mag_type'), iEt = ix('event_type'), iId = ix('id');
+  const rows = [];
+  for (let k = 1; k < lines.length; k++) {
+    const c = lines[k].split(',');
+    rows.push({ id: c[iId], t: Date.parse(c[iT] + 'Z'), lat: +c[iLa], lon: +c[iLo], dep: +c[iD], mag: +c[iM], mt: c[iMt], et: c[iEt] });
+  }
+  if (rows.length !== f.processed.rows) throw new Error(`${f.year}: satır sayısı ${rows.length} ≠ manifest ${f.processed.rows}`);
+  const out = { rows, sha };
+  scedcFileCache.set(path, out);
+  return out;
+}
+async function fetchRegionEventsFromScedc(bounds) {
+  setStatus('SCEDC SCSN statik arşivi yükleniyor…');
+  const magMin = document.getElementById('regionMagMin').value;
+  const magMax = document.getElementById('regionMagMax').value;
+  const depMin = document.getElementById('regionDepMin').value;
+  const depMax = document.getElementById('regionDepMax').value;
+  const poly = regionIsPolygon && regionRect ? regionRect.getLatLngs()[0] : null;
+  const circleActive = regionIsCircle && regionCircleCenter;
+  try {
+    if (!scedcManifest) {
+      const res = await fetchTimeout('data/scedc/manifest.json', {}, 15000);
+      if (!res.ok) throw new Error(`manifest HTTP ${res.status}`);
+      scedcManifest = await res.json();
+    }
+    const M = scedcManifest, A = M.source.area;
+    // Yıl başına önerilen anlık görüntünün dosya kaydı
+    const files = Object.entries(M.current).map(([y, sid]) => M.snapshots.find(s => s.id === sid).files.find(f => f.year === +y)).sort((a, b) => a.year - b.year);
+    const archEnd = Date.parse(files[files.length - 1].last_event + 'Z'), archStart = Date.parse(files[0].first_event + 'Z');
+    const dfV = document.getElementById('regionDateFrom')?.value, dtV = document.getElementById('regionDateTo')?.value;
+    let t1 = dtV ? Date.parse(dtV + 'T23:59:59.99Z') : archEnd;
+    let t0 = dfV ? Date.parse(dfV + 'T00:00:00Z') : t1 - 365 * 86400e3;
+    t0 = Math.max(t0, archStart); t1 = Math.min(t1, archEnd);
+    if (!(t1 > t0)) throw new Error('seçilen tarih aralığı arşivle (2008–2026) örtüşmüyor');
+    const inArea = !(bounds.getNorth() < A.lat_min || bounds.getSouth() > A.lat_max || bounds.getEast() < A.lon_min || bounds.getWest() > A.lon_max);
+    const need = files.filter(f => f.year >= new Date(t0).getUTCFullYear() && f.year <= new Date(t1).getUTCFullYear());
+    const loaded = [];
+    for (const f of need) { setStatus(`SCEDC SCSN ${f.year} yükleniyor ve doğrulanıyor…`); loaded.push({ f, d: await scedcLoadYear(f) }); }
+    let nNonEq = 0; const evs = [];
+    if (inArea) for (const { d } of loaded) for (const r of d.rows) {
+      if (r.t < t0 || r.t > t1) continue;
+      if (r.lat < bounds.getSouth() || r.lat > bounds.getNorth() || r.lon < bounds.getWest() || r.lon > bounds.getEast()) continue;
+      if (poly && !pointInPolygon(r.lat, r.lon, poly)) continue;
+      if (circleActive && !pointInCircle(r.lat, r.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm)) continue;
+      if (r.et !== 'eq') { nNonEq++; continue; }
+      if ((magMin && r.mag < +magMin) || (magMax && r.mag > +magMax)) continue;
+      if ((depMin && r.dep < +depMin) || (depMax && r.dep > +depMax)) continue;
+      evs.push({ id: r.id, lat: r.lat, lon: r.lon, dep: r.dep, mag: r.mag, mtype: SCEDC_MT[r.mt] || r.mt, place: 'SCEDC SCSN', time: new Date(r.t) });
+    }
+    evs.sort((a, b) => a.time - b.time);
+    regionEvents = evs;   // TAM küme — limit yok
+    if (regionLayer) map.removeLayer(regionLayer);
+    regionLayer = L.layerGroup();
+    timeBalancedSample(evs, VISUAL_SAMPLE_CAP).forEach(e => {
+      L.circleMarker([e.lat, e.lon], { radius: 3.5, color: '#22c55e', weight: 1, fillColor: '#16a34a', fillOpacity: .7 }).bindPopup(
+        `<b style="color:#22c55e">${e.mtype} ${e.mag.toFixed(2)}</b>` +
+        `<br><span style="color:#aaa">SCEDC SCSN · olay ${e.id}</span>` +
+        `<br>Depth: ${e.dep.toFixed(1)} km` +
+        `<br><span style="color:#666">${dfmt(e.time)}</span>`).addTo(regionLayer);
+    });
+    regionLayer.addTo(map);
+    regionCapped = false;
+    regionOrderUsed = 'time';
+    regionWindowStart = new Date(t0); regionWindowEnd = new Date(t1);
+    const mtc = {}; evs.forEach(e => { mtc[e.mtype] = (mtc[e.mtype] || 0) + 1; });
+    scedcLastMeta = { snapshot: [...new Set(loaded.map(x => M.current[String(x.f.year)]))], doi: M.source.doi,
+      files: loaded.map(x => ({ year: x.f.year, path: 'data/scedc/' + x.f.processed.path, sha256_gz: x.f.processed.sha256_gz, status: x.f.status })),
+      partial: loaded.filter(x => x.f.status === 'partial').map(x => x.f.year), nonEqExcluded: nNonEq, magTypes: mtc, inArea };
+    const sampleNote = evs.length > VISUAL_SAMPLE_CAP ? ` (görsel: ${VISUAL_SAMPLE_CAP} örnekleniyor)` : '';
+    setStatus(inArea
+      ? `Bölgede ${evs.length} deprem — SCEDC SCSN (statik arşiv, SHA-256 doğrulandı), limit yok${nNonEq ? ` · ${nNonEq} deprem dışı olay (qb vb.) hariç` : ''}${sampleNote}`
+      : 'Seçilen bölge SCEDC SCSN kapsamı dışında (32–37° K, 122–114° B) — 0 olay', !inArea);
+    renderRegionInfo();
+    if (tmAnyOpen()) renderTimeMag(regionEvents);
+  } catch (err) {
+    setStatus(`SCEDC SCSN hatası: ${err.message}`, true);
+  }
 }
 
 async function fetchRegionEventsLive(bounds, provider) {
@@ -10056,7 +10169,7 @@ function restoreRegionFromURL() {
   if (p.has('rlimit')) document.getElementById('regionLimit').value = p.get('rlimit');
   if (p.has('rorder')) document.getElementById('regionOrder').value = p.get('rorder');
   const rsrc = p.get('rsource');
-  regionSource = ['emsc','usgs','afad'].includes(rsrc) ? rsrc : 'emsc';
+  regionSource = ['emsc','usgs','afad','scedc'].includes(rsrc) ? rsrc : 'emsc';
   const srcSel = document.getElementById('regionSourceSel');
   if (srcSel) srcSel.value = regionSource;
   updateRegionCtrlForMode();
@@ -10579,22 +10692,26 @@ function updateRegionCtrlForMode() {
   const isAfad   = !historicalMode && regionSource === 'afad';
   const isHKLocal = !historicalMode && regionSource === 'hk_local';
   const isHKHistorical = !historicalMode && regionSource === 'hk_historical';
+  const isScedc = !historicalMode && regionSource === 'scedc';
   // Tarihsel Katalog, AFAD, HK Yerel Katalog VE HK Tarihsel Katalog dördü de
   // statik/önceden-çekilmiş veri — Limit/Sırala/Tarih(canlı) yalnızca canlı
   // FDSN sorgusunda (EMSC/USGS) anlamlı.
-  const staticMode = historicalMode || isAfad || isHKLocal || isHKHistorical;
+  const staticMode = historicalMode || isAfad || isHKLocal || isHKHistorical || isScedc;
+  const dateStatic = staticMode && !isScedc;   // SCEDC statik ama tarih aralığı seçilebilir (yıllık dosyalar)
   if (limitSel) limitSel.disabled = staticMode;
   if (orderSel) orderSel.disabled = staticMode;
   if (limitRow) limitRow.classList.toggle('disabledRow', staticMode);
   if (orderRow) orderRow.classList.toggle('disabledRow', staticMode);
-  if (dateFrom) dateFrom.disabled = staticMode;
-  if (dateTo)   dateTo.disabled = staticMode;
-  if (dateRow)  dateRow.classList.toggle('disabledRow', staticMode);
-  if (dateNote) dateNote.style.display = staticMode ? 'block' : 'none';
+  if (dateFrom) dateFrom.disabled = dateStatic;
+  if (dateTo)   dateTo.disabled = dateStatic;
+  if (dateRow)  dateRow.classList.toggle('disabledRow', dateStatic);
+  if (dateNote) dateNote.style.display = dateStatic ? 'block' : 'none';
   if (note) note.style.display = historicalMode ? 'block' : 'none';
   if (afadNote) afadNote.style.display = isAfad ? 'block' : 'none';
   if (hkNote) hkNote.style.display = isHKLocal ? 'block' : 'none';
   if (hkHistNote) hkHistNote.style.display = isHKHistorical ? 'block' : 'none';
+  const scedcNote = document.getElementById('regionScedcNote');
+  if (scedcNote) scedcNote.style.display = isScedc ? 'block' : 'none';
   if (refresh) refresh.title = historicalMode
     ? 'Tarihsel modda statik veri elle tekrar filtrelenir; Zaman/Tarihsel Katalog ve Mw/Derinlik değiştikçe zaten otomatik güncellenir — genelde gerekmez'
     : isAfad
@@ -10603,7 +10720,9 @@ function updateRegionCtrlForMode() {
         ? 'HK Yerel Katalog statik dosya elle tekrar filtrelenir — 1970-2011 sabit, yeni bir canlı sorgu YAPILMAZ'
         : isHKHistorical
           ? 'HK Tarihsel Katalog statik dosya elle tekrar filtrelenir — 1067-2005 sabit, yeni bir canlı sorgu YAPILMAZ'
-          : 'Bölgeyi seçili ayarlarla elle yeniden sorgula';
+          : isScedc
+            ? 'SCEDC SCSN statik arşivi seçili tarih aralığıyla elle tekrar filtrelenir — canlı sorgu YAPILMAZ'
+            : 'Bölgeyi seçili ayarlarla elle yeniden sorgula';
 }
 
 // Bölge Analizi kaynak seçici (EMSC/USGS/AFAD) değiştiğinde: Limit/Sırala
