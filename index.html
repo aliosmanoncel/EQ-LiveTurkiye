@@ -386,7 +386,7 @@
       <option value="afad">AFAD (statik)</option>
       <option value="hk_local">HK Yerel Katalog (statik)</option>
       <option value="hk_historical">HK Tarihsel Katalog (statik)</option>
-      <option value="scedc">SCEDC SCSN — G. Kaliforniya (statik)</option>
+      <option value="scedc">SCEDC SCSN (Statik, 2008–2026)</option>
     </select>
   </div>
   <div class="rowbox" id="regionLimitRow">
@@ -9819,6 +9819,11 @@ async function fetchRegionEventsFromScedc(bounds) {
     renderRegionInfo();
     if (tmAnyOpen()) renderTimeMag(regionEvents);
   } catch (err) {
+    // Doğrulanamayan/okunamayan veride önceki bölgenin olayları analizde kalmasın
+    regionEvents = []; scedcLastMeta = null;
+    if (regionLayer) { map.removeLayer(regionLayer); regionLayer = null; }
+    renderRegionInfo();
+    if (tmAnyOpen()) renderTimeMag(regionEvents);
     setStatus(`SCEDC SCSN hatası: ${err.message}`, true);
   }
 }
