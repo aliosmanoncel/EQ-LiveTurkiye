@@ -357,6 +357,7 @@
   <button class="tbtn"        id="btnAerial" onclick="toggleLayer('aerial')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Uydu Görüntüsü · Esri World Imagery © Esri, Maxar, Earthstar Geographics">🛰️ Uydu Görüntüsü</button>
   <button class="tbtn"        id="btnPlates" onclick="toggleLayer('plates')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Levha Sınırları · USGS/Smithsonian This Dynamic Planet · KAF/DAF dahil global levha tektoniği bağlamı">🌐 Levha Sınırları</button>
   <button class="tbtn"        id="btnGAF"    onclick="toggleLayer('gaf')"    style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Dünya Diri Fayları · GEM Global Active Faults Database · Styron &amp; Pagani (2020) · CC-BY-SA 4.0 · Türkiye içi hariç (MTA katmanıyla çakışmasın diye)">🌍 Dünya Diri Fayları</button>
+  <button class="tbtn tr-only" id="btnVs30Box" onclick="toggleLayer('vs30')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="📍 Yaşadığınız bölgenin zemin özelliklerini öğrenin: haritaya tıklayın ya da 📍 ile konumunuzu sorgulayın — yaklaşık zemin sınıfı (ZA–ZE), VS30, açıklama. Renkli alanlar yaklaşık bölgesel zemin göstergeleridir; bina bazında zemin etüdü veya deprem performans analizi değildir. USGS Global Vs30 Mosaic · eğim tabanlı vekil, saha ölçümü değil · PGA hesabına bağlı değil">🧱 Zemin Haritası</button>
   <button class="tbtn"        id="btnStations" onclick="toggleLayer('stations')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="İstasyon Ağı · AFAD (statik, deprem.afad.gov.tr) + KOERI (gerçek Açılış tarihine göre zaman filtreli, koeri.boun.edu.tr) · RQ-Mc-EMSC Network Effect (seismo-report §8) için keşif/diagnostic katmanı — Mc hesabına veya canlı sorguya bağlı DEĞİLDİR">📡 İstasyon Ağı</button>
   <button class="tbtn"        id="btnCityNet" onclick="toggleLayer('citynet')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Şehir Tabanlı İzleme · bir metropol alanının kendi yerel sismograf ağı (Türkiye ulusal AFAD/KOERI ağının aksine) · ilk örnek: Hong Kong Observatory 8-istasyon ağı (1979/1997) · konumlar yaklaşık (bkz. popup)">🏙️ Şehir Tabanlı İzleme</button>
   <button class="tbtn active" id="btnLabels" onclick="toggleLayer('labels')" style="width:100%;text-align:left;padding:4px 8px;font-size:.72rem" title="Yer adı / şehir etiketleri katmanı">🏷️ Etiketler</button>
@@ -11595,6 +11596,7 @@ function toggleLayer(type) {
     // Not: PGA katmanındaki Campbell (1981) hesabı sabit Vs30=760 m/s kullanır; bu katman o hesaba bağlı DEĞİLDİR.
     showVs30 = !showVs30;
     document.getElementById('btnVs30').classList.toggle('active', showVs30);
+    document.getElementById('btnVs30Box')?.classList.toggle('active', showVs30);
     const lg = document.getElementById('lgVs30Sec');
     if (lg) lg.style.display = showVs30 ? '' : 'none';
     if (showVs30) map.on('click', vs30MapClick); else { map.off('click', vs30MapClick); map.closePopup(); }
@@ -12631,6 +12633,7 @@ async function loadVs30Layer() {
     setStatus('VS30 (USGS) yüklenemedi: ' + e.message, true);
     showVs30 = false;
     document.getElementById('btnVs30').classList.remove('active');
+    document.getElementById('btnVs30Box')?.classList.remove('active');
   }
 }
 
