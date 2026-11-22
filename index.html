@@ -482,9 +482,10 @@
   <div class="regionCtrl-body hidden" id="lrcBody">
   <div class="rowbox" id="litRegionModeRow">
     <label>Şekil</label>
-    <div style="display:flex;gap:4px">
+    <div style="display:flex;gap:4px;flex-wrap:wrap">
       <button class="tbtn active" id="btnLitModePolygon" onclick="setLitRegionMode('polygon')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Önceden tanımlanmış literatür çalışma alanları (Öncel &amp; Wilson 2004/2006/2007, Ambraseys 2002, Hong Kong). Kullanıcı tanımlı poligon çizimi Bölge Analizi panelindedir.">Poligon (Literatür Çalışma Alanları)</button>
       <button class="tbtn" id="btnLitModeCircle" onclick="setLitRegionMode('circle')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Mekânsal Araştırma Penceresi (Spatial Research Window) — geometri: daire. Merkez + yarıçap (USGS Earthquake Catalog'un Geographic Region → Circle mantığıyla aynı: distance(event, center) ≤ R). Bir kaynak zonu tanımı DEĞİLDİR, sadece araştırma alanı sorgusudur.">Circle</button>
+      <button class="tbtn" id="btnLitModeUser" onclick="setLitRegionMode('user')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Kullanıcı tanımlı araştırma poligonu: haritaya köşe köşe çizilir. Alan WGS84 elipsoidi üzerinde (üyelik bölgesi), deprem sorgusu tüm poligon içinde yapılır. Bir kaynak zonu tanımı DEĞİLDİR.">Kullanıcı Tanımlı Poligon</button>
     </div>
   </div>
   <div id="litRegionPolygonUI">
@@ -525,6 +526,15 @@
     </div>
     <button class="tbtn" id="btnLitCirclePick" onclick="litCirclePickStart()" title="Haritada tıklayın — merkez lat/lon otomatik dolar ve daire çizilir. Bir deprem işaretinin üstüne (≤ 10 piksel) tıklarsanız merkez tam o depremin dış merkezine yapışır. Esc: iptal.">📍 Haritadan Merkez Seç</button>
     <button class="tbtn" id="btnLitCircleDraw" onclick="drawLitRegionCircle()" style="background:#3b0764;border-color:#a855f7">⭕ Daireyi Çiz</button>
+  </div>
+  <div id="litRegionUserUI" style="display:none">
+    <div style="font-size:.7rem;color:#aaa;line-height:1.5;margin:2px 0 4px">Haritaya tıklayarak köşeleri ekleyin. Bitirmek için <b>✓ Bitir</b>, <b>Enter</b> ya da ilk köşeye tıklayın · <b>Geri</b> son köşeyi siler · <b>Esc</b> iptal.</div>
+    <button class="tbtn" id="btnLitUserStart" onclick="litUserPolyStart()" style="background:#3b0764;border-color:#a855f7">✏️ Poligon Çizmeye Başla</button>
+    <div id="litUserDrawCtrl" style="display:none;gap:4px">
+      <button class="tbtn" onclick="litUserPolyFinish()" style="width:auto">✓ Bitir</button>
+      <button class="tbtn" onclick="litUserPolyUndo()" style="width:auto">↶ Geri</button>
+      <button class="tbtn" onclick="litUserPolyCancel()" style="width:auto">✕ İptal</button>
+    </div>
   </div>
   <button class="tbtn" id="btnLitRegionClear" onclick="litRegionClear()" style="display:none">✕ Araştırma Bölgesini Kaldır</button>
   <div id="litRegionInfo" style="display:none;font-size:.72rem;color:#ccc;line-height:1.5;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;width:260px"></div>
@@ -10465,7 +10475,7 @@ let litRegionLayer = null; // L.GeoJSON (poligon) veya L.Circle — seçili ara�
    aynı mantığı kullanır: distance(event, center) ≤ R. Circle bir kaynak zonu DEĞİLDİR,
    sadece kullanıcı tanımlı bir araştırma alanı sorgusudur — mevcut Poligon akışına
    (onLitRegionGroupChange/onLitRegionZoneChange) hiçbir şekilde dokunmaz. */
-let litRegionMode = 'polygon'; // 'polygon' | 'circle'
+let litRegionMode = 'polygon'; // 'polygon' | 'circle' | 'user' (Kullanıcı Tanımlı Poligon, 2026-11-23)
 function setLitRegionMode(mode) {
   if (litRegionMode === mode) return;
   litRegionClear(); // önceki moddan kalan çizim/seçim varsa temizle
@@ -10474,6 +10484,9 @@ function setLitRegionMode(mode) {
   document.getElementById('btnLitModeCircle').classList.toggle('active', mode === 'circle');
   document.getElementById('litRegionPolygonUI').style.display = mode === 'polygon' ? '' : 'none';
   document.getElementById('litRegionCircleUI').style.display = mode === 'circle' ? '' : 'none';
+  document.getElementById('btnLitModeUser').classList.toggle('active', mode === 'user');
+  document.getElementById('litRegionUserUI').style.display = mode === 'user' ? '' : 'none';
+  if (mode !== 'user') litUserPolyCancel(true);
 }
 
 let litCirclePicking = false;
@@ -10531,6 +10544,94 @@ function litCirclePickStart() {
   el.addEventListener('pointerdown', onDown, true);
   el.addEventListener('click', onClick, true);
   document.addEventListener('keydown', onKey);
+}
+
+// ══ Kullanıcı Tanımlı Poligon (2026-11-23) — çizim → WGS84 alan (areaKm2) → sorgu (pointInPolys) → yoğunluk ══
+// Kenarlar enlem–boylam doğrusudur (filtre ile aynı tanım). Kendini kesen poligon kabul edilmez (alan ve üyelik tanımsız).
+let litUserDrawing = false, litUserPts = [], litUserPreview = null, litUserMarkers = [], litUserHandlers = null;
+function litUserPolyRedraw() {
+  if (litUserPreview) { map.removeLayer(litUserPreview); litUserPreview = null; }
+  litUserMarkers.forEach(m => map.removeLayer(m)); litUserMarkers = [];
+  if (litUserPts.length >= 2) litUserPreview = L.polyline(litUserPts.concat(litUserPts.length >= 3 ? [litUserPts[0]] : []), { color: '#a855f7', weight: 2, dashArray: '3', interactive: false }).addTo(map);
+  litUserPts.forEach((p, i) => litUserMarkers.push(L.circleMarker(p, { radius: i ? 3 : 5, color: '#a855f7', fillColor: i ? '#a855f7' : '#fff', fillOpacity: 1, weight: 2, interactive: false }).addTo(map)));
+  const btn = document.getElementById('btnLitUserStart'); if (btn) btn.textContent = litUserDrawing ? `✏️ Çiziliyor… (${litUserPts.length} köşe)` : '✏️ Poligon Çizmeye Başla';
+}
+function litUserPolyStart() {
+  if (litUserDrawing) return;
+  litRegionClear();
+  litUserDrawing = true; litUserPts = [];
+  const el = map.getContainer(); el.style.cursor = 'crosshair'; map.doubleClickZoom.disable();
+  document.getElementById('btnLitUserStart').classList.add('active');
+  document.getElementById('litUserDrawCtrl').style.display = 'flex';
+  let down = null;
+  const onDown = e => { down = [e.clientX, e.clientY]; };
+  const onKey = e => { if (e.key === 'Escape') litUserPolyCancel(); else if (e.key === 'Enter') litUserPolyFinish(); else if (e.key === 'Backspace' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '')) { e.preventDefault(); litUserPolyUndo(); } };
+  const onClick = e => {
+    if (e.target.closest && e.target.closest('.leaflet-control, .leaflet-popup')) return;
+    if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;   // sürükleme
+    e.stopPropagation(); e.preventDefault();
+    const cp = map.mouseEventToContainerPoint(e);
+    if (litUserPts.length >= 3 && map.latLngToContainerPoint(litUserPts[0]).distanceTo(cp) <= 10) { litUserPolyFinish(); return; }   // ilk köşe → kapat
+    const last = litUserPts[litUserPts.length - 1];
+    if (last && map.latLngToContainerPoint(last).distanceTo(cp) < 3) return;   // aynı noktaya ikinci tık
+    litUserPts.push(map.containerPointToLatLng(cp));
+    litUserPolyRedraw();
+  };
+  litUserHandlers = { el, onDown, onKey, onClick };
+  el.addEventListener('pointerdown', onDown, true); el.addEventListener('click', onClick, true); document.addEventListener('keydown', onKey);
+  litUserPolyRedraw();
+  setStatus('Kullanıcı Tanımlı Poligon: haritaya tıklayarak köşe ekleyin (Enter/✓ Bitir: tamamla · Geri: son köşe · Esc: iptal)');
+}
+function litUserPolyStop() {
+  litUserDrawing = false;
+  if (litUserHandlers) { const h = litUserHandlers; h.el.removeEventListener('pointerdown', h.onDown, true); h.el.removeEventListener('click', h.onClick, true); document.removeEventListener('keydown', h.onKey); h.el.style.cursor = ''; litUserHandlers = null; }
+  map.doubleClickZoom.enable();
+  const btn = document.getElementById('btnLitUserStart'); if (btn) btn.classList.remove('active');
+  const ctl = document.getElementById('litUserDrawCtrl'); if (ctl) ctl.style.display = 'none';
+}
+function litUserPolyUndo() { if (!litUserDrawing || !litUserPts.length) return; litUserPts.pop(); litUserPolyRedraw(); }
+function litUserPolyCancel(silent) {
+  const was = litUserDrawing || litUserPts.length;
+  litUserPolyStop(); litUserPts = []; litUserPolyRedraw();
+  if (was && !silent) setStatus('Kullanıcı Tanımlı Poligon çizimi iptal edildi');
+}
+// Kenarlar enlem–boylam düzleminde kesişiyor mu (komşu olmayan kenarlar)
+function polySelfIntersects(pts) {
+  const n = pts.length, P = pts.map(p => [p.lng, p.lat]);
+  const orient = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
+  const cross = (a, b, c, d) => orient(a, b, c) * orient(a, b, d) < 0 && orient(c, d, a) * orient(c, d, b) < 0;
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    if (j === i + 1 || (i === 0 && j === n - 1)) continue;
+    if (cross(P[i], P[(i + 1) % n], P[j], P[(j + 1) % n])) return true;
+  }
+  return false;
+}
+function litUserPolyFinish() {
+  if (!litUserDrawing) return;
+  if (litUserPts.length < 3) { setStatus('Poligon için en az 3 köşe gerekir', true); return; }
+  if (polySelfIntersects(litUserPts)) { setStatus('Poligonun kenarları kesişiyor — alan ve üyelik tanımsız olur. Son köşeleri geri alıp yeniden çizin.', true); return; }
+  const pts = litUserPts.slice();
+  litUserPolyStop(); litUserPts = []; litUserPolyRedraw();
+  litRegionLayer = L.polygon(pts, { color: '#a855f7', weight: 2, fillColor: '#a855f7', fillOpacity: .12, dashArray: '3' }).addTo(map);
+  litRegionLayer._eqUserPoly = true;
+  const B = litRegionLayer.getBounds();
+  document.getElementById('btnLitRegionClear').style.display = '';
+  document.getElementById('btnLitRegionQuery').style.display = '';
+  document.getElementById('litRegionOnlyThisRow').style.display = 'flex';
+  const A = areaKm2({ type: 'MultiPolygon', polys: [[pts.map(p => [p.lat, p.lng])]] });
+  const secHd = (n, t) => `<div style="font-weight:700;color:#e5e7eb;margin-bottom:2px"><span style="display:inline-block;min-width:15px;height:15px;border-radius:50%;background:#a855f7;color:#fff;text-align:center;font-size:.62rem;line-height:15px;margin-right:5px">${n}</span>${t}</div>`;
+  const secSt = 'border-top:1px solid #333;margin-top:6px;padding-top:6px';
+  const info = document.getElementById('litRegionInfo'); info.style.display = 'block';
+  info.innerHTML =
+    `<b style="color:#a855f7">✏️ Kullanıcı Tanımlı Poligon</b> <span style="color:#888">(araştırmacı tanımlı mekânsal pencere)</span>` +
+    `<div style="${secSt}">` + secHd(1, 'Araştırma Alanı') +
+      `Köşe: ${pts.length} · Alan: <b>${A ? Math.round(A).toLocaleString('tr-TR') + ' km²</b> <span style="color:#888">(WGS84 jeodezik; üyelik bölgesi)</span>' : '—</b> <span style="color:#f59e0b">(alan kütüphanesi yüklenemedi)</span>'}` +
+      `<br>Bölge: ${B.getSouth().toFixed(3)},${B.getWest().toFixed(3)} – ${B.getNorth().toFixed(3)},${B.getEast().toFixed(3)}` +
+      `<br><span style="color:#888">Üyelik: enlem–boylam düzleminde nokta-içinde-poligon (kenarlar enlem–boylam doğrusu). Bu bir kaynak zonu tanımı DEĞİLDİR; il/şehir tehlike sıralaması için kullanılmaz.</span></div>` +
+    `<div style="${secSt}">` + secHd(2, '🧱 Zemin Özellikleri (VS30)') + `<span style="color:#888">VS30 alan özeti şimdilik yalnız Circle modunda; poligon için VS30 haritasını açıp noktaya tıklayabilirsiniz.</span></div>` +
+    `<div style="${secSt}">` + secHd(3, '🌍 Deprem Kataloğu') +
+      `<span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz. Sorgudan sonra G–R panelinde Oran/Yoğunluk (N/(T·A)) bu alanla hesaplanır.</span></div>`;
+  setStatus(`Kullanıcı Tanımlı Poligon çizildi: ${pts.length} köşe, A = ${A ? Math.round(A).toLocaleString('tr-TR') : '—'} km² (WGS84)`);
 }
 
 function drawLitRegionCircle() {
@@ -10712,6 +10813,7 @@ function onLitRegionZoneChange() {
 }
 
 function litRegionClear() {
+  if (typeof litUserPolyCancel === 'function') litUserPolyCancel(true);
   if (litRegionLayer) { map.removeLayer(litRegionLayer); litRegionLayer = null; }
   if (typeof vs30ClearCircleExtras === 'function') vs30ClearCircleExtras();
   const zoneSel = document.getElementById('litRegionZoneSel');
@@ -10828,7 +10930,7 @@ function litRegionCommitToQuery() {
 
   regionDeselect(); // TEK execution-state garantisi: önceki elle-çizilmiş bölge varsa kaldırılır
 
-  if (isMultiPart || hasHoles || uniqueCorners > 4) {
+  if (isMultiPart || hasHoles || uniqueCorners > 4 || litRegionLayer._eqUserPoly) {   // kullanıcı poligonu üçgen/dörtgen olsa da poligondur
     regionIsPolygon = true;
     regionRect = L.polygon(isMultiPart ? polys : polys[0], { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
   } else {
