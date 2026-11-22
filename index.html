@@ -482,7 +482,7 @@
   <div class="regionCtrl-body hidden" id="lrcBody">
   <div class="rowbox" id="litRegionModeRow">
     <label>Şekil</label>
-    <div style="display:flex;gap:4px;flex-wrap:wrap">
+    <div style="display:flex;gap:4px;flex-wrap:wrap;max-width:360px">
       <button class="tbtn active" id="btnLitModePolygon" onclick="setLitRegionMode('polygon')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Önceden tanımlanmış literatür çalışma alanları (Öncel &amp; Wilson 2004/2006/2007, Ambraseys 2002, Hong Kong). Kullanıcı tanımlı poligon çizimi Bölge Analizi panelindedir.">Poligon (Literatür Çalışma Alanları)</button>
       <button class="tbtn" id="btnLitModeCircle" onclick="setLitRegionMode('circle')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Mekânsal Araştırma Penceresi (Spatial Research Window) — geometri: daire. Merkez + yarıçap (USGS Earthquake Catalog'un Geographic Region → Circle mantığıyla aynı: distance(event, center) ≤ R). Bir kaynak zonu tanımı DEĞİLDİR, sadece araştırma alanı sorgusudur.">Circle</button>
       <button class="tbtn" id="btnLitModeUser" onclick="setLitRegionMode('user')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Kullanıcı tanımlı araştırma poligonu: haritaya köşe köşe çizilir. Alan WGS84 elipsoidi üzerinde (üyelik bölgesi), deprem sorgusu tüm poligon içinde yapılır. Bir kaynak zonu tanımı DEĞİLDİR.">Kullanıcı Tanımlı Poligon</button>
@@ -528,7 +528,7 @@
     <button class="tbtn" id="btnLitCircleDraw" onclick="drawLitRegionCircle()" style="background:#3b0764;border-color:#a855f7">⭕ Daireyi Çiz</button>
   </div>
   <div id="litRegionUserUI" style="display:none">
-    <div style="font-size:.7rem;color:#aaa;line-height:1.5;margin:2px 0 4px">Haritaya tıklayarak köşeleri ekleyin. Bitirmek için <b>✓ Bitir</b>, <b>Enter</b> ya da ilk köşeye tıklayın · <b>Geri</b> son köşeyi siler · <b>Esc</b> iptal.</div>
+    <div style="font-size:.7rem;color:#aaa;line-height:1.5;margin:2px 0 4px;max-width:300px;white-space:normal">Haritaya tıklayarak köşeleri ekleyin. Bitirmek için <b>✓ Bitir</b>, <b>Enter</b> ya da ilk köşeye tıklayın · <b>Geri</b> son köşeyi siler · <b>Esc</b> iptal.</div>
     <button class="tbtn" id="btnLitUserStart" onclick="litUserPolyStart()" style="background:#3b0764;border-color:#a855f7">✏️ Poligon Çizmeye Başla</button>
     <div id="litUserDrawCtrl" style="display:none;gap:4px">
       <button class="tbtn" onclick="litUserPolyFinish()" style="width:auto">✓ Bitir</button>
