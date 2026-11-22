@@ -12704,11 +12704,14 @@ async function vs30CircleSummary(lat, lon, rKm, box) {
 // Gösterge 0,5–1,5 ölçeğinde, 1,00 referans çizgisi; ölçek dışı değerler uçta ok ile. Büyütme/PSHA katsayısı DEĞİLDİR.
 function vs30RatioHtml(med) {
   const N = med / 760, N2 = Math.round(N * 100) / 100, Ntxt = N2.toFixed(2).replace('.', ',');
-  const st = N2 < 1 ? { t: 'Referansın altında', c: '#fdae61' } : N2 > 1 ? { t: 'Referansın üzerinde', c: '#3288bd' } : { t: 'Referansa eşit', c: '#e5e7eb' };
+  const st = N2 < 1 ? { t: 'Referansın altında', c: '#fdae61', s: 'Medyan Vs30 değeri, 760 m/s referans zemin hızının altındadır.' }
+           : N2 > 1 ? { t: 'Referansın üzerinde', c: '#3288bd', s: 'Medyan Vs30 değeri, 760 m/s referans zemin hızının üzerindedir.' }
+           : { t: 'Referansa eşit', c: '#e5e7eb', s: 'Medyan Vs30 değeri, 760 m/s referans zemin hızına eşittir.' };
   const lo = 0.5, hi = 1.5, pos = Math.max(0, Math.min(1, (N - lo) / (hi - lo))) * 100;
   const out = N < lo ? '◀ ' : N > hi ? ' ▶' : '';
   return '<div style="margin-top:6px" title="Normalized Vs30 Ratio (Reference = 760 m/s)">' +
     '<div>Referans Kaya Koşuluna Göre Vs30 Oranı: <b style="color:' + st.c + '">' + Ntxt + '</b> <span style="color:' + st.c + '">· ' + st.t + '</span></div>' +
+    '<div style="color:' + st.c + ';font-size:.68rem">' + st.s + '</div>' +
     '<div style="color:#888;font-size:.64rem">N = medyan VS30 / 760 = ' + med + ' / 760</div>' +
     '<div style="position:relative;height:12px;margin:4px 0 1px;border-radius:3px;background:linear-gradient(to right,#fdae61 0%,#fdae61 47%,#e5e7eb 50%,#3288bd 53%,#3288bd 100%);opacity:.9">' +
       '<span style="position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:#fff;box-shadow:0 0 0 1px #111"></span>' +
