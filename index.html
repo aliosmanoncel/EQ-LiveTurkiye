@@ -12690,6 +12690,8 @@ async function vs30CircleSummary(lat, lon, rKm, box) {
       '<div style="margin-top:3px">Merkez nokta: <b>' + cTxt + '</b></div>' +
       '<div>Medyan VS30: <b>' + q(0.5) + ' m/s</b> <span style="color:#888">(%10–%90: ' + q(0.1) + '–' + q(0.9) + ' · alan ağırlıklı ortalama ' + Math.round(sum / wLand) + ')</span></div>' +
       '<div>En düşük–en yüksek: ' + vals[0][0] + '–' + vals[vals.length - 1][0] + ' m/s</div>' +
+      '<div style="margin-top:3px">Referans VS30: 760 m/s · medyan / referans: <b>' + (q(0.5) / 760).toFixed(2).replace('.', ',') + '</b></div>' +
+      '<div style="color:#888;font-size:.66rem;line-height:1.4">760 m/s, Türkiye Deprem Tehlike Haritası’nın ve EQ-Live PGA hesabının esas aldığı referans zemin koşuludur (ZB–ZC sınırı). Oran yalnız bölgesel zemin koşulunu bu referansla karşılaştırır; <b>büyütme katsayısı değildir</b>.</div>' +
       '<div style="margin:4px 0 2px;display:flex;width:100%;border-radius:3px;overflow:hidden;background:#333">' + bar + '</div>' +
       '<div>Yaklaşık sınıf dağılımı (kara alanı): ' + dist + '</div>' +
       (wWater > 0 ? '<div style="color:#888">Su alanı: dairenin %' + (100 * wWater / (wLand + wWater)).toFixed(0) + '’i (hesaba katılmadı)</div>' : '') +
