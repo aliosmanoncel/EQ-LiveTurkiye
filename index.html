@@ -12690,8 +12690,7 @@ async function vs30CircleSummary(lat, lon, rKm, box) {
       '<div style="margin-top:3px">Merkez nokta: <b>' + cTxt + '</b></div>' +
       '<div>Medyan VS30: <b>' + q(0.5) + ' m/s</b> <span style="color:#888">(%10–%90: ' + q(0.1) + '–' + q(0.9) + ' · alan ağırlıklı ortalama ' + Math.round(sum / wLand) + ')</span></div>' +
       '<div>En düşük–en yüksek: ' + vals[0][0] + '–' + vals[vals.length - 1][0] + ' m/s</div>' +
-      '<div style="margin-top:3px">Referans VS30: 760 m/s · medyan / referans: <b>' + (q(0.5) / 760).toFixed(2).replace('.', ',') + '</b></div>' +
-      '<div style="color:#888;font-size:.66rem;line-height:1.4">760 m/s, Türkiye Deprem Tehlike Haritası’nın ve EQ-Live PGA hesabının esas aldığı referans zemin koşuludur (ZB–ZC sınırı). Oran yalnız bölgesel zemin koşulunu bu referansla karşılaştırır; <b>büyütme katsayısı değildir</b>.</div>' +
+      vs30RatioHtml(q(0.5)) +
       '<div style="margin:4px 0 2px;display:flex;width:100%;border-radius:3px;overflow:hidden;background:#333">' + bar + '</div>' +
       '<div>Yaklaşık sınıf dağılımı (kara alanı): ' + dist + '</div>' +
       (wWater > 0 ? '<div style="color:#888">Su alanı: dairenin %' + (100 * wWater / (wLand + wWater)).toFixed(0) + '’i (hesaba katılmadı)</div>' : '') +
@@ -12700,6 +12699,25 @@ async function vs30CircleSummary(lat, lon, rKm, box) {
                 : '<div style="color:#888;margin-top:3px">Daire içinde VS30 &lt; 180 m/s (ZE adayı) hücre yok.</div>') +
       '<div style="color:#777;font-size:.66rem;margin-top:4px;line-height:1.4">USGS eğim tabanlı vekil (Wald &amp; Allen 2007; vekilin üst sınırı ~900 m/s, bu yüzden en yüksek değer çoğu kez 900 görünür) · ~0,9 km hücre · TBDY 2018 sınıflaması değildir · bölgesel gösterge: parsel zemin etüdü ve bina deprem performansı değerlendirmesi yerine geçmez · PGA hesabına bağlı değildir.</div></div>';
   } catch (e) { box.innerHTML = '<span style="color:#f87171">🧱 Zemin özeti hesaplanamadı: ' + e.message + '</span>'; }
+}
+// Referans Kaya Koşuluna Göre Vs30 Oranı — N = medyan VS30 / 760 (Normalized Vs30 Ratio, reference = 760 m/s)
+// Gösterge 0,5–1,5 ölçeğinde, 1,00 referans çizgisi; ölçek dışı değerler uçta ok ile. Büyütme/PSHA katsayısı DEĞİLDİR.
+function vs30RatioHtml(med) {
+  const N = med / 760, N2 = Math.round(N * 100) / 100, Ntxt = N2.toFixed(2).replace('.', ',');
+  const st = N2 < 1 ? { t: 'Referansın altında', c: '#fdae61' } : N2 > 1 ? { t: 'Referansın üzerinde', c: '#3288bd' } : { t: 'Referansa eşit', c: '#e5e7eb' };
+  const lo = 0.5, hi = 1.5, pos = Math.max(0, Math.min(1, (N - lo) / (hi - lo))) * 100;
+  const out = N < lo ? '◀ ' : N > hi ? ' ▶' : '';
+  return '<div style="margin-top:6px" title="Normalized Vs30 Ratio (Reference = 760 m/s)">' +
+    '<div>Referans Kaya Koşuluna Göre Vs30 Oranı: <b style="color:' + st.c + '">' + Ntxt + '</b> <span style="color:' + st.c + '">· ' + st.t + '</span></div>' +
+    '<div style="color:#888;font-size:.64rem">N = medyan VS30 / 760 = ' + med + ' / 760</div>' +
+    '<div style="position:relative;height:12px;margin:4px 0 1px;border-radius:3px;background:linear-gradient(to right,#fdae61 0%,#fdae61 47%,#e5e7eb 50%,#3288bd 53%,#3288bd 100%);opacity:.9">' +
+      '<span style="position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:#fff;box-shadow:0 0 0 1px #111"></span>' +
+      '<span style="position:absolute;left:calc(' + pos.toFixed(1) + '% - 6px);top:-4px;width:12px;height:20px;border-radius:3px;background:#111;border:2px solid ' + st.c + '"></span>' +
+    '</div>' +
+    '<div style="display:flex;justify-content:space-between;color:#888;font-size:.62rem"><span>0,5</span><span>1,00 (760 m/s)</span><span>1,5</span></div>' +
+    (out ? '<div style="color:#888;font-size:.62rem">Değer ölçek dışında (' + Ntxt + '); işaret ' + (N < lo ? 'sol' : 'sağ') + ' uçta.</div>' : '') +
+    '<div style="color:#888;font-size:.66rem;line-height:1.4;margin-top:2px">760 m/s, Türkiye Deprem Tehlike Haritası’nın ve EQ-Live PGA hesabının esas aldığı referans kaya koşuludur (ZB–ZC sınırı). ' +
+    'Oran yalnız karşılaştırmadır: <b>zemin büyütme katsayısı veya PSHA düzeltme katsayısı değildir</b>. 1’in üzerindeki değer zeminin kaya sınıfında olduğunu kesin göstermez; yalnız medyan VS30’un 760 m/s’yi aştığını belirtir.</div></div>';
 }
 function vs30CircleSummaryUI(lat, lon, rKm, info) {
   const box = document.createElement('div'); box.id = 'litVs30Box'; box.style.marginTop = '4px'; info.appendChild(box);
