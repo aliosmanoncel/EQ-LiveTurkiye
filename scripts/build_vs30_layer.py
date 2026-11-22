@@ -50,8 +50,8 @@ TBDY = [('ZE', 0, 180), ('ZD', 180, 360), ('ZC', 360, 760), ('ZB', 760, 1500), (
 CLS = [('ZA', 1500, 99999, '#1f3a93', 'Sağlam, sert kayalar'),
        ('ZB', 760, 1500, '#3288bd', 'Az ayrışmış, orta sağlam kayalar'),
        ('ZC', 360, 760, '#99d594', 'Çok sıkı kum, çakıl ve sert kil tabakaları veya ayrışmış, çok çatlaklı zayıf kayalar'),
-       ('ZD', 180, 360, '#fdae61', 'Orta sıkı – sıkı kum, çakıl veya çok katı kil tabakaları'),
-       ('ZE?', 0, 180, '#c51b8a', 'ZE adayı — ZE yalnız VS30 ile atanamaz; özel zemin koşulları saha etüdüyle araştırılmalı')]
+       ('ZD', 180, 360, '#fdae61', 'Orta sıkı-sıkı kum, çakıl veya çok katı kil tabakaları'),
+       ('ZE?', 0, 180, '#c51b8a', 'ZE adayı — Tablo 16.1 ZE: Gevşek kum, çakıl veya yumuşak-katı kil tabakaları; PI > 20 ve w > %40 koşullarını sağlayan toplamda 3 m’den kalın yumuşak kil (cu < 25 kPa) içeren profiller. ZE yalnız VS30 ile atanamaz; ZF kapsamındaki özel koşullar saha etüdüyle araştırılmalı')]
 
 
 def read_tif(path):
@@ -114,7 +114,9 @@ def main():
                      'land_cells': counts[c]} for c, lo, hi, col, d in CLS],
         'classes_ref': 'TBDY 2018 Tablo 16.1 — yalnız (VS)30 sütunu; (N60)30 ve (cu)30 kullanılmadı',
         'classes_note': 'VS30 tabanlı YAKLAŞIK zemin sınıfı göstergesi — TBDY sınıflaması değildir. ZE ve ZF yalnız VS30 ile atanamaz; '
-                        'temel altı ile kaya arasında >3 m zemin varsa ZA/ZB tanımlanmaz. Saha etüdü gerekir.',
+                        'temel tabanı ile kaya üstü arasında >3 m zemin varsa ZA/ZB tanımlanmaz. ZF (sahaya özel araştırma gerektiren zeminler) '
+                        'bu gösterimin kapsamı dışındadır. Mühendislik amaçlı zemin etüdü değildir. Saha etüdü gerekir. '
+                        'Sınıf tanımları TBDY 2018 Tablo 16.1 ile karşılaştırıldı (JMO kopyası, 2026-11-22).',
         'value_png': 'vs30_usgs_deger.png (R*256+G = VS30 m/s; A=0 su)',
         'pga_link': 'YOK — PGA katmanı (Campbell 1981) sabit Vs30=760 m/s kullanır; bu katman o hesaba bağlanmamıştır.',
         'tbdy2018_thresholds': {k: [lo, (hi if hi < 99999 else None)] for k, lo, hi in TBDY},

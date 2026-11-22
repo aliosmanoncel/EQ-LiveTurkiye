@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-22T15:02:51Z",
+  "generated": "2026-11-22T15:39:49Z",
   "source": "USGS Global Vs30 Mosaic (2025)",
   "source_doi": "https://doi.org/10.5066/P1NV6UNM",
   "license": "Public domain (U.S. Geological Survey)",
@@ -35,7 +35,7 @@
       "min": 180,
       "max": 360,
       "color": "#fdae61",
-      "tbdy_description": "Orta sıkı – sıkı kum, çakıl veya çok katı kil tabakaları",
+      "tbdy_description": "Orta sıkı-sıkı kum, çakıl veya çok katı kil tabakaları",
       "land_cells": 499416
     },
     {
@@ -43,12 +43,12 @@
       "min": 0,
       "max": 180,
       "color": "#c51b8a",
-      "tbdy_description": "ZE adayı — ZE yalnız VS30 ile atanamaz; özel zemin koşulları saha etüdüyle araştırılmalı",
+      "tbdy_description": "ZE adayı — Tablo 16.1 ZE: Gevşek kum, çakıl veya yumuşak-katı kil tabakaları; PI > 20 ve w > %40 koşullarını sağlayan toplamda 3 m’den kalın yumuşak kil (cu < 25 kPa) içeren profiller. ZE yalnız VS30 ile atanamaz; ZF kapsamındaki özel koşullar saha etüdüyle araştırılmalı",
       "land_cells": 83
     }
   ],
   "classes_ref": "TBDY 2018 Tablo 16.1 — yalnız (VS)30 sütunu; (N60)30 ve (cu)30 kullanılmadı",
-  "classes_note": "VS30 tabanlı YAKLAŞIK zemin sınıfı göstergesi — TBDY sınıflaması değildir. ZE ve ZF yalnız VS30 ile atanamaz; temel altı ile kaya arasında >3 m zemin varsa ZA/ZB tanımlanmaz. Saha etüdü gerekir.",
+  "classes_note": "VS30 tabanlı YAKLAŞIK zemin sınıfı göstergesi — TBDY sınıflaması değildir. ZE ve ZF yalnız VS30 ile atanamaz; temel tabanı ile kaya üstü arasında >3 m zemin varsa ZA/ZB tanımlanmaz. ZF (sahaya özel araştırma gerektiren zeminler) bu gösterimin kapsamı dışındadır. Mühendislik amaçlı zemin etüdü değildir. Saha etüdü gerekir. Sınıf tanımları TBDY 2018 Tablo 16.1 ile karşılaştırıldı (JMO kopyası, 2026-11-22).",
   "value_png": "vs30_usgs_deger.png (R*256+G = VS30 m/s; A=0 su)",
   "pga_link": "YOK — PGA katmanı (Campbell 1981) sabit Vs30=760 m/s kullanır; bu katman o hesaba bağlanmamıştır.",
   "tbdy2018_thresholds": {
