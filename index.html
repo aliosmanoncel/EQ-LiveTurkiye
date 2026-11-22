@@ -193,6 +193,8 @@
     /* 2026-11-08: gövde ekran içinde kalır (max-height JS ile: layoutRegionPanels), fazlası panel içinde kaydırılır */
     .regionCtrl-body{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable;padding-right:2px}
     .regionCtrl .tbtn{background:rgba(20,20,20,.9);width:210px;text-align:left;font-size:.85rem;padding:8px 12px}
+    /* Araştırma Bölgesi şekil anahtarı: seçili düğme okunur olsun (.regionCtrl .tbtn arka planı .tbtn.active'i eziyordu → koyu zeminde siyah yazı) */
+    #litRegionModeRow .tbtn.active{background:#06b6d4}
     .regionCtrl .rowbox{display:flex;gap:6px;align-items:center;background:rgba(20,20,20,.9);border-radius:6px;padding:7px 10px}
     .regionCtrl .rowbox label{font-size:.78rem;color:#999;white-space:nowrap}
     .regionCtrl .rowbox input,.regionCtrl .rowbox select{font-size:.82rem;padding:5px 7px}
@@ -480,7 +482,7 @@
     <label>Şekil</label>
     <div style="display:flex;gap:4px">
       <button class="tbtn active" id="btnLitModePolygon" onclick="setLitRegionMode('polygon')" style="width:auto;padding:5px 10px;font-size:.75rem">Poligon</button>
-      <button class="tbtn" id="btnLitModeCircle" onclick="setLitRegionMode('circle')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Merkez + yarıçap (USGS Earthquake Catalog'un Geographic Region → Circle mantığıyla aynı: distance(event, center) ≤ R). Bir kaynak zonu tanımı DEĞİLDİR, sadece araştırma alanı sorgusudur.">Circle</button>
+      <button class="tbtn" id="btnLitModeCircle" onclick="setLitRegionMode('circle')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Mekânsal Araştırma Penceresi (Spatial Research Window) — geometri: daire. Merkez + yarıçap (USGS Earthquake Catalog'un Geographic Region → Circle mantığıyla aynı: distance(event, center) ≤ R). Bir kaynak zonu tanımı DEĞİLDİR, sadece araştırma alanı sorgusudur.">Mekânsal Araştırma Penceresi</button>
     </div>
   </div>
   <div id="litRegionPolygonUI">
@@ -10444,14 +10446,24 @@ function drawLitRegionCircle() {
   document.getElementById('litRegionOnlyThisRow').style.display = 'flex';
   const info = document.getElementById('litRegionInfo');
   info.style.display = 'block';
+  // Mekânsal Araştırma Penceresi (Spatial Research Window) — yalnız görünüm: ① Alan · ② Zemin (VS30) · ③ Katalog.
+  // Alan = πR² (G–R Yoğunluk moduyla aynı tanım). Hesaplar ve sorgu mantığı değişmez.
+  const areaKm2 = Math.round(Math.PI * radiusKm * radiusKm).toLocaleString('tr-TR');
+  const secHd = (n, t) => `<div style="font-weight:700;color:#e5e7eb;margin-bottom:2px"><span style="display:inline-block;min-width:15px;height:15px;border-radius:50%;background:#a855f7;color:#fff;text-align:center;font-size:.62rem;line-height:15px;margin-right:5px">${n}</span>${t}</div>`;
+  const secSt = 'border-top:1px solid #333;margin-top:6px;padding-top:6px';
   info.innerHTML =
-    `<b style="color:#a855f7">Circle — merkez ${lat.toFixed(4)}, ${lon.toFixed(4)}, R=${radiusKm}km</b>` +
-    `<br><span style="color:#888">distance(event, center) ≤ ${radiusKm}km — bu YALNIZCA araştırma alanı sorgusudur, bir kaynak zonu tanımı DEĞİLDİR.</span>` +
-    `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
-    `<br><span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span>`;
+    `<b style="color:#a855f7">📍 Mekânsal Araştırma Penceresi</b> <span style="color:#888">(Spatial Research Window) · geometri: daire</span>` +
+    `<div style="${secSt}">` + secHd(1, 'Araştırma Alanı') +
+      `Merkez: ${lat.toFixed(4)}, ${lon.toFixed(4)} · <b>R = ${radiusKm} km</b>` +
+      `<br>Alan: <b>${areaKm2} km²</b> <span style="color:#888">(πR²)</span>` +
+      `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
+      `<br><span style="color:#888">distance(event, center) ≤ ${radiusKm}km — bu YALNIZCA araştırma alanı sorgusudur, bir kaynak zonu tanımı DEĞİLDİR.</span></div>` +
+    `<div id="litSecVs30" style="${secSt}">` + secHd(2, '🧱 Zemin Özellikleri (VS30, yaklaşık)') + `</div>` +
+    `<div style="${secSt}">` + secHd(3, '🌍 Deprem Kataloğu') +
+      `<span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span></div>`;
   vs30ClearCircleExtras();
-  vs30CircleSummaryUI(lat, lon, radiusKm, info);
-  setStatus(`Araştırma Bölgesi: Circle çizildi (merkez ${lat.toFixed(4)},${lon.toFixed(4)}, R=${radiusKm}km)`);
+  vs30CircleSummaryUI(lat, lon, radiusKm, document.getElementById('litSecVs30'));
+  setStatus(`Araştırma Bölgesi: Mekânsal Araştırma Penceresi çizildi (daire; merkez ${lat.toFixed(4)},${lon.toFixed(4)}, R=${radiusKm}km)`);
 }
 
 async function onLitRegionGroupChange() {
@@ -12684,8 +12696,9 @@ async function vs30CircleSummary(lat, lon, rKm, box) {
         { color: '#f2c94c', weight: 2, fill: false, interactive: false }))).addTo(map);
     }
     box.innerHTML =
-      '<div style="border-top:1px solid #333;margin-top:6px;padding-top:6px"><b style="color:#e5e7eb">🧱 Daire içi zemin özeti (VS30, yaklaşık)</b>' +
-      '<div style="margin-top:3px">Merkez nokta: <b>' + cTxt + '</b></div>' +
+      '<div style="margin-top:2px">' +
+      '<div>Hesaba katılan kara alanı: <b>~' + Math.round(circKm2 * covered * wLand / (wLand + wWater)).toLocaleString('tr-TR') + ' km²</b> <span style="color:#888">(dairenin %' + (100 * covered * wLand / (wLand + wWater)).toFixed(0) + '’i)</span></div>' +
+      '<div>Merkez nokta: <b>' + cTxt + '</b></div>' +
       '<div>Medyan VS30: <b>' + q(0.5) + ' m/s</b> <span style="color:#888">(%10–%90: ' + q(0.1) + '–' + q(0.9) + ' · alan ağırlıklı ortalama ' + Math.round(sum / wLand) + ')</span></div>' +
       '<div>En düşük–en yüksek: ' + vals[0][0] + '–' + vals[vals.length - 1][0] + ' m/s</div>' +
       vs30RatioHtml(q(0.5)) +
