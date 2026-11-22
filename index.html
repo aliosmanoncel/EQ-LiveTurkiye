@@ -484,7 +484,7 @@
     <label>Şekil</label>
     <div style="display:flex;gap:4px">
       <button class="tbtn active" id="btnLitModePolygon" onclick="setLitRegionMode('polygon')" style="width:auto;padding:5px 10px;font-size:.75rem">Poligon</button>
-      <button class="tbtn" id="btnLitModeCircle" onclick="setLitRegionMode('circle')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Mekânsal Araştırma Penceresi (Spatial Research Window) — geometri: daire. Merkez + yarıçap (USGS Earthquake Catalog'un Geographic Region → Circle mantığıyla aynı: distance(event, center) ≤ R). Bir kaynak zonu tanımı DEĞİLDİR, sadece araştırma alanı sorgusudur.">Mekânsal Araştırma Penceresi</button>
+      <button class="tbtn" id="btnLitModeCircle" onclick="setLitRegionMode('circle')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Mekânsal Araştırma Penceresi (Spatial Research Window) — geometri: daire. Merkez + yarıçap (USGS Earthquake Catalog'un Geographic Region → Circle mantığıyla aynı: distance(event, center) ≤ R). Bir kaynak zonu tanımı DEĞİLDİR, sadece araştırma alanı sorgusudur.">Circle</button>
     </div>
   </div>
   <div id="litRegionPolygonUI">
@@ -10560,7 +10560,7 @@ function drawLitRegionCircle() {
   const secHd = (n, t) => `<div style="font-weight:700;color:#e5e7eb;margin-bottom:2px"><span style="display:inline-block;min-width:15px;height:15px;border-radius:50%;background:#a855f7;color:#fff;text-align:center;font-size:.62rem;line-height:15px;margin-right:5px">${n}</span>${t}</div>`;
   const secSt = 'border-top:1px solid #333;margin-top:6px;padding-top:6px';
   info.innerHTML =
-    `<b style="color:#a855f7">📍 Mekânsal Araştırma Penceresi</b> <span style="color:#888">(Spatial Research Window) · geometri: daire</span>` +
+    `<b style="color:#a855f7">📍 Circle — Mekânsal Araştırma Penceresi</b> <span style="color:#888">(Spatial Research Window)</span>` +
     `<div style="${secSt}">` + secHd(1, 'Araştırma Alanı') +
       `Merkez: ${lat.toFixed(4)}, ${lon.toFixed(4)} · <b>R = ${radiusKm} km</b>` +
       `<br>Alan: <b>${areaTxt}` +
