@@ -1,0 +1,15 @@
+{
+  "_aciklama": "VS30 Tabanlı Zemin Özellikleri Haritası — bölge kayıt listesi. EQ-Live'ın deprem verisi (EMSC, USGS) küreseldir; VS30 katmanı bölge bölge eklenir. Türkiye ilk örnek uygulamadır (case study). Yeni bölge: scripts/build_vs30_layer.py --region <id> --bbox minlon minlat maxlon maxlat --tif vs30_mosaic.tif ile dosyaları üretin, aşağıya bir kayıt ekleyin. index.html başka değişiklik gerektirmez. Bölgeler çakışırsa nokta sorgusunda listede ÖNCE gelen bölge kullanılır.",
+  "version": 1,
+  "source": "USGS Global Vs30 Mosaic (2025), doi:10.5066/P1NV6UNM",
+  "regions": [
+    {
+      "id": "turkiye",
+      "name_tr": "Türkiye ve çevresi (örnek uygulama)",
+      "name_en": "Türkiye and surroundings (case study)",
+      "meta": "data/vs30_usgs_meta.json",
+      "class_png": "data/vs30_usgs_sinif.png",
+      "value_png": "data/vs30_usgs_deger.png"
+    }
+  ]
+}

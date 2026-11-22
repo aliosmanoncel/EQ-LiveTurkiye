@@ -39,6 +39,15 @@ Some source data files are intentionally **excluded from git** (see `.gitignore`
 
 **Source vs. derived output:** the `.dbf` above is EFEHR's original data, not ours. `data/eshm20_turkey_historical.json` — this project's own filtered subset (Turkey + surroundings, M≥4.0), produced from that `.dbf` by the same script — **is** committed (small, git-friendly). Keep this distinction when adding similar large source datasets: the raw/source file stays out of git, the processed/derived output goes in.
 
+## VS30 Tabanlı Zemin Özellikleri Haritası (VS30-based ground-condition layer)
+
+Earthquake data in EQ-Live (EMSC, USGS) are **global**. The VS30 ground-condition layer is added **region by region**; **Türkiye and surroundings is the first case study** (chosen partly because the global USGS mosaic is ~1 GB and is clipped per region).
+
+- **Registry:** `data/vs30_regions.json` lists regions (`meta`, `class_png`, `value_png`). `index.html` reads the registry; adding a region needs **no code change**.
+- **Build a region:** `python scripts/build_vs30_layer.py --tif vs30/vs30_mosaic.tif --region <id> --bbox MINLON MINLAT MAXLON MAXLAT`, then add the printed entry to the registry.
+- **UI:** layer panel → "🧱 VS30 Tabanlı Zemin Özellikleri Haritası"; click a point (or 📍 own location, shared with 🎯) for an *approximate* ZA–ZE indicator, VS30 (m/s) and the TBDY 2018 Table 16.1 description; 🔗 share (point rounded to 0.01°).
+- **Scientific limits (kept visible in the UI):** slope-based proxy (Wald & Allen 2007), not a site measurement; not a TBDY classification (ZE only as a candidate; ZF out of scope); regional indicator — not a parcel site investigation or a building performance assessment; **not linked to the PGA layer** (fixed Vs30 = 760 m/s).
+
 ## How it works
 
 ```
