@@ -3687,18 +3687,25 @@ function regionAreaKm2() {
   const rad = x => x * Math.PI / 180;
   if (regionIsCircle && regionCircleRadiusKm) return 2 * Math.PI * CMP_R * CMP_R * (1 - Math.cos(regionCircleRadiusKm / CMP_R));
   if (regionIsPolygon && regionRect.getLatLngs) {
-    const r = regionRect.getLatLngs()[0]; if (!r || r.length < 3) return null; let s = 0;
-    for (let i = 0; i < r.length; i++) { const a = r[i], b = r[(i + 1) % r.length]; s += rad(b.lng - a.lng) * (2 + Math.sin(rad(a.lat)) + Math.sin(rad(b.lat))); }
-    return Math.abs(s * CMP_R * CMP_R / 2);
+    // İP-1: aynı küresel formül; çok parçalıda parçaların toplamı, deliklerde çıkarma (yöntem İP-2'de değişecek)
+    const ringA = r => { let s = 0; for (let i = 0; i < r.length; i++) { const a = r[i], b = r[(i + 1) % r.length]; s += rad(b.lng - a.lng) * (2 + Math.sin(rad(a.lat)) + Math.sin(rad(b.lat))); } return Math.abs(s * CMP_R * CMP_R / 2); };
+    const polys = regionPolys(); if (!polys.length || !polys[0][0] || polys[0][0].length < 3) return null;
+    return polys.reduce((t, rings) => t + (rings[0].length >= 3 ? ringA(rings[0]) : 0) - rings.slice(1).reduce((u, h) => u + (h.length >= 3 ? ringA(h) : 0), 0), 0);
   }
   const B = regionRect.getBounds();
   return CMP_R * CMP_R * Math.abs(rad(B.getEast() - B.getWest())) * Math.abs(Math.sin(rad(B.getNorth())) - Math.sin(rad(B.getSouth())));
+}
+// İP-1: "21 köşe" / "2 parça, 21 köşe" / "1 delik" — tek halkalıda eski metinle aynı
+function regionPolyDesc() {
+  const polys = regionPolys() || [];
+  const nV = polys.reduce((t, rs) => t + rs.reduce((u, r) => u + r.length, 0), 0), nH = polys.reduce((t, rs) => t + rs.length - 1, 0);
+  return (polys.length > 1 ? `${polys.length} parça, ` : '') + `${nV} köşe` + (nH ? `, ${nH} delik` : '');
 }
 function regionShapeText() {
   if (!regionRect) return 'bölge yok';
   if (regionIsCircle && regionCircleCenter) return `daire ${regionCircleCenter.lat.toFixed(2)}, ${regionCircleCenter.lon.toFixed(2)}, R = ${regionCircleRadiusKm} km`;
   const B = regionRect.getBounds(), bx = `${B.getSouth().toFixed(2)}–${B.getNorth().toFixed(2)}° K, ${B.getWest().toFixed(2)}–${B.getEast().toFixed(2)}° D`;
-  return regionIsPolygon ? `çokgen (${regionRect.getLatLngs()[0].length} köşe; ${bx})` : `dikdörtgen ${bx}`;
+  return regionIsPolygon ? `çokgen (${regionPolyDesc()}; ${bx})` : `dikdörtgen ${bx}`;
 }
 function cmpAdd() {
   const msg = document.getElementById('cmpMsg');
@@ -3719,7 +3726,7 @@ function cmpAdd() {
     turU: typeof lastTurUyari !== 'undefined' && lastTurUyari ? (lastTurUyari.on ? lastTurUyari.gecisler.map(g => `${g.a} → ${g.b} (${g.ySon}–${g.yIlk})`).join('; ') : lastTurUyari.degerlendirilemedi ? 'değerlendirilemedi' : null) : undefined,
     pts: ev.filter(e => isFinite(e.lat) && isFinite(e.lon)).map(e => [Math.round(e.lat * 1e3) / 1e3, Math.round(e.lon * 1e3) / 1e3, Math.round((e.mw ?? e.mag) * 100) / 100]),
     geom: !regionRect ? null : regionIsCircle && regionCircleCenter ? { k: 'c', lat: regionCircleCenter.lat, lon: regionCircleCenter.lon, R: regionCircleRadiusKm }
-      : regionIsPolygon ? { k: 'p', ring: regionRect.getLatLngs()[0].map(ll => [ll.lat, ll.lng]) }
+      : regionIsPolygon ? (P => ({ k: 'p', ring: P[0][0].map(ll => [ll.lat, ll.lng]), polys: P.map(rs => rs.map(r => r.map(ll => [ll.lat, ll.lng]))) }))(regionPolys())
       : (B => ({ k: 'r', S: B.getSouth(), N: B.getNorth(), W: B.getWest(), E: B.getEast() }))(regionRect.getBounds()) });
   document.getElementById('cmpName').value = '';
   { const r = CMP[CMP.length - 1]; reproKatBlobs(r.kat).then(bl => { if (bl) { r.kat.blob = bl; cmpSave(); } }); }   // dosyaların git blob SHA-1'i (eşzamansız)
@@ -4101,10 +4108,15 @@ function gnssLoad() {
     .then(j => { GNSS = j; GNSS_STATE = 'hazır'; try { cmpRender(); } catch (e) {} })
     .catch(e => { GNSS_STATE = 'hata'; try { cmpRender(); } catch (e2) {} });
 }
+const CMP_POLYS = new WeakMap();   // İP-1: kayıt geometrisi → {lat,lng} halkaları (localStorage'a yazılmaz)
 function cmpGeomHas(g, lat, lon) {
   if (!g) return false;
   if (g.k === 'c') return haversineKm(g.lat, g.lon, lat, lon) <= g.R;
-  if (g.k === 'p') return pointInPolygon(lat, lon, g.ring.map(q => ({ lat: q[0], lng: q[1] })));
+  if (g.k === 'p') {   // İP-1: yeni kayıtlarda tüm parçalar/delikler (g.polys); eski kayıtlarda yalnız g.ring
+    let P = CMP_POLYS.get(g);
+    if (!P) { P = (g.polys || [[g.ring]]).map(rs => rs.map(r => r.map(q => ({ lat: q[0], lng: q[1] })))); CMP_POLYS.set(g, P); }
+    return pointInPolys(lat, lon, P);
+  }
   return lat >= g.S && lat <= g.N && lon >= g.W && lon <= g.E;
 }
 function cmpParams() {
@@ -5042,7 +5054,7 @@ async function exportPosterAGU(scale, evt) {
     const pts = CMP_ON ? CMP.flatMap(r => (r.pts || []).map(q => ({ lat: q[0], lon: q[1], mag: q[2] }))) : evs.filter(e => isFinite(e.lat) && isFinite(e.lon));
     let S, N, Wl, E;
     const cmpBB = r => { const g = r.geom; if (!g) return null; if (g.k === 'r') return [g.S, g.N, g.W, g.E];
-      if (g.k === 'p') return [Math.min(...g.ring.map(q => q[0])), Math.max(...g.ring.map(q => q[0])), Math.min(...g.ring.map(q => q[1])), Math.max(...g.ring.map(q => q[1]))];
+      if (g.k === 'p') { const Q = g.polys ? g.polys.flat(2) : g.ring; return [Math.min(...Q.map(q => q[0])), Math.max(...Q.map(q => q[0])), Math.min(...Q.map(q => q[1])), Math.max(...Q.map(q => q[1]))]; }
       const dLa = g.R / 111.195, dLo = g.R / (111.195 * Math.max(0.05, Math.cos(g.lat * Math.PI / 180))); return [g.lat - dLa, g.lat + dLa, g.lon - dLo, g.lon + dLo]; };
     if (CMP_ON && CMP.some(cmpBB)) { const bbs = CMP.map(cmpBB).filter(Boolean); S = Math.min(...bbs.map(q => q[0])); N = Math.max(...bbs.map(q => q[1])); Wl = Math.min(...bbs.map(q => q[2])); E = Math.max(...bbs.map(q => q[3])); }
     else if (regionRect) { const b = regionRect.getBounds(); S = b.getSouth(); N = b.getNorth(); Wl = b.getWest(); E = b.getEast(); }
@@ -5089,14 +5101,15 @@ async function exportPosterAGU(scale, evt) {
       if (dark && r > 2) { c.globalAlpha = 0.8; c.lineWidth = 0.6; c.strokeStyle = '#000'; c.stroke(); } });
     if (CMP_ON) { c.globalAlpha = 1; c.lineWidth = 3; c.setLineDash([7, 4]);
       CMP.forEach((r, k) => { const g = r.geom; if (!g) return; c.strokeStyle = CMP_COL[k]; c.beginPath();
-        const ring = g.k === 'c' ? Array.from({ length: 91 }, (_, q) => { const a2 = q * 4 * Math.PI / 180; return [g.lat + g.R / 111.195 * Math.cos(a2), g.lon + g.R / (111.195 * Math.max(0.05, Math.cos(g.lat * Math.PI / 180))) * Math.sin(a2)]; })
-          : g.k === 'p' ? g.ring : [[g.N, g.W], [g.N, g.E], [g.S, g.E], [g.S, g.W]];
-        ring.forEach(([la, lo], q) => { const [px, py] = P(la, lo); q ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); c.stroke();
+        const rings = g.k === 'c' ? [Array.from({ length: 91 }, (_, q) => { const a2 = q * 4 * Math.PI / 180; return [g.lat + g.R / 111.195 * Math.cos(a2), g.lon + g.R / (111.195 * Math.max(0.05, Math.cos(g.lat * Math.PI / 180))) * Math.sin(a2)]; })]
+          : g.k === 'p' ? (g.polys ? g.polys.flat(1) : [g.ring]) : [[[g.N, g.W], [g.N, g.E], [g.S, g.E], [g.S, g.W]]];   // İP-1: tüm parçalar/delikler çizilir
+        rings.forEach(rg => { rg.forEach(([la, lo], q) => { const [px, py] = P(la, lo); q ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); }); c.stroke();
+        const ring = rings.flat(1);
         const [lx, ly] = P(Math.max(...ring.map(q => q[0])), ring.reduce((s2, q) => s2 + q[1], 0) / ring.length); halo(r.name, lx - 20, ly - 16, 'bold 13px Arial', CMP_COL[k]); });
       c.setLineDash([]); } else {
     c.globalAlpha = 1; c.strokeStyle = dark ? '#ffffff' : '#1e3a5f'; c.lineWidth = 2; c.setLineDash([6, 4]); c.beginPath();
     if (regionIsCircle && regionCircleCenter) { for (let a2 = 0; a2 <= 360; a2 += 4) { const la = regionCircleCenter.lat + regionCircleRadiusKm / 111.195 * Math.cos(a2 * Math.PI / 180), lo = regionCircleCenter.lon + regionCircleRadiusKm / (111.195 * Math.cos(regionCircleCenter.lat * Math.PI / 180)) * Math.sin(a2 * Math.PI / 180); const [px, py] = P(la, lo); a2 ? c.lineTo(px, py) : c.moveTo(px, py); } c.closePath(); }
-    else if (regionIsPolygon && regionRect) { regionRect.getLatLngs()[0].forEach((ll, i) => { const [px, py] = P(ll.lat, ll.lng); i ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); }
+    else if (regionIsPolygon && regionRect) { regionPolys().flat(1).forEach(rg => { rg.forEach((ll, i) => { const [px, py] = P(ll.lat, ll.lng); i ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); }); }   // İP-1: tüm halkalar
     else if (regionRect) { const b = regionRect.getBounds(); [[b.getNorth(), b.getWest()], [b.getNorth(), b.getEast()], [b.getSouth(), b.getEast()], [b.getSouth(), b.getWest()]].forEach(([la, lo], i) => { const [px, py] = P(la, lo); i ? c.lineTo(px, py) : c.moveTo(px, py); }); c.closePath(); }
     c.stroke(); c.setLineDash([]);
     }
@@ -9283,7 +9296,7 @@ function regionBoundsLine() {
   if (!regionRect) return '';
   const bounds = regionRect.getBounds();
   let line = `Bölge: ${bounds.getSouth().toFixed(2)},${bounds.getWest().toFixed(2)} – ${bounds.getNorth().toFixed(2)},${bounds.getEast().toFixed(2)}`;
-  if (regionIsPolygon) line += ` (poligon, ${regionRect.getLatLngs()[0].length} köşe — sınırlar kapsayan dikdörtgen)`;
+  if (regionIsPolygon) line += ` (poligon, ${regionPolyDesc()} — sınırlar kapsayan dikdörtgen)`;
   if (regionIsCircle && regionCircleCenter) line += ` (daire, merkez ${regionCircleCenter.lat.toFixed(3)},${regionCircleCenter.lon.toFixed(3)}, R=${regionCircleRadiusKm}km — sınırlar kapsayan dikdörtgen)`;
   return line;
 }
@@ -9454,6 +9467,32 @@ function pointInPolygon(lat, lon, latlngs) {
   return inside;
 }
 
+// İP-1 (2026-11-23): çok parçalı (MultiPolygon) ve delikli poligon üyeliği.
+// Leaflet 1.9 L.Polygon.getLatLngs() derinliği: 2 düzey = tek poligon [dış, delik…];
+// 3 düzey = MultiPolygon [[dış, delik…], [dış, …]]. Eskiden her yerde yalnız
+// getLatLngs()[0] (ilk halka) kullanılıyordu: çok parçalı bölgelerde 2. parça ya
+// delik sayılıyor ya da hiç sorgulanmıyordu. Tek halkalı poligonda sonuç
+// pointInPolygon(ring0) ile birebir aynıdır (aynı fonksiyon, aynı halka).
+function latLngsToPolys(ll) {
+  if (!ll || !ll.length) return [];
+  if (typeof ll[0].lat === 'number') return [[ll]];                       // düz halka (savunma amaçlı)
+  if (ll[0][0] && typeof ll[0][0].lat === 'number') return [ll];           // tek poligon: [dış, delik…]
+  return ll.filter(p => p && p.length && p[0] && p[0].length);             // MultiPolygon
+}
+function regionPolys() {
+  return regionIsPolygon && regionRect && regionRect.getLatLngs ? latLngsToPolys(regionRect.getLatLngs()) : null;
+}
+// Bir parçanın dış halkasında VE o parçanın hiçbir deliğinde değilse içeride.
+function pointInPolys(lat, lon, polys) {
+  for (const rings of polys) {
+    if (!rings[0] || !pointInPolygon(lat, lon, rings[0])) continue;
+    let inHole = false;
+    for (let h = 1; h < rings.length; h++) if (pointInPolygon(lat, lon, rings[h])) { inHole = true; break; }
+    if (!inHole) return true;
+  }
+  return false;
+}
+
 // Circle bölge testi — haversineKm() (aşağıda tanımlı, function hoisting ile burada da erişilebilir)
 // merkeze olan great-circle mesafesini hesaplar; USGS'in latitude+longitude+maxradiuskm modeliyle aynı mantık.
 function pointInCircle(lat, lon, centerLat, centerLon, radiusKm) {
@@ -9500,7 +9539,7 @@ async function fetchRegionEventsFromHistorical(bounds) {
   const magMax = document.getElementById('regionMagMax').value;
   const depMin = document.getElementById('regionDepMin').value;
   const depMax = document.getElementById('regionDepMax').value;
-  const poly = regionIsPolygon && regionRect ? regionRect.getLatLngs()[0] : null;
+  const polys = regionPolys();   // İP-1: tüm parçalar ve delikler
   const circleActive = regionIsCircle && regionCircleCenter;
 
   let evs = events.filter(e =>
@@ -9508,7 +9547,7 @@ async function fetchRegionEventsFromHistorical(bounds) {
     e.lon >= bounds.getWest()  && e.lon <= bounds.getEast() &&
     (!magMin || (e.mw??e.mag) >= +magMin) && (!magMax || (e.mw??e.mag) <= +magMax) &&
     (!depMin || e.dep >= +depMin) && (!depMax || e.dep <= +depMax) &&
-    (!poly || pointInPolygon(e.lat, e.lon, poly)) &&
+    (!polys || pointInPolys(e.lat, e.lon, polys)) &&
     (!circleActive || pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm))
   );
 
@@ -9576,7 +9615,7 @@ async function fetchRegionEventsFromHKLocal(bounds) {
   const magMax = document.getElementById('regionMagMax').value;
   const depMin = document.getElementById('regionDepMin').value;
   const depMax = document.getElementById('regionDepMax').value;
-  const poly = regionIsPolygon && regionRect ? regionRect.getLatLngs()[0] : null;
+  const polys = regionPolys();   // İP-1: tüm parçalar ve delikler
   const circleActive = regionIsCircle && regionCircleCenter;
   try {
     if (!hkLocalCache) {
@@ -9593,7 +9632,7 @@ async function fetchRegionEventsFromHKLocal(bounds) {
       e.lon >= bounds.getWest()  && e.lon <= bounds.getEast() &&
       (!magMin || e.mag >= +magMin) && (!magMax || e.mag <= +magMax) &&
       (!depMin || (e.dep!=null && e.dep >= +depMin)) && (!depMax || (e.dep!=null && e.dep <= +depMax)) &&
-      (!poly || pointInPolygon(e.lat, e.lon, poly)) &&
+      (!polys || pointInPolys(e.lat, e.lon, polys)) &&
       (!circleActive || pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm))
     );
     regionEvents = evs; // TAM küme — limit/cap yok, Mc/b tüm katalog aralığını yansıtır
@@ -9639,7 +9678,7 @@ async function fetchRegionEventsFromHKHistorical(bounds) {
   const magMax = document.getElementById('regionMagMax').value;
   const depMin = document.getElementById('regionDepMin').value;
   const depMax = document.getElementById('regionDepMax').value;
-  const poly = regionIsPolygon && regionRect ? regionRect.getLatLngs()[0] : null;
+  const polys = regionPolys();   // İP-1: tüm parçalar ve delikler
   const circleActive = regionIsCircle && regionCircleCenter;
   try {
     if (!hkHistoricalCache) {
@@ -9656,7 +9695,7 @@ async function fetchRegionEventsFromHKHistorical(bounds) {
       e.lon >= bounds.getWest()  && e.lon <= bounds.getEast() &&
       (!magMin || e.mag >= +magMin) && (!magMax || e.mag <= +magMax) &&
       (!depMin || (e.dep!=null && e.dep >= +depMin)) && (!depMax || (e.dep!=null && e.dep <= +depMax)) &&
-      (!poly || pointInPolygon(e.lat, e.lon, poly)) &&
+      (!polys || pointInPolys(e.lat, e.lon, polys)) &&
       (!circleActive || pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm))
     );
     regionEvents = evs; // TAM küme — limit/cap yok
@@ -9816,7 +9855,7 @@ async function fetchRegionEventsFromScedc(bounds) {
   const magMax = document.getElementById('regionMagMax').value;
   const depMin = document.getElementById('regionDepMin').value;
   const depMax = document.getElementById('regionDepMax').value;
-  const poly = regionIsPolygon && regionRect ? regionRect.getLatLngs()[0] : null;
+  const polys = regionPolys();   // İP-1: tüm parçalar ve delikler
   const circleActive = regionIsCircle && regionCircleCenter;
   try {
     if (!scedcManifest) {
@@ -9841,7 +9880,7 @@ async function fetchRegionEventsFromScedc(bounds) {
     if (inArea) for (const { d } of loaded) for (const r of d.rows) {
       if (r.t < t0 || r.t > t1) continue;
       if (r.lat < bounds.getSouth() || r.lat > bounds.getNorth() || r.lon < bounds.getWest() || r.lon > bounds.getEast()) continue;
-      if (poly && !pointInPolygon(r.lat, r.lon, poly)) continue;
+      if (polys && !pointInPolys(r.lat, r.lon, polys)) continue;
       if (circleActive && !pointInCircle(r.lat, r.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm)) continue;
       if (r.et !== 'eq') { nNonEq++; continue; }
       if ((magMin && r.mag < +magMin) || (magMax && r.mag > +magMax)) continue;
@@ -9933,8 +9972,8 @@ async function fetchRegionEventsLive(bounds, provider) {
     else if (provider === 'usgs') { const js = await res.json(); rawCount = (js.features || []).length; evs = parseGeoJSON(js); }
     else { const tx = await res.text(); rawCount = tx.split('\n').filter(l => l.trim() && !l.startsWith('#') && l.includes('|')).length; evs = parseEMSCText(tx); }
     if (regionIsPolygon && regionRect) {
-      const poly = regionRect.getLatLngs()[0];
-      evs = evs.filter(e => pointInPolygon(e.lat, e.lon, poly));
+      const polys = regionPolys();   // İP-1: tüm parçalar ve delikler
+      evs = evs.filter(e => pointInPolys(e.lat, e.lon, polys));
     }
     if (regionIsCircle && regionCircleCenter) {
       evs = evs.filter(e => pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm));
@@ -10018,8 +10057,8 @@ async function fetchRegionEventsFromAfad(bounds) {
       (!depMin || e.dep >= +depMin) && (!depMax || e.dep <= +depMax)
     );
     if (regionIsPolygon && regionRect) {
-      const poly = regionRect.getLatLngs()[0];
-      evs = evs.filter(e => pointInPolygon(e.lat, e.lon, poly));
+      const polys = regionPolys();   // İP-1: tüm parçalar ve delikler
+      evs = evs.filter(e => pointInPolys(e.lat, e.lon, polys));
     }
     if (regionIsCircle && regionCircleCenter) {
       evs = evs.filter(e => pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm));
@@ -10199,8 +10238,10 @@ function syncRegionURL(bounds, opt) {
   if (regionIsCircle && regionCircleCenter && isFinite(regionCircleRadiusKm)) url.searchParams.set('rcirc', `${regionCircleCenter.lat.toFixed(4)},${regionCircleCenter.lon.toFixed(4)},${+regionCircleRadiusKm.toFixed(1)}`);
   else url.searchParams.delete('rcirc');
   // 2026-10-20: çokgen bölge (dış halka köşeleri, 3 ondalık) da bağlantıda: rpoly=lat,lon;lat,lon;...
-  const ring = regionIsPolygon && regionRect && regionRect.getLatLngs ? regionRect.getLatLngs()[0] : null;
-  if (ring && ring.length >= 3) url.searchParams.set('rpoly', ring.map(ll => ll.lat.toFixed(3) + ',' + ll.lng.toFixed(3)).join(';'));
+  // İP-1: çok parçalıda parçalar '|' ile ayrılır; delikli bölge bağlantıya yazılmaz (yanlış geri kurulmasın)
+  const polysU = regionPolys();
+  if (polysU && polysU.length && polysU.every(rs => rs.length === 1 && rs[0].length >= 3))
+    url.searchParams.set('rpoly', polysU.map(rs => rs[0].map(ll => ll.lat.toFixed(3) + ',' + ll.lng.toFixed(3)).join(';')).join('|'));
   else url.searchParams.delete('rpoly');
   history.replaceState(null, '', url);
 }
@@ -10250,10 +10291,12 @@ function restoreRegionFromURL() {
     regionRect = L.circle([rc[0], rc[1]], { radius: rc[2] * 1000, color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
     fetchRegionEvents(regionRect.getBounds());
   } else if ((p.get('rpoly') || '').split(';').length >= 3) {
-    const pts = p.get('rpoly').split(';').map(s => s.split(',').map(Number)).filter(a => a.length === 2 && a.every(isFinite) && Math.abs(a[0]) <= 90);
+    // İP-1: 'a;b;c|d;e;f' → her parça ayrı dış halka (MultiPolygon); tek parça eskisi gibi
+    const parts = p.get('rpoly').split('|').map(part => part.split(';').map(s => s.split(',').map(Number)).filter(a => a.length === 2 && a.every(isFinite) && Math.abs(a[0]) <= 90)).filter(pp => pp.length >= 3);
+    const pts = parts.length ? parts[0] : [];
     if (pts.length >= 3) {
       regionIsPolygon = true; regionIsCircle = false;
-      regionRect = L.polygon(pts, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+      regionRect = L.polygon(parts.length > 1 ? parts.map(pp => [pp]) : pts, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
       fetchRegionEvents(regionRect.getBounds());
     } else {
       regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
@@ -10706,16 +10749,23 @@ function litRegionCommitToQuery() {
   // TypeError ile başarısız olurdu (2026-09-13, Batı Anadolu 2004 wiring
   // sırasında bulundu). 2006'nın basit dikdörtgenleri bu daldan etkilenmez.
   const isMultiPart = Array.isArray(rawLatLngs[0]) && Array.isArray(rawLatLngs[0][0]);
-  const outerRings  = isMultiPart ? rawLatLngs.map(part => part[0]) : [rawLatLngs[0]];
+  // İP-1 (2026-11-23): her parça delikleriyle birlikte korunur. Eskiden
+  // L.polygon(outerRings) iki düzeyli diziyle kuruluyordu; Leaflet bunu
+  // "dış halka + delikler" diye yorumladığından B parçası delik sayılıyor,
+  // filtre de yalnız getLatLngs()[0] (A) ile çalışıyordu. Şimdi üç düzeyli
+  // dizi (Leaflet 1.9 MultiPolygon) verilir; üyelik pointInPolys() ile.
+  const polys = isMultiPart ? rawLatLngs : [rawLatLngs];   // [[dış, delik…], …]
+  const outerRings  = polys.map(part => part[0]);
+  const hasHoles = polys.some(part => part.length > 1);
   const uniqueCorners = new Set(
     outerRings.flat().map(ll => `${ll.lat.toFixed(6)},${ll.lng.toFixed(6)}`)
   ).size;
 
   regionDeselect(); // TEK execution-state garantisi: önceki elle-çizilmiş bölge varsa kaldırılır
 
-  if (isMultiPart || uniqueCorners > 4) {
+  if (isMultiPart || hasHoles || uniqueCorners > 4) {
     regionIsPolygon = true;
-    regionRect = L.polygon(outerRings, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
+    regionRect = L.polygon(isMultiPart ? polys : polys[0], { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
   } else {
     regionIsPolygon = false;
     regionRect = L.rectangle(bounds, { color:'#06b6d4', weight:2, fillOpacity:.08, dashArray:'4' }).addTo(map);
