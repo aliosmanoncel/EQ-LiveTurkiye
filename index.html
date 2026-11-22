@@ -10452,6 +10452,8 @@ function drawLitRegionCircle() {
     `<br><span style="color:#888">distance(event, center) ≤ ${radiusKm}km — bu YALNIZCA araştırma alanı sorgusudur, bir kaynak zonu tanımı DEĞİLDİR.</span>` +
     `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
     `<br><span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span>`;
+  vs30ClearCircleExtras();
+  vs30CircleSummaryUI(lat, lon, radiusKm, info);
   setStatus(`Araştırma Bölgesi: Circle çizildi (merkez ${lat.toFixed(4)},${lon.toFixed(4)}, R=${radiusKm}km)`);
 }
 
@@ -10594,6 +10596,7 @@ function onLitRegionZoneChange() {
 
 function litRegionClear() {
   if (litRegionLayer) { map.removeLayer(litRegionLayer); litRegionLayer = null; }
+  if (typeof vs30ClearCircleExtras === 'function') vs30ClearCircleExtras();
   const zoneSel = document.getElementById('litRegionZoneSel');
   if (zoneSel) zoneSel.value = '';
   const info = document.getElementById('litRegionInfo');
@@ -12631,6 +12634,78 @@ window.addEventListener('load', () => {
     setTimeout(() => { if (!showVs30) toggleLayer('vs30'); vs30Query(L.latLng(la, lo), 'link'); }, 800);
   } catch (e) { /* bağlantı bozuksa sessizce geç */ }
 });
+
+// ── Araştırma Bölgesi (daire) için VS30 zemin özeti ─────────────────────────────
+// Ham değer ızgarası (vs30_usgs_deger.png, kayıpsız) tarayıcıda okunur — ek kütüphane yok, renkten geri okuma yok.
+// İstatistik ~0,9 km hücreler üzerinden, cos(enlem) ile alan ağırlıklı; su hücreleri dışarıda. Bölgesel gösterge.
+let vs30ZeLayer = null;
+function vs30ClearCircleExtras() { if (vs30ZeLayer) { map.removeLayer(vs30ZeLayer); vs30ZeLayer = null; } }
+async function vs30CircleSummary(lat, lon, rKm, box) {
+  box.innerHTML = '<span style="color:#888">🧱 Zemin özeti hesaplanıyor…</span>';
+  try {
+    await vs30LoadRegions();
+    const Rg = vs30RegionAt(lat, lon);
+    if (!Rg) { box.innerHTML = '<span style="color:#888">🧱 Bu dairenin merkezi için VS30 katmanı henüz eklenmedi (şu an: ' + vs30Regions.map(r => r.name_tr).join(', ') + ').</span>'; return; }
+    const g = Rg.grid || await vs30LoadGrid(Rg), b = g.meta.bounds;
+    const dLat = (b.maxlat - b.minlat) / g.h, dLon = (b.maxlon - b.minlon) / g.w, toRad = Math.PI / 180, Re = 6371.0088;
+    const hav = (la1, lo1, la2, lo2) => { const a = Math.sin((la2 - la1) * toRad / 2) ** 2 + Math.cos(la1 * toRad) * Math.cos(la2 * toRad) * Math.sin((lo2 - lo1) * toRad / 2) ** 2; return 2 * Re * Math.asin(Math.min(1, Math.sqrt(a))); };
+    const latPad = rKm / 111.2, lonPad = rKm / (111.2 * Math.max(0.05, Math.cos(lat * toRad)));
+    const r0 = Math.max(0, Math.floor((b.maxlat - (lat + latPad)) / dLat)), r1 = Math.min(g.h - 1, Math.ceil((b.maxlat - (lat - latPad)) / dLat));
+    const c0 = Math.max(0, Math.floor(((lon - lonPad) - b.minlon) / dLon)), c1 = Math.min(g.w - 1, Math.ceil(((lon + lonPad) - b.minlon) / dLon));
+    const vals = [], cls = { ZA: 0, ZB: 0, ZC: 0, ZD: 0, 'ZE adayı': 0 }; let wLand = 0, wWater = 0, sum = 0; const ze = [];
+    for (let r = r0; r <= r1; r++) {
+      const cl = b.maxlat - (r + 0.5) * dLat, w = Math.cos(cl * toRad);
+      for (let c = c0; c <= c1; c++) {
+        const cn = b.minlon + (c + 0.5) * dLon;
+        if (hav(lat, lon, cl, cn) > rKm) continue;
+        const i = (r * g.w + c) * 4;
+        if (g.px[i + 3] === 0) { wWater += w; continue; }
+        const v = g.px[i] * 256 + g.px[i + 1];
+        vals.push([v, w]); wLand += w; sum += v * w; cls[vs30ClassOf(v).code] += w;
+        if (v < 180 && ze.length < 500) ze.push([cl, cn]);
+      }
+    }
+    // dairenin kapsam içindeki payı: daire alanı / hücre alanı ile beklenen ağırlık
+    const cellKm2 = (dLat * 111.2) * (dLon * 111.2), circKm2 = Math.PI * rKm * rKm;
+    const covered = Math.min(1, ((wLand + wWater) * cellKm2) / circKm2);
+    if (!vals.length) { box.innerHTML = '<span style="color:#888">🧱 Daire içinde kara hücresi yok (su alanı) — VS30 değeri yok.</span>'; return; }
+    vals.sort((a, b2) => a[0] - b2[0]);
+    const q = p => { let acc = 0; for (const [v, w] of vals) { acc += w; if (acc >= p * wLand) return v; } return vals[vals.length - 1][0]; };
+    // merkez nokta
+    const cr = Math.floor((b.maxlat - lat) / dLat), cc = Math.floor((lon - b.minlon) / dLon), ci = (cr * g.w + cc) * 4;
+    const cTxt = (cr >= 0 && cr < g.h && cc >= 0 && cc < g.w) ? (g.px[ci + 3] === 0 ? 'su alanı' : (g.px[ci] * 256 + g.px[ci + 1]) + ' m/s (' + vs30ClassOf(g.px[ci] * 256 + g.px[ci + 1]).code + ')') : '—';
+    const pct = k => (100 * cls[k] / wLand);
+    const order = ['ZA', 'ZB', 'ZC', 'ZD', 'ZE adayı'].filter(k => cls[k] > 0);
+    const col = { ZA: '#1f3a93', ZB: '#3288bd', ZC: '#99d594', ZD: '#fdae61', 'ZE adayı': '#c51b8a' };
+    const bar = order.map(k => '<span title="' + k + ' %' + pct(k).toFixed(1) + '" style="display:inline-block;height:9px;width:' + pct(k).toFixed(2) + '%;background:' + col[k] + '"></span>').join('');
+    const dist = order.map(k => '<b>' + k + '</b> %' + (pct(k) < 0.1 ? '<0,1' : pct(k).toFixed(1).replace('.', ','))).join(' · ');
+    const nZe = Math.round(cls['ZE adayı'] / (wLand / vals.length));
+    vs30ClearCircleExtras();
+    if (ze.length) {
+      vs30ZeLayer = L.layerGroup(ze.map(([la, lo]) => L.rectangle([[la - dLat / 2, lo - dLon / 2], [la + dLat / 2, lo + dLon / 2]],
+        { color: '#f2c94c', weight: 2, fill: false, interactive: false }))).addTo(map);
+    }
+    box.innerHTML =
+      '<div style="border-top:1px solid #333;margin-top:6px;padding-top:6px"><b style="color:#e5e7eb">🧱 Daire içi zemin özeti (VS30, yaklaşık)</b>' +
+      '<div style="margin-top:3px">Merkez nokta: <b>' + cTxt + '</b></div>' +
+      '<div>Medyan VS30: <b>' + q(0.5) + ' m/s</b> <span style="color:#888">(%10–%90: ' + q(0.1) + '–' + q(0.9) + ' · alan ağırlıklı ortalama ' + Math.round(sum / wLand) + ')</span></div>' +
+      '<div>En düşük–en yüksek: ' + vals[0][0] + '–' + vals[vals.length - 1][0] + ' m/s</div>' +
+      '<div style="margin:4px 0 2px;display:flex;width:100%;border-radius:3px;overflow:hidden;background:#333">' + bar + '</div>' +
+      '<div>Yaklaşık sınıf dağılımı (kara alanı): ' + dist + '</div>' +
+      (wWater > 0 ? '<div style="color:#888">Su alanı: dairenin %' + (100 * wWater / (wLand + wWater)).toFixed(0) + '’i (hesaba katılmadı)</div>' : '') +
+      (covered < 0.97 ? '<div style="color:#fbbf24">Dairenin yalnız ~%' + (100 * covered).toFixed(0) + '’i VS30 kapsamında; istatistik bu kısımdan.</div>' : '') +
+      (nZe > 0 ? '<div style="color:#f2c94c;margin-top:3px">● VS30 &lt; 180 m/s (ZE adayı): ' + nZe + ' hücre — haritada sarı çerçeveyle gösterildi. Yerel zemin koşulları saha etüdüyle araştırılmalı; ZE yalnız VS30 ile atanamaz.</div>'
+                : '<div style="color:#888;margin-top:3px">Daire içinde VS30 &lt; 180 m/s (ZE adayı) hücre yok.</div>') +
+      '<div style="color:#777;font-size:.66rem;margin-top:4px;line-height:1.4">USGS eğim tabanlı vekil (Wald &amp; Allen 2007; vekilin üst sınırı ~900 m/s, bu yüzden en yüksek değer çoğu kez 900 görünür) · ~0,9 km hücre · TBDY 2018 sınıflaması değildir · bölgesel gösterge: parsel zemin etüdü ve bina deprem performansı değerlendirmesi yerine geçmez · PGA hesabına bağlı değildir.</div></div>';
+  } catch (e) { box.innerHTML = '<span style="color:#f87171">🧱 Zemin özeti hesaplanamadı: ' + e.message + '</span>'; }
+}
+function vs30CircleSummaryUI(lat, lon, rKm, info) {
+  const box = document.createElement('div'); box.id = 'litVs30Box'; box.style.marginTop = '4px'; info.appendChild(box);
+  const loaded = vs30Regions && vs30Regions.some(r => r.grid);
+  if ((typeof showVs30 !== 'undefined' && showVs30) || loaded) { vs30CircleSummary(lat, lon, rKm, box); return; }
+  box.innerHTML = '<button class="tbtn" type="button" style="margin-top:4px;font-size:.7rem;padding:3px 8px" title="Daire içindeki yaklaşık VS30 dağılımı (ilk kullanımda ~2,7 MB veri indirilir)">🧱 Daire içi zemin özeti (VS30)</button>';
+  box.querySelector('button').addEventListener('click', () => vs30CircleSummary(lat, lon, rKm, box));
+}
 
 async function loadVs30Layer() {
   setStatus('VS30 Tabanlı Zemin Özellikleri Haritası yükleniyor…');
