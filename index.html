@@ -638,7 +638,7 @@
           <span style="background:#d73027;color:#fff;font-size:.65rem;padding:1px 5px;border-radius:3px">&gt;0.10g Yüksek</span>
         </div>
         <div style="color:#666;font-size:.65rem;line-height:1.5">
-          Campbell (1981) GMPE · Vs30=760 m/s<br>
+          Campbell (1981) GMPE · Vs30=760 m/s (sabit; Zemin/VS30 katmanına bağlı değil)<br>
           Kaynak: EMSC katalog (Mw≥4.5, 1998–2018)<br>
           Yöntem: Delaunay triangülasyon · N≥75 filtresi
         </div>
@@ -648,15 +648,15 @@
     <!-- VS30 bölümü (yalnız katman açıkken görünür) -->
     <div class="legend-section" id="lgVs30Sec" style="display:none">
       <div class="legend-section-title" onclick="toggleSection('lgVs30','lgVs30T')">
-        VS30 (USGS, yaklaşık) <span class="tog" id="lgVs30T">▼</span>
+        Zemin (VS30, yaklaşık) <span class="tog" id="lgVs30T">▼</span>
       </div>
       <div class="legend-section-body" id="lgVs30">
-        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">Üst 30 m ortalama kayma dalgası hızı · m/s</div>
-        <div style="display:flex;flex-wrap:wrap;gap:2px 4px;line-height:1.5;margin-bottom:4px"><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#7a0177"></i>&lt; 180</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#c51b8a"></i>180–240</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#f768a1"></i>240–300</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#fdae61"></i>300–360</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#fee08b"></i>360–490</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#abdda4"></i>490–620</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#66c2a5"></i>620–760</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#3288bd"></i>&gt; 760</span></div>
-        <div style="color:#666;font-size:.65rem;line-height:1.5">
-          TBDY 2018 eşikleri: ZE &lt;180 · ZD 180–360 · ZC 360–760 · ZB 760–1500<br>
-          Eğim tabanlı vekil (Wald &amp; Allen 2007) · saha ölçümü değil<br>
-          Zemin sınıfı saha etüdüyle belirlenir · su alanları şeffaf<br>
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">VS30 tabanlı yaklaşık zemin sınıfı göstergesi · haritaya tıklayın</div>
+        <div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#1f3a93"></i><span style="font-size:.68rem"><b>ZA</b> <span style="color:#999">&gt; 1500 m/s</span><br><span style="color:#aaa">Sağlam, sert kayalar · bu bölgede yok</span></span></div><div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#3288bd"></i><span style="font-size:.68rem"><b>ZB</b> <span style="color:#999">760–1500 m/s</span><br><span style="color:#aaa">Az ayrışmış, orta sağlam kayalar</span></span></div><div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#99d594"></i><span style="font-size:.68rem"><b>ZC</b> <span style="color:#999">360–760 m/s</span><br><span style="color:#aaa">Çok sıkı kum, çakıl, sert kil / zayıf kaya</span></span></div><div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#fdae61"></i><span style="font-size:.68rem"><b>ZD</b> <span style="color:#999">180–360 m/s</span><br><span style="color:#aaa">Orta sıkı – sıkı kum, çakıl, çok katı kil</span></span></div><div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#c51b8a"></i><span style="font-size:.68rem"><b>ZE?</b> <span style="color:#999">&lt; 180 m/s</span><br><span style="color:#aaa">ZE adayı — yalnız VS30 ile atanamaz</span></span></div>
+        <div style="color:#666;font-size:.65rem;line-height:1.5;margin-top:4px">
+          TBDY 2018 sınıflaması değildir: Tablo 16.1 ayrıca (N60)30, (cu)30 ister; ZE/ZF özel zemin koşullarına bağlıdır<br>
+          USGS eğim tabanlı vekil (Wald &amp; Allen 2007) · saha ölçümü değil · su alanları şeffaf<br>
+          <span style="color:#fbbf24">PGA hesabına bağlı değil</span> (PGA sabit Vs30=760 m/s)<br>
           USGS Global Vs30 Mosaic · doi:10.5066/P1NV6UNM
         </div>
       </div>
@@ -1109,7 +1109,7 @@
       <button class="tbtn tr-only" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
       <button class="tbtn tr-only"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
       <button class="tbtn tr-only" id="btnStrainRate" onclick="toggleLayer('strainrate')" title="GSRM v2.1 jeodezik strain-rate modeli (Kreemer ve ark. 2014) · GPS-tabanlı, uzun-dönem gerinim oranı · CANLI ÖLÇÜM veya deprem tahmini DEĞİL · b-değeri/asperite katmanlarıyla karşılaştırma için">🌐 Strain Rate (GSRM)</button>
-      <button class="tbtn tr-only" id="btnVs30" onclick="toggleLayer('vs30')" title="USGS Global Vs30 Mosaic (doi:10.5066/P1NV6UNM) · üst 30 m ortalama kayma dalgası hızı · Türkiye'de topoğrafik eğime dayalı VEKİL (Wald &amp; Allen 2007) · SAHA ÖLÇÜMÜ DEĞİL · TBDY 2018 zemin sınıfı saha etüdüyle belirlenir · 30″ (~0,9 km) ızgara">🧱 VS30 (USGS, yaklaşık)</button>
+      <button class="tbtn tr-only" id="btnVs30" onclick="toggleLayer('vs30')" title="USGS Global Vs30 Mosaic (doi:10.5066/P1NV6UNM) · üst 30 m ortalama kayma dalgası hızı · Türkiye'de topoğrafik eğime dayalı VEKİL (Wald &amp; Allen 2007) · SAHA ÖLÇÜMÜ DEĞİL · Renkler TBDY 2018 eşiklerine göre YAKLAŞIK zemin sınıfı göstergesi (TBDY sınıflaması değil) · Haritaya tıklayın: sınıf + VS30 · PGA hesabına bağlı DEĞİL · 30″ (~0,9 km) ızgara">🧱 Zemin (VS30, yaklaşık)</button>
       <button class="tbtn global-only" id="btnStrainRateGlobal" onclick="toggleLayer('strainrateglobal')" title="GSRM v2.1 jeodezik strain-rate modeli · Dünya geneli · Yalnızca plaka sınırı bölgeleri (veri olmayan alanlar şeffaf, doldurulmadı) · GPS-tabanlı, canlı ölçüm DEĞİL">🌍 Strain Rate (GSRM, Global)</button>
     </div>
     <div class="pgrp" role="group" aria-label="Tarihi şiddet (MMI)">
@@ -11561,6 +11561,7 @@ function toggleLayer(type) {
     document.getElementById('btnVs30').classList.toggle('active', showVs30);
     const lg = document.getElementById('lgVs30Sec');
     if (lg) lg.style.display = showVs30 ? '' : 'none';
+    if (showVs30) map.on('click', vs30MapClick); else { map.off('click', vs30MapClick); map.closePopup(); }
     if (!vs30Layer) {
       loadVs30Layer();
     } else if (showVs30) {
@@ -12427,6 +12428,57 @@ async function loadStrainRateLayer() {
   }
 }
 
+// ── VS30 nokta sorgusu ─────────────────────────────────────────────────────
+// data/vs30_usgs_deger.png: R*256+G = VS30 (m/s), A=0 su. İlk tıklamada bir kez yüklenir (~2,7 MB).
+let vs30Grid = null, vs30GridPromise = null;
+function vs30LoadGrid() {
+  if (vs30GridPromise) return vs30GridPromise;
+  vs30GridPromise = Promise.all([
+    fetch('data/vs30_usgs_meta.json').then(r => r.json()),
+    new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('değer görüntüsü yüklenemedi')); im.src = 'data/vs30_usgs_deger.png'; })
+  ]).then(([meta, im]) => {
+    const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(im, 0, 0);
+    vs30Grid = { meta, w: c.width, h: c.height, px: ctx.getImageData(0, 0, c.width, c.height).data };
+    return vs30Grid;
+  }).catch(e => { vs30GridPromise = null; throw e; });
+  return vs30GridPromise;
+}
+function vs30ClassOf(v) {
+  if (v >= 1500) return { code: 'ZA', col: '#1f3a93', txt: 'Sağlam, sert kayalar' };
+  if (v >= 760)  return { code: 'ZB', col: '#3288bd', txt: 'Az ayrışmış, orta sağlam kayalar' };
+  if (v >= 360)  return { code: 'ZC', col: '#99d594', txt: 'Çok sıkı kum, çakıl ve sert kil tabakaları veya ayrışmış, çok çatlaklı zayıf kayalar' };
+  if (v >= 180)  return { code: 'ZD', col: '#fdae61', txt: 'Orta sıkı – sıkı kum, çakıl veya çok katı kil tabakaları' };
+  return { code: 'ZE adayı', col: '#c51b8a', txt: 'ZE yalnız VS30 ile atanamaz; özel zemin koşulları saha etüdüyle araştırılmalı' };
+}
+async function vs30MapClick(ev) {
+  if (!showVs30 || polygonActive) return;
+  const t = ev.originalEvent && ev.originalEvent.target;
+  if (t && t.classList && t.classList.contains('leaflet-interactive')) return; // deprem/fay işaretine tıklandı
+  const pop = L.popup({ maxWidth: 290 }).setLatLng(ev.latlng).setContent('<div style="font-size:.78rem">VS30 okunuyor…</div>').openOn(map);
+  let g;
+  try { g = vs30Grid || await vs30LoadGrid(); }
+  catch (e) { pop.setContent('<div style="font-size:.78rem">VS30 değeri yüklenemedi: ' + e.message + '</div>'); return; }
+  const b = g.meta.bounds, lat = ev.latlng.lat, lon = ev.latlng.lng;
+  const foot = '<div style="color:#888;font-size:.66rem;margin-top:6px;line-height:1.45">VS30 tabanlı <b>yaklaşık zemin sınıfı göstergesi</b> — TBDY 2018 sınıflaması değildir; (N60)30, (cu)30 ve saha etüdü gerekir. USGS eğim tabanlı vekil (Wald &amp; Allen 2007), saha ölçümü değil. PGA hesabı bu değeri kullanmaz (sabit Vs30=760 m/s).</div>';
+  if (lat < b.minlat || lat > b.maxlat || lon < b.minlon || lon > b.maxlon) {
+    pop.setContent('<div style="font-size:.78rem">Bu nokta VS30 kesitinin (25–45°D, 34–43°K) dışında.</div>'); return;
+  }
+  const col = Math.min(g.w - 1, Math.floor((lon - b.minlon) / (b.maxlon - b.minlon) * g.w));
+  const row = Math.min(g.h - 1, Math.floor((b.maxlat - lat) / (b.maxlat - b.minlat) * g.h));
+  const i = (row * g.w + col) * 4;
+  if (g.px[i + 3] === 0) { pop.setContent('<div style="font-size:.78rem">Su alanı (deniz/göl) — VS30 değeri yok.</div>'); return; }
+  const v = g.px[i] * 256 + g.px[i + 1], k = vs30ClassOf(v);
+  pop.setContent(
+    '<div style="font-size:.8rem;line-height:1.45">' +
+    '<div style="display:flex;align-items:center;gap:7px"><span style="background:' + k.col + ';color:#111;font-weight:800;padding:2px 8px;border-radius:4px">' + k.code + '</span>' +
+    '<span style="color:#ccc;font-size:.7rem">yaklaşık zemin sınıfı göstergesi</span></div>' +
+    '<div style="margin-top:4px;color:#ddd;font-size:.72rem">' + k.txt + '</div>' +
+    '<div style="margin-top:5px">VS30 ≈ <b>' + v + ' m/s</b> <span style="color:#888;font-size:.68rem">(' + lat.toFixed(3) + ', ' + lon.toFixed(3) + ')</span></div>' +
+    foot + '</div>');
+}
+
 async function loadVs30Layer() {
   setStatus('VS30 (USGS) katmanı yükleniyor…');
   try {
@@ -12434,12 +12486,12 @@ async function loadVs30Layer() {
     if (!metaRes.ok) throw new Error('meta bulunamadı');
     const meta = await metaRes.json();
     const b = meta.bounds;
-    vs30Layer = L.imageOverlay('data/vs30_usgs.png',
+    vs30Layer = L.imageOverlay('data/vs30_usgs_sinif.png',
       [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
       { opacity: 0.7, interactive: false, className: 'vs30-img' }
     );
     if (showVs30) vs30Layer.addTo(map);
-    setStatus(`VS30 · ${meta.source} · eğim tabanlı VEKİL, saha ölçümü değil · ${meta.units} · kara medyanı ${meta.stats_land.median} m/s`);
+    setStatus(`Zemin (VS30) · ${meta.source} · eğim tabanlı VEKİL, saha ölçümü değil · yaklaşık sınıf göstergesi · noktaya tıklayın`);
   } catch (e) {
     setStatus('VS30 (USGS) yüklenemedi: ' + e.message, true);
     showVs30 = false;

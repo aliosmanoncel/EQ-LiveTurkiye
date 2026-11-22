@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""VS30 katmanı — USGS Global Vs30 Mosaic → data/vs30_usgs.png + data/vs30_usgs_meta.json
+"""VS30 katmanı — USGS Global Vs30 Mosaic → data/vs30_usgs_sinif.png (yaklaşık ZA–ZE gösterge rengi),
+data/vs30_usgs_deger.png (nokta sorgusu için kayıpsız değer kodlaması) + data/vs30_usgs_meta.json
 
 Kaynak: U.S. Geological Survey (2025). The U.S. Geological Survey global Vs30 mosaic
 [Data release]. https://doi.org/10.5066/P1NV6UNM — kamu malı (public domain).
@@ -24,8 +25,13 @@ Su: USGS mozaiği denizleri/büyük gölleri sabit 600 m/s ile doldurur. Tam 600
 ≥200 hücrelik bağlantılı bölgeler su kabul edilip şeffaf yapılır (Akdeniz, Karadeniz,
 Ege, Marmara, Van, Tuz Gölü vb.); karadaki tek tük 600 değerli küçük alanlar korunur.
 
-Renkler: USGS Vs30 haritalarındaki 8 sınıf (Allen & Wald, 2007, USGS OFR 2007-1357).
-Develi Jeo-Tur v10.1.0 VS30 katmanıyla aynı palet; 5 noktada değerler birebir eşleşti
+Harita rengi: TBDY 2018 Tablo 16.1 (VS)30 eşiklerine göre YAKLAŞIK zemin sınıfı GÖSTERGESİ
+(ZA >1500, ZB 760–1500, ZC 360–760, ZD 180–360, <180 → "ZE adayı"). Bu bir TBDY sınıflaması
+DEĞİLDİR: Tablo 16.1 ayrıca (N60)30 ve (cu)30 ister; ZE ve ZF özel zemin koşullarına bağlıdır
+ve yalnız VS30'dan atanamaz; kaya üstünde >3 m zemin varsa ZA/ZB tanımlanmaz. Saha etüdü gerekir.
+Nokta sorgusu: vs30_usgs_deger.png — R = VS30 >> 8, G = VS30 & 255, A = 255 kara / 0 su
+(tarayıcıda canvas ile okunur; değerler ≤ 1063 olduğundan 16 bit yeterli, kayıpsız).
+Develi Jeo-Tur v10.1.0 kesitiyle 5 noktada değerler birebir eşleşti
 (Erciyes 784, Develi 1940 depremi 189, Fıraktın 270, Sultan Sazlığı 229, Yahyalı 519 m/s).
 """
 import argparse, json, datetime, pathlib
@@ -40,6 +46,12 @@ BINS = [(0, 180, '#7a0177', '< 180'), (180, 240, '#c51b8a', '180–240'), (240, 
         (300, 360, '#fdae61', '300–360'), (360, 490, '#fee08b', '360–490'), (490, 620, '#abdda4', '490–620'),
         (620, 760, '#66c2a5', '620–760'), (760, 99999, '#3288bd', '> 760')]
 TBDY = [('ZE', 0, 180), ('ZD', 180, 360), ('ZC', 360, 760), ('ZB', 760, 1500), ('ZA', 1500, 99999)]
+# Gösterge renkleri (yüksek hız = mavi, düşük = mor; ZE yalnız "aday")
+CLS = [('ZA', 1500, 99999, '#1f3a93', 'Sağlam, sert kayalar'),
+       ('ZB', 760, 1500, '#3288bd', 'Az ayrışmış, orta sağlam kayalar'),
+       ('ZC', 360, 760, '#99d594', 'Çok sıkı kum, çakıl ve sert kil tabakaları veya ayrışmış, çok çatlaklı zayıf kayalar'),
+       ('ZD', 180, 360, '#fdae61', 'Orta sıkı – sıkı kum, çakıl veya çok katı kil tabakaları'),
+       ('ZE?', 0, 180, '#c51b8a', 'ZE adayı — ZE yalnız VS30 ile atanamaz; özel zemin koşulları saha etüdüyle araştırılmalı')]
 
 
 def read_tif(path):
@@ -72,11 +84,22 @@ def main():
     water = np.isin(lab, 1 + np.where(sizes >= 200)[0])
 
     rgba = np.zeros(a.shape + (4,), np.uint8)
-    for lo, hi, col, _ in BINS:
+    counts = {}
+    for code, lo, hi, col, _ in CLS:
         m = (a >= lo) & (a < hi) & ~water
         rgba[m, :3] = [int(col[i:i + 2], 16) for i in (1, 3, 5)]
         rgba[m, 3] = 255
-    Image.fromarray(rgba, 'RGBA').save(ROOT / 'data/vs30_usgs.png', optimize=True)
+        counts[code] = int(m.sum())
+    Image.fromarray(rgba, 'RGBA').save(ROOT / 'data/vs30_usgs_sinif.png', optimize=True)
+
+    enc = np.zeros(a.shape + (4,), np.uint8)
+    enc[..., 0] = (a >> 8) & 255
+    enc[..., 1] = a & 255
+    enc[..., 3] = np.where(water, 0, 255)
+    Image.fromarray(enc, 'RGBA').save(ROOT / 'data/vs30_usgs_deger.png', optimize=True)
+    back = Image.open(ROOT / 'data/vs30_usgs_deger.png')
+    bk = np.asarray(back).astype(np.int32)
+    assert ((bk[..., 0] * 256 + bk[..., 1])[~water] == a[~water]).all()  # kayıpsız
 
     land = a[~water]
     meta = {
@@ -87,8 +110,13 @@ def main():
         'method': 'Türkiye ve çevresinde topoğrafik eğime dayalı vekil (Wald & Allen, 2007, BSSA 97(5), 1379–1395, doi:10.1785/0120060267). '
                   '30″ (~0,9 km) ızgara, en yakın komşu (yeniden örnekleme yok). Su: tam 600 m/s değerli ≥200 hücrelik bölgeler şeffaf.',
         'units': 'm/s (üst 30 m ortalama kayma dalgası hızı)',
-        'bins': [{'min': lo, 'max': (hi if hi < 99999 else None), 'color': col, 'label': lab_} for lo, hi, col, lab_ in BINS],
-        'bins_ref': 'Allen & Wald (2007), USGS Open-File Report 2007-1357',
+        'classes': [{'code': c, 'min': lo, 'max': (hi if hi < 99999 else None), 'color': col, 'tbdy_description': d,
+                     'land_cells': counts[c]} for c, lo, hi, col, d in CLS],
+        'classes_ref': 'TBDY 2018 Tablo 16.1 — yalnız (VS)30 sütunu; (N60)30 ve (cu)30 kullanılmadı',
+        'classes_note': 'VS30 tabanlı YAKLAŞIK zemin sınıfı göstergesi — TBDY sınıflaması değildir. ZE ve ZF yalnız VS30 ile atanamaz; '
+                        'temel altı ile kaya arasında >3 m zemin varsa ZA/ZB tanımlanmaz. Saha etüdü gerekir.',
+        'value_png': 'vs30_usgs_deger.png (R*256+G = VS30 m/s; A=0 su)',
+        'pga_link': 'YOK — PGA katmanı (Campbell 1981) sabit Vs30=760 m/s kullanır; bu katman o hesaba bağlanmamıştır.',
         'tbdy2018_thresholds': {k: [lo, (hi if hi < 99999 else None)] for k, lo, hi in TBDY},
         'grid_w': int(a.shape[1]), 'grid_h': int(a.shape[0]),
         'bounds': {'minlat': round(84 - (R1 - 0.5) * DX, 6), 'maxlat': round(84 - (R0 - 0.5) * DX, 6),
@@ -99,6 +127,7 @@ def main():
                 'VS30 eşiklerine göre verilen karşılık yalnız yaklaşıktır. Eğim vekili havza kenarlarında ve volkanik platolarda büyük hata yapabilir.',
     }
     (ROOT / 'data/vs30_usgs_meta.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding='utf-8')
+    print('classes', counts)
     print('PNG', a.shape, 'water', meta['stats_land']['water_fraction'], 'bounds', meta['bounds'])
 
 
