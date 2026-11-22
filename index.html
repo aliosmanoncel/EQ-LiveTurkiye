@@ -15,6 +15,8 @@
   <title>Türkiye Sismik Isı Haritası — Canlı Akış</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- İP-2 (2026-11-23): GeographicLib 2.2.0 (Karney 2013, MIT) — depoya gömülü, CDN yok; SHA-256 06e3512904b346575f475f14d0b27ea0979dbcd2b0eddebf5f1eeefd234395b5 -->
+  <script src="vendor/geographiclib-geodesic-2.2.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -3682,19 +3684,64 @@ const CMP_MAX = 3, CMP_COL = ['#0891b2', '#ea580c', '#7c3aed'], CMP_R = 6371.008
 let CMP = [];
 try { CMP = JSON.parse(localStorage.getItem('eqliveCmp') || '[]'); if (!Array.isArray(CMP)) CMP = []; } catch (e) { CMP = []; }
 function cmpSave() { try { localStorage.setItem('eqliveCmp', JSON.stringify(CMP)); } catch (e) {} }
-function regionAreaKm2() {
-  if (!regionRect) return null;
-  const rad = x => x * Math.PI / 180;
-  if (regionIsCircle && regionCircleRadiusKm) return 2 * Math.PI * CMP_R * CMP_R * (1 - Math.cos(regionCircleRadiusKm / CMP_R));
-  if (regionIsPolygon && regionRect.getLatLngs) {
-    // İP-1: aynı küresel formül; çok parçalıda parçaların toplamı, deliklerde çıkarma (yöntem İP-2'de değişecek)
-    const ringA = r => { let s = 0; for (let i = 0; i < r.length; i++) { const a = r[i], b = r[(i + 1) % r.length]; s += rad(b.lng - a.lng) * (2 + Math.sin(rad(a.lat)) + Math.sin(rad(b.lat))); } return Math.abs(s * CMP_R * CMP_R / 2); };
-    const polys = regionPolys(); if (!polys.length || !polys[0][0] || polys[0][0].length < 3) return null;
-    return polys.reduce((t, rings) => t + (rings[0].length >= 3 ? ringA(rings[0]) : 0) - rings.slice(1).reduce((u, h) => u + (h.length >= 3 ? ringA(h) : 0), 0), 0);
-  }
-  const B = regionRect.getBounds();
-  return CMP_R * CMP_R * Math.abs(rad(B.getEast() - B.getWest())) * Math.abs(Math.sin(rad(B.getNorth())) - Math.sin(rad(B.getSouth())));
+// ══ İP-2 (2026-11-23): geometriden bağımsız alan — WGS84 elipsoidi, Karney (2013), GeographicLib 2.2.0 ══════════════
+// İLKE: A = mevcut üyelik testinin KABUL ETTİĞİ koordinat kümesinin WGS84 yüzölçümü (tasarım v1.1 §4).
+//  · Daire: üyelik haversine (R = 6371 km, haversineKm ile aynı) — sınır bu küre üzerinde 1440 noktayla üretilir,
+//    noktalar coğrafi enlem–boylam olarak WGS84'e yerleştirilir ve jeodezik poligon alanı alınır.
+//  · Dikdörtgen / poligon / MultiPolygon: üyelik enlem–boylam düzleminde (bbox / ışın atma) → kenarlar enlem–boylam
+//    doğrusu boyunca ≤ 0,01° sıklaştırılır; dış halka − delikler, parçalar toplanır.
+// Kütüphane yüklenemezse alan HESAPLANMAZ (null) — sessizce küresel yönteme düşülmez; Oran/Yoğunluk "Ham"a döner.
+const AREA_METHOD = 'wgs84-membership-v1';
+const AREA_METHOD_AD = { 'wgs84-membership-v1': 'WGS84 jeodezik (üyelik bölgesi)', legacy: 'eski (küresel, ilk halka)' };
+const HAV_R = 6371;   // haversineKm() küre yarıçapı — daire üyeliği ile aynı
+function areaGeod() { return (typeof geodesic !== 'undefined' && geodesic.Geodesic) ? geodesic.Geodesic.WGS84 : null; }
+function densifyLL(ring, step = 0.01) {   // ring: [[lat, lon], …] açık halka; kenarlar enlem–boylam doğrusu
+  const out = [];
+  for (let i = 0; i < ring.length; i++) { const a = ring[i], b = ring[(i + 1) % ring.length];
+    const n = Math.max(1, Math.floor(Math.max(Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1])) / step));
+    for (let k = 0; k < n; k++) out.push([a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n]); }
+  return out;
 }
+function ringAreaWGS84(ring) {
+  const G = areaGeod(); if (!G || !ring || ring.length < 3) return null;
+  const p = G.Polygon(false); ring.forEach(([la, lo]) => p.AddPoint(la, lo));
+  return Math.abs(p.Compute(false, true).area) / 1e6;
+}
+function havCircleRing(lat, lon, rKm, n = 1440) {   // haversine (R = HAV_R) dairesinin sınırı, küresel hedef formülü
+  const la1 = lat * Math.PI / 180, lo1 = lon * Math.PI / 180, dd = rKm / HAV_R, out = [];
+  for (let k = 0; k < n; k++) { const th = 2 * Math.PI * k / n;
+    const la2 = Math.asin(Math.sin(la1) * Math.cos(dd) + Math.cos(la1) * Math.sin(dd) * Math.cos(th));
+    const lo2 = lo1 + Math.atan2(Math.sin(th) * Math.sin(dd) * Math.cos(la1), Math.cos(dd) - Math.sin(la1) * Math.sin(la2));
+    out.push([la2 * 180 / Math.PI, lo2 * 180 / Math.PI]); }
+  return out;
+}
+function regionGeometry() {
+  if (!regionRect) return null;
+  if (regionIsCircle && regionCircleCenter && regionCircleRadiusKm) return { type: 'Circle', lat: regionCircleCenter.lat, lon: regionCircleCenter.lon, rKm: regionCircleRadiusKm, membership: 'haversine-6371' };
+  if (regionIsPolygon && regionRect.getLatLngs) return { type: 'MultiPolygon', polys: (regionPolys() || []).map(rs => rs.map(r => r.map(ll => [ll.lat, ll.lng]))), membership: 'latlon-raycast' };
+  const B = regionRect.getBounds();
+  return { type: 'Rectangle', S: B.getSouth(), N: B.getNorth(), W: B.getWest(), E: B.getEast(), membership: 'bbox' };
+}
+function areaKm2(geom) {
+  if (!geom || !areaGeod()) return null;
+  if (geom.type === 'Circle') return geom.rKm > 0 ? ringAreaWGS84(havCircleRing(geom.lat, geom.lon, geom.rKm)) : null;
+  if (geom.type === 'Rectangle') return ringAreaWGS84(densifyLL([[geom.S, geom.W], [geom.S, geom.E], [geom.N, geom.E], [geom.N, geom.W]]));
+  if (geom.type === 'MultiPolygon') {
+    let t = 0;
+    for (const rs of geom.polys) { if (!rs[0] || rs[0].length < 3) continue; t += ringAreaWGS84(densifyLL(rs[0]));
+      for (let h = 1; h < rs.length; h++) if (rs[h].length >= 3) t -= ringAreaWGS84(densifyLL(rs[h])); }
+    return t > 0 ? t : null;
+  }
+  return null;
+}
+// Bölge Karşılaştırma, G–R Oran/Yoğunluk ve bölge bilgi satırı bu tek fonksiyonu kullanır (eski küresel formül kaldırıldı).
+function regionAreaKm2() { return areaKm2(regionGeometry()); }
+// Poisson modeline dayalı %95 güven aralığı (Garwood 1936) — N sayımı için [alt, üst]; deprem kümelenmesi bu aralığa dahil DEĞİLDİR.
+function poissonGarwood(N, alpha = 0.05) {
+  if (!(N >= 0)) return null;
+  return [N === 0 ? 0 : grGammaPInv(N, alpha / 2), grGammaPInv(N + 1, 1 - alpha / 2)];
+}
+const POIS_CI_AD = 'Poisson modeline dayalı %95 güven aralığı';
 // İP-1: "21 köşe" / "2 parça, 21 köşe" / "1 delik" — tek halkalıda eski metinle aynı
 function regionPolyDesc() {
   const polys = regionPolys() || [];
@@ -3717,7 +3764,7 @@ function cmpAdd() {
   const cLat = regionRect ? regionRect.getBounds().getCenter().lat : null;
   const types = {}; ev.forEach(e => { const k = (e.mtype || e.magType || '?').toString().toLowerCase(); types[k] = (types[k] || 0) + 1; });
   const nm = document.getElementById('cmpName').value.trim() || (document.getElementById('posterRegion')?.value.trim()) || `Bölge ${CMP.length + 1}`;
-  CMP.push({ name: nm, src: regionSourceLabel(), shape: regionShapeText(), area: regionAreaKm2(), cLat, t0, t1, Mc, dm,
+  CMP.push({ name: nm, src: regionSourceLabel(), shape: regionShapeText(), area: regionAreaKm2(), areaMethod: AREA_METHOD, cLat, t0, t1, Mc, dm,
     mags: ev.map(e => Math.round((e.mw ?? e.mag) * 100) / 100), types, url: location.href, added: new Date().toISOString(),
     // 2026-11-01 (olasılık modülü): eklendiği andaki GK74 durumu ve yorum katmanı uyarıları; eski kayıtlarda yok → "bilinmiyor"
     gk74: !!(typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect),
@@ -3935,11 +3982,16 @@ function cmpRender() {
   const ex = v => v === null || !Number.isFinite(v) ? '—' : v >= 1e4 || v < 0.01 ? v.toExponential(2) : v.toPrecision(3);
   const th = 'style="text-align:left;padding:2px 6px;border-bottom:1px solid #334;color:#cbd5e1;"', td = 'style="padding:2px 6px;border-bottom:1px solid #222;vertical-align:top;"';
   const rows = [['Katalog', r => r.src], ['Bölge', r => r.shape], ['Dönem', r => `${new Date(r.t0).toISOString().slice(0, 10)} – ${new Date(r.t1).toISOString().slice(0, 10)}`],
-    ['T (yıl)', (r, s) => f(s.T, 1)], ['A (km²)', r => r.area ? Math.round(r.area).toLocaleString('tr-TR') : '—'], ['N (tümü)', r => r.mags.length], ['Mc', r => fmtM(r.Mc)],
+    ['T (yıl)', (r, s) => f(s.T, 1)], ['A (km²)', r => r.area ? Math.round(r.area).toLocaleString('tr-TR') + ` <span style="color:#888">· ${AREA_METHOD_AD[r.areaMethod || 'legacy'] || r.areaMethod}</span>` : '—'], ['N (tümü)', r => r.mags.length], ['Mc', r => fmtM(r.Mc)],
     ['N(≥Mc)', (r, s) => s.n + (s.small ? ' ⚠' : '')], [bCiS('b ± σ (Aki 1965)', 'b [%95]'), (r, s) => s.b ? (B_CI_METHOD === 'normal' ? `${f(s.b)} ± ${f(s.sb)}` : `${f(s.b)}${bCiTxt({ b: s.b, ...s.ci })}${s.ci.ciM === 'chi2' ? ' (χ²)' : ''}${s.gridOff ? ` <span style="color:#f59e0b" title="${s.gridOff} büyüklük ızgara dışında; b hesabından önce sınıf merkezlerine yuvarlandı (RAPOR §16)">ⁱ</span>` : ''}`) : '—'], [`a [${aLab}; ${taLab}]`, (r, s) => f(s.a)],
     ...(B_CI_METHOD !== 'normal' && CMP.length > 1 ? [['b farkı, 1. bölgeye göre (Utsu 1992, P)', (r, s, i) => { if (!i) return '<span style="color:#888">referans</span>'; const P = s.b && S[0].b ? bUtsuP(S[0].b, S[0].n, s.b, s.n) : null;
       return P === null ? '—' : `<span title="P: iki b'nin aynı olduğu hipotezi altında olasılık; P &lt; 0,05 → b farkı anlamlı (%95). Küçük N'de anlamsız sonuç 'fark yok' demek değildir: güç düşüktür." style="color:${P < 0.05 ? '#fbbf24' : '#cbd5e1'}">${P < 0.001 ? '&lt; 0,001' : P.toFixed(3).replace('.', ',')}${P < 0.05 ? ' (anlamlı)' : ''}</span>`; }]] : []),
-    ['Mmax', (r, s) => f(s.Mmax, 1)], ['N(≥5) / N(≥6)', (r, s) => `${s.N5} / ${s.N6}`], [`λ(≥5) ${uLab}`, (r, s) => ex(s.lam5)],
+    ['Mmax', (r, s) => f(s.Mmax, 1)],
+    // İP-2 (2026-11-23): ham ve normalize a ayrı; a_{T·A} = tablodaki birim alan (seçili birim) ve yıl başına
+    ['a (ham) / a<sub>T</sub> / a<sub>T·A</sub>', (r, s) => s.b && s.T > 0 && s.n > 0 ? `${f(Math.log10(s.n) + s.b * r.Mc)} / ${f(Math.log10(s.n / s.T) + s.b * r.Mc)} / ${f(s.a)} <span style="color:#888">(${uLab})</span>` : '—'],
+    [`D = N(≥Mc)/(T·A) ${uLab} [${POIS_CI_AD}]`, (r, s) => { if (!(s.T > 0) || !r.area || s.unit === 'none') return '—'; const ci = poissonGarwood(s.n), k = 1 / (s.T * s.u);
+      return `<b>${ex(s.n * k)}</b> [${ex(ci[0] * k)} – ${ex(ci[1] * k)}]${s.n < 20 ? ' <span style="color:#f59e0b">küçük örneklem</span>' : ''}`; }],
+    ['N(≥5) / N(≥6)', (r, s) => `${s.N5} / ${s.N6}`], [`λ(≥5) ${uLab}`, (r, s) => ex(s.lam5)],
     ['M≥6 tekrarlanma (yıl, tüm bölge)', (r, s) => s.tr6 ? ex(s.tr6) + (s.extrap ? ' (ekstrapolasyon)' : '') : '—'],
     [`b [%95 bootstrap] — ${CMP_B_EST_AD.aki.tr} / ${CMP_B_EST_AD.bender.tr}`, (r, s) => { const A = cmpProb(r, s, 'aki'), Bn = cmpProb(r, s, 'bender'); if (!A || !Bn) return '—';
       const ci = p => { const v = p.bt.D.map(d => d[1]); return `${p.b.toFixed(3)} [${grPctl(v, 0.025).toFixed(3)}–${grPctl(v, 0.975).toFixed(3)}]`; }, w = (est, txt) => est === CMP_B_EST ? `<b>${txt}</b>` : txt;
@@ -3966,7 +4018,10 @@ function cmpRender() {
     ['Sismik kenetlenme (Kostrov / G–R)', (r, s, i) => M[i].geo !== null ? `<b>%${f(100 * M[i].cKos, 0)}</b> / <b>%${M[i].cGR !== null ? f(100 * M[i].cGR, 0) : '—'}</b>` : '—'],
     ['Büyüklük türleri', r => Object.entries(r.types).sort((p, q) => q[1] - p[1]).slice(0, 3).map(([k, v]) => `${k} %${Math.round(100 * v / r.mags.length)}`).join(', ')],
     ['', (r, s, i) => `<a href="${r.url.replace(/"/g, '&quot;')}" target="_blank" rel="noopener" style="color:#67e8f9">bağlantı</a> · <a href="#" onclick="cmpRemove(${i});return false;" style="color:#f87171">çıkar</a>`]];
-  tbl.innerHTML = `<table style="border-collapse:collapse;width:100%;font-size:.95em;margin-top:4px;"><tr><th ${th}></th>${CMP.map((r, i) => `<th ${th}><span style="color:${CMP_COL[i]}">■</span> ${r.name.replace(/</g, '&lt;')}</th>`).join('')}</tr>` +
+  // İP-2 (D6): eski kayıtlar yeniden hesaplanmaz; alan yöntemleri farklıysa açık uyarı
+  const amSet = new Set(CMP.map(r => r.areaMethod || 'legacy'));
+  const amWarn = amSet.size > 1 ? `<div style="color:#f59e0b;margin:3px 0;">⚠ Alan yöntemleri farklı: ${[...amSet].map(k => AREA_METHOD_AD[k] || k).join(' · ')} — alan ve yoğunluk karşılaştırmasında dikkat (eski kayıtlar yeniden hesaplanmadı).</div>` : '';
+  tbl.innerHTML = amWarn + `<table style="border-collapse:collapse;width:100%;font-size:.95em;margin-top:4px;"><tr><th ${th}></th>${CMP.map((r, i) => `<th ${th}><span style="color:${CMP_COL[i]}">■</span> ${r.name.replace(/</g, '&lt;')}</th>`).join('')}</tr>` +
     rows.map(([k, fn]) => `<tr><td ${td} style="color:#94a3b8">${k}</td>${CMP.map((r, i) => `<td ${td}>${fn(r, S[i], i)}</td>`).join('')}</tr>`).join('') + '</table>' +
     `<div style="color:#666;margin-top:3px;">Oranlar ${uLab} biriminde (Ambraseys 2006 yaklaşımı); a, ${aLab} doğrusunun M = 0'daki kesişimidir (Ambraseys 2006, Eş. 3: log(N/y·a) = α − β·M), olay sayısı değildir. Moment oranları tüm bölge içindir: jeodezik Savage & Simpson (1997), H = ${cmpParams().H} km, μ = ${cmpParams().mu / 1e9} GPa; sismik Kostrov (1974) toplamı ve kesik G–R (Hyndman & Weichert 1983); kenetlenme = sismik ÷ jeodezik (Sparacino vd. 2022). Kısa katalog süresi kenetlenmeyi olduğundan düşük gösterebilir. a, Mc'deki gözlenen orandan; tekrarlanma süresi G–R doğrusundan, tüm bölge alanı için. Retrospektif; tehlike değerlendirmesi değildir.</div>` +
     `<div style="color:#94a3b8;margin-top:3px;"><b>Poisson modeli: sabit oranlı, zamandan bağımsız istatistiksel olasılık. Deprem tahmini değildir.</b> ${cmpSelM().length && CMP.some(r => r.gk74 === false) ? `<span style="color:#f59e0b">ʰ ham katalog (GK74 kapalı): artçılar dahil, Poisson bağımsızlık varsayımı geçersiz; seçilen M satırlarında yalnız duyarlılık karşılaştırması içindir, ana şok sonucuyla eşdeğer değildir.</span> ` : ''}P(≥M; t) = 1 − e^(−λt), λ(≥M) = (N(≥Mc)/T)·10^(−b(M − Mc)): tekrarlanma süresiyle aynı model (kesilmesiz G–R, tek Mc), bölgenin tamamı için (ör. Alkan vd. 2025). b kestiricisi (olasılık satırları ve şekil): <b>${CMP_B_EST_AD[CMP_B_EST].tr}</b>; üstteki b satırları Aki–Utsu (referans), yan yana satır iki kestiriciyi aynı katalog, Mc ve dönemle verir (Bender 1983, gruplanmış veri en çok olabilirlik). [%95]: a ve b'nin ortak parametrik bootstrap'ı (${[...new Set(PR.filter(Boolean).map(p => p.bt.B))].length > 1 ? 'tekrar sayısı bölgeye göre: ' + CMP.map((r, i) => PR[i] ? `${r.name.replace(/</g, '&lt;')} ${PR[i].bt.B}` : null).filter(Boolean).join(', ') : (PR.find(Boolean) ? PR.find(Boolean).bt.B : GR_POIS.B) + ' tekrar'}, tohum ${GR_POIS.seed}); imleç üzerinde 16.–84. yüzdelik. Ekstrapolasyon, Tr = 1/λ(≥M) ile katalog süresi T karşılaştırılarak: işaretsiz Tr ≤ T (gözlem süresiyle karşılaştırılabilir); † T < Tr ≤ ${CMP_PROB.exK}T (G–R gözlem süresinin ötesine uzatıldı); ‡ Tr > ${CMP_PROB.exK}T (yüksek ekstrapolasyon belirsizliği). ${CMP_PROB.exK}T sınırı evrensel bir bilimsel eşik değil, ekstrapolasyon belirsizliğini sınıflandırmak için kullanılan operasyonel bir ölçüttür. ᵉ, italik: M gözlenen en büyük büyüklüğün üstünde. Olay bağımsızlığı varsayılır; GK74 bunu garanti etmez.</div>`;
@@ -4208,11 +4263,14 @@ function renderGutenbergRichter(evList, Mc) {
   // hesaplanmıyor. Uygun değilse sessizce 'raw'a döner, kullanıcıya stats
   // satırında bildirilir (aşağıda). T, computeRegionStatsLine() ile AYNI
   // kaynaktan (regionWindowStart/End) okunur -- iki farklı T tanımı olmasın diye.
-  const circleReady = regionIsCircle && regionCircleRadiusKm && regionWindowStart && regionWindowEnd;
-  const years = circleReady ? (regionWindowEnd - regionWindowStart) / (365.25*24*3600*1000) : null;
-  const areaKm2 = circleReady ? Math.PI * regionCircleRadiusKm * regionCircleRadiusKm : null;
+  // İP-2 (2026-11-23): Oran/Yoğunluk artık her geometride (daire, dikdörtgen, poligon, MultiPolygon). A = regionAreaKm2()
+  // (WGS84, üyelik bölgesi); T tanımı değişmedi. Normalizasyon yalnız y-eksenini 1/T veya 1/(T·A) ile ölçekler —
+  // b, Mc, fit ve ham a hesabı aynı kalır (aşağıdaki aFit/bFit değişmez).
+  const tReady = !!(regionRect && regionWindowStart && regionWindowEnd);
+  const years = tReady ? (regionWindowEnd - regionWindowStart) / (365.25*24*3600*1000) : null;
+  const areaKm2 = tReady && grNormMode === 'density' ? regionAreaKm2() : null;
   let effMode = grNormMode, modeFallback = false;
-  if (effMode !== 'raw' && !(circleReady && years > 0)) { effMode = 'raw'; modeFallback = true; }
+  if (effMode !== 'raw' && !(years > 0 && (effMode === 'rate' || areaKm2 > 0))) { effMode = 'raw'; modeFallback = true; }
   const normFactor = effMode === 'raw' ? 1 : effMode === 'rate' ? years : (years * areaKm2 / 1e6);
   window.lastGrNorm = { mode: effMode, years, area: areaKm2, t0: regionWindowStart, t1: regionWindowEnd };
   const dispCum    = p => p.cum    / normFactor;
@@ -4307,8 +4365,14 @@ function renderGutenbergRichter(evList, Mc) {
                 `<text x="${(xLabel+4).toFixed(1)}" y="${(yLabel-4).toFixed(1)}" fill="#f5a623" font-size="12" font-weight="700">b = ${bFit.toFixed(2)}${bErr !== null ? bCiTxt(lastGrSimple) : ''}</text>`;
       // 2026-10-27: a, seçilen gösterim moduna göre (grafikteki doğrunun kesişimi) ve tanımıyla yazılır; aFit (ham) hesabı değişmedi
       const aShow = effMode === 'rate' ? aFit - Math.log10(years) : effMode === 'density' ? aFit - Math.log10(years * areaKm2 / 1e6) : aFit;
-      const aDef = effMode === 'rate' ? 'log₁₀(N/T) = a − bM' : effMode === 'density' ? 'log₁₀(N/T·A) = a − bM; A: 10⁶ km²' : 'log₁₀N = a − bM; N: dönem toplamı';
-      fitStatsStr = ` &nbsp;|&nbsp; N≥Mc=<b>${nAboveMc}</b> · a=<b>${aShow.toFixed(2)}</b> <span style="color:#888">(${aDef})</span> · b_GR=<b>${bFit.toFixed(2)}</b>${bErr !== null ? bCiTxt(lastGrSimple) + ` <span style="color:#888">(%95, ${lastGrSimple.ciM === 'normal' ? 'Aki 1965' : lastGrSimple.ciM === 'tm' ? 'Tinti &amp; Mulargia 1987' : 'χ²₂N, Utsu 1966; ızgara dışı büyüklük'})</span>` : ''} · <span title="Aki MLE yalnızca M ≥ Mc olaylarıyla; GoF kümülatif N(≥M) ile Mc–Mmax aralığında. Mc tahmindir (maks. eğrilik +0,2): bölgeye, zaman aralığına ve yönteme bağlıdır.">uyum M ${Mc}–${mMax}</span> · <span title="Wiemer &amp; Wyss (2000) goodness-of-fit measure (not R²)">GoF=<b>${gofR !== null ? gofR.toFixed(1)+'%' : '—'}</b></span>`;
+      const aDef = effMode === 'rate' ? 'log₁₀(N/T) = a<sub>T</sub> − bM' : effMode === 'density' ? 'log₁₀(N/T·A) = a<sub>T·A</sub> − bM; A: 10⁶ km²' : 'log₁₀N = a − bM; N: dönem toplamı';
+      // İP-2: ham a ile normalize a ayrı etiketlenir — "a" tek başına yalnız ham değerdir
+      const aLab = effMode === 'rate' ? 'a<sub>T</sub>' : effMode === 'density' ? 'a<sub>T·A</sub>' : 'a (ham)';
+      const aRawTxt = effMode !== 'raw' ? ` <span style="color:#888">[a (ham) = ${aFit.toFixed(2)}]</span>` : '';
+      let dTxt = '';
+      if (effMode === 'density') { const ci = poissonGarwood(nAboveMc), f6 = 1e6 / (years * areaKm2);
+        dTxt = ` · D = N(≥Mc)/(T·A) = <b>${(nAboveMc * f6).toFixed(2)}</b> /10⁶km²/yıl <span style="color:#888" title="${POIS_CI_AD}: Garwood (1936) kesin Poisson aralığı. Artçı kümelenmesi ve zamansal bağımlılık bu aralıkta yoktur; tüm belirsizlikleri kapsamaz.">[${(ci[0] * f6).toFixed(2)}–${(ci[1] * f6).toFixed(2)}; ${POIS_CI_AD}]</span>${nAboveMc < 20 ? ' <span style="color:#f59e0b">küçük örneklem</span>' : ''}`; }
+      fitStatsStr = ` &nbsp;|&nbsp; N≥Mc=<b>${nAboveMc}</b> · ${aLab}=<b>${aShow.toFixed(2)}</b> <span style="color:#888">(${aDef})</span>${aRawTxt}${dTxt} · b_GR=<b>${bFit.toFixed(2)}</b>${bErr !== null ? bCiTxt(lastGrSimple) + ` <span style="color:#888">(%95, ${lastGrSimple.ciM === 'normal' ? 'Aki 1965' : lastGrSimple.ciM === 'tm' ? 'Tinti &amp; Mulargia 1987' : 'χ²₂N, Utsu 1966; ızgara dışı büyüklük'})</span>` : ''} · <span title="Aki MLE yalnızca M ≥ Mc olaylarıyla; GoF kümülatif N(≥M) ile Mc–Mmax aralığında. Mc tahmindir (maks. eğrilik +0,2): bölgeye, zaman aralığına ve yönteme bağlıdır.">uyum M ${Mc}–${mMax}</span> · <span title="Wiemer &amp; Wyss (2000) goodness-of-fit measure (not R²)">GoF=<b>${gofR !== null ? gofR.toFixed(1)+'%' : '—'}</b></span>`;
     } else {
       fitStatsStr = ` &nbsp;|&nbsp; GR fit: yetersiz veri (N≥Mc=${fmtM(Mc)}: ${nAboveMc} &lt; 10)`;
     }
@@ -4347,12 +4411,12 @@ function renderGutenbergRichter(evList, Mc) {
 
   const mcStr = Mc !== null ? ` · Mc=${fmtM(Mc)}${tmMcScale && tmMcScale.mapped ? ` (kaynak ölçeğinde ${fmtM(tmMcScale.mcSrc)}, ΔM=${tmMagDM.toFixed(3)})` : ''}` : '';
   const modeLabel = effMode === 'rate' ? `Oran (N/T, λ) · T=${years.toFixed(1)}yıl`
-                   : effMode === 'density' ? `Yoğunluk (N/(T·A)) · T=${years.toFixed(1)}yıl, A=${Math.round(areaKm2).toLocaleString('tr-TR')}km²`
+                   : effMode === 'density' ? `Yoğunluk (N/(T·A)) · T=${years.toFixed(1)}yıl, A=${Math.round(areaKm2).toLocaleString('tr-TR')}km² (${AREA_METHOD_AD[AREA_METHOD]})`
                    : null;
   const modeStr = modeLabel
     ? ` &nbsp;|&nbsp; <span style="color:#a855f7">Mod: ${modeLabel}</span>`
     : modeFallback
-    ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">⚠ Oran/Yoğunluk yalnızca Circle bölge modunda hesaplanır — Ham gösteriliyor</span>`
+    ? ` &nbsp;|&nbsp; <span style="color:#f59e0b">⚠ Oran/Yoğunluk için bir bölge sorgusu ve gözlem süresi gerekir${grNormMode === 'density' && !areaGeod() ? ' (alan kütüphanesi yüklenemedi)' : ''} — Ham gösteriliyor</span>`
     : '';
   // Poisson aşılma olasılığı (2026-10-27): tek Mc, kesilmesiz G–R; T = sorgu penceresi (yoksa ilk–son olay), Bölge karşılaştırmasıyla aynı kural
   let poisHtml = '';
@@ -5244,7 +5308,7 @@ async function exportPosterAGU(scale, evt) {
   const GN = window.lastGrNorm, gnD = v => v ? new Date(v).toISOString().slice(0, 10) : '?';
   const grNormTxt = !GN || GN.mode === 'raw' ? '' : GN.mode === 'rate'
     ? L(` Dikey eksen: yıllık oran N/T; T = ${DC(GN.years.toFixed(1))} yıl (gözlem süresi ${gnD(GN.t0)} – ${gnD(GN.t1)}).`, ` Vertical axis: annual rate N/T; T = ${GN.years.toFixed(1)} yr (observation period ${gnD(GN.t0)} – ${gnD(GN.t1)}).`)
-    : L(` Dikey eksen: N/(T·A) (10⁶ km² ve yıl başına); T = ${DC(GN.years.toFixed(1))} yıl, A = ${Math.round(GN.area).toLocaleString(NF)} km².`, ` Vertical axis: N/(T·A) per 10⁶ km² per year; T = ${GN.years.toFixed(1)} yr, A = ${Math.round(GN.area).toLocaleString(NF)} km².`);
+    : L(` Dikey eksen: N/(T·A) (10⁶ km² ve yıl başına); T = ${DC(GN.years.toFixed(1))} yıl, A = ${Math.round(GN.area).toLocaleString(NF)} km² (WGS84 elipsoidi, Karney 2013; üyelik bölgesinin alanı).`, ` Vertical axis: N/(T·A) per 10⁶ km² per year; T = ${GN.years.toFixed(1)} yr, A = ${Math.round(GN.area).toLocaleString(NF)} km² (WGS84 ellipsoid, Karney 2013; area of the membership region).`);
   if (!cs && GN && GN.mode === 'raw' && regionIsCircle) PW.push(L('G–R ham sayılarla çizildi; yayın için G–R panelinde "Oran" (N/T) seçmeyi düşünün.', 'G–R plotted as raw counts; consider selecting "Rate" (N/T) in the G–R panel for publication.'));
   const cmpCapTxt = !CMP_ON ? '' : (() => { const S2 = CMP.map(cmpStats), uL = S2[0].unit === 'deg' ? L('yıl ve kare derece başına', 'per year per square degree') : S2[0].unit === '1e4' ? L('yıl ve 10⁴ km² başına', 'per year per 10⁴ km²') : L('yıllık', 'per year');
     const per = CMP.map((r, k) => { const s2 = S2[k]; return `{${CMP_COL[k]}|${r.name.replace(/[{}|*]/g, '')}}: ` + (s2.b ? `b = ${DC(s2.b.toFixed(2))}${B_CI_METHOD === 'normal' ? ' ± ' + DC(s2.sb.toFixed(2)) : bCiTxt({ b: s2.b, ...s2.ci }, DC)}, a = ${DC(s2.a.toFixed(2))}` : 'b —') + `, Mc = ${DC(fmtM(r.Mc))}, N(≥Mc) = ${s2.n}${s2.small ? ' ⚠' : ''}, T = ${DC(s2.T.toFixed(1))} ${L('yıl', 'yr')}${r.area ? `, A = ${Math.round(r.area).toLocaleString(NF)} km²` : ''}`; }).join('; ');
@@ -9230,9 +9294,8 @@ function onRegionDeclusterCtxChange() {
 // ile AYNI formülle bir "Aktivite Yoğunluğu" (N(M≥Mc) yıllık oranı / alan × 10⁶)
 // satırı eklenir — o makalenin Figure 6 eğrileri alan-normalize DEĞİLDİR (y-ekseni
 // düz "Annual frequency"), alan normalizasyonu sadece Table 1'in "Density (per
-// 10^6 km²)" sütununda ayrıca yapılmıştır. Şu an yalnızca Circle modunda
-// çağrılır çünkü alan (π·R²) orada kesin/basit; poligon için jeodezik alan
-// hesabı henüz yok, o yüzden areaKm2 poligon modunda hiç geçirilmez.
+// 10^6 km²)" sütununda ayrıca yapılmıştır. İP-2 (2026-11-23): artık her geometride
+// çağrılır; alan regionAreaKm2() (WGS84, üyelik bölgesi).
 function computeRegionStatsLine(evs, orderby, capped, areaKm2) {
   if (orderby === 'magnitude') {
     return `Mc/b: hesaplanmadı — "En büyük" sıralamasında örneklem yanlı (Mc'yi elle girmek bunu düzeltmez; "En yeni" sıralamasına geçin)`;
@@ -9263,7 +9326,8 @@ function computeRegionStatsLine(evs, orderby, capped, areaKm2) {
     if (years > 0) {
       const annualRate = nAbove / years;
       const density = annualRate / areaKm2 * 1e6; // Pappin ve ark. (2015) Table 1 ile aynı formül
-      line += ` · Aktivite Yoğunluğu = <b>${density.toFixed(2)}</b>/10⁶km²/yıl`;
+      const ci = poissonGarwood(nAbove), f6 = 1e6 / (years * areaKm2);   // İP-2: Garwood (1936)
+      line += ` · Aktivite Yoğunluğu = <b>${density.toFixed(2)}</b>/10⁶km²/yıl <span style="color:#888" title="${POIS_CI_AD}; artçı kümelenmesi ve zamansal bağımlılık dahil değildir">[${(ci[0] * f6).toFixed(2)}–${(ci[1] * f6).toFixed(2)}, ${POIS_CI_AD}]</span> · A = ${Math.round(areaKm2).toLocaleString('tr-TR')} km² <span style="color:#888">(${AREA_METHOD_AD[AREA_METHOD]})</span>`;
     }
   }
   if (capped) line += ` <span style="color:#f59e0b">⚠ limite takıldı, Mc/b düşük olabilir</span>`;
@@ -9365,8 +9429,8 @@ function renderRegionInfo() {
     }
     line += `</span>`;
   }
-  const circleAreaKm2 = (regionIsCircle && regionCircleRadiusKm) ? Math.PI * regionCircleRadiusKm * regionCircleRadiusKm : null;
-  line += `<br>${computeRegionStatsLine(statsEvs, regionOrderUsed, regionCapped, circleAreaKm2)}`;
+  const regAreaKm2 = regionRect ? regionAreaKm2() : null;   // İP-2: her geometri, WGS84 (üyelik bölgesi)
+  line += `<br>${computeRegionStatsLine(statsEvs, regionOrderUsed, regionCapped, regAreaKm2)}`;
   info.innerHTML = line;
   syncDeclusterBtn();
 }
@@ -10491,14 +10555,15 @@ function drawLitRegionCircle() {
   info.style.display = 'block';
   // Mekânsal Araştırma Penceresi (Spatial Research Window) — yalnız görünüm: ① Alan · ② Zemin (VS30) · ③ Katalog.
   // Alan = πR² (G–R Yoğunluk moduyla aynı tanım). Hesaplar ve sorgu mantığı değişmez.
-  const areaKm2 = Math.round(Math.PI * radiusKm * radiusKm).toLocaleString('tr-TR');
+  const aW = areaKm2({ type: 'Circle', lat, lon, rKm: radiusKm });   // İP-2: haversine bölgesinin WGS84 alanı
+  const areaTxt = aW ? `${Math.round(aW).toLocaleString('tr-TR')} km²</b> <span style="color:#888">(WGS84; haversine üyelik bölgesi · πR² = ${Math.round(Math.PI * radiusKm * radiusKm).toLocaleString('tr-TR')})</span>` : `${Math.round(Math.PI * radiusKm * radiusKm).toLocaleString('tr-TR')} km²</b> <span style="color:#888">(πR²; WGS84 kütüphanesi yüklenemedi)</span>`;
   const secHd = (n, t) => `<div style="font-weight:700;color:#e5e7eb;margin-bottom:2px"><span style="display:inline-block;min-width:15px;height:15px;border-radius:50%;background:#a855f7;color:#fff;text-align:center;font-size:.62rem;line-height:15px;margin-right:5px">${n}</span>${t}</div>`;
   const secSt = 'border-top:1px solid #333;margin-top:6px;padding-top:6px';
   info.innerHTML =
     `<b style="color:#a855f7">📍 Mekânsal Araştırma Penceresi</b> <span style="color:#888">(Spatial Research Window) · geometri: daire</span>` +
     `<div style="${secSt}">` + secHd(1, 'Araştırma Alanı') +
       `Merkez: ${lat.toFixed(4)}, ${lon.toFixed(4)} · <b>R = ${radiusKm} km</b>` +
-      `<br>Alan: <b>${areaKm2} km²</b> <span style="color:#888">(πR²)</span>` +
+      `<br>Alan: <b>${areaTxt}` +
       `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
       `<br><span style="color:#888">distance(event, center) ≤ ${radiusKm}km — bu YALNIZCA araştırma alanı sorgusudur, bir kaynak zonu tanımı DEĞİLDİR.</span></div>` +
     `<div id="litSecVs30" style="${secSt}">` + secHd(2, '🧱 Zemin Özellikleri (VS30, yaklaşık)') + `</div>` +
@@ -12747,7 +12812,7 @@ async function vs30CircleSummary(lat, lon, rKm, box) {
     }
     box.innerHTML =
       '<div style="margin-top:2px">' +
-      '<div>Hesaba katılan kara alanı: <b>~' + Math.round(circKm2 * covered * wLand / (wLand + wWater)).toLocaleString('tr-TR') + ' km²</b> <span style="color:#888">(dairenin %' + (100 * covered * wLand / (wLand + wWater)).toFixed(0) + '’i)</span></div>' +
+      '<div>Hesaba katılan kara alanı: <b>~' + Math.round(circKm2 * covered * wLand / (wLand + wWater)).toLocaleString('tr-TR') + ' km²</b> <span style="color:#888" title="VS30 bölümü kendi ~0,9 km ızgarası ve πR² ile çalışır (dondurulmuş yöntem); ① Alan satırındaki WGS84 değerinden %0,1–0,3 farklı olabilir.">(dairenin %' + (100 * covered * wLand / (wLand + wWater)).toFixed(0) + '’i; VS30 ızgara tahmini)</span></div>' +
       '<div>Merkez nokta: <b>' + cTxt + '</b></div>' +
       '<div>Medyan VS30: <b>' + q(0.5) + ' m/s</b> <span style="color:#888">(%10–%90: ' + q(0.1) + '–' + q(0.9) + ' · alan ağırlıklı ortalama ' + Math.round(sum / wLand) + ')</span></div>' +
       '<div>En düşük–en yüksek: ' + vals[0][0] + '–' + vals[vals.length - 1][0] + ' m/s</div>' +
