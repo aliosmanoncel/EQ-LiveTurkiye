@@ -546,6 +546,20 @@
       <select id="korLabel" class="src-sel" onchange="korOnLabelChange()" title="MTA 2026 katmanında ana/tali ayrımı bulunmaz; etiket araştırmacı tarafından atanır ve D5 kaydına yazılır.">
         <option value="ana">Ana fay zonu</option><option value="tali">Tali fay zonu</option><option value="artci">Artçı kümesi ekseni (sismisiteden çizim)</option><option value="diger">Diğer</option>
       </select></div>
+    <div style="border:1px solid #333;border-radius:6px;padding:4px 6px;margin:3px 0">
+      <div class="rowbox" title="Kinematik sınıflama (USGS fokal mekanizma terminolojisi). Kayıt içindir; k katsayısı ve W mekanizmaya OTOMATİK bağlanmaz."><label>Faylanma mekanizması</label>
+        <select id="korMech" class="src-sel" onchange="korOnMechChange()">
+          <option value="">Belirtilmedi</option><option value="normal">Normal fay (Normal) — açılma</option><option value="ters">Ters fay (Reverse) — sıkışma</option><option value="bindirme">Bindirme fayı (Thrust) — düşük eğimli ters</option>
+          <option value="sag">Sağ yanal doğrultu atımlı (Right-lateral strike-slip)</option><option value="sol">Sol yanal doğrultu atımlı (Left-lateral strike-slip)</option><option value="egik">Eğik atımlı (Oblique-slip)</option>
+        </select></div>
+      <div class="rowbox"><label>Kaynak · güvenilirlik</label>
+        <select id="korMechSrc" class="src-sel" style="width:auto" onchange="korOnMechChange()"><option value="mta">MTA (kayma_turu)</option><option value="fokal">Fokal mekanizma</option><option value="literatur">Literatür</option><option value="arastirmaci">Araştırmacı yorumu</option></select>
+        <select id="korMechConf" class="src-sel" style="width:auto"><option value="">—</option><option value="yüksek">Yüksek</option><option value="orta">Orta</option><option value="düşük">Düşük</option></select></div>
+      <div class="rowbox"><label>Atıf / not</label><input type="text" id="korMechRef" placeholder="ör. GCMT kimliği, makale" style="width:170px"></div>
+      <label id="korMechNPRow" style="display:none;align-items:center;gap:6px;cursor:pointer" title="Fokal mekanizmada iki olası fay düzlemi (nodal plane) vardır; gerçek kırılma düzlemi bağımsız jeolojik/sismolojik kanıtla belirlenmelidir."><input type="checkbox" id="korMechNP"> Fay düzlemi bağımsız kanıtla seçildi</label>
+      <button class="tbtn" onclick="korMechFromMta()" style="width:auto;padding:3px 8px;font-size:.7rem" title="İzin yapıştığı MTA parçalarının kayma_turu kodlarından öneri: N → normal, T → ters (MTA kodu ters/bindirme ayrımı yapmaz), SaD → sağ yanal, SoD → sol yanal, bileşik (A+B) → eğik atımlı. AÇ kodu eşlenmez.">MTA'dan öner</button>
+      <div style="color:#888;line-height:1.4;margin-top:2px">Mekanizma k ve W'yi değiştirmez. Ampirik kırılma genişliği (ör. Wells &amp; Coppersmith 1994) yeraltındaki kırılma boyutudur; haritadaki araştırma koridoru W ile aynı büyüklük değildir.</div>
+    </div>
     <div style="display:flex;gap:4px;flex-wrap:wrap;margin:3px 0">
       <button class="tbtn" id="btnKorStart" onclick="korTraceStart()" style="width:auto;background:#3b0764;border-color:#a855f7">✏️ İzi Çizmeye Başla</button>
       <span id="korDrawCtrl" style="display:none;gap:4px">
@@ -575,6 +589,7 @@
     <div style="display:flex;gap:4px;flex-wrap:wrap;margin:3px 0">
       <button class="tbtn" id="btnKorBuild" onclick="korBuild()" style="width:auto;background:#3b0764;border-color:#a855f7" disabled>⚙ Poligonu Oluştur</button>
       <button class="tbtn" id="btnKorEdit" onclick="korEditToggle()" style="width:auto;display:none" title="Üst/alt sınırları köşe köşe elle düzenleyin: köşeyi sürükleyin · kenar ortasındaki soluk tutamağı sürükleyerek köşe ekleyin · köşeye sağ tıklayarak silin.">✋ Sınırları Elle Düzenle</button>
+      <button class="tbtn" id="btnKorSwap" onclick="korSwapRule()" style="width:auto;display:none" title="Aynı iz, p ve uç biçimiyle diğer genişlik kuralına (sabit W ↔ orantılı W = kL) geçip poligonu yeniden oluşturur. İki zonu ayrı ayrı sorgulayıp Bölge Karşılaştırma'ya ekleyerek aynı kümeyi iki genişlik kuralıyla karşılaştırabilirsiniz.">⇄ Diğer kuralla oluştur</button>
       <button class="tbtn" id="btnKorD5Load" onclick="korD5Pick()" style="width:auto" title="Daha önce indirilen D5 kaydını (JSON) yükler: iz ve parametrelerden poligon yeniden üretilir, alan kayıtla karşılaştırılır; elle düzenlenmiş kayıtlarda son geometri kayıttan alınır.">⬆ D5 yükle</button>
       <input type="file" id="korD5File" accept=".json,application/json" style="display:none" onchange="korD5FileChosen(this)">
       <button class="tbtn" id="btnKorD5" onclick="korD5Download()" style="width:auto;display:none" title="Tekrarlanabilirlik kaydı (D5): iz koordinatları, MTA parça kimlikleri, W kuralı, uç, yöntem parametreleri, uzunluklar, alan, elle düzenleme ve son geometri (GeoJSON).">⬇ D5 kaydı (JSON)</button>
@@ -3809,7 +3824,7 @@ function regionShapeText() {
   if (!regionRect) return 'bölge yok';
   if (regionIsCircle && regionCircleCenter) return `daire ${regionCircleCenter.lat.toFixed(2)}, ${regionCircleCenter.lon.toFixed(2)}, R = ${regionCircleRadiusKm} km`;
   const B = regionRect.getBounds(), bx = `${B.getSouth().toFixed(2)}–${B.getNorth().toFixed(2)}° K, ${B.getWest().toFixed(2)}–${B.getEast().toFixed(2)}° D`;
-  const kz = regionIsPolygon && regionRect._eqKor ? (m => `fay izi zonu [${m.zon_etiketi}${m.fay_adlari.length ? ': ' + m.fay_adlari.join(', ') : ''}; W = ${(+m.genislik.W_toplam_km.toFixed(2)).toLocaleString('tr-TR')} km ${m.genislik.kip}, üst/alt ${(+m.genislik.ust_km.toFixed(2)).toLocaleString('tr-TR')}/${(+m.genislik.alt_km.toFixed(2)).toLocaleString('tr-TR')} km, uç ${m.uc}; L_birleşik = ${(+m.uzunluk.L_birlesik_km.toFixed(1)).toLocaleString('tr-TR')} km${m.elle_duzenleme.yapildi ? '; elle düzenlendi' : ''}] `)(regionRect._eqKor) : '';
+  const kz = regionIsPolygon && regionRect._eqKor ? (m => `fay izi zonu [${m.zon_etiketi}${m.fay_adlari.length ? ': ' + m.fay_adlari.join(', ') : ''}${m.mekanizma && m.mekanizma.tur ? '; ' + m.mekanizma.ad : ''}; W = ${(+m.genislik.W_toplam_km.toFixed(2)).toLocaleString('tr-TR')} km ${m.genislik.kip}, üst/alt ${(+m.genislik.ust_km.toFixed(2)).toLocaleString('tr-TR')}/${(+m.genislik.alt_km.toFixed(2)).toLocaleString('tr-TR')} km, uç ${m.uc}; L_birleşik = ${(+m.uzunluk.L_birlesik_km.toFixed(1)).toLocaleString('tr-TR')} km${m.elle_duzenleme.yapildi ? '; elle düzenlendi' : ''}] `)(regionRect._eqKor) : '';
   return regionIsPolygon ? `${kz}çokgen (${regionPolyDesc()}; ${bx})` : `dikdörtgen ${bx}`;
 }
 function cmpAdd() {
@@ -3824,7 +3839,7 @@ function cmpAdd() {
   const nm = document.getElementById('cmpName').value.trim() || (document.getElementById('posterRegion')?.value.trim()) || `Bölge ${CMP.length + 1}`;
   CMP.push({ name: nm, src: regionSourceLabel(), shape: regionShapeText(), area: regionAreaKm2(), areaMethod: AREA_METHOD, cLat, t0, t1, Mc, dm,
     mags: ev.map(e => Math.round((e.mw ?? e.mag) * 100) / 100), types, url: location.href, added: new Date().toISOString(),
-    kor: regionIsPolygon && regionRect && regionRect._eqKor ? (m => ({ etiket: m.zon_etiketi, fay: m.fay_adlari, W: m.genislik.W_toplam_km, kip: m.genislik.kip, ust: m.genislik.ust_km, alt: m.genislik.alt_km, uc: m.uc, L_toplam: m.uzunluk.L_toplam_km, L_birlesik: m.uzunluk.L_birlesik_km, elle: m.elle_duzenleme.yapildi, surum: m.surum }))(regionRect._eqKor) : undefined,
+    kor: regionIsPolygon && regionRect && regionRect._eqKor ? (m => ({ etiket: m.zon_etiketi, mekanizma: m.mekanizma ? m.mekanizma.ad : null, fay: m.fay_adlari, W: m.genislik.W_toplam_km, kip: m.genislik.kip, ust: m.genislik.ust_km, alt: m.genislik.alt_km, uc: m.uc, L_toplam: m.uzunluk.L_toplam_km, L_birlesik: m.uzunluk.L_birlesik_km, elle: m.elle_duzenleme.yapildi, surum: m.surum }))(regionRect._eqKor) : undefined,
     // 2026-11-01 (olasılık modülü): eklendiği andaki GK74 durumu ve yorum katmanı uyarıları; eski kayıtlarda yok → "bilinmiyor"
     gk74: !!(typeof regionDeclusterOn !== 'undefined' && regionDeclusterOn && regionRect),
     kat: cmpCatalogMeta(),   // 2026-11-01 (aşama 4): katalog sürümü/kimliği — yeniden üretim kaydı (eski kayıtlarda yok → "bilinmiyor")
@@ -9042,6 +9057,7 @@ let regionCapped  = false;  // son sorgu limite takıldı mı
 let regionOrderUsed = 'time';
 let regionWindowStart = null, regionWindowEnd = null;
 let regionIsPolygon = false; // true ise regionRect aslında bir L.Polygon — fetchRegionEvents ek point-in-polygon filtresi uygular
+let regionPolyCounts = null;   // son poligon sorgusu: { bbox, ic, dis } (bbox içindeki olaylar → poligon içi / dışlanan)
 let regionSource = 'emsc';   // 'emsc' | 'usgs' | 'afad' | 'hk_local' | 'hk_historical' | 'scedc' — Bölge Analizi'nin KENDİ kaynak seçimi, üstteki genel Kaynak (srcSel/src) ile bağımsız (bkz. DATA FLOW NOTE)
 // Circle bölge modu — regionIsPolygon'a PARALEL, birbirini dışlayan bir bayrak (ikisi aynı anda true olmaz).
 // USGS Earthquake Catalog'un "Geographic Region → Circle" (center lat/lon + maxradiuskm) mantığıyla
@@ -9427,6 +9443,7 @@ function regionBoundsLine() {
 function renderRegionInfo() {
   const info = document.getElementById('regionInfo');
   if (!info || !regionRect) return;
+  if (regionRect._eqKor && typeof korShowCounts === 'function') korShowCounts();
   const magMin = document.getElementById('regionMagMin').value;
   const magMax = document.getElementById('regionMagMax').value;
   const depMin = document.getElementById('regionDepMin').value;
@@ -9674,6 +9691,9 @@ async function fetchRegionEventsFromHistorical(bounds) {
     (!circleActive || pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm))
   );
 
+  regionPolyCounts = polys ? (n => ({ bbox: n, ic: evs.length, dis: n - evs.length }))(events.filter(e =>
+    e.lat >= bounds.getSouth() && e.lat <= bounds.getNorth() && e.lon >= bounds.getWest() && e.lon <= bounds.getEast() &&
+    (!magMin || (e.mw??e.mag) >= +magMin) && (!magMax || (e.mw??e.mag) <= +magMax) && (!depMin || e.dep >= +depMin) && (!depMax || e.dep <= +depMax)).length) : null;
   regionEvents = evs; // TAM küme — limit/cap yok, Mc/b tüm yüzyılı yansıtır
   if (regionLayer) map.removeLayer(regionLayer);
   regionLayer = L.layerGroup();
@@ -10094,9 +10114,12 @@ async function fetchRegionEventsLive(bounds, provider) {
     if (chunked) { evs = chunked.events; rawCount = chunked.info.nUnique; }
     else if (provider === 'usgs') { const js = await res.json(); rawCount = (js.features || []).length; evs = parseGeoJSON(js); }
     else { const tx = await res.text(); rawCount = tx.split('\n').filter(l => l.trim() && !l.startsWith('#') && l.includes('|')).length; evs = parseEMSCText(tx); }
+    regionPolyCounts = null;
     if (regionIsPolygon && regionRect) {
       const polys = regionPolys();   // İP-1: tüm parçalar ve delikler
+      const nBbox = evs.length;
       evs = evs.filter(e => pointInPolys(e.lat, e.lon, polys));
+      regionPolyCounts = { bbox: nBbox, ic: evs.length, dis: nBbox - evs.length };   // 2026-11-23: poligon içi/dışı ayrı raporlanır
     }
     if (regionIsCircle && regionCircleCenter) {
       evs = evs.filter(e => pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm));
@@ -10179,9 +10202,12 @@ async function fetchRegionEventsFromAfad(bounds) {
       (!magMin || e.mag >= +magMin) && (!magMax || e.mag <= +magMax) &&
       (!depMin || e.dep >= +depMin) && (!depMax || e.dep <= +depMax)
     );
+    regionPolyCounts = null;
     if (regionIsPolygon && regionRect) {
       const polys = regionPolys();   // İP-1: tüm parçalar ve delikler
+      const nBbox = evs.length;
       evs = evs.filter(e => pointInPolys(e.lat, e.lon, polys));
+      regionPolyCounts = { bbox: nBbox, ic: evs.length, dis: nBbox - evs.length };   // 2026-11-23: poligon içi/dışı ayrı raporlanır
     }
     if (regionIsCircle && regionCircleCenter) {
       evs = evs.filter(e => pointInCircle(e.lat, e.lon, regionCircleCenter.lat, regionCircleCenter.lon, regionCircleRadiusKm));
@@ -10842,7 +10868,7 @@ const KOR_SNAP_PX = 12;
 let korTraces = [];          // tamamlanan izler: { clicks:[{ll:[lat,lon], snap}], line:[[lat,lon]…], bridges, routed }
 let korCur = null;           // çizilmekte olan iz
 let korDrawing = false, korHandlers = null, korDrawLayer = null, korDecor = null, korMeta = null, korEdit = null;
-let korSnapIdx = null, korWModeTouched = false;
+let korSnapIdx = null, korWModeTouched = false, korAltPolys = null;
 const korGeod = () => (typeof geodesic !== 'undefined' && geodesic.Geodesic) ? geodesic.Geodesic.WGS84 : null;
 
 function korBuildSnapIndex() {
@@ -10853,7 +10879,7 @@ function korBuildSnapIndex() {
     const parts = g.type === 'MultiLineString' ? g.coordinates : g.type === 'LineString' ? [g.coordinates] : [];
     parts.forEach((c, pi) => { if (c.length < 2) return; const ll = c.map(([lo, la]) => [la, lo]);
       let S = 90, N = -90, W = 180, E = -180; ll.forEach(([a, b]) => { S = Math.min(S, a); N = Math.max(N, a); W = Math.min(W, b); E = Math.max(E, b); });
-      F.push({ fi, pi, ll, S, N, W, E, name: (f.properties || {}).fay_adi || '—', tip: (f.properties || {}).faytipi }); });
+      F.push({ fi, pi, ll, S, N, W, E, name: (f.properties || {}).fay_adi || '—', tip: (f.properties || {}).faytipi, kayma: (f.properties || {}).kayma_turu || null }); });
   });
   korSnapIdx = { F, byKey: null };
   return korSnapIdx;
@@ -10994,7 +11020,7 @@ function korClearPolygon() {
     const r = document.getElementById('litRegionOnlyThisRow'); if (r) r.style.display = 'none';
     if (typeof vs30ClearCircleExtras === 'function') vs30ClearCircleExtras(); }
   korMeta = null;
-  ['btnKorEdit', 'btnKorD5'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; });
+  ['btnKorEdit', 'btnKorD5', 'btnKorSwap'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; });
 }
 function korReset(silent) {
   if (korDrawing) korTraceStop();
@@ -11032,14 +11058,55 @@ function korUpdateLenInfo() {
     (Math.abs(Lsum - Luni) > 1e-6 ? ' <span style="color:#888">(yinelenen kenarlar bir kez)</span>' : '') +
     `<br>kL önerisi: ${sug ? `${prm.k} × ${f1(Luni)} = ${f1(sug.raw)} km${sug.clamped ? ` → sınır ${sug.clamped === 'min' ? 'W_min' : 'W_max'} = ${f1(sug.W)} km` : ''}` : '—'} <span style="color:#888">(L<sub>birleşik</sub> ile)</span>` +
     (w.err ? `<br><span style="color:#f59e0b">${w.err}</span>` : `<br>Kullanılacak toplam W = <b>${f1(w.W)} km</b> (${prm.mode === 'oranli' ? 'orantılı' : 'sabit'}) → üst ${f1(w.W * prm.p)} km · alt ${f1(w.W * (1 - prm.p))} km`) +
+    (c => Object.keys(c).length ? `<br><span style="color:#888">MTA kayma_turu (yapışan tıklar): ${Object.entries(c).map(([k, n]) => k + ' ×' + n).join(', ')}</span>` : '')(korMtaSlipSummary()) +
     (bridges ? `<br><span style="color:#f59e0b">${bridges} düz köprü: bağlantısız MTA parçaları arasında iz düz çizgiyle sürdürüldü (L'ye dahil).</span>` : '');
   const ws = [];
-  if (prm.mode === 'oranli') ws.push('Orantılı W = kL: yoğunluk D = N/(T·A) ≈ N/(T·k·L²) olur; farklı uzunluktaki fay zonlarının yoğunlukları karşılaştırılamaz. Fay karşılaştırmalarında sabit W kullanın. k fiziksel bir sabit değildir, araştırmacı seçimidir.');
+  if (prm.mode === 'oranli') ws.push('Orantılı W = kL: yoğunluk D = N/(T·A) ≈ N/(T·k·L²) olur; farklı uzunluktaki fay zonlarının yoğunlukları karşılaştırılamaz. Fay karşılaştırmalarında sabit W kullanın. k fiziksel bir sabit değildir, araştırmacı seçimidir. Orantılı W iz boyunca SABİT bir genişliktir (uzunluğa bağlı); kesim bazlı değişken W değildir.');
   if (!w.err) { const side = Math.min(...[w.W * prm.p, w.W * (1 - prm.p)].filter(v => v > 0)); if (side < 5) ws.push(`Dar yan ${f1(side)} km: bölgesel katalogların episantr konum belirsizliği (tipik birkaç–10 km) mertebesinde; sayımlar konum hatasına duyarlı olabilir.`); }
   if (!(prm.p >= 0 && prm.p <= 1)) ws.push('Üst pay p %0–100 arasında olmalı.');
   warn.style.display = ws.length ? 'block' : 'none'; warn.innerHTML = ws.join('<br>');
 }
 function korSecHd(n, t) { return `<div style="font-weight:700;color:#e5e7eb;margin-bottom:2px"><span style="display:inline-block;min-width:15px;height:15px;border-radius:50%;background:#f97316;color:#fff;text-align:center;font-size:.62rem;line-height:15px;margin-right:5px">${n}</span>${t}</div>`; }
+// Faylanma mekanizması (2026-11-23 kararı): arayüzde ve D5'te kayıt; k katsayısı mekanizmaya OTOMATİK bağlanmaz.
+const KOR_MECH = {
+  normal: ['Normal fay', 'Normal fault', 'Açılma (düşey bileşen, tavan bloğu aşağı)'],
+  ters: ['Ters fay', 'Reverse fault', 'Sıkışma (tavan bloğu yukarı)'],
+  bindirme: ['Bindirme fayı', 'Thrust fault', 'Düşük eğimli ters fay'],
+  sag: ['Sağ yanal doğrultu atımlı', 'Right-lateral strike-slip', 'Yatay kayma'],
+  sol: ['Sol yanal doğrultu atımlı', 'Left-lateral strike-slip', 'Yatay kayma'],
+  egik: ['Eğik atımlı', 'Oblique-slip', 'Yatay ve düşey bileşen']
+};
+const KOR_MECH_SRC = { mta: 'MTA TDFH-2026 kayma_turu', fokal: 'Fokal mekanizma', literatur: 'Literatür', arastirmaci: 'Araştırmacı yorumu' };
+// MTA kayma_turu kodları → mekanizma (T: ters; MTA kodu ters/bindirme ayrımı yapmaz. Bileşik kod (A+B) → eğik atımlı. AÇ: kaynakta doğrulanmadığı için eşlenmez)
+const KOR_MTA_KOD = { N: 'normal', T: 'ters', SaD: 'sag', SoD: 'sol' };
+function korMtaMech(kod) { if (!kod) return null; if (kod.includes('+')) return 'egik'; return KOR_MTA_KOD[kod] || null; }
+function korMtaSlipSummary() {
+  const idx = korSnapIdx, c = {}; if (!idx) return c;
+  korTraces.forEach(t => t.clicks.forEach(k => { if (k.snap) { const v = idx.F[k.snap.k].kayma || 'yok'; c[v] = (c[v] || 0) + 1; } }));
+  if (korCur) korCur.clicks.forEach(k => { if (k.snap) { const v = idx.F[k.snap.k].kayma || 'yok'; c[v] = (c[v] || 0) + 1; } });
+  return c;
+}
+function korMechFromMta() {
+  const c = korMtaSlipSummary(), top = Object.entries(c).filter(([k]) => k !== 'yok').sort((a, b) => b[1] - a[1])[0];
+  if (!top) { setStatus('İzin yapıştığı MTA parçalarında kayma türü bilgisi yok', true); return; }
+  const m = korMtaMech(top[0]); if (!m) { setStatus(`MTA kayma türü "${top[0]}" bir mekanizmaya eşlenmedi; elle seçin`, true); return; }
+  document.getElementById('korMech').value = m; document.getElementById('korMechSrc').value = 'mta';
+  document.getElementById('korMechRef').value = `MTA kayma_turu: ${Object.entries(c).map(([k, n]) => k + ' ×' + n).join(', ')}`;
+  korOnMechChange();
+}
+function korOnMechChange() {
+  const src = document.getElementById('korMechSrc').value, np = document.getElementById('korMechNPRow');
+  if (np) np.style.display = src === 'fokal' ? 'flex' : 'none';
+}
+function korMechMeta() {
+  const v = document.getElementById('korMech').value, src = document.getElementById('korMechSrc').value;
+  return { tur: v || null, ad: v ? KOR_MECH[v][0] : 'Belirtilmedi', ad_en: v ? KOR_MECH[v][1] : null, kinematik: v ? KOR_MECH[v][2] : null,
+    kaynak: v ? KOR_MECH_SRC[src] : null, guvenilirlik: v ? (document.getElementById('korMechConf').value || null) : null,
+    atif: (document.getElementById('korMechRef').value || '').trim() || null,
+    nodal_duzlem_bagimsiz_kanitla_secildi: v && src === 'fokal' ? document.getElementById('korMechNP').checked : null,
+    mta_kayma_turu_ozeti: korMtaSlipSummary(),
+    not: 'Mekanizma k katsayısını ve W\'yi DEĞİŞTİRMEZ (karar 2026-11-23). Ampirik kırılma boyutu ilişkileri (ör. Wells & Coppersmith 1994) yeraltı kırılma genişliğini verir; harita araştırma koridoru W ile aynı fiziksel büyüklük değildir.' };
+}
 const KOR_LABEL_AD = { ana: 'Ana fay zonu', tali: 'Tali fay zonu', artci: 'Artçı kümesi ekseni', diger: 'Diğer' };
 function korBuild(opts) {
   opts = opts || {};
@@ -11057,14 +11124,15 @@ function korBuild(opts) {
   litRegionLayer = L.polygon(LL.length === 1 ? LL[0] : LL, { color: '#f97316', weight: 2, fillColor: '#f97316', fillOpacity: .12, dashArray: '3' }).addTo(map);
   litRegionLayer._eqUserPoly = true;
   const idx = korSnapIdx, segs = new Map();
-  korTraces.forEach(t => t.clicks.forEach(c => { if (c.snap) { const P = idx.F[c.snap.k]; segs.set(c.snap.k, { mta_ozellik: P.fi, parca: P.pi, fay_adi: P.name, faytipi: P.tip }); } }));
+  korTraces.forEach(t => t.clicks.forEach(c => { if (c.snap) { const P = idx.F[c.snap.k]; segs.set(c.snap.k, { mta_ozellik: P.fi, parca: P.pi, fay_adi: P.name, faytipi: P.tip, kayma_turu: P.kayma }); } }));
   const label = document.getElementById('korLabel').value, snapped = korTraces.some(t => t.clicks.some(c => c.snap));
   korMeta = {
     ozellik: 'Fay İzinden Sismik Araştırma Poligonu (Fault-Trace-Based Zonation)', surum: KOR_VERSION, olusturma: new Date().toISOString(),
-    zon_etiketi: KOR_LABEL_AD[label], zon_kodu: label, etiket_notu: 'MTA 2026 katmanında ana/tali alanı yoktur; etiket araştırmacı tarafından atanmıştır.',
+    zon_etiketi: KOR_LABEL_AD[label], zon_kodu: label, mekanizma: korMechMeta(), etiket_notu: 'MTA 2026 katmanında ana/tali alanı yoktur; etiket araştırmacı tarafından atanmıştır.',
     kaynak: snapped ? { tur: 'MTA TDFH-2026 diri fay izi', dosya: FAY_URL, yapisma_px: KOR_SNAP_PX } : { tur: 'araştırmacı çizimli eksen', not: 'Eksen haritalanmış bir fay DEĞİLDİR (ör. artçı kümesinden çizim).' },
     fay_adlari: [...new Set([...segs.values()].map(s => s.fay_adi))], mta_parcalari: [...segs.values()],
-    izler: korTraces.map((t, i) => ({ kesim_no: i + 1, tiklar: t.clicks.map(c => ({ lat: +c.ll[0].toFixed(8), lon: +c.ll[1].toFixed(8), yapisti: !!c.snap, mta: c.snap ? { ozellik: idx.F[c.snap.k].fi, parca: idx.F[c.snap.k].pi, si: c.snap.si, t: +c.snap.t.toFixed(8) } : null })), iz: t.line.map(p => [+p[0].toFixed(8), +p[1].toFixed(8)]), duz_kopru: t.bridges, fay_izi_takibi: t.routed })),
+    izler: korTraces.map((t, i) => ({ kesim_no: i + 1, tiklar: t.clicks.map(c => ({ lat: +c.ll[0].toFixed(8), lon: +c.ll[1].toFixed(8), yapisti: !!c.snap, mta: c.snap ? { ozellik: idx.F[c.snap.k].fi, parca: idx.F[c.snap.k].pi, si: c.snap.si, t: +c.snap.t.toFixed(8) } : null })), baslangic: { lat: +t.line[0][0].toFixed(8), lon: +t.line[0][1].toFixed(8) }, bitis: { lat: +t.line[t.line.length - 1][0].toFixed(8), lon: +t.line[t.line.length - 1][1].toFixed(8) },
+      iz: t.line.map(p => [+p[0].toFixed(8), +p[1].toFixed(8)]), duz_kopru: t.bridges, fay_izi_takibi: t.routed })),
     // Değişken W (kesim bazlı) için ayrılmış alan: v1'de tüm kesimler aynı W ve p ile üretilir (kullanıcı kararı 2026-11-23: ileride eklenebilir)
     kesimler: korTraces.map((t, i) => ({ kesim_no: i + 1, W_toplam_km: w.W, ust_pay_p: prm.p, not: 'v1: genel W' })),
     genislik: { kip: prm.mode, W_toplam_km: w.W, W_kL_ham_km: w.raw, sinir: w.clamped, k: prm.mode === 'oranli' ? prm.k : null, W_min_km: prm.mode === 'oranli' ? prm.Wmin : null, W_max_km: prm.mode === 'oranli' ? prm.Wmax : null,
@@ -11078,13 +11146,26 @@ function korBuild(opts) {
     alan: null, alan_yontemi: AREA_METHOD, elle_duzenleme: { yapildi: false },
     ifade: 'Bu özellik araştırma penceresi oluşturur; fayın fiziksel kırılma genişliğini veya sismojenik zon sınırını belirlemez.'
   };
+  // Diğer genişlik kuralıyla karşılaştırma (aynı iz): sabit kipte kL önerisi, orantılı kipte sabit W alanı
+  try {
+    const altW = prm.mode === 'oranli' ? (prm.W > 0 ? { W: prm.W, kural: 'sabit' } : null)
+      : (prm.k > 0 && prm.Wmin > 0 && prm.Wmax >= prm.Wmin ? { W: korWidth({ mode: 'oranli', k: prm.k, Wmin: prm.Wmin, Wmax: prm.Wmax }, Luni).W, kural: 'oranli' } : null);
+    if (altW && Math.abs(altW.W - w.W) > 1e-9) {
+      const ra = korZone(lines, { W: altW.W, p: prm.p, cap: prm.cap }, polygonClipping, geod);
+      const Aa = ra ? areaKm2({ type: 'MultiPolygon', polys: ra.polys }) : null;
+      korMeta.karsilastirma = { kural: altW.kural, W_toplam_km: +altW.W.toFixed(4), alan_km2: Aa != null ? +Aa.toFixed(3) : null,
+        not: 'Aynı iz, p ve uç biçimiyle diğer genişlik kuralı. Olay sayısı, alternatif zon mevcut zonun içindeyse (daha dar W) aynı sorgudan sayılır; daha genişse "⇄" ile ayrı sorgu gerekir.' };
+      korAltPolys = ra ? ra.polys.map(rs => rs.map(r => r.map(([a, b]) => ({ lat: a, lng: b })))) : null;
+    } else { korMeta.karsilastirma = null; korAltPolys = null; }
+  } catch (e) { korMeta.karsilastirma = null; korAltPolys = null; }
+  korMeta.sorgular = [];
   litRegionLayer._eqKor = korMeta;
   korDecor = L.layerGroup().addTo(map);
   if (r.labels) [['Üst', r.labels.ust, r.WU], ['Alt', r.labels.alt, r.WA]].forEach(([t, p, d]) => { if (d > 0) L.marker(p, { interactive: false, icon: L.divIcon({ className: '', html: `<span style="background:rgba(17,17,17,.85);color:#fdba74;border:1px solid #f97316;border-radius:4px;padding:1px 4px;font-size:10px;white-space:nowrap">${t} ${(+d.toFixed(2)).toLocaleString('tr-TR')} km</span>`, iconAnchor: [20, 8] }) }).addTo(korDecor); });
   map.fitBounds(litRegionLayer.getBounds(), { padding: [40, 40] });
   ['btnLitRegionClear', 'btnLitRegionQuery'].forEach(id => document.getElementById(id).style.display = '');
   document.getElementById('litRegionOnlyThisRow').style.display = 'flex';
-  document.getElementById('btnKorEdit').style.display = ''; document.getElementById('btnKorD5').style.display = '';
+  document.getElementById('btnKorEdit').style.display = ''; document.getElementById('btnKorD5').style.display = ''; document.getElementById('btnKorSwap').style.display = '';
   if (opts.yuklenen) korMeta.yuklenen = opts.yuklenen;
   if (!opts.noRender) korRenderInfo();
   return true;
@@ -11103,16 +11184,18 @@ function korRenderInfo() {
     `<div style="${secSt}">` + korSecHd(1, 'Araştırma Alanı') +
       `Zon: <b>${m.zon_etiketi}</b>${m.fay_adlari.length ? ' · ' + m.fay_adlari.join(', ') : ''}` +
       `<br>Kaynak: ${m.kaynak.tur}${m.kaynak.not ? ` <span style="color:#f59e0b">(${m.kaynak.not})</span>` : ''}` +
+      `<br>Faylanma mekanizması: <b>${m.mekanizma.ad}</b>${m.mekanizma.tur ? ` <span style="color:#888">(${m.mekanizma.ad_en}; kaynak: ${m.mekanizma.kaynak}${m.mekanizma.guvenilirlik ? ', güvenilirlik: ' + m.mekanizma.guvenilirlik : ''}${m.mekanizma.nodal_duzlem_bagimsiz_kanitla_secildi === false ? ', <span style="color:#f59e0b">fay düzlemi bağımsız kanıtla seçilmedi</span>' : ''})</span>` : ''}` +
       `<br>L<sub>toplam</sub> = ${f1(m.uzunluk.L_toplam_km)} km · L<sub>birleşik</sub> = ${f1(m.uzunluk.L_birlesik_km)} km` +
       `<br>W<sub>toplam</sub> = <b>${f1(g.W_toplam_km)} km</b> (${g.kip === 'oranli' ? `orantılı: k = ${g.k} × L<sub>birleşik</sub>${g.sinir ? `, ${g.sinir === 'min' ? 'W_min' : 'W_max'} sınırında` : ''}` : 'sabit, araştırmacı seçimi'}) · üst ${f1(g.ust_km)} km / alt ${f1(g.alt_km)} km · uç: ${m.uc === 'duz' ? 'düz' : 'yuvarlak'}` +
       `<br>Alan: <b>${A ? Math.round(A).toLocaleString('tr-TR') + ' km²</b> <span style="color:#888">(WGS84 jeodezik; üyelik bölgesi)</span>' : '—</b>'}` +
+      (m.karsilastirma && m.karsilastirma.alan_km2 && A ? `<br><span style="color:#a5b4fc">⇄ Diğer kural (${m.karsilastirma.kural === 'sabit' ? 'sabit' : 'orantılı kL'}, W = ${f1(m.karsilastirma.W_toplam_km)} km): A = ${Math.round(m.karsilastirma.alan_km2).toLocaleString('tr-TR')} km² (×${(m.karsilastirma.alan_km2 / A).toFixed(2).replace('.', ',')})</span>` : '') +
       `<br>${polys.length > 1 ? polys.length + ' parça, ' : ''}${nV} köşe${nH ? `, ${nH} delik` : ''}${m.elle_duzenleme.yapildi ? ' · <span style="color:#fdba74">elle düzenlendi</span>' : ''}` +
       `<br><span style="color:#888">Projeksiyon bozulması (enine ölçek) en çok %${((m.yontem.en_buyuk_enine_olcek - 1) * 100).toFixed(3)} · sadeleştirme ≤ ${(m.yontem.sadelestirme_tol_km * 1000).toFixed(0)} m. Bölge: ${B.getSouth().toFixed(3)},${B.getWest().toFixed(3)} – ${B.getNorth().toFixed(3)},${B.getEast().toFixed(3)}</span>` +
       (m.yuklenen ? `<br><span style="color:#93c5fd">D5'ten yüklendi${m.yuklenen.dosya ? ' (' + m.yuklenen.dosya + ')' : ''}: ${m.yuklenen.geometri}${m.yuklenen.fark_km2 != null ? ` · kayıtla alan farkı ${(+m.yuklenen.fark_km2).toLocaleString('tr-TR', { maximumFractionDigits: 4 })} km²` : ''}</span>` : '') +
       `<br><span style="color:#888">${m.ifade}</span></div>` +
     `<div id="litSecVs30" style="${secSt}">` + korSecHd(2, '🧱 Zemin Özellikleri (VS30, yaklaşık)') + `</div>` +
-    `<div style="${secSt}">` + korSecHd(3, '🌍 Deprem Kataloğu') +
-      `<span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz. Sorgudan sonra G–R panelinde Oran/Yoğunluk (N/(T·A)) bu alanla hesaplanır; Bölge Karşılaştırma'da zon etiketi kayda girer.</span></div>`;
+    `<div id="litSecKat" style="${secSt}">` + korSecHd(3, '🌍 Deprem Kataloğu') +
+      `<span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz. Sorgudan sonra G–R panelinde Oran/Yoğunluk (N/(T·A)) bu alanla hesaplanır; Bölge Karşılaştırma'da zon etiketi kayda girer.</span><div id="korKatSay"></div></div>`;
   vs30ClearCircleExtras();
   vs30PolySummaryUI(polys, document.getElementById('litSecVs30'));
   setStatus(`Fay izinden araştırma poligonu: L_birleşik = ${f1(m.uzunluk.L_birlesik_km)} km, W = ${f1(g.W_toplam_km)} km, A = ${A ? Math.round(A).toLocaleString('tr-TR') : '—'} km² (WGS84)`);
@@ -11192,6 +11275,10 @@ function korD5Load(o, dosya) {
   set('korLabel', o.zon_kodu); set('korWMode', g.kip); if (g.kip !== 'oranli') set('korW', g.W_toplam_km);   // orantılıda sabit W alanı değiştirilmez set('korP', +(g.ust_pay_p * 100).toFixed(6)); set('korCap', o.uc);
   const on = g.oneri || {}; set('korK', g.k ?? on.k); set('korWmin', g.W_min_km ?? on.W_min_km); set('korWmax', g.W_max_km ?? on.W_max_km);
   document.getElementById('korSnap').checked = /MTA/.test((o.kaynak || {}).tur || '');
+  const mk = o.mekanizma || {}, srcKey = Object.keys(KOR_MECH_SRC).find(k => KOR_MECH_SRC[k] === mk.kaynak) || 'mta';
+  set('korMech', mk.tur || ''); set('korMechSrc', srcKey); set('korMechConf', mk.guvenilirlik || ''); set('korMechRef', mk.atif || '');
+  if (document.getElementById('korMechNP')) document.getElementById('korMechNP').checked = !!mk.nodal_duzlem_bagimsiz_kanitla_secildi;
+  korOnMechChange();
   let kayip = 0;
   korTraces = o.izler.map(t => ({ clicks: (t.tiklar || []).map(c => { let snap = null;
       if (c.mta && idx) { const k = idx.F.findIndex(F => F.fi === c.mta.ozellik && F.pi === c.mta.parca); if (k >= 0) snap = { k, si: c.mta.si, t: c.mta.t, ll: [c.lat, c.lon] }; else kayip++; }
@@ -11213,6 +11300,31 @@ function korD5Load(o, dosya) {
   const y = korMeta.yuklenen, f1 = v => (+v).toLocaleString('tr-TR', { maximumFractionDigits: 3 });
   setStatus(`D5 yüklendi: ${y.geometri}; alan kayıt ${kayitA != null ? f1(kayitA) : '—'} km² · ${elle ? 'son geometri ' + f1(korMeta.alan.km2) : 'yeniden üretilen ' + f1(y.yeniden_uretilen_alan_km2)} km²${y.fark_km2 != null ? ` (fark ${f1(y.fark_km2)} km²)` : ''}${kayip ? ` · ${kayip} MTA tıkı çözülemedi` : ''}`);
   return korMeta;
+}
+
+// Sorgu sonrası: poligon içi / dışlanan (bbox içinde, poligon dışında) sayılar; kayıt D5'e (sorgular[]) eklenir.
+function korShowCounts() {
+  const m = korMeta, el = document.getElementById('korKatSay'), c = regionPolyCounts;
+  if (!m || !regionRect || regionRect._eqKor !== m || !c) return;
+  const src = typeof regionSourceLabel === 'function' ? regionSourceLabel() : regionSource, n = c.ic;
+  let alt = null;
+  if (m.karsilastirma && korAltPolys && m.karsilastirma.W_toplam_km < m.genislik.W_toplam_km && Array.isArray(regionEvents))
+    alt = regionEvents.filter(e => pointInPolys(e.lat, e.lon, korAltPolys)).length;
+  const rec = { zaman: new Date().toISOString(), kaynak: src, pencere: [regionWindowStart ? new Date(regionWindowStart).toISOString() : null, regionWindowEnd ? new Date(regionWindowEnd).toISOString() : null],
+    M_min: document.getElementById('regionMagMin')?.value || null, bbox_olay: c.bbox, poligon_ici: c.ic, poligon_disi_dislanan: c.dis, limite_takildi: !!regionCapped,
+    alternatif_zon_ici: alt, alternatif_kural: m.karsilastirma ? m.karsilastirma.kural : null };
+  const last = m.sorgular[m.sorgular.length - 1];
+  if (!last || last.kaynak !== rec.kaynak || last.bbox_olay !== rec.bbox_olay || last.poligon_ici !== rec.poligon_ici || last.pencere[0] !== rec.pencere[0]) m.sorgular.push(rec);
+  if (!el) return;
+  const A = m.alan.km2, f0 = v => (+v).toLocaleString('tr-TR');
+  el.innerHTML = `<div style="margin-top:4px;color:#ddd">Son sorgu (${src}): bbox içinde <b>${f0(c.bbox)}</b> olay → poligon içi <b>${f0(c.ic)}</b> · poligon dışı (dışlanan) <b>${f0(c.dis)}</b>${regionCapped ? ' <span style="color:#f59e0b">(bbox sorgu limitine takıldı)</span>' : ''}` +
+    (alt != null ? `<br><span style="color:#a5b4fc">⇄ ${m.karsilastirma.kural === 'sabit' ? 'Sabit' : 'Orantılı kL'} W = ${(+m.karsilastirma.W_toplam_km).toLocaleString('tr-TR', { maximumFractionDigits: 2 })} km zonunda (aynı sorgu): <b>${f0(alt)}</b> olay · A = ${Math.round(m.karsilastirma.alan_km2).toLocaleString('tr-TR')} km²</span>` :
+      m.karsilastirma ? `<br><span style="color:#888">⇄ Diğer kural daha geniş bir zon verir; olay sayısı için "⇄ Diğer kuralla oluştur" ile ayrı sorgulayıp Bölge Karşılaştırma'ya ekleyin.</span>` : '') + `</div>`;
+}
+function korSwapRule() {   // aynı iz, diğer genişlik kuralı (sabit ↔ orantılı) ile yeniden oluştur
+  if (!korAllLines().length) return;
+  const m = document.getElementById('korWMode'); m.value = m.value === 'oranli' ? 'sabit' : 'oranli';
+  korUpdateLenInfo(); korBuild();
 }
 
 function drawLitRegionCircle() {
@@ -11521,7 +11633,7 @@ function litRegionCommitToQuery() {
     if (litRegionLayer._eqKor) {   // Fay İzinden Araştırma Poligonu: zon kaydı sorgu bölgesine taşınır (bilgi satırı, Bölge Karşılaştırma)
       regionRect._eqKor = litRegionLayer._eqKor;
       const cn = document.getElementById('cmpName'), m = regionRect._eqKor;
-      if (cn && !cn.value.trim()) cn.value = `${m.zon_etiketi}${m.fay_adlari.length ? ' · ' + m.fay_adlari[0] : ''} · W ${(+m.genislik.W_toplam_km.toFixed(1)).toLocaleString('tr-TR')} km`;
+      if (cn) cn.value = `${m.zon_etiketi}${m.fay_adlari.length ? ' · ' + m.fay_adlari[0] : ''} · W ${(+m.genislik.W_toplam_km.toFixed(1)).toLocaleString('tr-TR')} km ${m.genislik.kip === 'oranli' ? '(kL)' : '(sabit)'}`;
     }
   } else {
     regionIsPolygon = false;
