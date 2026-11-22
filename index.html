@@ -153,6 +153,10 @@
     .legend-section-body.hidden{display:none}
     #stationYearCtrl.hidden{display:none}
     .vs30-img{image-rendering:pixelated}
+    .vs30-pop .leaflet-popup-content{margin:10px 12px}
+    .vs30-share{margin-top:7px;background:#1f2937;color:#e5e7eb;border:1px solid #374151;border-radius:6px;padding:5px 10px;font-size:.74rem;cursor:pointer}
+    .vs30-share-msg{color:#4ade80;font-size:.7rem}
+    @media (max-width:600px){.vs30-pop .leaflet-popup-content{font-size:.86rem;max-height:52vh;overflow-y:auto}.vs30-share{padding:10px 14px;font-size:.82rem;min-height:42px}}
     .legend-title{color:#fbbf24;font-weight:700;margin-bottom:3px;font-size:.78rem}
     .fl{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
 
@@ -651,7 +655,7 @@
         Zemin (VS30, yaklaşık) <span class="tog" id="lgVs30T">▼</span>
       </div>
       <div class="legend-section-body" id="lgVs30">
-        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">VS30 tabanlı yaklaşık zemin sınıfı göstergesi · haritaya tıklayın</div>
+        <div style="font-size:.72rem;color:#e5e7eb;font-weight:700;line-height:1.35;margin-bottom:2px">Haritada bir noktaya tıklayın, bulunduğunuz bölgenin yaklaşık zemin özelliklerini öğrenin!</div><div style="font-size:.64rem;color:#aaa;line-height:1.4;margin-bottom:4px">USGS VS30 verilerinden türetilen yaklaşık zemin göstergesi. Saha ölçümü ve mühendislik amaçlı zemin etüdü yerine geçmez. 📍: kendi konumunuz · 🔗: paylaş</div>
         <div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#1f3a93"></i><span style="font-size:.68rem"><b>ZA</b> <span style="color:#999">&gt; 1500 m/s</span><br><span style="color:#aaa">Sağlam, sert kayalar · bu bölgede yok</span></span></div><div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#3288bd"></i><span style="font-size:.68rem"><b>ZB</b> <span style="color:#999">760–1500 m/s</span><br><span style="color:#aaa">Az ayrışmış, orta sağlam kayalar</span></span></div><div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#99d594"></i><span style="font-size:.68rem"><b>ZC</b> <span style="color:#999">360–760 m/s</span><br><span style="color:#aaa">Çok sıkı kum, çakıl, sert kil / zayıf kaya</span></span></div><div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#fdae61"></i><span style="font-size:.68rem"><b>ZD</b> <span style="color:#999">180–360 m/s</span><br><span style="color:#aaa">Orta sıkı-sıkı kum, çakıl, çok katı kil</span></span></div><div style="display:flex;align-items:flex-start;gap:6px;margin:2px 0;line-height:1.3"><i style="flex:none;display:inline-block;width:12px;height:12px;border-radius:2px;margin-top:2px;background:#c51b8a"></i><span style="font-size:.68rem"><b>ZE?</b> <span style="color:#999">&lt; 180 m/s</span><br><span style="color:#aaa">ZE adayı — yalnız VS30 ile atanamaz</span></span></div>
         <div style="font-size:.66rem;color:#aaa;margin-top:5px;line-height:1.6">
           <b style="color:#ccc">Güven etiketi</b> (tıklama penceresinde):<br>
@@ -1119,7 +1123,7 @@
       <button class="tbtn tr-only" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
       <button class="tbtn tr-only"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
       <button class="tbtn tr-only" id="btnStrainRate" onclick="toggleLayer('strainrate')" title="GSRM v2.1 jeodezik strain-rate modeli (Kreemer ve ark. 2014) · GPS-tabanlı, uzun-dönem gerinim oranı · CANLI ÖLÇÜM veya deprem tahmini DEĞİL · b-değeri/asperite katmanlarıyla karşılaştırma için">🌐 Strain Rate (GSRM)</button>
-      <button class="tbtn tr-only" id="btnVs30" onclick="toggleLayer('vs30')" title="USGS Global Vs30 Mosaic (doi:10.5066/P1NV6UNM) · üst 30 m ortalama kayma dalgası hızı · Türkiye'de topoğrafik eğime dayalı VEKİL (Wald &amp; Allen 2007) · SAHA ÖLÇÜMÜ DEĞİL · Renkler TBDY 2018 eşiklerine göre YAKLAŞIK zemin sınıfı göstergesi (TBDY sınıflaması değil) · Haritaya tıklayın: sınıf + VS30 · PGA hesabına bağlı DEĞİL · 30″ (~0,9 km) ızgara">🧱 Zemin (VS30, yaklaşık)</button>
+      <button class="tbtn tr-only" id="btnVs30" onclick="toggleLayer('vs30')" title="Haritada bir noktaya tıklayın, bulunduğunuz bölgenin yaklaşık zemin özelliklerini öğrenin! USGS VS30 verilerinden türetilen yaklaşık zemin göstergesi. Saha ölçümü ve mühendislik amaçlı zemin etüdü yerine geçmez. · USGS Global Vs30 Mosaic (doi:10.5066/P1NV6UNM) · üst 30 m ortalama kayma dalgası hızı · Türkiye'de topoğrafik eğime dayalı VEKİL (Wald &amp; Allen 2007) · SAHA ÖLÇÜMÜ DEĞİL · Renkler TBDY 2018 eşiklerine göre YAKLAŞIK zemin sınıfı göstergesi (TBDY sınıflaması değil) · Haritaya tıklayın: sınıf + VS30 · PGA hesabına bağlı DEĞİL · 30″ (~0,9 km) ızgara">🧱 Zemin (VS30, yaklaşık)</button>
       <button class="tbtn global-only" id="btnStrainRateGlobal" onclick="toggleLayer('strainrateglobal')" title="GSRM v2.1 jeodezik strain-rate modeli · Dünya geneli · Yalnızca plaka sınırı bölgeleri (veri olmayan alanlar şeffaf, doldurulmadı) · GPS-tabanlı, canlı ölçüm DEĞİL">🌍 Strain Rate (GSRM, Global)</button>
     </div>
     <div class="pgrp" role="group" aria-label="Tarihi şiddet (MMI)">
@@ -8698,6 +8702,16 @@ function makeDraggablePanel(panel, header, setWasDragged) {
 /* 🎯 Yakınımdaki depremler: konum izniyle kullanıcının çevresinde 100 km'lik daire bölge analizi.
    Konum yalnızca tarayıcıda kullanılır; gizlilik için merkez 0,1°'ye (~10 km) yuvarlanır, çünkü bölge
    sınırları paylaşılabilir bağlantıya (adres çubuğu) yazılır. */
+// Ortak konum yardımcısı (🎯 Yakınımdaki depremler + 🧱 Zemin/VS30 📍): tek mekanizma, son konum yalnız bellekte
+// 5 dk tutulur (diske/adres çubuğuna yazılmaz) — ikinci özellik konumu yeniden istemez.
+window.eqLastPos = null;
+window.eqGetPosition = function (ok, fail) {
+  const c = window.eqLastPos;
+  if (c && Date.now() - c.t < 300000) { ok(c.pos); return; }
+  if (!navigator.geolocation) { if (fail) fail({ code: -1 }); return; }
+  navigator.geolocation.getCurrentPosition(pos => { window.eqLastPos = { pos, t: Date.now() }; ok(pos); },
+    err => { if (fail) fail(err); }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
+};
 (function initLocateControl() {
   if (!window.L || !navigator.geolocation) return;
   const Ctl = L.Control.extend({ options: { position: 'topleft' }, onAdd() {
@@ -8705,11 +8719,14 @@ function makeDraggablePanel(panel, header, setWasDragged) {
     const a = L.DomUtil.create('a', '', div); a.href = '#'; a.textContent = '🎯'; a.title = 'Yakınımdaki depremler (100 km) — konum yalnızca tarayıcınızda kullanılır, ~10 km yuvarlanır'; a.setAttribute('role', 'button'); a.setAttribute('aria-label', 'Yakınımdaki depremler');
     L.DomEvent.on(a, 'click', ev => { L.DomEvent.preventDefault(ev); L.DomEvent.stopPropagation(ev);
       setStatus('Konum alınıyor…');
-      navigator.geolocation.getCurrentPosition(pos => {
+      window.eqGetPosition(pos => {
         const lat = Math.round(pos.coords.latitude * 10) / 10, lon = Math.round(pos.coords.longitude * 10) / 10;
         setStatus(`Yakınım: ${lat.toFixed(1)}°, ${lon.toFixed(1)}° çevresinde 100 km (konum ~10 km yuvarlandı)`);
         if (window.eqCircleRegionAt) window.eqCircleRegionAt(L.latLng(lat, lon), 100, '🎯 Yakınımdaki depremler');
-      }, err => setStatus(err && err.code === 1 ? 'Konum izni verilmedi.' : 'Konum alınamadı.', true), { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
+        // Zemin (VS30) katmanı açıksa: aynı konumla bulunduğunuz noktanın yaklaşık zemini de (yalnız tarayıcıda)
+        if (typeof showVs30 !== 'undefined' && showVs30 && typeof vs30Query === 'function')
+          vs30Query(L.latLng(pos.coords.latitude, pos.coords.longitude), 'locate');
+      }, err => setStatus(err && err.code === 1 ? 'Konum izni verilmedi.' : 'Konum alınamadı.', true));
     });
     return div; } });
   new Ctl().addTo(map);
@@ -11572,6 +11589,8 @@ function toggleLayer(type) {
     const lg = document.getElementById('lgVs30Sec');
     if (lg) lg.style.display = showVs30 ? '' : 'none';
     if (showVs30) map.on('click', vs30MapClick); else { map.off('click', vs30MapClick); map.closePopup(); }
+    vs30LocControl(showVs30);
+    if (showVs30) vs30AutoLocate();
     if (!vs30Layer) {
       loadVs30Layer();
     } else if (showVs30) {
@@ -12462,35 +12481,109 @@ function vs30ClassOf(v) {
   if (v >= 180)  return { code: 'ZD', col: '#fdae61', txt: 'Orta sıkı-sıkı kum, çakıl veya çok katı kil tabakaları' };
   return { code: 'ZE adayı', col: '#c51b8a', txt: 'Tablo 16.1 ZE tanımı: Gevşek kum, çakıl veya yumuşak-katı kil tabakaları; PI &gt; 20 ve w &gt; %40 koşullarını sağlayan toplamda 3 m’den kalın yumuşak kil (cu &lt; 25 kPa) içeren profiller. ZE yalnız VS30 ile atanamaz; ZF kapsamındaki özel koşullar da saha etüdüyle araştırılmalı.' };
 }
-async function vs30MapClick(ev) {
+function vs30MapClick(ev) {
   if (!showVs30 || polygonActive) return;
   const t = ev.originalEvent && ev.originalEvent.target;
   if (t && t.classList && t.classList.contains('leaflet-interactive')) return; // deprem/fay işaretine tıklandı
-  const pop = L.popup({ maxWidth: 290 }).setLatLng(ev.latlng).setContent('<div style="font-size:.78rem">VS30 okunuyor…</div>').openOn(map);
+  vs30Query(ev.latlng, 'click');
+}
+// Nokta sorgusu (tıklama, "Konumum" ve paylaşılan bağlantı ortak kullanır).
+// Gizlilik: paylaşılan bağlantıda nokta 0,01°'ye (~1 km; VS30 ızgarası ~0,9 km) yuvarlanır;
+// "Konumum" sorgusunda konum yalnızca tarayıcıda kullanılır, adres çubuğuna yazılmaz.
+async function vs30Query(latlng, src) {
+  const narrow = window.innerWidth < 600;
+  const pop = L.popup({ maxWidth: Math.min(310, window.innerWidth - 40), minWidth: Math.min(240, window.innerWidth - 60),
+    autoPanPaddingTopLeft: L.point(10, narrow ? 70 : 20), autoPanPaddingBottomRight: L.point(10, narrow ? 140 : 20), className: 'vs30-pop' })
+    .setLatLng(latlng).setContent('<div style="font-size:.8rem">VS30 okunuyor…</div>').openOn(map);
   let g;
   try { g = vs30Grid || await vs30LoadGrid(); }
-  catch (e) { pop.setContent('<div style="font-size:.78rem">VS30 değeri yüklenemedi: ' + e.message + '</div>'); return; }
-  const b = g.meta.bounds, lat = ev.latlng.lat, lon = ev.latlng.lng;
-  const foot = '<div style="color:#888;font-size:.66rem;margin-top:6px;line-height:1.45">VS30 tabanlı <b>yaklaşık zemin sınıfı göstergesi</b> — TBDY 2018 sınıflaması değildir; (N60)30, (cu)30 ve saha etüdü gerekir. ZF (sahaya özel araştırma gerektiren zeminler) bu haritayla belirlenemez. USGS eğim tabanlı vekil (Wald &amp; Allen 2007), saha ölçümü değil. PGA hesabı bu değeri kullanmaz (sabit Vs30=760 m/s).</div>';
-  const badge = (bg, fg, t) => '<span style="display:inline-block;background:' + bg + ';color:' + fg + ';font-size:.64rem;font-weight:700;padding:1px 6px;border-radius:9px;margin-bottom:5px">' + t + '</span>';
+  catch (e) { pop.setContent('<div style="font-size:.8rem">VS30 değeri yüklenemedi: ' + e.message + '</div>'); return; }
+  const b = g.meta.bounds, lat = latlng.lat, lon = latlng.lng;
+  const badge = (bg, fg, t) => '<span style="display:inline-block;background:' + bg + ';color:' + fg + ';font-size:.66rem;font-weight:700;padding:1px 7px;border-radius:9px;margin-bottom:5px">' + t + '</span>';
   const B_OK = badge('#2e7d32', '#fff', '● VS30 tabanlı yaklaşık sınıf'), B_ZE = badge('#f2c94c', '#222', '● ZE adayı'), B_NA = badge('#777', '#fff', '● Su alanı / veri dışı');
+  const where = src === 'locate' ? '<div style="font-weight:800;font-size:.84rem;margin-bottom:2px">📍 Bulunduğunuz Noktanın Zemin Bilgisi</div>' +
+    '<div style="color:#9fb8d4;font-size:.7rem;margin-bottom:4px">Koordinatlar: ' + latlng.lat.toFixed(3) + '° K, ' + latlng.lng.toFixed(3) + '° D · konum yalnız tarayıcınızda kullanıldı, paylaşılmadı</div>' : '';
   if (lat < b.minlat || lat > b.maxlat || lon < b.minlon || lon > b.maxlon) {
-    pop.setContent('<div style="font-size:.78rem">' + B_NA + '<br>Bu nokta VS30 kesitinin (25–45°D, 34–43°K) dışında.</div>'); return;
+    pop.setContent('<div style="font-size:.8rem">' + where + B_NA + '<br>Bu nokta VS30 kesitinin (25–45°D, 34–43°K) dışında.</div>'); return;
   }
   const col = Math.min(g.w - 1, Math.floor((lon - b.minlon) / (b.maxlon - b.minlon) * g.w));
   const row = Math.min(g.h - 1, Math.floor((b.maxlat - lat) / (b.maxlat - b.minlat) * g.h));
   const i = (row * g.w + col) * 4;
-  if (g.px[i + 3] === 0) { pop.setContent('<div style="font-size:.78rem">' + B_NA + '<br>Su alanı (deniz/göl) — VS30 değeri yok.</div>'); return; }
+  if (g.px[i + 3] === 0) { pop.setContent('<div style="font-size:.8rem">' + where + B_NA + '<br>Su alanı (deniz/göl) — VS30 değeri yok.</div>'); return; }
   const v = g.px[i] * 256 + g.px[i + 1], k = vs30ClassOf(v);
+  const lat2 = lat.toFixed(2), lon2 = lon.toFixed(2);
+  const coordTxt = src === 'click' ? lat.toFixed(3) + ', ' + lon.toFixed(3) : src === 'locate' ? 'Saha ölçümü değildir' : '≈ ' + lat2 + ', ' + lon2;
+  const foot = '<div style="color:#888;font-size:.66rem;margin-top:6px;line-height:1.45">USGS VS30 verilerinden türetilen <b>yaklaşık zemin göstergesi</b> (eğim tabanlı vekil, Wald &amp; Allen 2007) — saha ölçümü değildir. ' +
+    '<b>Mahalle veya parsel ölçeğinde zemin etüdünün yerine geçmez</b> (~0,9 km ızgara). TBDY 2018 sınıflaması değildir; (N60)30, (cu)30 ve saha etüdü gerekir. ZF (sahaya özel araştırma gerektiren zeminler) bu haritayla belirlenemez. PGA hesabı bu değeri kullanmaz (sabit Vs30=760 m/s).</div>';
+  const shareId = 'vs30share' + Date.now();
   pop.setContent(
-    '<div style="font-size:.8rem;line-height:1.45">' + (k.code === 'ZE adayı' ? B_ZE : B_OK) +
+    '<div style="font-size:.8rem;line-height:1.45">' + where + (k.code === 'ZE adayı' ? B_ZE : B_OK) +
     '<div style="display:flex;align-items:center;gap:7px"><span style="background:' + k.col + ';color:#111;font-weight:800;padding:2px 8px;border-radius:4px">' + k.code + '</span>' +
     '<span style="color:#ccc;font-size:.7rem">yaklaşık zemin sınıfı göstergesi</span></div>' +
     '<div style="margin-top:4px;color:#ddd;font-size:.72rem">' + k.txt + '</div>' +
     ((k.code === 'ZA' || k.code === 'ZB') ? '<div style="margin-top:5px;color:#fbbf24;font-size:.7rem">⚠ ZA/ZB değerlendirmesi için temel tabanı ile kaya üstü arasındaki zemin kalınlığı ayrıca incelenmelidir (TBDY: &gt;3 m zemin varsa ZA/ZB tanımlanmaz).</div>' : '') +
-    '<div style="margin-top:5px">VS30 ≈ <b>' + v + ' m/s</b> <span style="color:#888;font-size:.68rem">(' + lat.toFixed(3) + ', ' + lon.toFixed(3) + ')</span></div>' +
+    '<div style="margin-top:5px">VS30 ≈ <b>' + v + ' m/s</b> <span style="color:#888;font-size:.68rem">(' + coordTxt + ')</span></div>' +
+    '<button id="' + shareId + '" class="vs30-share" type="button">' + (src === 'locate' ? '🔗 Konumumu (~1 km) paylaş' : '🔗 Paylaş') + '</button><span class="vs30-share-msg"></span>' +
     foot + '</div>');
+  const btn = document.getElementById(shareId);
+  if (btn) btn.addEventListener('click', e => { L.DomEvent.stopPropagation(e); vs30Share(lat2, lon2, k.code, v, btn); });
 }
+async function vs30Share(lat2, lon2, code, v, btn) {
+  const url = location.origin + location.pathname + '?vs30=' + lat2 + ',' + lon2 + '&lat=' + lat2 + '&lng=' + lon2 + '&zoom=10';
+  const text = 'Yaklaşık zemin göstergesi: ' + code + ' · VS30 ≈ ' + v + ' m/s · ' + lat2 + ', ' + lon2 +
+    ' (USGS eğim tabanlı vekil; saha ölçümü ve zemin etüdü yerine geçmez) — EQ-LiveTürkiye';
+  const msg = btn.nextElementSibling;
+  try {
+    if (navigator.share) { await navigator.share({ title: 'EQ-LiveTürkiye · Yaklaşık zemin', text, url }); return; }
+    await navigator.clipboard.writeText(text + '\n' + url);
+    if (msg) msg.textContent = ' Kopyalandı ✓';
+  } catch (e) {
+    if (e && e.name === 'AbortError') return; // kullanıcı paylaşım penceresini kapattı
+    if (msg) msg.innerHTML = '<textarea readonly style="width:100%;margin-top:5px;font-size:.66rem;height:58px;background:#111;color:#ddd;border:1px solid #333">' + text + '\n' + url + '</textarea>';
+  }
+}
+function vs30Locate() {
+  setStatus('Konum alınıyor…');
+  window.eqGetPosition(pos => {
+    const ll = L.latLng(pos.coords.latitude, pos.coords.longitude);
+    map.setView(ll, Math.max(map.getZoom(), 10));
+    setStatus('Zemin (VS30): bulunduğunuz nokta sorgulandı — konum yalnız tarayıcınızda kullanıldı, paylaşılmadı.');
+    vs30Query(ll, 'locate');
+  }, err => setStatus((err && err.code === 1 ? 'Konum izni verilmedi' : 'Konum alınamadı') +
+      ' — haritada bir noktaya tıklayarak yaklaşık zemini sorgulayabilirsiniz.', true));
+}
+// Katman açılınca: konum zaten bellekteyse ya da izin önceden verilmişse otomatik sorgula; aksi hâlde izin İSTEME.
+function vs30AutoLocate() {
+  const c = window.eqLastPos;
+  if (c && Date.now() - c.t < 300000) { vs30Locate(); return; }
+  if (navigator.permissions && navigator.permissions.query) {
+    navigator.permissions.query({ name: 'geolocation' }).then(st => { if (st.state === 'granted' && showVs30) vs30Locate(); }).catch(() => {});
+  }
+}
+// "📍" harita düğmesi — yalnız Zemin (VS30) katmanı açıkken görünür
+let vs30LocCtl = null;
+function vs30LocControl(on) {
+  if (on && !vs30LocCtl) {
+    const Ctl = L.Control.extend({ options: { position: 'topleft' }, onAdd() {
+      const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control vs30LocBtn');
+      const a = L.DomUtil.create('a', '', div); a.href = '#'; a.textContent = '📍';
+      a.title = 'Bulunduğum yerin yaklaşık zemini (VS30) — konum yalnızca tarayıcınızda kullanılır';
+      a.setAttribute('role', 'button'); a.setAttribute('aria-label', 'Bulunduğum yerin yaklaşık zemini');
+      L.DomEvent.on(a, 'click', ev => { L.DomEvent.preventDefault(ev); L.DomEvent.stopPropagation(ev); vs30Locate(); });
+      return div; } });
+    vs30LocCtl = new Ctl().addTo(map);
+  } else if (!on && vs30LocCtl) { map.removeControl(vs30LocCtl); vs30LocCtl = null; }
+}
+// Paylaşılan bağlantı: ?vs30=enlem,boylam → katmanı aç ve o noktayı sorgula
+window.addEventListener('load', () => {
+  try {
+    const q = new URLSearchParams(location.search).get('vs30');
+    if (!q) return;
+    const [la, lo] = q.split(',').map(Number);
+    if (!Number.isFinite(la) || !Number.isFinite(lo)) return;
+    setTimeout(() => { if (!showVs30) toggleLayer('vs30'); vs30Query(L.latLng(la, lo), 'link'); }, 800);
+  } catch (e) { /* bağlantı bozuksa sessizce geç */ }
+});
 
 async function loadVs30Layer() {
   setStatus('VS30 (USGS) katmanı yükleniyor…');
@@ -12504,7 +12597,7 @@ async function loadVs30Layer() {
       { opacity: 0.7, interactive: false, className: 'vs30-img' }
     );
     if (showVs30) vs30Layer.addTo(map);
-    setStatus(`Zemin (VS30) · ${meta.source} · eğim tabanlı VEKİL, saha ölçümü değil · yaklaşık sınıf göstergesi · noktaya tıklayın`);
+    setStatus('🧱 Haritada bir noktaya tıklayın, bulunduğunuz bölgenin yaklaşık zemin özelliklerini öğrenin! · 📍 düğmesiyle kendi konumunuzu sorgulayın · USGS VS30 verilerinden türetilen yaklaşık zemin göstergesi. Saha ölçümü ve mühendislik amaçlı zemin etüdü yerine geçmez.');
   } catch (e) {
     setStatus('VS30 (USGS) yüklenemedi: ' + e.message, true);
     showVs30 = false;

@@ -166,7 +166,7 @@
 | ESRM20 WMS | Harici URL | WMS tile | ✅ |
 | AFAD TSTH WMS | Harici URL | WMS tile | ✅ |
 | Forecast overlay | `forecast_marmara_test_events.json` | circleMarker | ✅ |
-| Zemin (VS30, yaklaşık) | `vs30_usgs_sinif.png` (yaklaşık ZA–ZE gösterge rengi) + `vs30_usgs_deger.png` (nokta sorgusu: R·256+G = VS30) + `vs30_usgs_meta.json` (kaynak kesit: `vs30_usgs_clip.npz`; betik: `scripts/build_vs30_layer.py`) | imageOverlay + tıklama sorgusu (sınıf + VS30 m/s) · TBDY sınıflaması DEĞİL, VS30 tabanlı yaklaşık gösterge; ZE yalnız "aday" · eğim tabanlı vekil, saha ölçümü değil · PGA hesabına bağlı DEĞİL (o hâlâ sabit Vs30=760) | ✅ 2026-11-22 |
+| Zemin (VS30, yaklaşık) | `vs30_usgs_sinif.png` (yaklaşık ZA–ZE gösterge rengi) + `vs30_usgs_deger.png` (nokta sorgusu: R·256+G = VS30) + `vs30_usgs_meta.json` (kaynak kesit: `vs30_usgs_clip.npz`; betik: `scripts/build_vs30_layer.py`) | imageOverlay + tıklama sorgusu (sınıf + VS30 m/s) + 📍 konum (🎯 ile ortak `eqGetPosition`, konum yalnız bellekte 5 dk) + 🔗 paylaş (`?vs30=enlem,boylam`, 0,01° yuvarlı) · TBDY sınıflaması DEĞİL, VS30 tabanlı yaklaşık gösterge; ZE yalnız "aday" · eğim tabanlı vekil, saha ölçümü değil · PGA hesabına bağlı DEĞİL (o hâlâ sabit Vs30=760) | ✅ 2026-11-22 |
 
 ---
 
