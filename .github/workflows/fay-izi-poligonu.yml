@@ -1,0 +1,47 @@
+name: Fay izinden arastirma poligonu (geometri regresyonu)
+
+# Fault-Trace-Based Zonation (2026-11-23): index.html'deki korZone/korWidth/korLengths,
+# areaKm2 ve pointInPolys dogrudan index.html'den cikarilip sinanir (tek kaynak).
+# Testler: KAF 20 km toplam genislik referansi, duz cizgi simetrisi, asimetri, egrisel iz,
+# paralel kollar, kesisen parcalar, yinelenen parca, sabit/orantili W, uyelik.
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'vendor/polygon-clipping-0.15.7.umd.min.js'
+      - 'vendor/geographiclib-geodesic-2.2.0.min.js'
+      - 'data/turkiye_diri_fay_mta2026.geojson'
+      - 'scripts/fay_izi_poligonu_tests/**'
+      - '.github/workflows/fay-izi-poligonu.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'vendor/polygon-clipping-0.15.7.umd.min.js'
+      - 'vendor/geographiclib-geodesic-2.2.0.min.js'
+      - 'data/turkiye_diri_fay_mta2026.geojson'
+      - 'scripts/fay_izi_poligonu_tests/**'
+      - '.github/workflows/fay-izi-poligonu.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  geometri:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Vendor SHA-256 denetimi
+        run: |
+          echo "7f8619e84a86ce8dd400c9b50430e9c8cf8f26027b19eeb479f109f5c1a9d688  vendor/polygon-clipping-0.15.7.umd.min.js" | sha256sum -c -
+          echo "06e3512904b346575f475f14d0b27ea0979dbcd2b0eddebf5f1eeefd234395b5  vendor/geographiclib-geodesic-2.2.0.min.js" | sha256sum -c -
+      - name: Geometri testleri
+        run: node scripts/fay_izi_poligonu_tests/run.cjs --out fay_izi_poligonu_sonuc.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fay-izi-poligonu-sonuc
+          path: fay_izi_poligonu_sonuc.json
