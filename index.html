@@ -152,6 +152,7 @@
     .legend-section-title .tog{color:#555;font-size:.8rem}
     .legend-section-body.hidden{display:none}
     #stationYearCtrl.hidden{display:none}
+    .vs30-img{image-rendering:pixelated}
     .legend-title{color:#fbbf24;font-weight:700;margin-bottom:3px;font-size:.78rem}
     .fl{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
 
@@ -644,6 +645,23 @@
       </div>
     </div>
 
+    <!-- VS30 bölümü (yalnız katman açıkken görünür) -->
+    <div class="legend-section" id="lgVs30Sec" style="display:none">
+      <div class="legend-section-title" onclick="toggleSection('lgVs30','lgVs30T')">
+        VS30 (USGS, yaklaşık) <span class="tog" id="lgVs30T">▼</span>
+      </div>
+      <div class="legend-section-body" id="lgVs30">
+        <div style="font-size:.68rem;color:#aaa;margin-bottom:3px">Üst 30 m ortalama kayma dalgası hızı · m/s</div>
+        <div style="display:flex;flex-wrap:wrap;gap:2px 4px;line-height:1.5;margin-bottom:4px"><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#7a0177"></i>&lt; 180</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#c51b8a"></i>180–240</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#f768a1"></i>240–300</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#fdae61"></i>300–360</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#fee08b"></i>360–490</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#abdda4"></i>490–620</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#66c2a5"></i>620–760</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:.66rem;width:48%"><i style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#3288bd"></i>&gt; 760</span></div>
+        <div style="color:#666;font-size:.65rem;line-height:1.5">
+          TBDY 2018 eşikleri: ZE &lt;180 · ZD 180–360 · ZC 360–760 · ZB 760–1500<br>
+          Eğim tabanlı vekil (Wald &amp; Allen 2007) · saha ölçümü değil<br>
+          Zemin sınıfı saha etüdüyle belirlenir · su alanları şeffaf<br>
+          USGS Global Vs30 Mosaic · doi:10.5066/P1NV6UNM
+        </div>
+      </div>
+    </div>
+
     <!-- Tarihsel Depremler bölümü -->
     <div class="legend-section">
       <div class="legend-section-title" onclick="toggleSection('lgHist','lgHistT')">
@@ -1091,6 +1109,7 @@
       <button class="tbtn tr-only" id="btnBFN" onclick="setBvalueMethod('fn')" title="Fixed Number · N=50 adaptif R · ZMAP(Wiemer 2001)" style="font-size:.7rem;padding:3px 7px;border-color:#555;color:#555">FN</button>
       <button class="tbtn tr-only"        id="btnFractal"  onclick="toggleLayer('fractal')"  title="Grassberger-Procaccia korelasyon boyutu D_c · N≥50 · R=100km">Fraktal D_c</button>
       <button class="tbtn tr-only" id="btnStrainRate" onclick="toggleLayer('strainrate')" title="GSRM v2.1 jeodezik strain-rate modeli (Kreemer ve ark. 2014) · GPS-tabanlı, uzun-dönem gerinim oranı · CANLI ÖLÇÜM veya deprem tahmini DEĞİL · b-değeri/asperite katmanlarıyla karşılaştırma için">🌐 Strain Rate (GSRM)</button>
+      <button class="tbtn tr-only" id="btnVs30" onclick="toggleLayer('vs30')" title="USGS Global Vs30 Mosaic (doi:10.5066/P1NV6UNM) · üst 30 m ortalama kayma dalgası hızı · Türkiye'de topoğrafik eğime dayalı VEKİL (Wald &amp; Allen 2007) · SAHA ÖLÇÜMÜ DEĞİL · TBDY 2018 zemin sınıfı saha etüdüyle belirlenir · 30″ (~0,9 km) ızgara">🧱 VS30 (USGS, yaklaşık)</button>
       <button class="tbtn global-only" id="btnStrainRateGlobal" onclick="toggleLayer('strainrateglobal')" title="GSRM v2.1 jeodezik strain-rate modeli · Dünya geneli · Yalnızca plaka sınırı bölgeleri (veri olmayan alanlar şeffaf, doldurulmadı) · GPS-tabanlı, canlı ölçüm DEĞİL">🌍 Strain Rate (GSRM, Global)</button>
     </div>
     <div class="pgrp" role="group" aria-label="Tarihi şiddet (MMI)">
@@ -10843,6 +10862,8 @@ let gafLayer    = null;
 let showGAF     = false;
 let strainRateLayer = null;
 let showStrainRate  = false;
+let vs30Layer = null;
+let showVs30 = false;
 let strainRateGlobalLayer = null;
 let showStrainRateGlobal  = false;
 
@@ -11531,6 +11552,21 @@ function toggleLayer(type) {
       strainRateLayer.addTo(map);
     } else {
       map.removeLayer(strainRateLayer);
+    }
+  } else if (type === 'vs30') {
+    // USGS Global Vs30 Mosaic — statik PNG+meta.json, scripts/build_vs30_layer.py ile üretilir.
+    // Türkiye'de topoğrafik eğime dayalı VEKİL (Wald & Allen 2007); saha ölçümü DEĞİLDİR.
+    // Not: PGA katmanındaki Campbell (1981) hesabı sabit Vs30=760 m/s kullanır; bu katman o hesaba bağlı DEĞİLDİR.
+    showVs30 = !showVs30;
+    document.getElementById('btnVs30').classList.toggle('active', showVs30);
+    const lg = document.getElementById('lgVs30Sec');
+    if (lg) lg.style.display = showVs30 ? '' : 'none';
+    if (!vs30Layer) {
+      loadVs30Layer();
+    } else if (showVs30) {
+      vs30Layer.addTo(map);
+    } else {
+      map.removeLayer(vs30Layer);
     }
   } else if (type === 'strainrateglobal') {
     // GSRM v2.1'in dünya geneli sürümü — scripts/build_strain_rate_layer_global.py.
@@ -12388,6 +12424,26 @@ async function loadStrainRateLayer() {
     setStatus('Strain Rate (GSRM) yüklenemedi: ' + e.message, true);
     showStrainRate = false;
     document.getElementById('btnStrainRate').classList.remove('active');
+  }
+}
+
+async function loadVs30Layer() {
+  setStatus('VS30 (USGS) katmanı yükleniyor…');
+  try {
+    const metaRes = await fetch('data/vs30_usgs_meta.json');
+    if (!metaRes.ok) throw new Error('meta bulunamadı');
+    const meta = await metaRes.json();
+    const b = meta.bounds;
+    vs30Layer = L.imageOverlay('data/vs30_usgs.png',
+      [[b.minlat, b.minlon], [b.maxlat, b.maxlon]],
+      { opacity: 0.7, interactive: false, className: 'vs30-img' }
+    );
+    if (showVs30) vs30Layer.addTo(map);
+    setStatus(`VS30 · ${meta.source} · eğim tabanlı VEKİL, saha ölçümü değil · ${meta.units} · kara medyanı ${meta.stats_land.median} m/s`);
+  } catch (e) {
+    setStatus('VS30 (USGS) yüklenemedi: ' + e.message, true);
+    showVs30 = false;
+    document.getElementById('btnVs30').classList.remove('active');
   }
 }
 

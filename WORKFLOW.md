@@ -166,6 +166,7 @@
 | ESRM20 WMS | Harici URL | WMS tile | ✅ |
 | AFAD TSTH WMS | Harici URL | WMS tile | ✅ |
 | Forecast overlay | `forecast_marmara_test_events.json` | circleMarker | ✅ |
+| VS30 (USGS, yaklaşık) | `vs30_usgs.png` + `vs30_usgs_meta.json` (kaynak kesit: `vs30_usgs_clip.npz`; betik: `scripts/build_vs30_layer.py`) | imageOverlay · eğim tabanlı vekil, saha ölçümü değil · PGA hesabına bağlı DEĞİL (o hâlâ sabit Vs30=760) | ✅ 2026-11-22 |
 
 ---
 

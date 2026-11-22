@@ -1,0 +1,96 @@
+{
+  "generated": "2026-11-22T14:51:17Z",
+  "source": "USGS Global Vs30 Mosaic (2025)",
+  "source_doi": "https://doi.org/10.5066/P1NV6UNM",
+  "license": "Public domain (U.S. Geological Survey)",
+  "method": "Türkiye ve çevresinde topoğrafik eğime dayalı vekil (Wald & Allen, 2007, BSSA 97(5), 1379–1395, doi:10.1785/0120060267). 30″ (~0,9 km) ızgara, en yakın komşu (yeniden örnekleme yok). Su: tam 600 m/s değerli ≥200 hücrelik bölgeler şeffaf.",
+  "units": "m/s (üst 30 m ortalama kayma dalgası hızı)",
+  "bins": [
+    {
+      "min": 0,
+      "max": 180,
+      "color": "#7a0177",
+      "label": "< 180"
+    },
+    {
+      "min": 180,
+      "max": 240,
+      "color": "#c51b8a",
+      "label": "180–240"
+    },
+    {
+      "min": 240,
+      "max": 300,
+      "color": "#f768a1",
+      "label": "240–300"
+    },
+    {
+      "min": 300,
+      "max": 360,
+      "color": "#fdae61",
+      "label": "300–360"
+    },
+    {
+      "min": 360,
+      "max": 490,
+      "color": "#fee08b",
+      "label": "360–490"
+    },
+    {
+      "min": 490,
+      "max": 620,
+      "color": "#abdda4",
+      "label": "490–620"
+    },
+    {
+      "min": 620,
+      "max": 760,
+      "color": "#66c2a5",
+      "label": "620–760"
+    },
+    {
+      "min": 760,
+      "max": null,
+      "color": "#3288bd",
+      "label": "> 760"
+    }
+  ],
+  "bins_ref": "Allen & Wald (2007), USGS Open-File Report 2007-1357",
+  "tbdy2018_thresholds": {
+    "ZE": [
+      0,
+      180
+    ],
+    "ZD": [
+      180,
+      360
+    ],
+    "ZC": [
+      360,
+      760
+    ],
+    "ZB": [
+      760,
+      1500
+    ],
+    "ZA": [
+      1500,
+      null
+    ]
+  },
+  "grid_w": 2400,
+  "grid_h": 1080,
+  "bounds": {
+    "minlat": 34.004167,
+    "maxlat": 43.004167,
+    "minlon": 24.995833,
+    "maxlon": 44.995833
+  },
+  "stats_land": {
+    "min": 88,
+    "max": 1063,
+    "median": 480,
+    "water_fraction": 0.318
+  },
+  "note": "Bu bir MODEL/VEKİL ürünüdür — saha ölçümü DEĞİLDİR. TBDY 2018 yerel zemin sınıfı (ZA–ZF) saha etüdüyle belirlenir; VS30 eşiklerine göre verilen karşılık yalnız yaklaşıktır. Eğim vekili havza kenarlarında ve volkanik platolarda büyük hata yapabilir."
+}
