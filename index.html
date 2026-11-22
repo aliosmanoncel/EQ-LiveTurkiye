@@ -10628,9 +10628,11 @@ function litUserPolyFinish() {
       `Köşe: ${pts.length} · Alan: <b>${A ? Math.round(A).toLocaleString('tr-TR') + ' km²</b> <span style="color:#888">(WGS84 jeodezik; üyelik bölgesi)</span>' : '—</b> <span style="color:#f59e0b">(alan kütüphanesi yüklenemedi)</span>'}` +
       `<br>Bölge: ${B.getSouth().toFixed(3)},${B.getWest().toFixed(3)} – ${B.getNorth().toFixed(3)},${B.getEast().toFixed(3)}` +
       `<br><span style="color:#888">Üyelik: enlem–boylam düzleminde nokta-içinde-poligon (kenarlar enlem–boylam doğrusu). Bu bir kaynak zonu tanımı DEĞİLDİR; il/şehir tehlike sıralaması için kullanılmaz.</span></div>` +
-    `<div style="${secSt}">` + secHd(2, '🧱 Zemin Özellikleri (VS30)') + `<span style="color:#888">VS30 alan özeti şimdilik yalnız Circle modunda; poligon için VS30 haritasını açıp noktaya tıklayabilirsiniz.</span></div>` +
+    `<div id="litSecVs30" style="${secSt}">` + secHd(2, '🧱 Zemin Özellikleri (VS30, yaklaşık)') + `</div>` +
     `<div style="${secSt}">` + secHd(3, '🌍 Deprem Kataloğu') +
       `<span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz. Sorgudan sonra G–R panelinde Oran/Yoğunluk (N/(T·A)) bu alanla hesaplanır.</span></div>`;
+  vs30ClearCircleExtras();
+  vs30PolySummaryUI([[pts]], document.getElementById('litSecVs30'));
   setStatus(`Kullanıcı Tanımlı Poligon çizildi: ${pts.length} köşe, A = ${A ? Math.round(A).toLocaleString('tr-TR') : '—'} km² (WGS84)`);
 }
 
@@ -10803,7 +10805,10 @@ function onLitRegionZoneChange() {
     descriptionLine +
     `<br><span style="color:#666">${p.source_full}</span>` +
     `<br>Bölge: ${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)} – ${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}` +
-    `<br><span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span>`;
+    `<br><span style="color:#666">Sadece görsel seçim — "▶ Bu bölgede sorgula"ya basmadan hiçbir EMSC/USGS/AFAD isteği yapılmaz</span>` +
+    `<div id="litSecVs30" style="border-top:1px solid #333;margin-top:6px;padding-top:6px"><b style="color:#e5e7eb">🧱 Zemin Özellikleri (VS30, yaklaşık)</b></div>`;
+  { const sub = litRegionLayer.getLayers ? litRegionLayer.getLayers()[0] : litRegionLayer; const ll = sub && sub.getLatLngs ? sub.getLatLngs() : null;   // VS30 poligon özeti (2026-11-23)
+    if (ll) { vs30ClearCircleExtras(); vs30PolySummaryUI(latLngsToPolys(ll), document.getElementById('litSecVs30')); } }
   const modeLabel = isPilot ? '🧪 PİLOT BÖLGE (Yöntem Doğrulama)' : 'Araştırma Bölgesi';
   setStatus(hasZoneId
     ? `${modeLabel}: ${LIT_REGION_SOURCES[groupKey].label} — Zone ${p.zone_id} çizildi`
@@ -12927,6 +12932,76 @@ async function vs30CircleSummary(lat, lon, rKm, box) {
                 : '<div style="color:#888;margin-top:3px">Daire içinde VS30 &lt; 180 m/s (ZE adayı) hücre yok.</div>') +
       '<div style="color:#777;font-size:.66rem;margin-top:4px;line-height:1.4">USGS eğim tabanlı vekil (Wald &amp; Allen 2007; vekilin üst sınırı ~900 m/s, bu yüzden en yüksek değer çoğu kez 900 görünür) · ~0,9 km hücre · TBDY 2018 sınıflaması değildir · bölgesel gösterge: parsel zemin etüdü ve bina deprem performansı değerlendirmesi yerine geçmez · AFAD tehlike haritasına (PGA) bağlı değildir.</div></div>';
   } catch (e) { box.innerHTML = '<span style="color:#f87171">🧱 Zemin özeti hesaplanamadı: ' + e.message + '</span>'; }
+}
+// ══ VS30 poligon özeti (2026-11-23; kullanıcı kararı: VS30 dondurması yalnız bu iş için açıldı) ══════════════════════
+// Circle özeti (vs30CircleSummary) DEĞİŞMEDİ. Poligonda yalnız hücre SEÇİMİ farklıdır: hücre merkezi pointInPolys()
+// ile (sorgu filtresiyle aynı enlem–boylam ışın atma kuralı) seçilir. Ağırlık (cos φ), su dışlama, medyan, %10–%90,
+// alan ağırlıklı ortalama, sınıf eşikleri, ZE adayı ve 760 m/s oranı Circle ile birebir aynı tanımdır.
+// Kapsam payı: (seçilen hücre alanı) / A, A = poligonun WGS84 alanı (areaKm2).
+async function vs30PolySummary(polys, box) {
+  box.innerHTML = '<span style="color:#888">🧱 Zemin özeti hesaplanıyor…</span>';
+  try {
+    await vs30LoadRegions();
+    const pts = polys.flat(2); if (!pts.length) { box.innerHTML = '—'; return; }
+    const S = Math.min(...pts.map(p => p.lat)), N = Math.max(...pts.map(p => p.lat)), W = Math.min(...pts.map(p => p.lng)), E = Math.max(...pts.map(p => p.lng));
+    const Rg = vs30RegionAt((S + N) / 2, (W + E) / 2) || pts.map(p => vs30RegionAt(p.lat, p.lng)).find(Boolean);
+    if (!Rg) { box.innerHTML = '<span style="color:#888">🧱 Bu poligon için VS30 katmanı henüz eklenmedi (şu an: ' + vs30Regions.map(r => r.name_tr).join(', ') + ').</span>'; return; }
+    const g = Rg.grid || await vs30LoadGrid(Rg), b = g.meta.bounds;
+    const dLat = (b.maxlat - b.minlat) / g.h, dLon = (b.maxlon - b.minlon) / g.w, toRad = Math.PI / 180;
+    const r0 = Math.max(0, Math.floor((b.maxlat - N) / dLat)), r1 = Math.min(g.h - 1, Math.ceil((b.maxlat - S) / dLat));
+    const c0 = Math.max(0, Math.floor((W - b.minlon) / dLon)), c1 = Math.min(g.w - 1, Math.ceil((E - b.minlon) / dLon));
+    const vals = [], cls = { ZA: 0, ZB: 0, ZC: 0, ZD: 0, 'ZE adayı': 0 }; let wLand = 0, wWater = 0, sum = 0; const ze = [];
+    for (let r = r0; r <= r1; r++) {
+      const cl = b.maxlat - (r + 0.5) * dLat, w = Math.cos(cl * toRad);
+      for (let c = c0; c <= c1; c++) {
+        const cn = b.minlon + (c + 0.5) * dLon;
+        if (!pointInPolys(cl, cn, polys)) continue;
+        const i = (r * g.w + c) * 4;
+        if (g.px[i + 3] === 0) { wWater += w; continue; }
+        const v = g.px[i] * 256 + g.px[i + 1];
+        vals.push([v, w]); wLand += w; sum += v * w; cls[vs30ClassOf(v).code] += w;
+        if (v < 180 && ze.length < 500) ze.push([cl, cn]);
+      }
+    }
+    const A = areaKm2({ type: 'MultiPolygon', polys: polys.map(rs => rs.map(r => r.map(p => [p.lat, p.lng]))) });
+    const cellKm2 = (dLat * 111.2) * (dLon * 111.2), selKm2 = (wLand + wWater) * cellKm2;
+    const covered = A ? Math.min(1, selKm2 / A) : 1;
+    if (!vals.length) { box.innerHTML = '<span style="color:#888">🧱 Poligon içinde VS30 kara hücresi yok (su alanı ya da kapsam dışı) — VS30 değeri yok.</span>'; return; }
+    vals.sort((a, b2) => a[0] - b2[0]);
+    const q = p => { let acc = 0; for (const [v, w] of vals) { acc += w; if (acc >= p * wLand) return v; } return vals[vals.length - 1][0]; };
+    const pct = k => (100 * cls[k] / wLand);
+    const order = ['ZA', 'ZB', 'ZC', 'ZD', 'ZE adayı'].filter(k => cls[k] > 0);
+    const col = { ZA: '#1f3a93', ZB: '#3288bd', ZC: '#99d594', ZD: '#fdae61', 'ZE adayı': '#c51b8a' };
+    const bar = order.map(k => '<span title="' + k + ' %' + pct(k).toFixed(1) + '" style="display:inline-block;height:9px;width:' + pct(k).toFixed(2) + '%;background:' + col[k] + '"></span>').join('');
+    const dist = order.map(k => '<b>' + k + '</b> %' + (pct(k) < 0.1 ? '<0,1' : pct(k).toFixed(1).replace('.', ','))).join(' · ');
+    const nZe = Math.round(cls['ZE adayı'] / (wLand / vals.length));
+    vs30ClearCircleExtras();
+    if (ze.length) {
+      vs30ZeLayer = L.layerGroup(ze.map(([la, lo]) => L.rectangle([[la - dLat / 2, lo - dLon / 2], [la + dLat / 2, lo + dLon / 2]],
+        { color: '#f2c94c', weight: 2, fill: false, interactive: false }))).addTo(map);
+    }
+    const landKm2 = wLand * cellKm2;
+    box.innerHTML =
+      '<div style="margin-top:2px">' +
+      '<div>Hesaba katılan kara alanı: <b>~' + Math.round(landKm2).toLocaleString('tr-TR') + ' km²</b> <span style="color:#888" title="VS30 ~0,9 km ızgara hücreleri; hücre merkezi poligon içindeyse seçilir. ① Alan satırındaki WGS84 değerinden küçük farklar olabilir.">(' + vals.length.toLocaleString('tr-TR') + ' hücre; VS30 ızgara tahmini)</span></div>' +
+      '<div>Medyan VS30: <b>' + q(0.5) + ' m/s</b> <span style="color:#888">(%10–%90: ' + q(0.1) + '–' + q(0.9) + ' · alan ağırlıklı ortalama ' + Math.round(sum / wLand) + ')</span></div>' +
+      '<div>En düşük–en yüksek: ' + vals[0][0] + '–' + vals[vals.length - 1][0] + ' m/s</div>' +
+      vs30RatioHtml(q(0.5)) +
+      '<div style="margin:4px 0 2px;display:flex;width:100%;border-radius:3px;overflow:hidden;background:#333">' + bar + '</div>' +
+      '<div>Yaklaşık sınıf dağılımı (kara alanı): ' + dist + '</div>' +
+      (wWater > 0 ? '<div style="color:#888">Su alanı: poligonun %' + (100 * wWater / (wLand + wWater)).toFixed(0) + '’i (hesaba katılmadı)</div>' : '') +
+      (covered < 0.97 ? '<div style="color:#fbbf24">Poligonun yalnız ~%' + (100 * covered).toFixed(0) + '’i VS30 kapsamında; istatistik bu kısımdan.</div>' : '') +
+      (nZe > 0 ? '<div style="color:#f2c94c;margin-top:3px">● VS30 &lt; 180 m/s (ZE adayı): ' + nZe + ' hücre — haritada sarı çerçeveyle gösterildi. Yerel zemin koşulları saha etüdüyle araştırılmalı; ZE yalnız VS30 ile atanamaz.</div>'
+                : '<div style="color:#888;margin-top:3px">Poligon içinde VS30 &lt; 180 m/s (ZE adayı) hücre yok.</div>') +
+      '<div style="color:#777;font-size:.66rem;margin-top:4px;line-height:1.4">USGS eğim tabanlı vekil (Wald &amp; Allen 2007; vekilin üst sınırı ~900 m/s, bu yüzden en yüksek değer çoğu kez 900 görünür) · ~0,9 km hücre · TBDY 2018 sınıflaması değildir · bölgesel gösterge: parsel zemin etüdü ve bina deprem performansı değerlendirmesi yerine geçmez · AFAD tehlike haritasına (PGA) bağlı değildir.</div></div>';
+  } catch (e) { box.innerHTML = '<span style="color:#f87171">🧱 Zemin özeti hesaplanamadı: ' + e.message + '</span>'; }
+}
+function vs30PolySummaryUI(polys, info) {
+  const box = document.createElement('div'); box.id = 'litVs30Box'; box.style.marginTop = '4px'; info.appendChild(box);
+  const loaded = vs30Regions && vs30Regions.some(r => r.grid);
+  if ((typeof showVs30 !== 'undefined' && showVs30) || loaded) { vs30PolySummary(polys, box); return; }
+  box.innerHTML = '<button class="tbtn" type="button" style="margin-top:4px;font-size:.7rem;padding:3px 8px" title="Poligon içindeki yaklaşık VS30 dağılımı (ilk kullanımda ~2,7 MB veri indirilir)">🧱 Poligon içi zemin özeti (VS30)</button>';
+  box.querySelector('button').addEventListener('click', () => vs30PolySummary(polys, box));
 }
 // Referans Kaya Koşuluna Göre Vs30 Oranı — N = medyan VS30 / 760 (Normalized Vs30 Ratio, reference = 760 m/s)
 // Gösterge 0,5–1,5 ölçeğinde, 1,00 referans çizgisi; ölçek dışı değerler uçta ok ile. Büyütme/PSHA katsayısı DEĞİLDİR.
