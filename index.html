@@ -10776,7 +10776,7 @@ function korSideParts(P, s, w, seg, out) {
 }
 // lines: [[[lat, lon], …], …]; opt: { W: TOPLAM genişlik (km), p: üst pay (0–1, vars. 0,5), cap: 'duz' | 'yuvarlak', seg, tol }
 function korZone(lines, opt, PC, geod) {
-  const W = opt.W, p = opt.p == null ? 0.5 : opt.p, cap = opt.cap || 'duz', seg = opt.seg || 32;
+  const W = opt.W, p = opt.p == null ? 0.5 : opt.p, cap = opt.cap || 'duz', seg = opt.seg || 64;   // 64 köşeli tam daire: yay kirişi sapması W/2·(1−cos(π/64)) ≈ %0,12·W/2
   const clean = (lines || []).map(l => l.filter(q => q && isFinite(q[0]) && isFinite(q[1]))).filter(l => l.length >= 2);
   if (!(W > 0) || !(p >= 0 && p <= 1) || !clean.length) return null;
   const WU = W * p, WA = W * (1 - p), sym = Math.abs(WU - WA) < 1e-9;
