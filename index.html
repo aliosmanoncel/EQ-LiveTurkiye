@@ -666,6 +666,13 @@
         <div style="color:#fbbf24;font-size:.65rem;line-height:1.45;margin-top:4px">
           ZA/ZB değerlendirmesi için temel tabanı ile kaya üstü arasındaki zemin kalınlığı ayrıca incelenmelidir.
         </div>
+        <div style="font-size:.64rem;line-height:1.45;margin-top:5px;color:#ccc">
+          <b>Birbirinin yerine geçmez:</b><br>
+          • <b>Bölgesel VS30</b> (bu katman): bölgenin yaklaşık zemin özelliği<br>
+          • <b>Yerel zemin etüdü</b>: binanın parselindeki zemin koşulları<br>
+          • <b>Bina deprem performansı</b>: taşıyıcı sistemin deprem davranışı<br>
+          <span style="color:#999">Bir bölgede ZC görünmesi, oradaki binaların güvenli olduğu anlamına gelmez.</span>
+        </div>
         <div style="color:#666;font-size:.65rem;line-height:1.5;margin-top:4px">
           Mühendislik amaçlı zemin etüdü değildir. TBDY 2018 sınıflaması değildir: Tablo 16.1 ayrıca (N60)30, (cu)30 ister<br>
           ZF (sahaya özel araştırma gerektiren zeminler: sıvılaşabilir, hassas kil, turba vb.) bu gösterimin kapsamı dışındadır<br>
@@ -12515,6 +12522,9 @@ async function vs30Query(latlng, src) {
   const coordTxt = src === 'click' ? lat.toFixed(3) + ', ' + lon.toFixed(3) : src === 'locate' ? 'Saha ölçümü değildir' : '≈ ' + lat2 + ', ' + lon2;
   const foot = '<div style="color:#888;font-size:.66rem;margin-top:6px;line-height:1.45">USGS VS30 verilerinden türetilen <b>yaklaşık zemin göstergesi</b> (eğim tabanlı vekil, Wald &amp; Allen 2007) — saha ölçümü değildir. ' +
     '<b>Mahalle veya parsel ölçeğinde zemin etüdünün yerine geçmez</b> (~0,9 km ızgara). TBDY 2018 sınıflaması değildir; (N60)30, (cu)30 ve saha etüdü gerekir. ZF (sahaya özel araştırma gerektiren zeminler) bu haritayla belirlenemez. PGA hesabı bu değeri kullanmaz (sabit Vs30=760 m/s).</div>';
+  const sep = '<div style="margin-top:6px;padding:5px 7px;border-left:3px solid #fbbf24;background:rgba(251,191,36,.08);font-size:.68rem;line-height:1.45;color:#e5e7eb">' +
+    'Bu <b>bölgesel</b> bir zemin göstergesidir. Parseldeki <b>yerel zemin etüdünün</b> ve binanın <b>deprem performansı</b> değerlendirmesinin yerine geçmez; ' +
+    k.code + ' göstergesi, bölgedeki binaların güvenli ya da güvensiz olduğu anlamına gelmez.</div>';
   const shareId = 'vs30share' + Date.now();
   pop.setContent(
     '<div style="font-size:.8rem;line-height:1.45">' + where + (k.code === 'ZE adayı' ? B_ZE : B_OK) +
@@ -12523,7 +12533,7 @@ async function vs30Query(latlng, src) {
     '<div style="margin-top:4px;color:#ddd;font-size:.72rem">' + k.txt + '</div>' +
     ((k.code === 'ZA' || k.code === 'ZB') ? '<div style="margin-top:5px;color:#fbbf24;font-size:.7rem">⚠ ZA/ZB değerlendirmesi için temel tabanı ile kaya üstü arasındaki zemin kalınlığı ayrıca incelenmelidir (TBDY: &gt;3 m zemin varsa ZA/ZB tanımlanmaz).</div>' : '') +
     '<div style="margin-top:5px">VS30 ≈ <b>' + v + ' m/s</b> <span style="color:#888;font-size:.68rem">(' + coordTxt + ')</span></div>' +
-    '<button id="' + shareId + '" class="vs30-share" type="button">' + (src === 'locate' ? '🔗 Konumumu (~1 km) paylaş' : '🔗 Paylaş') + '</button><span class="vs30-share-msg"></span>' +
+    sep + '<button id="' + shareId + '" class="vs30-share" type="button">' + (src === 'locate' ? '🔗 Konumumu (~1 km) paylaş' : '🔗 Paylaş') + '</button><span class="vs30-share-msg"></span>' +
     foot + '</div>');
   const btn = document.getElementById(shareId);
   if (btn) btn.addEventListener('click', e => { L.DomEvent.stopPropagation(e); vs30Share(lat2, lon2, k.code, v, btn); });
@@ -12531,7 +12541,7 @@ async function vs30Query(latlng, src) {
 async function vs30Share(lat2, lon2, code, v, btn) {
   const url = location.origin + location.pathname + '?vs30=' + lat2 + ',' + lon2 + '&lat=' + lat2 + '&lng=' + lon2 + '&zoom=10';
   const text = 'Yaklaşık zemin göstergesi: ' + code + ' · VS30 ≈ ' + v + ' m/s · ' + lat2 + ', ' + lon2 +
-    ' (USGS eğim tabanlı vekil; saha ölçümü ve zemin etüdü yerine geçmez) — EQ-LiveTürkiye';
+    ' (bölgesel gösterge, USGS eğim tabanlı vekil; saha ölçümü, parsel zemin etüdü ve bina deprem performansı değerlendirmesi yerine geçmez) — EQ-LiveTürkiye';
   const msg = btn.nextElementSibling;
   try {
     if (navigator.share) { await navigator.share({ title: 'EQ-LiveTürkiye · Yaklaşık zemin', text, url }); return; }
