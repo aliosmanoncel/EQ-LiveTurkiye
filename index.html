@@ -12537,6 +12537,12 @@ async function vs30Query(latlng, src) {
     '<div style="margin-top:5px">VS30 ≈ <b>' + v + ' m/s</b> <span style="color:#888;font-size:.68rem">(' + coordTxt + ')</span></div>' +
     sep + '<button id="' + shareId + '" class="vs30-share" type="button">' + (src === 'locate' ? '🔗 Konumumu (~1 km) paylaş' : '🔗 Paylaş') + '</button><span class="vs30-share-msg"></span>' +
     foot + '</div>');
+  // Üstteki sabit kartlar (son büyük deprem vb.) pencereyi örtmesin: gerekirse haritayı aşağı kaydır
+  setTimeout(() => {
+    const el = pop.getElement(); if (!el) return;
+    const need = (narrow ? 90 : 160) - (el.getBoundingClientRect().top - map.getContainer().getBoundingClientRect().top);
+    if (need > 0) map.panBy([0, -need]);
+  }, 350);
   const btn = document.getElementById(shareId);
   if (btn) btn.addEventListener('click', e => { L.DomEvent.stopPropagation(e); vs30Share(lat2, lon2, k.code, v, btn); });
 }
