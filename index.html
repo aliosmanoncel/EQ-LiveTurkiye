@@ -11189,7 +11189,7 @@ function korD5Load(o, dosya) {
   if (litRegionMode !== 'kor') setLitRegionMode('kor');
   korReset(true);
   const idx = korBuildSnapIndex(), g = o.genislik, set = (id, v) => { if (v != null && document.getElementById(id)) document.getElementById(id).value = v; };
-  set('korLabel', o.zon_kodu); set('korWMode', g.kip); set('korW', g.W_toplam_km); set('korP', +(g.ust_pay_p * 100).toFixed(6)); set('korCap', o.uc);
+  set('korLabel', o.zon_kodu); set('korWMode', g.kip); if (g.kip !== 'oranli') set('korW', g.W_toplam_km);   // orantılıda sabit W alanı değiştirilmez set('korP', +(g.ust_pay_p * 100).toFixed(6)); set('korCap', o.uc);
   const on = g.oneri || {}; set('korK', g.k ?? on.k); set('korWmin', g.W_min_km ?? on.W_min_km); set('korWmax', g.W_max_km ?? on.W_max_km);
   document.getElementById('korSnap').checked = /MTA/.test((o.kaynak || {}).tur || '');
   let kayip = 0;
