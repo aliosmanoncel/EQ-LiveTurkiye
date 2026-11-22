@@ -51,7 +51,7 @@
   "classes_note": "VS30 tabanlı YAKLAŞIK zemin sınıfı göstergesi — TBDY sınıflaması değildir. ZE ve ZF yalnız VS30 ile atanamaz; temel tabanı ile kaya üstü arasında >3 m zemin varsa ZA/ZB tanımlanmaz. ZF (sahaya özel araştırma gerektiren zeminler) bu gösterimin kapsamı dışındadır. Mühendislik amaçlı zemin etüdü değildir. Saha etüdü gerekir. Sınıf tanımları TBDY 2018 Tablo 16.1 ile karşılaştırıldı (JMO kopyası, 2026-11-22).",
   "region": "turkiye",
   "value_png": "vs30_usgs_deger.png (R*256+G = VS30 m/s; A=0 su)",
-  "pga_link": "YOK — PGA katmanı (Campbell 1981) sabit Vs30=760 m/s kullanır; bu katman o hesaba bağlanmamıştır.",
+  "pga_link": "YOK — Hazard katmanı AFAD Türkiye Deprem Tehlike Haritası’dır (resmî WMS; referans zemin Vs30 = 760 m/s); bu katman o haritaya bağlanmamıştır.",
   "tbdy2018_thresholds": {
     "ZE": [
       0,

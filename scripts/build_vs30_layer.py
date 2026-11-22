@@ -145,7 +145,7 @@ def main():
                         'Sınıf tanımları TBDY 2018 Tablo 16.1 ile karşılaştırıldı (JMO kopyası, 2026-11-22).',
         'region': args.region,
         'value_png': out['val'].split('/')[-1] + ' (R*256+G = VS30 m/s; A=0 su)',
-        'pga_link': 'YOK — PGA katmanı (Campbell 1981) sabit Vs30=760 m/s kullanır; bu katman o hesaba bağlanmamıştır.',
+        'pga_link': 'YOK — Hazard katmanı AFAD Türkiye Deprem Tehlike Haritası’dır (resmî WMS; referans zemin Vs30 = 760 m/s); bu katman o haritaya bağlanmamıştır.',
         'tbdy2018_thresholds': {k: [lo, (hi if hi < 99999 else None)] for k, lo, hi in TBDY},
         'grid_w': int(a.shape[1]), 'grid_h': int(a.shape[0]),
         'bounds': {'minlat': round(84 - (R1 - 0.5) * DX, 6), 'maxlat': round(84 - (R0 - 0.5) * DX, 6),

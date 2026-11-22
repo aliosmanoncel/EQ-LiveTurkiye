@@ -26,7 +26,7 @@ Follows EMSC monitoring area: **10–75°N, 45°W–120°E** (Euro-Mediterranean
 | [EMSC SeismicPortal FDSN](https://www.seismicportal.eu/fdsnws/event/1/) | Historical earthquake catalog (M≥2.0, auto-updated hourly) |
 | [EMSC WebSocket](wss://www.seismicportal.eu/standing_order/websocket) | Real-time live event stream |
 | [MTA Active Fault Map 2026](https://github.com/aliosmanoncel/fay-yolu-aricilik-veri-bankasi) | Turkey active fault GeoJSON — Elmacı et al., Özel Yayın Serisi-60 |
-| [USGS Global Vs30 Mosaic](https://doi.org/10.5066/P1NV6UNM) | VS30 layer (25–45°E, 34–43°N, 30″) shown as an *approximate* ZA–ZE indicator from TBDY 2018 Vs30 thresholds (not a TBDY site classification; ZE only as a candidate) with click query; slope-based proxy in Türkiye (Wald & Allen 2007); **not a site measurement**; **not linked to the PGA layer** (fixed Vs30 = 760 m/s); public domain |
+| [USGS Global Vs30 Mosaic](https://doi.org/10.5066/P1NV6UNM) | VS30 layer (25–45°E, 34–43°N, 30″) shown as an *approximate* ZA–ZE indicator from TBDY 2018 Vs30 thresholds (not a TBDY site classification; ZE only as a candidate) with click query; slope-based proxy in Türkiye (Wald & Allen 2007); **not a site measurement**; **not linked to the Hazard layer** — that layer is the official *AFAD Türkiye Deprem Tehlike Haritası* (PGA, 475-yr; reference ground Vs30 = 760 m/s) shown via the AFAD/ÇŞB TUCBS WMS service, not an EQ-Live computation; public domain |
 
 ## Large/Excluded Data Files
 
@@ -46,7 +46,7 @@ Earthquake data in EQ-Live (EMSC, USGS) are **global**. The VS30 ground-conditio
 - **Registry:** `data/vs30_regions.json` lists regions (`meta`, `class_png`, `value_png`). `index.html` reads the registry; adding a region needs **no code change**.
 - **Build a region:** `python scripts/build_vs30_layer.py --tif vs30/vs30_mosaic.tif --region <id> --bbox MINLON MINLAT MAXLON MAXLAT`, then add the printed entry to the registry.
 - **UI:** layer panel → "🧱 VS30 Tabanlı Zemin Özellikleri Haritası"; click a point (or 📍 own location, shared with 🎯) for an *approximate* ZA–ZE indicator, VS30 (m/s) and the TBDY 2018 Table 16.1 description; 🔗 share (point rounded to 0.01°).
-- **Scientific limits (kept visible in the UI):** slope-based proxy (Wald & Allen 2007), not a site measurement; not a TBDY classification (ZE only as a candidate; ZF out of scope); regional indicator — not a parcel site investigation or a building performance assessment; **not linked to the PGA layer** (fixed Vs30 = 760 m/s).
+- **Scientific limits (kept visible in the UI):** slope-based proxy (Wald & Allen 2007), not a site measurement; not a TBDY classification (ZE only as a candidate; ZF out of scope); regional indicator — not a parcel site investigation or a building performance assessment; **not linked to the Hazard layer** — that layer is the official *AFAD Türkiye Deprem Tehlike Haritası* (PGA, 475-yr; reference ground Vs30 = 760 m/s) shown via the AFAD/ÇŞB TUCBS WMS service, not an EQ-Live computation.
 
 ## How it works
 
