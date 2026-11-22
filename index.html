@@ -153,7 +153,9 @@
     .legend-section-body.hidden{display:none}
     #stationYearCtrl.hidden{display:none}
     .vs30-img{image-rendering:pixelated}
-    .vs30-pop .leaflet-popup-content{margin:10px 12px}
+    .vs30-pop .leaflet-popup-content{margin:10px 12px;color:#e5e7eb}
+    .vs30-pop .leaflet-popup-content-wrapper,.vs30-pop .leaflet-popup-tip{background:#111827;color:#e5e7eb;border:1px solid #374151;box-shadow:0 4px 18px rgba(0,0,0,.55)}
+    .vs30-pop a.leaflet-popup-close-button{color:#9ca3af}
     .vs30-share{margin-top:7px;background:#1f2937;color:#e5e7eb;border:1px solid #374151;border-radius:6px;padding:5px 10px;font-size:.74rem;cursor:pointer}
     .vs30-share-msg{color:#4ade80;font-size:.7rem}
     @media (max-width:600px){.vs30-pop .leaflet-popup-content{font-size:.86rem;max-height:52vh;overflow-y:auto}.vs30-share{padding:10px 14px;font-size:.82rem;min-height:42px}}
@@ -12500,7 +12502,7 @@ function vs30MapClick(ev) {
 async function vs30Query(latlng, src) {
   const narrow = window.innerWidth < 600;
   const pop = L.popup({ maxWidth: Math.min(310, window.innerWidth - 40), minWidth: Math.min(240, window.innerWidth - 60),
-    autoPanPaddingTopLeft: L.point(10, narrow ? 70 : 20), autoPanPaddingBottomRight: L.point(10, narrow ? 140 : 20), className: 'vs30-pop' })
+    autoPanPaddingTopLeft: L.point(10, narrow ? 90 : 160), autoPanPaddingBottomRight: L.point(10, narrow ? 140 : 20), className: 'vs30-pop' })
     .setLatLng(latlng).setContent('<div style="font-size:.8rem">VS30 okunuyor…</div>').openOn(map);
   let g;
   try { g = vs30Grid || await vs30LoadGrid(); }
