@@ -12540,7 +12540,18 @@ async function vs30Query(latlng, src) {
   // Üstteki sabit kartlar (son büyük deprem vb.) pencereyi örtmesin: gerekirse haritayı aşağı kaydır
   setTimeout(() => {
     const el = pop.getElement(); if (!el) return;
-    const need = (narrow ? 90 : 160) - (el.getBoundingClientRect().top - map.getContainer().getBoundingClientRect().top);
+    const pr = el.getBoundingClientRect();
+    // pencerenin üst bandını örten harita dışı öğeleri (son büyük deprem kartı vb.) bul; konumlanmış kapsayıcısının alt kenarına göre kaydır
+    let clear = map.getContainer().getBoundingClientRect().top + (narrow ? 60 : 20);
+    for (let x = pr.left + 12; x < pr.right - 12; x += 30) {
+      for (let dy = 4; dy <= 40; dy += 12) {
+        let o = document.elementFromPoint(x, pr.top + dy);
+        if (!o || o.closest('.vs30-pop') || o.closest('.leaflet-pane') || o === map.getContainer()) continue;
+        while (o.parentElement && o.parentElement !== document.body && getComputedStyle(o).position === 'static') o = o.parentElement;
+        clear = Math.max(clear, o.getBoundingClientRect().bottom);
+      }
+    }
+    const need = clear + 10 - pr.top;
     if (need > 0) map.panBy([0, -need]);
   }, 350);
   const btn = document.getElementById(shareId);
