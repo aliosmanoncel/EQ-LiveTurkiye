@@ -70,5 +70,10 @@ for (const cap of ['duz','yuvarlak']) { const r=K.korZone([st],{W:20,cap},PC,g);
     for (const sd of [90,-90]) { const a=g.Direct(q.lat2,q.lon2,az+sd,9000), b=g.Direct(q.lat2,q.lon2,az+sd,11000); n++;
       if (ctx.pointInPolys(a.lat2,a.lon2,PL)) inn++; if (!ctx.pointInPolys(b.lat2,b.lon2,PL)) outn++; } }
   ok('7_sorgu_uyelik_cevrimdisi', inn===n&&outn===n, {n, ic_9km_icinde:inn, dis_11km_disinda:outn, A:+A(r).toFixed(2), not:'Canlı EMSC/USGS/AFAD ve VS30 uyumu tarayıcı testinde (PR raporu)'}); }
+// 8) MTA kayma_turu → faylanma mekanizması eşlemesi (index.html'deki KOR_MTA_KOD + korMtaMech)
+{ const src = HTML.slice(HTML.indexOf('const KOR_MTA_KOD'), HTML.indexOf('function korMtaSlipSummary')); const f = new Function(src + '; return korMtaMech;')();
+  const beklenen = { N: 'normal', T: 'ters', SaD: 'sag', SoD: 'sol', 'AÇ': 'acilma', 'SaD+N': 'egik', 'T+SoD': 'egik', 'SoD+T': 'egik', 'AÇ+N': 'acilma', 'N+AÇ': 'normal', 'N+SaD': 'egik', 'XYZ': null, '': null };
+  const sonuc = Object.fromEntries(Object.keys(beklenen).map(k => [k, f(k)]));
+  ok('8_MTA_kayma_turu_eslemesi', Object.keys(beklenen).every(k => sonuc[k] === beklenen[k]), { sonuc }); }
 const oi = process.argv.indexOf('--out'); if (oi > 0) fs.writeFileSync(process.argv[oi + 1], JSON.stringify(out, null, 1));
 const np=Object.values(out).filter(x=>x.gecti).length, nt=Object.keys(out).length; console.log('Toplam', np+'/'+nt); if (np!==nt) process.exit(1);
