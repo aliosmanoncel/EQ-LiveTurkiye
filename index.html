@@ -11112,6 +11112,7 @@ function korMechMeta() {
     atif: (document.getElementById('korMechRef').value || '').trim() || null,
     nodal_duzlem_bagimsiz_kanitla_secildi: v && src === 'fokal' ? document.getElementById('korMechNP').checked : null,
     mta_kayma_turu_ozeti: korMtaSlipSummary(),
+    mta_onerisi: !!v && src === 'mta', eslesme_kurali: 'MTA kayma_turu → mekanizma: N→normal, T→ters (MTA kodu ters/bindirme ayırmaz), SaD→sağ yanal, SoD→sol yanal, AÇ→açılma; doğrultu+eğim atım bileşiği→eğik atımlı; N+AÇ/AÇ+N→ilk kod. Kod tabanlı ÖNERİDİR; kesin mekanizma değildir (fokal mekanizma/literatürle doğrulanmalı).',
     not: 'Mekanizma k katsayısını ve W\'yi DEĞİŞTİRMEZ (karar 2026-11-23). Ampirik kırılma boyutu ilişkileri (ör. Wells & Coppersmith 1994) yeraltı kırılma genişliğini verir; harita araştırma koridoru W ile aynı fiziksel büyüklük değildir.' };
 }
 const KOR_LABEL_AD = { ana: 'Ana fay zonu', tali: 'Tali fay zonu', artci: 'Artçı kümesi ekseni', diger: 'Diğer' };
@@ -11191,7 +11192,7 @@ function korRenderInfo() {
     `<div style="${secSt}">` + korSecHd(1, 'Araştırma Alanı') +
       `Zon: <b>${m.zon_etiketi}</b>${m.fay_adlari.length ? ' · ' + m.fay_adlari.join(', ') : ''}` +
       `<br>Kaynak: ${m.kaynak.tur}${m.kaynak.not ? ` <span style="color:#f59e0b">(${m.kaynak.not})</span>` : ''}` +
-      `<br>Faylanma mekanizması: <b>${m.mekanizma.ad}</b>${m.mekanizma.tur ? ` <span style="color:#888">(${m.mekanizma.ad_en}; kaynak: ${m.mekanizma.kaynak}${m.mekanizma.guvenilirlik ? ', güvenilirlik: ' + m.mekanizma.guvenilirlik : ''}${m.mekanizma.nodal_duzlem_bagimsiz_kanitla_secildi === false ? ', <span style="color:#f59e0b">fay düzlemi bağımsız kanıtla seçilmedi</span>' : ''})</span>` : ''}` +
+      `<br>Faylanma mekanizması: <b>${m.mekanizma.ad}</b>${m.mekanizma.mta_onerisi ? ' <span style="color:#f59e0b">(MTA kodundan öneri — kesin mekanizma değil)</span>' : ''}${m.mekanizma.tur ? ` <span style="color:#888">(${m.mekanizma.ad_en}; kaynak: ${m.mekanizma.kaynak}${m.mekanizma.guvenilirlik ? ', güvenilirlik: ' + m.mekanizma.guvenilirlik : ''}${m.mekanizma.nodal_duzlem_bagimsiz_kanitla_secildi === false ? ', <span style="color:#f59e0b">fay düzlemi bağımsız kanıtla seçilmedi</span>' : ''})</span>` : ''}` +
       `<br>L<sub>toplam</sub> = ${f1(m.uzunluk.L_toplam_km)} km · L<sub>birleşik</sub> = ${f1(m.uzunluk.L_birlesik_km)} km` +
       `<br>W<sub>toplam</sub> = <b>${f1(g.W_toplam_km)} km</b> (${g.kip === 'oranli' ? `orantılı: k = ${g.k} × L<sub>birleşik</sub>${g.sinir ? `, ${g.sinir === 'min' ? 'W_min' : 'W_max'} sınırında` : ''}` : 'sabit, araştırmacı seçimi'}) · üst ${f1(g.ust_km)} km / alt ${f1(g.alt_km)} km · uç: ${m.uc === 'duz' ? 'düz' : 'yuvarlak'}` +
       `<br>Alan: <b>${A ? Math.round(A).toLocaleString('tr-TR') + ' km²</b> <span style="color:#888">(WGS84 jeodezik; üyelik bölgesi)</span>' : '—</b>'}` +
