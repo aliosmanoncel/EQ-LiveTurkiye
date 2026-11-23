@@ -487,7 +487,7 @@
       <button class="tbtn active" id="btnLitModePolygon" onclick="setLitRegionMode('polygon')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Önceden tanımlanmış literatür çalışma alanları (Öncel &amp; Wilson 2004/2006/2007, Ambraseys 2002, Hong Kong). Kullanıcı tanımlı poligon çizimi Bölge Analizi panelindedir.">Poligon (Literatür Çalışma Alanları)</button>
       <button class="tbtn" id="btnLitModeCircle" onclick="setLitRegionMode('circle')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Mekânsal Araştırma Penceresi (Spatial Research Window) — geometri: daire. Merkez + yarıçap (USGS Earthquake Catalog'un Geographic Region → Circle mantığıyla aynı: distance(event, center) ≤ R). Bir kaynak zonu tanımı DEĞİLDİR, sadece araştırma alanı sorgusudur.">Circle</button>
       <button class="tbtn" id="btnLitModeUser" onclick="setLitRegionMode('user')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Kullanıcı tanımlı araştırma poligonu: haritaya köşe köşe çizilir. Alan WGS84 elipsoidi üzerinde (üyelik bölgesi), deprem sorgusu tüm poligon içinde yapılır. Bir kaynak zonu tanımı DEĞİLDİR.">Kullanıcı Tanımlı Poligon</button>
-      <button class="tbtn" id="btnLitModeKor" onclick="setLitRegionMode('kor')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Fay İzinden Sismik Araştırma Poligonu (Fault-Trace-Based Zonation): MTA diri fay izi üzerinde başlangıç → ara noktalar → bitiş seçilir; sistem iz uzunluğunu (L) hesaplar, araştırmacının seçtiği toplam genişlikle (W) fayın iki yanında paralel üst/alt sınırlar kurar ve uçları birleştirerek kapalı poligon üretir. Araştırma penceresidir; kırılma genişliği ya da sismojenik zon sınırı DEĞİLDİR.">Fay İzinden Araştırma Poligonu</button>
+      <button class="tbtn" id="btnLitModeKor" onclick="setLitRegionMode('kor')" style="width:auto;padding:5px 10px;font-size:.75rem" title="Fay İzinden Sismik Araştırma Poligonu (Fault-Trace-Based Zonation): MTA diri fay izi üzerinde başlangıç → ara noktalar → bitiş seçilir; sistem iz uzunluğunu (L) hesaplar, araştırmacının seçtiği toplam genişlikle (W) fayın iki yanında paralel üst/alt sınırlar kurar ve uçları birleştirerek kapalı poligon üretir. Araştırma penceresidir; kırılma genişliği ya da sismojenik zon sınırı DEĞİLDİR ve tek başına sismik tehlike zonlaması değildir.">Fay İzinden Araştırma Poligonu</button>
     </div>
   </div>
   <div id="litRegionPolygonUI">
@@ -550,14 +550,14 @@
       <div class="rowbox" title="Kinematik sınıflama (USGS fokal mekanizma terminolojisi). Kayıt içindir; k katsayısı ve W mekanizmaya OTOMATİK bağlanmaz."><label>Faylanma mekanizması</label>
         <select id="korMech" class="src-sel" onchange="korOnMechChange()">
           <option value="">Belirtilmedi</option><option value="normal">Normal fay (Normal) — açılma</option><option value="ters">Ters fay (Reverse) — sıkışma</option><option value="bindirme">Bindirme fayı (Thrust) — düşük eğimli ters</option>
-          <option value="sag">Sağ yanal doğrultu atımlı (Right-lateral strike-slip)</option><option value="sol">Sol yanal doğrultu atımlı (Left-lateral strike-slip)</option><option value="egik">Eğik atımlı (Oblique-slip)</option>
+          <option value="sag">Sağ yanal doğrultu atımlı (Right-lateral strike-slip)</option><option value="sol">Sol yanal doğrultu atımlı (Left-lateral strike-slip)</option><option value="egik">Eğik atımlı (Oblique-slip)</option><option value="acilma">Açılma (Extensional / opening)</option>
         </select></div>
       <div class="rowbox"><label>Kaynak · güvenilirlik</label>
         <select id="korMechSrc" class="src-sel" style="width:auto" onchange="korOnMechChange()"><option value="mta">MTA (kayma_turu)</option><option value="fokal">Fokal mekanizma</option><option value="literatur">Literatür</option><option value="arastirmaci">Araştırmacı yorumu</option></select>
         <select id="korMechConf" class="src-sel" style="width:auto"><option value="">—</option><option value="yüksek">Yüksek</option><option value="orta">Orta</option><option value="düşük">Düşük</option></select></div>
       <div class="rowbox"><label>Atıf / not</label><input type="text" id="korMechRef" placeholder="ör. GCMT kimliği, makale" style="width:170px"></div>
       <label id="korMechNPRow" style="display:none;align-items:center;gap:6px;cursor:pointer" title="Fokal mekanizmada iki olası fay düzlemi (nodal plane) vardır; gerçek kırılma düzlemi bağımsız jeolojik/sismolojik kanıtla belirlenmelidir."><input type="checkbox" id="korMechNP"> Fay düzlemi bağımsız kanıtla seçildi</label>
-      <button class="tbtn" onclick="korMechFromMta()" style="width:auto;padding:3px 8px;font-size:.7rem" title="İzin yapıştığı MTA parçalarının kayma_turu kodlarından öneri: N → normal, T → ters (MTA kodu ters/bindirme ayrımı yapmaz), SaD → sağ yanal, SoD → sol yanal, bileşik (A+B) → eğik atımlı. AÇ kodu eşlenmez.">MTA'dan öner</button>
+      <button class="tbtn" onclick="korMechFromMta()" style="width:auto;padding:3px 8px;font-size:.7rem" title="İzin yapıştığı MTA parçalarının kayma_turu kodlarından öneri: N → normal, T → ters (MTA kodu ters/bindirme ayrımı yapmaz), SaD → sağ yanal, SoD → sol yanal, AÇ → açılma (extensional); doğrultu + eğim atımlı bileşik kod (ör. SaD+N) → eğik atımlı; N+AÇ / AÇ+N → ilk (baskın) kod.">MTA'dan öner</button>
       <div style="color:#888;line-height:1.4;margin-top:2px">Mekanizma k ve W'yi değiştirmez. Ampirik kırılma genişliği (ör. Wells &amp; Coppersmith 1994) yeraltındaki kırılma boyutudur; haritadaki araştırma koridoru W ile aynı büyüklük değildir.</div>
     </div>
     <div style="display:flex;gap:4px;flex-wrap:wrap;margin:3px 0">
@@ -594,7 +594,7 @@
       <input type="file" id="korD5File" accept=".json,application/json" style="display:none" onchange="korD5FileChosen(this)">
       <button class="tbtn" id="btnKorD5" onclick="korD5Download()" style="width:auto;display:none" title="Tekrarlanabilirlik kaydı (D5): iz koordinatları, MTA parça kimlikleri, W kuralı, uç, yöntem parametreleri, uzunluklar, alan, elle düzenleme ve son geometri (GeoJSON).">⬇ D5 kaydı (JSON)</button>
     </div>
-    <div style="color:#888;line-height:1.45;margin-top:2px">Bu özellik araştırma penceresi oluşturur; fayın fiziksel kırılma genişliğini veya sismojenik zon sınırını belirlemez.</div>
+    <div style="color:#888;line-height:1.45;margin-top:2px">Bu özellik araştırma penceresi oluşturur; fayın fiziksel kırılma genişliğini veya sismojenik zon sınırını belirlemez. <b>Fay araştırma poligonu tek başına sismik tehlike zonlaması değildir.</b></div>
   </div>
   <button class="tbtn" id="btnLitRegionClear" onclick="litRegionClear()" style="display:none">✕ Araştırma Bölgesini Kaldır</button>
   <div id="litRegionInfo" style="display:none;font-size:.72rem;color:#ccc;line-height:1.5;background:rgba(20,20,20,.9);border-radius:6px;padding:6px 8px;width:260px"></div>
@@ -11074,12 +11074,19 @@ const KOR_MECH = {
   bindirme: ['Bindirme fayı', 'Thrust fault', 'Düşük eğimli ters fay'],
   sag: ['Sağ yanal doğrultu atımlı', 'Right-lateral strike-slip', 'Yatay kayma'],
   sol: ['Sol yanal doğrultu atımlı', 'Left-lateral strike-slip', 'Yatay kayma'],
-  egik: ['Eğik atımlı', 'Oblique-slip', 'Yatay ve düşey bileşen']
+  egik: ['Eğik atımlı', 'Oblique-slip', 'Yatay ve düşey bileşen'],
+  acilma: ['Açılma', 'Extensional (opening)', 'Açılma; MTA kayma_turu AÇ']
 };
 const KOR_MECH_SRC = { mta: 'MTA TDFH-2026 kayma_turu', fokal: 'Fokal mekanizma', literatur: 'Literatür', arastirmaci: 'Araştırmacı yorumu' };
-// MTA kayma_turu kodları → mekanizma (T: ters; MTA kodu ters/bindirme ayrımı yapmaz. Bileşik kod (A+B) → eğik atımlı. AÇ: kaynakta doğrulanmadığı için eşlenmez)
-const KOR_MTA_KOD = { N: 'normal', T: 'ters', SaD: 'sag', SoD: 'sol' };
-function korMtaMech(kod) { if (!kod) return null; if (kod.includes('+')) return 'egik'; return KOR_MTA_KOD[kod] || null; }
+// MTA kayma_turu kodları → mekanizma. T: ters (MTA kodu ters/bindirme ayrımı yapmaz); AÇ: açılma (extensional; kullanıcı açıklaması 2026-11-23).
+// Bileşik kodlar: doğrultu atım (SaD/SoD) + eğim atım (N/T/AÇ) → eğik atımlı; yalnız eğim atımlı/açılma bileşenleri (N+AÇ, AÇ+N) → ilk (baskın) kod.
+const KOR_MTA_KOD = { N: 'normal', T: 'ters', SaD: 'sag', SoD: 'sol', 'AÇ': 'acilma' };
+function korMtaMech(kod) {
+  if (!kod) return null; const p = kod.split('+').map(x => x.trim());
+  if (p.length === 1) return KOR_MTA_KOD[p[0]] || null;
+  const ss = p.some(x => x === 'SaD' || x === 'SoD'), ds = p.some(x => x === 'N' || x === 'T' || x === 'AÇ');
+  if (ss && ds) return 'egik'; return KOR_MTA_KOD[p[0]] || null;
+}
 function korMtaSlipSummary() {
   const idx = korSnapIdx, c = {}; if (!idx) return c;
   korTraces.forEach(t => t.clicks.forEach(k => { if (k.snap) { const v = idx.F[k.snap.k].kayma || 'yok'; c[v] = (c[v] || 0) + 1; } }));
@@ -11144,7 +11151,7 @@ function korBuild(opts) {
       en_buyuk_enine_olcek: +r.maxScale.toFixed(6), sadelestirme_tol_km: r.tol, yay_kose: r.seg, izgara_q_km: r.q, sinir_sikilastirma_km: r.step,
       birlesim: 'polygon-clipping 0.15.7 (yalnız birleşim)', atilan_yozlasmis_halka: r.dropped, zincir: r.nChains, dallanma_dugumu: r.branchNodes, parca_sayisi: r.nParts, sure_ms: Math.round(performance.now() - t0) },
     alan: null, alan_yontemi: AREA_METHOD, elle_duzenleme: { yapildi: false },
-    ifade: 'Bu özellik araştırma penceresi oluşturur; fayın fiziksel kırılma genişliğini veya sismojenik zon sınırını belirlemez.'
+    ifade: 'Bu özellik araştırma penceresi oluşturur; fayın fiziksel kırılma genişliğini veya sismojenik zon sınırını belirlemez. Fay araştırma poligonu tek başına sismik tehlike zonlaması değildir.'
   };
   // Diğer genişlik kuralıyla karşılaştırma (aynı iz): sabit kipte kL önerisi, orantılı kipte sabit W alanı
   try {
