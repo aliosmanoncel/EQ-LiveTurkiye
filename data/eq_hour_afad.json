@@ -1,1 +1,1 @@
-{"generated":"2026-11-23T10:07:46Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"734939","time":"2026-11-23T09:10:54","lat":39.34383,"lon":33.4335,"dep":7.0,"mag":1.0,"mtype":"ML","mw":null,"place":"Bala (Ankara)","province":"Ankara","district":"Bala"}]}
+{"generated":"2026-11-23T22:23:05Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"734965","time":"2026-11-23T21:46:11","lat":38.797,"lon":40.355,"dep":7.04,"mag":1.6,"mtype":"ML","mw":null,"place":"Palu (Elazığ)","province":"Elazığ","district":"Palu"}]}
