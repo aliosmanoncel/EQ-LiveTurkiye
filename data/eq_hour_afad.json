@@ -1,1 +1,1 @@
-{"generated":"2026-11-23T01:19:12Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-11-23T10:07:46Z","source":"AFAD TDVMS REST API","hours":1,"minmag":1.0,"count":1,"events":[{"id":"734939","time":"2026-11-23T09:10:54","lat":39.34383,"lon":33.4335,"dep":7.0,"mag":1.0,"mtype":"ML","mw":null,"place":"Bala (Ankara)","province":"Ankara","district":"Bala"}]}

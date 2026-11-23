@@ -1,1 +1,1 @@
-{"generated":"2026-11-23T01:19:04Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":0,"events":[]}
+{"generated":"2026-11-23T10:07:38Z","source":"EMSC SeismicPortal FDSN","hours":1,"minmag":1.0,"count":2,"events":[{"id":"20261123_0000118","time":"2026-11-23T09:11:10.639Z","lat":51.4798,"lon":16.2458,"dep":2.5,"mag":2.5,"mtype":"m","mw":null,"place":"POLAND"},{"id":"20261123_0000125","time":"2026-11-23T09:10:54.41Z","lat":39.3438,"lon":33.4335,"dep":7.0,"mag":1.1,"mtype":"ml","mw":null,"place":"CENTRAL TURKEY"}]}
